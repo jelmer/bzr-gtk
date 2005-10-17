@@ -67,7 +67,6 @@ class BranchWindow(gtk.Window):
         scrollwin = gtk.ScrolledWindow()
         scrollwin.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         scrollwin.set_shadow_type(gtk.SHADOW_IN)
-        #scrollwin.set_border_width(12)
         vbox.pack_start(scrollwin, expand=True, fill=True)
         scrollwin.show()
 
@@ -181,26 +180,11 @@ class BranchWindow(gtk.Window):
         (path, col) = self.treeview.get_cursor()
         revision = self.model[path][0]
 
-        self.back_button.set_sensitive(len(self.children[revision]) > 0)
-        self.fwd_button.set_sensitive(len(revision.parent_ids) > 0)
+        self.back_button.set_sensitive(len(revision.parent_ids) > 0)
+        self.fwd_button.set_sensitive(len(self.children[revision]) > 0)
 
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
-        (path, col) = self.treeview.get_cursor()
-        revision = self.model[path][0]
-        if not len(self.children[revision]):
-            return
-
-        for child in self.children[revision]:
-            if same_branch(child, revision):
-                self.treeview.set_cursor(self.index[child])
-                break
-        else:
-            prev = list(self.children[revision])[0]
-            self.treeview.set_cursor(self.index[prev])
-
-    def _fwd_clicked_cb(self, *args):
-        """Callback for when the forward button is clicked."""
         (path, col) = self.treeview.get_cursor()
         revision = self.model[path][0]
         if not len(revision.parent_ids):
@@ -215,3 +199,17 @@ class BranchWindow(gtk.Window):
             next = self.revisions[revision.parent_ids[0]]
             self.treeview.set_cursor(self.index[next])
 
+    def _fwd_clicked_cb(self, *args):
+        """Callback for when the forward button is clicked."""
+        (path, col) = self.treeview.get_cursor()
+        revision = self.model[path][0]
+        if not len(self.children[revision]):
+            return
+
+        for child in self.children[revision]:
+            if same_branch(child, revision):
+                self.treeview.set_cursor(self.index[child])
+                break
+        else:
+            prev = list(self.children[revision])[0]
+            self.treeview.set_cursor(self.index[prev])
