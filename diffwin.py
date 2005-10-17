@@ -99,7 +99,6 @@ class DiffWindow(gtk.Window):
             sourceview = gtk.TextView(self.buffer)
 
         sourceview.set_editable(False)
-        sourceview.set_wrap_mode(gtk.WRAP_CHAR)
         sourceview.modify_font(pango.FontDescription("Monospace"))
         scrollwin.add(sourceview)
         sourceview.show()
@@ -115,6 +114,8 @@ class DiffWindow(gtk.Window):
 
         self.model.clear()
         delta = compare_trees(self.parent_tree, self.rev_tree)
+
+        self.model.append(None, [ "Complete Diff", "" ])
 
         if len(delta.added):
             titer = self.model.append(None, [ "Added", None ])
@@ -143,10 +144,12 @@ class DiffWindow(gtk.Window):
     def _treeview_cursor_cb(self, *args):
         """Callback for when the treeview cursor changes."""
         (path, col) = self.treeview.get_cursor()
-        path = self.model[path][1]
-        if path is None:
+        specific_files = [ self.model[path][1] ]
+        if specific_files == [ None ]:
             return
+        elif specific_files == [ "" ]:
+            specific_files = []
 
         s = StringIO()
-        show_diff_trees(self.parent_tree, self.rev_tree, s, [ path ])
+        show_diff_trees(self.parent_tree, self.rev_tree, s, specific_files)
         self.buffer.set_text(s.getvalue())
