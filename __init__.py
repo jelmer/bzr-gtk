@@ -21,8 +21,6 @@ import bzrlib.commands
 
 from bzrlib.branch import Branch
 
-from bzrkapp import BzrkApp
-
 
 class cmd_visualise(bzrlib.commands.Command):
     """Graphically visualise this branch.
@@ -45,6 +43,8 @@ class cmd_visualise(bzrlib.commands.Command):
                 return
         else:
             (revno, revid) = revision[0].in_history(branch)
+
+        from bzrkapp import BzrkApp
 
         app = BzrkApp()
         app.show(branch, revid)
