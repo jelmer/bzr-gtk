@@ -344,6 +344,7 @@ class BranchWindow(gtk.Window):
         else:
             next = self.revisions[revision.parent_ids[0]]
             self.treeview.set_cursor(self.index[next])
+        self.treeview.grab_focus()
 
     def _fwd_clicked_cb(self, *args):
         """Callback for when the forward button is clicked."""
@@ -359,12 +360,15 @@ class BranchWindow(gtk.Window):
         else:
             prev = list(self.children[revision])[0]
             self.treeview.set_cursor(self.index[prev])
+        self.treeview.grab_focus()
 
     def _go_clicked_cb(self, widget, revid):
         """Callback for when the go button for a parent is clicked."""
         self.treeview.set_cursor(self.index[self.revisions[revid]])
+        self.treeview.grab_focus()
 
     def _show_clicked_cb(self, widget, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
         if self.app is not None:
             self.app.show_diff(self.branch, revid, parentid)
+        self.treeview.grab_focus()
