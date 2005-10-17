@@ -138,10 +138,10 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         ctx.rectangle(bg_area.x, bg_area.y, bg_area.width, bg_area.height)
         ctx.clip()
 
-        ctx.set_line_width(2)
-        ctx.set_line_cap(cairo.LINE_CAP_SQUARE)
-
         box_size = self.box_size(widget)
+
+        ctx.set_line_width(box_size / 10)
+        ctx.set_line_cap(cairo.LINE_CAP_SQUARE)
 
         # Draw lines into the cell
         for start, end, colour in self.in_lines:
