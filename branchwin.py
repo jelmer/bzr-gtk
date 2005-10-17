@@ -136,6 +136,8 @@ class BranchWindow(gtk.Window):
         """Construct the bottom half of the window."""
         vbox = gtk.VBox(False, spacing=6)
         vbox.set_border_width(12)
+        (width, height) = self.get_size()
+        vbox.set_size_request(width, int(height / 2.5))
         vbox.show()
 
         self.table = gtk.Table(rows=4, columns=2)
@@ -144,7 +146,7 @@ class BranchWindow(gtk.Window):
         vbox.pack_start(self.table, expand=False, fill=True)
         self.table.show()
 
-        align = gtk.Alignment(0.0, 0.0)
+        align = gtk.Alignment(0.0, 0.5)
         label = gtk.Label()
         label.set_markup("<b>Revision:</b>")
         align.add(label)
@@ -152,7 +154,7 @@ class BranchWindow(gtk.Window):
         label.show()
         align.show()
 
-        align = gtk.Alignment(0.0, 0.0)
+        align = gtk.Alignment(0.0, 0.5)
         self.revid_label = gtk.Label()
         self.revid_label.set_selectable(True)
         align.add(self.revid_label)
@@ -160,7 +162,7 @@ class BranchWindow(gtk.Window):
         self.revid_label.show()
         align.show()
 
-        align = gtk.Alignment(0.0, 0.0)
+        align = gtk.Alignment(0.0, 0.5)
         label = gtk.Label()
         label.set_markup("<b>Committer:</b>")
         align.add(label)
@@ -168,7 +170,7 @@ class BranchWindow(gtk.Window):
         label.show()
         align.show()
 
-        align = gtk.Alignment(0.0, 0.0)
+        align = gtk.Alignment(0.0, 0.5)
         self.committer_label = gtk.Label()
         self.committer_label.set_selectable(True)
         align.add(self.committer_label)
@@ -176,7 +178,7 @@ class BranchWindow(gtk.Window):
         self.committer_label.show()
         align.show()
 
-        align = gtk.Alignment(0.0, 0.0)
+        align = gtk.Alignment(0.0, 0.5)
         label = gtk.Label()
         label.set_markup("<b>Timestamp:</b>")
         align.add(label)
@@ -184,7 +186,7 @@ class BranchWindow(gtk.Window):
         label.show()
         align.show()
 
-        align = gtk.Alignment(0.0, 0.0)
+        align = gtk.Alignment(0.0, 0.5)
         self.timestamp_label = gtk.Label()
         self.timestamp_label.set_selectable(True)
         align.add(self.timestamp_label)
@@ -192,7 +194,7 @@ class BranchWindow(gtk.Window):
         self.timestamp_label.show()
         align.show()
 
-        align = gtk.Alignment(0.0, 0.0)
+        align = gtk.Alignment(0.0, 0.5)
         label = gtk.Label()
         label.set_markup("<b>Parents:</b>")
         align.add(label)
@@ -205,7 +207,6 @@ class BranchWindow(gtk.Window):
         scrollwin = gtk.ScrolledWindow()
         scrollwin.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         scrollwin.set_shadow_type(gtk.SHADOW_IN)
-        scrollwin.set_size_request(100, 120)
         vbox.pack_start(scrollwin, expand=True, fill=True)
         scrollwin.show()
 
