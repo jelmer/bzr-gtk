@@ -16,6 +16,7 @@ pygtk.require("2.0")
 import gtk
 
 from branchwin import BranchWindow
+from diffwin import DiffWindow
 
 
 class BzrkApp(object):
@@ -31,10 +32,19 @@ class BzrkApp(object):
 
     def show(self, branch, start):
         """Open a new window to show the given branch."""
-        self._num_windows += 1
-
-        window = BranchWindow()
+        window = BranchWindow(self)
         window.set_branch(branch, start)
+
+        self._num_windows += 1
+        window.connect("destroy", self._destroy_cb)
+        window.show()
+
+    def show_diff(self, branch, revid, parentid):
+        """Open a new window to show a diff between the given revisions."""
+        window = DiffWindow(self)
+        window.set_diff(branch, revid, parentid)
+
+        self._num_windows += 1
         window.connect("destroy", self._destroy_cb)
         window.show()
 

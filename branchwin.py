@@ -29,10 +29,12 @@ class BranchWindow(gtk.Window):
     for a particular branch.
     """
 
-    def __init__(self):
+    def __init__(self, app=None):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.set_border_width(0)
         self.set_title("bzrk")
+
+        self.app = app
 
         # Use three-quarters of the screen by default
         screen = self.get_screen()
@@ -227,6 +229,8 @@ class BranchWindow(gtk.Window):
         the new branch before updating the window title and model of the
         treeview itself.
         """
+        self.branch = branch
+
         # [ revision, node, last_lines, lines, message, committer, timestamp ]
         self.model = gtk.ListStore(gobject.TYPE_PYOBJECT,
                                    gobject.TYPE_PYOBJECT,
@@ -319,8 +323,9 @@ class BranchWindow(gtk.Window):
             button = gtk.Button()
             button.add(image)
             button.set_relief(gtk.RELIEF_NONE)
-            button.set_sensitive(False)
-            button.connect("clicked", self._show_clicked_cb, parent_id)
+            button.set_sensitive(self.app is not None)
+            button.connect("clicked", self._show_clicked_cb,
+                           revision.revision_id, parent_id)
             hbox.pack_start(button, expand=False, fill=True)
             button.show()
 
@@ -359,6 +364,7 @@ class BranchWindow(gtk.Window):
         """Callback for when the go button for a parent is clicked."""
         self.treeview.set_cursor(self.index[self.revisions[revid]])
 
-    def _show_clicked_cb(self, widget, revid):
+    def _show_clicked_cb(self, widget, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
-        print "SHOW %s" % revid
+        if self.app is not None:
+            self.app.show_diff(self.branch, revid, parentid)
