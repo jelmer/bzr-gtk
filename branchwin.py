@@ -36,8 +36,9 @@ class BranchWindow(gtk.Window):
 
         # Use three-quarters of the screen by default
         screen = self.get_screen()
-        width = int(screen.get_width() * 0.75)
-        height = int(screen.get_height() * 0.75)
+        monitor = screen.get_monitor_geometry(0)
+        width = int(monitor.width * 0.75)
+        height = int(monitor.height * 0.75)
         self.set_default_size(width, height)
 
         # FIXME AndyFitz!
