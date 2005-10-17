@@ -35,6 +35,12 @@ Simply run "bzr visualise" (or "bzr viz") while in a bzr working tree,
 a window will appear with the history of the branch and a graph
 connecting the individual revisions.
 
-Clicking on a revision in the list at the top will show its details in
-pane at the bottom, clicking on any revision id will move the list at
-the top to that revision.
+You can move through the revision history by clicking or with the arrow
+keys.  You can also use the Back (shortcut '[') and Forward (shortcut ']')
+buttons which move to the previous and next revision from that selected
+(which may not be immediately adjacent in the list).
+
+Details for the selected revision are shown in the pane at the bottom,
+including the ids of the parent revisions.  Clicking on the go icon next
+to a parent moves the list to that revision; clicking on the view icon
+opens a window to display the difference between the two revisions.
