@@ -18,7 +18,7 @@ import pango
 
 from bzrlib.osutils import format_date
 
-from graph import graph
+from graph import distances, graph, same_branch
 from graphcell import CellRendererGraph
 
 
@@ -44,20 +44,36 @@ class BranchWindow(gtk.Window):
         icon = self.render_icon(gtk.STOCK_INDEX, gtk.ICON_SIZE_BUTTON)
         self.set_icon(icon)
 
+        self.accel_group = gtk.AccelGroup()
+        self.add_accel_group(self.accel_group)
+
         self.construct()
 
     def construct(self):
         """Construct the window contents."""
+        paned = gtk.VPaned()
+        paned.pack1(self.construct_top(), resize=True, shrink=False)
+        paned.pack2(self.construct_bottom(), resize=True, shrink=True)
+        self.add(paned)
+        paned.show()
+
+    def construct_top(self):
+        """Construct the top-half of the window."""
+        vbox = gtk.VBox(spacing=6)
+        vbox.set_border_width(12)
+        vbox.show()
+
         scrollwin = gtk.ScrolledWindow()
         scrollwin.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         scrollwin.set_shadow_type(gtk.SHADOW_IN)
-        scrollwin.set_border_width(12)
-        self.add(scrollwin)
+        #scrollwin.set_border_width(12)
+        vbox.pack_start(scrollwin, expand=True, fill=True)
         scrollwin.show()
 
         self.treeview = gtk.TreeView()
         self.treeview.set_rules_hint(True)
         self.treeview.set_search_column(4)
+        self.treeview.connect("cursor-changed", self._treeview_cursor_cb)
         scrollwin.add(self.treeview)
         self.treeview.show()
 
@@ -96,6 +112,33 @@ class BranchWindow(gtk.Window):
         column.add_attribute(cell, "text", 6)
         self.treeview.append_column(column)
 
+        hbox = gtk.HBox(False, spacing=6)
+        vbox.pack_start(hbox, expand=False, fill=False)
+        hbox.show()
+
+        self.back_button = gtk.Button(stock=gtk.STOCK_GO_BACK)
+        self.back_button.add_accelerator("clicked", self.accel_group, ord('['),
+                                         0, 0)
+        self.back_button.connect("clicked", self._back_clicked_cb)
+        hbox.pack_start(self.back_button, expand=False, fill=True)
+        self.back_button.show()
+
+        self.fwd_button = gtk.Button(stock=gtk.STOCK_GO_FORWARD)
+        self.fwd_button.add_accelerator("clicked", self.accel_group, ord(']'),
+                                        0, 0)
+        self.fwd_button.connect("clicked", self._fwd_clicked_cb)
+        hbox.pack_start(self.fwd_button, expand=False, fill=True)
+        self.fwd_button.show()
+
+        return vbox
+
+    def construct_bottom(self):
+        """Construct the bottom half of the window."""
+        label = gtk.Label("test")
+        label.show()
+
+        return label
+
     def set_branch(self, branch, start):
         """Set the branch and start position for this window.
 
@@ -104,21 +147,70 @@ class BranchWindow(gtk.Window):
         treeview itself.
         """
         # [ revision, node, last_lines, lines, message, committer, timestamp ]
-        model = gtk.ListStore(gobject.TYPE_PYOBJECT, gobject.TYPE_PYOBJECT,
-                              gobject.TYPE_PYOBJECT, gobject.TYPE_PYOBJECT,
-                              str, str, str)
+        self.model = gtk.ListStore(gobject.TYPE_PYOBJECT,
+                                   gobject.TYPE_PYOBJECT,
+                                   gobject.TYPE_PYOBJECT,
+                                   gobject.TYPE_PYOBJECT,
+                                   str, str, str)
+        self.index = {}
+        index = 0
 
         last_lines = []
-        for revision, node, lines in graph(branch, start):
+        (revids, self.revisions, colours, self.children) \
+                 = distances(branch, start)
+        for revision, node, lines in graph(revids, self.revisions, colours):
             message = revision.message.split("\n")[0]
             if revision.committer is not None:
                 timestamp = format_date(revision.timestamp, revision.timezone)
             else:
                 timestamp = None
 
-            model.append([ revision, node, last_lines, lines,
-                           message, revision.committer, timestamp ])
+            self.model.append([ revision, node, last_lines, lines,
+                                message, revision.committer, timestamp ])
+            self.index[revision] = index
+            index += 1
+
             last_lines = lines
 
         self.set_title(os.path.basename(branch.base) + " - bzrk")
-        self.treeview.set_model(model)
+        self.treeview.set_model(self.model)
+
+    def _treeview_cursor_cb(self, *args):
+        """Callback for when the treeview cursor changes."""
+        (path, col) = self.treeview.get_cursor()
+        revision = self.model[path][0]
+
+        self.back_button.set_sensitive(len(self.children[revision]) > 0)
+        self.fwd_button.set_sensitive(len(revision.parent_ids) > 0)
+
+    def _back_clicked_cb(self, *args):
+        """Callback for when the back button is clicked."""
+        (path, col) = self.treeview.get_cursor()
+        revision = self.model[path][0]
+        if not len(self.children[revision]):
+            return
+
+        for child in self.children[revision]:
+            if same_branch(child, revision):
+                self.treeview.set_cursor(self.index[child])
+                break
+        else:
+            prev = list(self.children[revision])[0]
+            self.treeview.set_cursor(self.index[prev])
+
+    def _fwd_clicked_cb(self, *args):
+        """Callback for when the forward button is clicked."""
+        (path, col) = self.treeview.get_cursor()
+        revision = self.model[path][0]
+        if not len(revision.parent_ids):
+            return
+
+        for parent_id in revision.parent_ids:
+            parent = self.revisions[parent_id]
+            if same_branch(revision, parent):
+                self.treeview.set_cursor(self.index[parent])
+                break
+        else:
+            next = self.revisions[revision.parent_ids[0]]
+            self.treeview.set_cursor(self.index[next])
+

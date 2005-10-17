@@ -30,35 +30,17 @@ class DummyRevision(object):
         self.message = self.revision_id
 
 
-def graph(branch, start):
-    """Produce a directed graph of a bzr branch.
+def distances(branch, start):
+    """Sort the revisions.
 
     Traverses the branch revision tree starting at start and produces an
     ordered list of revisions such that a revision always comes after
-    any revision it is the parent of.  It also tries to make a reasonably
-    not-too-stupid decision whether a parent revision is on the same
-    logical branch, as that information is not available with bzr.
+    any revision it is the parent of.
 
-    For each revision it then yields a tuple of (revision, node, lines).
-    If the revision is only referenced in the branch and not present in the
-    store, revision will be a DummyRevision object, otherwise it is the bzr
-    Revision object with the meta-data for the revision.
-
-    Node is a tuple of (column, colour) with column being a zero-indexed
-    column number of the graph that this revision represents and colour
-    being a zero-indexed colour (which doesn't specify any actual colour
-    in particular) to draw the node in.
-
-    Lines is a list of tuples which represent lines you should draw away
-    from the revision, if you also need to draw lines into the revision
-    you should use the lines list from the previous iteration.  Each
-    typle in the list is in the form (start, end, colour) with start and
-    end being zero-indexed column numbers and colour as in node.
-
-    It's up to you how to actually draw the nodes and lines (straight,
-    curved, kinked, etc.) and to pick the actual colours for each index.
+    Returns a tuple of (revids, revisions, colours, children)
     """
     revisions = { start: branch.get_revision(start) }
+    children = { revisions[start]: set() }
     distances = { start: 0 }
     colours = { start: 0 }
     last_colour = 0
@@ -82,12 +64,15 @@ def graph(branch, start):
             # Get the parent from the cache, or put it in the cache
             try:
                 parent = revisions[parent_id]
+                children[parent].add(revision)
             except KeyError:
                 try:
                     parent = revisions[parent_id] \
                              = branch.get_revision(parent_id)
                 except NoSuchRevision:
                     parent = revisions[parent_id] = DummyRevision(parent_id)
+
+                children[parent] = set([ revision ])
 
             # Penalise revisions a little at a fork if we think they're on
             # the same branch -- this makes the few few (at least) revisions
@@ -104,12 +89,33 @@ def graph(branch, start):
 
             todo.add(parent_id)
 
-    # Now iterate the revisions again, but this time in list order rather
-    # than traversing the tree, and build up the graph lines.  We do this
-    # by keeping a list of "hanging parents", which can only be removed
-    # once we encounter the revision being hung.
-    hanging = [ start ]
-    for revid in sorted(distances, key=distances.get):
+    return ( sorted(distances, key=distances.get), revisions, colours,
+             children )
+
+def graph(revids, revisions, colours):
+    """Produce a directed graph of a bzr branch.
+
+    For each revision it then yields a tuple of (revision, node, lines).
+    If the revision is only referenced in the branch and not present in the
+    store, revision will be a DummyRevision object, otherwise it is the bzr
+    Revision object with the meta-data for the revision.
+
+    Node is a tuple of (column, colour) with column being a zero-indexed
+    column number of the graph that this revision represents and colour
+    being a zero-indexed colour (which doesn't specify any actual colour
+    in particular) to draw the node in.
+
+    Lines is a list of tuples which represent lines you should draw away
+    from the revision, if you also need to draw lines into the revision
+    you should use the lines list from the previous iteration.  Each
+    typle in the list is in the form (start, end, colour) with start and
+    end being zero-indexed column numbers and colour as in node.
+
+    It's up to you how to actually draw the nodes and lines (straight,
+    curved, kinked, etc.) and to pick the actual colours for each index.
+    """
+    hanging = revids[:1]
+    for revid in revids:
         lines = []
         node = None
 
