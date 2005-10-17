@@ -72,9 +72,9 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             metrics = pango_ctx.get_metrics(font_desc)
 
             ascent = pango.PIXELS(metrics.get_ascent())
-            descent = pango.PIXELS(metrics.get_ascent())
+            descent = pango.PIXELS(metrics.get_descent())
 
-            self._box_size = ascent + descent
+            self._box_size = ascent + descent + 6
             return self._box_size
 
     def set_colour(self, ctx, colour, bg, fg):
@@ -140,7 +140,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
 
         box_size = self.box_size(widget)
 
-        ctx.set_line_width(box_size / 10)
+        ctx.set_line_width(box_size / 8)
         ctx.set_line_cap(cairo.LINE_CAP_SQUARE)
 
         # Draw lines into the cell
@@ -188,7 +188,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         (column, colour) = self.node
         ctx.arc(cell_area.x + box_size * column + box_size / 2,
                 cell_area.y + cell_area.height / 2,
-                box_size / 5, 0, 2 * math.pi)
+                box_size / 4, 0, 2 * math.pi)
 
         self.set_colour(ctx, colour, 0.0, 0.5)
         ctx.stroke_preserve()
