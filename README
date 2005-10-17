@@ -1,0 +1,40 @@
+bzrk - visualisation plugin for bzr
+===================================
+
+This is a plugin for bzr that allows you to see the history of a branch
+and relationships between the revisions visually.
+
+
+Dependencies
+------------
+
+bzrk is written in Python, so doesn't need compiling, however you will
+need the following runtime dependencies:
+
+  * Python 2.4
+  * bzr 0.1 or later
+  * PyGTK 2.8 or later
+  * PyCairo 1.0 or later
+
+
+Installation
+------------
+
+The easiest way to install bzrk is to either copy or symlink the
+directory into your ~/.bazaar/plugins directory.
+
+Other ways include doing the same in the bzrlib/plugins directory of
+your bzr working tree, or adding the location of bzrk to your
+BZR_PLUGIN_PATH environment variable.
+
+
+Usage
+-----
+
+Simply run "bzr visualise" (or "bzr viz") while in a bzr working tree,
+a window will appear with the history of the branch and a graph
+connecting the individual revisions.
+
+Clicking on a revision in the list at the top will show its details in
+pane at the bottom, clicking on any revision id will move the list at
+the top to that revision.
