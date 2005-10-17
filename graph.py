@@ -74,7 +74,6 @@ def graph(branch, start):
         distance = distances[revid] + 1
         colour = colours[revid]
 
-        reused = False
         for parent_id in revision.parent_ids:
             # Check whether there's any point re-processing this
             if parent_id in distances and distances[parent_id] >= distance:
@@ -90,19 +89,18 @@ def graph(branch, start):
                 except NoSuchRevision:
                     parent = revisions[parent_id] = DummyRevision(parent_id)
 
-            # Make a guess as to whether this node represents the same
-            # branch, or a new one.  Penalise same branches in the distance
-            # stakes to give new ones a chance to appear first as one set.
-            if len(revision.parent_ids) == 1:
+            # Penalise revisions a little at a fork if we think they're on
+            # the same branch -- this makes the few few (at least) revisions
+            # of a branch appear straight after the fork
+            if same_branch(revision, parent):
                 colours[parent_id] = colour
-                distances[parent_id] = distance
-            elif revision.committer == parent.committer and not reused:
-                colours[parent_id] = colour
-                distances[parent_id] = distance
-                reused = True
+                if len(revision.parent_ids) > 1:
+                    distances[parent_id] = distance + 10
+                else:
+                    distances[parent_id] = distance
             else:
                 colours[parent_id] = last_colour = last_colour + 1
-                distances[parent_id] = distance + 10
+                distances[parent_id] = distance
 
             todo.add(parent_id)
 
@@ -146,3 +144,14 @@ def graph(branch, start):
         hanging = new_hanging
 
         yield (revisions[revid], node, lines)
+
+def same_branch(a, b):
+    """Return whether we think revisions a and b are on the same branch."""
+    if len(a.parent_ids) == 1:
+        # Defacto same branch if only parent
+        return True
+    elif a.committer == b.committer:
+        # Same committer so may as well be
+        return True
+    else:
+        return False
