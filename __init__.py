@@ -36,7 +36,7 @@ class cmd_visualise(bzrlib.commands.Command):
     aliases = [ "visualize", "vis", "viz" ]
 
     def run(self, location=".", revision=None):
-        branch = Branch.open_containing(location)
+        (branch, path) = Branch.open_containing(location)
         if revision is None:
             revid = branch.last_revision()
             if revid is None:
