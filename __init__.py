@@ -33,7 +33,7 @@ class cmd_visualise(bzrlib.commands.Command):
     """
     takes_options = [ "revision" ]
     takes_args = [ "location?" ]
-    aliases = [ "viz" ]
+    aliases = [ "visualize", "vis", "viz" ]
 
     def run(self, location=".", revision=None):
         branch = Branch.open_containing(location)
