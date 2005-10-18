@@ -27,15 +27,10 @@ class BzrkApp(object):
     the last window is closed.
     """
 
-    def __init__(self):
-        self._num_windows = 0
-
     def show(self, branch, start):
         """Open a new window to show the given branch."""
         window = BranchWindow(self)
         window.set_branch(branch, start)
-
-        self._num_windows += 1
         window.connect("destroy", self._destroy_cb)
         window.show()
 
@@ -43,16 +38,11 @@ class BzrkApp(object):
         """Open a new window to show a diff between the given revisions."""
         window = DiffWindow(self)
         window.set_diff(branch, revid, parentid)
-
-        self._num_windows += 1
-        window.connect("destroy", self._destroy_cb)
         window.show()
 
     def _destroy_cb(self, widget):
         """Callback for when a window we manage is destroyed."""
-        self._num_windows -= 1
-        if self._num_windows <= 0:
-            self.quit()
+        self.quit()
 
     def main(self):
         """Start the GTK+ main loop."""
