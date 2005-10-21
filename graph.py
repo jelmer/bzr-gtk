@@ -56,6 +56,7 @@ def distances(branch, start):
         distance = distances[revid] + 1
         colour = colours[revid]
 
+        found_same = False
         for parent_id in revision.parent_ids:
             # Check whether there's any point re-processing this
             if parent_id in distances and distances[parent_id] >= distance:
@@ -77,7 +78,8 @@ def distances(branch, start):
             # Penalise revisions a little at a fork if we think they're on
             # the same branch -- this makes the few few (at least) revisions
             # of a branch appear straight after the fork
-            if same_branch(revision, parent):
+            if not found_same and same_branch(revision, parent):
+                found_same = True
                 colours[parent_id] = colour
                 if len(revision.parent_ids) > 1:
                     distances[parent_id] = distance + 10
