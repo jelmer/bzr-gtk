@@ -24,7 +24,7 @@ from bzrlib.errors import NotVersionedError
 from bzrlib.option import Option
 
 
-class cmd_xannotate(Command):
+class cmd_gannotate(Command):
     """GTK+ annotate.
     
     Browse changes to FILENAME line by line in a GTK+ window.
@@ -32,7 +32,7 @@ class cmd_xannotate(Command):
 
     takes_args = ["filename"]
     takes_options = [Option("all", help="show annotations on all lines")]
-    aliases = ["xblame", "xpraise"]
+    aliases = ["gblame", "gpraise"]
     
     def run(self, filename, all=False):
         (branch, path) = Branch.open_containing(filename)
@@ -42,15 +42,15 @@ class cmd_xannotate(Command):
         if file_id is None:
             raise NotVersionedError(filename)
 
-        from xannotate import XAnnotateWindow
+        from gannotate import GAnnotateWindow
 
-        window = XAnnotateWindow()
+        window = GAnnotateWindow()
         window.show()
-        window.set_title(path + " - xannotate")
+        window.set_title(path + " - gannotate")
         window.annotate(branch, file_id, all)
         window.connect("destroy", lambda w: gtk.main_quit())
         gtk.main()
 
 
-register_command(cmd_xannotate)
+register_command(cmd_gannotate)
 

@@ -1,7 +1,7 @@
-                            xannotate - bzr plugin
+                            gannotate - bzr plugin
                             ======================
 
-xannotate is a GTK+ annotation plugin for bazaar-NG.
+gannotate is a GTK+ annotation plugin for bazaar-NG.
 
 The commit log message is shown in the lower window pane for the selected
 line.  The line number column is searchable; jump to a specific line by typing
@@ -14,8 +14,8 @@ DEPENDENCIES
 
 USAGE
 
-    bzr xannotate FILENAME
-    aliases: xblame, xpraise
+    bzr gannotate FILENAME
+    aliases: gblame, gpraise
 
     options:
         --all                     show annotations on all lines

@@ -34,7 +34,7 @@ from logview import LogView
 ) = range(5)
 
 
-class XAnnotateWindow(gtk.Window):
+class GAnnotateWindow(gtk.Window):
     """Annotate window."""
 
     def __init__(self):
