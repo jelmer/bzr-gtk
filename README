@@ -1,0 +1,27 @@
+                            xannotate - bzr plugin
+                            ======================
+
+xannotate is a GTK+ annotation plugin for bazaar-NG.
+
+The commit log message is shown in the lower window pane for the selected
+line.  The line number column is searchable; jump to a specific line by typing
+the line number when the annotation pane is in focus.
+
+DEPENDENCIES
+
+    * bzr >= 0.6
+    * pyGTK >= 2.8 (untested on earlier versions)
+
+USAGE
+
+    bzr xannotate FILENAME
+    aliases: xblame, xpraise
+
+    options:
+        --all                     show annotations on all lines
+        --help                    show help message
+
+CONTACT
+
+    Dan Loda <danloda@gmail.com>
+
