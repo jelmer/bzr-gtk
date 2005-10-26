@@ -14,14 +14,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import time
+
 import pygtk
 pygtk.require("2.0")
+import gobject
 import gtk
 import pango
 
 from bzrlib.branch import Branch
 from bzrlib.errors import NoSuchRevision
 
+from colormap import ColorMap, GrannyColorMap
 from logview import LogView
 
 
@@ -30,8 +34,9 @@ from logview import LogView
     LINE_NUM_COL,
     COMMITTER_COL,
     REVNO_COL,
+    HIGHLIGHT_COLOR_COL,
     TEXT_LINE_COL
-) = range(5)
+) = range(6)
 
 
 class GAnnotateWindow(gtk.Window):
@@ -41,15 +46,23 @@ class GAnnotateWindow(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.set_default_size(640, 480)
         self.set_icon(self.render_icon(gtk.STOCK_FIND, gtk.ICON_SIZE_BUTTON))
+        self.color_map = GrannyColorMap()
 
         self._create()
 
     def annotate(self, branch, file_id, all=False):
         self.revisions = {}
         
-        # [revision id, line number, committer, revno, line]
-        self.model = gtk.ListStore(str, str, str, str, str)
+        # [revision id, line number, committer, revno, highlight color, line]
+        self.model = gtk.ListStore(gobject.TYPE_STRING,
+                                   gobject.TYPE_STRING,
+                                   gobject.TYPE_STRING,
+                                   gobject.TYPE_STRING,
+                                   gobject.TYPE_STRING,
+                                   gobject.TYPE_STRING)
         
+        colors = {}
+        now = time.time()
         last_seen = None
         for line_no, (revision, revno, line)\
                 in enumerate(self._annotate(branch, file_id)):
@@ -58,12 +71,17 @@ class GAnnotateWindow(gtk.Window):
             else:
                 last_seen = revision.revision_id
                 committer = revision.committer
+
+            if revision.revision_id not in self.revisions:
+                days = ((now - revision.timestamp) / (24 * 3600))
+                colors[revision.revision_id] = self.color_map.get_color(days)
                 self.revisions[revision.revision_id] = revision
 
             self.model.append([revision.revision_id,
                                line_no + 1,
                                committer,
                                revno,
+                               colors[revision.revision_id],
                                line.rstrip("\r\n")
                               ])
 
@@ -91,25 +109,46 @@ class GAnnotateWindow(gtk.Window):
 
             yield revision, revno, text
 
+    def set_span(self, w):
+        model = w.get_model()
+        iter = w.get_active_iter()
+        span = model.get_value(iter, 0)
+        self.color_map.set_span(span)
+        now = time.time()
+        self.model.foreach(self._update_annotate, now)
+
+    def _update_annotate(self, model, path, iter, now):
+        revid = model[path][REVISION_ID_COL]
+        revision = self.revisions[revid]
+        days = ((now - revision.timestamp) / (24 * 3600))
+        model[path][HIGHLIGHT_COLOR_COL] = self.color_map.get_color(days)
+
     def _show_log(self, w):
         (path, col) = self.treeview.get_cursor()
         rev_id = self.model[path][REVISION_ID_COL]
         self.logview.set_revision(self.revisions[rev_id])
 
     def _create(self):
+        vbox = gtk.VBox(False, 12)
+        vbox.set_border_width(12)
+        vbox.show()
+        
         pane = gtk.VPaned()
         pane.pack1(self._create_annotate_view(), resize=True, shrink=False)
         pane.pack2(self._create_log_view(), resize=False, shrink=True)
-        (width, height) = self.get_size()
-        pane.set_position(int(height / 1.75))
         pane.show()
-
-        vbox = gtk.VBox(False, 12)
-        vbox.set_border_width(12)
         vbox.pack_start(pane, expand=True, fill=True)
-        vbox.pack_start(self._create_button_box(), expand=False, fill=True)
+        
+        hbox = gtk.HBox(True, 6)
+        hbox.pack_start(self._create_toolbar(), expand=False, fill=True)
+        hbox.pack_start(self._create_button_box(), expand=False, fill=True)
+        hbox.show()
+        vbox.pack_start(hbox, expand=False, fill=True)
+
+        (width, height) = self.get_size()
+        pane.set_position(int(height / 1.5))
+
         self.add(vbox)
-        vbox.show()
 
     def _create_annotate_view(self):
         sw = gtk.ScrolledWindow()
@@ -164,12 +203,41 @@ class GAnnotateWindow(gtk.Window):
         col = gtk.TreeViewColumn()
         col.set_resizable(False)
         col.pack_start(cell, expand=True)
+        col.add_attribute(cell, "foreground", HIGHLIGHT_COLOR_COL)
         col.add_attribute(cell, "text", TEXT_LINE_COL)
         self.treeview.append_column(col)
 
         self.treeview.set_search_column(LINE_NUM_COL)
         
         return sw
+
+    def _create_toolbar(self):
+        toolbar = gtk.HBox(False, 6)
+        toolbar.show()
+
+        label = gtk.Label("Highlight within the past")
+        label.show()
+        toolbar.pack_start(label, expand=False, fill=True)
+
+        options = gtk.ListStore(gobject.TYPE_FLOAT, gobject.TYPE_STRING)
+        options.append([1., "day"])
+        options.append([7., "week"])
+        options.append([30., "month"])
+        options.append([90., "6 months"])
+        options.append([364., "year"])
+        options.append([364. * 2, "2 years"])
+        
+        box = gtk.ComboBox(options)
+        cell = gtk.CellRendererText()
+        box.pack_start(cell, True)
+        box.add_attribute(cell, "text", 1)
+        box.set_active(1)
+        self.color_map.set_span(7.)
+        box.connect("changed", self.set_span)
+        box.show()
+        toolbar.pack_start(box, expand=False, fill=False)
+
+        return toolbar
 
     def _create_log_view(self):
         self.logview = LogView()

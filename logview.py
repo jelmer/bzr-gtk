@@ -43,7 +43,7 @@ class LogView(gtk.ScrolledWindow):
         self.revision_id.set_text(revision.revision_id)
         self.committer.set_text(revision.committer)
         self.timestamp.set_text(format_date(revision.timestamp,
-                                                  revision.timezone))
+                                            revision.timezone))
         self.message_buffer.set_text(revision.message)
         self._add_parents(revision.parent_ids)
 
