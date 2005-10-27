@@ -61,8 +61,6 @@ class GAnnotateWindow(gtk.Window):
                                    gobject.TYPE_STRING,
                                    gobject.TYPE_STRING)
         
-        colors = {}
-        now = time.time()
         last_seen = None
         for line_no, (revision, revno, line)\
                 in enumerate(self._annotate(branch, file_id)):
@@ -73,18 +71,17 @@ class GAnnotateWindow(gtk.Window):
                 committer = revision.committer
 
             if revision.revision_id not in self.revisions:
-                days = ((now - revision.timestamp) / (24 * 3600))
-                colors[revision.revision_id] = self.color_map.get_color(days)
                 self.revisions[revision.revision_id] = revision
 
             self.model.append([revision.revision_id,
                                line_no + 1,
                                committer,
                                revno,
-                               colors[revision.revision_id],
+                               None,
                                line.rstrip("\r\n")
                               ])
 
+        self._set_default_span()
         self.treeview.set_model(self.model)
         self.treeview.set_cursor(0)
         self.treeview.grab_focus()
@@ -109,19 +106,31 @@ class GAnnotateWindow(gtk.Window):
 
             yield revision, revno, text
 
-    def set_span(self, w):
+    def _set_default_span(self):
+        rev_dates = map(lambda i: self.revisions[i].timestamp,
+                        self.revisions)
+        oldest = min(rev_dates)
+        span = ((time.time() - oldest) / (24 * 60 * 60))
+        self.spans.prepend([span, "file's age", False])
+        self.span_combo.set_active(0)
+        self.set_span(span)
+    
+    def _set_span_cb(self, w):
         model = w.get_model()
         iter = w.get_active_iter()
         span = model.get_value(iter, 0)
+        self.set_span(span)        
+        
+    def set_span(self, span):
         self.color_map.set_span(span)
         now = time.time()
-        self.model.foreach(self._update_annotate, now)
+        self.model.foreach(self._highlight_annotation, now)
 
-    def _update_annotate(self, model, path, iter, now):
-        revid = model[path][REVISION_ID_COL]
-        revision = self.revisions[revid]
-        days = ((now - revision.timestamp) / (24 * 3600))
-        model[path][HIGHLIGHT_COLOR_COL] = self.color_map.get_color(days)
+    def _highlight_annotation(self, model, path, iter, now):
+        revision_id, = model.get(iter, REVISION_ID_COL)
+        revision = self.revisions[revision_id]
+        days = ((now - revision.timestamp) / (24 * 60 * 60))
+        model.set(iter, HIGHLIGHT_COLOR_COL, self.color_map.get_color(days))
 
     def _show_log(self, w):
         (path, col) = self.treeview.get_cursor()
@@ -185,7 +194,6 @@ class GAnnotateWindow(gtk.Window):
         col.add_attribute(cell, "text", COMMITTER_COL)
         self.treeview.append_column(col)
 
-
         cell = gtk.CellRendererText()
         cell.set_property("xalign", 1.0)
         cell.set_property("ypad", 0)
@@ -215,27 +223,32 @@ class GAnnotateWindow(gtk.Window):
         toolbar = gtk.HBox(False, 6)
         toolbar.show()
 
-        label = gtk.Label("Highlight within the past")
+        label = gtk.Label("Highlight spans:")
         label.show()
         toolbar.pack_start(label, expand=False, fill=True)
 
-        options = gtk.ListStore(gobject.TYPE_FLOAT, gobject.TYPE_STRING)
-        options.append([1., "day"])
-        options.append([7., "week"])
-        options.append([30., "month"])
-        options.append([90., "6 months"])
-        options.append([364., "year"])
-        options.append([364. * 2, "2 years"])
+        # [span in days, span as string, row is seperator?]
+        self.spans = gtk.ListStore(gobject.TYPE_FLOAT,
+                                   gobject.TYPE_STRING,
+                                   gobject.TYPE_BOOLEAN)
+        self.separator = [0., "", True]
         
-        box = gtk.ComboBox(options)
+        self.spans.append(self.separator)
+        self.spans.append([1., "1 day", False])
+        self.spans.append([7., "1 week", False])
+        self.spans.append([30., "1 month", False])
+        self.spans.append([90., "3 months", False])
+        self.spans.append([180., "6 months", False])
+        self.spans.append([364., "1 year", False])
+        
+        self.span_combo = gtk.ComboBox(self.spans)
+        self.span_combo.set_row_separator_func(lambda m, i: m.get_value(i, 2))
         cell = gtk.CellRendererText()
-        box.pack_start(cell, True)
-        box.add_attribute(cell, "text", 1)
-        box.set_active(1)
-        self.color_map.set_span(7.)
-        box.connect("changed", self.set_span)
-        box.show()
-        toolbar.pack_start(box, expand=False, fill=False)
+        self.span_combo.pack_start(cell, True)
+        self.span_combo.add_attribute(cell, "text", 1)
+        self.span_combo.connect("changed", self._set_span_cb)
+        self.span_combo.show()
+        toolbar.pack_start(self.span_combo, expand=False, fill=False)
 
         return toolbar
 
