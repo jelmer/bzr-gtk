@@ -38,6 +38,13 @@ from logview import LogView
     TEXT_LINE_COL
 ) = range(6)
 
+(
+    SPAN_DAYS_COL,
+    SPAN_STR_COL,
+    SPAN_IS_SEPARATOR_COL,
+    SPAN_IS_CUSTOM_COL
+) = range(4)
+
 
 class GAnnotateWindow(gtk.Window):
     """Annotate window."""
@@ -47,6 +54,7 @@ class GAnnotateWindow(gtk.Window):
         self.set_default_size(640, 480)
         self.set_icon(self.render_icon(gtk.STOCK_FIND, gtk.ICON_SIZE_BUTTON))
         self.color_map = GrannyColorMap()
+        self.num_custom_spans = 0
 
         self._create()
 
@@ -107,19 +115,55 @@ class GAnnotateWindow(gtk.Window):
             yield revision, revno, text
 
     def _set_default_span(self):
-        rev_dates = map(lambda i: self.revisions[i].timestamp,
-                        self.revisions)
+        rev_dates = map(lambda i: self.revisions[i].timestamp, self.revisions)
         oldest = min(rev_dates)
+        newest = max(rev_dates)
+
+        span = ((newest - oldest) / (24 * 60 * 60))
+        self.span_model.set_value(self.newest_iter, SPAN_DAYS_COL, span)
+        
         span = ((time.time() - oldest) / (24 * 60 * 60))
-        self.spans.prepend([span, "file's age", False])
-        self.span_combo.set_active(0)
+        self.span_model.set_value(self.oldest_iter, SPAN_DAYS_COL, span)
+        
+        index = int(self.span_model.get_string_from_iter(self.oldest_iter))
+        self.span_combo.set_active(index)
         self.set_span(span)
     
     def _set_span_cb(self, w):
         model = w.get_model()
         iter = w.get_active_iter()
-        span = model.get_value(iter, 0)
-        self.set_span(span)        
+
+        if model.get_value(iter, SPAN_IS_CUSTOM_COL):
+            self._request_custom_span()
+        else:
+            span = model.get_value(iter, SPAN_DAYS_COL)
+            self.set_span(span)
+
+    def _request_custom_span(self):
+        self.span_combo.hide()
+        self.span_entry.show_all()
+
+    def _set_custom_span_cb(self, w):
+        days = float(w.get_text())
+        self.span_entry.hide_all()
+        self.span_combo.show()
+
+        if self.num_custom_spans == 0:
+            self.custom_iter = self.span_model.insert_after(self.custom_iter,
+                                                            self.separator)
+            self.citer_top = self.custom_iter.copy()
+
+        if self.num_custom_spans == 4:
+            self.num_custom_spans -= 1
+            self.span_model.remove(self.span_model.iter_next(self.citer_top))
+            
+        self.num_custom_spans += 1
+        self.custom_iter = self.span_model.insert_after(
+            self.custom_iter, [days, "%.2f Days" % days, False, False])
+        
+        index = int(self.span_model.get_string_from_iter(self.custom_iter))
+        self.span_combo.set_active(index)
+        self.set_span(days)
         
     def set_span(self, span):
         self.color_map.set_span(span)
@@ -223,32 +267,55 @@ class GAnnotateWindow(gtk.Window):
         toolbar = gtk.HBox(False, 6)
         toolbar.show()
 
-        label = gtk.Label("Highlight spans:")
+        label = gtk.Label("Highlighting spans:")
         label.show()
         toolbar.pack_start(label, expand=False, fill=True)
 
-        # [span in days, span as string, row is seperator?]
-        self.spans = gtk.ListStore(gobject.TYPE_FLOAT,
-                                   gobject.TYPE_STRING,
-                                   gobject.TYPE_BOOLEAN)
-        self.separator = [0., "", True]
+        # [span in days, span as string, row is seperator?, row is select
+        # default?]
+        self.span_model = gtk.ListStore(gobject.TYPE_FLOAT,
+                                        gobject.TYPE_STRING,
+                                        gobject.TYPE_BOOLEAN,
+                                        gobject.TYPE_BOOLEAN)
+
+        self.separator = [0., "", True, False]
         
-        self.spans.append(self.separator)
-        self.spans.append([1., "1 day", False])
-        self.spans.append([7., "1 week", False])
-        self.spans.append([30., "1 month", False])
-        self.spans.append([90., "3 months", False])
-        self.spans.append([180., "6 months", False])
-        self.spans.append([364., "1 year", False])
+        self.oldest_iter =\
+                self.span_model.append([0., "to Oldest Revision", False, False])
+        self.newest_iter =\
+                self.span_model.append([0., "Newest to Oldest",
+                                        False, False])
+        self.span_model.append(self.separator)
+        self.span_model.append([1., "1 Day", False, False])
+        self.span_model.append([7., "1 Week", False, False])
+        self.span_model.append([30., "1 Month", False, False])
+        self.custom_iter =\
+                self.span_model.append([365., "1 Year", False, False])
+        self.span_model.append(self.separator)
+        self.span_model.append([0., "Custom...", False, True])
         
-        self.span_combo = gtk.ComboBox(self.spans)
-        self.span_combo.set_row_separator_func(lambda m, i: m.get_value(i, 2))
+        self.span_combo = gtk.ComboBox(self.span_model)
+        self.span_combo.set_row_separator_func(
+            lambda m, i: m.get_value(i, SPAN_IS_SEPARATOR_COL))
         cell = gtk.CellRendererText()
-        self.span_combo.pack_start(cell, True)
+        self.span_combo.pack_start(cell, False)
         self.span_combo.add_attribute(cell, "text", 1)
         self.span_combo.connect("changed", self._set_span_cb)
         self.span_combo.show()
         toolbar.pack_start(self.span_combo, expand=False, fill=False)
+
+        self.span_entry = gtk.HBox(False, 6)
+        spin = gtk.SpinButton(digits=2)
+        spin.set_numeric(True)
+        spin.set_increments(1.0, 10.0)
+        spin.set_range(0.0, 100 * 365)
+        spin.connect('activate', self._set_custom_span_cb)
+        spin.connect('show', lambda w: w.grab_focus())
+        self.span_entry.pack_start(spin, expand=False, fill=False)
+        self.span_entry.pack_start(gtk.Label("Days"),
+                                   expand=False, fill=False)
+
+        toolbar.pack_start(self.span_entry, expand=False, fill=False)
 
         return toolbar
 
