@@ -31,10 +31,13 @@ class cmd_gannotate(Command):
     """
 
     takes_args = ["filename"]
-    takes_options = [Option("all", help="show annotations on all lines")]
+    takes_options = [
+        Option("all", help="show annotations on all lines"),
+        Option("plain", help="don't highlight annotation lines")
+    ]
     aliases = ["gblame", "gpraise"]
     
-    def run(self, filename, all=False):
+    def run(self, filename, all=False, plain=False):
         (branch, path) = Branch.open_containing(filename)
 
         file_id = branch.working_tree().path2id(path)
@@ -44,10 +47,10 @@ class cmd_gannotate(Command):
 
         from gannotate import GAnnotateWindow
 
-        window = GAnnotateWindow()
+        window = GAnnotateWindow(all, plain)
         window.show()
         window.set_title(path + " - gannotate")
-        window.annotate(branch, file_id, all)
+        window.annotate(branch, file_id)
         window.connect("destroy", lambda w: gtk.main_quit())
         gtk.main()
 

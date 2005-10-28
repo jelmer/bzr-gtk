@@ -42,15 +42,19 @@ from spanselector import SpanSelector
 class GAnnotateWindow(gtk.Window):
     """Annotate window."""
 
-    def __init__(self):
+    def __init__(self, all=False, plain=False):
+        self.all = all
+        self.plain = plain
+        
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        
         self.set_default_size(640, 480)
         self.set_icon(self.render_icon(gtk.STOCK_FIND, gtk.ICON_SIZE_BUTTON))
         self.annotate_colormap = AnnotateColorMap()
 
         self._create()
 
-    def annotate(self, branch, file_id, all=False):
+    def annotate(self, branch, file_id):
         self.revisions = {}
         
         # [revision id, line number, committer, revno, highlight color, line]
@@ -64,7 +68,7 @@ class GAnnotateWindow(gtk.Window):
         last_seen = None
         for line_no, (revision, revno, line)\
                 in enumerate(self._annotate(branch, file_id)):
-            if revision.revision_id == last_seen and not all:
+            if revision.revision_id == last_seen and not self.all:
                 revno = committer = ""
             else:
                 last_seen = revision.revision_id
@@ -81,10 +85,12 @@ class GAnnotateWindow(gtk.Window):
                                line.rstrip("\r\n")
                               ])
 
-        self._set_oldest_newest()
-        # Recall that calling activate_default will emit "span-changed",
-        # so self._span_changed_cb will take care of initial highlighting
-        self.span_selector.activate_default()
+        if not self.plain:
+            self._set_oldest_newest()
+            # Recall that calling activate_default will emit "span-changed",
+            # so self._span_changed_cb will take care of initial highlighting
+            self.span_selector.activate_default()
+
         self.treeview.set_model(self.model)
         self.treeview.set_cursor(0)
         self.treeview.grab_focus()
@@ -153,7 +159,11 @@ class GAnnotateWindow(gtk.Window):
         vbox.pack_start(pane, expand=True, fill=True)
         
         hbox = gtk.HBox(True, 6)
-        hbox.pack_start(self._create_span_selector(), expand=False, fill=True)
+
+        if not self.plain:
+            hbox.pack_start(self._create_span_selector(),
+                            expand=False, fill=True)
+
         hbox.pack_start(self._create_button_box(), expand=False, fill=True)
         hbox.show()
         vbox.pack_start(hbox, expand=False, fill=True)
