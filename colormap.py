@@ -15,51 +15,9 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-class ColorMap:
+class AnnotateColorMap:
 
     really_old_color = "#0046FF"
-
-    colors =  {
-        20.: "#FFCC00",
-        40.: "#FF6666",
-        60.: "#FF6600",
-        80.: "#FF3300",
-        100.: "#FF00FF",
-        120.: "#FF0000",
-        140.: "#CCCC00",
-        160.: "#CC00CC",
-        180.: "#BC8F8F",
-        200.: "#99CC00",
-        220.: "#999900",
-        240.: "#7AC5CD",
-        260.: "#66CC00",
-        280.: "#33CC33",
-        300.: "#00CCFF",
-        320.: "#00CC99",
-        340.: "#0099FF"
-    }
-
-    def __init__(self, span=340.):
-        self.set_span(span)
-
-    def set_span(self, span):
-        self._span = span
-        self._scale = span / max(self.colors.keys())
-
-    def get_color(self, days_old):
-        color = self.really_old_color
-        days = self.colors.keys()
-        days.sort()
-        
-        for day in days:
-            if (days_old <= day * self._scale):
-                color = self.colors[day]
-                break
-
-        return color
-
-
-class GrannyColorMap(ColorMap):
 
     colors = {
         20.: "#FF0000",
@@ -80,4 +38,23 @@ class GrannyColorMap(ColorMap):
         320.:"#00B6FF",
         340.:"#007EFF"
     }
+
+    def __init__(self, span=340.):
+        self.set_span(span)
+
+    def set_span(self, span):
+        self._span = span
+        self._scale = span / max(self.colors.keys())
+
+    def get_color(self, days_old):
+        color = self.really_old_color
+        days = self.colors.keys()
+        days.sort()
+        
+        for day in days:
+            if (days_old <= day * self._scale):
+                color = self.colors[day]
+                break
+
+        return color
 

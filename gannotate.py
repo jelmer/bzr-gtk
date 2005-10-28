@@ -24,7 +24,7 @@ import pango
 
 from bzrlib.errors import NoSuchRevision
 
-from colormap import ColorMap, GrannyColorMap
+from colormap import AnnotateColorMap
 from logview import LogView
 from spanselector import SpanSelector
 
@@ -46,7 +46,7 @@ class GAnnotateWindow(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.set_default_size(640, 480)
         self.set_icon(self.render_icon(gtk.STOCK_FIND, gtk.ICON_SIZE_BUTTON))
-        self.color_map = GrannyColorMap()
+        self.annotate_colormap = AnnotateColorMap()
 
         self._create()
 
@@ -125,7 +125,7 @@ class GAnnotateWindow(gtk.Window):
         return (seconds / (24 * 60 * 60))
     
     def _span_changed_cb(self, w, span):
-        self.color_map.set_span(span)
+        self.annotate_colormap.set_span(span)
         now = time.time()
         self.model.foreach(self._highlight_annotation, now)
 
@@ -133,7 +133,8 @@ class GAnnotateWindow(gtk.Window):
         revision_id, = model.get(iter, REVISION_ID_COL)
         revision = self.revisions[revision_id]
         days = self._span_from_seconds(now - revision.timestamp)
-        model.set(iter, HIGHLIGHT_COLOR_COL, self.color_map.get_color(days))
+        model.set(iter, HIGHLIGHT_COLOR_COL,
+                  self.annotate_colormap.get_color(days))
 
     def _show_log(self, w):
         (path, col) = self.treeview.get_cursor()
