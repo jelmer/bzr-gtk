@@ -14,6 +14,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+__version__ = "0.6"
+__author__ = "Dan Loda <danloda@gmail.com>"
+
 import pygtk
 pygtk.require("2.0")
 import gtk

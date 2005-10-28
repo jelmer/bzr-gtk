@@ -12,6 +12,12 @@ DEPENDENCIES
     * bzr >= 0.6
     * pyGTK >= 2.8 (untested on earlier versions)
 
+INSTALL
+
+Simply copy this source directory to your  ~/.bazaar/plugins directory.
+Alternatively use included distutils setup.py script to install to the system
+wide bzrlib/plugins directory.
+
 USAGE
 
     bzr gannotate FILENAME
