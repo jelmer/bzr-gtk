@@ -22,11 +22,11 @@ import gobject
 import gtk
 import pango
 
-from bzrlib.branch import Branch
 from bzrlib.errors import NoSuchRevision
 
 from colormap import ColorMap, GrannyColorMap
 from logview import LogView
+from spanselector import SpanSelector
 
 
 (
@@ -38,13 +38,6 @@ from logview import LogView
     TEXT_LINE_COL
 ) = range(6)
 
-(
-    SPAN_DAYS_COL,
-    SPAN_STR_COL,
-    SPAN_IS_SEPARATOR_COL,
-    SPAN_IS_CUSTOM_COL
-) = range(4)
-
 
 class GAnnotateWindow(gtk.Window):
     """Annotate window."""
@@ -54,7 +47,6 @@ class GAnnotateWindow(gtk.Window):
         self.set_default_size(640, 480)
         self.set_icon(self.render_icon(gtk.STOCK_FIND, gtk.ICON_SIZE_BUTTON))
         self.color_map = GrannyColorMap()
-        self.num_custom_spans = 0
 
         self._create()
 
@@ -89,7 +81,10 @@ class GAnnotateWindow(gtk.Window):
                                line.rstrip("\r\n")
                               ])
 
-        self._set_default_span()
+        self._set_oldest_newest()
+        # Recall that calling activate_default will emit "span-changed",
+        # so self._span_changed_cb will take care of initial highlighting
+        self.span_selector.activate_default()
         self.treeview.set_model(self.model)
         self.treeview.set_cursor(0)
         self.treeview.grab_focus()
@@ -98,7 +93,8 @@ class GAnnotateWindow(gtk.Window):
         rev_hist = branch.revision_history()
         rev_tree = branch.revision_tree(branch.last_revision())
         rev_id = rev_tree.inventory[file_id].revision
-        weave = branch.weave_store.get_weave(file_id, branch.get_transaction())
+        weave = branch.weave_store.get_weave(file_id,
+                                             branch.get_transaction())
         
         for origin, text in weave.annotate_iter(rev_id):
             rev_id = weave.idx_to_name(origin)
@@ -114,58 +110,21 @@ class GAnnotateWindow(gtk.Window):
 
             yield revision, revno, text
 
-    def _set_default_span(self):
+    def _set_oldest_newest(self):
         rev_dates = map(lambda i: self.revisions[i].timestamp, self.revisions)
         oldest = min(rev_dates)
         newest = max(rev_dates)
 
-        span = ((newest - oldest) / (24 * 60 * 60))
-        self.span_model.set_value(self.newest_iter, SPAN_DAYS_COL, span)
+        span = self._span_from_seconds(time.time() - oldest)
+        self.span_selector.set_to_oldest_span(span)
         
-        span = ((time.time() - oldest) / (24 * 60 * 60))
-        self.span_model.set_value(self.oldest_iter, SPAN_DAYS_COL, span)
-        
-        index = int(self.span_model.get_string_from_iter(self.oldest_iter))
-        self.span_combo.set_active(index)
-        self.set_span(span)
+        span = self._span_from_seconds(newest - oldest)
+        self.span_selector.set_newest_to_oldest_span(span)
+
+    def _span_from_seconds(self, seconds):
+        return (seconds / (24 * 60 * 60))
     
-    def _set_span_cb(self, w):
-        model = w.get_model()
-        iter = w.get_active_iter()
-
-        if model.get_value(iter, SPAN_IS_CUSTOM_COL):
-            self._request_custom_span()
-        else:
-            span = model.get_value(iter, SPAN_DAYS_COL)
-            self.set_span(span)
-
-    def _request_custom_span(self):
-        self.span_combo.hide()
-        self.span_entry.show_all()
-
-    def _set_custom_span_cb(self, w):
-        days = float(w.get_text())
-        self.span_entry.hide_all()
-        self.span_combo.show()
-
-        if self.num_custom_spans == 0:
-            self.custom_iter = self.span_model.insert_after(self.custom_iter,
-                                                            self.separator)
-            self.citer_top = self.custom_iter.copy()
-
-        if self.num_custom_spans == 4:
-            self.num_custom_spans -= 1
-            self.span_model.remove(self.span_model.iter_next(self.citer_top))
-            
-        self.num_custom_spans += 1
-        self.custom_iter = self.span_model.insert_after(
-            self.custom_iter, [days, "%.2f Days" % days, False, False])
-        
-        index = int(self.span_model.get_string_from_iter(self.custom_iter))
-        self.span_combo.set_active(index)
-        self.set_span(days)
-        
-    def set_span(self, span):
+    def _span_changed_cb(self, w, span):
         self.color_map.set_span(span)
         now = time.time()
         self.model.foreach(self._highlight_annotation, now)
@@ -173,7 +132,7 @@ class GAnnotateWindow(gtk.Window):
     def _highlight_annotation(self, model, path, iter, now):
         revision_id, = model.get(iter, REVISION_ID_COL)
         revision = self.revisions[revision_id]
-        days = ((now - revision.timestamp) / (24 * 60 * 60))
+        days = self._span_from_seconds(now - revision.timestamp)
         model.set(iter, HIGHLIGHT_COLOR_COL, self.color_map.get_color(days))
 
     def _show_log(self, w):
@@ -193,7 +152,7 @@ class GAnnotateWindow(gtk.Window):
         vbox.pack_start(pane, expand=True, fill=True)
         
         hbox = gtk.HBox(True, 6)
-        hbox.pack_start(self._create_toolbar(), expand=False, fill=True)
+        hbox.pack_start(self._create_span_selector(), expand=False, fill=True)
         hbox.pack_start(self._create_button_box(), expand=False, fill=True)
         hbox.show()
         vbox.pack_start(hbox, expand=False, fill=True)
@@ -263,61 +222,12 @@ class GAnnotateWindow(gtk.Window):
         
         return sw
 
-    def _create_toolbar(self):
-        toolbar = gtk.HBox(False, 6)
-        toolbar.show()
+    def _create_span_selector(self):
+        self.span_selector = SpanSelector()
+        self.span_selector.connect("span-changed", self._span_changed_cb)
+        self.span_selector.show()
 
-        label = gtk.Label("Highlighting spans:")
-        label.show()
-        toolbar.pack_start(label, expand=False, fill=True)
-
-        # [span in days, span as string, row is seperator?, row is select
-        # default?]
-        self.span_model = gtk.ListStore(gobject.TYPE_FLOAT,
-                                        gobject.TYPE_STRING,
-                                        gobject.TYPE_BOOLEAN,
-                                        gobject.TYPE_BOOLEAN)
-
-        self.separator = [0., "", True, False]
-        
-        self.oldest_iter =\
-                self.span_model.append([0., "to Oldest Revision", False, False])
-        self.newest_iter =\
-                self.span_model.append([0., "Newest to Oldest",
-                                        False, False])
-        self.span_model.append(self.separator)
-        self.span_model.append([1., "1 Day", False, False])
-        self.span_model.append([7., "1 Week", False, False])
-        self.span_model.append([30., "1 Month", False, False])
-        self.custom_iter =\
-                self.span_model.append([365., "1 Year", False, False])
-        self.span_model.append(self.separator)
-        self.span_model.append([0., "Custom...", False, True])
-        
-        self.span_combo = gtk.ComboBox(self.span_model)
-        self.span_combo.set_row_separator_func(
-            lambda m, i: m.get_value(i, SPAN_IS_SEPARATOR_COL))
-        cell = gtk.CellRendererText()
-        self.span_combo.pack_start(cell, False)
-        self.span_combo.add_attribute(cell, "text", 1)
-        self.span_combo.connect("changed", self._set_span_cb)
-        self.span_combo.show()
-        toolbar.pack_start(self.span_combo, expand=False, fill=False)
-
-        self.span_entry = gtk.HBox(False, 6)
-        spin = gtk.SpinButton(digits=2)
-        spin.set_numeric(True)
-        spin.set_increments(1.0, 10.0)
-        spin.set_range(0.0, 100 * 365)
-        spin.connect('activate', self._set_custom_span_cb)
-        spin.connect('show', lambda w: w.grab_focus())
-        self.span_entry.pack_start(spin, expand=False, fill=False)
-        self.span_entry.pack_start(gtk.Label("Days"),
-                                   expand=False, fill=False)
-
-        toolbar.pack_start(self.span_entry, expand=False, fill=False)
-
-        return toolbar
+        return self.span_selector
 
     def _create_log_view(self):
         self.logview = LogView()
@@ -336,6 +246,7 @@ class GAnnotateWindow(gtk.Window):
         button.show()
         
         box.pack_start(button, expand=False, fill=False)
+
         return box
 
 
