@@ -10,7 +10,7 @@ from distutils.core import setup
 
 
 setup(name="bzrk",
-      version="0.1",
+      version="0.2",
       description="GTK+ Branch Visualisation plugin for bzr",
       author="Scott James Remnant",
       author_email="scott@ubuntu.com",

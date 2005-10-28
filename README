@@ -12,7 +12,7 @@ bzrk is written in Python, so doesn't need compiling, however you will
 need the following runtime dependencies:
 
   * Python 2.4
-  * bzr 0.1 or later
+  * bzr 0.6 or later
   * PyGTK 2.8 or later
   * PyCairo 1.0 or later
 
