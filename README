@@ -5,7 +5,18 @@ gannotate is a GTK+ annotation plugin for bazaar-NG.
 
 The commit log message is shown in the lower window pane for the selected
 line.  The line number column is searchable; jump to a specific line by typing
-the line number when the annotation pane is in focus.
+the line number while the annotation pane is in focus.
+
+By default, lines are highlighted according to age. This functionality is a
+crib of emacs' VC-annotate highlighting, and thus works similarly: blue is
+oldest and red is youngest, and an assortment of other colors in-between:
+
+        blue --> green --> yellow --> orange --> red
+
+Time spans are scaled; for instance by selecting "1 Day", lines older than a
+day will be highlighted blue, but changes in the past hour will be red and
+lines 2 hours old may be orange. Highlighting can be turned off with --plain
+if overwhelming.
 
 DEPENDENCIES
 
@@ -26,6 +37,7 @@ USAGE
     options:
         --all                     show annotations on all lines
         --help                    show help message
+        --plain                   don't highlight annotation lines
 
 CONTACT
 
