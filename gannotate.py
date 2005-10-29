@@ -48,7 +48,7 @@ class GAnnotateWindow(gtk.Window):
         
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         
-        self.set_default_size(640, 480)
+        self.set_default_size(760, 560)
         self.set_icon(self.render_icon(gtk.STOCK_FIND, gtk.ICON_SIZE_BUTTON))
         self.annotate_colormap = AnnotateColorMap()
 
