@@ -152,7 +152,7 @@ class GAnnotateWindow(gtk.Window):
         vbox.set_border_width(12)
         vbox.show()
         
-        pane = gtk.VPaned()
+        self.pane = pane = gtk.VPaned()
         pane.pack1(self._create_annotate_view(), resize=True, shrink=False)
         pane.pack2(self._create_log_view(), resize=False, shrink=True)
         pane.show()

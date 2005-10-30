@@ -49,12 +49,15 @@ class cmd_gannotate(Command):
             raise NotVersionedError(filename)
 
         from gannotate import GAnnotateWindow
+        from config import GAnnotateConfig
 
         window = GAnnotateWindow(all, plain)
-        window.show()
-        window.set_title(path + " - gannotate")
-        window.annotate(branch, file_id)
         window.connect("destroy", lambda w: gtk.main_quit())
+        window.set_title(path + " - gannotate")
+        config = GAnnotateConfig(window)
+        window.show()
+        window.annotate(branch, file_id)
+        
         gtk.main()
 
 

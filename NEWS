@@ -1,3 +1,14 @@
+gannotate current development
+=============================
+
+    ENHANCEMENTS:
+        
+        * The window and log pane now magically remember their size and
+          position. This change introduces the gannotate.conf configuration
+          file in your bazaar configuration directory, though at this point
+          there is no reason for one to stick their nose in it.
+
+
 gannotate 0.6 2005-10-28
 ========================
 
