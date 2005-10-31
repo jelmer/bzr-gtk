@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name = "gannotate",
-    version = "0.6",
+    version = "0.6.1",
     description = "GTK+ annotate plugin for bzr",
     author = "Dan Loda",
     author_email = "danloda@gmail.com",
