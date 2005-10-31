@@ -8,6 +8,15 @@ gannotate current development
           file in your bazaar configuration directory, though at this point
           there is no reason for one to stick their nose in it.
 
+gannotate 0.6.1 2005-10-31
+==========================
+    
+    Happy Halloween!
+
+    BUGFIXES:
+
+        * Late-load gtk so it doesn't attempt connection with a local X server
+          over ssh when running other bzr commands.
 
 gannotate 0.6 2005-10-28
 ========================
