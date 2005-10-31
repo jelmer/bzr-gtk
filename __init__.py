@@ -17,10 +17,6 @@
 __version__ = "0.6"
 __author__ = "Dan Loda <danloda@gmail.com>"
 
-import pygtk
-pygtk.require("2.0")
-import gtk
-
 from bzrlib.branch import Branch
 from bzrlib.commands import Command, register_command
 from bzrlib.errors import NotVersionedError
@@ -47,6 +43,10 @@ class cmd_gannotate(Command):
 
         if file_id is None:
             raise NotVersionedError(filename)
+
+        import pygtk
+        pygtk.require("2.0")
+        import gtk
 
         from gannotate import GAnnotateWindow
 
