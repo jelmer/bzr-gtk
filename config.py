@@ -16,6 +16,8 @@
 
 import os
 
+import gtk.gdk
+
 from bzrlib.config import config_dir
 import bzrlib.util.configobj.configobj as configobj
 from bzrlib.util.configobj.validate import Validator
@@ -25,6 +27,7 @@ gannotate_configspec = (
     "[window]",
     "width = integer(default=750)",
     "height = integer(default=550)",
+    "maximized = boolean(default=False)",
     "x = integer(default=0)",
     "y = integer(default=0)",
     "pane_position = integer(default=325)"
@@ -50,31 +53,41 @@ class GAnnotateConfig(configobj.ConfigObj):
         self.initial_comment = ["gannotate plugin configuration"]
         self.validate(Validator())
 
-        self._connect_signals()
         self.apply()
+        self._connect_signals()
 
     def apply(self):
         """Apply properties and such from gannotate.conf, or
         gannotate_config_spec defaults."""
-        self.window.resize(self["window"]["width"], self["window"]["height"])
-        self.window.move(self["window"]["x"], self["window"]["y"])
         self.pane.set_position(self["window"]["pane_position"])
+        self.window.set_default_size(self["window"]["width"],
+                                     self["window"]["height"])
+        self.window.move(self["window"]["x"], self["window"]["y"])
+
+        if self["window"]["maximized"]:
+            self.window.maximize()
 
     def _connect_signals(self):
         self.window.connect("destroy", self._write)
-        self.window.connect("delete-event", self._save_window_props)
         self.window.connect("configure-event", self._save_window_props)
-        self.pane.connect("delete-event", self._save_pane_props)
+        self.window.connect("window-state-event", self._save_window_props)
         self.pane.connect("notify", self._save_pane_props)
 
-    def _save_window_props(self, w, *args):
-        self["window"]["width"], self["window"]["height"] = w.get_size()
-        self["window"]["x"], self["window"]["y"] = w.get_position()
+    def _save_window_props(self, w, e, *args):
+        if e.window.get_state() & gtk.gdk.WINDOW_STATE_MAXIMIZED:
+            maximized = True
+        else:
+            self["window"]["width"], self["window"]["height"] = w.get_size()
+            self["window"]["x"], self["window"]["y"] = w.get_position()
+            maximized = False
+
+        self["window"]["maximized"] = maximized
         
         return False
 
-    def _save_pane_props(self, w, *args):
-        self["window"]["pane_position"] = w.get_position()
+    def _save_pane_props(self, w, gparam):
+        if gparam.name == "position":
+            self["window"]["pane_position"] = w.get_position()
 
         return False
 

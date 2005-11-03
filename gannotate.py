@@ -48,7 +48,6 @@ class GAnnotateWindow(gtk.Window):
         
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         
-        self.set_default_size(760, 560)
         self.set_icon(self.render_icon(gtk.STOCK_FIND, gtk.ICON_SIZE_BUTTON))
         self.annotate_colormap = AnnotateColorMap()
 
@@ -153,8 +152,8 @@ class GAnnotateWindow(gtk.Window):
         vbox.show()
         
         self.pane = pane = gtk.VPaned()
-        pane.pack1(self._create_annotate_view(), resize=True, shrink=False)
-        pane.pack2(self._create_log_view(), resize=False, shrink=True)
+        pane.add1(self._create_annotate_view())
+        pane.add2(self._create_log_view())
         pane.show()
         vbox.pack_start(pane, expand=True, fill=True)
         
@@ -167,9 +166,6 @@ class GAnnotateWindow(gtk.Window):
         hbox.pack_start(self._create_button_box(), expand=False, fill=True)
         hbox.show()
         vbox.pack_start(hbox, expand=False, fill=True)
-
-        (width, height) = self.get_size()
-        pane.set_position(int(height / 1.5))
 
         self.add(vbox)
 
