@@ -38,6 +38,7 @@ USAGE
     options:
         --all                     show annotations on all lines
         --help                    show help message
+        --line LINENO             jump to specified line number
         --plain                   don't highlight annotation lines
 
 CONTACT

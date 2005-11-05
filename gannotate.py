@@ -91,8 +91,19 @@ class GAnnotateWindow(gtk.Window):
             self.span_selector.activate_default()
 
         self.treeview.set_model(self.model)
-        self.treeview.set_cursor(0)
         self.treeview.grab_focus()
+
+    def jump_to_line(self, lineno):
+        if lineno > len(self.model) or lineno < 1:
+            row = 0
+            # FIXME:should really deal with this in the gui. Perhaps a status
+            # bar?
+            print("gannotate: Line number %d does't exist. Defaulting to "
+                  "line 1." % lineno)
+        else:
+            row = lineno - 1
+
+        self.treeview.set_cursor(row)
 
     def _annotate(self, branch, file_id):
         rev_hist = branch.revision_history()

@@ -32,11 +32,13 @@ class cmd_gannotate(Command):
     takes_args = ["filename"]
     takes_options = [
         Option("all", help="show annotations on all lines"),
-        Option("plain", help="don't highlight annotation lines")
+        Option("plain", help="don't highlight annotation lines"),
+        Option("line", type=int, argname="lineno",
+               help="jump to specified line number")
     ]
     aliases = ["gblame", "gpraise"]
     
-    def run(self, filename, all=False, plain=False):
+    def run(self, filename, all=False, plain=False, line=1):
         (branch, path) = Branch.open_containing(filename)
 
         file_id = branch.working_tree().path2id(path)
@@ -57,6 +59,7 @@ class cmd_gannotate(Command):
         config = GAnnotateConfig(window)
         window.show()
         window.annotate(branch, file_id)
+        window.jump_to_line(line)
         
         gtk.main()
 
