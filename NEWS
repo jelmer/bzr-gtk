@@ -5,6 +5,8 @@ gannotate 0.7pre
         
         * New --line option. Jump directly to the specified line number.
 
+        * Your custom spans are now remembered.
+
         * The window and log pane now magically remember their size and
           position. This change introduces the gannotate.conf configuration
           file in your bazaar configuration directory, though at this point
