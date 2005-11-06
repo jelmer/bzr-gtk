@@ -19,7 +19,7 @@ __author__ = "Dan Loda <danloda@gmail.com>"
 
 from bzrlib.branch import Branch
 from bzrlib.commands import Command, register_command
-from bzrlib.errors import NotVersionedError
+from bzrlib.errors import NotVersionedError, BzrCommandError
 from bzrlib.option import Option
 
 
@@ -39,19 +39,24 @@ class cmd_gannotate(Command):
     aliases = ["gblame", "gpraise"]
     
     def run(self, filename, all=False, plain=False, line=1):
+        import pygtk
+        pygtk.require("2.0")
+
+        try:
+            import gtk
+        except RuntimeError, e:
+            if str(e) == "could not open display":
+                raise NoDisplayError
+
+        from gannotate import GAnnotateWindow
+        from config import GAnnotateConfig
+
         (branch, path) = Branch.open_containing(filename)
 
         file_id = branch.working_tree().path2id(path)
 
         if file_id is None:
             raise NotVersionedError(filename)
-
-        import pygtk
-        pygtk.require("2.0")
-        import gtk
-
-        from gannotate import GAnnotateWindow
-        from config import GAnnotateConfig
 
         window = GAnnotateWindow(all, plain)
         window.connect("destroy", lambda w: gtk.main_quit())
@@ -65,4 +70,11 @@ class cmd_gannotate(Command):
 
 
 register_command(cmd_gannotate)
+
+
+class NoDisplayError(BzrCommandError):
+    """gtk could not find a proper display"""
+
+    def __str__(self):
+        return "No DISPLAY. gannotate is disabled."
 
