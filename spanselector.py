@@ -37,7 +37,7 @@ class SpanSelector(gtk.HBox):
     """
     
     max_custom_spans = 4
-    num_custom_spans = 0
+    custom_spans = []
     last_selected = None
 
     def __init__(self, homogeneous=False, spacing=6):
@@ -111,20 +111,24 @@ class SpanSelector(gtk.HBox):
             self.activate_last_selected()
             return
 
-        if self.num_custom_spans == 0:
+        self.add_custom_span(span)
+        self.emit("custom-span-added", span)
+
+        self.activate(self.custom_iter)
+
+    def add_custom_span(self, span):
+        if not len(self.custom_spans):
             self.custom_iter = self.model.insert_after(self.custom_iter,
                                                        self.separator)
             self.custom_iter_top = self.custom_iter.copy()
-
-        if self.num_custom_spans == self.max_custom_spans:
-            self.num_custom_spans -= 1
+        
+        if len(self.custom_spans) == self.max_custom_spans:
+            self.custom_spans.pop(0)
             self.model.remove(self.model.iter_next(self.custom_iter_top))
-
-        self.num_custom_spans += 1
+        
+        self.custom_spans.append(span)
         self.custom_iter = self.model.insert_after(
             self.custom_iter, [span, "%.2f Days" % span, False, False])
-
-        self.activate(self.custom_iter)
 
     def _request_custom_span(self):
         self.combo.hide()
@@ -181,12 +185,23 @@ class SpanSelector(gtk.HBox):
 
         return entry
 
+
 """The "span-changed" signal is emitted when a new span has been selected or
 entered.
 
-Callback signature: def callback(SpanSelector, span, user_param, ...)
+Callback signature: def callback(SpanSelector, span, [user_param, ...])
 """
 gobject.signal_new("span-changed", SpanSelector,
+                   gobject.SIGNAL_RUN_LAST,
+                   gobject.TYPE_NONE,
+                   (gobject.TYPE_FLOAT,))
+
+"""The "custom-span-added" signal is emitted after a custom span has been
+added, but before it has been selected.
+
+Callback signature: def callback(SpanSelector, span, [user_param, ...])
+"""
+gobject.signal_new("custom-span-added", SpanSelector,
                    gobject.SIGNAL_RUN_LAST,
                    gobject.TYPE_NONE,
                    (gobject.TYPE_FLOAT,))
