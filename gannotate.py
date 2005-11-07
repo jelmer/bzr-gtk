@@ -53,16 +53,19 @@ class GAnnotateWindow(gtk.Window):
 
         self._create()
 
+        if self.plain:
+            self.span_selector.hide()
+
     def annotate(self, branch, file_id):
         self.revisions = {}
         
         # [revision id, line number, committer, revno, highlight color, line]
-        self.model = gtk.ListStore(gobject.TYPE_STRING,
-                                   gobject.TYPE_STRING,
-                                   gobject.TYPE_STRING,
-                                   gobject.TYPE_STRING,
-                                   gobject.TYPE_STRING,
-                                   gobject.TYPE_STRING)
+        self.annomodel = gtk.ListStore(gobject.TYPE_STRING,
+                                       gobject.TYPE_STRING,
+                                       gobject.TYPE_STRING,
+                                       gobject.TYPE_STRING,
+                                       gobject.TYPE_STRING,
+                                       gobject.TYPE_STRING)
         
         last_seen = None
         for line_no, (revision, revno, line)\
@@ -76,13 +79,13 @@ class GAnnotateWindow(gtk.Window):
             if revision.revision_id not in self.revisions:
                 self.revisions[revision.revision_id] = revision
 
-            self.model.append([revision.revision_id,
-                               line_no + 1,
-                               committer,
-                               revno,
-                               None,
-                               line.rstrip("\r\n")
-                              ])
+            self.annomodel.append([revision.revision_id,
+                                   line_no + 1,
+                                   committer,
+                                   revno,
+                                   None,
+                                   line.rstrip("\r\n")
+                                  ])
 
         if not self.plain:
             self._set_oldest_newest()
@@ -90,11 +93,11 @@ class GAnnotateWindow(gtk.Window):
             # so self._span_changed_cb will take care of initial highlighting
             self.span_selector.activate_default()
 
-        self.treeview.set_model(self.model)
-        self.treeview.grab_focus()
+        self.annoview.set_model(self.annomodel)
+        self.annoview.grab_focus()
 
     def jump_to_line(self, lineno):
-        if lineno > len(self.model) or lineno < 1:
+        if lineno > len(self.annomodel) or lineno < 1:
             row = 0
             # FIXME:should really deal with this in the gui. Perhaps a status
             # bar?
@@ -103,7 +106,7 @@ class GAnnotateWindow(gtk.Window):
         else:
             row = lineno - 1
 
-        self.treeview.set_cursor(row)
+        self.annoview.set_cursor(row)
 
     def _annotate(self, branch, file_id):
         rev_hist = branch.revision_history()
@@ -143,7 +146,7 @@ class GAnnotateWindow(gtk.Window):
     def _span_changed_cb(self, w, span):
         self.annotate_colormap.set_span(span)
         now = time.time()
-        self.model.foreach(self._highlight_annotation, now)
+        self.annomodel.foreach(self._highlight_annotation, now)
 
     def _highlight_annotation(self, model, path, iter, now):
         revision_id, = model.get(iter, REVISION_ID_COL)
@@ -153,27 +156,33 @@ class GAnnotateWindow(gtk.Window):
                   self.annotate_colormap.get_color(days))
 
     def _show_log(self, w):
-        (path, col) = self.treeview.get_cursor()
-        rev_id = self.model[path][REVISION_ID_COL]
+        (path, col) = self.annoview.get_cursor()
+        rev_id = self.annomodel[path][REVISION_ID_COL]
         self.logview.set_revision(self.revisions[rev_id])
 
     def _create(self):
+        self.logview = self._create_log_view()
+        self.annoview = self._create_annotate_view()
+        self.span_selector = self._create_span_selector()
+
         vbox = gtk.VBox(False, 12)
         vbox.set_border_width(12)
         vbox.show()
+
+        sw = gtk.ScrolledWindow()
+        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        sw.set_shadow_type(gtk.SHADOW_IN)
+        sw.add(self.annoview)
+        sw.show()
         
         self.pane = pane = gtk.VPaned()
-        pane.add1(self._create_annotate_view())
-        pane.add2(self._create_log_view())
+        pane.add1(sw)
+        pane.add2(self.logview)
         pane.show()
         vbox.pack_start(pane, expand=True, fill=True)
         
         hbox = gtk.HBox(True, 6)
-
-        if not self.plain:
-            hbox.pack_start(self._create_span_selector(),
-                            expand=False, fill=True)
-
+        hbox.pack_start(self.span_selector, expand=False, fill=True)
         hbox.pack_start(self._create_button_box(), expand=False, fill=True)
         hbox.show()
         vbox.pack_start(hbox, expand=False, fill=True)
@@ -181,28 +190,22 @@ class GAnnotateWindow(gtk.Window):
         self.add(vbox)
 
     def _create_annotate_view(self):
-        sw = gtk.ScrolledWindow()
-        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        sw.set_shadow_type(gtk.SHADOW_IN)
-        sw.show()
-
-        self.treeview = gtk.TreeView()
-        self.treeview.set_rules_hint(False)
-        self.treeview.connect("cursor-changed", self._show_log)
-        sw.add(self.treeview)
-        self.treeview.show()
+        tv = gtk.TreeView()
+        tv.set_rules_hint(False)
+        tv.connect("cursor-changed", self._show_log)
+        tv.show()
 
         cell = gtk.CellRendererText()
         cell.set_property("xalign", 1.0)
         cell.set_property("ypad", 0)
         cell.set_property("family", "Monospace")
         cell.set_property("cell-background-gdk",
-                          self.treeview.get_style().bg[gtk.STATE_NORMAL])
+                          tv.get_style().bg[gtk.STATE_NORMAL])
         col = gtk.TreeViewColumn()
         col.set_resizable(False)
         col.pack_start(cell, expand=True)
         col.add_attribute(cell, "text", LINE_NUM_COL)
-        self.treeview.append_column(col)
+        tv.append_column(col)
 
         cell = gtk.CellRendererText()
         cell.set_property("ypad", 0)
@@ -213,7 +216,7 @@ class GAnnotateWindow(gtk.Window):
         col.set_resizable(True)
         col.pack_start(cell, expand=True)
         col.add_attribute(cell, "text", COMMITTER_COL)
-        self.treeview.append_column(col)
+        tv.append_column(col)
 
         cell = gtk.CellRendererText()
         cell.set_property("xalign", 1.0)
@@ -224,7 +227,7 @@ class GAnnotateWindow(gtk.Window):
         col.set_resizable(False)
         col.pack_start(cell, expand=True)
         col.add_attribute(cell, "markup", REVNO_COL)
-        self.treeview.append_column(col)
+        tv.append_column(col)
 
         cell = gtk.CellRendererText()
         cell.set_property("ypad", 0)
@@ -234,23 +237,24 @@ class GAnnotateWindow(gtk.Window):
         col.pack_start(cell, expand=True)
         col.add_attribute(cell, "foreground", HIGHLIGHT_COLOR_COL)
         col.add_attribute(cell, "text", TEXT_LINE_COL)
-        self.treeview.append_column(col)
+        tv.append_column(col)
 
-        self.treeview.set_search_column(LINE_NUM_COL)
+        tv.set_search_column(LINE_NUM_COL)
         
-        return sw
+        return tv
 
     def _create_span_selector(self):
-        self.span_selector = SpanSelector()
-        self.span_selector.connect("span-changed", self._span_changed_cb)
-        self.span_selector.show()
+        ss = SpanSelector()
+        ss.connect("span-changed", self._span_changed_cb)
+        ss.show()
 
-        return self.span_selector
+        return ss
 
     def _create_log_view(self):
-        self.logview = LogView()
-        self.logview.show()
-        return self.logview
+        lv = LogView()
+        lv.show()
+
+        return lv
 
     def _create_button_box(self):
         box = gtk.HButtonBox()
