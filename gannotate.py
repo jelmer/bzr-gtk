@@ -24,7 +24,7 @@ import pango
 
 from bzrlib.errors import NoSuchRevision
 
-from colormap import AnnotateColorMap
+from colormap import AnnotateColorMap, AnnotateColorSaturation
 from logview import LogView
 from spanselector import SpanSelector
 
@@ -49,7 +49,7 @@ class GAnnotateWindow(gtk.Window):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         
         self.set_icon(self.render_icon(gtk.STOCK_FIND, gtk.ICON_SIZE_BUTTON))
-        self.annotate_colormap = AnnotateColorMap()
+        self.annotate_colormap = AnnotateColorSaturation()
 
         self._create()
 
@@ -235,7 +235,8 @@ class GAnnotateWindow(gtk.Window):
         col = gtk.TreeViewColumn()
         col.set_resizable(False)
         col.pack_start(cell, expand=True)
-        col.add_attribute(cell, "foreground", HIGHLIGHT_COLOR_COL)
+#        col.add_attribute(cell, "foreground", HIGHLIGHT_COLOR_COL)
+        col.add_attribute(cell, "background", HIGHLIGHT_COLOR_COL)
         col.add_attribute(cell, "text", TEXT_LINE_COL)
         tv.append_column(col)
 

@@ -58,3 +58,8 @@ class AnnotateColorMap:
 
         return color
 
+class AnnotateColorSaturation(AnnotateColorMap):
+    def get_color(self, days):
+        saturation = 255/((days/10) + 1)
+        blue_green = 255 - (saturation/3)
+        return "#FF%x%x" % (int(blue_green), int(blue_green))
