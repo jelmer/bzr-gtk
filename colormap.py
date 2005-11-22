@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
+import sys
 
 class AnnotateColorMap:
 
@@ -46,11 +46,14 @@ class AnnotateColorMap:
         self._span = span
         self._scale = span / max(self.colors.keys())
 
-    def get_color(self, days_old):
+    def _days(self, revision, now):
+        return (now - revision.timestamp) / (24 * 60 * 60)
+
+    def get_color(self, revision, now):
         color = self.really_old_color
         days = self.colors.keys()
         days.sort()
-        
+        days_old = self._days(revision, now)
         for day in days:
             if (days_old <= day * self._scale):
                 color = self.colors[day]
@@ -59,7 +62,39 @@ class AnnotateColorMap:
         return color
 
 class AnnotateColorSaturation(AnnotateColorMap):
-    def get_color(self, days):
+    def __init__(self, span=340.):
+        AnnotateColorMap.__init__(self, span)
+        self.current_angle = 0
+
+    def hue(self, angle):
+        return tuple([self.v(angle, r) for r in (0, 120, 240)])
+
+    @staticmethod
+    def ang(angle, rotation):
+        angle += rotation
+        angle = angle % 360
+        if angle > 180:
+            angle = 180 - (angle - 180)
+        return abs(angle)
+
+    def v(self, angle, rotation):
+        ang = self.ang(angle, rotation)
+        if ang < 60:
+            return 1
+        elif ang > 120:
+            return 0
+        else:
+            return 1 - ((ang - 60) / 60)
+
+    def saturate_v(self, saturation, hv):
+        return int(255 - (saturation/3*(1-hv)))
+    
+    def committer_angle(self, committer):
+        return float(abs(hash(committer))) / sys.maxint * 360.0
+
+    def get_color(self, revision, now):
+        days = self._days(revision, now)
         saturation = 255/((days/10) + 1)
-        blue_green = 255 - (saturation/3)
-        return "#FF%x%x" % (int(blue_green), int(blue_green))
+        hue = self.hue(self.committer_angle(revision.committer))
+        color = tuple([self.saturate_v(saturation, h) for h in hue])
+        return "#%x%x%x" % color

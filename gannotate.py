@@ -151,9 +151,8 @@ class GAnnotateWindow(gtk.Window):
     def _highlight_annotation(self, model, path, iter, now):
         revision_id, = model.get(iter, REVISION_ID_COL)
         revision = self.revisions[revision_id]
-        days = self._span_from_seconds(now - revision.timestamp)
         model.set(iter, HIGHLIGHT_COLOR_COL,
-                  self.annotate_colormap.get_color(days))
+                  self.annotate_colormap.get_color(revision, now))
 
     def _show_log(self, w):
         (path, col) = self.annoview.get_cursor()
