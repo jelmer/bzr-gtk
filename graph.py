@@ -132,15 +132,17 @@ def distances(branch, start):
                     children_of_candidate = children[revisions[candidate_id]]
                     children_of_candidate.remove(revision)
                     break
+        # save the set of ancestors of that revision
         ancestor_ids = set(parent_ids)
         for parent_id in parent_ids:
             ancestor_ids.update(ancestor_ids_of[parent_id])
+        ancestor_ids_of[revid] = ancestor_ids
+        # discard ancestry data for revisions whose children are already done
         for parent_id in parent_ids + redundant_ids:
             pending_count = pending_count_of[parent_id] - 1
             pending_count_of[parent_id] = pending_count
             if pending_count == 0:
                 ancestor_ids_of[parent_id] = None
-        ancestor_ids_of[revid] = ancestor_ids
 
     return (sorted_revids, revisions, colours, children, parent_ids_of)
 
