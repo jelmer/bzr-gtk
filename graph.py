@@ -58,22 +58,20 @@ def distances(branch, start):
 
         found_same = False
         for parent_id in revision.parent_ids:
-            # Check whether there's any point re-processing this
-            if parent_id in distances and distances[parent_id] >= distance:
-                continue
-
             # Get the parent from the cache, or put it in the cache
             try:
                 parent = revisions[parent_id]
-                children[parent].add(revision)
             except KeyError:
                 try:
-                    parent = revisions[parent_id] \
-                             = branch.get_revision(parent_id)
+                    parent = branch.get_revision(parent_id)
                 except NoSuchRevision:
-                    parent = revisions[parent_id] = DummyRevision(parent_id)
+                    parent = DummyRevision(parent_id)
+                revisions[parent_id] = parent
+            children.setdefault(parent, set()).add(revision)
 
-                children[parent] = set([ revision ])
+            # Check whether there's any point re-processing this
+            if parent_id in distances and distances[parent_id] >= distance:
+                continue
 
             # Penalise revisions a little at a fork if we think they're on
             # the same branch -- this makes the few few (at least) revisions
@@ -91,10 +89,62 @@ def distances(branch, start):
 
             todo.add(parent_id)
 
-    return ( sorted(distances, key=distances.get), revisions, colours,
-             children )
+    # Topologically sorted revids, with the most recent revisions first
+    sorted_revids = sorted(distances, key=distances.get)
 
-def graph(revids, revisions, colours):
+    # Build a parents dictionnary, where redundant parents will be removed, and
+    # that will be passed along tothe rest of program.
+    parent_ids_of = {}
+    for revision in revisions.itervalues():
+        if len(revision.parent_ids) == len(set(revision.parent_ids)):
+            parent_ids_of[revision] = list(revision.parent_ids)
+        else:
+            # remove duplicate parent revisions
+            parent_ids = []
+            parent_ids_set = set()
+            for parent_id in revision.parent_ids:
+                if parent_id in parent_ids_set:
+                    continue
+                parent_ids.append(parent_id)
+                parent_ids_set.add(parent_id)
+            parent_ids_of[revision] = parent_ids
+
+    # Count the number of children of each revision, so we can release memory
+    # for ancestry data as soon as it's not going to be needed anymore.
+    pending_count_of = {}
+    for parent, the_children in children.iteritems():
+        pending_count_of[parent.revision_id] = len(the_children)
+
+    # Build the ancestry dictionnary by examining older revisions first, and
+    # remove revision parents that are ancestors of other parents of the same
+    # revision.
+    ancestor_ids_of = {}
+    for revid in reversed(sorted_revids):
+        revision = revisions[revid]
+        parent_ids = parent_ids_of[revision]
+        # ignore candidate parents which are an ancestor of another parent
+        redundant_ids = []
+        for candidate_id in list(parent_ids):
+            for parent_id in list(parent_ids):
+                if candidate_id in ancestor_ids_of[parent_id]:
+                    redundant_ids.append(candidate_id)
+                    parent_ids.remove(candidate_id)
+                    children_of_candidate = children[revisions[candidate_id]]
+                    children_of_candidate.remove(revision)
+                    break
+        ancestor_ids = set(parent_ids)
+        for parent_id in parent_ids:
+            ancestor_ids.update(ancestor_ids_of[parent_id])
+        for parent_id in parent_ids + redundant_ids:
+            pending_count = pending_count_of[parent_id] - 1
+            pending_count_of[parent_id] = pending_count
+            if pending_count == 0:
+                ancestor_ids_of[parent_id] = None
+        ancestor_ids_of[revid] = ancestor_ids
+
+    return (sorted_revids, revisions, colours, children, parent_ids_of)
+
+def graph(revids, revisions, colours, parent_ids):
     """Produce a directed graph of a bzr branch.
 
     For each revision it then yields a tuple of (revision, node, lines).
@@ -132,7 +182,7 @@ def graph(revids, revisions, colours):
                 # the old column was so anything to the right of this has
                 # to move outwards to make room.  We also try and collapse
                 # hangs to keep the graph small.
-                for parent_id in revisions[revid].parent_ids:
+                for parent_id in parent_ids[revisions[revid]]:
                     try:
                         n_idx = new_hanging.index(parent_id)
                     except ValueError:

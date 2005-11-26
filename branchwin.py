@@ -241,9 +241,10 @@ class BranchWindow(gtk.Window):
         index = 0
 
         last_lines = []
-        (revids, self.revisions, colours, self.children) \
+        (revids, self.revisions, colours, self.children, self.parent_ids) \
                  = distances(branch, start)
-        for revision, node, lines in graph(revids, self.revisions, colours):
+        for revision, node, lines in graph(
+                revids, self.revisions, colours, self.parent_ids):
             message = revision.message.split("\n")[0]
             if revision.committer is not None:
                 timestamp = format_date(revision.timestamp, revision.timezone)
@@ -265,7 +266,7 @@ class BranchWindow(gtk.Window):
         (path, col) = self.treeview.get_cursor()
         revision = self.model[path][0]
 
-        self.back_button.set_sensitive(len(revision.parent_ids) > 0)
+        self.back_button.set_sensitive(len(self.parent_ids[revision]) > 0)
         self.fwd_button.set_sensitive(len(self.children[revision]) > 0)
 
         if revision.committer is not None:
@@ -286,8 +287,8 @@ class BranchWindow(gtk.Window):
             self.table.remove(widget)
 
         self.parents_widgets = []
-        self.table.resize(4 + len(revision.parent_ids) - 1, 2)
-        for idx, parent_id in enumerate(revision.parent_ids):
+        self.table.resize(4 + len(self.parent_ids[revision]) - 1, 2)
+        for idx, parent_id in enumerate(self.parent_ids[revision]):
             self.table.set_row_spacing(idx + 3, 0)
 
             align = gtk.Alignment(0.0, 0.0)
@@ -333,16 +334,16 @@ class BranchWindow(gtk.Window):
         """Callback for when the back button is clicked."""
         (path, col) = self.treeview.get_cursor()
         revision = self.model[path][0]
-        if not len(revision.parent_ids):
+        if not len(self.parent_ids[revision]):
             return
 
-        for parent_id in revision.parent_ids:
+        for parent_id in self.parent_ids[revision]:
             parent = self.revisions[parent_id]
             if same_branch(revision, parent):
                 self.treeview.set_cursor(self.index[parent])
                 break
         else:
-            next = self.revisions[revision.parent_ids[0]]
+            next = self.revisions[self.parent_ids[revision][0]]
             self.treeview.set_cursor(self.index[next])
         self.treeview.grab_focus()
 
