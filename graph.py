@@ -30,6 +30,7 @@ class DummyRevision(object):
         self.message = self.revision_id
 
 
+
 def distances(branch, start):
     """Sort the revisions.
 
@@ -54,7 +55,6 @@ def distances(branch, start):
         revid = todo.pop()
         revision = revisions[revid]
         distance = distances[revid] + 1
-        colour = colours[revid]
 
         found_same = False
         for parent_id in revision.parent_ids:
@@ -78,13 +78,11 @@ def distances(branch, start):
             # of a branch appear straight after the fork
             if not found_same and same_branch(revision, parent):
                 found_same = True
-                colours[parent_id] = colour
                 if len(revision.parent_ids) > 1:
                     distances[parent_id] = distance + 10
                 else:
                     distances[parent_id] = distance
             else:
-                colours[parent_id] = last_colour = last_colour + 1
                 distances[parent_id] = distance
 
             todo.add(parent_id)
@@ -145,6 +143,7 @@ def distances(branch, start):
                 ancestor_ids_of[parent_id] = None
 
     # Try to compact sequences of revisions on the same branch.
+    direct_parent_of = {}
     distances = {}
     skipped_revids = []
     expected_id = sorted_revids[0]
@@ -169,6 +168,49 @@ def distances(branch, start):
         else:
             # all children are here, push!
             distances[revid] = len(distances)
+            # choose colour
+            the_children = children[revision]
+            if len(the_children) == 1:
+                [child] = the_children
+                if len(parent_ids_of[child]) == 1:
+                    # one-one relationship between parent and child, same
+                    # colour
+                    colours[revid] = colours[child.revision_id]
+                else:
+                    # one child with multiple parents, the first parent with
+                    # the same committer gets the colour
+                    direct_parent = direct_parent_of.get(child)
+                    if direct_parent is None:                        
+                        for parent_id in parent_ids_of[child]:
+                            parent_revision = revisions[parent_id]
+                            if parent_revision.committer == child.committer:
+                                direct_parent = parent_revision
+                                direct_parent_of[child] = direct_parent
+                                break
+                    if direct_parent == revision:
+                        colours[revid] = colours[child.revision_id]
+                    else:
+                        colours[revid] = last_colour = last_colour + 1
+            else:
+                # multiple children, get the colour of the last displayed child
+                # with the same committer which does not already had its colour
+                # taken
+                available = {}
+                for child in the_children:
+                    if child.committer != revision.committer:
+                        continue
+                    if direct_parent_of.get(child) not in (None, revision):
+                        continue
+                    available[child] = distances[child.revision_id]
+                if available:
+                    sorted_children = sorted(available, key=available.get)
+                    child = sorted_children[-1]
+                    direct_parent_of[child] = revision
+                    colours[revid] = colours[child.revision_id]
+                else:
+                    # no candidate children is available, pick the next colour
+                    colours[revid] = last_colour = last_colour + 1
+            # all parents will need to be pushed as soon as possible
             for parent in parent_ids_of[revision]:
                 if parent not in pending_ids:
                     pending_ids.insert(0, parent)
