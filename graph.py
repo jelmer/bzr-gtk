@@ -149,13 +149,8 @@ def distances(branch, start):
     skipped_revids = []
     expected_id = sorted_revids[0]
     pending_ids = []
-    import pdb
     while True:
-        #pdb.set_trace()
-        try:
-            revid = sorted_revids.pop(0)
-        except:
-            pdb.set_trace()
+        revid = sorted_revids.pop(0)
         if revid != expected_id:
             skipped_revids.append(revid)
             continue
@@ -173,8 +168,6 @@ def distances(branch, start):
                 break
         else:
             # all children are here, push!
-            #if len(distances) == 15:
-            #    pdb.set_trace()
             distances[revid] = len(distances)
             for parent in parent_ids_of[revision]:
                 if parent not in pending_ids:
@@ -182,8 +175,8 @@ def distances(branch, start):
             if not pending_ids:
                 break
             expected_id = pending_ids.pop(0)
-            # if the next expected has already been skipped, requeue the
-            # expected and its potential ancestors.
+            # if the next expected revid has already been skipped, requeue it
+            # and its potential ancestors.
             if expected_id in skipped_revids:
                 pos = skipped_revids.index(expected_id)
                 sorted_revids[:0] = skipped_revids[pos:]
