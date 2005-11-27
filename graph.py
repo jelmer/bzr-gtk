@@ -144,6 +144,53 @@ def distances(branch, start):
             if pending_count == 0:
                 ancestor_ids_of[parent_id] = None
 
+    # Try to compact sequences of revisions on the same branch.
+    distances = {}
+    skipped_revids = []
+    expected_id = sorted_revids[0]
+    pending_ids = []
+    import pdb
+    while True:
+        #pdb.set_trace()
+        try:
+            revid = sorted_revids.pop(0)
+        except:
+            pdb.set_trace()
+        if revid != expected_id:
+            skipped_revids.append(revid)
+            continue
+        revision = revisions[revid]
+        for child in children[revision]:
+            # postpone if any child is missing
+            if child.revision_id not in distances:
+                if expected_id not in pending_ids:
+                    pending_ids.append(expected_id)
+                assert len(pending_ids) > 1
+                expected_id = pending_ids.pop(0)
+                skipped_revids.append(revid)
+                sorted_revids[:0] = skipped_revids
+                skipped_revids = []
+                break
+        else:
+            # all children are here, push!
+            #if len(distances) == 15:
+            #    pdb.set_trace()
+            distances[revid] = len(distances)
+            for parent in parent_ids_of[revision]:
+                if parent not in pending_ids:
+                    pending_ids.insert(0, parent)
+            if not pending_ids:
+                break
+            expected_id = pending_ids.pop(0)
+            # if the next expected has already been skipped, requeue the
+            # expected and its potential ancestors.
+            if expected_id in skipped_revids:
+                pos = skipped_revids.index(expected_id)
+                sorted_revids[:0] = skipped_revids[pos:]
+                del skipped_revids[pos:]
+
+    sorted_revids = sorted(distances, key=distances.get)
+
     return (sorted_revids, revisions, colours, children, parent_ids_of)
 
 def graph(revids, revisions, colours, parent_ids):
