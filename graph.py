@@ -73,18 +73,7 @@ def distances(branch, start):
             if parent_id in distances and distances[parent_id] >= distance:
                 continue
 
-            # Penalise revisions a little at a fork if we think they're on
-            # the same branch -- this makes the few few (at least) revisions
-            # of a branch appear straight after the fork
-            if not found_same and same_branch(revision, parent):
-                found_same = True
-                if len(revision.parent_ids) > 1:
-                    distances[parent_id] = distance + 10
-                else:
-                    distances[parent_id] = distance
-            else:
-                distances[parent_id] = distance
-
+            distances[parent_id] = distance
             todo.add(parent_id)
 
     # Topologically sorted revids, with the most recent revisions first
@@ -201,17 +190,22 @@ def distances(branch, start):
                 for child in the_children:
                     if child.committer != revision.committer:
                         continue
-                    if direct_parent_of.get(child) not in (None, revision):
-                        continue
-                    available[child] = distances[child.revision_id]
-                if available:
-                    sorted_children = sorted(available, key=available.get)
-                    child = sorted_children[-1]
-                    direct_parent_of[child] = revision
-                    colours[revid] = colours[child.revision_id]
+                    direct_parent = direct_parent_of.get(child)
+                    if direct_parent == revision:
+                        colours[revid] = colours[child.revision_id]
+                        break
+                    if direct_parent is None:
+                        available[child] = distances[child.revision_id]
                 else:
-                    # no candidate children is available, pick the next colour
-                    colours[revid] = last_colour = last_colour + 1
+                    if available:
+                        sorted_children = sorted(available, key=available.get)
+                        child = sorted_children[-1]
+                        direct_parent_of[child] = revision
+                        colours[revid] = colours[child.revision_id]
+                    else:
+                        # no candidate children is available, pick the next
+                        # colour
+                        colours[revid] = last_colour = last_colour + 1
             # all parents will need to be pushed as soon as possible
             for parent in parent_ids_of[revision]:
                 if parent not in pending_ids:
