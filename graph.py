@@ -120,9 +120,11 @@ def distances(branch, start):
     for revid in reversed(sorted_revids):
         revision = revisions[revid]
         parent_ids = parent_ids_of[revision]
-        # ignore candidate parents which are an ancestor of another parent
+        # ignore candidate parents which are an ancestor of another parent, but
+        # never ignore the leftmost parent
         redundant_ids = []
-        for candidate_id in list(parent_ids):
+        ignorable_parent_ids = parent_ids[1:] # never ignore leftmost
+        for candidate_id in ignorable_parent_ids: 
             for parent_id in list(parent_ids):
                 if candidate_id in ancestor_ids_of[parent_id]:
                     redundant_ids.append(candidate_id)
