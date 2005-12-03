@@ -149,7 +149,7 @@ class DistanceMethod(object):
                 if pending_count == 0:
                     ancestor_ids_of[parent_id] = None
 
-    def sort_revisions_and_set_colours(self, sorted_revids):
+    def sort_revisions(self, sorted_revids):
         revisions = self.revisions
         parent_ids_of = self.parent_ids_of
         children_of_id = self.children_of_id
@@ -173,12 +173,11 @@ class DistanceMethod(object):
                     expected_id = pending_ids.pop(0)
                     skipped_revids.append(revid)
                     sorted_revids[:0] = skipped_revids
-                    skipped_revids = []
+                    del skipped_revids[:]
                     break
             else:
                 # all children are here, push!
                 distances[revid] = len(distances)
-                self.choose_colour(revision, distances)
                 # all parents will need to be pushed as soon as possible
                 for parent in parent_ids_of[revision]:
                     if parent not in pending_ids:
@@ -192,10 +191,11 @@ class DistanceMethod(object):
                     pos = skipped_revids.index(expected_id)
                     sorted_revids[:0] = skipped_revids[pos:]
                     del skipped_revids[pos:]
+        self.distances = distances
         return sorted(distances, key=distances.get)
 
-    def choose_colour(self, revision, distances):
-        revid = revision.revision_id
+    def choose_colour(self, revid):
+        revision = self.revisions[revid]
         children_of_id = self.children_of_id
         parent_ids_of = self.parent_ids_of
         colours = self.colours
@@ -210,7 +210,7 @@ class DistanceMethod(object):
             else:
                 self.choose_colour_one_child(revision, child)
         else:
-            self.choose_colour_many_children(revision, the_children, distances)
+            self.choose_colour_many_children(revision, the_children)
 
     def choose_colour_one_child(self, revision, child):
         revid = revision.revision_id
@@ -233,7 +233,8 @@ class DistanceMethod(object):
         else:
             self.colours[revid] = self.last_colour = self.last_colour + 1
 
-    def choose_colour_many_children(self, revision, the_children, distances):
+    def choose_colour_many_children(self, revision, the_children):
+        distances = self.distances
         revid = revision.revision_id
         direct_parent_of = self.direct_parent_of
         # multiple children, get the colour of the last displayed child
@@ -273,9 +274,15 @@ def distances(branch, start):
     distance = DistanceMethod(branch, start)
     distance.fill_caches()
     sorted_revids = distance.first_ancestry_traversal()
+    print 'removing redundant parents'
     distance.remove_redundant_parents(sorted_revids)
     children = distance.make_children_map()
-    sorted_revids = distance.sort_revisions_and_set_colours(sorted_revids)
+    print 'sorting'
+    sorted_revids = distance.sort_revisions(sorted_revids)
+    print 'colouring'
+    for revid in sorted_revids:
+        distance.choose_colour(revid)
+    print 'done'
 
     revisions = distance.revisions
     colours = distance.colours
