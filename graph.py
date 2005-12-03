@@ -86,7 +86,7 @@ class DistanceMethod(object):
                     for (revid, c) in self.children_of_id.iteritems())
 
     def first_ancestry_traversal(self):
-        distances = { self.start: 0 }
+        distances = {}
         todo = [self.start]
         revisions = self.revisions
         children_of_id = self.children_of_id
@@ -103,6 +103,7 @@ class DistanceMethod(object):
                         todo.insert(0, parent_id)
         # Topologically sorted revids, with the most recent revisions first.
         # A revision occurs only after all of its children.
+        self.distances = distances
         return sorted(distances, key=distances.get)
 
     def remove_redundant_parents(self, sorted_revids):
@@ -169,7 +170,6 @@ class DistanceMethod(object):
                 if child.revision_id not in distances:
                     if expected_id not in pending_ids:
                         pending_ids.append(expected_id)
-                    assert len(pending_ids) > 1
                     expected_id = pending_ids.pop(0)
                     skipped_revids.append(revid)
                     sorted_revids[:0] = skipped_revids
@@ -186,7 +186,8 @@ class DistanceMethod(object):
                     break
                 expected_id = pending_ids.pop(0)
                 # if the next expected revid has already been skipped, requeue
-                # it and its potential ancestors.
+                # the skipped ids, except those that would go right back to the
+                # skipped list.
                 if expected_id in skipped_revids:
                     pos = skipped_revids.index(expected_id)
                     sorted_revids[:0] = skipped_revids[pos:]
@@ -274,15 +275,11 @@ def distances(branch, start):
     distance = DistanceMethod(branch, start)
     distance.fill_caches()
     sorted_revids = distance.first_ancestry_traversal()
-    print 'removing redundant parents'
     distance.remove_redundant_parents(sorted_revids)
     children = distance.make_children_map()
-    print 'sorting'
     sorted_revids = distance.sort_revisions(sorted_revids)
-    print 'colouring'
     for revid in sorted_revids:
         distance.choose_colour(revid)
-    print 'done'
 
     revisions = distance.revisions
     colours = distance.colours
