@@ -43,19 +43,22 @@ class DistanceMethod(object):
         self.last_colour = 0
         self.direct_parent_of = {}
 
-    def get_revision(self, revid):
-        """Retrieve a revision from the cache or the branch."""
-        try:
-            revision = self.revisions[revid]
-        except KeyError:
+    def fill_caches(self):
+        branch = self.branch
+        revisions = self.revisions
+        todo = set([self.start])
+        while todo:
+            revid = todo.pop()
             try:
-                revision = self.branch.get_revision(revid)
+                revision = branch.get_revision(revid)
             except NoSuchRevision:
                 revision = DummyRevision(revid)
-            self.set_caches(revid, revision)
-        return revision
+            self.cache_revision(revid, revision)
+            for parent_id in revision.parent_ids:
+                if parent_id not in revisions:
+                    todo.add(parent_id)
 
-    def set_caches(self, revid, revision):
+    def cache_revision(self, revid, revision):
         "Set the caches for a newly retrieved revision."""
         # Build a revision cache
         self.revisions[revid] = revision
@@ -89,9 +92,10 @@ class DistanceMethod(object):
         # we increased the distance. This produces the sort order we desire
         distances = { self.start: 0 }
         todo = set([self.start])
+        revisions = self.revisions
         while todo:
             revid = todo.pop()
-            revision = self.get_revision(revid)
+            revision = revisions[revid]
             distance = distances[revid] + 1
             for parent_id in revision.parent_ids:
                 if parent_id in distances and distances[parent_id] >= distance:
@@ -267,16 +271,16 @@ def distances(branch, start):
 
     Returns a tuple of (revids, revisions, colours, children)
     """
-    distance_method = DistanceMethod(branch, start)
-    sorted_revids = distance_method.first_ancestry_traversal()
-    distance_method.remove_redundant_parents(sorted_revids)
-    sorted_revids = \
-        distance_method.sort_revisions_and_set_colours(sorted_revids)
+    distance = DistanceMethod(branch, start)
+    distance.fill_caches()
+    sorted_revids = distance.first_ancestry_traversal()
+    distance.remove_redundant_parents(sorted_revids)
+    sorted_revids = distance.sort_revisions_and_set_colours(sorted_revids)
 
-    revisions = distance_method.revisions
-    colours = distance_method.colours
-    children = distance_method.make_children_map()
-    parent_ids_of = distance_method.parent_ids_of
+    revisions = distance.revisions
+    colours = distance.colours
+    children = distance.make_children_map()
+    parent_ids_of = distance.parent_ids_of
     return (sorted_revids, revisions, colours, children, parent_ids_of)
 
 def graph(revids, revisions, colours, parent_ids):
