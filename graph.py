@@ -263,7 +263,7 @@ class DistanceMethod(object):
                 self.colours[revid] = self.last_colour = self.last_colour + 1
 
 
-def distances(branch, start):
+def distances(branch, start, robust, accurate):
     """Sort the revisions.
 
     Traverses the branch revision tree starting at start and produces an
@@ -275,9 +275,13 @@ def distances(branch, start):
     distance = DistanceMethod(branch, start)
     distance.fill_caches()
     sorted_revids = distance.first_ancestry_traversal()
-    distance.remove_redundant_parents(sorted_revids)
+    if robust:
+        print 'robust filtering'
+        distance.remove_redundant_parents(sorted_revids)
     children = distance.make_children_map()
-    sorted_revids = distance.sort_revisions(sorted_revids)
+    if accurate:
+        print 'accurate sorting'
+        sorted_revids = distance.sort_revisions(sorted_revids)
     for revid in sorted_revids:
         distance.choose_colour(revid)
 
