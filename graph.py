@@ -86,22 +86,21 @@ class DistanceMethod(object):
                     for (revid, c) in self.children_of_id.iteritems())
 
     def first_ancestry_traversal(self):
-        # Sort the revisions; the fastest way to do this is to visit each node
-        # as few times as possible (by keeping the todo list in a set) and
-        # record the largest distance to it before queuing up the children if
-        # we increased the distance. This produces the sort order we desire
         distances = { self.start: 0 }
-        todo = set([self.start])
+        todo = [self.start]
         revisions = self.revisions
+        children_of_id = self.children_of_id
         while todo:
-            revid = todo.pop()
-            revision = revisions[revid]
-            distance = distances[revid] + 1
-            for parent_id in revision.parent_ids:
-                if parent_id in distances and distances[parent_id] >= distance:
-                    continue
-                distances[parent_id] = distance
-                todo.add(parent_id)
+            revid = todo.pop(0)
+            for child in children_of_id[revid]:
+                if child.revision_id not in distances:
+                    todo.append(revid)
+                    break
+            else:
+                distances[revid] = len(distances)
+                for parent_id in revisions[revid].parent_ids:
+                    if parent_id not in todo:
+                        todo.insert(0, parent_id)
         # Topologically sorted revids, with the most recent revisions first.
         # A revision occurs only after all of its children.
         return sorted(distances, key=distances.get)
@@ -275,11 +274,11 @@ def distances(branch, start):
     distance.fill_caches()
     sorted_revids = distance.first_ancestry_traversal()
     distance.remove_redundant_parents(sorted_revids)
+    children = distance.make_children_map()
     sorted_revids = distance.sort_revisions_and_set_colours(sorted_revids)
 
     revisions = distance.revisions
     colours = distance.colours
-    children = distance.make_children_map()
     parent_ids_of = distance.parent_ids_of
     return (sorted_revids, revisions, colours, children, parent_ids_of)
 
