@@ -40,11 +40,13 @@ class cmd_visualise(bzrlib.commands.Command):
     takes_options = [
         "revision",
         Option('robust', "ignore redundant parents"),
-        Option('accurate', "sort revisions more carefully")]
+        Option('accurate', "sort revisions more carefully"),
+        Option('maxnum', "maximum number of revisions to display", int, 'count')]
     takes_args = [ "location?" ]
     aliases = [ "visualize", "vis", "viz" ]
 
-    def run(self, location=".", revision=None, robust=False, accurate=False):
+    def run(self, location=".", revision=None, robust=False, accurate=False,
+            maxnum=None):
         (branch, path) = Branch.open_containing(location)
         if revision is None:
             revid = branch.last_revision()
@@ -56,7 +58,7 @@ class cmd_visualise(bzrlib.commands.Command):
         from bzrkapp import BzrkApp
 
         app = BzrkApp()
-        app.show(branch, revid, robust, accurate)
+        app.show(branch, revid, robust, accurate, maxnum)
         app.main()
 
 

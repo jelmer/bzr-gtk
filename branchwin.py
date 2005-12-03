@@ -222,7 +222,7 @@ class BranchWindow(gtk.Window):
 
         return vbox
 
-    def set_branch(self, branch, start, robust, accurate):
+    def set_branch(self, branch, start, robust, accurate, maxnum):
         """Set the branch and start position for this window.
 
         Creates a new TreeModel and populates it with information about
@@ -242,7 +242,7 @@ class BranchWindow(gtk.Window):
 
         last_lines = []
         (revids, self.revisions, colours, self.children, self.parent_ids) \
-                 = distances(branch, start, robust, accurate)
+                 = distances(branch, start, robust, accurate, maxnum)
         for revision, node, lines in graph(
                 revids, self.revisions, colours, self.parent_ids):
             message = revision.message.split("\n")[0]

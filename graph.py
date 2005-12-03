@@ -263,7 +263,7 @@ class DistanceMethod(object):
                 self.colours[revid] = self.last_colour = self.last_colour + 1
 
 
-def distances(branch, start, robust, accurate):
+def distances(branch, start, robust, accurate, maxnum):
     """Sort the revisions.
 
     Traverses the branch revision tree starting at start and produces an
@@ -284,6 +284,9 @@ def distances(branch, start, robust, accurate):
         sorted_revids = distance.sort_revisions(sorted_revids)
     for revid in sorted_revids:
         distance.choose_colour(revid)
+
+    if maxnum is not None:
+        del sorted_revids[maxnum:]
 
     revisions = distance.revisions
     colours = distance.colours
