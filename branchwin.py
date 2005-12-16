@@ -142,7 +142,7 @@ class BranchWindow(gtk.Window):
         vbox.set_size_request(width, int(height / 2.5))
         vbox.show()
 
-        self.table = gtk.Table(rows=4, columns=2)
+        self.table = gtk.Table(rows=5, columns=2)
         self.table.set_row_spacings(6)
         self.table.set_col_spacings(6)
         vbox.pack_start(self.table, expand=False, fill=True)
@@ -182,9 +182,25 @@ class BranchWindow(gtk.Window):
 
         align = gtk.Alignment(0.0, 0.5)
         label = gtk.Label()
-        label.set_markup("<b>Timestamp:</b>")
+        label.set_markup("<b>Branch nick:</b>")
         align.add(label)
         self.table.attach(align, 0, 1, 2, 3, gtk.FILL, gtk.FILL)
+        label.show()
+        align.show()
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.branchnick_label = gtk.Label()
+        self.branchnick_label.set_selectable(True)
+        align.add(self.branchnick_label)
+        self.table.attach(align, 1, 2, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.branchnick_label.show()
+        align.show()
+
+        align = gtk.Alignment(0.0, 0.5)
+        label = gtk.Label()
+        label.set_markup("<b>Timestamp:</b>")
+        align.add(label)
+        self.table.attach(align, 0, 1, 3, 4, gtk.FILL, gtk.FILL)
         label.show()
         align.show()
 
@@ -192,7 +208,7 @@ class BranchWindow(gtk.Window):
         self.timestamp_label = gtk.Label()
         self.timestamp_label.set_selectable(True)
         align.add(self.timestamp_label)
-        self.table.attach(align, 1, 2, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.table.attach(align, 1, 2, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
         self.timestamp_label.show()
         align.show()
 
@@ -200,7 +216,7 @@ class BranchWindow(gtk.Window):
         label = gtk.Label()
         label.set_markup("<b>Parents:</b>")
         align.add(label)
-        self.table.attach(align, 0, 1, 3, 4, gtk.FILL, gtk.FILL)
+        self.table.attach(align, 0, 1, 4, 5, gtk.FILL, gtk.FILL)
         label.show()
         align.show()
 
@@ -270,15 +286,24 @@ class BranchWindow(gtk.Window):
         self.fwd_button.set_sensitive(len(self.children[revision]) > 0)
 
         if revision.committer is not None:
+	    branchnick = ""
             committer = revision.committer
             timestamp = format_date(revision.timestamp, revision.timezone)
             message = revision.message
+	    try:
+		branchnick = revision.properties['branch-nick']
+	    except KeyError:
+		pass
+
         else:
             committer = ""
             timestamp = ""
             message = ""
+	    branchnick = ""
 
         self.revid_label.set_text(revision.revision_id)
+	self.branchnick_label.set_text(branchnick)
+
         self.committer_label.set_text(committer)
         self.timestamp_label.set_text(timestamp)
         self.message_buffer.set_text(message)
@@ -287,13 +312,13 @@ class BranchWindow(gtk.Window):
             self.table.remove(widget)
 
         self.parents_widgets = []
-        self.table.resize(4 + len(self.parent_ids[revision]) - 1, 2)
+        self.table.resize(5 + len(self.parent_ids[revision]) - 1, 2)
         for idx, parent_id in enumerate(self.parent_ids[revision]):
             self.table.set_row_spacing(idx + 3, 0)
 
             align = gtk.Alignment(0.0, 0.0)
             self.parents_widgets.append(align)
-            self.table.attach(align, 1, 2, idx + 3, idx + 4,
+            self.table.attach(align, 1, 2, idx + 4, idx + 5,
                               gtk.EXPAND | gtk.FILL, gtk.FILL)
             align.show()
 
