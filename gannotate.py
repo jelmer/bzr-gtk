@@ -110,15 +110,16 @@ class GAnnotateWindow(gtk.Window):
 
     def _annotate(self, branch, file_id):
         rev_hist = branch.revision_history()
-        rev_tree = branch.revision_tree(branch.last_revision())
+        repository = branch.repository
+        rev_tree = repository.revision_tree(branch.last_revision())
         rev_id = rev_tree.inventory[file_id].revision
-        weave = branch.weave_store.get_weave(file_id,
-                                             branch.get_transaction())
+        weave = repository.weave_store.get_weave(file_id,
+                                                 branch.get_transaction())
         
         for origin, text in weave.annotate_iter(rev_id):
             rev_id = weave.idx_to_name(origin)
             try:
-                revision = branch.get_revision(rev_id)
+                revision = repository.get_revision(rev_id)
                 if rev_id in rev_hist:
                     revno = branch.revision_id_to_revno(rev_id)
                 else:
