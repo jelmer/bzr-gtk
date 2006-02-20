@@ -39,7 +39,7 @@ def distances(branch, start):
 
     Returns a tuple of (revids, revisions, colours, children)
     """
-    revisions = { start: branch.get_revision(start) }
+    revisions = { start: branch.repository.get_revision(start) }
     children = { revisions[start]: set() }
     distances = { start: 0 }
     colours = { start: 0 }
@@ -69,7 +69,7 @@ def distances(branch, start):
             except KeyError:
                 try:
                     parent = revisions[parent_id] \
-                             = branch.get_revision(parent_id)
+                             = branch.repository.get_revision(parent_id)
                 except NoSuchRevision:
                     parent = revisions[parent_id] = DummyRevision(parent_id)
 
