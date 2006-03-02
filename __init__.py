@@ -17,7 +17,7 @@
 __version__ = "0.7pre"
 __author__ = "Dan Loda <danloda@gmail.com>"
 
-from bzrlib.branch import Branch
+from bzrlib.workingtree import WorkingTree
 from bzrlib.commands import Command, register_command
 from bzrlib.errors import NotVersionedError, BzrCommandError
 from bzrlib.option import Option
@@ -51,9 +51,10 @@ class cmd_gannotate(Command):
         from gannotate import GAnnotateWindow
         from config import GAnnotateConfig
 
-        (branch, path) = Branch.open_containing(filename)
+        (wt, path) = WorkingTree.open_containing(filename)
+        branch = wt.branch
 
-        file_id = branch.working_tree().path2id(path)
+        file_id = wt.path2id(path)
 
         if file_id is None:
             raise NotVersionedError(filename)
