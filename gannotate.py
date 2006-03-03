@@ -116,10 +116,11 @@ class GAnnotateWindow(gtk.Window):
         weave = repository.weave_store.get_weave(file_id,
                                                  branch.get_transaction())
         
+        revision_cache = RevisionCache(repository)
         for origin, text in weave.annotate_iter(rev_id):
             rev_id = weave.idx_to_name(origin)
             try:
-                revision = repository.get_revision(rev_id)
+                revision = revision_cache.get_revision(rev_id)
                 if rev_id in rev_hist:
                     revno = branch.revision_id_to_revno(rev_id)
                 else:
@@ -287,3 +288,15 @@ class NoneRevision:
         self.timestamp = 0.0
         self.timezone = 0
 
+
+class RevisionCache(object):
+    """A caching revision source"""
+    def __init__(self, real_source):
+        self.__real_source = real_source
+        self.__cache = {}
+
+    def get_revision(self, revision_id):
+        if revision_id not in self.__cache:
+            revision = self.__real_source.get_revision(revision_id)
+            self.__cache[revision_id] = revision
+        return self.__cache[revision_id]
