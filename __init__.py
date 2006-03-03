@@ -64,7 +64,11 @@ class cmd_gannotate(Command):
         window.set_title(path + " - gannotate")
         config = GAnnotateConfig(window)
         window.show()
-        window.annotate(branch, file_id)
+        branch.lock_read()
+        try:
+            window.annotate(branch, file_id)
+        finally:
+            branch.unlock()
         window.jump_to_line(line)
         
         gtk.main()
