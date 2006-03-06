@@ -50,7 +50,7 @@ class DistanceMethod(object):
         while todo:
             revid = todo.pop()
             try:
-                revision = branch.get_revision(revid)
+                revision = branch.repository.get_revision(revid)
             except NoSuchRevision:
                 revision = DummyRevision(revid)
             self.cache_revision(revid, revision)

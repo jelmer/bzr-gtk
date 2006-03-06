@@ -109,8 +109,8 @@ class DiffWindow(gtk.Window):
         Compares the two trees and populates the window with the
         differences.
         """
-        self.rev_tree = branch.revision_tree(revid)
-        self.parent_tree = branch.revision_tree(parentid)
+        self.rev_tree = branch.repository.revision_tree(revid)
+        self.parent_tree = branch.repository.revision_tree(parentid)
 
         self.model.clear()
         delta = compare_trees(self.parent_tree, self.rev_tree)
