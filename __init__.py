@@ -48,17 +48,23 @@ class cmd_visualise(bzrlib.commands.Command):
     def run(self, location=".", revision=None, robust=False, accurate=False,
             maxnum=None):
         (branch, path) = Branch.open_containing(location)
-        if revision is None:
-            revid = branch.last_revision()
-            if revid is None:
-                return
-        else:
-            (revno, revid) = revision[0].in_history(branch)
+        branch.lock_read()
+        branch.repository.lock_read()
+        try:
+            if revision is None:
+                revid = branch.last_revision()
+                if revid is None:
+                    return
+            else:
+                (revno, revid) = revision[0].in_history(branch)
 
-        from bzrkapp import BzrkApp
-
-        app = BzrkApp()
-        app.show(branch, revid, robust, accurate, maxnum)
+            from bzrkapp import BzrkApp
+                
+            app = BzrkApp()
+            app.show(branch, revid, robust, accurate, maxnum)
+        finally:
+            branch.repository.unlock()
+            branch.unlock()
         app.main()
 
 
