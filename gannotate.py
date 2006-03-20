@@ -68,30 +68,36 @@ class GAnnotateWindow(gtk.Window):
                                        gobject.TYPE_STRING)
         
         last_seen = None
-        for line_no, (revision, revno, line)\
-                in enumerate(self._annotate(branch, file_id)):
-            if revision.revision_id == last_seen and not self.all:
-                revno = committer = ""
-            else:
-                last_seen = revision.revision_id
-                committer = revision.committer
+        try:
+            branch.lock_read()
+            branch.repository.lock_read()
+            for line_no, (revision, revno, line)\
+                    in enumerate(self._annotate(branch, file_id)):
+                if revision.revision_id == last_seen and not self.all:
+                    revno = committer = ""
+                else:
+                    last_seen = revision.revision_id
+                    committer = revision.committer
 
-            if revision.revision_id not in self.revisions:
-                self.revisions[revision.revision_id] = revision
+                if revision.revision_id not in self.revisions:
+                    self.revisions[revision.revision_id] = revision
 
-            self.annomodel.append([revision.revision_id,
-                                   line_no + 1,
-                                   committer,
-                                   revno,
-                                   None,
-                                   line.rstrip("\r\n")
-                                  ])
+                self.annomodel.append([revision.revision_id,
+                                       line_no + 1,
+                                       committer,
+                                       revno,
+                                       None,
+                                       line.rstrip("\r\n")
+                                      ])
 
-        if not self.plain:
-            self._set_oldest_newest()
-            # Recall that calling activate_default will emit "span-changed",
-            # so self._span_changed_cb will take care of initial highlighting
-            self.span_selector.activate_default()
+            if not self.plain:
+                self._set_oldest_newest()
+                # Recall that calling activate_default will emit "span-changed",
+                # so self._span_changed_cb will take care of initial highlighting
+                self.span_selector.activate_default()
+        finally:
+            branch.repository.unlock()
+            branch.unlock()
 
         self.annoview.set_model(self.annomodel)
         self.annoview.grab_focus()
@@ -118,7 +124,7 @@ class GAnnotateWindow(gtk.Window):
         
         revision_cache = RevisionCache(repository)
         for origin, text in weave.annotate_iter(rev_id):
-            rev_id = weave.idx_to_name(origin)
+            rev_id = origin
             try:
                 revision = revision_cache.get_revision(rev_id)
                 if rev_id in rev_hist:
