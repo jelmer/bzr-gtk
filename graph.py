@@ -150,7 +150,7 @@ class DistanceMethod(object):
                 if pending_count == 0:
                     ancestor_ids_of[parent_id] = None
 
-    def sort_revisions(self, sorted_revids):
+    def sort_revisions(self, sorted_revids, maxnum):
         revisions = self.revisions
         parent_ids_of = self.parent_ids_of
         children_of_id = self.children_of_id
@@ -178,6 +178,12 @@ class DistanceMethod(object):
             else:
                 # all children are here, push!
                 distances[revid] = len(distances)
+                if maxnum is not None and len(distances) > maxnum:
+                    # bail out early if a limit was specified
+                    sorted_revids[:0] = skipped_revids
+                    for revid in sorted_revids:
+                        distances[revid] = len(distances)
+                    break
                 # all parents will need to be pushed as soon as possible
                 for parent in parent_ids_of[revision]:
                     if parent not in pending_ids:
@@ -281,7 +287,7 @@ def distances(branch, start, robust, accurate, maxnum):
     children = distance.make_children_map()
     if accurate:
         print 'accurate sorting'
-        sorted_revids = distance.sort_revisions(sorted_revids)
+        sorted_revids = distance.sort_revisions(sorted_revids, maxnum)
     for revid in sorted_revids:
         distance.choose_colour(revid)
 
