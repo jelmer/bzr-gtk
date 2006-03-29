@@ -286,23 +286,23 @@ class BranchWindow(gtk.Window):
         self.fwd_button.set_sensitive(len(self.children[revision]) > 0)
 
         if revision.committer is not None:
-	    branchnick = ""
+            branchnick = ""
             committer = revision.committer
             timestamp = format_date(revision.timestamp, revision.timezone)
             message = revision.message
-	    try:
-		branchnick = revision.properties['branch-nick']
-	    except KeyError:
-		pass
+            try:
+                branchnick = revision.properties['branch-nick']
+            except KeyError:
+                pass
 
         else:
             committer = ""
             timestamp = ""
             message = ""
-	    branchnick = ""
+            branchnick = ""
 
         self.revid_label.set_text(revision.revision_id)
-	self.branchnick_label.set_text(branchnick)
+        self.branchnick_label.set_text(branchnick)
 
         self.committer_label.set_text(committer)
         self.timestamp_label.set_text(timestamp)
