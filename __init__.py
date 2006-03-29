@@ -33,19 +33,15 @@ class cmd_visualise(bzrlib.commands.Command):
 
     The --robust option enables removal of redundant parents. It is sometimes
     useful on branches that contain corrupt revisions.
-
-    The --accurate option enables a more expensive sorting algorithm to keep
-    revisions on the same branch close.
     """
     takes_options = [
         "revision",
         Option('robust', "ignore redundant parents"),
-        Option('accurate', "sort revisions more carefully"),
         Option('maxnum', "maximum number of revisions to display", int, 'count')]
     takes_args = [ "location?" ]
     aliases = [ "visualize", "vis", "viz" ]
 
-    def run(self, location=".", revision=None, robust=False, accurate=False,
+    def run(self, location=".", revision=None, robust=False,
             maxnum=None):
         (branch, path) = Branch.open_containing(location)
         branch.lock_read()
@@ -61,7 +57,7 @@ class cmd_visualise(bzrlib.commands.Command):
             from bzrkapp import BzrkApp
                 
             app = BzrkApp()
-            app.show(branch, revid, robust, accurate, maxnum)
+            app.show(branch, revid, robust, maxnum)
         finally:
             branch.repository.unlock()
             branch.unlock()

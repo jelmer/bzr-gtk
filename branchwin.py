@@ -238,7 +238,7 @@ class BranchWindow(gtk.Window):
 
         return vbox
 
-    def set_branch(self, branch, start, robust, accurate, maxnum):
+    def set_branch(self, branch, start, robust, maxnum):
         """Set the branch and start position for this window.
 
         Creates a new TreeModel and populates it with information about
@@ -257,16 +257,15 @@ class BranchWindow(gtk.Window):
         index = 0
 
         last_lines = []
-        (revids, self.revisions, colours, self.children, self.parent_ids) \
-                 = distances(branch, start, robust, accurate, maxnum)
+        (self.revisions, colours, self.children, self.parent_ids, merge_sorted) \
+                 = distances(branch, start, robust, maxnum)
         for revision, node, lines in graph(
-                revids, self.revisions, colours, self.parent_ids):
+                self.revisions, colours, self.parent_ids, merge_sorted):
             message = revision.message.split("\n")[0]
             if revision.committer is not None:
                 timestamp = format_date(revision.timestamp, revision.timezone)
             else:
                 timestamp = None
-
             self.model.append([ revision, node, last_lines, lines,
                                 message, revision.committer, timestamp ])
             self.index[revision] = index
