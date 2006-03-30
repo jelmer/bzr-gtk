@@ -273,7 +273,7 @@ class BranchWindow(gtk.Window):
 
             last_lines = lines
 
-        self.set_title(os.path.basename(branch.base) + " - bzrk")
+        self.set_title(branch.nick + " - bzrk")
         self.treeview.set_model(self.model)
 
     def _treeview_cursor_cb(self, *args):
