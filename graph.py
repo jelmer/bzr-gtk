@@ -12,6 +12,7 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 
 from bzrlib.errors import NoSuchRevision
+from bzrlib.tsort import merge_sort
 
 
 class DummyRevision(object):
@@ -44,6 +45,7 @@ class DistanceMethod(object):
         self.direct_parent_of = {}
 
     def fill_caches(self):
+        # FIXME: look at using repository.get_revision_graph_with_ghosts - RBC.
         branch = self.branch
         revisions = self.revisions
         todo = set([self.start])
@@ -86,12 +88,15 @@ class DistanceMethod(object):
                     for (revid, c) in self.children_of_id.iteritems())
 
     def first_ancestry_traversal(self):
+        # make a revision graph:
+        self.graph = {}
         distances = {}
         todo = [self.start]
         revisions = self.revisions
         children_of_id = self.children_of_id
         while todo:
             revid = todo.pop(0)
+            self.graph[revid] = self.revisions[revid].parent_ids
             for child in children_of_id[revid]:
                 if child.revision_id not in distances:
                     todo.append(revid)
@@ -104,6 +109,7 @@ class DistanceMethod(object):
         # Topologically sorted revids, with the most recent revisions first.
         # A revision occurs only after all of its children.
         self.distances = distances
+        self.merge_sorted = merge_sort(self.graph, self.start)
         return sorted(distances, key=distances.get)
 
     def remove_redundant_parents(self, sorted_revids):
@@ -150,7 +156,7 @@ class DistanceMethod(object):
                 if pending_count == 0:
                     ancestor_ids_of[parent_id] = None
 
-    def sort_revisions(self, sorted_revids):
+    def sort_revisions(self, sorted_revids, maxnum):
         revisions = self.revisions
         parent_ids_of = self.parent_ids_of
         children_of_id = self.children_of_id
@@ -178,6 +184,12 @@ class DistanceMethod(object):
             else:
                 # all children are here, push!
                 distances[revid] = len(distances)
+                if maxnum is not None and len(distances) > maxnum:
+                    # bail out early if a limit was specified
+                    sorted_revids[:0] = skipped_revids
+                    for revid in sorted_revids:
+                        distances[revid] = len(distances)
+                    break
                 # all parents will need to be pushed as soon as possible
                 for parent in parent_ids_of[revision]:
                     if parent not in pending_ids:
@@ -263,7 +275,7 @@ class DistanceMethod(object):
                 self.colours[revid] = self.last_colour = self.last_colour + 1
 
 
-def distances(branch, start, robust, accurate, maxnum):
+def distances(branch, start, robust, maxnum):
     """Sort the revisions.
 
     Traverses the branch revision tree starting at start and produces an
@@ -279,21 +291,22 @@ def distances(branch, start, robust, accurate, maxnum):
         print 'robust filtering'
         distance.remove_redundant_parents(sorted_revids)
     children = distance.make_children_map()
-    if accurate:
-        print 'accurate sorting'
-        sorted_revids = distance.sort_revisions(sorted_revids)
-    for revid in sorted_revids:
+    sorted_revids = []
+    
+    for seq, revid, merge_depth, end_of_merge in distance.merge_sorted:
+        sorted_revids.append(revid)
         distance.choose_colour(revid)
 
     if maxnum is not None:
         del sorted_revids[maxnum:]
+        print 'FIXME: maxnum disabled.'
 
     revisions = distance.revisions
     colours = distance.colours
     parent_ids_of = distance.parent_ids_of
-    return (sorted_revids, revisions, colours, children, parent_ids_of)
+    return (revisions, colours, children, parent_ids_of, distance.merge_sorted)
 
-def graph(revids, revisions, colours, parent_ids):
+def graph(revisions, colours, parent_ids, merge_sorted):
     """Produce a directed graph of a bzr branch.
 
     For each revision it then yields a tuple of (revision, node, lines).
@@ -315,39 +328,160 @@ def graph(revids, revisions, colours, parent_ids):
     It's up to you how to actually draw the nodes and lines (straight,
     curved, kinked, etc.) and to pick the actual colours for each index.
     """
-    hanging = revids[:1]
-    for revid in revids:
+    if not len(merge_sorted):
+        return
+    # split merge_sorted into a map:
+    revs = {}
+    # FIXME: get a hint on this from the merge_sorted data rather than
+    # calculating it ourselves
+    # mapping from rev_id to the sequence number of the next lowest rev
+    next_lower_rev = {}
+    # mapping from rev_id to next-in-branch-revid - may be None for end
+    # of branch
+    next_branch_revid = {}
+    # the stack we are in in the sorted data for determining which 
+    # next_lower_rev to set. It is a stack which has one list at each
+    # depth - the ids at that depth that need the same id allocated.
+    current_stack = [[]]
+    for seq, revid, indent, end_merge in merge_sorted:
+        revs[revid] = (seq, indent, end_merge)
+        if indent == len(current_stack):
+            # new merge group starts
+            current_stack.append([revid])
+        elif indent == len(current_stack) - 1:
+            # part of the current merge group
+            current_stack[-1].append(revid)
+        else:
+            # end of a merge group
+            while current_stack[-1]:
+                stack_rev_id = current_stack[-1].pop()
+                # record the next lower rev for this rev:
+                next_lower_rev[stack_rev_id] = seq
+                # if this followed a non-end-merge rev in this group note that
+                if len(current_stack[-1]):
+                    if not revs[current_stack[-1][-1]][2]:
+                        next_branch_revid[current_stack[-1][-1]] = stack_rev_id
+            current_stack.pop()
+            # append to the now-current merge group
+            current_stack[-1].append(revid)
+    # assign a value to all the depth 0 revisions
+    while current_stack[-1]:
+        stack_rev_id = current_stack[-1].pop()
+        # record the next lower rev for this rev:
+        next_lower_rev[stack_rev_id] = len(merge_sorted)
+        # if this followed a non-end-merge rev in this group note that
+        if len(current_stack[-1]):
+            if not revs[current_stack[-1][-1]][2]:
+                next_branch_revid[current_stack[-1][-1]] = stack_rev_id
+
+    # a list of the current revisions we are drawing lines TO indicating
+    # the sequence of their lines on the screen.
+    # i.e. [A, B, C] means that the line to A, to B, and to C are in
+    # (respectively), 0, 1, 2 on the screen.
+    hanging = [merge_sorted[0][1]]
+    for seq, revid, indent, end_merge in merge_sorted:
+        # a list of the lines to draw: their position in the
+        # previous row, their position in this row, and the colour
+        # (which is the colour they are routing to).
         lines = []
-        node = None
 
         new_hanging = []
+
         for h_idx, hang in enumerate(hanging):
+            # one of these will be the current lines node:
+            # we are drawing a line. h_idx 
             if hang == revid:
-                # We've matched a hanging revision, so need to output a node
-                # at this point
+                # we have found the current lines node
                 node = (h_idx, colours[revid])
 
+                # note that we might have done the main parent
+                drawn_parents = set()
+
+                def draw_line(from_idx, to_idx, revision_id):
+                    try:
+                        n_idx = new_hanging.index(revision_id)
+                    except ValueError:
+                        # force this to be vertical at the place this rev was
+                        # drawn.
+                        new_hanging.insert(to_idx, revision_id)
+                        n_idx = to_idx
+                    lines.append((from_idx, n_idx, colours[revision_id]))
+
+                
+                # we want to draw a line to the next commit on 'this' branch
+                if not end_merge:
+                    # drop this line first.
+                    parent_id = next_branch_revid[revid]
+                    draw_line(h_idx, h_idx, parent_id)
+                    # we have drawn this parent
+                    drawn_parents.add(parent_id)
+                else:
+                    # this is the last revision in a 'merge', show where it came from
+                    if len(parent_ids[revisions[revid]]) > 1:
+                        # having > 1
+                        # parents means this commit was a merge, and being
+                        # the end point of a merge group means that all
+                        # the parent revisions were merged into branches
+                        # to the left of this before this was committed
+                        # - so we want to show this as a new branch from
+                        # those revisions.
+                        # to do this, we show the parent with the lowest
+                        # sequence number, which is the one that this
+                        # branch 'spawned from', and no others.
+                        # If this sounds like a problem, remember that:
+                        # if the parent was not already in our mainline
+                        # it would show up as a merge into this making
+                        # this not the end of a merge-line.
+                        lowest = len(merge_sorted)
+                        for parent_id in parent_ids[revisions[revid]]:
+                            if revs[parent_id][0] < lowest:
+                                lowest = revs[parent_id][0]
+                        assert lowest != len(merge_sorted)
+                        draw_line(h_idx, len(new_hanging), merge_sorted[lowest][1])
+                        drawn_parents.add(merge_sorted[lowest][1])
+                    elif len(parent_ids[revisions[revid]]) == 1:
+                        # only one parent, must show this link to be useful.
+                        parent_id = parent_ids[revisions[revid]][0]
+                        draw_line(h_idx, len(new_hanging), parent_id)
+                        drawn_parents.add(parent_id)
+                
+                # what do we want to draw lines to from here:
+                # each parent IF its relevant.
+                #
                 # Now we need to hang its parents, we put them at the point
                 # the old column was so anything to the right of this has
                 # to move outwards to make room.  We also try and collapse
                 # hangs to keep the graph small.
+                # RBC: we do not draw lines to parents that were already merged
+                # unless its the last revision in a merge group.
                 for parent_id in parent_ids[revisions[revid]]:
-                    try:
-                        n_idx = new_hanging.index(parent_id)
-                    except ValueError:
-                        n_idx = len(new_hanging)
-                        new_hanging.append(parent_id)
-                    lines.append((h_idx, n_idx, colours[parent_id]))
+                    if parent_id in drawn_parents:
+                        continue
+                    parent_seq = revs[parent_id][0]
+                    parent_depth = revs[parent_id][1]
+                    if parent_depth == indent + 1:
+                        # the parent was a merge into this branch
+                        # determine if it was already merged into the mainline
+                        # via a different merge:
+                        # if all revisions between us and parent_seq have a 
+                        # indent greater than there are no revisions with a lower indent than
+                        # us.
+                        # we do not use 'parent_depth < indent' because that would allow
+                        # un-uniqueified merges to show up, and merge_sorted should take
+                        # care of that for us (but does not trim the values)
+                        if parent_seq < next_lower_rev[revid]:
+                            draw_line(h_idx, len(new_hanging), parent_id)
+                    elif parent_depth == indent and parent_seq == seq + 1:
+                        # part of this branch
+                        draw_line(h_idx, len(new_hanging), parent_id)
             else:
-                # Revision keeps on hanging, adjust for any change in the
-                # graph shape and try to collapse hangs to keep the graph
-                # small.
-                try:
-                    n_idx = new_hanging.index(hang)
-                except ValueError:
-                    n_idx = len(new_hanging)
-                    new_hanging.append(hang)
-                lines.append((h_idx, n_idx, colours[hang]))
+                # draw a line from the previous position of this line to the 
+                # new position.
+                # h_idx is the old position.
+                # new_indent is the new position. 
+                draw_line(h_idx, len(new_hanging), hang)
+        # we've calculated the row, assign new_hanging to hanging to setup for
+        # the next row
         hanging = new_hanging
 
         yield (revisions[revid], node, lines)
