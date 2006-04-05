@@ -260,7 +260,10 @@ class BranchWindow(gtk.Window):
         (self.revisions, colours, self.children, self.parent_ids, merge_sorted) \
                  = distances(branch, start, robust, maxnum)
         for revision, node, lines in graph(
-                self.revisions, colours, self.parent_ids, merge_sorted):
+                self.revisions, colours, merge_sorted):
+            # FIXME: at this point we should be able to show the graph order and
+            # lines with no message or commit data - and then incrementally fill
+            # the timestamp, committer etc data as desired.
             message = revision.message.split("\n")[0]
             if revision.committer is not None:
                 timestamp = format_date(revision.timestamp, revision.timezone)

@@ -31,6 +31,38 @@ class DummyRevision(object):
         self.message = self.revision_id
 
 
+class RevisionProxy(object):
+    """A revision proxy object.
+
+    This will demand load the revision it represents when the committer or
+    message attributes are accessed in order to populate them. It is 
+    constructed with the revision id and parent_ids list and a repository
+    object to request the revision from when needed.
+    """
+
+    def __init__(self, revid, parent_ids, repository):
+        self.revision_id = revid
+        self.parent_ids = parent_ids
+        self._repository = repository
+        self._revision = None
+
+    def _get_attribute_getter(attr):
+        def get_attribute(self):
+            if self._revision is None:
+                self._load()
+            return getattr(self._revision, attr)
+        return get_attribute
+    committer = property(_get_attribute_getter('committer'))
+    message = property(_get_attribute_getter('message'))
+    properties = property(_get_attribute_getter('properties'))
+    timestamp = property(_get_attribute_getter('timestamp'))
+    timezone = property(_get_attribute_getter('timezone'))
+
+    def _load(self):
+        """Load the revision object."""
+        self._revision = self._repository.get_revision(self.revision_id)
+
+
 class DistanceMethod(object):
 
     def __init__(self, branch, start):
@@ -43,36 +75,28 @@ class DistanceMethod(object):
         self.colours = { start: 0 }
         self.last_colour = 0
         self.direct_parent_of = {}
+        self.graph = {}
 
     def fill_caches(self):
         # FIXME: look at using repository.get_revision_graph_with_ghosts - RBC.
-        branch = self.branch
-        revisions = self.revisions
-        todo = set([self.start])
-        while todo:
-            revid = todo.pop()
-            try:
-                revision = branch.repository.get_revision(revid)
-            except NoSuchRevision:
-                revision = DummyRevision(revid)
-            self.cache_revision(revid, revision)
-            for parent_id in revision.parent_ids:
-                if parent_id not in revisions:
-                    todo.add(parent_id)
+        graph = self.branch.repository.get_revision_graph_with_ghosts([self.start])
+        for revid in graph.ghosts:
+            self.cache_revision(DummyRevision(revid))
+        for revid, parents in graph.get_ancestors().items():
+            self.cache_revision(RevisionProxy(revid, parents, self.branch.repository))
 
-    def cache_revision(self, revid, revision):
+    def cache_revision(self, revision):
         "Set the caches for a newly retrieved revision."""
+        revid = revision.revision_id
         # Build a revision cache
         self.revisions[revid] = revision
-        # Build a children dictionnary
+        # Build a children dictionary
         for parent_id in revision.parent_ids:
             self.children_of_id.setdefault(parent_id, set()).add(revision)
         # Build a parents dictionnary, where redundant parents will be removed,
         # and that will be passed along tothe rest of program.
-        if len(revision.parent_ids) == len(set(revision.parent_ids)):
-            self.parent_ids_of[revision] = list(revision.parent_ids)
-        else:
-            # Remove duplicate parents
+        if len(revision.parent_ids) != len(set(revision.parent_ids)):
+            # fix the parent_ids list.
             parent_ids = []
             parent_ids_set = set()
             for parent_id in revision.parent_ids:
@@ -80,37 +104,14 @@ class DistanceMethod(object):
                     continue
                 parent_ids.append(parent_id)
                 parent_ids_set.add(parent_id)
-            self.parent_ids_of[revision] = parent_ids
+            revision.parent_ids = parent_ids
+        self.parent_ids_of[revision] = list(revision.parent_ids)
+        self.graph[revid] = revision.parent_ids
 
     def make_children_map(self):
         revisions = self.revisions
         return dict((revisions[revid], c)
                     for (revid, c) in self.children_of_id.iteritems())
-
-    def first_ancestry_traversal(self):
-        # make a revision graph:
-        self.graph = {}
-        distances = {}
-        todo = [self.start]
-        revisions = self.revisions
-        children_of_id = self.children_of_id
-        while todo:
-            revid = todo.pop(0)
-            self.graph[revid] = self.revisions[revid].parent_ids
-            for child in children_of_id[revid]:
-                if child.revision_id not in distances:
-                    todo.append(revid)
-                    break
-            else:
-                distances[revid] = len(distances)
-                for parent_id in revisions[revid].parent_ids:
-                    if parent_id not in todo:
-                        todo.insert(0, parent_id)
-        # Topologically sorted revids, with the most recent revisions first.
-        # A revision occurs only after all of its children.
-        self.distances = distances
-        self.merge_sorted = merge_sort(self.graph, self.start)
-        return sorted(distances, key=distances.get)
 
     def remove_redundant_parents(self, sorted_revids):
         children_of_id = self.children_of_id
@@ -247,7 +248,7 @@ class DistanceMethod(object):
             self.colours[revid] = self.last_colour = self.last_colour + 1
 
     def choose_colour_many_children(self, revision, the_children):
-        distances = self.distances
+        """Colour revision revision."""
         revid = revision.revision_id
         direct_parent_of = self.direct_parent_of
         # multiple children, get the colour of the last displayed child
@@ -261,8 +262,14 @@ class DistanceMethod(object):
             if direct_parent == revision:
                 self.colours[revid] = self.colours[child.revision_id]
                 break
-            if direct_parent is None:
-                available[child] = distances[child.revision_id]
+            # FIXME: Colouring based on whats been displayed MUST be done with 
+            # knowledge of the revisions being output.
+            # until the refactoring to fold graph() into this more compactly is
+            # done, I've disabled this reuse. RBC 20060403
+            # if direct_parent is None:
+            #     available[child] = distances[child.revision_id] 
+            #   .. it will be something like available[child] =  \
+            #  revs[child.revision_id][0] - which is the sequence number
         else:
             if available:
                 sorted_children = sorted(available, key=available.get)
@@ -286,19 +293,16 @@ def distances(branch, start, robust, maxnum):
     """
     distance = DistanceMethod(branch, start)
     distance.fill_caches()
-    sorted_revids = distance.first_ancestry_traversal()
     if robust:
         print 'robust filtering'
-        distance.remove_redundant_parents(sorted_revids)
+        distance.remove_redundant_parents(self.graph.keys())
+    distance.merge_sorted = merge_sort(distance.graph, distance.start)
     children = distance.make_children_map()
-    sorted_revids = []
     
     for seq, revid, merge_depth, end_of_merge in distance.merge_sorted:
-        sorted_revids.append(revid)
         distance.choose_colour(revid)
 
     if maxnum is not None:
-        del sorted_revids[maxnum:]
         print 'FIXME: maxnum disabled.'
 
     revisions = distance.revisions
@@ -306,7 +310,7 @@ def distances(branch, start, robust, maxnum):
     parent_ids_of = distance.parent_ids_of
     return (revisions, colours, children, parent_ids_of, distance.merge_sorted)
 
-def graph(revisions, colours, parent_ids, merge_sorted):
+def graph(revisions, colours, merge_sorted):
     """Produce a directed graph of a bzr branch.
 
     For each revision it then yields a tuple of (revision, node, lines).
@@ -417,7 +421,7 @@ def graph(revisions, colours, parent_ids, merge_sorted):
                     drawn_parents.add(parent_id)
                 else:
                     # this is the last revision in a 'merge', show where it came from
-                    if len(parent_ids[revisions[revid]]) > 1:
+                    if len(revisions[revid].parent_ids) > 1:
                         # having > 1
                         # parents means this commit was a merge, and being
                         # the end point of a merge group means that all
@@ -433,15 +437,15 @@ def graph(revisions, colours, parent_ids, merge_sorted):
                         # it would show up as a merge into this making
                         # this not the end of a merge-line.
                         lowest = len(merge_sorted)
-                        for parent_id in parent_ids[revisions[revid]]:
+                        for parent_id in revisions[revid].parent_ids:
                             if revs[parent_id][0] < lowest:
                                 lowest = revs[parent_id][0]
                         assert lowest != len(merge_sorted)
                         draw_line(h_idx, len(new_hanging), merge_sorted[lowest][1])
                         drawn_parents.add(merge_sorted[lowest][1])
-                    elif len(parent_ids[revisions[revid]]) == 1:
+                    elif len(revisions[revid].parent_ids) == 1:
                         # only one parent, must show this link to be useful.
-                        parent_id = parent_ids[revisions[revid]][0]
+                        parent_id = revisions[revid].parent_ids[0]
                         draw_line(h_idx, len(new_hanging), parent_id)
                         drawn_parents.add(parent_id)
                 
@@ -454,7 +458,7 @@ def graph(revisions, colours, parent_ids, merge_sorted):
                 # hangs to keep the graph small.
                 # RBC: we do not draw lines to parents that were already merged
                 # unless its the last revision in a merge group.
-                for parent_id in parent_ids[revisions[revid]]:
+                for parent_id in revisions[revid].parent_ids:
                     if parent_id in drawn_parents:
                         continue
                     parent_seq = revs[parent_id][0]
