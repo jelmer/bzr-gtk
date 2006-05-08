@@ -10,8 +10,6 @@ __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 
-import os
-
 import gtk
 import gobject
 import pango
@@ -238,7 +236,7 @@ class BranchWindow(gtk.Window):
 
         return vbox
 
-    def set_branch(self, branch, start, robust, maxnum):
+    def set_branch(self, branch, start, maxnum):
         """Set the branch and start position for this window.
 
         Creates a new TreeModel and populates it with information about
@@ -257,8 +255,8 @@ class BranchWindow(gtk.Window):
         index = 0
 
         last_lines = []
-        (self.revisions, colours, self.children, self.parent_ids, merge_sorted) \
-                 = distances(branch, start, robust, maxnum)
+        (self.revisions, colours, self.children, self.parent_ids,
+         merge_sorted) = distances(branch, start, maxnum)
         for revision, node, lines in graph(
                 self.revisions, colours, merge_sorted):
             # FIXME: at this point we should be able to show the graph order and

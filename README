@@ -12,7 +12,7 @@ bzrk is written in Python, so doesn't need compiling, however you will
 need the following runtime dependencies:
 
   * Python 2.4
-  * bzr 0.6 or later
+  * bzr 0.8 or later
   * PyGTK 2.8 or later
   * PyCairo 1.0 or later
 
@@ -31,8 +31,8 @@ BZR_PLUGIN_PATH environment variable.
 Usage
 -----
 
-Simply run "bzr visualise" (or "bzr viz") while in a bzr working tree,
-a window will appear with the history of the branch and a graph
+Simply run "bzr visualise" (or "bzr viz") while in a bzr working tree or
+branch, a window will appear with the history of the branch and a graph
 connecting the individual revisions.
 
 You can move through the revision history by clicking or with the arrow

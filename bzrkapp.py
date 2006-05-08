@@ -27,10 +27,10 @@ class BzrkApp(object):
     the last window is closed.
     """
 
-    def show(self, branch, start, robust, maxnum):
+    def show(self, branch, start, maxnum):
         """Open a new window to show the given branch."""
         window = BranchWindow(self)
-        window.set_branch(branch, start, robust, maxnum)
+        window.set_branch(branch, start, maxnum)
         window.connect("destroy", self._destroy_cb)
         window.show()
 

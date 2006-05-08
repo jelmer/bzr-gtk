@@ -10,12 +10,9 @@ __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 
-import os
-
 from cStringIO import StringIO
 
 import gtk
-import gobject
 import pango
 
 try:

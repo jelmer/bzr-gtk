@@ -16,13 +16,12 @@ __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 
-import bzrlib
-import bzrlib.commands
+from bzrlib.commands import Command, register_command
 from bzrlib.option import Option
 from bzrlib.branch import Branch
 
 
-class cmd_visualise(bzrlib.commands.Command):
+class cmd_visualise(Command):
     """Graphically visualise this branch.
 
     Opens a graphical window to allow you to see the history of the branch
@@ -30,19 +29,14 @@ class cmd_visualise(bzrlib.commands.Command):
 
     The default starting point is latest revision on the branch, you can
     specify a starting point with -r revision.
-
-    The --robust option enables removal of redundant parents. It is sometimes
-    useful on branches that contain corrupt revisions.
     """
     takes_options = [
         "revision",
-        Option('robust', "ignore redundant parents"),
         Option('maxnum', "maximum number of revisions to display", int, 'count')]
     takes_args = [ "location?" ]
     aliases = [ "visualize", "vis", "viz" ]
 
-    def run(self, location=".", revision=None, robust=False,
-            maxnum=None):
+    def run(self, location=".", revision=None, maxnum=None):
         (branch, path) = Branch.open_containing(location)
         branch.lock_read()
         branch.repository.lock_read()
@@ -57,11 +51,11 @@ class cmd_visualise(bzrlib.commands.Command):
             from bzrkapp import BzrkApp
                 
             app = BzrkApp()
-            app.show(branch, revid, robust, maxnum)
+            app.show(branch, revid, maxnum)
         finally:
             branch.repository.unlock()
             branch.unlock()
         app.main()
 
 
-bzrlib.commands.register_command(cmd_visualise)
+register_command(cmd_visualise)

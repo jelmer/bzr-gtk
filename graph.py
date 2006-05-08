@@ -11,7 +11,6 @@ __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 
-from bzrlib.errors import NoSuchRevision
 from bzrlib.tsort import merge_sort
 
 
@@ -112,50 +111,6 @@ class DistanceMethod(object):
         revisions = self.revisions
         return dict((revisions[revid], c)
                     for (revid, c) in self.children_of_id.iteritems())
-
-    def remove_redundant_parents(self, sorted_revids):
-        children_of_id = self.children_of_id
-        revisions = self.revisions
-        parent_ids_of = self.parent_ids_of
-        
-        # Count the number of children of each revision, so we can release
-        # memory for ancestry data as soon as it's not going to be needed
-        # anymore.
-        pending_count_of = {}
-        for parent_id, children in children_of_id.iteritems():
-            pending_count_of[parent_id] = len(children)
-
-        # Build the ancestry dictionnary by examining older revisions first,
-        # and remove revision parents that are ancestors of other parents of
-        # the same revision.
-        ancestor_ids_of = {}
-        for revid in reversed(sorted_revids):
-            revision = revisions[revid]
-            parent_ids = parent_ids_of[revision]
-            # ignore candidate parents which are an ancestor of another parent,
-            # but never ignore the leftmost parent
-            redundant_ids = []
-            ignorable_parent_ids = parent_ids[1:] # never ignore leftmost
-            for candidate_id in ignorable_parent_ids: 
-                for parent_id in list(parent_ids):
-                    if candidate_id in ancestor_ids_of[parent_id]:
-                        redundant_ids.append(candidate_id)
-                        parent_ids.remove(candidate_id)
-                        children_of_candidate = children_of_id[candidate_id]
-                        children_of_candidate.remove(revision)
-                        break
-            # save the set of ancestors of that revision
-            ancestor_ids = set(parent_ids)
-            for parent_id in parent_ids:
-                ancestor_ids.update(ancestor_ids_of[parent_id])
-            ancestor_ids_of[revid] = ancestor_ids
-            # discard ancestry data for revisions whose children are already
-            # done
-            for parent_id in parent_ids + redundant_ids:
-                pending_count = pending_count_of[parent_id] - 1
-                pending_count_of[parent_id] = pending_count
-                if pending_count == 0:
-                    ancestor_ids_of[parent_id] = None
 
     def sort_revisions(self, sorted_revids, maxnum):
         revisions = self.revisions
@@ -282,7 +237,7 @@ class DistanceMethod(object):
                 self.colours[revid] = self.last_colour = self.last_colour + 1
 
 
-def distances(branch, start, robust, maxnum):
+def distances(branch, start, maxnum):
     """Sort the revisions.
 
     Traverses the branch revision tree starting at start and produces an
@@ -293,9 +248,6 @@ def distances(branch, start, robust, maxnum):
     """
     distance = DistanceMethod(branch, start)
     distance.fill_caches()
-    if robust:
-        print 'robust filtering'
-        distance.remove_redundant_parents(self.graph.keys())
     distance.merge_sorted = merge_sort(distance.graph, distance.start)
     children = distance.make_children_map()
     
