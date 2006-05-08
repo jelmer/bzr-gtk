@@ -61,7 +61,7 @@ class BranchWindow(gtk.Window):
     def construct_top(self):
         """Construct the top-half of the window."""
         vbox = gtk.VBox(spacing=6)
-        vbox.set_border_width(12)
+        vbox.set_border_width(6)
         vbox.show()
 
         scrollwin = gtk.ScrolledWindow()
@@ -135,22 +135,22 @@ class BranchWindow(gtk.Window):
     def construct_bottom(self):
         """Construct the bottom half of the window."""
         vbox = gtk.VBox(False, spacing=6)
-        vbox.set_border_width(12)
+        vbox.set_border_width(6)
         (width, height) = self.get_size()
         vbox.set_size_request(width, int(height / 2.5))
         vbox.show()
 
-        self.table = gtk.Table(rows=5, columns=2)
-        self.table.set_row_spacings(6)
-        self.table.set_col_spacings(6)
-        vbox.pack_start(self.table, expand=False, fill=True)
-        self.table.show()
+        table = gtk.Table(rows=4, columns=2)
+        table.set_row_spacings(6)
+        table.set_col_spacings(6)
+        vbox.pack_start(table, expand=False, fill=True)
+        table.show()
 
         align = gtk.Alignment(0.0, 0.5)
         label = gtk.Label()
         label.set_markup("<b>Revision:</b>")
         align.add(label)
-        self.table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
+        table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
         label.show()
         align.show()
 
@@ -158,7 +158,7 @@ class BranchWindow(gtk.Window):
         self.revid_label = gtk.Label()
         self.revid_label.set_selectable(True)
         align.add(self.revid_label)
-        self.table.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        table.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
         self.revid_label.show()
         align.show()
 
@@ -166,7 +166,7 @@ class BranchWindow(gtk.Window):
         label = gtk.Label()
         label.set_markup("<b>Committer:</b>")
         align.add(label)
-        self.table.attach(align, 0, 1, 1, 2, gtk.FILL, gtk.FILL)
+        table.attach(align, 0, 1, 1, 2, gtk.FILL, gtk.FILL)
         label.show()
         align.show()
 
@@ -174,7 +174,7 @@ class BranchWindow(gtk.Window):
         self.committer_label = gtk.Label()
         self.committer_label.set_selectable(True)
         align.add(self.committer_label)
-        self.table.attach(align, 1, 2, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        table.attach(align, 1, 2, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
         self.committer_label.show()
         align.show()
 
@@ -182,7 +182,7 @@ class BranchWindow(gtk.Window):
         label = gtk.Label()
         label.set_markup("<b>Branch nick:</b>")
         align.add(label)
-        self.table.attach(align, 0, 1, 2, 3, gtk.FILL, gtk.FILL)
+        table.attach(align, 0, 1, 2, 3, gtk.FILL, gtk.FILL)
         label.show()
         align.show()
 
@@ -190,7 +190,7 @@ class BranchWindow(gtk.Window):
         self.branchnick_label = gtk.Label()
         self.branchnick_label.set_selectable(True)
         align.add(self.branchnick_label)
-        self.table.attach(align, 1, 2, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        table.attach(align, 1, 2, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
         self.branchnick_label.show()
         align.show()
 
@@ -198,7 +198,7 @@ class BranchWindow(gtk.Window):
         label = gtk.Label()
         label.set_markup("<b>Timestamp:</b>")
         align.add(label)
-        self.table.attach(align, 0, 1, 3, 4, gtk.FILL, gtk.FILL)
+        table.attach(align, 0, 1, 3, 4, gtk.FILL, gtk.FILL)
         label.show()
         align.show()
 
@@ -206,19 +206,24 @@ class BranchWindow(gtk.Window):
         self.timestamp_label = gtk.Label()
         self.timestamp_label.set_selectable(True)
         align.add(self.timestamp_label)
-        self.table.attach(align, 1, 2, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        table.attach(align, 1, 2, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
         self.timestamp_label.show()
         align.show()
 
-        align = gtk.Alignment(0.0, 0.5)
+        self.parents_table = gtk.Table(rows=1, columns=2)
+        self.parents_table.set_row_spacings(3)
+        self.parents_table.set_col_spacings(6)
+        self.parents_table.show()
+        vbox.pack_start(self.parents_table, expand=False, fill=True)
+        self.parents_widgets = []
+
         label = gtk.Label()
         label.set_markup("<b>Parents:</b>")
+        align = gtk.Alignment(0.0, 0.5)
         align.add(label)
-        self.table.attach(align, 0, 1, 4, 5, gtk.FILL, gtk.FILL)
+        self.parents_table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
         label.show()
         align.show()
-
-        self.parents_widgets = []
 
         scrollwin = gtk.ScrolledWindow()
         scrollwin.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
@@ -309,51 +314,51 @@ class BranchWindow(gtk.Window):
         self.message_buffer.set_text(message)
 
         for widget in self.parents_widgets:
-            self.table.remove(widget)
+            self.parents_table.remove(widget)
 
         self.parents_widgets = []
-        self.table.resize(5 + len(self.parent_ids[revision]) - 1, 2)
+        self.parents_table.resize(max(len(self.parent_ids[revision]), 1), 2)
+        
         for idx, parent_id in enumerate(self.parent_ids[revision]):
-            self.table.set_row_spacing(idx + 3, 0)
-
             align = gtk.Alignment(0.0, 0.0)
             self.parents_widgets.append(align)
-            self.table.attach(align, 1, 2, idx + 4, idx + 5,
-                              gtk.EXPAND | gtk.FILL, gtk.FILL)
+            self.parents_table.attach(align, 1, 2, idx, idx + 1,
+                                      gtk.EXPAND | gtk.FILL, gtk.FILL)
             align.show()
 
-            hbox = gtk.HBox(False, 0)
+            hbox = gtk.HBox(False, spacing=6)
             align.add(hbox)
             hbox.show()
+
+            image = gtk.Image()
+            image.set_from_stock(
+                gtk.STOCK_JUMP_TO, gtk.ICON_SIZE_SMALL_TOOLBAR)
+            image.show()
+
+            button = gtk.Button()
+            button.add(image)
+            button.connect("clicked", self._go_clicked_cb, parent_id)
+            hbox.pack_start(button, expand=False, fill=True)
+            button.show()
+
+            image = gtk.Image()
+            image.set_from_stock(
+                gtk.STOCK_FIND, gtk.ICON_SIZE_SMALL_TOOLBAR)
+            image.show()
+
+            button = gtk.Button()
+            button.add(image)
+            button.set_sensitive(self.app is not None)
+            button.connect("clicked", self._show_clicked_cb,
+                           revision.revision_id, parent_id)
+            hbox.pack_start(button, expand=False, fill=True)
+            button.show()
 
             label = gtk.Label(parent_id)
             label.set_selectable(True)
             hbox.pack_start(label, expand=False, fill=True)
             label.show()
 
-            image = gtk.Image()
-            image.set_from_stock(gtk.STOCK_JUMP_TO, gtk.ICON_SIZE_MENU)
-            image.show()
-
-            button = gtk.Button()
-            button.add(image)
-            button.set_relief(gtk.RELIEF_NONE)
-            button.connect("clicked", self._go_clicked_cb, parent_id)
-            hbox.pack_start(button, expand=False, fill=True)
-            button.show()
-
-            image = gtk.Image()
-            image.set_from_stock(gtk.STOCK_FIND, gtk.ICON_SIZE_MENU)
-            image.show()
-
-            button = gtk.Button()
-            button.add(image)
-            button.set_relief(gtk.RELIEF_NONE)
-            button.set_sensitive(self.app is not None)
-            button.connect("clicked", self._show_clicked_cb,
-                           revision.revision_id, parent_id)
-            hbox.pack_start(button, expand=False, fill=True)
-            button.show()
 
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
