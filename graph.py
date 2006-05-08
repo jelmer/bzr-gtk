@@ -237,7 +237,7 @@ class DistanceMethod(object):
                 self.colours[revid] = self.last_colour = self.last_colour + 1
 
 
-def distances(branch, start, maxnum):
+def distances(branch, start):
     """Sort the revisions.
 
     Traverses the branch revision tree starting at start and produces an
@@ -254,13 +254,11 @@ def distances(branch, start, maxnum):
     for seq, revid, merge_depth, end_of_merge in distance.merge_sorted:
         distance.choose_colour(revid)
 
-    if maxnum is not None:
-        print 'FIXME: maxnum disabled.'
-
     revisions = distance.revisions
     colours = distance.colours
     parent_ids_of = distance.parent_ids_of
     return (revisions, colours, children, parent_ids_of, distance.merge_sorted)
+
 
 def graph(revisions, colours, merge_sorted):
     """Produce a directed graph of a bzr branch.
@@ -416,15 +414,15 @@ def graph(revisions, colours, merge_sorted):
                     parent_seq = revs[parent_id][0]
                     parent_depth = revs[parent_id][1]
                     if parent_depth == indent + 1:
-                        # the parent was a merge into this branch
-                        # determine if it was already merged into the mainline
-                        # via a different merge:
-                        # if all revisions between us and parent_seq have a 
-                        # indent greater than there are no revisions with a lower indent than
-                        # us.
-                        # we do not use 'parent_depth < indent' because that would allow
-                        # un-uniqueified merges to show up, and merge_sorted should take
-                        # care of that for us (but does not trim the values)
+                        # The parent was a merge into this branch determine if
+                        # it was already merged into the mainline via a
+                        # different merge: if all revisions between us and
+                        # parent_seq have a indent greater than there are no
+                        # revisions with a lower indent than us.
+                        # We do not use 'parent_depth < indent' because that
+                        # would allow un-uniqueified merges to show up, and
+                        # merge_sorted should take care of that for us (but
+                        # does not trim the values)
                         if parent_seq < next_lower_rev[revid]:
                             draw_line(h_idx, len(new_hanging), parent_id)
                     elif parent_depth == indent and parent_seq == seq + 1:

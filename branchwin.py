@@ -256,23 +256,23 @@ class BranchWindow(gtk.Window):
 
         last_lines = []
         (self.revisions, colours, self.children, self.parent_ids,
-         merge_sorted) = distances(branch, start, maxnum)
-        for revision, node, lines in graph(
-                self.revisions, colours, merge_sorted):
-            # FIXME: at this point we should be able to show the graph order and
-            # lines with no message or commit data - and then incrementally fill
-            # the timestamp, committer etc data as desired.
+         merge_sorted) = distances(branch, start)
+        for (index, (revision, node, lines)) in enumerate(graph(
+                self.revisions, colours, merge_sorted)):
+            # FIXME: at this point we should be able to show the graph order
+            # and lines with no message or commit data - and then incrementally
+            # fill the timestamp, committer etc data as desired.
             message = revision.message.split("\n")[0]
             if revision.committer is not None:
                 timestamp = format_date(revision.timestamp, revision.timezone)
             else:
                 timestamp = None
-            self.model.append([ revision, node, last_lines, lines,
-                                message, revision.committer, timestamp ])
+            self.model.append([revision, node, last_lines, lines,
+                               message, revision.committer, timestamp])
             self.index[revision] = index
-            index += 1
-
             last_lines = lines
+            if maxnum is not None and index > maxnum:
+                break
 
         self.set_title(branch.nick + " - bzrk")
         self.treeview.set_model(self.model)
