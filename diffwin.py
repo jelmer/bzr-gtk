@@ -139,7 +139,7 @@ class DiffWindow(gtk.Window):
                 self.model.append(titer, [ path, path ])
 
         self.treeview.expand_all()
-        self.set_title(os.path.basename(branch.base) + " - bzrk diff")
+        self.set_title(revid + " - " + branch.nick + " - bzrk diff")
 
     def _treeview_cursor_cb(self, *args):
         """Callback for when the treeview cursor changes."""
