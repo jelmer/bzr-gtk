@@ -32,11 +32,12 @@ class cmd_visualise(Command):
     """
     takes_options = [
         "revision",
-        Option('maxnum', "maximum number of revisions to display", int, 'count')]
+        Option('limit', "maximum number of revisions to display",
+               int, 'count')]
     takes_args = [ "location?" ]
     aliases = [ "visualize", "vis", "viz" ]
 
-    def run(self, location=".", revision=None, maxnum=None):
+    def run(self, location=".", revision=None, limit=None):
         (branch, path) = Branch.open_containing(location)
         branch.lock_read()
         branch.repository.lock_read()
@@ -51,7 +52,7 @@ class cmd_visualise(Command):
             from bzrkapp import BzrkApp
                 
             app = BzrkApp()
-            app.show(branch, revid, maxnum)
+            app.show(branch, revid, limit)
         finally:
             branch.repository.unlock()
             branch.unlock()
