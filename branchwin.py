@@ -82,7 +82,7 @@ class BranchWindow(gtk.Window):
 
         cell = CellRendererGraph()
         column = gtk.TreeViewColumn()
-        column.set_resizable(False)
+        column.set_resizable(True)
         column.pack_start(cell, expand=False)
         column.add_attribute(cell, "node", 1)
         column.add_attribute(cell, "in-lines", 2)
