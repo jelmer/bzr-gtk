@@ -52,22 +52,25 @@ class BranchWindow(gtk.Window):
 
     def construct(self):
         """Construct the window contents."""
+        vbox = gtk.VBox(spacing=0)
+        self.add(vbox)
+
+        vbox.pack_start(self.construct_navigation(), expand=False, fill=True)
+
         paned = gtk.VPaned()
         paned.pack1(self.construct_top(), resize=True, shrink=False)
         paned.pack2(self.construct_bottom(), resize=False, shrink=True)
-        self.add(paned)
         paned.show()
+        vbox.pack_start(paned, expand=True, fill=True)
+        vbox.set_focus_child(paned)
+
+        vbox.show()
 
     def construct_top(self):
         """Construct the top-half of the window."""
-        vbox = gtk.VBox(spacing=6)
-        vbox.set_border_width(6)
-        vbox.show()
-
         scrollwin = gtk.ScrolledWindow()
         scrollwin.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         scrollwin.set_shadow_type(gtk.SHADOW_IN)
-        vbox.pack_start(scrollwin, expand=True, fill=True)
         scrollwin.show()
 
         self.treeview = gtk.TreeView()
@@ -112,11 +115,20 @@ class BranchWindow(gtk.Window):
         column.add_attribute(cell, "text", 6)
         self.treeview.append_column(column)
 
-        hbox = gtk.HBox(False, spacing=6)
-        vbox.pack_start(hbox, expand=False, fill=False)
+        return scrollwin
+
+    def construct_navigation(self):
+        """Construct the navigation buttons."""
+        frame = gtk.Frame()
+        frame.set_shadow_type(gtk.SHADOW_OUT)
+        frame.show()
+        
+        hbox = gtk.HBox(spacing=12)
+        frame.add(hbox)
         hbox.show()
 
         self.back_button = gtk.Button(stock=gtk.STOCK_GO_BACK)
+        self.back_button.set_relief(gtk.RELIEF_NONE)
         self.back_button.add_accelerator("clicked", self.accel_group, ord('['),
                                          0, 0)
         self.back_button.connect("clicked", self._back_clicked_cb)
@@ -124,20 +136,27 @@ class BranchWindow(gtk.Window):
         self.back_button.show()
 
         self.fwd_button = gtk.Button(stock=gtk.STOCK_GO_FORWARD)
+        self.fwd_button.set_relief(gtk.RELIEF_NONE)
         self.fwd_button.add_accelerator("clicked", self.accel_group, ord(']'),
                                         0, 0)
         self.fwd_button.connect("clicked", self._fwd_clicked_cb)
         hbox.pack_start(self.fwd_button, expand=False, fill=True)
         self.fwd_button.show()
 
-        return vbox
+        return frame
 
     def construct_bottom(self):
         """Construct the bottom half of the window."""
+        scrollwin = gtk.ScrolledWindow()
+        scrollwin.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        scrollwin.set_shadow_type(gtk.SHADOW_NONE)
+        (width, height) = self.get_size()
+        scrollwin.set_size_request(width, int(height / 2.5))
+        scrollwin.show()
+
         vbox = gtk.VBox(False, spacing=6)
         vbox.set_border_width(6)
-        (width, height) = self.get_size()
-        vbox.set_size_request(width, int(height / 2.5))
+        scrollwin.add_with_viewport(vbox)
         vbox.show()
 
         table = gtk.Table(rows=4, columns=2)
@@ -225,21 +244,15 @@ class BranchWindow(gtk.Window):
         label.show()
         align.show()
 
-        scrollwin = gtk.ScrolledWindow()
-        scrollwin.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-        scrollwin.set_shadow_type(gtk.SHADOW_IN)
-        vbox.pack_start(scrollwin, expand=True, fill=True)
-        scrollwin.show()
-
         self.message_buffer = gtk.TextBuffer()
         textview = gtk.TextView(self.message_buffer)
         textview.set_editable(False)
         textview.set_wrap_mode(gtk.WRAP_WORD)
         textview.modify_font(pango.FontDescription("Monospace"))
-        scrollwin.add(textview)
+        vbox.pack_start(textview, expand=True, fill=True)
         textview.show()
 
-        return vbox
+        return scrollwin
 
     def set_branch(self, branch, start, maxnum):
         """Set the branch and start position for this window.
