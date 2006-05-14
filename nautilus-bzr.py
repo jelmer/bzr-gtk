@@ -92,6 +92,7 @@ class BzrExtension(nautilus.MenuProvider):
         try:
             tree, path = WorkingTree.open_containing(file)
         except NotBranchError:
+            BzrDir.create_branch_and_repo(file)
             return
 
         return
