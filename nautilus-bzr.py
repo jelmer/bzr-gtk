@@ -4,6 +4,9 @@ from bzrlib.bzrdir import BzrDir
 from bzrlib.errors import NotBranchError
 from bzrlib.workingtree import WorkingTree
 
+from bzrlib.plugin import load_plugins
+load_plugins()
+
 try:
     from bzrlib.plugins.bzrk import cmd_visualise
     have_bzrk = True
