@@ -1,0 +1,13 @@
+Nautilus plugin for bzr
+=======================
+
+This tool, written by Jelmer Vernooij and Jeff Bailey presents
+menu options when working in a bzr tree.
+
+To use this, either place the nautilus-bzr.py file in
+~/.nautilus/python-extensions or in /usr/lib/nautilus/extensions-1.0/python
+
+If on an Ubuntu system, you must install python-nautilus.  This package
+assumes bzr 0.8.  After installation, restart nautilus.
+
+
