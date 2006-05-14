@@ -10,4 +10,11 @@ To use this, either place the nautilus-bzr.py file in
 If on an Ubuntu system, you must install python-nautilus.  This package
 assumes bzr 0.8.  After installation, restart nautilus.
 
+Optional Dependencies
+=====================
+
+ * bzrk (plugin for bzr)
+ * gannotate (plugin for bzr)
+
+
 
