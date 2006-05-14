@@ -8,7 +8,13 @@ try:
     from bzrlib.plugins.bzrk import cmd_visualise
     have_bzrk = True
 except ImportError:
-    pass
+    have_bzrk = False
+
+try:
+    from bzrlib.plugins.gannotate import cmd_gannotate
+    have_gannotate = True
+except ImportError:
+    have_gannotate = False
 
 class BzrExtension(nautilus.MenuProvider):
     def __init__(self):
@@ -112,6 +118,19 @@ class BzrExtension(nautilus.MenuProvider):
 
         return
 
+    def annotate_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+
+        vis = cmd_gannotate()
+        vis.run(file)
+
+        return
+ 
+
     def visualise_cb(self, menu, vfs_file):
         # We can only cope with local files
         if vfs_file.get_uri_scheme() != 'file':
@@ -209,5 +228,12 @@ class BzrExtension(nautilus.MenuProvider):
                                      'Remove this file from versioning')
                 item.connect('activate', self.remove_cb, vfs_file)
                 items.append(item)
+
+                if have_gannotate:
+                    item = nautilus.MenuItem('BzrNautilus::annotate',
+                                 'Annotate',
+                                 'Annotate File Data')
+                    item.connect('activate', self.annotate_cb, vfs_file)
+                    items.append(item)
     
         return items
