@@ -4,6 +4,12 @@ from bzrlib.bzrdir import BzrDir
 from bzrlib.errors import NotBranchError
 from bzrlib.workingtree import WorkingTree
 
+try:
+    from bzrlib.plugins.bzrk import cmd_visualise
+    have_bzrk = True
+except ImportError:
+    pass
+
 class BzrExtension(nautilus.MenuProvider):
     def __init__(self):
         pass
@@ -105,6 +111,24 @@ class BzrExtension(nautilus.MenuProvider):
 
         return
 
+    def visualise_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+
+        # We only want to continue here if we get a NotBranchError
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
+        vis = cmd_visualise()
+        vis.run(file)
+
+        return
+
     def get_background_items(self, window, vfs_file):
         file = vfs_file.get_uri()
         try:
@@ -115,6 +139,14 @@ class BzrExtension(nautilus.MenuProvider):
                                  'Create new Bazaar tree in this folder')
             item.connect('activate', self.newtree_cb, vfs_file)
             return item,
+
+        if have_bzrk:
+            item = nautilus.MenuItem('BzrNautilus::visualise',
+                                 'Visualise Bazaar history',
+                                 'Visualise Bazaar history')
+            item.connect('activate', self.visualise_cb, vfs_file)
+            return item,
+
         return
 
 
