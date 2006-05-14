@@ -86,6 +86,8 @@ class BzrExtension(nautilus.MenuProvider):
         except NotBranchError:
             return
 
+        tree.remove(path)
+
         return
 
     def get_file_items(self, window, files):
