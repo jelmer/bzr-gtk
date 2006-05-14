@@ -77,6 +77,7 @@ class BranchWindow(gtk.Window):
         self.treeview.set_rules_hint(True)
         self.treeview.set_search_column(4)
         self.treeview.connect("cursor-changed", self._treeview_cursor_cb)
+        self.treeview.connect("row-activated", self._treeview_clicked_cb)
         scrollwin.add(self.treeview)
         self.treeview.show()
 
@@ -415,4 +416,13 @@ class BranchWindow(gtk.Window):
         """Callback for when the show button for a parent is clicked."""
         if self.app is not None:
             self.app.show_diff(self.branch, revid, parentid)
+        self.treeview.grab_focus()
+
+    def _treeview_clicked_cb(self, widget, path, col):
+        # TODO: more than one parent
+        """Callback for when the treeview is double-clicked"""
+        revision = self.model[path][0]
+        parent_id = self.parent_ids[revision][0]
+        if self.app is not None:
+            self.app.show_diff(self.branch, revision.revision_id, parent_id)
         self.treeview.grab_focus()
