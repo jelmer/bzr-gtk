@@ -8,22 +8,149 @@ class BzrExtension(nautilus.MenuProvider):
     def __init__(self):
         pass
 
-    def add_cb(self, menu, files):
+    def add_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
+        tree.add(path)
+
         return
 
-    def ignore_cb(self, menu, files):
+    def ignore_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
         return
 
-    def unignore_cb(self, menu, files):
+    def unignore_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
         return
 
-    def log_cb(self, menu, files):
+    def unignore_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
         return
 
-    def diff_cb(self, menu, files):
+    def unignore_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
         return
 
-    def remove_cb(self, menu, files):
+    def log_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
+        return
+
+    def unignore_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
+        return
+
+    def diff_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
+        return
+
+    def unignore_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
+        return
+
+    def remove_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
+        return
+
+    def unignore_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
         return
 
     def get_file_items(self, window, files):
