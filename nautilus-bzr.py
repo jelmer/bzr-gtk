@@ -8,7 +8,7 @@ try:
     from bzrlib.plugins.bzrk import cmd_visualise
     have_bzrk = True
 except ImportError:
-    pass
+    have_bzrk = False
 
 class BzrExtension(nautilus.MenuProvider):
     def __init__(self):
