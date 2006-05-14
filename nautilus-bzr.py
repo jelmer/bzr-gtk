@@ -49,46 +49,7 @@ class BzrExtension(nautilus.MenuProvider):
 
         return
 
-    def unignore_cb(self, menu, vfs_file):
-        # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
-        file = vfs_file.get_uri()
-        try:
-            tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            return
-
-        return
-
-    def unignore_cb(self, menu, vfs_file):
-        # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
-        file = vfs_file.get_uri()
-        try:
-            tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            return
-
-        return
-
     def log_cb(self, menu, vfs_file):
-        # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
-        file = vfs_file.get_uri()
-        try:
-            tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            return
-
-        return
-
-    def unignore_cb(self, menu, vfs_file):
         # We can only cope with local files
         if vfs_file.get_uri_scheme() != 'file':
             return
@@ -114,33 +75,7 @@ class BzrExtension(nautilus.MenuProvider):
 
         return
 
-    def unignore_cb(self, menu, vfs_file):
-        # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
-        file = vfs_file.get_uri()
-        try:
-            tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            return
-
-        return
-
     def remove_cb(self, menu, vfs_file):
-        # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
-        file = vfs_file.get_uri()
-        try:
-            tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            return
-
-        return
-
-    def unignore_cb(self, menu, vfs_file):
         # We can only cope with local files
         if vfs_file.get_uri_scheme() != 'file':
             return
