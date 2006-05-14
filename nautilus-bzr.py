@@ -75,6 +75,21 @@ class BzrExtension(nautilus.MenuProvider):
 
         return
 
+    def newtree_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+
+        # We only want to continue here if we get a NotBranchError
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
+        return
+
     def remove_cb(self, menu, vfs_file):
         # We can only cope with local files
         if vfs_file.get_uri_scheme() != 'file':
@@ -90,6 +105,19 @@ class BzrExtension(nautilus.MenuProvider):
 
         return
 
+    def get_background_items(self, window, vfs_file):
+        file = vfs_file.get_uri()
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            item = nautilus.MenuItem('BzrNautilus::newtree',
+                                 'Create new Bazaar tree',
+                                 'Create new Bazaar tree in this folder')
+            item.connect('activate', self.newtree_cb, vfs_file)
+            return item,
+        return
+
+
     def get_file_items(self, window, files):
         items = []
 
@@ -102,7 +130,13 @@ class BzrExtension(nautilus.MenuProvider):
             try:
                 tree, path = WorkingTree.open_containing(file)
             except NotBranchError:
-                return
+                if not vfs_file.is_directory():
+                    return
+                item = nautilus.MenuItem('BzrNautilus::newtree',
+                                     'Create new Bazaar tree',
+                                     'Create new Bazaar tree in %s' % vfs_file.get_name())
+                item.connect('activate', self.newtree_cb, vfs_file)
+                return item,
 
             file_class = tree.file_class(path)
 
