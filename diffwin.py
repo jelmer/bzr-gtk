@@ -51,7 +51,7 @@ class DiffWindow(gtk.Window):
     def construct(self):
         """Construct the window contents."""
         hbox = gtk.HBox(spacing=6)
-        hbox.set_border_width(12)
+        hbox.set_border_width(0)
         self.add(hbox)
         hbox.show()
 
