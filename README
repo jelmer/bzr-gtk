@@ -21,6 +21,9 @@ In order to see graphs in the visualisation tool, you will also need:
 
   * PyCairo 1.0 or later
 
+In order to see syntax highlighted diffs:
+
+  * gtksourceview python bindings
 
 Installation
 ------------
