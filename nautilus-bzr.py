@@ -72,7 +72,7 @@ class BzrExtension(nautilus.MenuProvider):
 
         from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
         window = DiffWindow()
-        window.set_diff(tree.branch, tree, tree.branch.revision_tree())
+        window.set_diff("Working Tree", tree, tree.branch.repository.revision_tree(tree.branch.last_revision()))
         window.show()
 
         return
@@ -208,6 +208,8 @@ class BzrExtension(nautilus.MenuProvider):
                     item.connect('activate', self.log_cb, vfs_file)
                     items.append(item)
 
+                    # FIXME: Don't show if there are no changes
+                    # to the current file...
                     item = nautilus.MenuItem('BzrNautilus::diff',
                                      'Diff',
                                      'Show differences')
