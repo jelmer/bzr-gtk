@@ -1,21 +1,15 @@
-#!/usr/bin/env python
-# -*- coding: UTF-8 -*-
-"""GTK+ Branch Visualisation plugin for bzr."""
-
-__copyright__ = "Copyright © 2005 Canonical Ltd."
-__author__    = "Scott James Remnant <scott@ubuntu.com>"
-
+#!/usr/bin/env python2.4
+"""GTK+ Frontends for various Bazaar commands."""
 
 from distutils.core import setup
 
-
-setup(name="bzrk",
-      version="0.2",
-      description="GTK+ Branch Visualisation plugin for bzr",
-      author="Scott James Remnant",
-      author_email="scott@ubuntu.com",
-      license="GNU GPL v2",
-
-      package_dir = { "bzrlib.plugins.bzrk": "." },
-      packages = [ "bzrlib.plugins.bzrk" ],
-      )
+setup(
+    name = "gtk",
+    version = "0.8.2",
+    description = "GTK+ Frontends for various Bazaar commands",
+    author = "Dan Loda",
+    author_email = "danloda@gmail.com",
+    license = "GNU GPL v2",
+    package_dir = {"bzrlib.plugins.gtk": ".","bzrlib.plugins.gtk.viz": "viz", "bzrlib.plugins.gtk.annotate": "annotate"},
+    packages = ["bzrlib.plugins.gtk","bzrlib.plugins.gtk.viz","bzrlib.plugins.gtk.annotate"],
+)

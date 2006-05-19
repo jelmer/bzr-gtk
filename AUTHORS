@@ -1,4 +1,10 @@
-bzrk was written by Scott James Remnant <scott@ubuntu.com>
+bzr-gtk is a plugin that is based on a collection of earlier plugins for 
+Bazaar-NG.
+
+bzrk was written by Scott James Remnant <scott@ubuntu.com>. 
 
 It's vaguely based on a screenshot of gitk (the equivalent tool for git)
 shown to me by Fabio M. Di Nitto <fabbione@ubuntu.com>.
+
+gannotate was written by Dan Loda <danloda@gmail.com> and later maintained 
+by Aaron Bentley <abentley@panoramicfeedback.com>.

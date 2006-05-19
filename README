@@ -1,35 +1,39 @@
-bzrk - visualisation plugin for bzr
-===================================
+bzr-gtk - GTK+ Frontends to various Bazaar commands
+===================================================
 
-This is a plugin for bzr that allows you to see the history of a branch
-and relationships between the revisions visually.
+This is a plugin for bzr that contains various GTK+ frontends to 
+Bazaar commands. It currently contains a tool to see the history
+and relationships between the revisions visually and one to 
+view annotated files.
 
 
 Dependencies
 ------------
 
-bzrk is written in Python, so doesn't need compiling, however you will
+bzr-gtk is written in Python, so doesn't need compiling, however you will
 need the following runtime dependencies:
 
   * Python 2.4
   * bzr 0.8 or later
   * PyGTK 2.8 or later
+
+In order to see graphs in the visualisation tool, you will also need:
+
   * PyCairo 1.0 or later
 
 
 Installation
 ------------
 
-The easiest way to install bzrk is to either copy or symlink the
+The easiest way to install bzr-gtk is to either copy or symlink the
 directory into your ~/.bazaar/plugins directory.
 
 Other ways include doing the same in the bzrlib/plugins directory of
-your bzr working tree, or adding the location of bzrk to your
+your bzr working tree, or adding the location of bzr-gtk to your
 BZR_PLUGIN_PATH environment variable.
 
-
-Usage
------
+Usage - Visualisation
+---------------------
 
 Simply run "bzr visualise" (or "bzr viz") while in a bzr working tree or
 branch, a window will appear with the history of the branch and a graph
@@ -44,3 +48,24 @@ Details for the selected revision are shown in the pane at the bottom,
 including the ids of the parent revisions.  Clicking on the go icon next
 to a parent moves the list to that revision; clicking on the view icon
 opens a window to display the difference between the two revisions.
+
+Usage - annotate
+----------------
+
+Simply run "bzr gannotate FILENAME" while in a bzr working tree or branch.
+ 
+The commit log message is shown in the lower window pane for the selected
+line.  The line number column is searchable; jump to a specific line by typing
+the line number while the annotation pane is in focus. Control-f will also
+initiate a search.
+
+By default, lines are highlighted according to age. This functionality is a
+crib of emacs' VC-annotate highlighting, and thus works similarly: blue is
+oldest and red is youngest, and an assortment of other colors in-between:
+
+        blue --> green --> yellow --> orange --> red
+
+Time spans are scaled; for instance by selecting "1 Day", lines older than a
+day will be highlighted blue, but changes in the past hour will be red and
+lines 2 hours old may be orange. Highlighting can be turned off with --plain
+if overwhelming.
