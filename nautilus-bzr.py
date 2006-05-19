@@ -64,19 +64,6 @@ class BzrExtension(nautilus.MenuProvider):
 
         return
 
-    def log_cb(self, menu, vfs_file):
-        # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
-        file = vfs_file.get_uri()
-        try:
-            tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            return
-
-        return
-
     def diff_cb(self, menu, vfs_file):
         # We can only cope with local files
         if vfs_file.get_uri_scheme() != 'file':
@@ -134,7 +121,7 @@ class BzrExtension(nautilus.MenuProvider):
         return
  
 
-    def visualise_cb(self, menu, vfs_file):
+    def log_cb(self, menu, vfs_file):
         # We can only cope with local files
         if vfs_file.get_uri_scheme() != 'file':
             return
@@ -164,10 +151,10 @@ class BzrExtension(nautilus.MenuProvider):
             return item,
 
         if have_bzrk:
-            item = nautilus.MenuItem('BzrNautilus::visualise',
-                                 'Visualise Bazaar history',
-                                 'Visualise Bazaar history')
-            item.connect('activate', self.visualise_cb, vfs_file)
+            item = nautilus.MenuItem('BzrNautilus::log',
+                                 'Log',
+                                 'Show Bazaar history')
+            item.connect('activate', self.log_cb, vfs_file)
             return item,
 
         return
