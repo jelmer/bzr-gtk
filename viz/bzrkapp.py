@@ -36,8 +36,11 @@ class BzrkApp(object):
 
     def show_diff(self, branch, revid, parentid):
         """Open a new window to show a diff between the given revisions."""
-        window = DiffWindow(self)
-        window.set_diff(branch, revid, parentid)
+        window = DiffWindow()
+        rev_tree = branch.repository.revision_tree(revid)
+        parent_tree = branch.repository.revision_tree(parentid)
+        description = revid + " - " + branch.nick
+        window.set_diff(description, rev_tree, parent_tree)
         window.show()
 
     def _destroy_cb(self, widget):

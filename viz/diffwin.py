@@ -32,12 +32,10 @@ class DiffWindow(gtk.Window):
     differences between two revisions on a branch.
     """
 
-    def __init__(self, app=None):
+    def __init__(self):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.set_border_width(0)
         self.set_title("bzrk diff")
-
-        self.app = app
 
         # Use two thirds of the screen by default
         screen = self.get_screen()
@@ -100,14 +98,14 @@ class DiffWindow(gtk.Window):
         scrollwin.add(sourceview)
         sourceview.show()
 
-    def set_diff(self, branch, revid, parentid):
+    def set_diff(self, description, rev_tree, parent_tree):
         """Set the differences showed by this window.
 
         Compares the two trees and populates the window with the
         differences.
         """
-        self.rev_tree = branch.repository.revision_tree(revid)
-        self.parent_tree = branch.repository.revision_tree(parentid)
+        self.rev_tree = rev_tree
+        self.parent_tree = parent_tree
 
         self.model.clear()
         delta = compare_trees(self.parent_tree, self.rev_tree)
@@ -136,7 +134,7 @@ class DiffWindow(gtk.Window):
                 self.model.append(titer, [ path, path ])
 
         self.treeview.expand_all()
-        self.set_title(revid + " - " + branch.nick + " - bzrk diff")
+        self.set_title(description + " - bzrk diff")
 
     def _treeview_cursor_cb(self, *args):
         """Callback for when the treeview cursor changes."""
