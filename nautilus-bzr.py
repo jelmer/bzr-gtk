@@ -8,16 +8,11 @@ from bzrlib.plugin import load_plugins
 load_plugins()
 
 try:
-    from bzrlib.plugins.bzrk import cmd_visualise
-    have_bzrk = True
+    from bzrlib.plugins.gtk.viz import cmd_visualise
+    from bzrlib.plugins.gtk.annotate import cmd_gannotate
+    have_gtkplugin = True
 except ImportError:
-    have_bzrk = False
-
-try:
-    from bzrlib.plugins.gannotate import cmd_gannotate
-    have_gannotate = True
-except ImportError:
-    have_gannotate = False
+    have_gtkplugin = False
 
 class BzrExtension(nautilus.MenuProvider):
     def __init__(self):
@@ -74,6 +69,11 @@ class BzrExtension(nautilus.MenuProvider):
             tree, path = WorkingTree.open_containing(file)
         except NotBranchError:
             return
+
+        from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
+        window = DiffWindow()
+        window.set_diff(tree.branch, tree, tree.branch.revision_tree())
+        window.show()
 
         return
 
@@ -150,7 +150,7 @@ class BzrExtension(nautilus.MenuProvider):
             item.connect('activate', self.newtree_cb, vfs_file)
             return item,
 
-        if have_bzrk:
+        if have_gtkplugin:
             item = nautilus.MenuItem('BzrNautilus::log',
                                  'Log',
                                  'Show Bazaar history')
@@ -201,17 +201,18 @@ class BzrExtension(nautilus.MenuProvider):
                 item.connect('activate', self.unignore_cb, vfs_file)
                 items.append(item)
             elif file_class == 'V':
-                item = nautilus.MenuItem('BzrNautilus::log',
+                if have_gtkplugin:
+                    item = nautilus.MenuItem('BzrNautilus::log',
                                      'Log',
                                      'List changes')
-                item.connect('activate', self.log_cb, vfs_file)
-                items.append(item)
+                    item.connect('activate', self.log_cb, vfs_file)
+                    items.append(item)
 
-                item = nautilus.MenuItem('BzrNautilus::diff',
+                    item = nautilus.MenuItem('BzrNautilus::diff',
                                      'Diff',
                                      'Show differences')
-                item.connect('activate', self.diff_cb, vfs_file)
-                items.append(item)
+                    item.connect('activate', self.diff_cb, vfs_file)
+                    items.append(item)
 
                 item = nautilus.MenuItem('BzrNautilus::remove',
                                      'Remove',
@@ -219,7 +220,7 @@ class BzrExtension(nautilus.MenuProvider):
                 item.connect('activate', self.remove_cb, vfs_file)
                 items.append(item)
 
-                if have_gannotate:
+                if have_gtkplugin:
                     item = nautilus.MenuItem('BzrNautilus::annotate',
                                  'Annotate',
                                  'Annotate File Data')
