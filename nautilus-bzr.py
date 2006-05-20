@@ -72,7 +72,7 @@ class BzrExtension(nautilus.MenuProvider):
 
         from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
         window = DiffWindow()
-        window.set_diff("Working Tree", tree, tree.branch.repository.revision_tree(tree.branch.last_revision()))
+        window.set_diff(tree.branch, tree, tree.branch.revision_tree())
         window.show()
 
         return
@@ -117,9 +117,24 @@ class BzrExtension(nautilus.MenuProvider):
 
         vis = cmd_gannotate()
         vis.run(file)
-
-        return
  
+    def commit_cb(self, menu, vfs_file=None):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
+        from bzrlib.plugins.gtk.commit.gcommit import GCommitDialog
+        dialog = GCommitDialog(tree)
+        dialog.set_title(path + " - Commit")
+        if dialog.run() != gtk.RESPONSE_CANCEL:
+            Commit().commit(working_tree=wt,message=dialog.message,
+                            specific_files=dialog.specific_files)
 
     def log_cb(self, menu, vfs_file):
         # We can only cope with local files
@@ -148,16 +163,23 @@ class BzrExtension(nautilus.MenuProvider):
                                  'Create new Bazaar tree',
                                  'Create new Bazaar tree in this folder')
             item.connect('activate', self.newtree_cb, vfs_file)
-            return item,
+            return item
 
+        items = []
         if have_gtkplugin:
             item = nautilus.MenuItem('BzrNautilus::log',
                                  'Log',
                                  'Show Bazaar history')
             item.connect('activate', self.log_cb, vfs_file)
-            return item,
+            items.append(item)
 
-        return
+            item = nautilus.MenuItem('BzrNautilus::commit',
+                                 'Commit',
+                                 'Commit Changes')
+            item.connect('activate', self.commit_cb, vfs_file)
+            items.append(item)
+
+        return items
 
 
     def get_file_items(self, window, files):
@@ -208,8 +230,6 @@ class BzrExtension(nautilus.MenuProvider):
                     item.connect('activate', self.log_cb, vfs_file)
                     items.append(item)
 
-                    # FIXME: Don't show if there are no changes
-                    # to the current file...
                     item = nautilus.MenuItem('BzrNautilus::diff',
                                      'Diff',
                                      'Show differences')
@@ -227,6 +247,12 @@ class BzrExtension(nautilus.MenuProvider):
                                  'Annotate',
                                  'Annotate File Data')
                     item.connect('activate', self.annotate_cb, vfs_file)
+                    items.append(item)
+
+                    item = nautilus.MenuItem('BzrNautilus::commit',
+                                 'Commit',
+                                 'Commit Changes')
+                    item.connect('activate', self.commit_cb, vfs_file)
                     items.append(item)
     
         return items
