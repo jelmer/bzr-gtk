@@ -8,8 +8,7 @@ from bzrlib.plugin import load_plugins
 load_plugins()
 
 try:
-    from bzrlib.plugins.gtk.viz import cmd_visualise
-    from bzrlib.plugins.gtk.annotate import cmd_gannotate
+    from bzrlib.plugins.gtk import cmd_visualise, cmd_gannotate
     have_gtkplugin = True
 except ImportError:
     have_gtkplugin = False
@@ -44,6 +43,8 @@ class BzrExtension(nautilus.MenuProvider):
         except NotBranchError:
             return
 
+        #FIXME
+
         return
 
     def unignore_cb(self, menu, vfs_file):
@@ -56,6 +57,8 @@ class BzrExtension(nautilus.MenuProvider):
             tree, path = WorkingTree.open_containing(file)
         except NotBranchError:
             return
+
+        #FIXME
 
         return
 
@@ -89,9 +92,6 @@ class BzrExtension(nautilus.MenuProvider):
             tree, path = WorkingTree.open_containing(file)
         except NotBranchError:
             BzrDir.create_branch_and_repo(file)
-            return
-
-        return
 
     def remove_cb(self, menu, vfs_file):
         # We can only cope with local files
@@ -106,8 +106,6 @@ class BzrExtension(nautilus.MenuProvider):
 
         tree.remove(path)
 
-        return
-
     def annotate_cb(self, menu, vfs_file):
         # We can only cope with local files
         if vfs_file.get_uri_scheme() != 'file':
@@ -117,6 +115,23 @@ class BzrExtension(nautilus.MenuProvider):
 
         vis = cmd_gannotate()
         vis.run(file)
+
+    def clone_cb(self, menu, vfs_file=None):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
+        from bzrlib.plugins.gtk.clone import CloneDialog
+        dialog = CloneDialog(file)
+        if dialog.run() != gtk.RESPONSE_CANCEL:
+            bzrdir = BzrDir.open(dialog.url)
+            bzrdir.sprout(dialog.dest_path)
  
     def commit_cb(self, menu, vfs_file=None):
         # We can only cope with local files
@@ -129,7 +144,7 @@ class BzrExtension(nautilus.MenuProvider):
         except NotBranchError:
             return
 
-        from bzrlib.plugins.gtk.commit.gcommit import GCommitDialog
+        from bzrlib.plugins.gtk.commit import GCommitDialog
         dialog = GCommitDialog(tree)
         dialog.set_title(path + " - Commit")
         if dialog.run() != gtk.RESPONSE_CANCEL:
@@ -163,7 +178,15 @@ class BzrExtension(nautilus.MenuProvider):
                                  'Create new Bazaar tree',
                                  'Create new Bazaar tree in this folder')
             item.connect('activate', self.newtree_cb, vfs_file)
-            return item
+            items.append(item)
+
+            item = nautilus.MenuItem('BzrNautilus::clone',
+                                 'Checkout',
+                                 'Checkout Existing Bazaar Branch')
+            item.connect('activate', self.clone_cb, vfs_file)
+            items.append(item)
+
+            return items
 
         items = []
         if have_gtkplugin:
