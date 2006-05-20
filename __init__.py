@@ -37,12 +37,12 @@ class cmd_gbranch(Command):
             if str(e) == "could not open display":
                 raise NoDisplayError
 
-        from clone import GCloneDialog
+        from clone import CloneDialog
 
-        window = GCloneDialog()
+        window = CloneDialog()
         if window.run() == gtk.RESPONSE_OK:
-            print window.url
-            print window.dest_path
+            bzrdir = BzrDir.open(window.url)
+            bzrdir.sprout(window.dest_path)
 
 register_command(cmd_gbranch)
 
