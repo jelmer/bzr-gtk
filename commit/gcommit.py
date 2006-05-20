@@ -38,7 +38,7 @@ class GCommitDialog(gtk.Dialog):
     def _create_file_view(self):
         self.file_store = gtk.ListStore(gobject.TYPE_BOOLEAN, gobject.TYPE_STRING, gobject.TYPE_STRING)
         self.file_view = gtk.TreeView(self.file_store)
-        self.file_view.append_column(gtk.TreeViewColumn("Change",gtk.CellRendererToggle(),active=0))
+        self.file_view.append_column(gtk.TreeViewColumn("Commit",gtk.CellRendererToggle(),active=0))
         self.file_view.append_column(gtk.TreeViewColumn("Path",gtk.CellRendererText(),text=1))
         self.file_view.append_column(gtk.TreeViewColumn("Type",gtk.CellRendererText(),text=2))
 
