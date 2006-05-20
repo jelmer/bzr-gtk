@@ -17,4 +17,5 @@
 """GTK+ frontends to Bazaar commands """
 import viz
 import annotate
+import commit
 import gdiff

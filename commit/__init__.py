@@ -51,14 +51,10 @@ class cmd_gcommit(Command):
         if file_id is None:
             raise NotVersionedError(filename)
 
-        dialog = GCommitDialog()
-        dialog.connect("destroy", lambda w: gtk.main_quit())
+        dialog = GCommitDialog(wt)
         dialog.set_title(path + " - Commit")
-        dialog.show()
-
-        gtk.main()
-
-        Commit().commit(working_tree=wt,message=dialog.message,
+        if dialog.run() != gtk.RESPONSE_CANCEL:
+            Commit().commit(working_tree=wt,message=dialog.message,
                 specific_files=dialog.specific_files)
 
 register_command(cmd_gcommit)
