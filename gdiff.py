@@ -27,11 +27,9 @@ class cmd_gdiff(Command):
 
     @display_command
     def run(self, revision=None, file_list=None):
-        bzrdir = BzrDir.open_containing(".")[0]
-        repos = bzrdir.open_repository()
-        branch = bzrdir.open_branch()
-        tree2 = repos.revision_tree(branch.last_revision())
         tree1 = WorkingTree.open_containing(".")[0]
+        branch = tree1.branch
+        tree2 = tree1.branch.repository.revision_tree(branch.last_revision())
 
         from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
         import gtk
