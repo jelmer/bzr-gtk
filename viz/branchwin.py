@@ -346,17 +346,6 @@ class BranchWindow(gtk.Window):
 
             image = gtk.Image()
             image.set_from_stock(
-                gtk.STOCK_JUMP_TO, gtk.ICON_SIZE_SMALL_TOOLBAR)
-            image.show()
-
-            button = gtk.Button()
-            button.add(image)
-            button.connect("clicked", self._go_clicked_cb, parent_id)
-            hbox.pack_start(button, expand=False, fill=True)
-            button.show()
-
-            image = gtk.Image()
-            image.set_from_stock(
                 gtk.STOCK_FIND, gtk.ICON_SIZE_SMALL_TOOLBAR)
             image.show()
 
@@ -368,10 +357,10 @@ class BranchWindow(gtk.Window):
             hbox.pack_start(button, expand=False, fill=True)
             button.show()
 
-            label = gtk.Label(parent_id)
-            label.set_selectable(True)
-            hbox.pack_start(label, expand=False, fill=True)
-            label.show()
+            button = gtk.Button(parent_id)
+            button.connect("clicked", self._go_clicked_cb, parent_id)
+            hbox.pack_start(button, expand=False, fill=True)
+            button.show()
 
 
     def _back_clicked_cb(self, *args):
