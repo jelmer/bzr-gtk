@@ -7,8 +7,6 @@ setup(
     name = "gtk",
     version = "0.8.2",
     description = "GTK+ Frontends for various Bazaar commands",
-    author = "Dan Loda",
-    author_email = "danloda@gmail.com",
     license = "GNU GPL v2",
     package_dir = {"bzrlib.plugins.gtk": ".","bzrlib.plugins.gtk.viz": "viz", "bzrlib.plugins.gtk.annotate": "annotate"},
     packages = ["bzrlib.plugins.gtk","bzrlib.plugins.gtk.viz","bzrlib.plugins.gtk.annotate"],
