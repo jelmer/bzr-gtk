@@ -1,0 +1,6 @@
+2006-06-10  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * backend/errors.py: some basic exceptions added
+    * backend/fileops.py: mkdir() and add() implemented 
+    * backend/init.py: init() and branch() implemented
+    * The work has begun :)
