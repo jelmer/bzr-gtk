@@ -52,13 +52,25 @@ class cmd_gdiff(Command):
     Otherwise, all changes for the tree are listed.
     """
     takes_args = []
-    takes_options = []
+    takes_options = ['revision']
 
     @display_command
     def run(self, revision=None, file_list=None):
-        tree1 = WorkingTree.open_containing(".")[0]
-        branch = tree1.branch
-        tree2 = tree1.branch.repository.revision_tree(branch.last_revision())
+        wt = WorkingTree.open_containing(".")[0]
+        branch = wt.branch
+        if revision is not None:
+            if len(revision) == 1:
+                tree1 = wt
+                revision_id = revision[0].in_history(branch).rev_id
+                tree2 = branch.repository.revision_tree(revision_id)
+            elif len(revision) == 2:
+                revision_id_0 = revision[0].in_history(branch).rev_id
+                tree2 = branch.repository.revision_tree(revision_id_0)
+                revision_id_1 = revision[1].in_history(branch).rev_id
+                tree1 = branch.repository.revision_tree(revision_id_1)
+        else:
+            tree1 = wt
+            tree2 = tree1.basis_tree()
 
         from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
         import gtk
