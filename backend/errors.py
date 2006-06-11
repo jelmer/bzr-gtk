@@ -21,25 +21,134 @@ class OliveError(Exception):
     pass
 
 class AlreadyBranchError(OliveError):
-    """ The specified directory is already a branch """
+    """ The specified directory is already a branch
+    
+    May occur in:
+        init.init()
+    """
+
+class BoundBranchOutOfDate(OliveError):
+    """ Occurs if the bound branch is out of date
+    
+    May occur in:
+        commit.commit()
+    """
 
 class BranchExistsWithoutWorkingTree(OliveError):
-    """ The specified directory is a branch, however it doesn't contain a working tree """
+    """ The specified directory is a branch, however it doesn't contain a working tree
+    
+    May occur in:
+        init.init()
+    """
+
+class ConflictsInTreeError(OliveError):
+    """ Occurs if non-resolved conflicts remained in the tree
+    
+    May occur in:
+        commit.commit()
+    """
 
 class DirectoryAlreadyExists(OliveError):
-    """ The specified directory already exists """
+    """ The specified directory already exists
+    
+    May occur in:
+        fileops.mkdir()
+    """
+
+class EmptyMessageError(OliveError):
+    """ Occurs if no commit message specified
+    
+    May occur in:
+        commit.commit()
+    """
+
+class LocalRequiresBoundBranch(OliveError):
+    """ Occurs when the local branch needs a bound branch
+    
+    May occur in:
+        commit.commit()
+    """
+
+class NoChangesToCommitError(OliveError):
+    """ Occurs if there are no changes to commit
+    
+    May occur in:
+        commit.commit()
+    """
+
+class NoFilesSpecified(OliveError):
+    """ No files were specified as an argument to a function
+    
+    May occur in:
+        fileops.remove()
+    """
+
+class NoMatchingFiles(OliveError):
+    """ No files found which could match the criteria
+    
+    May occur in:
+        fileops.remove()
+    """
+
+class NoMessageNoFileError(OliveError):
+    """ No message and no file given (for commit)
+    
+    May occur in:
+        commit.commit()
+    """
 
 class NonExistingParent(OliveError):
-    """ Parent directory doesn't exist """
+    """ Parent directory doesn't exist
+    
+    May occur in:
+        init.branch()
+    """
 
 class NonExistingRevision(OliveError):
-    """ The specified revision doesn't exist in the branch """
+    """ The specified revision doesn't exist in the branch
+    
+    May occur in:
+        init.branch()
+    """
 
 class NonExistingSource(OliveError):
-    """ The source provided doesn't exist """
+    """ The source provided doesn't exist
+    
+    May occur in:
+        init.branch()
+    """
+
+class NotBranchError(OliveError):
+    """ Specified directory is not a branch
+    
+    May occur in:
+        commit.commit()
+    """
+
+class NotVersionedError(OliveError):
+    """ Occurs if the specified file/directory is not in the branch
+    
+    May occur in:
+        fileops.remove()
+    """
 
 class RevisionValueError(OliveError):
-    """ Invalid revision value provided """
+    """ Invalid revision value provided
+    
+    May occur in:
+        init.branch()
+    """
+
+class StrictCommitError(OliveError):
+    """ Occurs if strict commit fails
+    
+    May occur in:
+        commit.commit()
+    """
 
 class TargetAlreadyExists(OliveError):
-    """ Target directory already exists """
+    """ Target directory already exists
+    
+    May occur in:
+        init.branch()
+    """

@@ -17,10 +17,17 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import os
-from errors import DirectoryAlreadyExists
+
+import bzrlib.errors as errors
+
+from errors import (DirectoryAlreadyExists, NoFilesSpecified, NoMatchingFiles,
+                    NotVersionedError)
 
 def mkdir(directory):
-    """ Create new versioned directory """
+    """ Create new versioned directory.
+    
+    :param directory: the full path to the directory to be created
+    """
     from bzrlib.workingtree import WorkingTree
     
     try:
@@ -33,15 +40,14 @@ def mkdir(directory):
         wt.add([dd])
 
 def add(file_list):
-    """ Add listed files to the branch 
+    """ Add listed files to the branch. 
     
-    file_list must contain full paths
+    :param file_list - list of files to be added (using full paths)
     
-    Returns the ignored files.
+    :return: count of ignored files
     """
     import bzrlib.add
     
-    #action = bzrlib.add.AddAction()
     added, ignored = bzrlib.add.smart_add(file_list)
     
     match_len = 0
@@ -49,3 +55,31 @@ def add(file_list):
         match_len += len(paths)
     
     return match_len
+
+def remove(file_list, new=False):
+    """ Make selected files unversioned.
+    
+    :param file_list: list of files/directories to be removed
+    
+    :param new: if True, the 'added' files will be removed
+    """
+    from bzrlib.builtins import tree_files
+    
+    tree, file_list = tree_files(file_list)
+    
+    if new is False:
+        if file_list is None:
+            raise NoFilesSpecified
+    else:
+        from bzrlib.delta import compare_trees
+        added = [compare_trees(tree.basis_tree(), tree,
+                               specific_files=file_list).added]
+        file_list = sorted([f[0] for f in added[0]], reverse=True)
+        if len(file_list) == 0:
+            raise NoMatchingFiles
+    
+    try:
+        tree.remove(file_list)
+    except errors.NotVersionedError:
+        raise NotVersionedError
+

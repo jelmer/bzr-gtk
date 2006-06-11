@@ -26,6 +26,10 @@ from errors import (AlreadyBranchError, BranchExistsWithoutWorkingTree,
                     RevisionValueError, TargetAlreadyExists)
 
 def init(location):
+    """ Initialize a directory.
+    
+    :param location: full path to the directory you want to be versioned
+    """
     from bzrlib.builtins import get_format_type
     import bzrlib.bzrdir as bzrdir
 
@@ -49,13 +53,23 @@ def init(location):
             existing_bzrdir.create_workingtree()
 
 def branch(from_location, to_location, revision=None):
+    """ Create a branch from a local/remote location.
+    
+    :param from_location: The original location of the branch
+    
+    :param to_location: The directory where the branch should be created
+    
+    :param revision: if specified, the given revision will be branched
+    
+    :return: number of revisions branched
+    """
     from bzrlib.branch import Branch
     from bzrlib.transport import get_transport
 
     if revision is None:
         revision = [None]
     elif len(revision) > 1:
-        raise RevisionValueError('bzr branch --revision takes exactly 1 revision value')
+        raise RevisionValueError
 
     try:
         br_from = Branch.open(from_location)
