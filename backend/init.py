@@ -19,7 +19,11 @@
 import errno
 import os
 
+import bzrlib
+import bzrlib.bzrdir as bzrdir
 import bzrlib.errors as errors
+
+from bzrlib.branch import Branch
 
 from errors import (AlreadyBranchError, BranchExistsWithoutWorkingTree,
                     NonExistingParent, NonExistingRevision, NonExistingSource,
@@ -31,7 +35,6 @@ def init(location):
     :param location: full path to the directory you want to be versioned
     """
     from bzrlib.builtins import get_format_type
-    import bzrlib.bzrdir as bzrdir
 
     format = get_format_type('default')
  
@@ -55,15 +58,14 @@ def init(location):
 def branch(from_location, to_location, revision=None):
     """ Create a branch from a local/remote location.
     
-    :param from_location: The original location of the branch
+    :param from_location: the original location of the branch
     
-    :param to_location: The directory where the branch should be created
+    :param to_location: the directory where the branch should be created
     
     :param revision: if specified, the given revision will be branched
     
     :return: number of revisions branched
     """
-    from bzrlib.branch import Branch
     from bzrlib.transport import get_transport
 
     if revision is None:
@@ -113,5 +115,66 @@ def branch(from_location, to_location, revision=None):
         
     return branch.revno()
 
-def checkout():
-    """ FIXME - will be implemented later """
+# FIXME - not tested yet
+def checkout(branch_location, to_location, revision=None, lightweight=False):
+    """ Create a new checkout of an existing branch.
+    
+    :param branch_location: the location of the branch you'd like to checkout
+    
+    :param to_location: the directory where the checkout should be created
+    
+    :param revision: the given revision will be checkout'ed (be aware!)
+    
+    :param lightweight: perform a lightweight checkout (be aware!)
+    """
+    if revision is None:
+        revision = [None]
+    elif len(revision) > 1:
+        raise RevisionValueError
+
+    source = Branch.open(branch_location)
+
+    if len(revision) == 1 and revision[0] is not None:
+        revision_id = revision[0].in_history(source)[1]
+    else:
+        revision_id = None
+
+    # if the source and to_location are the same, 
+    # and there is no working tree,
+    # then reconstitute a branch
+    if (bzrlib.osutils.abspath(to_location) == 
+        bzrlib.osutils.abspath(branch_location)):
+        try:
+            source.bzrdir.open_workingtree()
+        except errors.NoWorkingTree:
+            source.bzrdir.create_workingtree()
+            return
+
+    try:
+        os.mkdir(to_location)
+    except OSError, e:
+        if e.errno == errno.EEXIST:
+            raise TargetAlreadyExists(to_location)
+        if e.errno == errno.ENOENT:
+            raise NonExistingParent(to_location)
+        else:
+            raise
+
+    old_format = bzrlib.bzrdir.BzrDirFormat.get_default_format()
+    bzrlib.bzrdir.BzrDirFormat.set_default_format(bzrdir.BzrDirMetaFormat1())
+
+    try:
+        if lightweight:
+            checkout = bzrdir.BzrDirMetaFormat1().initialize(to_location)
+            bzrlib.branch.BranchReferenceFormat().initialize(checkout, source)
+        else:
+            checkout_branch = bzrlib.bzrdir.BzrDir.create_branch_convenience(
+                to_location, force_new_tree=False)
+            checkout = checkout_branch.bzrdir
+            checkout_branch.bind(source)
+            if revision_id is not None:
+                rh = checkout_branch.revision_history()
+                checkout_branch.set_revision_history(rh[:rh.index(revision_id) + 1])
+        checkout.create_workingtree(revision_id)
+    finally:
+        bzrlib.bzrdir.BzrDirFormat.set_default_format(old_format)

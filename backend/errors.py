@@ -55,6 +55,13 @@ class DirectoryAlreadyExists(OliveError):
         fileops.mkdir()
     """
 
+class DivergedBranchesError(OliveError):
+    """ The branches have been diverged
+    
+    May occur in:
+        commit.push()
+    """
+
 class EmptyMessageError(OliveError):
     """ Occurs if no commit message specified
     
@@ -102,6 +109,8 @@ class NonExistingParent(OliveError):
     
     May occur in:
         init.branch()
+        init.checkout()
+        commit.push()
     """
 
 class NonExistingRevision(OliveError):
@@ -118,6 +127,13 @@ class NonExistingSource(OliveError):
         init.branch()
     """
 
+class NoPushLocationKnown(OliveError):
+    """ No push location known or specified
+    
+    May occur in:
+        commit.push()
+    """
+
 class NotBranchError(OliveError):
     """ Specified directory is not a branch
     
@@ -132,11 +148,19 @@ class NotVersionedError(OliveError):
         fileops.remove()
     """
 
+class PathPrefixNotCreated(OliveError):
+    """ The path prefix couldn't be created
+    
+    May occur in:
+        commit.push()
+    """
+
 class RevisionValueError(OliveError):
     """ Invalid revision value provided
     
     May occur in:
         init.branch()
+        init.checkout()
     """
 
 class StrictCommitError(OliveError):
@@ -151,4 +175,5 @@ class TargetAlreadyExists(OliveError):
     
     May occur in:
         init.branch()
+        init.checkout()
     """
