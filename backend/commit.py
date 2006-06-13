@@ -120,7 +120,7 @@ def push(branch, location=None, remember=False, overwrite=False,
     try:
         dir_to = bzrlib.bzrdir.BzrDir.open(location_url)
         br_to = dir_to.open_branch()
-    except NotBranchError:
+    except errors.NotBranchError:
         # create a branch.
         transport = transport.clone('..')
         if not create_prefix:

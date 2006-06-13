@@ -159,8 +159,6 @@ class RevisionValueError(OliveError):
     """ Invalid revision value provided
     
     May occur in:
-        init.branch()
-        init.checkout()
     """
 
 class StrictCommitError(OliveError):

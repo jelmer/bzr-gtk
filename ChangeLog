@@ -1,5 +1,10 @@
 2006-06-12  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * backend/commit.py: minor tweaks to push()
+    * backend/init.py: minor tweaks to checkout() and branch()
+
+2006-06-12  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
     * backend/init.py: checkout() implemented - not tested yet
     * backend/commit.py: push() implemented - not tested yet
     * backend/error.py: another bunch of exceptions added

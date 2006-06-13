@@ -27,7 +27,7 @@ from bzrlib.branch import Branch
 
 from errors import (AlreadyBranchError, BranchExistsWithoutWorkingTree,
                     NonExistingParent, NonExistingRevision, NonExistingSource,
-                    RevisionValueError, TargetAlreadyExists)
+                    TargetAlreadyExists)
 
 def init(location):
     """ Initialize a directory.
@@ -68,11 +68,6 @@ def branch(from_location, to_location, revision=None):
     """
     from bzrlib.transport import get_transport
 
-    if revision is None:
-        revision = [None]
-    elif len(revision) > 1:
-        raise RevisionValueError
-
     try:
         br_from = Branch.open(from_location)
     except OSError, e:
@@ -85,10 +80,10 @@ def branch(from_location, to_location, revision=None):
 
     try:
         basis_dir = None
-        if len(revision) == 1 and revision[0] is not None:
-            revision_id = revision[0].in_history(br_from)[1]
+        if revision is not None:
+            revision_id = br_from.get_rev_id(revision)
         else:
-            revision_id = br_from.last_revision()
+            revision_id = None
 
         to_location = to_location + '/' + os.path.basename(from_location.rstrip("/\\"))
         name = None
@@ -115,7 +110,6 @@ def branch(from_location, to_location, revision=None):
         
     return branch.revno()
 
-# FIXME - not tested yet
 def checkout(branch_location, to_location, revision=None, lightweight=False):
     """ Create a new checkout of an existing branch.
     
@@ -127,22 +121,17 @@ def checkout(branch_location, to_location, revision=None, lightweight=False):
     
     :param lightweight: perform a lightweight checkout (be aware!)
     """
-    if revision is None:
-        revision = [None]
-    elif len(revision) > 1:
-        raise RevisionValueError
-
     source = Branch.open(branch_location)
-
-    if len(revision) == 1 and revision[0] is not None:
-        revision_id = revision[0].in_history(source)[1]
+    
+    if revision is not None:
+        revision_id = source.get_rev_id(revision)
     else:
         revision_id = None
 
     # if the source and to_location are the same, 
     # and there is no working tree,
     # then reconstitute a branch
-    if (bzrlib.osutils.abspath(to_location) == 
+    if (bzrlib.osutils.abspath(to_location) ==
         bzrlib.osutils.abspath(branch_location)):
         try:
             source.bzrdir.open_workingtree()
@@ -175,6 +164,7 @@ def checkout(branch_location, to_location, revision=None, lightweight=False):
             if revision_id is not None:
                 rh = checkout_branch.revision_history()
                 checkout_branch.set_revision_history(rh[:rh.index(revision_id) + 1])
+
         checkout.create_workingtree(revision_id)
     finally:
         bzrlib.bzrdir.BzrDirFormat.set_default_format(old_format)
