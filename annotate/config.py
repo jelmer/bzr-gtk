@@ -20,7 +20,6 @@ import gtk.gdk
 
 from bzrlib.config import config_dir
 import bzrlib.util.configobj.configobj as configobj
-from bzrlib.util.configobj.validate import Validator
 
 
 gannotate_configspec = (
@@ -55,7 +54,14 @@ class GAnnotateConfig(configobj.ConfigObj):
         self.span_selector = window.span_selector
         
         self.initial_comment = ["gannotate plugin configuration"]
-        self.validate(Validator())
+        self['window']['width'] = 750
+        self['window']['height'] = 550
+        self['window']['maximized'] = False
+        self['window']['x'] = 0
+        self['window']['y'] = 0
+        self['window']['pane_position'] = 325
+        self['spans']['max_custom_spans'] = 4
+        self['spans']['custom_spans'] = []
 
         self.apply()
         self._connect_signals()
