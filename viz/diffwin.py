@@ -23,6 +23,7 @@ except ImportError:
 
 from bzrlib.delta import compare_trees
 from bzrlib.diff import show_diff_trees
+from bzrlib.errors import NoSuchFile
 
 
 class DiffWindow(gtk.Window):
@@ -135,6 +136,17 @@ class DiffWindow(gtk.Window):
 
         self.treeview.expand_all()
         self.set_title(description + " - bzrk diff")
+
+    def set_file(self, file_path):
+        tv_path = None
+        for data in self.model:
+            for child in data.iterchildren():
+                if child[0] == file_path:
+                    tv_path = child.path
+                    break
+        if tv_path is None:
+            raise NoSuchFile(file_path)
+        self.treeview.set_cursor(tv_path)
 
     def _treeview_cursor_cb(self, *args):
         """Callback for when the treeview cursor changes."""

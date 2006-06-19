@@ -58,6 +58,9 @@ class GAnnotateWindow(gtk.Window):
 
     def annotate(self, branch, file_id):
         self.revisions = {}
+        self.annotations = []
+        self.branch = branch
+        self.file_id = file_id
         
         # [revision id, line number, committer, revno, highlight color, line]
         self.annomodel = gtk.ListStore(gobject.TYPE_STRING,
@@ -89,6 +92,7 @@ class GAnnotateWindow(gtk.Window):
                                        None,
                                        line.rstrip("\r\n")
                                       ])
+                self.annotations.append(revision)
 
             if not self.plain:
                 self._set_oldest_newest()
@@ -113,6 +117,7 @@ class GAnnotateWindow(gtk.Window):
             row = lineno - 1
 
         self.annoview.set_cursor(row)
+        self.annoview.scroll_to_cell(row, use_align=True)
 
     def _annotate(self, branch, file_id):
         rev_hist = branch.revision_history()
@@ -180,6 +185,7 @@ class GAnnotateWindow(gtk.Window):
         sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         sw.set_shadow_type(gtk.SHADOW_IN)
         sw.add(self.annoview)
+        self.annoview.gwindow = self
         sw.show()
         
         self.pane = pane = gtk.VPaned()
@@ -196,11 +202,24 @@ class GAnnotateWindow(gtk.Window):
 
         self.add(vbox)
 
+    def row_diff(self, tv, path, tvc):
+        row = path[0]
+        revision = self.annotations[row]
+        tree1 = self.branch.repository.revision_tree(revision.revision_id)
+        tree2 = self.branch.repository.revision_tree(revision.parent_ids[0])
+        from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
+        window = DiffWindow()
+        window.set_diff("Diff for row %d" % row, tree1, tree2)
+        window.set_file(tree1.id2path(self.file_id))
+        window.show()
+
+
     def _create_annotate_view(self):
         tv = gtk.TreeView()
         tv.set_rules_hint(False)
         tv.connect("cursor-changed", self._show_log)
         tv.show()
+        tv.connect("row-activated", self.row_diff)
 
         cell = gtk.CellRendererText()
         cell.set_property("xalign", 1.0)
