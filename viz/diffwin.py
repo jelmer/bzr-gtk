@@ -136,6 +136,16 @@ class DiffWindow(gtk.Window):
         self.treeview.expand_all()
         self.set_title(description + " - bzrk diff")
 
+    def set_file(self, file_path):
+        tv_path = None
+        for data in self.model:
+            for child in data.iterchildren():
+                if child[0] == file_path:
+                    tv_path = child.path
+                    break
+        assert tv_path is not None
+        self.treeview.set_cursor(tv_path)
+
     def _treeview_cursor_cb(self, *args):
         """Callback for when the treeview cursor changes."""
         (path, col) = self.treeview.get_cursor()

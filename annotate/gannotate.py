@@ -60,6 +60,7 @@ class GAnnotateWindow(gtk.Window):
         self.revisions = {}
         self.annotations = []
         self.branch = branch
+        self.file_id = file_id
         
         # [revision id, line number, committer, revno, highlight color, line]
         self.annomodel = gtk.ListStore(gobject.TYPE_STRING,
@@ -209,6 +210,7 @@ class GAnnotateWindow(gtk.Window):
         from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
         window = DiffWindow()
         window.set_diff("Diff for row %d" % row, tree1, tree2)
+        window.set_file(tree1.id2path(self.file_id))
         window.show()
 
 
