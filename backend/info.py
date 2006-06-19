@@ -16,6 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import bzrlib
 import bzrlib.errors as errors
 
 from bzrlib.branch import Branch
@@ -55,4 +56,139 @@ def revno(branch):
     else:
         return revno
 
+def version():
+    """ Get version information from bzr
+    
+    :return: bzrlib version
+    """
+    return bzrlib.__version__
 
+def whoami(branch=None, email=False):
+    """ Get user's data (name and email address)
+    
+    :param branch: if specified, the user's data will be looked up in the branch's config
+    
+    :param email: if True, only the email address will be returned
+    
+    :return: user info (only email address if email is True)
+    """
+    from bzrlib.workingtree import WorkingTree
+    
+    if branch is not None:
+        try:
+            b = WorkingTree.open_containing(u'.')[0].branch
+            config = bzrlib.config.BranchConfig(b)
+        except NotBranchError:
+            config = bzrlib.config.GlobalConfig()
+    else:
+        config = bzrlib.config.GlobalConfig()
+        
+    if email:
+        return config.user_email()
+    else:
+        return config.username()
+
+def info(location):
+    """ Get info about branch, working tree, and repository
+    
+    :param location: the location of the branch/working tree/repository
+    
+    :return: the information in dictionary format
+    
+    The following informations are delivered (if available):
+    ret['location']['lightcoroot']: Light checkout root
+    ret['location']['sharedrepo']: Shared repository
+    ret['location']['repobranch']: Repository branch
+    ret['location']['cobranch']: Checkout of branch
+    ret['location']['repoco']: Repository checkout
+    ret['location']['coroot']: Checkout root
+    ret['location']['branchroot']: Branch root
+    ret['related']['parentbranch']: Parent branch
+    ret['related']['publishbranch']: Publish to branch
+    ret['format']['control']: Control format
+    ret['format']['workingtree']: Working tree format
+    ret['format']['branch']: Branch format
+    ret['format']['repository']: Repository format
+    ret['locking']['workingtree']: Working tree lock status
+    ret['locking']['branch']: Branch lock status
+    ret['locking']['repository']: Repository lock status
+    ret['mrevbranch']['missing']: Missing revisions in branch
+    ret['mrevworking']['missing']: Missing revisions in working tree
+    ret['wtstats']['unchanged']: Unchanged files
+    ret['wtstats']['modified']: Modified files
+    ret['wtstats']['added']: Added files
+    ret['wtstats']['removed']: Removed files
+    ret['wtstats']['renamed']: Renamed files
+    ret['wtstats']['unknown']: Unknown files
+    ret['wtstats']['ignored']: Ingnored files
+    ret['wtstats']['subdirs']: Versioned subdirectories
+    ret['brstats']['revno']: Revisions in branch
+    ret['brstats']['commiters']: Number of commiters
+    ret['brstats']['age']: Age of branch in days
+    ret['brstats']['firstrev']: Time of first revision
+    ret['brstats']['lastrev']: Time of last revision
+    ret['repstats']['revisions']: Revisions in repository
+    ret['repstats']['size']: Size of repository in bytes
+    """
+    import bzrlib.bzrdir as bzrdir
+    
+    import info_helper
+    
+    ret = {}
+    a_bzrdir = bzrdir.BzrDir.open_containing(location)[0]
+    try:
+        working = a_bzrdir.open_workingtree()
+        working.lock_read()
+        try:
+            branch = working.branch
+            repository = branch.repository
+            control = working.bzrdir
+
+            ret['location'] = info_helper.get_location_info(repository, branch, working)
+            ret['related'] = info_helper.get_related_info(branch)
+            ret['format'] = info_helper.get_format_info(control, repository, branch, working)
+            ret['locking'] = info_helper.get_locking_info(repository, branch, working)
+            ret['mrevbranch'] = info_helper.get_missing_revisions_branch(branch)
+            ret['mrevworking'] = info_helper.get_missing_revisions_working(working)
+            ret['wtstats'] = info_helper.get_working_stats(working)
+            ret['brstats'] = info_helper.get_branch_stats(branch)
+            ret['repstats'] = info_helper.get_repository_stats(repository)
+        finally:
+            working.unlock()
+            return ret
+        return
+    except (errors.NoWorkingTree, errors.NotLocalUrl):
+        pass
+
+    try:
+        branch = a_bzrdir.open_branch()
+        branch.lock_read()
+        try:
+            ret['location'] = info_helper.get_location_info(repository, branch)
+            ret['related'] = info_helper.get_related_info(branch)
+            ret['format'] = info_helper.get_format_info(control, repository, branch)
+            ret['locking'] = info_helper.get_locking_info(repository, branch)
+            ret['mrevbranch'] = info_helper.get_missing_revisions_branch(branch)
+            ret['brstats'] = info_helper.get_branch_stats(branch)
+            ret['repstats'] = info_helper.get_repository_stats(repository)
+        finally:
+            branch.unlock()
+            return ret
+        return
+    except errors.NotBranchError:
+        pass
+
+    try:
+        repository = a_bzrdir.open_repository()
+        repository.lock_read()
+        try:
+            ret['location'] = info_helper.get_location_info(repository)
+            ret['format'] = info_helper.get_format_info(control, repository)
+            ret['locking'] = info_helper.get_locking_info(repository)
+            ret['repstats'] = info_helper.get_repository_stats(repository)
+        finally:
+            repository.unlock()
+            return ret
+        return
+    except errors.NoRepositoryPresent:
+        pass

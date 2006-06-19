@@ -1,3 +1,8 @@
+2006-06-18  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * backend/info.py: implemented version(), whoami() and info()
+    * backend/info_helper.py: some helper functions for info.info()
+
 2006-06-13  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * backend/info.py: nick() and revno() implemented
