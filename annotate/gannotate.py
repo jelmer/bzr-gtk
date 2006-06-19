@@ -23,6 +23,7 @@ import gtk
 import pango
 
 from bzrlib.errors import NoSuchRevision
+from bzrlib.revision import NULL_REVISION
 
 from colormap import AnnotateColorMap, AnnotateColorSaturation
 from logview import LogView
@@ -205,8 +206,12 @@ class GAnnotateWindow(gtk.Window):
     def row_diff(self, tv, path, tvc):
         row = path[0]
         revision = self.annotations[row]
-        tree1 = self.branch.repository.revision_tree(revision.revision_id)
-        tree2 = self.branch.repository.revision_tree(revision.parent_ids[0])
+        repository = self.branch.repository
+        tree1 = repository.revision_tree(revision.revision_id)
+        if len(revision.parent_ids) > 0:
+            tree2 = repository.revision_tree(revision.parent_ids[0])
+        else:
+            tree2 = repository.revision_tree(NULL_REVISION)
         from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
         window = DiffWindow()
         window.set_diff("Diff for row %d" % row, tree1, tree2)
