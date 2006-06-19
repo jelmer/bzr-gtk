@@ -127,7 +127,7 @@ class DiffWindow(gtk.Window):
             titer = self.model.append(None, [ "Renamed", None ])
             for oldpath, newpath, id, kind, text_modified, meta_modified \
                     in delta.renamed:
-                self.model.append(titer, [ oldpath, oldpath ])
+                self.model.append(titer, [ oldpath, newpath ])
 
         if len(delta.modified):
             titer = self.model.append(None, [ "Modified", None ])
@@ -141,7 +141,7 @@ class DiffWindow(gtk.Window):
         tv_path = None
         for data in self.model:
             for child in data.iterchildren():
-                if child[0] == file_path:
+                if child[0] == file_path or child[1] == file_path:
                     tv_path = child.path
                     break
         if tv_path is None:
