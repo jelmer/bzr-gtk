@@ -23,6 +23,7 @@ except ImportError:
 
 from bzrlib.delta import compare_trees
 from bzrlib.diff import show_diff_trees
+from bzrlib.errors import NoSuchFile
 
 
 class DiffWindow(gtk.Window):
@@ -143,7 +144,8 @@ class DiffWindow(gtk.Window):
                 if child[0] == file_path:
                     tv_path = child.path
                     break
-        assert tv_path is not None
+        if tv_path is None:
+            raise NoSuchFile(file_path)
         self.treeview.set_cursor(tv_path)
 
     def _treeview_cursor_cb(self, *args):

@@ -16,7 +16,7 @@
 
 """GTK+ frontends to Bazaar commands """
 from bzrlib.commands import Command, register_command, display_command
-from bzrlib.errors import NotVersionedError, BzrCommandError
+from bzrlib.errors import NotVersionedError, BzrCommandError, NoSuchFile
 from bzrlib.commands import Command, register_command
 from bzrlib.option import Option
 from bzrlib.branch import Branch
@@ -51,11 +51,11 @@ class cmd_gdiff(Command):
     
     Otherwise, all changes for the tree are listed.
     """
-    takes_args = []
+    takes_args = ['filename?']
     takes_options = ['revision']
 
     @display_command
-    def run(self, revision=None, file_list=None):
+    def run(self, revision=None, filename=None):
         wt = WorkingTree.open_containing(".")[0]
         branch = wt.branch
         if revision is not None:
@@ -77,6 +77,16 @@ class cmd_gdiff(Command):
         window = DiffWindow()
         window.connect("destroy", lambda w: gtk.main_quit())
         window.set_diff("Working Tree", tree1, tree2)
+        if filename is not None:
+            tree_filename = tree1.relpath(filename)
+            try:
+                window.set_file(tree_filename)
+            except NoSuchFile:
+                if (tree1.inventory.path2id(tree_filename) is None and 
+                    tree2.inventory.path2id(tree_filename) is None):
+                    raise NotVersionedError(filename)
+                raise BzrCommandError('No changes found for file "%s"' % 
+                                      filename)
         window.show()
 
         gtk.main()
