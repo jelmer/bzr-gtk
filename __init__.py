@@ -129,7 +129,7 @@ class cmd_gannotate(Command):
     Browse changes to FILENAME line by line in a GTK+ window.
     """
 
-    takes_args = ["filename"]
+    takes_args = ["filename", "line?"]
     takes_options = [
         Option("all", help="show annotations on all lines"),
         Option("plain", help="don't highlight annotation lines"),
@@ -138,7 +138,7 @@ class cmd_gannotate(Command):
     ]
     aliases = ["gblame", "gpraise"]
     
-    def run(self, filename, all=False, plain=False, line=1):
+    def run(self, filename, all=False, plain=False, line='1'):
         import pygtk
         pygtk.require("2.0")
 
@@ -147,6 +147,12 @@ class cmd_gannotate(Command):
         except RuntimeError, e:
             if str(e) == "could not open display":
                 raise NoDisplayError
+
+        try:
+            line = int(line)
+        except ValueError:
+            raise BzrCommandError('Line argument ("%s") is not a number.' % 
+                                  line)
 
         from annotate.gannotate import GAnnotateWindow
         from annotate.config import GAnnotateConfig

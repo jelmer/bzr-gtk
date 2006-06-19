@@ -113,6 +113,7 @@ class GAnnotateWindow(gtk.Window):
             row = lineno - 1
 
         self.annoview.set_cursor(row)
+        self.annoview.scroll_to_cell(row, use_align=True)
 
     def _annotate(self, branch, file_id):
         rev_hist = branch.revision_history()
