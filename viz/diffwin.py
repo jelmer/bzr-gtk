@@ -147,6 +147,7 @@ class DiffWindow(gtk.Window):
         if tv_path is None:
             raise NoSuchFile(file_path)
         self.treeview.set_cursor(tv_path)
+        self.treeview.scroll_to_cell(tv_path)
 
     def _treeview_cursor_cb(self, *args):
         """Callback for when the treeview cursor changes."""
