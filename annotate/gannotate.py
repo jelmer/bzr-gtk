@@ -214,7 +214,7 @@ class GAnnotateWindow(gtk.Window):
             tree2 = repository.revision_tree(NULL_REVISION)
         from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
         window = DiffWindow()
-        window.set_diff("Diff for row %d" % row, tree1, tree2)
+        window.set_diff("Diff for row %d" % (row+1), tree1, tree2)
         window.set_file(tree1.id2path(self.file_id))
         window.show()
 
