@@ -57,11 +57,12 @@ class GAnnotateWindow(gtk.Window):
         if self.plain:
             self.span_selector.hide()
 
-    def annotate(self, branch, file_id):
+    def annotate(self, branch, file_id, revision_id=None):
         self.revisions = {}
         self.annotations = []
         self.branch = branch
         self.file_id = file_id
+        self.revision_id = revision_id
         
         # [revision id, line number, committer, revno, highlight color, line]
         self.annomodel = gtk.ListStore(gobject.TYPE_STRING,
@@ -76,7 +77,7 @@ class GAnnotateWindow(gtk.Window):
             branch.lock_read()
             branch.repository.lock_read()
             for line_no, (revision, revno, line)\
-                    in enumerate(self._annotate(branch, file_id)):
+                    in enumerate(self._annotate(branch, file_id, revision_id)):
                 if revision.revision_id == last_seen and not self.all:
                     revno = committer = ""
                 else:
@@ -120,16 +121,18 @@ class GAnnotateWindow(gtk.Window):
         self.annoview.set_cursor(row)
         self.annoview.scroll_to_cell(row, use_align=True)
 
-    def _annotate(self, branch, file_id):
+    def _annotate(self, branch, file_id, revision_id):
         rev_hist = branch.revision_history()
         repository = branch.repository
-        rev_tree = repository.revision_tree(branch.last_revision())
-        rev_id = rev_tree.inventory[file_id].revision
+        if revision_id is None:
+            revision_id = branch.last_revision()
+        rev_tree = repository.revision_tree(revision_id)
+        revision_id = rev_tree.inventory[file_id].revision
         weave = repository.weave_store.get_weave(file_id,
                                                  branch.get_transaction())
         
         revision_cache = RevisionCache(repository)
-        for origin, text in weave.annotate_iter(rev_id):
+        for origin, text in weave.annotate_iter(revision_id):
             rev_id = origin
             try:
                 revision = revision_cache.get_revision(rev_id)

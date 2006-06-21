@@ -144,11 +144,12 @@ class cmd_gannotate(Command):
         Option("all", help="show annotations on all lines"),
         Option("plain", help="don't highlight annotation lines"),
         Option("line", type=int, argname="lineno",
-               help="jump to specified line number")
+               help="jump to specified line number"),
+        "revision",
     ]
     aliases = ["gblame", "gpraise"]
     
-    def run(self, filename, all=False, plain=False, line='1'):
+    def run(self, filename, all=False, plain=False, line='1', revision=None):
         import pygtk
         pygtk.require("2.0")
 
@@ -174,6 +175,12 @@ class cmd_gannotate(Command):
 
         if file_id is None:
             raise NotVersionedError(filename)
+        if revision is not None:
+            if len(revision) != 1:
+                raise BzrCommandError("Only 1 revion may be specified.")
+            revision_id = revision[0].in_history(branch).rev_id
+        else:
+            revision_id = None
 
         window = GAnnotateWindow(all, plain)
         window.connect("destroy", lambda w: gtk.main_quit())
@@ -182,7 +189,7 @@ class cmd_gannotate(Command):
         window.show()
         branch.lock_read()
         try:
-            window.annotate(branch, file_id)
+            window.annotate(branch, file_id, revision_id)
         finally:
             branch.unlock()
         window.jump_to_line(line)
