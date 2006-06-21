@@ -90,6 +90,14 @@ class NoFilesSpecified(OliveError):
         fileops.remove()
     """
 
+class NoLocationKnown(OliveError):
+    """ No location known or specified
+    
+    May occur in:
+        commit.push()
+        init.pull()
+    """
+
 class NoMatchingFiles(OliveError):
     """ No files found which could match the criteria
     
@@ -125,13 +133,6 @@ class NonExistingSource(OliveError):
     
     May occur in:
         init.branch()
-    """
-
-class NoPushLocationKnown(OliveError):
-    """ No push location known or specified
-    
-    May occur in:
-        commit.push()
     """
 
 class NotBranchError(OliveError):

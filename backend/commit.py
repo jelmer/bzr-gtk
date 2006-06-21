@@ -25,7 +25,7 @@ from errors import (EmptyMessageError, NoMessageNoFileError,
                     NoChangesToCommitError, ConflictsInTreeError,
                     StrictCommitError, BoundBranchOutOfDate,
                     LocalRequiresBoundBranch, NotBranchError, NonExistingParent,
-                    PathPrefixNotCreated, NoPushLocationKnown,
+                    PathPrefixNotCreated, NoLocationKnown,
                     DivergedBranchesError)
 
 def commit(selected_list, message=None, file=None, unchanged=False,
@@ -81,7 +81,6 @@ def commit(selected_list, message=None, file=None, unchanged=False,
     except errors.BoundBranchOutOfDate, e:
         raise BoundBranchOutOfDate(str(e))
 
-# FIXME - not tested yet
 def push(branch, location=None, remember=False, overwrite=False,
          create_prefix=False):
     """ Update a mirror of a branch.
@@ -105,7 +104,7 @@ def push(branch, location=None, remember=False, overwrite=False,
     stored_loc = br_from.get_push_location()
     if location is None:
         if stored_loc is None:
-            raise NoPushLocationKnown
+            raise NoLocationKnown
         else:
             location = stored_loc
 

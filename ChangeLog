@@ -1,3 +1,13 @@
+2006-06-20  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * backend/init.py: moved pull() to backend/update.py
+    * backend/update.py: implemented update() and missing()
+
+2006-06-19  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * backend/errors.py: renamed NoPushLocationKnown to NoLocationKnown
+    * backend/init.py: implemented pull()
+
 2006-06-18  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * backend/info.py: implemented version(), whoami() and info()

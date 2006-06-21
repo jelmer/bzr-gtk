@@ -26,8 +26,8 @@ import bzrlib.errors as errors
 from bzrlib.branch import Branch
 
 from errors import (AlreadyBranchError, BranchExistsWithoutWorkingTree,
-                    NonExistingParent, NonExistingRevision, NonExistingSource,
-                    TargetAlreadyExists)
+                    NonExistingParent, NonExistingRevision,
+                    NonExistingSource, TargetAlreadyExists)
 
 def init(location):
     """ Initialize a directory.
