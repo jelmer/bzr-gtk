@@ -172,4 +172,3 @@ def update(location):
             return 0
     finally:
         tree.unlock()
-

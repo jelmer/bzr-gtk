@@ -244,3 +244,42 @@ def get_repository_stats(repository):
         ret['size'] = t
 
     return ret
+
+def diff_helper(tree, specific_files, external_diff_options, 
+                    old_revision_spec=None, new_revision_spec=None,
+                    old_label='a/', new_label='b/', output=None):
+    """ Helper for diff.
+
+    :param tree: a WorkingTree
+
+    :param specific_files: the specific files to compare, or None
+
+    :param external_diff_options: if non-None, run an external diff, and pass it these options
+
+    :param old_revision_spec: if None, use basis tree as old revision, otherwise use the tree for the specified revision. 
+
+    :param new_revision_spec:  if None, use working tree as new revision, otherwise use the tree for the specified revision.
+    """
+    import sys
+    
+    from bzrlib.diff import show_diff_trees
+    
+    if output == None:
+        output = sys.stdout
+    
+    def spec_tree(spec):
+        revision_id = spec.in_store(tree.branch).rev_id
+        return tree.branch.repository.revision_tree(revision_id)
+    if old_revision_spec is None:
+        old_tree = tree.basis_tree()
+    else:
+        old_tree = spec_tree(old_revision_spec)
+
+    if new_revision_spec is None:
+        new_tree = tree
+    else:
+        new_tree = spec_tree(new_revision_spec)
+
+    return show_diff_trees(old_tree, new_tree, output, specific_files,
+                           external_diff_options,
+                           old_label=old_label, new_label=new_label)

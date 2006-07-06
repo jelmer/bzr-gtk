@@ -20,24 +20,9 @@ import os
 
 import bzrlib.errors as errors
 
-from errors import (DirectoryAlreadyExists, NoFilesSpecified, NoMatchingFiles,
+from errors import (DirectoryAlreadyExists, MissingArgumentError,
+                    MultipleMoveError, NoFilesSpecified, NoMatchingFiles,
                     NotVersionedError)
-
-def mkdir(directory):
-    """ Create new versioned directory.
-    
-    :param directory: the full path to the directory to be created
-    """
-    from bzrlib.workingtree import WorkingTree
-    
-    try:
-        os.mkdir(directory)
-    except OSError, e:
-        if e.errno == 17:
-            raise DirectoryAlreadyExists(directory)
-    else:
-        wt, dd = WorkingTree.open_containing(directory)
-        wt.add([dd])
 
 def add(file_list):
     """ Add listed files to the branch. 
@@ -55,6 +40,42 @@ def add(file_list):
         match_len += len(paths)
     
     return match_len
+
+def mkdir(directory):
+    """ Create new versioned directory.
+    
+    :param directory: the full path to the directory to be created
+    """
+    from bzrlib.workingtree import WorkingTree
+    
+    try:
+        os.mkdir(directory)
+    except OSError, e:
+        if e.errno == 17:
+            raise DirectoryAlreadyExists(directory)
+    else:
+        wt, dd = WorkingTree.open_containing(directory)
+        wt.add([dd])
+
+def move(names_list):
+    """ Move or rename given files.
+    
+    :param file_list: if two elements, then rename the first to the second, if more elements then move all of them to the directory specified in the last element
+    """
+    from bzrlib.builtins import tree_files
+    
+    if len(names_list) < 2:
+        raise MissingArgumentError
+    tree, rel_names = tree_files(names_list)
+        
+    if os.path.isdir(names_list[-1]):
+        # move into existing directory
+        for pair in tree.move(rel_names[:-1], rel_names[-1]):
+            pass
+    else:
+        if len(names_list) != 2:
+            raise MultipleMoveError
+        tree.rename_one(rel_names[0], rel_names[1])
 
 def remove(file_list, new=False):
     """ Make selected files unversioned.

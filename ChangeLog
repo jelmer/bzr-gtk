@@ -1,3 +1,11 @@
+2006-07-06  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * I'm not dead :)
+    * backend/errors.py: added some exceptions related to fileops.move()
+    * backend/fileops.py: implemented move()
+    * backend/info_helper.py: added diff_helper()
+    * backend/info.py: implemented diff()
+
 2006-06-20  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * backend/init.py: moved pull() to backend/update.py

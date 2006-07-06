@@ -76,6 +76,20 @@ class LocalRequiresBoundBranch(OliveError):
         commit.commit()
     """
 
+class MissingArgumentError(OliveError):
+    """ Occurs when not enough parameters are given.
+    
+    May occur in:
+        fileops.move()
+    """
+
+class MultipleMoveError(OliveError):
+    """ Occurs when moving/renaming more than 2 files, but the last argument is not a directory
+    
+    May occur in:
+        fileops.move()
+    """
+
 class NoChangesToCommitError(OliveError):
     """ Occurs if there are no changes to commit
     
