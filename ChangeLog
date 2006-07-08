@@ -1,3 +1,14 @@
+2006-07-08  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * backend/errors.py: added some exceptions related to diff() and log()
+    * backend/info.py: implemented log()
+    * backend/info.py: diff() works well with revnos
+    * added e-mail address to copyright header
+
+2006-07-07  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * I turned 20 today, so please forgive me for the short changelog :)
+
 2006-07-06  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * I'm not dead :)

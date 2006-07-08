@@ -1,4 +1,4 @@
-# Copyright (C) 2006 by Szilveszter Farkas (Phanatic)
+# Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
 # Some parts of the code are:
 # Copyright (C) 2005, 2006 by Canonical Ltd
 
@@ -270,6 +270,7 @@ def diff_helper(tree, specific_files, external_diff_options,
     def spec_tree(spec):
         revision_id = spec.in_store(tree.branch).rev_id
         return tree.branch.repository.revision_tree(revision_id)
+    
     if old_revision_spec is None:
         old_tree = tree.basis_tree()
     else:

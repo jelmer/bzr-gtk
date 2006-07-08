@@ -1,4 +1,4 @@
-# Copyright (C) 2006 by Szilveszter Farkas (Phanatic)
+# Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
 # Some parts of the code are:
 # Copyright (C) 2005, 2006 by Canonical Ltd
 
@@ -46,6 +46,13 @@ class ConflictsInTreeError(OliveError):
     
     May occur in:
         commit.commit()
+    """
+
+class DifferentBranchesError(OliveError):
+    """ Occurs if the specified files are in different branches
+    
+    May occur in:
+        info.diff()
     """
 
 class DirectoryAlreadyExists(OliveError):
@@ -147,6 +154,7 @@ class NonExistingSource(OliveError):
     
     May occur in:
         init.branch()
+        fileops.rename()
     """
 
 class NotBranchError(OliveError):
@@ -170,10 +178,18 @@ class PathPrefixNotCreated(OliveError):
         commit.push()
     """
 
+class PrefixFormatError(OliveError):
+    """ Occurs if the prefix is badly formatted
+    
+    May occur in:
+        info.diff()
+    """
+
 class RevisionValueError(OliveError):
     """ Invalid revision value provided
     
     May occur in:
+        info.log()
     """
 
 class StrictCommitError(OliveError):

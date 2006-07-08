@@ -1,4 +1,4 @@
-# Copyright (C) 2006 by Szilveszter Farkas (Phanatic)
+# Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
 # Some parts of the code are:
 # Copyright (C) 2005, 2006 by Canonical Ltd
 
@@ -22,7 +22,7 @@ import bzrlib.errors as errors
 
 from errors import (DirectoryAlreadyExists, MissingArgumentError,
                     MultipleMoveError, NoFilesSpecified, NoMatchingFiles,
-                    NotVersionedError)
+                    NonExistingSource, NotVersionedError)
 
 def add(file_list):
     """ Add listed files to the branch. 
@@ -104,3 +104,14 @@ def remove(file_list, new=False):
     except errors.NotVersionedError:
         raise NotVersionedError
 
+def rename(source, target):
+    """ Rename a versioned file
+    
+    :param source: full path to the original file
+    
+    :param target: full path to the new file
+    """
+    if os.access(source, os.F_OK) is not True:
+        raise NonExistingSource(source)
+    
+    move([source, target])

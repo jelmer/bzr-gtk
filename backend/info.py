@@ -1,4 +1,4 @@
-# Copyright (C) 2006 by Szilveszter Farkas (Phanatic)
+# Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
 # Some parts of the code are:
 # Copyright (C) 2005, 2006 by Canonical Ltd
 
@@ -21,12 +21,13 @@ import bzrlib.errors as errors
 
 from bzrlib.branch import Branch
 
-from errors import (NotBranchError)
+from errors import (DifferentBranchesError, NotBranchError, PrefixFormatError,
+                    RevisionValueError)
 
 def diff(revision=None, file_list=None, diff_options=None, prefix=None):
     """ Save the diff into a temporary file.
     
-    :param revision: a list of revisions (one or two elements)
+    :param revision: a list of revision numbers (one or two elements)
     
     :param file_list: list of files you want to diff
     
@@ -34,12 +35,13 @@ def diff(revision=None, file_list=None, diff_options=None, prefix=None):
     
     :param prefix: 0 - p0, 1 - p1, or specify prefixes in the form of old/:new/
     
-    :return: path to the temporary file which contains the diff output
+    :return: path to the temporary file which contains the diff output (the frontend has to remove it!)
     """
     from tempfile import mkstemp
     
     from bzrlib.builtins import internal_tree_files
     from bzrlib.diff import show_diff_trees
+    from bzrlib.revisionspec import RevisionSpec_int
     from bzrlib.workingtree import WorkingTree
     
     from info_helper import diff_helper
@@ -53,7 +55,7 @@ def diff(revision=None, file_list=None, diff_options=None, prefix=None):
         new_label = 'new/'
     else:
         if not ':' in prefix:
-            raise errors.BzrError("--diff-prefix expects two values separated by a colon")
+            raise PrefixFormatError
         old_label, new_label = prefix.split(":")
     
     try:
@@ -63,14 +65,13 @@ def diff(revision=None, file_list=None, diff_options=None, prefix=None):
         b2 = None
     except errors.FileInWrongBranch:
         if len(file_list) != 2:
-            raise errors.BzrCommandError("Files are in different branches")
+            raise DifferentBranchesError
 
         tree1, file1 = WorkingTree.open_containing(file_list[0])
         tree2, file2 = WorkingTree.open_containing(file_list[1])
     
         if file1 != "" or file2 != "":
-            # FIXME diff those two files. rbc 20051123
-            raise errors.BzrCommandError("Files are in different branches")
+            raise DifferentBranchesError
     
         file_list = None
     
@@ -79,30 +80,35 @@ def diff(revision=None, file_list=None, diff_options=None, prefix=None):
     
     if revision is not None:
         if tree2 is not None:
-            raise errors.BzrCommandError("Can't specify -r with two branches")
+            raise RevisionValueError
     
+        if len(revision) >= 1:
+            revision[0] = RevisionSpec_int(revision[0])
+        if len(revision) == 2:
+            revision[1] = RevisionSpec_int(revision[1])
+        
         if (len(revision) == 1) or (revision[1].spec is None):
             ret = diff_helper(tree1, file_list, diff_options,
-                                   revision[0], 
-                                   old_label=old_label, new_label=new_label,
-                                   output=tmpfp)
+                              revision[0], 
+                              old_label=old_label, new_label=new_label,
+                              output=tmpfp)
         elif len(revision) == 2:
             ret = diff_helper(tree1, file_list, diff_options,
-                                   revision[0], revision[1],
-                                   old_label=old_label, new_label=new_label,
-                                   output=tmpfp)
+                              revision[0], revision[1],
+                              old_label=old_label, new_label=new_label,
+                              output=tmpfp)
         else:
-            raise errors.BzrCommandError('bzr diff --revision takes exactly one or two revision identifiers')
+            raise RevisionValueError
     else:
         if tree2 is not None:
             ret = show_diff_trees(tree1, tree2, tmpfp, 
-                                   specific_files=file_list,
-                                   external_diff_options=diff_options,
-                                   old_label=old_label, new_label=new_label)
+                                  specific_files=file_list,
+                                  external_diff_options=diff_options,
+                                  old_label=old_label, new_label=new_label)
         else:
             ret = diff_helper(tree1, file_list, diff_options,
-                                   old_label=old_label, new_label=new_label,
-                                   output=tmpfp)
+                              old_label=old_label, new_label=new_label,
+                              output=tmpfp)
     
     tmpfp.close()
     
@@ -215,6 +221,118 @@ def info(location):
         return
     except errors.NoRepositoryPresent:
         pass
+
+def log(location, timezone='original', verbose=False, show_ids=False,
+        forward=False, revision=None, log_format=None, message=None,
+        long=False, short=False, line=False):
+    """ Print log into a temporary file.
+    
+    :param location: location of local/remote branch or file
+    
+    :param timzone: requested timezone
+    
+    :param verbose: verbose output
+    
+    :param show_ids:
+    
+    :param forward: if True, start from the earliest entry
+    
+    :param revision: revision range as a list ([from, to])
+    
+    :param log_format: line, short, long
+    
+    :param message: show revisions whose message matches this regexp
+    
+    :param long: long log format
+    
+    :param short: short log format
+    
+    :param line: line log format
+    
+    :return: full path to the temporary file containing the log (the frontend has to remove it!)
+    """
+    from tempfile import mkstemp
+    
+    from bzrlib import bzrdir    
+    from bzrlib.builtins import get_log_format
+    from bzrlib.log import log_formatter, show_log
+    from bzrlib.revisionspec import RevisionSpec_int
+    
+    assert message is None or isinstance(message, basestring), \
+        "invalid message argument %r" % message
+    direction = (forward and 'forward') or 'reverse'
+        
+    # log everything
+    file_id = None
+    
+    # find the file id to log:
+    dir, fp = bzrdir.BzrDir.open_containing(location)
+    b = dir.open_branch()
+    if fp != '':
+        try:
+            # might be a tree:
+            inv = dir.open_workingtree().inventory
+        except (errors.NotBranchError, errors.NotLocalUrl):
+            # either no tree, or is remote.
+            inv = b.basis_tree().inventory
+        file_id = inv.path2id(fp)
+
+    if revision is not None:
+        if len(revision) >= 1:
+            revision[0] = RevisionSpec_int(revision[0])
+        if len(revision) == 2:
+            revision[1] = RevisionSpec_int(revision[1])
+    
+    if revision is None:
+        rev1 = None
+        rev2 = None
+    elif len(revision) == 1:
+        rev1 = rev2 = revision[0].in_history(b).revno
+    elif len(revision) == 2:
+        if revision[0].spec is None:
+            # missing begin-range means first revision
+            rev1 = 1
+        else:
+            rev1 = revision[0].in_history(b).revno
+
+        if revision[1].spec is None:
+            # missing end-range means last known revision
+            rev2 = b.revno()
+        else:
+            rev2 = revision[1].in_history(b).revno
+    else:
+        raise RevisionValueError
+
+    # By this point, the revision numbers are converted to the +ve
+    # form if they were supplied in the -ve form, so we can do
+    # this comparison in relative safety
+    if rev1 > rev2:
+        (rev2, rev1) = (rev1, rev2)
+
+    if (log_format == None):
+        default = b.get_config().log_format()
+        log_format = get_log_format(long=long, short=short, line=line, 
+                                    default=default)
+    
+    tmpfile = mkstemp(prefix='olive_')
+    tmpfp = open(tmpfile[1], 'w')
+    
+    lf = log_formatter(log_format,
+                       show_ids=show_ids,
+                       to_file=tmpfp,
+                       show_timezone=timezone)
+
+    show_log(b,
+             lf,
+             file_id,
+             verbose=verbose,
+             direction=direction,
+             start_revision=rev1,
+             end_revision=rev2,
+             search=message)
+    
+    tmpfp.close()
+    return tmpfile[1]
 
 def nick(branch, nickname=None):
     """ Get or set nickname.

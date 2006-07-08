@@ -1,4 +1,4 @@
-# Copyright (C) 2006 by Szilveszter Farkas (Phanatic)
+# Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
 # Some parts of the code are:
 # Copyright (C) 2005, 2006 by Canonical Ltd
 
