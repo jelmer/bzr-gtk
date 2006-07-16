@@ -1,5 +1,6 @@
 2006-07-16  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive/backend/ui.py: GtkUIFactory implementation
     * Done some directory reorganization.
     * setup.py: added some basic install script
     * Began to implement the GTK UI.
