@@ -1,3 +1,9 @@
+2006-07-16  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * Done some directory reorganization.
+    * setup.py: added some basic install script
+    * Began to implement the GTK UI.
+
 2006-07-08  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * backend/errors.py: added some exceptions related to diff() and log()
