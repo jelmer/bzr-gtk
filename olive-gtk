@@ -16,15 +16,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from distutils.core import setup
+import sys
+try:
+ 	import pygtk
+  	pygtk.require("2.0")
+except:
+  	pass
+try:
+	import gtk
+except:
+	sys.exit(1)
+	
+from olive.frontend.gtk import OliveGtk
 
-setup(name='Olive',
-      version='0.1',
-      description='Olive - Graphical frontend for Bazaar-NG',
-      author='Szilveszter Farkas (Phanatic)',
-      author_email='szilveszter.farkas@gmail.com',
-      url='https://launchpad.net/products/olive/',
-      packages=['olive', 'olive.backend', 'olive.frontend', 'olive.frontend.gtk'],
-      package_dir={'olive.backend': 'olive/backend', 'olive.frontend.gtk': 'olive/frontend/gtk'},
-      scripts=['olive-gtk'],
-      data_files=[('share/olive', ['olive.glade', 'oliveicon2.png'])])
+app = OliveGtk()
+gtk.main()
