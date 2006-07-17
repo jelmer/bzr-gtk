@@ -17,16 +17,17 @@
 import sys
 
 try:
- 	import pygtk
-  	pygtk.require("2.0")
+    import pygtk
+    pygtk.require("2.0")
 except:
-  	pass
+    pass
 try:
-	import gtk
-  	import gtk.glade
+    import gtk
+    import gtk.glade
 except:
-	sys.exit(1)
+    sys.exit(1)
 
+from branch import OliveBranch
 from dialog import OliveDialog
 
 class OliveHandler:
@@ -37,6 +38,10 @@ class OliveHandler:
     
     def on_about_activate(self, widget):
         self.dialog.about()
+        
+    def on_menuitem_branch_branch_activate(self, widget):
+        branch = OliveBranch(self.gladefile)
+        branch.display()
     
     def not_implemented(self, widget):
         """ Display a Not implemented error message. """

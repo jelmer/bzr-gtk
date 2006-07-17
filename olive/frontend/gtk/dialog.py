@@ -17,15 +17,15 @@
 import sys
 
 try:
- 	import pygtk
-  	pygtk.require("2.0")
+    import pygtk
+    pygtk.require("2.0")
 except:
-  	pass
+    pass
 try:
-	import gtk
-  	import gtk.glade
+    import gtk
+    import gtk.glade
 except:
-	sys.exit(1)
+    sys.exit(1)
 
 class OliveDialog:
     def __init__(self, gladefile):

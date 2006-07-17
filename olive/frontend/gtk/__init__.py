@@ -17,15 +17,15 @@
 import sys
 
 try:
- 	import pygtk
-  	pygtk.require("2.0")
+    import pygtk
+    pygtk.require("2.0")
 except:
-  	pass
+    pass
 try:
-	import gtk
-  	import gtk.glade
+    import gtk
+    import gtk.glade
 except:
-	sys.exit(1)
+    sys.exit(1)
 
 from handler import OliveHandler
 
@@ -45,7 +45,10 @@ class OliveGtk:
             # Load from current directory if not installed
             self.gladefile = "olive.glade"
 
-        self.toplevel = gtk.glade.XML(self.gladefile, "window_main")
+        self.toplevel = gtk.glade.XML(self.gladefile, 'window_main')
+        
+        self.window = self.toplevel.get_widget('window_main')
+        self.window.show_all()
         
         handler = OliveHandler(self.gladefile)
         
@@ -54,6 +57,7 @@ class OliveGtk:
                 "on_quit_activate": gtk.main_quit,
                 "on_about_activate": handler.on_about_activate,
                 "on_menuitem_file_make_directory_activate": handler.not_implemented,
+                "on_menuitem_branch_branch_activate": handler.on_menuitem_branch_branch_activate,
                 "on_menuitem_branch_commit_activate": handler.not_implemented }
         
         # Connect the signals to the handlers

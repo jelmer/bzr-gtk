@@ -1,5 +1,8 @@
 2006-07-17  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive.glade: signals added + Branch dialog modifications
+    * olive/frontend/gtk/branch.py: began to implement branching functionality
+    * olive/frontend/gtk/*: fixes tabs and spaces
     * olive/frontend/gtk/dialog.py: some basic dialog stuff added
     * olive/frontend/gtk/handler.py: moved dialog stuff into dialog.py
     * olive/frontend/gtk/__init__.py: added Status column to filelist
