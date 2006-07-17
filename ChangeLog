@@ -1,5 +1,10 @@
 2006-07-17  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive/frontend/gtk/dialog.py: some basic dialog stuff added
+    * olive/frontend/gtk/handler.py: moved dialog stuff into dialog.py
+    * olive/frontend/gtk/__init__.py: added Status column to filelist
+    * olive/backend/fileops.py: implemented status()
+    * TODO: added a TODO list
     * setup.py: some tweaks
     * olive-gtk: added main executable
     * olive/frontend/gtk/handler.py: signal handler class added (OliveHandler)

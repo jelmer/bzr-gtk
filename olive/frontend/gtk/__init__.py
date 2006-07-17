@@ -27,7 +27,7 @@ try:
 except:
 	sys.exit(1)
 
-from olive.frontend.gtk.handler import OliveHandler
+from handler import OliveHandler
 
 # Olive GTK UI version
 __version__ = '0.1'
@@ -37,15 +37,24 @@ class OliveGtk:
     program."""
     
     def __init__(self):
+        import os.path
+        
         # Load the glade file
         self.gladefile = "/usr/share/olive/olive.glade"
+        if not os.path.exists(self.gladefile):
+            # Load from current directory if not installed
+            self.gladefile = "olive.glade"
+
         self.toplevel = gtk.glade.XML(self.gladefile, "window_main")
         
         handler = OliveHandler(self.gladefile)
         
         # Dictionary for signal_autoconnect
         dic = { "on_window_main_destroy": gtk.main_quit,
-                "on_about_activate": handler.about }
+                "on_quit_activate": gtk.main_quit,
+                "on_about_activate": handler.on_about_activate,
+                "on_menuitem_file_make_directory_activate": handler.not_implemented,
+                "on_menuitem_branch_commit_activate": handler.not_implemented }
         
         # Connect the signals to the handlers
         self.toplevel.signal_autoconnect(dic)
@@ -53,20 +62,22 @@ class OliveGtk:
         # Load default data into the panels
         self.treeview_left = self.toplevel.get_widget('treeview_left')
         self.treeview_right = self.toplevel.get_widget('treeview_right')
-        self.load_left()
-        self.load_right()
+        self._load_left()
+        self._load_right()
     
-    def load_left(self):
+    def _load_left(self):
         """ Load data into the left panel. (Bookmarks) """
         pass
         
-    def load_right(self):
+    def _load_right(self):
         """ Load data into the right panel. (Filelist) """
         import os
         import os.path
         
+        import olive.backend.fileops as fileops
+        
         # Create ListStore
-        liststore = gtk.ListStore(str, str)
+        liststore = gtk.ListStore(str, str, str)
         
         dirs = []
         files = []
@@ -84,16 +95,18 @@ class OliveGtk:
         
         # Add'em to the ListStore
         for item in dirs:    
-            liststore.append(['D', item])
+            liststore.append(['D', item, ''])
         for item in files:
-            liststore.append(['', item])
+            liststore.append(['', item, fileops.status(item)])
         
         # Create the columns and add them to the TreeView
         self.treeview_right.set_model(liststore)
-        tvcolumn_filename = gtk.TreeViewColumn('Filename')
         tvcolumn_filetype = gtk.TreeViewColumn('Type')
+        tvcolumn_filename = gtk.TreeViewColumn('Filename')
+        tvcolumn_status = gtk.TreeViewColumn('Status')
         self.treeview_right.append_column(tvcolumn_filetype)
         self.treeview_right.append_column(tvcolumn_filename)
+        self.treeview_right.append_column(tvcolumn_status)
         
         # Set up the cells
         cell = gtk.CellRendererText()
@@ -101,3 +114,5 @@ class OliveGtk:
         tvcolumn_filetype.add_attribute(cell, 'text', 0)
         tvcolumn_filename.pack_start(cell, True)
         tvcolumn_filename.add_attribute(cell, 'text', 1)
+        tvcolumn_status.pack_start(cell, True)
+        tvcolumn_status.add_attribute(cell, 'text', 2)

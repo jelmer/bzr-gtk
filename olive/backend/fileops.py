@@ -115,3 +115,39 @@ def rename(source, target):
         raise NonExistingSource(source)
     
     move([source, target])
+
+def status(filename):
+    """ Get the status of a file.
+    
+    :param filename: the full path to the file
+    
+    :return: renamed | added | removed | modified | unchanged | unknown
+    """
+    from bzrlib.delta import compare_trees
+    from bzrlib.workingtree import WorkingTree
+    
+    try:
+        tree1 = WorkingTree.open_containing(filename)[0]
+    except errors.NotBranchError:
+        return 'unknown'
+    
+    branch = tree1.branch
+    tree2 = tree1.branch.repository.revision_tree(branch.last_revision())
+    
+    delta = compare_trees(old_tree=tree2,
+                          new_tree=tree1,
+                          want_unchanged=True,
+                          specific_files=[filename])
+    
+    if len(delta.renamed):
+        return 'renamed'
+    elif len(delta.added):
+        return 'added'
+    elif len(delta.removed):
+        return 'removed'
+    elif len(delta.modified):
+        return 'modified'
+    elif len(delta.unchanged):
+        return 'unchanged'
+    else:
+        return 'unknown'

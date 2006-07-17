@@ -27,17 +27,18 @@ try:
 except:
 	sys.exit(1)
 
+from dialog import OliveDialog
+
 class OliveHandler:
     """ Signal handler class for Olive. """
     def __init__(self, gladefile):
         self.gladefile = gladefile
+        self.dialog = OliveDialog(self.gladefile)
     
-    def about(self, widget):
-        import olive.frontend.gtk
+    def on_about_activate(self, widget):
+        self.dialog.about()
+    
+    def not_implemented(self, widget):
+        """ Display a Not implemented error message. """
+        self.dialog.error_dialog('This feature is not yet implemented.')
 
-        # Load AboutDialog description
-        dglade = gtk.glade.XML(self.gladefile, 'aboutdialog')
-        dialog = dglade.get_widget('aboutdialog')
-
-        # Set version
-        dialog.set_version(olive.frontend.gtk.__version__)

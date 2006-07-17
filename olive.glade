@@ -45,6 +45,45 @@
 		<widget class="GtkMenu" id="menuitem_file_menu">
 
 		  <child>
+		    <widget class="GtkMenuItem" id="menuitem_file_make_directory">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">Make _directory...</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="on_menuitem_file_make_directory_activate" last_modification_time="Mon, 17 Jul 2006 08:56:08 GMT"/>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkSeparatorMenuItem" id="separator_file1">
+		      <property name="visible">True</property>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkMenuItem" id="menuitem_file_rename">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">_Rename...</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="on_menuitem_file_rename_activate" last_modification_time="Mon, 17 Jul 2006 08:56:08 GMT"/>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkMenuItem" id="menuitem_file_move">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">_Move...</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="on_menuitem_file_move_activate" last_modification_time="Mon, 17 Jul 2006 08:56:08 GMT"/>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkSeparatorMenuItem" id="separator_file2">
+		      <property name="visible">True</property>
+		    </widget>
+		  </child>
+
+		  <child>
 		    <widget class="GtkImageMenuItem" id="menuitem_quit">
 		      <property name="visible">True</property>
 		      <property name="label">gtk-quit</property>
@@ -58,10 +97,108 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkMenuItem" id="menuitem_view">
+	    <widget class="GtkMenuItem" id="menuitem_branch">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">_View</property>
+	      <property name="label" translatable="yes">_Branch</property>
 	      <property name="use_underline">True</property>
+
+	      <child>
+		<widget class="GtkMenu" id="menuitem_branch_menu">
+
+		  <child>
+		    <widget class="GtkMenuItem" id="menuitem_branch_initialize">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">_Initialize</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="on_menuitem_branch_initialize_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkMenuItem" id="menuitem_branch_branch">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">_Branch...</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="on_menuitem_branch_branch_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkSeparatorMenuItem" id="separator_branch1">
+		      <property name="visible">True</property>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkImageMenuItem" id="menuitem_branch_pull">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">Pu_ll</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="on_menuitem_branch_pull_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
+
+		      <child internal-child="image">
+			<widget class="GtkImage" id="image10">
+			  <property name="visible">True</property>
+			  <property name="stock">gtk-goto-bottom</property>
+			  <property name="icon_size">1</property>
+			  <property name="xalign">0.5</property>
+			  <property name="yalign">0.5</property>
+			  <property name="xpad">0</property>
+			  <property name="ypad">0</property>
+			</widget>
+		      </child>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkImageMenuItem" id="menuitem_branch_push">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">Pu_sh...</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="on_menuitem_branch_push_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
+
+		      <child internal-child="image">
+			<widget class="GtkImage" id="image11">
+			  <property name="visible">True</property>
+			  <property name="stock">gtk-goto-top</property>
+			  <property name="icon_size">1</property>
+			  <property name="xalign">0.5</property>
+			  <property name="yalign">0.5</property>
+			  <property name="xpad">0</property>
+			  <property name="ypad">0</property>
+			</widget>
+		      </child>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkSeparatorMenuItem" id="separator_branch2">
+		      <property name="visible">True</property>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkImageMenuItem" id="menuitem_branch_commit">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">_Commit...</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="on_menuitem_branch_commit_activate" last_modification_time="Mon, 17 Jul 2006 08:53:37 GMT"/>
+
+		      <child internal-child="image">
+			<widget class="GtkImage" id="image12">
+			  <property name="visible">True</property>
+			  <property name="stock">gtk-redo</property>
+			  <property name="icon_size">1</property>
+			  <property name="xalign">0.5</property>
+			  <property name="yalign">0.5</property>
+			  <property name="xpad">0</property>
+			  <property name="ypad">0</property>
+			</widget>
+		      </child>
+		    </widget>
+		  </child>
+		</widget>
+	      </child>
 	    </widget>
 	  </child>
 
@@ -111,6 +248,7 @@
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
+	      <signal name="clicked" handler="on_toolbutton_update_clicked" last_modification_time="Mon, 17 Jul 2006 09:04:16 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
@@ -119,32 +257,36 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkToolButton" id="toolbutton_log">
+	    <widget class="GtkMenuToolButton" id="menutoolbutton_log">
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Log</property>
 	      <property name="use_underline">True</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
+	      <signal name="show_menu" handler="on_menutoolbutton_log_show_menu" last_modification_time="Mon, 17 Jul 2006 09:04:28 GMT"/>
+	      <signal name="clicked" handler="on_menutoolbutton_log_clicked" last_modification_time="Mon, 17 Jul 2006 09:04:37 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
-	      <property name="homogeneous">True</property>
+	      <property name="homogeneous">False</property>
 	    </packing>
 	  </child>
 
 	  <child>
-	    <widget class="GtkToolButton" id="toolbutton_diff">
+	    <widget class="GtkMenuToolButton" id="menutoolbutton_diff">
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Diff</property>
 	      <property name="use_underline">True</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
+	      <signal name="show_menu" handler="on_menutoolbutton_diff_show_menu" last_modification_time="Mon, 17 Jul 2006 09:04:43 GMT"/>
+	      <signal name="clicked" handler="on_menutoolbutton_diff_clicked" last_modification_time="Mon, 17 Jul 2006 09:04:46 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
-	      <property name="homogeneous">True</property>
+	      <property name="homogeneous">False</property>
 	    </packing>
 	  </child>
 
@@ -170,6 +312,7 @@
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
+	      <signal name="clicked" handler="on_toolbutton_commit_clicked" last_modification_time="Mon, 17 Jul 2006 09:03:12 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
@@ -199,6 +342,7 @@
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
+	      <signal name="clicked" handler="on_toolbutton_pull_clicked" last_modification_time="Mon, 17 Jul 2006 09:03:19 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
@@ -215,34 +359,7 @@
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
-	    </widget>
-	    <packing>
-	      <property name="expand">False</property>
-	      <property name="homogeneous">True</property>
-	    </packing>
-	  </child>
-
-	  <child>
-	    <widget class="GtkSeparatorToolItem" id="separatortoolitem3">
-	      <property name="visible">True</property>
-	      <property name="draw">True</property>
-	      <property name="visible_horizontal">True</property>
-	      <property name="visible_vertical">True</property>
-	    </widget>
-	    <packing>
-	      <property name="expand">False</property>
-	      <property name="homogeneous">False</property>
-	    </packing>
-	  </child>
-
-	  <child>
-	    <widget class="GtkToolButton" id="toolbutton_bookmarks">
-	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">Bookmarks</property>
-	      <property name="use_underline">True</property>
-	      <property name="visible_horizontal">True</property>
-	      <property name="visible_vertical">True</property>
-	      <property name="is_important">False</property>
+	      <signal name="clicked" handler="on_toolbutton_push_clicked" last_modification_time="Mon, 17 Jul 2006 09:03:24 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
