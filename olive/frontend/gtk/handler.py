@@ -32,15 +32,17 @@ from dialog import OliveDialog
 
 class OliveHandler:
     """ Signal handler class for Olive. """
-    def __init__(self, gladefile):
+    def __init__(self, gladefile, comm):
         self.gladefile = gladefile
+        self.comm = comm
+        
         self.dialog = OliveDialog(self.gladefile)
     
     def on_about_activate(self, widget):
         self.dialog.about()
         
     def on_menuitem_branch_branch_activate(self, widget):
-        branch = OliveBranch(self.gladefile)
+        branch = OliveBranch(self.gladefile, self.comm)
         branch.display()
     
     def not_implemented(self, widget):

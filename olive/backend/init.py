@@ -27,7 +27,7 @@ from bzrlib.branch import Branch
 
 from errors import (AlreadyBranchError, BranchExistsWithoutWorkingTree,
                     NonExistingParent, NonExistingRevision,
-                    NonExistingSource, TargetAlreadyExists)
+                    NonExistingSource, NotBranchError, TargetAlreadyExists)
 
 def init(location):
     """ Initialize a directory.
@@ -75,6 +75,8 @@ def branch(from_location, to_location, revision=None):
             raise NonExistingSource(from_location)
         else:
             raise
+    except errors.NotBranchError:
+        raise NotBranchError(from_location)
 
     br_from.lock_read()
 

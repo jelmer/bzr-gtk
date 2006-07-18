@@ -14,6 +14,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import os
+import os.path
 import sys
 
 try:
@@ -37,8 +39,6 @@ class OliveGtk:
     program."""
     
     def __init__(self):
-        import os.path
-        
         # Load the glade file
         self.gladefile = "/usr/share/olive/olive.glade"
         if not os.path.exists(self.gladefile):
@@ -50,7 +50,8 @@ class OliveGtk:
         self.window = self.toplevel.get_widget('window_main')
         self.window.show_all()
         
-        handler = OliveHandler(self.gladefile)
+        self.comm = OliveCommunicator(self.toplevel)
+        handler = OliveHandler(self.gladefile, self.comm)
         
         # Dictionary for signal_autoconnect
         dic = { "on_window_main_destroy": gtk.main_quit,
@@ -75,9 +76,6 @@ class OliveGtk:
         
     def _load_right(self):
         """ Load data into the right panel. (Filelist) """
-        import os
-        import os.path
-        
         import olive.backend.fileops as fileops
         
         # Create ListStore
@@ -87,7 +85,7 @@ class OliveGtk:
         files = []
         
         # Fill the appropriate lists
-        for item in os.listdir('.'):
+        for item in os.listdir(self.comm.get_path()):
             if os.path.isdir(item):
                 dirs.append(item)
             else:
@@ -120,3 +118,36 @@ class OliveGtk:
         tvcolumn_filename.add_attribute(cell, 'text', 1)
         tvcolumn_status.pack_start(cell, True)
         tvcolumn_status.add_attribute(cell, 'text', 2)
+
+class OliveCommunicator:
+    """ This class is responsible for the communication between the different
+    modules. """
+    def __init__(self, toplevel):
+        # Get glade main component
+        self.toplevel = toplevel
+        # Default path
+        self._path = os.getcwd()
+        
+        # Initialize the statusbar
+        self.statusbar = self.toplevel.get_widget('statusbar')
+        self.context_id = self.statusbar.get_context_id('olive')
+    
+    def set_path(self, path):
+        """ Set the current path while browsing the directories. """
+        self._path = path
+    
+    def get_path(self):
+        """ Get the current path. """
+        return self._path
+
+    def set_statusbar(self, message):
+        """ Set the statusbar message. """
+        self.statusbar.push(self.context_id, message)
+    
+    def clear_statusbar(self):
+        """ Clean the last message from the statusbar. """
+        self.statusbar.pop(self.context_id)
+    
+    def refresh_right(self):
+        """ Refresh the file list. """
+        pass

@@ -1,3 +1,9 @@
+2006-07-18  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * olive/backend/init.py: added NotBranchError handling to branch()
+    * olive/frontend/gtk/__init__.py: added OliveCommunication class
+    * olive/frontend/gtk/branch.py: finished implementation of Branch window
+
 2006-07-17  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * olive.glade: signals added + Branch dialog modifications
