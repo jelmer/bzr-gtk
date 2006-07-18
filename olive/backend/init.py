@@ -123,7 +123,10 @@ def checkout(branch_location, to_location, revision=None, lightweight=False):
     
     :param lightweight: perform a lightweight checkout (be aware!)
     """
-    source = Branch.open(branch_location)
+    try:
+        source = Branch.open(branch_location)
+    except errors.NotBranchError:
+        raise NotBranchError(branch_location)
     
     if revision is not None:
         revision_id = source.get_rev_id(revision)
@@ -141,6 +144,8 @@ def checkout(branch_location, to_location, revision=None, lightweight=False):
             source.bzrdir.create_workingtree()
             return
 
+    to_location = to_location + '/' + os.path.basename(branch_location.rstrip("/\\"))
+    
     try:
         os.mkdir(to_location)
     except OSError, e:

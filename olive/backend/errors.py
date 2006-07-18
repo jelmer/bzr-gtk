@@ -163,6 +163,7 @@ class NotBranchError(OliveError):
     May occur in:
         commit.commit()
         init.branch()
+        init.checkout()
     """
 
 class NotVersionedError(OliveError):
