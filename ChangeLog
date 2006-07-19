@@ -1,3 +1,7 @@
+2006-07-19  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * olive/frontend/gtk/__init__.py: added folder and file icons
+
 2006-07-18  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * olive/backend/init.py: added NotBranchError handling to branch()

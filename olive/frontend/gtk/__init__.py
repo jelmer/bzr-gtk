@@ -97,24 +97,23 @@ class OliveGtk:
         
         # Add'em to the ListStore
         for item in dirs:    
-            liststore.append(['D', item, ''])
+            liststore.append([gtk.STOCK_DIRECTORY, item, ''])
         for item in files:
-            liststore.append(['', item, fileops.status(item)])
+            liststore.append([gtk.STOCK_FILE, item, fileops.status(item)])
         
         # Create the columns and add them to the TreeView
         self.treeview_right.set_model(liststore)
-        tvcolumn_filetype = gtk.TreeViewColumn('Type')
         tvcolumn_filename = gtk.TreeViewColumn('Filename')
         tvcolumn_status = gtk.TreeViewColumn('Status')
-        self.treeview_right.append_column(tvcolumn_filetype)
         self.treeview_right.append_column(tvcolumn_filename)
         self.treeview_right.append_column(tvcolumn_status)
         
         # Set up the cells
+        cellpb = gtk.CellRendererPixbuf()
         cell = gtk.CellRendererText()
-        tvcolumn_filetype.pack_start(cell, True)
-        tvcolumn_filetype.add_attribute(cell, 'text', 0)
+        tvcolumn_filename.pack_start(cellpb, False)
         tvcolumn_filename.pack_start(cell, True)
+        tvcolumn_filename.set_attributes(cellpb, stock_id=0)
         tvcolumn_filename.add_attribute(cell, 'text', 1)
         tvcolumn_status.pack_start(cell, True)
         tvcolumn_status.add_attribute(cell, 'text', 2)
