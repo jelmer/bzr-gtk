@@ -1,3 +1,9 @@
+2006-07-20  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * olive/frontend/gtk/__init__.py: implemented OliveCommunication.refresh_right()
+    * olive/frontend/gtk/handler.py: implemented browsing in the file list
+    * olive/backend/fileops.py: tweaked status() (to get proper status in fact)
+
 2006-07-19  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * olive/frontend/gtk/__init__.py: added folder and file icons

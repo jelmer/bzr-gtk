@@ -59,7 +59,8 @@ class OliveGtk:
                 "on_about_activate": handler.on_about_activate,
                 "on_menuitem_file_make_directory_activate": handler.not_implemented,
                 "on_menuitem_branch_branch_activate": handler.on_menuitem_branch_branch_activate,
-                "on_menuitem_branch_commit_activate": handler.not_implemented }
+                "on_menuitem_branch_commit_activate": handler.not_implemented,
+                "on_treeview_right_row_activated": handler.on_treeview_right_row_activated }
         
         # Connect the signals to the handlers
         self.toplevel.signal_autoconnect(dic)
@@ -81,12 +82,13 @@ class OliveGtk:
         # Create ListStore
         liststore = gtk.ListStore(str, str, str)
         
-        dirs = []
+        dirs = ['..']
         files = []
         
         # Fill the appropriate lists
-        for item in os.listdir(self.comm.get_path()):
-            if os.path.isdir(item):
+        path = self.comm.get_path()
+        for item in os.listdir(path):
+            if os.path.isdir(path + '/' + item):
                 dirs.append(item)
             else:
                 files.append(item)
@@ -99,7 +101,7 @@ class OliveGtk:
         for item in dirs:    
             liststore.append([gtk.STOCK_DIRECTORY, item, ''])
         for item in files:
-            liststore.append([gtk.STOCK_FILE, item, fileops.status(item)])
+            liststore.append([gtk.STOCK_FILE, item, fileops.status(path + '/' + item)])
         
         # Create the columns and add them to the TreeView
         self.treeview_right.set_model(liststore)
@@ -130,6 +132,10 @@ class OliveCommunicator:
         # Initialize the statusbar
         self.statusbar = self.toplevel.get_widget('statusbar')
         self.context_id = self.statusbar.get_context_id('olive')
+        
+        # Get the TreeViews
+        self.treeview_left = self.toplevel.get_widget('treeview_left')
+        self.treeview_right = self.toplevel.get_widget('treeview_right')
     
     def set_path(self, path):
         """ Set the current path while browsing the directories. """
@@ -147,6 +153,36 @@ class OliveCommunicator:
         """ Clean the last message from the statusbar. """
         self.statusbar.pop(self.context_id)
     
-    def refresh_right(self):
+    def refresh_right(self, path=None):
         """ Refresh the file list. """
-        pass
+        import olive.backend.fileops as fileops
+
+        if path is None:
+            path = self.get_path()
+
+        # Get ListStore and clear it
+        liststore = self.treeview_right.get_model()
+        liststore.clear()
+        
+        dirs = ['..']
+        files = []
+        
+        # Fill the appropriate lists
+        for item in os.listdir(path):
+            if os.path.isdir(path + '/' + item):
+                dirs.append(item)
+            else:
+                files.append(item)
+            
+        # Sort'em
+        dirs.sort()
+        files.sort()
+        
+        # Add'em to the ListStore
+        for item in dirs:    
+            liststore.append([gtk.STOCK_DIRECTORY, item, ''])
+        for item in files:
+            liststore.append([gtk.STOCK_FILE, item, fileops.status(path + '/' + item)])
+        
+        # Add the ListStore to the TreeView
+        self.treeview_right.set_model(liststore)

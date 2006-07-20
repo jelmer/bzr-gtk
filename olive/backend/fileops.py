@@ -134,10 +134,46 @@ def status(filename):
     branch = tree1.branch
     tree2 = tree1.branch.repository.revision_tree(branch.last_revision())
     
+    # find the relative path to the given file (needed for proper delta)
+    wtpath = tree1.basedir
+    fullpath = filename
+    i = 0
+    wtsplit = wtpath.split('/')
+    fpsplit = fullpath.split('/')
+    fpcopy = fullpath.split('/')
+    for item in fpsplit:
+        if i is not len(wtsplit):
+            if item == wtsplit[i]:
+                del fpcopy[0]
+            i = i + 1
+    rel = '/'.join(fpcopy)
+    
     delta = compare_trees(old_tree=tree2,
                           new_tree=tree1,
                           want_unchanged=True,
-                          specific_files=[filename])
+                          specific_files=[rel])
+    
+    """ Debug information (could be usable in the future, so didn't cut out)
+    print "DEBUG: delta.renamed:"
+    for path, id, kind, text_modified, meta_modified in delta.renamed:
+        print path
+    print
+    print "DEBUG: delta.added:"
+    for path, id, kind, text_modified, meta_modified in delta.added:
+        print path
+    print
+    print "DEBUG: delta.removed:"
+    for path, id, kind, text_modified, meta_modified in delta.removed:
+        print path
+    print
+    print "DEBUG: delta.modified:"
+    for path, id, kind, text_modified, meta_modified in delta.modified:
+        print path
+    print
+    print "DEBUG: delta.unchanged:"
+    for path, id, kind in delta.unchanged:
+        print path
+    """
     
     if len(delta.renamed):
         return 'renamed'

@@ -42,8 +42,25 @@ class OliveHandler:
         self.dialog.about()
         
     def on_menuitem_branch_branch_activate(self, widget):
+        """ Branch/Branch... menu handler. """
         branch = OliveBranch(self.gladefile, self.comm)
         branch.display()
+        
+    def on_treeview_right_row_activated(self, treeview, path, view_column):
+        """ Occurs when somebody double-clicks or enters an item in the
+        file list. """
+        import os.path
+        
+        treeselection = treeview.get_selection()
+        (model, iter) = treeselection.get_selected()
+        newdir = model.get_value(iter, 1)
+        
+        if newdir == '..':
+            self.comm.set_path(os.path.split(self.comm.get_path())[0])
+        else:
+            self.comm.set_path(self.comm.get_path() + '/' + newdir)
+        
+        self.comm.refresh_right()
     
     def not_implemented(self, widget):
         """ Display a Not implemented error message. """
