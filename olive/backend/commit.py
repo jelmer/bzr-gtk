@@ -32,7 +32,7 @@ def commit(selected_list, message=None, file=None, unchanged=False,
            strict=False, local=False):
     """ Command to commit changes into the branch.
     
-    :param selected_list: list of files you want to commit (at least the top working directory has to specified)
+    :param selected_list: list of files you want to commit (at least the top working directory has to be specified)
     
     :param message: commit message
     
@@ -53,7 +53,7 @@ def commit(selected_list, message=None, file=None, unchanged=False,
         raise NotBranchError
     
     if local and not tree.branch.get_bound_location():
-        raise LocalRequiresBoundBranch()
+        raise LocalRequiresBoundBranch
     if message is None and not file:
         if message is None:
             raise NoMessageNoFileError
@@ -100,7 +100,13 @@ def push(branch, location=None, remember=False, overwrite=False,
     from bzrlib.branch import Branch
     from bzrlib.transport import get_transport
         
-    br_from = Branch.open_containing(branch)[0]
+    try:
+        br_from = Branch.open_containing(branch)[0]
+    except errors.NotBranchError:
+        raise NotBranchError(branch)
+    except:
+        raise
+    
     stored_loc = br_from.get_push_location()
     if location is None:
         if stored_loc is None:

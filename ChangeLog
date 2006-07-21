@@ -1,3 +1,14 @@
+2006-07-21  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * olive/olive.glade: some UI refreshment (push, remove and commit dialog)
+    * olive/frontend/gtk/push.py: implemented 'push' functionality
+    * olive/frontend/gtk/commit.py: implemented 'commit' functionality
+    * olive/frontend/gtk/remove.py: implemented 'remove' functionality
+    * olive/frontend/gtk/add.py: implemented 'add' functionality
+    * olive/frontend/gtk/handler.py: implemented 'init' functionality
+    * olive/backend/fileops.py: added recursive mode to add(), added
+      NotBranchError exception to add() and remove()
+
 2006-07-20  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * olive/frontend/gtk/__init__.py: implemented OliveCommunication.refresh_right()

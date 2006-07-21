@@ -22,18 +22,25 @@ import bzrlib.errors as errors
 
 from errors import (DirectoryAlreadyExists, MissingArgumentError,
                     MultipleMoveError, NoFilesSpecified, NoMatchingFiles,
-                    NonExistingSource, NotVersionedError)
+                    NonExistingSource, NotBranchError, NotVersionedError)
 
-def add(file_list):
+def add(file_list, recursive=False):
     """ Add listed files to the branch. 
     
     :param file_list - list of files to be added (using full paths)
+    
+    :param recursive - if True, all unknown files will be added
     
     :return: count of ignored files
     """
     import bzrlib.add
     
-    added, ignored = bzrlib.add.smart_add(file_list)
+    try:
+        added, ignored = bzrlib.add.smart_add(file_list, recursive)
+    except errors.NotBranchError:
+        raise NotBranchError
+    except:
+        raise
     
     match_len = 0
     for glob, paths in ignored.items():
@@ -86,7 +93,12 @@ def remove(file_list, new=False):
     """
     from bzrlib.builtins import tree_files
     
-    tree, file_list = tree_files(file_list)
+    try:
+        tree, file_list = tree_files(file_list)
+    except errors.NotBranchError:
+        raise NotBranchError
+    except:
+        raise
     
     if new is False:
         if file_list is None:
@@ -136,7 +148,9 @@ def status(filename):
     
     # find the relative path to the given file (needed for proper delta)
     wtpath = tree1.basedir
+    #print "DEBUG: wtpath =", wtpath
     fullpath = filename
+    #print "DEBUG: fullpath =", fullpath
     i = 0
     wtsplit = wtpath.split('/')
     fpsplit = fullpath.split('/')
@@ -147,6 +161,7 @@ def status(filename):
                 del fpcopy[0]
             i = i + 1
     rel = '/'.join(fpcopy)
+    #print "DEBUG: rel =", rel
     
     delta = compare_trees(old_tree=tree2,
                           new_tree=tree1,
@@ -159,7 +174,7 @@ def status(filename):
         print path
     print
     print "DEBUG: delta.added:"
-    for path, id, kind, text_modified, meta_modified in delta.added:
+    for path, id, kind in delta.added:
         print path
     print
     print "DEBUG: delta.removed:"

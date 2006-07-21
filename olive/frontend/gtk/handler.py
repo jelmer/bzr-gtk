@@ -27,8 +27,14 @@ try:
 except:
     sys.exit(1)
 
+import olive.backend.errors as errors
+
+from add import OliveAdd
 from branch import OliveBranch
+from commit import OliveCommit
 from dialog import OliveDialog
+from push import OlivePush
+from remove import OliveRemove
 
 class OliveHandler:
     """ Signal handler class for Olive. """
@@ -41,19 +47,51 @@ class OliveHandler:
     def on_about_activate(self, widget):
         self.dialog.about()
         
+    def on_menuitem_add_files_activate(self, widget):
+        """ Add file(s)... menu handler. """
+        add = OliveAdd(self.gladefile, self.comm)
+        add.display()
+    
     def on_menuitem_branch_branch_activate(self, widget):
         """ Branch/Branch... menu handler. """
         branch = OliveBranch(self.gladefile, self.comm)
         branch.display()
+    
+    def on_menuitem_branch_commit_activate(self, widget):
+        """ Branch/Commit... menu handler. """
+        commit = OliveCommit(self.gladefile, self.comm)
+        commit.display()
+    
+    def on_menuitem_branch_push_activate(self, widget):
+        """ Branch/Push... menu handler. """
+        push = OlivePush(self.gladefile, self.comm)
+        push.display()
+    
+    def on_menuitem_branch_initialize_activate(self, widget):
+        """ Initialize current directory. """
+        import olive.backend.init as init
         
+        try:
+            init.init(self.comm.get_path())
+        except errors.AlreadyBranchError, errmsg:
+            self.dialog.error_dialog('Directory is already a branch: %s' % errmsg)
+        except errors.BranchExistsWithoutWorkingTree, errmsg:
+            self.dialog.error_dialog('Branch exists without a working tree: %s' % errmsg)
+        else:
+            self.dialog.info_dialog('Directory successfully initialized.')
+            self.comm.refresh_right()
+        
+    def on_menuitem_remove_file_activate(self, widget):
+        """ Remove (unversion) selected file. """
+        remove = OliveRemove(self.gladefile, self.comm)
+        remove.display()
+    
     def on_treeview_right_row_activated(self, treeview, path, view_column):
         """ Occurs when somebody double-clicks or enters an item in the
         file list. """
         import os.path
         
-        treeselection = treeview.get_selection()
-        (model, iter) = treeselection.get_selected()
-        newdir = model.get_value(iter, 1)
+        newdir = self.comm.get_selected_right()
         
         if newdir == '..':
             self.comm.set_path(os.path.split(self.comm.get_path())[0])

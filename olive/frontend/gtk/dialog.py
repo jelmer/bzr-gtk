@@ -75,3 +75,11 @@ class OliveDialog:
     def error_dialog(self, message):
         """ Display an error dialog with the given message. """
         self._message_dialog('error', message)
+    
+    def info_dialog(self, message):
+        """ Display an info dialog with the given message. """
+        self._message_dialog('info', message)
+    
+    def warning_dialog(self, message):
+        """ Display a warning dialog with the given message. """
+        self._message_dialog('warning', message)

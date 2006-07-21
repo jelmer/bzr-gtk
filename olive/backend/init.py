@@ -29,32 +29,6 @@ from errors import (AlreadyBranchError, BranchExistsWithoutWorkingTree,
                     NonExistingParent, NonExistingRevision,
                     NonExistingSource, NotBranchError, TargetAlreadyExists)
 
-def init(location):
-    """ Initialize a directory.
-    
-    :param location: full path to the directory you want to be versioned
-    """
-    from bzrlib.builtins import get_format_type
-
-    format = get_format_type('default')
- 
-    if not os.path.exists(location):
-        os.mkdir(location)
- 
-    try:
-        existing_bzrdir = bzrdir.BzrDir.open(location)
-    except errors.NotBranchError:
-        bzrdir.BzrDir.create_branch_convenience(location, format=format)
-    else:
-        if existing_bzrdir.has_branch():
-            if existing_bzrdir.has_workingtree():
-                raise AlreadyBranchError(location)
-            else:
-                raise BranchExistsWithoutWorkingTree(location)
-        else:
-            existing_bzrdir.create_branch()
-            existing_bzrdir.create_workingtree()
-
 def branch(from_location, to_location, revision=None):
     """ Create a branch from a local/remote location.
     
@@ -175,3 +149,29 @@ def checkout(branch_location, to_location, revision=None, lightweight=False):
         checkout.create_workingtree(revision_id)
     finally:
         bzrlib.bzrdir.BzrDirFormat.set_default_format(old_format)
+
+def init(location):
+    """ Initialize a directory.
+    
+    :param location: full path to the directory you want to be versioned
+    """
+    from bzrlib.builtins import get_format_type
+
+    format = get_format_type('default')
+ 
+    if not os.path.exists(location):
+        os.mkdir(location)
+ 
+    try:
+        existing_bzrdir = bzrdir.BzrDir.open(location)
+    except errors.NotBranchError:
+        bzrdir.BzrDir.create_branch_convenience(location, format=format)
+    else:
+        if existing_bzrdir.has_branch():
+            if existing_bzrdir.has_workingtree():
+                raise AlreadyBranchError(location)
+            else:
+                raise BranchExistsWithoutWorkingTree(location)
+        else:
+            existing_bzrdir.create_branch()
+            existing_bzrdir.create_workingtree()

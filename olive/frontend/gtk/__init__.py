@@ -36,7 +36,7 @@ __version__ = '0.1'
 
 class OliveGtk:
     """ The main Olive GTK frontend class. This is called when launching the
-    program."""
+    program. """
     
     def __init__(self):
         # Load the glade file
@@ -57,9 +57,17 @@ class OliveGtk:
         dic = { "on_window_main_destroy": gtk.main_quit,
                 "on_quit_activate": gtk.main_quit,
                 "on_about_activate": handler.on_about_activate,
+                "on_menuitem_add_files_activate": handler.on_menuitem_add_files_activate,
+                "on_menuitem_remove_file_activate": handler.on_menuitem_remove_file_activate,
                 "on_menuitem_file_make_directory_activate": handler.not_implemented,
+                "on_menuitem_branch_initialize_activate": handler.on_menuitem_branch_initialize_activate,
                 "on_menuitem_branch_branch_activate": handler.on_menuitem_branch_branch_activate,
-                "on_menuitem_branch_commit_activate": handler.not_implemented,
+                "on_menuitem_branch_commit_activate": handler.on_menuitem_branch_commit_activate,
+                "on_menuitem_branch_push_activate": handler.on_menuitem_branch_push_activate,
+                "on_toolbutton_update_clicked": handler.not_implemented,
+                "on_toolbutton_commit_clicked": handler.on_menuitem_branch_commit_activate,
+                "on_toolbutton_pull_clicked": handler.not_implemented,
+                "on_toolbutton_push_clicked": handler.on_menuitem_branch_push_activate,
                 "on_treeview_right_row_activated": handler.on_treeview_right_row_activated }
         
         # Connect the signals to the handlers
@@ -144,6 +152,16 @@ class OliveCommunicator:
     def get_path(self):
         """ Get the current path. """
         return self._path
+    
+    def get_selected_right(self):
+        """ Get the selected filename. """
+        treeselection = self.treeview_right.get_selection()
+        (model, iter) = treeselection.get_selected()
+        
+        if iter is None:
+            return None
+        else:
+            return model.get_value(iter, 1)
 
     def set_statusbar(self, message):
         """ Set the statusbar message. """
