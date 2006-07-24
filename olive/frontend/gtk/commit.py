@@ -24,11 +24,15 @@ except:
 try:
     import gtk
     import gtk.glade
+    import gobject
 except:
     sys.exit(1)
 
-import olive.backend.commit as commit
-import olive.backend.errors as errors
+from bzrlib.delta import compare_trees
+import bzrlib.errors as errors
+from bzrlib.workingtree import WorkingTree
+
+from dialog import OliveDialog
 
 class OliveCommit:
     """ Display Commit dialog and perform the needed actions. """
@@ -39,6 +43,30 @@ class OliveCommit:
         
         self.comm = comm
         
+        self.dialog = OliveDialog(self.gladefile)
+        
+        # Check if current location is a branch
+        try:
+            (self.wt, path) = WorkingTree.open_containing(self.comm.get_path())
+            branch = self.wt.branch
+        except errors.NotBranchError:
+            self.notbranch = True
+            return
+        except:
+            raise
+
+        file_id = self.wt.path2id(path)
+
+        self.notbranch = False
+        if file_id is None:
+            self.notbranch = True
+            return
+        
+        # Set the delta
+        self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
+        self.delta = compare_trees(self.old_tree, self.wt)
+        
+        # Get the Commit dialog widget
         self.window = self.glade.get_widget('window_commit')
         
         # Dictionary for signal_autoconnect
@@ -47,15 +75,57 @@ class OliveCommit:
         
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
+        
+        # Create the file list
+        self._create_file_view()
     
     def display(self):
         """ Display the Push dialog. """
-        self.window.show_all()
+        if self.notbranch:
+            self.dialog.error_dialog('Directory is not a branch.')
+        else:
+            self.window.show_all()
+    
+    # This code is from Jelmer Vernooij's bzr-gtk branch
+    def _create_file_view(self):
+        self.file_store = gtk.ListStore(gobject.TYPE_BOOLEAN, gobject.TYPE_STRING, gobject.TYPE_STRING)
+        self.file_view = self.glade.get_widget('treeview_commit_select')
+        self.file_view.set_model(self.file_store)
+        crt = gtk.CellRendererToggle()
+        crt.set_property("activatable", True)
+        crt.connect("toggled", self._toggle_commit, self.file_store)
+        self.file_view.append_column(gtk.TreeViewColumn("Commit",crt,active=0))
+        self.file_view.append_column(gtk.TreeViewColumn("Path",gtk.CellRendererText(),text=1))
+        self.file_view.append_column(gtk.TreeViewColumn("Type",gtk.CellRendererText(),text=2))
+
+        for path, id, kind in self.delta.added:
+            self.file_store.append([ True, path, "added" ])
+
+        for path, id, kind in self.delta.removed:
+            self.file_store.append([ True, path, "removed" ])
+
+        for oldpath, newpath, id, kind, text_modified, meta_modified in self.delta.renamed:
+            self.file_store.append([ True, oldpath, "renamed"])
+
+        for path, id, kind, text_modified, meta_modified in self.delta.modified:
+            self.file_store.append([ True, path, "modified"])
+    
+    def _get_specific_files(self):
+        ret = []
+        it = self.file_store.get_iter_first()
+        while it:
+            if self.file_store.get_value(it, 0):
+                ret.append(self.file_store.get_value(it,1))
+            it = self.file_store.iter_next(it)
+
+        return ret
+    # end of bzr-gtk code
+    
+    def _toggle_commit(self, cell, path, model):
+        model[path][0] = not model[path][0]
+        return
     
     def commit(self, widget):
-        from dialog import OliveDialog
-        dialog = OliveDialog(self.gladefile)
-        
         textview = self.glade.get_widget('textview_commit')
         textbuffer = textview.get_buffer()
         start, end = textbuffer.get_bounds()
@@ -65,31 +135,32 @@ class OliveCommit:
         checkbutton_strict = self.glade.get_widget('checkbutton_commit_strict')
         checkbutton_force = self.glade.get_widget('checkbutton_commit_force')
         
+        specific_files = self._get_specific_files()
+        
+        # merged from Jelmer Vernooij's olive integration branch
         try:
-            commit.commit([self.comm.get_path()], message, None,
-                          checkbutton_force.get_active(),
-                          checkbutton_strict.get_active(),
-                          checkbutton_local.get_active())
+            self.wt.commit(message, 
+                           allow_pointless=checkbutton_force.get_active(),
+                           strict=checkbutton_strict.get_active(),
+                           local=checkbutton_local.get_active(),
+                           specific_files=specific_files)
         except errors.NotBranchError:
-            dialog.error_dialog('Directory is not a branch.')
+            self.dialog.error_dialog('Directory is not a branch.')
             return
         except errors.LocalRequiresBoundBranch:
-            dialog.error_dialog('Local commit requires a bound branch.')
+            self.dialog.error_dialog('Local commit requires a bound branch.')
             return
-        except errors.EmptyMessageError:
-            dialog.error_dialog('Commit message is empty.')
+        except errors.PointlessCommit:
+            self.dialog.error_dialog('No changes to commit. Try force commit.')
             return
-        except errors.NoChangesToCommitError:
-            dialog.error_dialog('No changes to commit. Try force commit.')
+        except errors.ConflictsInTree:
+            self.dialog.error_dialog('Conflicts in tree. Please resolve them first.')
             return
-        except errors.ConflictsInTreeError:
-            dialog.error_dialog('Conflicts in tree. Please resolve them first.')
-            return
-        except errors.StrictCommitError:
-            dialog.error_dialog('Strict commit failed. There are unknown files.')
+        except errors.StrictCommitFailed:
+            self.dialog.error_dialog('Strict commit failed. There are unknown files.')
             return
         except errors.BoundBranchOutOfDate, errmsg:
-            dialog.error_dialog('Bound branch is out of date: %s' % errmsg)
+            self.dialog.error_dialog('Bound branch is out of date: %s' % errmsg)
             return
         except:
             raise

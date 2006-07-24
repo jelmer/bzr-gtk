@@ -1,3 +1,10 @@
+2006-07-24  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * olive.glade: improvements to the Commit dialog
+    * olive/frontend/gtk/commit.py: merged Jelmer Vernooij's integration branch
+      and some code from bzr-gtk (select files to commit)
+    * TODO: added some wishlist stuff
+
 2006-07-21  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * olive/olive.glade: some UI refreshment (push, remove and commit dialog)

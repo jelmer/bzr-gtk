@@ -85,10 +85,6 @@ class OlivePush:
             self.check_create.hide()
     
     def push(self, widget):
-        import bzrlib.ui as ui
-        from olive.backend.ui import GtkUIFactory
-        ui.ui_factory = GtkUIFactory()
-        
         from dialog import OliveDialog
         dialog = OliveDialog(self.gladefile)
         
