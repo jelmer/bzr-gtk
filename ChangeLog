@@ -1,5 +1,13 @@
+2006-07-25  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * olive-gtk: display error if python 2.4 not available (Mario Đanić)
+      (Fixed: #54014)
+    * olive-gtk: display error if pygtk2 (and glade) not available (Mario Đanić)
+      (Fixed: #54013)
+
 2006-07-24  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive/frontend/gtk/push.py: display number of pushed revisions
     * olive.glade: improvements to the Commit dialog
     * olive/frontend/gtk/commit.py: merged Jelmer Vernooij's integration branch
       and some code from bzr-gtk (select files to commit)

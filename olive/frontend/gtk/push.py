@@ -115,10 +115,10 @@ class OlivePush:
                 return
             
             try:
-                commit.push(self.comm.get_path(), location,
-                            self.check_remember.get_active(),
-                            self.check_overwrite.get_active(),
-                            self.check_create.get_active())
+                revs = commit.push(self.comm.get_path(), location,
+                                   self.check_remember.get_active(),
+                                   self.check_overwrite.get_active(),
+                                   self.check_create.get_active())
             except errors.NotBranchError:
                 dialog.error_dialog('Directory is not a branch.')
                 return
@@ -138,6 +138,7 @@ class OlivePush:
             pass
         
         self.close()
+        dialog.info_dialog('%d revision(s) pushed.' % revs)
     
     def close(self, widget=None):
         self.window.destroy()

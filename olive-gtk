@@ -16,7 +16,31 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import os
 import sys
+
+try:
+    version_info = sys.version_info
+except AttributeError:
+    version_info = 1, 5 # 1.5 or older
+
+REINVOKE = "__BZR_REINVOKE"
+NEED_VERS = (2, 4)
+KNOWN_PYTHONS = ('python2.4',)
+
+if version_info < NEED_VERS:
+    if not os.environ.has_key(REINVOKE):
+        # mutating os.environ doesn't work in old Pythons
+        os.putenv(REINVOKE, "1")
+        for python in KNOWN_PYTHONS:
+            try:
+                os.execvp(python, [python] + sys.argv)
+            except OSError:
+                pass
+    print >>sys.stderr, "bzr: error: cannot find a suitable python interpreter"
+    print >>sys.stderr, " (need %d.%d or later)" % NEED_VERS
+    sys.exit(1)
+
 try:
  	import pygtk
   	pygtk.require("2.0")
@@ -24,9 +48,14 @@ except:
   	pass
 try:
 	import gtk
+	import gtk.glade
 except:
-	sys.exit(1)
-	
+    print >>sys.stderr, "You need to install python-glade2 and/or pygtk2",
+    print >>sys.stderr, "(gtk2) or set your PYTHONPATH correctly."
+    print >>sys.stderr, "try: export PYTHONPATH=",
+    print >>sys.stderr, "/usr/local/lib/python2.4/site-packages/"
+    sys.exit(1)
+
 from olive.frontend.gtk import OliveGtk
 
 app = OliveGtk()
