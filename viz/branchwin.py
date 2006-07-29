@@ -358,6 +358,7 @@ class BranchWindow(gtk.Window):
             button.show()
 
             button = gtk.Button(parent_id)
+            button.set_use_underline(False)
             button.connect("clicked", self._go_clicked_cb, parent_id)
             hbox.pack_start(button, expand=False, fill=True)
             button.show()
