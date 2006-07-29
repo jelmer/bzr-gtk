@@ -77,7 +77,6 @@ class DistanceMethod(object):
         self.graph = {}
 
     def fill_caches(self):
-        # FIXME: look at using repository.get_revision_graph_with_ghosts - RBC.
         graph = self.branch.repository.get_revision_graph_with_ghosts([self.start])
         for revid in graph.ghosts:
             self.cache_revision(DummyRevision(revid))
