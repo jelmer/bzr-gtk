@@ -38,8 +38,11 @@ class GCommitDialog(gtk.Dialog):
     def _create_file_view(self):
         self.file_store = gtk.ListStore(gobject.TYPE_BOOLEAN, gobject.TYPE_STRING, gobject.TYPE_STRING)
         self.file_view = gtk.TreeView(self.file_store)
+        crt = gtk.CellRendererToggle()
+        crt.set_property("activatable", True)
+        crt.connect("toggled", self._toggle_commit, self.file_store)
         self.file_view.append_column(gtk.TreeViewColumn("Commit", 
-                                     gtk.CellRendererToggle(), active=0))
+                                     crt, active=0))
         self.file_view.append_column(gtk.TreeViewColumn("Path", 
                                      gtk.CellRendererText(), text=1))
         self.file_view.append_column(gtk.TreeViewColumn("Type", 
@@ -59,6 +62,10 @@ class GCommitDialog(gtk.Dialog):
 
         self.file_view.show()
 
+    def _toggle_commit(self, cell, path, model):
+        model[path][0] = not model[path][0]
+        return
+    
     def _get_specific_files(self):
         ret = []
         it = self.file_store.get_iter_first()
