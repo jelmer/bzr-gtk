@@ -31,6 +31,7 @@ import olive.backend.errors as errors
 
 from add import OliveAdd
 from branch import OliveBranch
+from checkout import OliveCheckout
 from commit import OliveCommit
 from dialog import OliveDialog
 from push import OlivePush
@@ -52,10 +53,15 @@ class OliveHandler:
         add = OliveAdd(self.gladefile, self.comm)
         add.display()
     
-    def on_menuitem_branch_branch_activate(self, widget):
-        """ Branch/Branch... menu handler. """
+    def on_menuitem_branch_get_activate(self, widget):
+        """ Branch/Get... menu handler. """
         branch = OliveBranch(self.gladefile, self.comm)
         branch.display()
+    
+    def on_menuitem_branch_checkout_activate(self, widget):
+        """ Branch/Checkout... menu handler. """
+        checkout = OliveCheckout(self.gladefile, self.comm)
+        checkout.display()
     
     def on_menuitem_branch_commit_activate(self, widget):
         """ Branch/Commit... menu handler. """

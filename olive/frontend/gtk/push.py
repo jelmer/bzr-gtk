@@ -59,6 +59,7 @@ class OlivePush:
     def display(self):
         """ Display the Push dialog. """
         self.window.show()
+        self.width, self.height = self.window.get_size()
     
     def stored_toggled(self, widget):
         if widget.get_active():
@@ -66,6 +67,7 @@ class OlivePush:
             self.check_remember.hide()
             self.check_overwrite.hide()
             self.check_create.hide()
+            self.window.resize(self.width, self.height)
         else:
             self.entry_location.show()
             self.check_remember.show()
@@ -137,8 +139,8 @@ class OlivePush:
             # This should really never happen
             pass
         
-        self.close()
         dialog.info_dialog('%d revision(s) pushed.' % revs)
+        self.close()
     
     def close(self, widget=None):
         self.window.destroy()

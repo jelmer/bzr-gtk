@@ -30,55 +30,66 @@ except:
 import olive.backend.init as init
 import olive.backend.errors as errors
 
-class OliveBranch:
-    """ Display branch dialog and perform the needed operations. """
+class OliveCheckout:
+    """ Display checkout dialog and perform the needed operations. """
     def __init__(self, gladefile, comm):
         """ Initialize the Branch dialog. """
         self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_branch')
+        self.glade = gtk.glade.XML(self.gladefile, 'window_checkout')
         
         self.comm = comm
         
-        self.window = self.glade.get_widget('window_branch')
+        self.window = self.glade.get_widget('window_checkout')
         
         # Dictionary for signal_autoconnect
-        dic = { "on_button_branch_branch_clicked": self.branch,
-                "on_button_branch_cancel_clicked": self.close }
+        dic = { "on_button_checkout_checkout_clicked": self.checkout,
+                "on_button_checkout_cancel_clicked": self.close }
         
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
         
         # Save FileChooser state
-        self.filechooser = self.glade.get_widget('filechooserbutton_branch')
+        self.filechooser = self.glade.get_widget('filechooserbutton_checkout')
         self.filechooser.set_filename(self.comm.get_path())
 
     def display(self):
-        """ Display the Branch dialog. """
+        """ Display the Checkout dialog. """
         self.window.show_all()
     
-    def branch(self, widget):
+    def checkout(self, widget):
         from dialog import OliveDialog
         dialog = OliveDialog(self.gladefile)
+        print "DEBUG: dialog imported"
         
-        entry_location = self.glade.get_widget('entry_branch_location')
+        entry_location = self.glade.get_widget('entry_checkout_location')
         location = entry_location.get_text()
         if location is '':
             dialog.error_dialog('You must specify a branch location.')
             return
+        print "DEBUG: got branch location:", location
         
         destination = self.filechooser.get_filename()
+        print "DEBUG: got destination:", destination
         
-        spinbutton_revno = self.glade.get_widget('spinbutton_branch_revno')
+        spinbutton_revno = self.glade.get_widget('spinbutton_checkout_revno')
         revno = spinbutton_revno.get_value_as_int()
         if revno == 0:
             revno = None
+        print "DEBUG: got revision number:", revno
+        
+        checkbutton_lightweight = self.glade.get_widget('checkbutton_checkout_lightweight')
+        lightweight = checkbutton_lightweight.get_active()
+        print "DEBUG: got lightweight:", lightweight
         
         try:
-            self.comm.set_statusbar('Branching in progress, please wait...')
-            init.branch(location, destination, revno)
+            self.comm.set_statusbar('Checkout in progress, please wait...')
+            print "DEBUG: statusbar set"
+            init.checkout(location, destination, revno, lightweight)
+            print "DEBUG: checkout ended"
             self.comm.clear_statusbar()
-        except errors.NonExistingSource, errmsg:
-            dialog.error_dialog('Non existing source: %s' % errmsg)
+            print "DEBUG: statusbar cleared"
+        except errors.NotBranchError, errmsg:
+            dialog.error_dialog('Not a branch: %s' % errmsg)
             self.comm.clear_statusbar()
             return
         except errors.TargetAlreadyExists, errmsg:
@@ -87,14 +98,6 @@ class OliveBranch:
             return
         except errors.NonExistingParent, errmsg:
             dialog.error_dialog('Parent directory doesn\'t exist: %s' % errmsg)
-            self.comm.clear_statusbar()
-            return
-        except errors.NonExistingRevision:
-            dialog.error_dialog('The given revision doesn\'t exist.')
-            self.comm.clear_statusbar()
-            return
-        except errors.NotBranchError, errmsg:
-            dialog.error_dialog('Not a branch: %s' % errmsg)
             self.comm.clear_statusbar()
             return
         except:
