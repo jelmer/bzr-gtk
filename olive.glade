@@ -696,7 +696,6 @@
 
       <child>
 	<widget class="GtkCheckButton" id="checkbutton_commit_local">
-	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="label" translatable="yes">_Local only commit (works in bound branches)</property>
 	  <property name="use_underline">True</property>

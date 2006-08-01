@@ -59,46 +59,37 @@ class OliveCheckout:
     def checkout(self, widget):
         from dialog import OliveDialog
         dialog = OliveDialog(self.gladefile)
-        print "DEBUG: dialog imported"
         
         entry_location = self.glade.get_widget('entry_checkout_location')
         location = entry_location.get_text()
         if location is '':
             dialog.error_dialog('You must specify a branch location.')
             return
-        print "DEBUG: got branch location:", location
         
         destination = self.filechooser.get_filename()
-        print "DEBUG: got destination:", destination
         
         spinbutton_revno = self.glade.get_widget('spinbutton_checkout_revno')
         revno = spinbutton_revno.get_value_as_int()
         if revno == 0:
             revno = None
-        print "DEBUG: got revision number:", revno
         
         checkbutton_lightweight = self.glade.get_widget('checkbutton_checkout_lightweight')
         lightweight = checkbutton_lightweight.get_active()
-        print "DEBUG: got lightweight:", lightweight
         
+        self.comm.set_busy(self.window)
         try:
-            self.comm.set_statusbar('Checkout in progress, please wait...')
-            print "DEBUG: statusbar set"
             init.checkout(location, destination, revno, lightweight)
-            print "DEBUG: checkout ended"
-            self.comm.clear_statusbar()
-            print "DEBUG: statusbar cleared"
         except errors.NotBranchError, errmsg:
             dialog.error_dialog('Not a branch: %s' % errmsg)
-            self.comm.clear_statusbar()
+            self.comm.set_busy(self.window, False)
             return
         except errors.TargetAlreadyExists, errmsg:
             dialog.error_dialog('Target already exists: %s' % errmsg)
-            self.comm.clear_statusbar()
+            self.comm.set_busy(self.window, False)
             return
         except errors.NonExistingParent, errmsg:
             dialog.error_dialog('Parent directory doesn\'t exist: %s' % errmsg)
-            self.comm.clear_statusbar()
+            self.comm.set_busy(self.window, False)
             return
         except:
             raise

@@ -1,3 +1,14 @@
+2006-08-01  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * olive/frontend/gtk/push.py: now the number of pushed revisions gets
+      displayed (Fixed: #54698)
+    * olive/backend/info.py: added is_checkout()
+    * olive/frontend/gtk/commit.py: local commit checkbox shows up only if the
+      current directory is a checkout
+    * olive/backend/fileops.py: upgraded to new API (compare_trees deprecated)
+    * many files: the cursor changes to a watch when performing time consuming
+      operations (Fixed: #54015)
+
 2006-07-31  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * Back from holiday.

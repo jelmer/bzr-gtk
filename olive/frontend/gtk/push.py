@@ -23,6 +23,7 @@ except:
     pass
 try:
     import gtk
+    import gtk.gdk
     import gtk.glade
 except:
     sys.exit(1)
@@ -93,9 +94,11 @@ class OlivePush:
         radio_stored = self.glade.get_widget('radiobutton_push_stored')
         radio_specific = self.glade.get_widget('radiobutton_push_specific')
         
+        revs = 0
+        self.comm.set_busy(self.window)
         if radio_stored.get_active():
             try:
-                commit.push(self.comm.get_path())
+                revs = commit.push(self.comm.get_path())
             except errors.NotBranchError:
                 dialog.error_dialog('Directory is not a branch.')
                 return
@@ -123,15 +126,19 @@ class OlivePush:
                                    self.check_create.get_active())
             except errors.NotBranchError:
                 dialog.error_dialog('Directory is not a branch.')
+                self.comm.set_busy(self.window, False)
                 return
             except errors.NonExistingParent, errmsg:
                 dialog.error_dialog('Parent directory doesn\'t exist: %s', errmsg)
+                self.comm.set_busy(self.window, False)
                 return
             except errors.DivergedBranchesError:
                 dialog.error_dialog('Branches have been diverged.')
+                self.comm.set_busy(self.window, False)
                 return
             except errors.PathPrefixNotCreated:
                 dialog.error_dialog('Path prefix couldn\'t be created.')
+                self.comm.set_busy(self.window, False)
                 return
             except:
                 raise
@@ -139,8 +146,8 @@ class OlivePush:
             # This should really never happen
             pass
         
-        dialog.info_dialog('%d revision(s) pushed.' % revs)
         self.close()
+        dialog.info_dialog('%d revision(s) pushed.' % revs)
     
     def close(self, widget=None):
         self.window.destroy()

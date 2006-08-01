@@ -61,6 +61,7 @@ class OliveAdd:
         
         directory = self.comm.get_path()
         
+        self.comm.set_busy(self.window)
         if radio_selected.get_active():
             # Add only the selected file
             filename = self.comm.get_selected_right()
@@ -73,6 +74,7 @@ class OliveAdd:
                 fileops.add([directory + '/' + filename])
             except errors.NotBranchError:
                 dialog.error_dialog('The directory is not a branch.')
+                self.comm.set_busy(self.window, False)
                 return
             except:
                 raise
@@ -82,6 +84,7 @@ class OliveAdd:
                 fileops.add([directory], True)
             except errors.NotBranchError:
                 dialog.error_dialog('The directory is not a branch.')
+                self.comm.set_busy(self.window, False)
                 return
             except:
                 raise

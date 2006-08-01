@@ -73,29 +73,28 @@ class OliveBranch:
         if revno == 0:
             revno = None
         
+        self.comm.set_busy(self.window)
         try:
-            self.comm.set_statusbar('Branching in progress, please wait...')
             init.branch(location, destination, revno)
-            self.comm.clear_statusbar()
         except errors.NonExistingSource, errmsg:
             dialog.error_dialog('Non existing source: %s' % errmsg)
-            self.comm.clear_statusbar()
+            self.comm.set_busy(self.window, False)
             return
         except errors.TargetAlreadyExists, errmsg:
             dialog.error_dialog('Target already exists: %s' % errmsg)
-            self.comm.clear_statusbar()
+            self.comm.set_busy(self.window, False)
             return
         except errors.NonExistingParent, errmsg:
             dialog.error_dialog('Parent directory doesn\'t exist: %s' % errmsg)
-            self.comm.clear_statusbar()
+            self.comm.set_busy(self.window, False)
             return
         except errors.NonExistingRevision:
             dialog.error_dialog('The given revision doesn\'t exist.')
-            self.comm.clear_statusbar()
+            self.comm.set_busy(self.window, False)
             return
         except errors.NotBranchError, errmsg:
             dialog.error_dialog('Not a branch: %s' % errmsg)
-            self.comm.clear_statusbar()
+            self.comm.set_busy(self.window, False)
             return
         except:
             raise

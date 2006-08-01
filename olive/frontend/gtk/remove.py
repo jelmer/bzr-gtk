@@ -49,7 +49,7 @@ class OliveRemove:
         self.glade.signal_autoconnect(dic)
 
     def display(self):
-        """ Display the Add file(s) dialog. """
+        """ Display the Remove file(s) dialog. """
         self.window.show_all()
         
     def remove(self, widget):
@@ -61,6 +61,7 @@ class OliveRemove:
         
         directory = self.comm.get_path()
         
+        self.comm.set_busy(self.window)
         if radio_selected.get_active():
             # Add only the selected file
             filename = self.comm.get_selected_right()
@@ -73,9 +74,11 @@ class OliveRemove:
                 fileops.remove([directory + '/' + filename])
             except errors.NotBranchError:
                 dialog.error_dialog('The directory is not a branch.')
+                self.comm.set_busy(self.window, False)
                 return
             except errors.NotVersionedError:
                 dialog.error_dialog('Selected file is not versioned.')
+                self.comm.set_busy(self.window, False)
                 return
             except:
                 raise
@@ -85,9 +88,11 @@ class OliveRemove:
                 fileops.remove([directory], True)
             except errors.NotBranchError:
                 dialog.error_dialog('The directory is not a branch.')
+                self.comm.set_busy(self.window, False)
                 return
             except errors.NoMatchingFiles:
                 dialog.warning_dialog('No matching files were found.')
+                self.comm.set_busy(self.window, False)
             except:
                 raise
         else:

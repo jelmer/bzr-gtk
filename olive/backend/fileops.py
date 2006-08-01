@@ -135,6 +135,7 @@ def status(filename):
     
     :return: renamed | added | removed | modified | unchanged | unknown
     """
+    import bzrlib
     from bzrlib.delta import compare_trees
     from bzrlib.workingtree import WorkingTree
     
@@ -163,10 +164,15 @@ def status(filename):
     rel = '/'.join(fpcopy)
     #print "DEBUG: rel =", rel
     
-    delta = compare_trees(old_tree=tree2,
-                          new_tree=tree1,
-                          want_unchanged=True,
-                          specific_files=[rel])
+    if bzrlib.version_info[1] < 9:
+        delta = compare_trees(old_tree=tree2,
+                              new_tree=tree1,
+                              want_unchanged=True,
+                              specific_files=[rel])
+    else:
+        delta = tree1.changes_from(tree2,
+                                   want_unchanged=True,
+                                   specific_files=[rel])
     
     """ Debug information (could be usable in the future, so didn't cut out)
     print "DEBUG: delta.renamed:"

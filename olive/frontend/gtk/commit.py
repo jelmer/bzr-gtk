@@ -38,6 +38,8 @@ class OliveCommit:
     """ Display Commit dialog and perform the needed actions. """
     def __init__(self, gladefile, comm):
         """ Initialize the Commit dialog. """
+        import bzrlib
+        
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_commit')
         
@@ -64,7 +66,10 @@ class OliveCommit:
         
         # Set the delta
         self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
-        self.delta = compare_trees(self.old_tree, self.wt)
+        if bzrlib.version_info[1] < 9:
+            self.delta = compare_trees(self.old_tree, self.wt)
+        else:
+            self.delta = self.wt.changes_from(self.old_tree)
         
         # Get the Commit dialog widget
         self.window = self.glade.get_widget('window_commit')
@@ -78,13 +83,22 @@ class OliveCommit:
         
         # Create the file list
         self._create_file_view()
+        
+        # Some additional widgets
+        self.checkbutton_local = self.glade.get_widget('checkbutton_commit_local')
     
     def display(self):
         """ Display the Push dialog. """
         if self.notbranch:
             self.dialog.error_dialog('Directory is not a branch.')
         else:
-            self.window.show_all()
+            from olive.backend.info import is_checkout
+            if is_checkout(self.comm.get_path()):
+                # we have a checkout, so the local commit checkbox must appear
+                self.checkbutton_local.show()
+            
+            self.window.show()
+            
     
     # This code is from Jelmer Vernooij's bzr-gtk branch
     def _create_file_view(self):
@@ -136,36 +150,42 @@ class OliveCommit:
         start, end = textbuffer.get_bounds()
         message = textbuffer.get_text(start, end)
         
-        checkbutton_local = self.glade.get_widget('checkbutton_commit_local')
         checkbutton_strict = self.glade.get_widget('checkbutton_commit_strict')
         checkbutton_force = self.glade.get_widget('checkbutton_commit_force')
         
         specific_files = self._get_specific_files()
         
+        self.comm.set_busy(self.window)
         # merged from Jelmer Vernooij's olive integration branch
         try:
             self.wt.commit(message, 
                            allow_pointless=checkbutton_force.get_active(),
                            strict=checkbutton_strict.get_active(),
-                           local=checkbutton_local.get_active(),
+                           local=self.checkbutton_local.get_active(),
                            specific_files=specific_files)
         except errors.NotBranchError:
             self.dialog.error_dialog('Directory is not a branch.')
+            self.comm.set_busy(self.window, False)
             return
         except errors.LocalRequiresBoundBranch:
             self.dialog.error_dialog('Local commit requires a bound branch.')
+            self.comm.set_busy(self.window, False)
             return
         except errors.PointlessCommit:
             self.dialog.error_dialog('No changes to commit. Try force commit.')
+            self.comm.set_busy(self.window, False)
             return
         except errors.ConflictsInTree:
             self.dialog.error_dialog('Conflicts in tree. Please resolve them first.')
+            self.comm.set_busy(self.window, False)
             return
         except errors.StrictCommitFailed:
             self.dialog.error_dialog('Strict commit failed. There are unknown files.')
+            self.comm.set_busy(self.window, False)
             return
         except errors.BoundBranchOutOfDate, errmsg:
             self.dialog.error_dialog('Bound branch is out of date: %s' % errmsg)
+            self.comm.set_busy(self.window, False)
             return
         except:
             raise

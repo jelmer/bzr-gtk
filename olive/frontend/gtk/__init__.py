@@ -25,6 +25,7 @@ except:
     pass
 try:
     import gtk
+    import gtk.gdk
     import gtk.glade
 except:
     sys.exit(1)
@@ -79,7 +80,7 @@ class OliveGtk:
         self.treeview_right = self.toplevel.get_widget('treeview_right')
         self._load_left()
         self._load_right()
-    
+        
     def _load_left(self):
         """ Load data into the left panel. (Bookmarks) """
         pass
@@ -87,6 +88,9 @@ class OliveGtk:
     def _load_right(self):
         """ Load data into the right panel. (Filelist) """
         import olive.backend.fileops as fileops
+        
+        # set cursor to busy
+        self.comm.set_busy(self.treeview_right)
         
         # Create ListStore
         liststore = gtk.ListStore(str, str, str)
@@ -128,6 +132,9 @@ class OliveGtk:
         tvcolumn_filename.add_attribute(cell, 'text', 1)
         tvcolumn_status.pack_start(cell, True)
         tvcolumn_status.add_attribute(cell, 'text', 2)
+        
+        # set cursor to default
+        self.comm.set_busy(self.treeview_right, False)
 
 class OliveCommunicator:
     """ This class is responsible for the communication between the different
@@ -175,7 +182,9 @@ class OliveCommunicator:
     def refresh_right(self, path=None):
         """ Refresh the file list. """
         import olive.backend.fileops as fileops
-
+        
+        self.set_busy(self.treeview_right)
+        
         if path is None:
             path = self.get_path()
 
@@ -205,3 +214,13 @@ class OliveCommunicator:
         
         # Add the ListStore to the TreeView
         self.treeview_right.set_model(liststore)
+        
+        self.set_busy(self.treeview_right, False)
+
+    def set_busy(self, widget, busy=True):
+        if busy:
+            widget.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+        else:
+            widget.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR))
+        
+        gtk.main_iteration(0)

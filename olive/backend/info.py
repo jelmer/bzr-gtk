@@ -20,6 +20,7 @@ import bzrlib
 import bzrlib.errors as errors
 
 from bzrlib.branch import Branch
+from bzrlib.workingtree import WorkingTree
 
 from errors import (DifferentBranchesError, NotBranchError, PrefixFormatError,
                     RevisionValueError)
@@ -221,6 +222,36 @@ def info(location):
         return
     except errors.NoRepositoryPresent:
         pass
+
+def is_checkout(location):
+    """ Check if the location is a checkout.
+    
+    :param location: the location you want to check
+    
+    :return: True or False respectively
+    """
+    try:
+        branch = Branch.open_containing(location)[0]
+    except errors.NotBranchError:
+        raise NotBranchError
+    
+    try:
+        working = WorkingTree.open_containing(location)[0]
+    except:
+        raise
+    
+    working_path = working.bzrdir.root_transport.base
+    branch_path = branch.bzrdir.root_transport.base
+    
+    if working_path != branch_path:
+        # lightweight checkout
+        return True
+    elif branch.get_bound_location():
+        # checkout
+        return True
+    else:
+        return False
+
 
 def log(location, timezone='original', verbose=False, show_ids=False,
         forward=False, revision=None, log_format=None, message=None,
