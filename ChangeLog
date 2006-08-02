@@ -1,3 +1,8 @@
+2006-08-03  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * olive.glade: added icons to windows and the about box, and the skeleton
+      of the diff window was designed
+
 2006-08-02  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * cmenu.ui: context menu UIManager description added
