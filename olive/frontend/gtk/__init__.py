@@ -70,6 +70,7 @@ class OliveGtk:
                 "on_toolbutton_commit_clicked": handler.on_menuitem_branch_commit_activate,
                 "on_toolbutton_pull_clicked": handler.not_implemented,
                 "on_toolbutton_push_clicked": handler.on_menuitem_branch_push_activate,
+                "on_treeview_right_button_press_event": handler.on_treeview_right_button_press_event,
                 "on_treeview_right_row_activated": handler.on_treeview_right_row_activated }
         
         # Connect the signals to the handlers

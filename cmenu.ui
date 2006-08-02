@@ -1,0 +1,11 @@
+<ui>
+    <popup name="context_right">
+        <menuitem name="add" action="add" />
+        <menuitem name="remove" action="remove" />
+        <separator />
+        <menuitem name="commit" action="commit" />
+        <separator />
+        <menuitem name="diff" action="diff" />
+        <menuitem name="log" action="log" />
+    </popup>
+</ui>

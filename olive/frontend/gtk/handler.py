@@ -34,6 +34,7 @@ from branch import OliveBranch
 from checkout import OliveCheckout
 from commit import OliveCommit
 from dialog import OliveDialog
+from menu import OliveMenu
 from push import OlivePush
 from remove import OliveRemove
 
@@ -44,6 +45,8 @@ class OliveHandler:
         self.comm = comm
         
         self.dialog = OliveDialog(self.gladefile)
+        
+        self.menu = OliveMenu(self.gladefile, self.comm, self.dialog)
     
     def on_about_activate(self, widget):
         self.dialog.about()
@@ -92,6 +95,12 @@ class OliveHandler:
         remove = OliveRemove(self.gladefile, self.comm)
         remove.display()
     
+    def on_treeview_right_button_press_event(self, widget, event):
+        """ Occurs when somebody right-clicks in the file list. """
+        if event.button == 3:
+            self.menu.right_context_menu().popup(None, None, None, 0,
+                                                 event.time)
+        
     def on_treeview_right_row_activated(self, treeview, path, view_column):
         """ Occurs when somebody double-clicks or enters an item in the
         file list. """

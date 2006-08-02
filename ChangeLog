@@ -1,3 +1,11 @@
+2006-08-02  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * cmenu.ui: context menu UIManager description added
+    * setup.py: install cmenu.ui to the appropriate place
+    * olive/frontend/gtk/menu.py: implement the context menus
+    * olive/frontend/gtk/__init__.py: added button_press_event for file list
+    * olive/frontend/gtk/handler.py: handling that even (show popup menu)
+
 2006-08-01  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * olive/frontend/gtk/push.py: now the number of pushed revisions gets

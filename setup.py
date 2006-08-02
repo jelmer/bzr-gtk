@@ -27,4 +27,4 @@ setup(name='Olive',
       packages=['olive', 'olive.backend', 'olive.frontend', 'olive.frontend.gtk'],
       package_dir={'olive.backend': 'olive/backend', 'olive.frontend.gtk': 'olive/frontend/gtk'},
       scripts=['olive-gtk'],
-      data_files=[('share/olive', ['olive.glade', 'oliveicon2.png'])])
+      data_files=[('share/olive', ['olive.glade', 'oliveicon2.png', 'cmenu.ui'])])

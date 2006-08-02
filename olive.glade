@@ -51,7 +51,7 @@
 		      <signal name="activate" handler="on_menuitem_add_files_activate" last_modification_time="Fri, 21 Jul 2006 11:38:39 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image56">
+			<widget class="GtkImage" id="image70">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-add</property>
 			  <property name="icon_size">1</property>
@@ -72,7 +72,7 @@
 		      <signal name="activate" handler="on_menuitem_remove_file_activate" last_modification_time="Fri, 21 Jul 2006 13:54:07 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image57">
+			<widget class="GtkImage" id="image71">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-remove</property>
 			  <property name="icon_size">1</property>
@@ -193,7 +193,7 @@
 		      <signal name="activate" handler="on_menuitem_branch_pull_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image58">
+			<widget class="GtkImage" id="image72">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-goto-bottom</property>
 			  <property name="icon_size">1</property>
@@ -214,7 +214,7 @@
 		      <signal name="activate" handler="on_menuitem_branch_push_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image59">
+			<widget class="GtkImage" id="image73">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-goto-top</property>
 			  <property name="icon_size">1</property>
@@ -241,7 +241,7 @@
 		      <signal name="activate" handler="on_menuitem_branch_commit_activate" last_modification_time="Mon, 17 Jul 2006 08:53:37 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image60">
+			<widget class="GtkImage" id="image74">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-redo</property>
 			  <property name="icon_size">1</property>
@@ -486,6 +486,7 @@
 		  <property name="hover_selection">False</property>
 		  <property name="hover_expand">False</property>
 		  <signal name="row_activated" handler="on_treeview_right_row_activated" last_modification_time="Thu, 20 Jul 2006 11:31:38 GMT"/>
+		  <signal name="button_press_event" handler="on_treeview_right_button_press_event" last_modification_time="Wed, 02 Aug 2006 17:16:29 GMT"/>
 		</widget>
 	      </child>
 	    </widget>

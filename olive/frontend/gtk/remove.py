@@ -63,7 +63,7 @@ class OliveRemove:
         
         self.comm.set_busy(self.window)
         if radio_selected.get_active():
-            # Add only the selected file
+            # Remove only the selected file
             filename = self.comm.get_selected_right()
             
             if filename is None:
