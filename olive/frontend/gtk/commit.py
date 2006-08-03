@@ -25,10 +25,16 @@ try:
     import gtk
     import gtk.glade
     import gobject
+    import pango
 except:
     sys.exit(1)
 
-from bzrlib.delta import compare_trees
+import bzrlib
+
+if bzrlib.version_info[1] < 9:
+    # function deprecated after 0.9
+    from bzrlib.delta import compare_trees
+
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
@@ -38,8 +44,6 @@ class OliveCommit:
     """ Display Commit dialog and perform the needed actions. """
     def __init__(self, gladefile, comm):
         """ Initialize the Commit dialog. """
-        import bzrlib
-        
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_commit')
         
@@ -86,6 +90,7 @@ class OliveCommit:
         
         # Some additional widgets
         self.checkbutton_local = self.glade.get_widget('checkbutton_commit_local')
+        self.textview = self.glade.get_widget('textview_commit')
     
     def display(self):
         """ Display the Push dialog. """
@@ -97,6 +102,7 @@ class OliveCommit:
                 # we have a checkout, so the local commit checkbox must appear
                 self.checkbutton_local.show()
             
+            self.textview.modify_font(pango.FontDescription("Monospace"))
             self.window.show()
             
     
@@ -145,8 +151,7 @@ class OliveCommit:
         return
     
     def commit(self, widget):
-        textview = self.glade.get_widget('textview_commit')
-        textbuffer = textview.get_buffer()
+        textbuffer = self.textview.get_buffer()
         start, end = textbuffer.get_bounds()
         message = textbuffer.get_text(start, end)
         

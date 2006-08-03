@@ -1,5 +1,7 @@
 2006-08-03  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive/frontend/gtk/commit.py: change TextView font to Monospace
+    * olive/frontend/gtk/diff.py: implemented diff window
     * olive.glade: added icons to windows and the about box, and the skeleton
       of the diff window was designed
 
