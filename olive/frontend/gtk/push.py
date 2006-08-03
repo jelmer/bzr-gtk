@@ -30,6 +30,7 @@ except:
 
 import olive.backend.commit as commit
 import olive.backend.errors as errors
+import olive.backend.info as info
 
 class OlivePush:
     """ Display Push dialog and perform the needed actions. """
@@ -52,10 +53,16 @@ class OlivePush:
         self.glade.signal_autoconnect(dic)
         
         # Get some useful widgets
+        self.entry_stored = self.glade.get_widget('entry_push_stored')
         self.entry_location = self.glade.get_widget('entry_push_location')
         self.check_remember = self.glade.get_widget('checkbutton_push_remember')
         self.check_overwrite = self.glade.get_widget('checkbutton_push_overwrite')
         self.check_create = self.glade.get_widget('checkbutton_push_create')
+        
+        # Get stored location
+        loc = info.get_push_location(self.comm.get_path())
+        if loc != '':
+            self.entry_stored.set_text(loc)
     
     def display(self):
         """ Display the Push dialog. """
@@ -64,27 +71,27 @@ class OlivePush:
     
     def stored_toggled(self, widget):
         if widget.get_active():
+            self.entry_stored.show()
             self.entry_location.hide()
             self.check_remember.hide()
-            self.check_overwrite.hide()
             self.check_create.hide()
             self.window.resize(self.width, self.height)
         else:
+            self.entry_stored.hide()
             self.entry_location.show()
             self.check_remember.show()
-            self.check_overwrite.show()
             self.check_create.show()
     
     def specific_toggled(self, widget):
         if widget.get_active():
+            self.entry_stored.hide()
             self.entry_location.show()
             self.check_remember.show()
-            self.check_overwrite.show()
             self.check_create.show()
         else:
+            self.entry_stored.show()
             self.entry_location.hide()
             self.check_remember.hide()
-            self.check_overwrite.hide()
             self.check_create.hide()
     
     def push(self, widget):
@@ -98,7 +105,8 @@ class OlivePush:
         self.comm.set_busy(self.window)
         if radio_stored.get_active():
             try:
-                revs = commit.push(self.comm.get_path())
+                revs = commit.push(self.comm.get_path(),
+                                   overwrite=self.check_overwrite.get_active())
             except errors.NotBranchError:
                 dialog.error_dialog('Directory is not a branch.')
                 return

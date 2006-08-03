@@ -118,6 +118,24 @@ def diff(revision=None, file_list=None, diff_options=None, prefix=None):
     else:
         return tmpfile[1]
 
+def get_push_location(location):
+    """ Get the stored push location of a branch.
+    
+    :param location: the path to the branch
+    
+    :return: the stored location
+    """
+    from bzrlib.branch import Branch
+    
+    try:
+        branch = Branch.open_containing(location)[0]
+    except errors.NotBranchError:
+        raise NotBranchError(location)
+    except:
+        raise
+    
+    return branch.get_push_location()
+
 def info(location):
     """ Get info about branch, working tree, and repository
     
