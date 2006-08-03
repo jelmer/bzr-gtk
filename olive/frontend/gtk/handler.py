@@ -34,6 +34,7 @@ from branch import OliveBranch
 from checkout import OliveCheckout
 from commit import OliveCommit
 from dialog import OliveDialog
+from diff import OliveDiff
 from menu import OliveMenu
 from push import OlivePush
 from remove import OliveRemove
@@ -94,6 +95,11 @@ class OliveHandler:
         """ Remove (unversion) selected file. """
         remove = OliveRemove(self.gladefile, self.comm)
         remove.display()
+    
+    def on_menuitem_stats_diff_activate(self, widget):
+        """ Statistics/Differences... menu handler. """
+        diff = OliveDiff(self.gladefile, self.comm)
+        diff.display()
     
     def on_treeview_right_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the file list. """

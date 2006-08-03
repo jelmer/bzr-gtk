@@ -1,5 +1,8 @@
 2006-08-03  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive.glade: added Statistics menu
+    * olive/frontend/gtk/__init__.py: added Statistics menu handlers
+    * olive/frontend/gtk/handler.py: implemented Diff menu handler
     * olive/frontend/gtk/push.py: display known push location if available
     * olive/backend/info.py: implemented get_push_location()
     * olive/frontend/gtk/commit.py: change TextView font to Monospace
