@@ -1,9 +1,5 @@
 # Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
 #
-# Some parts of the code:
-# Copyright (C) 2005 by Canonical Ltd.
-# Author: Scott James Remnant <scott@ubuntu.com>
-#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -20,8 +16,6 @@
 
 import sys
 
-from cStringIO import StringIO
-
 try:
     import pygtk
     pygtk.require("2.0")
@@ -35,30 +29,23 @@ try:
 except:
     sys.exit(1)
 
-try:
-    import gtksourceview
-    have_gtksourceview = True
-except ImportError:
-    have_gtksourceview = False
-
 import bzrlib
 
 if (bzrlib.version_info[0] == 0) and (bzrlib.version_info[1] < 9):
     # function deprecated after 0.9
     from bzrlib.delta import compare_trees
 
-from bzrlib.diff import show_diff_trees
-import bzrlib.errors as errors
+from bzrlib.status import show_tree_status
 from bzrlib.workingtree import WorkingTree
 
 from dialog import OliveDialog
 
-class OliveDiff:
-    """ Display Diff window and perform the needed actions. """
+class OliveStatus:
+    """ Display Status window and perform the needed actions. """
     def __init__(self, gladefile, comm):
         """ Initialize the Diff window. """
         self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_diff')
+        self.glade = gtk.glade.XML(self.gladefile, 'window_status')
         
         self.comm = comm
         
@@ -73,7 +60,7 @@ class OliveDiff:
             return
         except:
             raise
-
+        
         file_id = self.wt.path2id(path)
 
         self.notbranch = False
@@ -85,32 +72,21 @@ class OliveDiff:
         self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
         
         # Get the Diff window widget
-        self.window = self.glade.get_widget('window_diff')
+        self.window = self.glade.get_widget('window_status')
         
         # Dictionary for signal_autoconnect
-        dic = { "on_button_diff_close_clicked": self.close,
-                "on_treeview_diff_files_cursor_changed": self.cursor_changed }
+        dic = { "on_button_status_close_clicked": self.close }
         
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
         
-        # Create the file list
-        self._create_file_view()
-        
-        # Generate initial diff
-        self._init_diff()
-    
-    def display(self):
-        """ Display the Diff window. """
-        if self.notbranch:
-            self.dialog.error_dialog('Directory is not a branch.')
-        else:
-            self.window.show_all()
-    
-    def _create_file_view(self):
-        """ Create the list of files. """
+        # Generate status output
+        self._generate_status()
+
+    def _generate_status(self):
+        """ Generate 'bzr status' output. """
         self.model = gtk.TreeStore(str, str)
-        self.treeview = self.glade.get_widget('treeview_diff_files')
+        self.treeview = self.glade.get_widget('treeview_status')
         self.treeview.set_model(self.model)
         
         cell = gtk.CellRendererText()
@@ -120,32 +96,10 @@ class OliveDiff:
         column.add_attribute(cell, "text", 0)
         self.treeview.append_column(column)
         
-        if have_gtksourceview:
-            self.buffer = gtksourceview.SourceBuffer()
-            slm = gtksourceview.SourceLanguagesManager()
-            gsl = slm.get_language_from_mime_type("text/x-patch")
-            self.buffer.set_language(gsl)
-            self.buffer.set_highlight(True)
-
-            sourceview = gtksourceview.SourceView(self.buffer)
-        else:
-            self.buffer = gtk.TextBuffer()
-            sourceview = gtk.TextView(self.buffer)
-
-        sourceview.set_editable(False)
-        sourceview.modify_font(pango.FontDescription("Monospace"))
-        scrollwin_diff = self.glade.get_widget('scrolledwindow_diff_diff')
-        scrollwin_diff.add(sourceview)
-    
-    def _init_diff(self):
-        """ Generate initial diff. """
-        self.model.clear()
         if (bzrlib.version_info[0] == 0) and (bzrlib.version_info[1] < 9):
             delta = compare_trees(self.old_tree, self.wt)
         else:
             delta = self.wt.changes_from(self.old_tree)
-
-        self.model.append(None, [ "Complete Diff", "" ])
 
         if len(delta.added):
             titer = self.model.append(None, [ "Added", None ])
@@ -167,21 +121,22 @@ class OliveDiff:
             titer = self.model.append(None, [ "Modified", None ])
             for path, id, kind, text_modified, meta_modified in delta.modified:
                 self.model.append(titer, [ path, path ])
+        
+        done_unknown = False
+        for path in self.wt.unknowns():
+            if not done_unknown:
+                titer = self.model.append(None, [ "Unknown", None ])
+                done_unknown = True
+            self.model.append(titer, [ path, path ])
 
         self.treeview.expand_all()
     
-    def cursor_changed(self, *args):
-        """ Callback when the TreeView cursor changes. """
-        (path, col) = self.treeview.get_cursor()
-        specific_files = [ self.model[path][1] ]
-        if specific_files == [ None ]:
-            return
-        elif specific_files == [ "" ]:
-            specific_files = []
+    def display(self):
+        """ Display the Diff window. """
+        if self.notbranch:
+            self.dialog.error_dialog('Directory is not a branch.')
+        else:
+            self.window.show_all()
 
-        s = StringIO()
-        show_diff_trees(self.old_tree, self.wt, s, specific_files)
-        self.buffer.set_text(s.getvalue())
-    
     def close(self, widget=None):
         self.window.destroy()

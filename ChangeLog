@@ -1,5 +1,7 @@
 2006-08-03  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive/frontend/gtk/status.py: Status window implemented
+    * olive.glade: Status window designed and Branch/status menu added
     * olive.glade: added Statistics menu
     * olive/frontend/gtk/__init__.py: added Statistics menu handlers
     * olive/frontend/gtk/handler.py: implemented Diff menu handler
