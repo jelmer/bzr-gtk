@@ -64,6 +64,10 @@ class OliveDiff:
         
         self.dialog = OliveDialog(self.gladefile)
         
+        # Get some important widgets
+        self.window = self.glade.get_widget('window_diff')
+        self.treeview = self.glade.get_widget('treeview_diff_files')
+
         # Check if current location is a branch
         try:
             (self.wt, path) = WorkingTree.open_containing(self.comm.get_path())
@@ -84,9 +88,6 @@ class OliveDiff:
         # Set the old working tree
         self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
         
-        # Get the Diff window widget
-        self.window = self.glade.get_widget('window_diff')
-        
         # Dictionary for signal_autoconnect
         dic = { "on_button_diff_close_clicked": self.close,
                 "on_treeview_diff_files_cursor_changed": self.cursor_changed }
@@ -104,13 +105,13 @@ class OliveDiff:
         """ Display the Diff window. """
         if self.notbranch:
             self.dialog.error_dialog('Directory is not a branch.')
+            self.close()
         else:
             self.window.show_all()
     
     def _create_file_view(self):
         """ Create the list of files. """
         self.model = gtk.TreeStore(str, str)
-        self.treeview = self.glade.get_widget('treeview_diff_files')
         self.treeview.set_model(self.model)
         
         cell = gtk.CellRendererText()
