@@ -51,7 +51,7 @@
 		      <signal name="activate" handler="on_menuitem_add_files_activate" last_modification_time="Fri, 21 Jul 2006 11:38:39 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image106">
+			<widget class="GtkImage" id="image126">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-add</property>
 			  <property name="icon_size">1</property>
@@ -72,7 +72,7 @@
 		      <signal name="activate" handler="on_menuitem_remove_file_activate" last_modification_time="Fri, 21 Jul 2006 13:54:07 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image107">
+			<widget class="GtkImage" id="image127">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-remove</property>
 			  <property name="icon_size">1</property>
@@ -193,7 +193,7 @@
 		      <signal name="activate" handler="on_menuitem_branch_pull_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image108">
+			<widget class="GtkImage" id="image128">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-goto-bottom</property>
 			  <property name="icon_size">1</property>
@@ -214,7 +214,7 @@
 		      <signal name="activate" handler="on_menuitem_branch_push_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image109">
+			<widget class="GtkImage" id="image129">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-goto-top</property>
 			  <property name="icon_size">1</property>
@@ -241,7 +241,7 @@
 		      <signal name="activate" handler="on_menuitem_branch_commit_activate" last_modification_time="Mon, 17 Jul 2006 08:53:37 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image110">
+			<widget class="GtkImage" id="image130">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-redo</property>
 			  <property name="icon_size">1</property>
@@ -355,7 +355,7 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Update</property>
 	      <property name="use_underline">True</property>
-	      <property name="stock_id">gtk-refresh</property>
+	      <property name="icon">reload.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
@@ -372,6 +372,7 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Log</property>
 	      <property name="use_underline">True</property>
+	      <property name="icon">log-action.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
@@ -389,6 +390,7 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Diff</property>
 	      <property name="use_underline">True</property>
+	      <property name="icon">diff.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
@@ -419,7 +421,7 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Commit</property>
 	      <property name="use_underline">True</property>
-	      <property name="stock_id">gtk-redo</property>
+	      <property name="icon">commit.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
@@ -449,7 +451,7 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Pull</property>
 	      <property name="use_underline">True</property>
-	      <property name="stock_id">gtk-goto-bottom</property>
+	      <property name="icon">checkin.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
@@ -466,7 +468,7 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Push</property>
 	      <property name="use_underline">True</property>
-	      <property name="stock_id">gtk-goto-top</property>
+	      <property name="icon">checkout.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
@@ -2369,6 +2371,27 @@
 	</packing>
       </child>
     </widget>
+  </child>
+</widget>
+
+<widget class="GtkWindow" id="window_log">
+  <property name="visible">True</property>
+  <property name="title" translatable="yes">Olive - Log</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
+  <property name="window_position">GTK_WIN_POS_NONE</property>
+  <property name="modal">False</property>
+  <property name="resizable">True</property>
+  <property name="destroy_with_parent">False</property>
+  <property name="decorated">True</property>
+  <property name="skip_taskbar_hint">False</property>
+  <property name="skip_pager_hint">False</property>
+  <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
+  <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
+  <property name="focus_on_map">True</property>
+  <property name="urgency_hint">False</property>
+
+  <child>
+    <placeholder/>
   </child>
 </widget>
 
