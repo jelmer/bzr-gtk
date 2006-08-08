@@ -1,3 +1,9 @@
+2006-08-08  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+    * olive/frontend/gtk/__init__.py: implemented OlivePreferences - this class
+      is responsible for loading/saving user preferences
+    * olive/frontend/gtk/handler.py: save preferences before quit
+    * olive.glade: some wordings fixed (thanks to David Allouche)
+
 2006-08-07  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * olive.galde: added custom artwork (icons)

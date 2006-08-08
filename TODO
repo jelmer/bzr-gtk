@@ -9,3 +9,4 @@ TODO list for Olive
  - Display the count of pushed revisions on push (phanatic) [DONE]
  - Display the commit file selector as a tree (so whole directories can be
    toggled) (j-a-meinel)
+ - "Probe location" button on the Push dialog (test write access, etc.) (ddaa)

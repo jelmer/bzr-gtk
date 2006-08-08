@@ -51,12 +51,14 @@ class OliveGtk:
         self.window = self.toplevel.get_widget('window_main')
         self.window.show_all()
         
-        self.comm = OliveCommunicator(self.toplevel)
+        self.pref = OlivePreferences()
+        self.comm = OliveCommunicator(self.toplevel, self.pref)
         handler = OliveHandler(self.gladefile, self.comm)
         
         # Dictionary for signal_autoconnect
         dic = { "on_window_main_destroy": gtk.main_quit,
-                "on_quit_activate": gtk.main_quit,
+                "on_window_main_delete_event": handler.on_window_main_delete_event,
+                "on_quit_activate": handler.on_window_main_delete_event,
                 "on_about_activate": handler.on_about_activate,
                 "on_menuitem_add_files_activate": handler.on_menuitem_add_files_activate,
                 "on_menuitem_remove_file_activate": handler.on_menuitem_remove_file_activate,
@@ -106,7 +108,10 @@ class OliveGtk:
         
         # Fill the appropriate lists
         path = self.comm.get_path()
+        dotted_files = self.pref.get_dotted_files()
         for item in os.listdir(path):
+            if not dotted_files and item[0] == '.':
+                continue
             if os.path.isdir(path + '/' + item):
                 dirs.append(item)
             else:
@@ -145,9 +150,11 @@ class OliveGtk:
 class OliveCommunicator:
     """ This class is responsible for the communication between the different
     modules. """
-    def __init__(self, toplevel):
+    def __init__(self, toplevel, pref):
         # Get glade main component
         self.toplevel = toplevel
+        # Preferences object
+        self.pref = pref
         # Default path
         self._path = os.getcwd()
         
@@ -155,6 +162,8 @@ class OliveCommunicator:
         self.statusbar = self.toplevel.get_widget('statusbar')
         self.context_id = self.statusbar.get_context_id('olive')
         
+        # Get the main window
+        self.window_main = self.toplevel.get_widget('window_main')
         # Get the TreeViews
         self.treeview_left = self.toplevel.get_widget('treeview_left')
         self.treeview_right = self.toplevel.get_widget('treeview_right')
@@ -202,7 +211,10 @@ class OliveCommunicator:
         files = []
         
         # Fill the appropriate lists
+        dotted_files = self.pref.get_dotted_files()
         for item in os.listdir(path):
+            if not dotted_files and item[0] == '.':
+                continue
             if os.path.isdir(path + '/' + item):
                 dirs.append(item)
             else:
@@ -228,5 +240,107 @@ class OliveCommunicator:
             widget.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
         else:
             widget.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR))
-        
+
         gtk.main_iteration(0)
+
+class OlivePreferences:
+    """ A class which handles Olive's preferences. """
+    def __init__(self):
+        """ Initialize the Preferences class. """
+        import ConfigParser
+        
+        # Some default options
+        self.defaults = { 'strict_commit': False,
+                          'dotted_files' : False }
+        
+        # Create a config parser object
+        self.config = ConfigParser.RawConfigParser()
+        
+        # Load the configuration
+        if sys.platform == 'win32':
+            # Windows - no dotted files
+            self.config.read([os.path.expanduser('~/olive.conf')])
+        else:
+            self.config.read([os.path.expanduser('~/.olive.conf')])
+        
+    def _get_default(self, option):
+        """ Get the default option for a preference. """
+        try:
+            ret = self.defaults[option]
+        except KeyError:
+            return None
+        else:
+            return ret
+
+    def refresh(self):
+        """ Refresh the configuration. """
+        # First write out the changes
+        self.write()
+        # Then load the configuration again
+        if sys.platform == 'win32':
+            # Windows - no dotted files
+            self.config.read([os.path.expanduser('~/olive.conf')])
+        else:
+            self.config.read([os.path.expanduser('~/.olive.conf')])
+
+    def write(self):
+        """ Write the configuration to the appropriate files. """
+        if sys.platform == 'win32':
+            # Windows - no dotted files
+            fp = open(os.path.expanduser('~/olive.conf'), 'w')
+            self.config.write(fp)
+            fp.close()
+        else:
+            fp = open(os.path.expanduser('~/.olive.conf'), 'w')
+            self.config.write(fp)
+            fp.close()
+
+    def get_strict_commit(self):
+        """ Get strict commit preference. """
+        if self.config.has_option('preferences', 'strict_commit'):
+            return self.config.getboolean('preferences', 'strict_commit')
+        else:
+            return self._get_default('strict_commit')
+
+    def set_strict_commit(self, value):
+        """ Set strict commit preference. """
+        if self.config.has_section('preferences'):
+            self.config.set('preferences', 'strict_commit', value)
+        else:
+            self.config.add_section('preferences')
+            self.config.set('preferences', 'strict_commit', value)
+
+    def get_dotted_files(self):
+        """ Get dotted files preference. """
+        if self.config.has_option('preferences', 'dotted_files'):
+            return self.config.getboolean('preferences', 'dotted_files')
+        else:
+            return self._get_default('dotted_files')
+
+    def set_dotted_files(self, value):
+        """ Set dotted files preference. """
+        if self.config.has_section('preferences'):
+            self.config.set('preferences', 'dotted_files', value)
+        else:
+            self.config.add_section('preferences')
+            self.config.set('preferences', 'dotted_files', value)
+
+    def get_bookmarks(self):
+        """ Return the list of bookmarks. """
+        bookmarks = self.config.sections()
+        if self.config.has_section('preferences'):
+            bookmarks.remove('preferences')
+        return bookmarks
+
+    def add_bookmark(self, path):
+        """ Add bookmark. """
+        try:
+            self.config.add_section(path)
+        except DuplicateSectionError:
+            return False
+        else:
+            return True
+
+    def del_bookmark(self, path):
+        """ Remove bookmark. """
+        return self.config.remove_section(path)

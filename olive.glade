@@ -21,6 +21,7 @@
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
   <signal name="destroy" handler="on_window_main_destroy" last_modification_time="Sun, 16 Jul 2006 15:29:52 GMT"/>
+  <signal name="delete_event" handler="on_window_main_delete_event" last_modification_time="Tue, 08 Aug 2006 14:20:39 GMT"/>
 
   <child>
     <widget class="GtkVBox" id="vbox_main">
@@ -756,7 +757,7 @@
       <child>
 	<widget class="GtkCheckButton" id="checkbutton_commit_local">
 	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">_Local only commit (works in bound branches)</property>
+	  <property name="label" translatable="yes">_Local only commit (works in checkouts)</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
 	  <property name="focus_on_click">True</property>
@@ -775,7 +776,7 @@
 	<widget class="GtkCheckButton" id="checkbutton_commit_strict">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">_Strict commit (fails if unknown files available)</property>
+	  <property name="label" translatable="yes">_Strict commit (fails if unknown files are present)</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
 	  <property name="focus_on_click">True</property>
@@ -794,7 +795,7 @@
 	<widget class="GtkCheckButton" id="checkbutton_commit_force">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">_Force commit (even do it when nothing has changed)</property>
+	  <property name="label" translatable="yes">_Force commit (even do it if nothing has changed)</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
 	  <property name="focus_on_click">True</property>
@@ -1628,7 +1629,7 @@
 	<widget class="GtkRadioButton" id="radiobutton_push_stored">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">Push to _stored location</property>
+	  <property name="label" translatable="yes">Push to _default location</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
 	  <property name="focus_on_click">True</property>
@@ -1667,7 +1668,7 @@
 	<widget class="GtkRadioButton" id="radiobutton_push_specific">
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">Push to specific _location</property>
+	  <property name="label" translatable="yes">Push to _specific location</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
 	  <property name="focus_on_click">True</property>
@@ -1705,7 +1706,7 @@
       <child>
 	<widget class="GtkCheckButton" id="checkbutton_push_remember">
 	  <property name="can_focus">True</property>
-	  <property name="label" translatable="yes">_Remember this location</property>
+	  <property name="label" translatable="yes">_Remember as default location</property>
 	  <property name="use_underline">True</property>
 	  <property name="relief">GTK_RELIEF_NORMAL</property>
 	  <property name="focus_on_click">True</property>

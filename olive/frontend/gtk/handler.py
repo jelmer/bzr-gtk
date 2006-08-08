@@ -127,6 +127,11 @@ class OliveHandler:
         
         self.comm.refresh_right()
     
+    def on_window_main_delete_event(self, widget, event=None):
+        """ Do some stuff before exiting. """
+        self.comm.pref.write()
+        self.comm.window_main.destroy()
+
     def not_implemented(self, widget):
         """ Display a Not implemented error message. """
         self.dialog.error_dialog('This feature is not yet implemented.')
