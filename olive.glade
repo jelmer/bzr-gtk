@@ -52,7 +52,7 @@
 		      <signal name="activate" handler="on_menuitem_add_files_activate" last_modification_time="Fri, 21 Jul 2006 11:38:39 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image126">
+			<widget class="GtkImage" id="image136">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-add</property>
 			  <property name="icon_size">1</property>
@@ -73,7 +73,7 @@
 		      <signal name="activate" handler="on_menuitem_remove_file_activate" last_modification_time="Fri, 21 Jul 2006 13:54:07 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image127">
+			<widget class="GtkImage" id="image137">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-remove</property>
 			  <property name="icon_size">1</property>
@@ -194,10 +194,9 @@
 		      <signal name="activate" handler="on_menuitem_branch_pull_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image128">
+			<widget class="GtkImage" id="image138">
 			  <property name="visible">True</property>
-			  <property name="stock">gtk-goto-bottom</property>
-			  <property name="icon_size">1</property>
+			  <property name="pixbuf">pull16.png</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -215,10 +214,9 @@
 		      <signal name="activate" handler="on_menuitem_branch_push_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image129">
+			<widget class="GtkImage" id="image139">
 			  <property name="visible">True</property>
-			  <property name="stock">gtk-goto-top</property>
-			  <property name="icon_size">1</property>
+			  <property name="pixbuf">push16.png</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -242,10 +240,9 @@
 		      <signal name="activate" handler="on_menuitem_branch_commit_activate" last_modification_time="Mon, 17 Jul 2006 08:53:37 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image130">
+			<widget class="GtkImage" id="image140">
 			  <property name="visible">True</property>
-			  <property name="stock">gtk-redo</property>
-			  <property name="icon_size">1</property>
+			  <property name="pixbuf">commit16.png</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -284,20 +281,42 @@
 		<widget class="GtkMenu" id="menuitem_stats_menu">
 
 		  <child>
-		    <widget class="GtkMenuItem" id="menuitem_stats_diff">
+		    <widget class="GtkImageMenuItem" id="menuitem_stats_diff">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">_Differences...</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="on_menuitem_stats_diff_activate" last_modification_time="Thu, 03 Aug 2006 11:35:30 GMT"/>
+
+		      <child internal-child="image">
+			<widget class="GtkImage" id="image141">
+			  <property name="visible">True</property>
+			  <property name="pixbuf">diff16.png</property>
+			  <property name="xalign">0.5</property>
+			  <property name="yalign">0.5</property>
+			  <property name="xpad">0</property>
+			  <property name="ypad">0</property>
+			</widget>
+		      </child>
 		    </widget>
 		  </child>
 
 		  <child>
-		    <widget class="GtkMenuItem" id="menuitem_stats_log">
+		    <widget class="GtkImageMenuItem" id="menuitem_stats_log">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">_Log...</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="on_menuitem_stats_log_activate" last_modification_time="Thu, 03 Aug 2006 11:35:43 GMT"/>
+
+		      <child internal-child="image">
+			<widget class="GtkImage" id="image142">
+			  <property name="visible">True</property>
+			  <property name="pixbuf">log16.png</property>
+			  <property name="xalign">0.5</property>
+			  <property name="yalign">0.5</property>
+			  <property name="xpad">0</property>
+			  <property name="ypad">0</property>
+			</widget>
+		      </child>
 		    </widget>
 		  </child>
 
@@ -356,7 +375,7 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Update</property>
 	      <property name="use_underline">True</property>
-	      <property name="icon">reload.png</property>
+	      <property name="icon">refresh.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
@@ -373,7 +392,7 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Log</property>
 	      <property name="use_underline">True</property>
-	      <property name="icon">log-action.png</property>
+	      <property name="icon">log.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
@@ -452,7 +471,7 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Pull</property>
 	      <property name="use_underline">True</property>
-	      <property name="icon">checkin.png</property>
+	      <property name="icon">pull.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
@@ -469,7 +488,7 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Push</property>
 	      <property name="use_underline">True</property>
-	      <property name="icon">checkout.png</property>
+	      <property name="icon">push.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
