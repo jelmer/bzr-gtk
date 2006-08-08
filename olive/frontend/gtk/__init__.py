@@ -14,6 +14,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import ConfigParser
 import os
 import os.path
 import sys
@@ -78,7 +79,9 @@ class OliveGtk:
                 "on_toolbutton_pull_clicked": handler.not_implemented,
                 "on_toolbutton_push_clicked": handler.on_menuitem_branch_push_activate,
                 "on_treeview_right_button_press_event": handler.on_treeview_right_button_press_event,
-                "on_treeview_right_row_activated": handler.on_treeview_right_row_activated }
+                "on_treeview_right_row_activated": handler.on_treeview_right_row_activated,
+                "on_treeview_left_button_press_event": handler.on_treeview_left_button_press_event,
+                "on_treeview_left_row_activated": handler.on_treeview_left_row_activated }
         
         # Connect the signals to the handlers
         self.toplevel.signal_autoconnect(dic)
@@ -91,7 +94,34 @@ class OliveGtk:
         
     def _load_left(self):
         """ Load data into the left panel. (Bookmarks) """
-        pass
+        # set cursor to busy
+        self.comm.set_busy(self.treeview_left)
+        
+        # Create TreeStore
+        treestore = gtk.TreeStore(str)
+        
+        # Get bookmarks
+        bookmarks = self.comm.pref.get_bookmarks()
+        
+        # Add them to the TreeStore
+        titer = treestore.append(None, ['Bookmarks'])
+        for item in bookmarks:
+            treestore.append(titer, [item])
+        
+        # Create the column and add it to the TreeView
+        self.treeview_left.set_model(treestore)
+        tvcolumn_bookmark = gtk.TreeViewColumn('Bookmark')
+        self.treeview_left.append_column(tvcolumn_bookmark)
+        
+        # Set up the cells
+        cell = gtk.CellRendererText()
+        tvcolumn_bookmark.pack_start(cell, True)
+        tvcolumn_bookmark.add_attribute(cell, 'text', 0)
+        
+        # Expand the tree
+        self.treeview_left.expand_all()
+        
+        self.comm.set_busy(self.treeview_left, False)
         
     def _load_right(self):
         """ Load data into the right panel. (Filelist) """
@@ -185,6 +215,16 @@ class OliveCommunicator:
             return None
         else:
             return model.get_value(iter, 1)
+    
+    def get_selected_left(self):
+        """ Get the selected bookmark. """
+        treeselection = self.treeview_left.get_selection()
+        (model, iter) = treeselection.get_selected()
+        
+        if iter is None:
+            return None
+        else:
+            return model.get_value(iter, 0)
 
     def set_statusbar(self, message):
         """ Set the statusbar message. """
@@ -193,6 +233,31 @@ class OliveCommunicator:
     def clear_statusbar(self):
         """ Clean the last message from the statusbar. """
         self.statusbar.pop(self.context_id)
+    
+    def refresh_left(self):
+        """ Refresh the bookmark list. """
+        # set cursor to busy
+        self.set_busy(self.treeview_left)
+        
+        # Get TreeStore and clear it
+        treestore = self.treeview_left.get_model()
+        treestore.clear()
+        
+        # Get bookmarks
+        bookmarks = self.pref.get_bookmarks()
+        
+        # Add them to the TreeStore
+        titer = treestore.append(None, ['Bookmarks'])
+        for item in bookmarks:
+            treestore.append(titer, [item])
+        
+        # Add the TreeStore to the TreeView
+        self.treeview_left.set_model(treestore)
+        
+        # Expand the tree
+        self.treeview_left.expand_all()
+        
+        self.set_busy(self.treeview_left, False)
     
     def refresh_right(self, path=None):
         """ Refresh the file list. """
@@ -247,8 +312,6 @@ class OlivePreferences:
     """ A class which handles Olive's preferences. """
     def __init__(self):
         """ Initialize the Preferences class. """
-        import ConfigParser
-        
         # Some default options
         self.defaults = { 'strict_commit': False,
                           'dotted_files' : False }
@@ -336,11 +399,11 @@ class OlivePreferences:
         """ Add bookmark. """
         try:
             self.config.add_section(path)
-        except DuplicateSectionError:
+        except ConfigParser.DuplicateSectionError:
             return False
         else:
             return True
 
-    def del_bookmark(self, path):
+    def remove_bookmark(self, path):
         """ Remove bookmark. """
         return self.config.remove_section(path)

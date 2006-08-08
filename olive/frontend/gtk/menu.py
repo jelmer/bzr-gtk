@@ -47,37 +47,52 @@ class OliveMenu:
         self.comm = comm
         self.dialog = dialog
         
-        self.ui_right = gtk.UIManager()
+        # Create the file list context menu
+        self.ui = gtk.UIManager()
         
-        self.actiongroup_right = gtk.ActionGroup('context_right')
-        self.actiongroup_right.add_actions([('add', gtk.STOCK_ADD,
-                                             'Add', None,
-                                             'Add the selected file',
-                                             self.add_file),
-                                            ('remove', gtk.STOCK_REMOVE,
-                                             'Remove', None,
-                                             'Remove the selected file',
-                                             self.remove_file),
-                                            ('commit', gtk.STOCK_REDO,
-                                             'Commit', None,
-                                             'Commit the changes',
-                                             self.commit),
-                                            ('diff', None,
-                                             'Diff', None,
-                                             'Show the diff of the file',
-                                             self.diff),
-                                            ('log', None,
-                                             'Log', None,
-                                             'Show the log of the file',
-                                             self.log)])
+        self.actiongroup = gtk.ActionGroup('context')
+        self.actiongroup.add_actions([('add', gtk.STOCK_ADD,
+                                       'Add', None,
+                                       'Add the selected file',
+                                       self.add_file),
+                                      ('remove', gtk.STOCK_REMOVE,
+                                       'Remove', None,
+                                       'Remove the selected file',
+                                       self.remove_file),
+                                      ('commit', gtk.STOCK_REDO,
+                                       'Commit', None,
+                                       'Commit the changes',
+                                       self.commit),
+                                      ('diff', None,
+                                       'Diff', None,
+                                       'Show the diff of the file',
+                                       self.diff),
+                                      ('log', None,
+                                       'Log', None,
+                                       'Show the log of the file',
+                                       self.log),
+                                      ('bookmark', None,
+                                       'Bookmark', None,
+                                       'Bookmark current location',
+                                       self.bookmark),
+                                      ('remove_bookmark', gtk.STOCK_REMOVE,
+                                       'Remove', None,
+                                       'Remove the selected bookmark',
+                                       self.remove_bookmark)
+                                     ])
         
-        self.ui_right.insert_action_group(self.actiongroup_right, 0)
-        self.ui_right.add_ui_from_file(self.uifile)
+        self.ui.insert_action_group(self.actiongroup, 0)
+        self.ui.add_ui_from_file(self.uifile)
         
-        self.cmenu_right = self.ui_right.get_widget('/context_right')
+        self.cmenu_right = self.ui.get_widget('/context_right')
+        
+        self.cmenu_left = self.ui.get_widget('/context_left')
 
     def right_context_menu(self):
         return self.cmenu_right
+    
+    def left_context_menu(self):
+        return self.cmenu_left
     
     def add_file(self, action):
         """ Right context menu -> Add """
@@ -135,3 +150,18 @@ class OliveMenu:
     def log(self, action):
         """ Right context menu -> Log """
         self.dialog.error_dialog('This feature is not yet implemented.')
+    
+    def bookmark(self, action):
+        """ Right context menu -> Bookmark """
+        if self.comm.pref.add_bookmark(self.comm.get_path()):
+            self.dialog.info_dialog('Bookmark successfully added.')
+        else:
+            self.dialog.warning_dialog('Location already bookmarked.')
+        
+        self.comm.refresh_left()
+
+    def remove_bookmark(self, action):
+        """ Left context menu -> Remove """
+        self.comm.pref.remove_bookmark(self.comm.get_selected_left())
+        
+        self.comm.refresh_left()

@@ -1,4 +1,9 @@
 2006-08-08  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+    * olive/frontend/gtk/menu.py: Added left context menu + Bookmark option
+    * olive/frontend/gtk/__init__.py: load bookmarks into the left panel
+    * olive/frontend/gtk/handler.py: implemented signal handlers for left panel
+    * olive.glade: added signals for the bookmark TreeView
+    * cmenu.ui: added description for bookmark context menu
     * olive/frontend/gtk/__init__.py: implemented OlivePreferences - this class
       is responsible for loading/saving user preferences
     * olive/frontend/gtk/handler.py: save preferences before quit

@@ -107,6 +107,24 @@ class OliveHandler:
         diff = OliveDiff(self.gladefile, self.comm)
         diff.display()
     
+    def on_treeview_left_button_press_event(self, widget, event):
+        """ Occurs when somebody right-clicks in the bookmark list. """
+        if event.button == 3:
+            self.menu.left_context_menu().popup(None, None, None, 0,
+                                                 event.time)
+        
+    def on_treeview_left_row_activated(self, treeview, path, view_column):
+        """ Occurs when somebody double-clicks or enters an item in the
+        bookmark list. """
+        self.comm.set_busy(treeview)
+        
+        newdir = self.comm.get_selected_left()
+        self.comm.set_path(newdir)
+        
+        self.comm.refresh_right()
+        
+        self.comm.set_busy(treeview, False)
+    
     def on_treeview_right_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the file list. """
         if event.button == 3:
