@@ -1,6 +1,12 @@
+2006-08-09  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * olive/frontend/gtk/status.py: fixed a NotBranchError related bug
+    * olive.glade: diff and status window not visible by default
+
 2006-08-08  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
     * olive.glade: some icons redrawn + added 16x16 icons
     * icons/*: some icons redrawn + added 16x16 icons
+    * setup.py: modified respectively
     * olive/frontend/gtk/menu.py: Added left context menu + Bookmark option
     * olive/frontend/gtk/__init__.py: load bookmarks into the left panel
     * olive/frontend/gtk/handler.py: implemented signal handlers for left panel

@@ -30,6 +30,7 @@ except:
     sys.exit(1)
 
 import bzrlib
+import bzrlib.errors as errors
 
 if (bzrlib.version_info[0] == 0) and (bzrlib.version_info[1] < 9):
     # function deprecated after 0.9
@@ -51,6 +52,9 @@ class OliveStatus:
         
         self.dialog = OliveDialog(self.gladefile)
         
+        # Get the Status window widget
+        self.window = self.glade.get_widget('window_status')
+        
         # Check if current location is a branch
         try:
             (self.wt, path) = WorkingTree.open_containing(self.comm.get_path())
@@ -70,9 +74,6 @@ class OliveStatus:
         
         # Set the old working tree
         self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
-        
-        # Get the Diff window widget
-        self.window = self.glade.get_widget('window_status')
         
         # Dictionary for signal_autoconnect
         dic = { "on_button_status_close_clicked": self.close }
@@ -135,6 +136,7 @@ class OliveStatus:
         """ Display the Diff window. """
         if self.notbranch:
             self.dialog.error_dialog('Directory is not a branch.')
+            self.close()
         else:
             self.window.show_all()
 
