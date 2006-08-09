@@ -124,6 +124,12 @@ class OliveHandler:
         move = OliveMove(self.gladefile, self.comm)
         move.display()
     
+    def on_menuitem_file_rename_activate(self, widget):
+        """ File/Rename... menu handler. """
+        from rename import OliveRename
+        rename = OliveRename(self.gladefile, self.comm)
+        rename.display()
+
     def on_menuitem_remove_file_activate(self, widget):
         """ Remove (unversion) selected file. """
         from remove import OliveRemove

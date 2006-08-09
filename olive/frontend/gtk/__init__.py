@@ -65,7 +65,7 @@ class OliveGtk:
                 "on_menuitem_remove_file_activate": handler.on_menuitem_remove_file_activate,
                 "on_menuitem_file_make_directory_activate": handler.on_menuitem_file_make_directory_activate,
                 "on_menuitem_file_move_activate": handler.on_menuitem_file_move_activate,
-                "on_menuitem_file_rename_activate": handler.not_implemented,
+                "on_menuitem_file_rename_activate": handler.on_menuitem_file_rename_activate,
                 "on_menuitem_branch_initialize_activate": handler.on_menuitem_branch_initialize_activate,
                 "on_menuitem_branch_get_activate": handler.on_menuitem_branch_get_activate,
                 "on_menuitem_branch_checkout_activate": handler.on_menuitem_branch_checkout_activate,
