@@ -118,6 +118,12 @@ class OliveHandler:
         mkdir = OliveMkdir(self.gladefile, self.comm)
         mkdir.display()
     
+    def on_menuitem_file_move_activate(self, widget):
+        """ File/Move... menu handler. """
+        from move import OliveMove
+        move = OliveMove(self.gladefile, self.comm)
+        move.display()
+    
     def on_menuitem_remove_file_activate(self, widget):
         """ Remove (unversion) selected file. """
         from remove import OliveRemove

@@ -22,7 +22,8 @@ import bzrlib.errors as errors
 
 from errors import (DirectoryAlreadyExists, MissingArgumentError,
                     MultipleMoveError, NoFilesSpecified, NoMatchingFiles,
-                    NonExistingSource, NotBranchError, NotVersionedError)
+                    NonExistingSource, NotBranchError, NotSameBranchError,
+                    NotVersionedError)
 
 def add(file_list, recursive=False):
     """ Add listed files to the branch. 
@@ -77,7 +78,14 @@ def move(names_list):
     
     if len(names_list) < 2:
         raise MissingArgumentError
-    tree, rel_names = tree_files(names_list)
+    
+    try:
+        tree, rel_names = tree_files(names_list)
+    except errors.NotBranchError:
+        raise NotBranchError
+    except errors.BzrCommandError:
+        # not the same branch presumably
+        raise NotSameBranchError
         
     if os.path.isdir(names_list[-1]):
         # move into existing directory

@@ -1,8 +1,15 @@
 2006-08-09  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive/frontend/gtk/move.py: implemented OliveMove
+    * olive/frontend/gtk/handler.py: added Move signal handler
+    * olive.glade: added Move dialog
+    * olive/backend/errors.py: added NotSameBranchError
+    * olive/backend/fileops.py: added NotBranchError and NotSameBranchError
+      support to move()
     * olive/backend/fileops.py: added NotBranchError support to mkdir()
     * olive/frontend/gtk/mkdir.py: implemented OliveMkdir
     * olive/frontend/gtk/handler.py: added Make directory signal handler
+    * olive.glade: added Make directory dialog
     * olive/backend/update.py: added NotBranchError support to pull()
     * olive/backend/__init__.py: added Branch/Pull signal
     * olive/backend/handler.py: implemented Branch/Pull signal handler

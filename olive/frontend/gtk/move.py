@@ -33,60 +33,54 @@ import olive.backend.fileops as fileops
 
 from dialog import OliveDialog
 
-class OliveMkdir:
-    """ Display the Make directory dialog and perform the needed actions. """
+class OliveMove:
+    """ Display the Move dialog and perform the needed actions. """
     def __init__(self, gladefile, comm):
-        """ Initialize the Make directory dialog. """
+        """ Initialize the Move dialog. """
         self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_mkdir')
+        self.glade = gtk.glade.XML(self.gladefile, 'window_move')
         
         self.comm = comm
         
         self.dialog = OliveDialog(self.gladefile)
         
-        self.window = self.glade.get_widget('window_mkdir')
+        self.window = self.glade.get_widget('window_move')
         
         # Dictionary for signal_autoconnect
-        dic = { "on_button_mkdir_mkdir_clicked": self.mkdir,
-                "on_button_mkdir_cancel_clicked": self.close }
+        dic = { "on_button_move_move_clicked": self.move,
+                "on_button_move_cancel_clicked": self.close }
         
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
+        
+        # Set FileChooser directory
+        self.filechooser = self.glade.get_widget('filechooserbutton_move')
+        self.filechooser.set_filename(self.comm.get_path())
 
     def display(self):
-        """ Display the Make directory dialog. """
+        """ Display the Move dialog. """
         self.window.show_all()
 
-    def mkdir(self, widget):
-        # Get the widgets
-        entry = self.glade.get_widget('entry_mkdir')
-        checkbox = self.glade.get_widget('checkbutton_mkdir_versioned')
-        
-        dirname = entry.get_text()
-        
-        if dirname == "":
-            self.dialog.error_dialog('No directory name given.')
+    def move(self, widget):
+        destination = self.filechooser.get_filename()
+
+        filename = self.comm.get_selected_right()
+            
+        if filename is None:
+            self.dialog.error_dialog('No file was selected.')
             return
         
-        newdir = self.comm.get_path() + '/' + dirname
+        source = self.comm.get_path() + '/' + filename
         
-        if checkbox.get_active():
-            # Want to create a versioned directory
-            try:
-                fileops.mkdir(newdir)
-            except errors.DirectoryAlreadyExists:
-                self.dialog.error_dialog('Directory already exists.')
-                return
-            except errors.NotBranchError:
-                self.dialog.warning_dialog('Directory is not in a branch: not versioned.')
-        else:
-            # Just a simple directory
-            try:
-                os.mkdir(newdir)
-            except OSError, e:
-                if e.errno == 17:
-                    self.dialog.error_dialog('Directory already exists.')
-                    return
+        # Move the file to a directory
+        try:
+            fileops.move([source, destination])
+        except errors.NotBranchError:
+            self.dialog.error_dialog('Selected file is not in a branch.')
+            return
+        except errors.NotSameBranchError:
+            self.dialog.error_dialog('The destination is not in the same branch.')
+            return
 
         self.close()
         self.comm.refresh_right()

@@ -166,6 +166,13 @@ class NotBranchError(OliveError):
         init.checkout()
     """
 
+class NotSameBranchError(OliveError):
+    """ The specified files are not in the same branch
+    
+    May occur in:
+        fileops.move()
+    """
+
 class NotVersionedError(OliveError):
     """ Occurs if the specified file/directory is not in the branch
     
