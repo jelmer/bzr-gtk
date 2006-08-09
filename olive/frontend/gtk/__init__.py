@@ -269,6 +269,11 @@ class OliveCommunicator:
         
         if path is None:
             path = self.get_path()
+        
+        # A workaround for double-clicking Bookmarks
+        if not os.path.exists(path):
+            self.set_busy(self.treeview_right, False)
+            return
 
         # Get ListStore and clear it
         liststore = self.treeview_right.get_model()

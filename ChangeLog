@@ -1,5 +1,6 @@
 2006-08-09  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive/frontend/gtk/__init__.py: fixed the double-click Bookmarks bug
     * olive/frontend/gtk/move.py: implemented OliveMove
     * olive/frontend/gtk/handler.py: added Move signal handler
     * olive.glade: added Move dialog
