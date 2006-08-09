@@ -88,6 +88,17 @@ class OliveGtk:
         # Connect the signals to the handlers
         self.toplevel.signal_autoconnect(dic)
         
+        # Apply window size and position
+        width = self.pref.get_preference('window_width', 'int')
+        height = self.pref.get_preference('window_height', 'int')
+        self.window.resize(width, height)
+        x = self.pref.get_preference('window_x', 'int')
+        y = self.pref.get_preference('window_y', 'int')
+        self.window.move(x, y)
+        # Apply paned position
+        pos = self.pref.get_preference('paned_position', 'int')
+        self.comm.hpaned_main.set_position(pos)
+        
         # Load default data into the panels
         self.treeview_left = self.toplevel.get_widget('treeview_left')
         self.treeview_right = self.toplevel.get_widget('treeview_right')
@@ -140,7 +151,7 @@ class OliveGtk:
         
         # Fill the appropriate lists
         path = self.comm.get_path()
-        dotted_files = self.pref.get_dotted_files()
+        dotted_files = self.pref.get_preference('dotted_files')
         for item in os.listdir(path):
             if not dotted_files and item[0] == '.':
                 continue
@@ -196,6 +207,8 @@ class OliveCommunicator:
         
         # Get the main window
         self.window_main = self.toplevel.get_widget('window_main')
+        # Get the HPaned
+        self.hpaned_main = self.toplevel.get_widget('hpaned_main')
         # Get the TreeViews
         self.treeview_left = self.toplevel.get_widget('treeview_left')
         self.treeview_right = self.toplevel.get_widget('treeview_right')
@@ -283,7 +296,7 @@ class OliveCommunicator:
         files = []
         
         # Fill the appropriate lists
-        dotted_files = self.pref.get_dotted_files()
+        dotted_files = self.pref.get_preference('dotted_files')
         for item in os.listdir(path):
             if not dotted_files and item[0] == '.':
                 continue
@@ -320,8 +333,13 @@ class OlivePreferences:
     def __init__(self):
         """ Initialize the Preferences class. """
         # Some default options
-        self.defaults = { 'strict_commit': False,
-                          'dotted_files' : False }
+        self.defaults = { 'strict_commit' : False,
+                          'dotted_files'  : False,
+                          'window_width'  : 700,
+                          'window_height' : 400,
+                          'window_x'      : 40,
+                          'window_y'      : 40,
+                          'paned_position': 200 }
         
         # Create a config parser object
         self.config = ConfigParser.RawConfigParser()
@@ -365,36 +383,34 @@ class OlivePreferences:
             self.config.write(fp)
             fp.close()
 
-    def get_strict_commit(self):
-        """ Get strict commit preference. """
-        if self.config.has_option('preferences', 'strict_commit'):
-            return self.config.getboolean('preferences', 'strict_commit')
+    def get_preference(self, option, kind='str'):
+        """ Get the value of the given option.
+        
+        :param kind: str/bool/int/float. default: str
+        """
+        if self.config.has_option('preferences', option):
+            if kind == 'bool':
+                return self.config.getboolean('preferences', option)
+            elif kind == 'int':
+                return self.config.getint('preferences', option)
+            elif kind == 'float':
+                return self.config.getfloat('preferences', option)
+            else:
+                return self.config.get('preferences', option)
         else:
-            return self._get_default('strict_commit')
-
-    def set_strict_commit(self, value):
-        """ Set strict commit preference. """
+            try:
+                return self._get_default(option)
+            except KeyError:
+                return None
+    
+    def set_preference(self, option, value):
+        """ Set the value of the given option. """
         if self.config.has_section('preferences'):
-            self.config.set('preferences', 'strict_commit', value)
+            self.config.set('preferences', option, value)
         else:
             self.config.add_section('preferences')
-            self.config.set('preferences', 'strict_commit', value)
-
-    def get_dotted_files(self):
-        """ Get dotted files preference. """
-        if self.config.has_option('preferences', 'dotted_files'):
-            return self.config.getboolean('preferences', 'dotted_files')
-        else:
-            return self._get_default('dotted_files')
-
-    def set_dotted_files(self, value):
-        """ Set dotted files preference. """
-        if self.config.has_section('preferences'):
-            self.config.set('preferences', 'dotted_files', value)
-        else:
-            self.config.add_section('preferences')
-            self.config.set('preferences', 'dotted_files', value)
-
+            self.config.set('preferences', option, value)
+    
     def get_bookmarks(self):
         """ Return the list of bookmarks. """
         bookmarks = self.config.sections()

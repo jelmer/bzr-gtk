@@ -146,7 +146,7 @@ class OliveHandler:
         """ Occurs when somebody right-clicks in the bookmark list. """
         if event.button == 3:
             self.menu.left_context_menu().popup(None, None, None, 0,
-                                                 event.time)
+                                                event.time)
         
     def on_treeview_left_row_activated(self, treeview, path, view_column):
         """ Occurs when somebody double-clicks or enters an item in the
@@ -182,6 +182,15 @@ class OliveHandler:
     
     def on_window_main_delete_event(self, widget, event=None):
         """ Do some stuff before exiting. """
+        width, height = self.comm.window_main.get_size()
+        self.comm.pref.set_preference('window_width', width)
+        self.comm.pref.set_preference('window_height', height)
+        x, y = self.comm.window_main.get_position()
+        self.comm.pref.set_preference('window_x', x)
+        self.comm.pref.set_preference('window_y', y)
+        self.comm.pref.set_preference('paned_position',
+                                      self.comm.hpaned_main.get_position())
+        
         self.comm.pref.write()
         self.comm.window_main.destroy()
 
