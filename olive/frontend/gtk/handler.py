@@ -112,6 +112,12 @@ class OliveHandler:
             self.dialog.info_dialog('Directory successfully initialized.')
             self.comm.refresh_right()
         
+    def on_menuitem_file_make_directory_activate(self, widget):
+        """ File/Make directory... menu handler. """
+        from mkdir import OliveMkdir
+        mkdir = OliveMkdir(self.gladefile, self.comm)
+        mkdir.display()
+    
     def on_menuitem_remove_file_activate(self, widget):
         """ Remove (unversion) selected file. """
         from remove import OliveRemove

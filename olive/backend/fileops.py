@@ -61,8 +61,12 @@ def mkdir(directory):
         if e.errno == 17:
             raise DirectoryAlreadyExists(directory)
     else:
-        wt, dd = WorkingTree.open_containing(directory)
-        wt.add([dd])
+        try:
+            wt, dd = WorkingTree.open_containing(directory)
+        except errors.NotBranchError:
+            raise NotBranchError
+        else:
+            wt.add([dd])
 
 def move(names_list):
     """ Move or rename given files.
