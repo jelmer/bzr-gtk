@@ -29,16 +29,8 @@ except:
 
 import olive.backend.errors as errors
 
-from add import OliveAdd
-from branch import OliveBranch
-from checkout import OliveCheckout
-from commit import OliveCommit
 from dialog import OliveDialog
-from diff import OliveDiff
 from menu import OliveMenu
-from push import OlivePush
-from remove import OliveRemove
-from status import OliveStatus
 
 class OliveHandler:
     """ Signal handler class for Olive. """
@@ -55,31 +47,54 @@ class OliveHandler:
         
     def on_menuitem_add_files_activate(self, widget):
         """ Add file(s)... menu handler. """
+        from add import OliveAdd
         add = OliveAdd(self.gladefile, self.comm)
         add.display()
     
     def on_menuitem_branch_get_activate(self, widget):
         """ Branch/Get... menu handler. """
+        from branch import OliveBranch
         branch = OliveBranch(self.gladefile, self.comm)
         branch.display()
     
     def on_menuitem_branch_checkout_activate(self, widget):
         """ Branch/Checkout... menu handler. """
+        from checkout import OliveCheckout
         checkout = OliveCheckout(self.gladefile, self.comm)
         checkout.display()
     
     def on_menuitem_branch_commit_activate(self, widget):
         """ Branch/Commit... menu handler. """
+        from commit import OliveCommit
         commit = OliveCommit(self.gladefile, self.comm)
         commit.display()
     
+    def on_menuitem_branch_pull_activate(self, widget):
+        """ Branch/Pull menu handler. """
+        import olive.backend.update as update
+        
+        self.comm.set_busy(self.comm.window_main)
+        
+        try:
+            ret = update.pull(self.comm.get_path())
+        except errors.NotBranchError:
+            self.dialog.error_dialog('Directory is not a branch.')
+        except errors.NoLocationKnown:
+            self.dialog.error_dialog('Parent location is unknown.')
+        else:
+            self.dialog.info_dialog('%d revision(s) pulled.' % ret)
+        
+        self.comm.set_busy(self.comm.window_main, False)
+    
     def on_menuitem_branch_push_activate(self, widget):
         """ Branch/Push... menu handler. """
+        from push import OlivePush
         push = OlivePush(self.gladefile, self.comm)
         push.display()
     
     def on_menuitem_branch_status_activate(self, widget):
         """ Branch/Status... menu handler. """
+        from status import OliveStatus
         status = OliveStatus(self.gladefile, self.comm)
         status.display()
     
@@ -99,11 +114,13 @@ class OliveHandler:
         
     def on_menuitem_remove_file_activate(self, widget):
         """ Remove (unversion) selected file. """
+        from remove import OliveRemove
         remove = OliveRemove(self.gladefile, self.comm)
         remove.display()
     
     def on_menuitem_stats_diff_activate(self, widget):
         """ Statistics/Differences... menu handler. """
+        from diff import OliveDiff
         diff = OliveDiff(self.gladefile, self.comm)
         diff.display()
     

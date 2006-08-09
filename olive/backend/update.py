@@ -20,7 +20,7 @@ import bzrlib.errors as errors
 
 from bzrlib.workingtree import WorkingTree
 
-from errors import NoLocationKnown
+from errors import NoLocationKnown, NotBranchError
 
 def missing(branch, other_branch=None, reverse=False):
     """ Get the number of missing or extra revisions of local branch.
@@ -108,7 +108,12 @@ def pull(branch, location=None, remember=False, overwrite=False, revision=None):
         branch_to = tree_to.branch
     except errors.NoWorkingTree:
         tree_to = None
-        branch_to = Branch.open_containing(branch)[0]
+        try:
+            branch_to = Branch.open_containing(branch)[0]
+        except errors.NotBranchError:
+            raise NotBranchError(location)
+    except errors.NotBranchError:
+        raise NotBranchError(location)
 
     reader = None
     if location is not None:
