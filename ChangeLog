@@ -1,5 +1,10 @@
 2006-08-10  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive/frontend/gtk/log.py: implemented OliveLog (calls BzrkApp)
+    * olive/frontend/gtk/viz/diffwin.py: made it bzrlib 0.9 API compatible
+    * olive/frontend/gtk/viz/bzrkapp.py: don't quit main loop
+    * olive/frontend/gtk/viz: added bzrk codebase for Log functionality
+    * setup.py: added olive.frontend.gtk.viz package
     * olive/backend/info_helper.py: made it 0.9 API compatible
     * olive/backend/info.py: small bug fixed
     * olive/frontend/gtk/info.py: implemented Information window

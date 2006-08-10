@@ -148,6 +148,12 @@ class OliveHandler:
         info = OliveInfo(self.gladefile, self.comm)
         info.display()
     
+    def on_menuitem_stats_log_activate(self, widget):
+        """ Statistics/Log... menu handler. """
+        from log import OliveLog
+        log = OliveLog(self.gladefile, self.comm)
+        log.display()
+    
     def on_treeview_left_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the bookmark list. """
         if event.button == 3:
