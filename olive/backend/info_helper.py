@@ -1,24 +1,25 @@
 # Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
 # Some parts of the code are:
 # Copyright (C) 2005, 2006 by Canonical Ltd
-
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
-
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import time
 
-import bzrlib.diff as diff
+import bzrlib
+
 import bzrlib.osutils as osutils
 
 from bzrlib.info import _repo_relpath
@@ -145,7 +146,7 @@ def get_missing_revisions_branch(branch):
     if master:
         local_extra, remote_extra = find_unmerged(branch, master)
         if remote_extra:
-            ret['missing'] = len(remote_extra)
+            ret = len(remote_extra)
     
     return ret
 
@@ -155,18 +156,27 @@ def get_missing_revisions_working(working):
     
     :return: a dictionary containing the needed infos
     """
+    if (bzrlib.version_info[0] == 0) and (bzrlib.version_info[1] < 9):
+        # function deprecated after 0.9
+        from bzrlib.delta import compare_trees
+
     ret = {}
     branch = working.branch
     basis = working.basis_tree()
     work_inv = working.inventory
-    delta = diff.compare_trees(basis, working, want_unchanged=True)
+    
+    if (bzrlib.version_info[0] == 0) and (bzrlib.version_info[1] < 9):
+        delta = compare_trees(basis, working, want_unchanged=True)
+    else:
+        delta = working.changes_from(basis, want_unchanged=True)
+
     history = branch.revision_history()
     tree_last_id = working.last_revision()
 
     if len(history) and tree_last_id != history[-1]:
         tree_last_revno = branch.revision_id_to_revno(tree_last_id)
         missing_count = len(history) - tree_last_revno
-        ret['missing'] = missing_count
+        ret = missing_count
     
     return ret
 
@@ -176,10 +186,18 @@ def get_working_stats(working):
     
     :return: a dictionary containing the needed infos
     """
+    if (bzrlib.version_info[0] == 0) and (bzrlib.version_info[1] < 9):
+        # function deprecated after 0.9
+        from bzrlib.delta import compare_trees
+    
     ret = {}
     basis = working.basis_tree()
     work_inv = working.inventory
-    delta = diff.compare_trees(basis, working, want_unchanged=True)
+    
+    if (bzrlib.version_info[0] == 0) and (bzrlib.version_info[1] < 9):
+        delta = compare_trees(basis, working, want_unchanged=True)
+    else:
+        delta = working.changes_from(basis, want_unchanged=True)
 
     ret['unchanged'] = len(delta.unchanged)
     ret['modified'] = len(delta.modified)

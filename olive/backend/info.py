@@ -1,17 +1,17 @@
 # Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
 # Some parts of the code are:
 # Copyright (C) 2005, 2006 by Canonical Ltd
-
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
-
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -160,8 +160,8 @@ def info(location):
     ret['locking']['workingtree']: Working tree lock status
     ret['locking']['branch']: Branch lock status
     ret['locking']['repository']: Repository lock status
-    ret['mrevbranch']['missing']: Missing revisions in branch
-    ret['mrevworking']['missing']: Missing revisions in working tree
+    ret['missing']['branch']: Missing revisions in branch
+    ret['missing']['workingtree']: Missing revisions in working tree
     ret['wtstats']['unchanged']: Unchanged files
     ret['wtstats']['modified']: Modified files
     ret['wtstats']['added']: Added files
@@ -183,7 +183,11 @@ def info(location):
     import info_helper
     
     ret = {}
-    a_bzrdir = bzrdir.BzrDir.open_containing(location)[0]
+    try:
+        a_bzrdir = bzrdir.BzrDir.open_containing(location)[0]
+    except errors.NotBranchError:
+        raise NotBranchError(location)
+
     try:
         working = a_bzrdir.open_workingtree()
         working.lock_read()
@@ -191,13 +195,14 @@ def info(location):
             branch = working.branch
             repository = branch.repository
             control = working.bzrdir
-
+            
             ret['location'] = info_helper.get_location_info(repository, branch, working)
             ret['related'] = info_helper.get_related_info(branch)
             ret['format'] = info_helper.get_format_info(control, repository, branch, working)
             ret['locking'] = info_helper.get_locking_info(repository, branch, working)
-            ret['mrevbranch'] = info_helper.get_missing_revisions_branch(branch)
-            ret['mrevworking'] = info_helper.get_missing_revisions_working(working)
+            ret['missing'] = {}
+            ret['missing']['branch'] = info_helper.get_missing_revisions_branch(branch)
+            ret['missing']['workingtree'] = info_helper.get_missing_revisions_working(working)
             ret['wtstats'] = info_helper.get_working_stats(working)
             ret['brstats'] = info_helper.get_branch_stats(branch)
             ret['repstats'] = info_helper.get_repository_stats(repository)
@@ -216,7 +221,7 @@ def info(location):
             ret['related'] = info_helper.get_related_info(branch)
             ret['format'] = info_helper.get_format_info(control, repository, branch)
             ret['locking'] = info_helper.get_locking_info(repository, branch)
-            ret['mrevbranch'] = info_helper.get_missing_revisions_branch(branch)
+            ret['missing']['branch'] = info_helper.get_missing_revisions_branch(branch)
             ret['brstats'] = info_helper.get_branch_stats(branch)
             ret['repstats'] = info_helper.get_repository_stats(repository)
         finally:

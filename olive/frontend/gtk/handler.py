@@ -142,6 +142,12 @@ class OliveHandler:
         diff = OliveDiff(self.gladefile, self.comm)
         diff.display()
     
+    def on_menuitem_stats_infos_activate(self, widget):
+        """ Statistics/Informations... menu handler. """
+        from info import OliveInfo
+        info = OliveInfo(self.gladefile, self.comm)
+        info.display()
+    
     def on_treeview_left_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the bookmark list. """
         if event.button == 3:

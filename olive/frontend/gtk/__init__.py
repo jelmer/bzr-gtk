@@ -75,7 +75,7 @@ class OliveGtk:
                 "on_menuitem_branch_status_activate": handler.on_menuitem_branch_status_activate,
                 "on_menuitem_stats_diff_activate": handler.on_menuitem_stats_diff_activate,
                 "on_menuitem_stats_log_activate": handler.not_implemented,
-                "on_menuitem_stats_infos_activate": handler.not_implemented,
+                "on_menuitem_stats_infos_activate": handler.on_menuitem_stats_infos_activate,
                 "on_toolbutton_update_clicked": handler.not_implemented,
                 "on_toolbutton_commit_clicked": handler.on_menuitem_branch_commit_activate,
                 "on_toolbutton_pull_clicked": handler.on_menuitem_branch_pull_activate,

@@ -1,3 +1,11 @@
+2006-08-10  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * olive/backend/info_helper.py: made it 0.9 API compatible
+    * olive/backend/info.py: small bug fixed
+    * olive/frontend/gtk/info.py: implemented Information window
+    * olive.glade: added Informations window
+    * Olive is two months old!
+
 2006-08-09  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * olive/frontend/gtk/__init__.py: simplified preference handling
