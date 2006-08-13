@@ -834,13 +834,27 @@
       <child>
 	<widget class="GtkHButtonBox" id="hbuttonbox_commit">
 	  <property name="visible">True</property>
-	  <property name="layout_style">GTK_BUTTONBOX_SPREAD</property>
-	  <property name="spacing">0</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
+	  <property name="spacing">3</property>
+
+	  <child>
+	    <widget class="GtkButton" id="button_commit_cancel">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-cancel</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
+	      <signal name="clicked" handler="on_button_commit_cancel_clicked" last_modification_time="Fri, 21 Jul 2006 15:04:52 GMT"/>
+	    </widget>
+	  </child>
 
 	  <child>
 	    <widget class="GtkButton" id="button_commit_commit">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
+	      <property name="has_default">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
@@ -909,19 +923,6 @@
 		  </child>
 		</widget>
 	      </child>
-	    </widget>
-	  </child>
-
-	  <child>
-	    <widget class="GtkButton" id="button_commit_cancel">
-	      <property name="visible">True</property>
-	      <property name="can_default">True</property>
-	      <property name="can_focus">True</property>
-	      <property name="label">gtk-cancel</property>
-	      <property name="use_stock">True</property>
-	      <property name="relief">GTK_RELIEF_NORMAL</property>
-	      <property name="focus_on_click">True</property>
-	      <signal name="clicked" handler="on_button_commit_cancel_clicked" last_modification_time="Fri, 21 Jul 2006 15:04:52 GMT"/>
 	    </widget>
 	  </child>
 	</widget>
@@ -1123,13 +1124,27 @@
       <child>
 	<widget class="GtkHButtonBox" id="hbuttonbox_branch">
 	  <property name="visible">True</property>
-	  <property name="layout_style">GTK_BUTTONBOX_SPREAD</property>
-	  <property name="spacing">0</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
+	  <property name="spacing">3</property>
+
+	  <child>
+	    <widget class="GtkButton" id="button_branch_cancel">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-cancel</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
+	      <signal name="clicked" handler="on_button_branch_cancel_clicked" last_modification_time="Mon, 17 Jul 2006 16:26:15 GMT"/>
+	    </widget>
+	  </child>
 
 	  <child>
 	    <widget class="GtkButton" id="button_branch_branch">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
+	      <property name="has_default">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
@@ -1198,19 +1213,6 @@
 		  </child>
 		</widget>
 	      </child>
-	    </widget>
-	  </child>
-
-	  <child>
-	    <widget class="GtkButton" id="button_branch_cancel">
-	      <property name="visible">True</property>
-	      <property name="can_default">True</property>
-	      <property name="can_focus">True</property>
-	      <property name="label">gtk-cancel</property>
-	      <property name="use_stock">True</property>
-	      <property name="relief">GTK_RELIEF_NORMAL</property>
-	      <property name="focus_on_click">True</property>
-	      <signal name="clicked" handler="on_button_branch_cancel_clicked" last_modification_time="Mon, 17 Jul 2006 16:26:15 GMT"/>
 	    </widget>
 	  </child>
 	</widget>
@@ -1328,13 +1330,27 @@
       <child>
 	<widget class="GtkHButtonBox" id="hbuttonbox_add">
 	  <property name="visible">True</property>
-	  <property name="layout_style">GTK_BUTTONBOX_DEFAULT_STYLE</property>
-	  <property name="spacing">0</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
+	  <property name="spacing">3</property>
+
+	  <child>
+	    <widget class="GtkButton" id="button_add_cancel">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-cancel</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
+	      <signal name="clicked" handler="on_button_add_cancel_clicked" last_modification_time="Fri, 21 Jul 2006 11:37:02 GMT"/>
+	    </widget>
+	  </child>
 
 	  <child>
 	    <widget class="GtkButton" id="button_add_add">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
+	      <property name="has_default">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
@@ -1403,19 +1419,6 @@
 		  </child>
 		</widget>
 	      </child>
-	    </widget>
-	  </child>
-
-	  <child>
-	    <widget class="GtkButton" id="button_add_cancel">
-	      <property name="visible">True</property>
-	      <property name="can_default">True</property>
-	      <property name="can_focus">True</property>
-	      <property name="label">gtk-cancel</property>
-	      <property name="use_stock">True</property>
-	      <property name="relief">GTK_RELIEF_NORMAL</property>
-	      <property name="focus_on_click">True</property>
-	      <signal name="clicked" handler="on_button_add_cancel_clicked" last_modification_time="Fri, 21 Jul 2006 11:37:02 GMT"/>
 	    </widget>
 	  </child>
 	</widget>
@@ -1520,13 +1523,27 @@
       <child>
 	<widget class="GtkHButtonBox" id="hbuttonbox_remove">
 	  <property name="visible">True</property>
-	  <property name="layout_style">GTK_BUTTONBOX_DEFAULT_STYLE</property>
-	  <property name="spacing">0</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
+	  <property name="spacing">3</property>
+
+	  <child>
+	    <widget class="GtkButton" id="button_remove_cancel">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-cancel</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
+	      <signal name="clicked" handler="on_button_remove_cancel_clicked" last_modification_time="Fri, 21 Jul 2006 14:22:58 GMT"/>
+	    </widget>
+	  </child>
 
 	  <child>
 	    <widget class="GtkButton" id="button_remove_remove">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
+	      <property name="has_default">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
@@ -1595,19 +1612,6 @@
 		  </child>
 		</widget>
 	      </child>
-	    </widget>
-	  </child>
-
-	  <child>
-	    <widget class="GtkButton" id="button_remove_cancel">
-	      <property name="visible">True</property>
-	      <property name="can_default">True</property>
-	      <property name="can_focus">True</property>
-	      <property name="label">gtk-cancel</property>
-	      <property name="use_stock">True</property>
-	      <property name="relief">GTK_RELIEF_NORMAL</property>
-	      <property name="focus_on_click">True</property>
-	      <signal name="clicked" handler="on_button_remove_cancel_clicked" last_modification_time="Fri, 21 Jul 2006 14:22:58 GMT"/>
 	    </widget>
 	  </child>
 	</widget>
@@ -1782,13 +1786,27 @@
       <child>
 	<widget class="GtkHButtonBox" id="hbuttonbox_push">
 	  <property name="visible">True</property>
-	  <property name="layout_style">GTK_BUTTONBOX_SPREAD</property>
-	  <property name="spacing">0</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
+	  <property name="spacing">3</property>
+
+	  <child>
+	    <widget class="GtkButton" id="button_push_cancel">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-cancel</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
+	      <signal name="clicked" handler="on_button_push_cancel_clicked" last_modification_time="Fri, 21 Jul 2006 16:38:55 GMT"/>
+	    </widget>
+	  </child>
 
 	  <child>
 	    <widget class="GtkButton" id="button_push_push">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
+	      <property name="has_default">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
@@ -1857,19 +1875,6 @@
 		  </child>
 		</widget>
 	      </child>
-	    </widget>
-	  </child>
-
-	  <child>
-	    <widget class="GtkButton" id="button_push_cancel">
-	      <property name="visible">True</property>
-	      <property name="can_default">True</property>
-	      <property name="can_focus">True</property>
-	      <property name="label">gtk-cancel</property>
-	      <property name="use_stock">True</property>
-	      <property name="relief">GTK_RELIEF_NORMAL</property>
-	      <property name="focus_on_click">True</property>
-	      <signal name="clicked" handler="on_button_push_cancel_clicked" last_modification_time="Fri, 21 Jul 2006 16:38:55 GMT"/>
 	    </widget>
 	  </child>
 	</widget>
@@ -2093,13 +2098,27 @@
       <child>
 	<widget class="GtkHButtonBox" id="hbuttonbox_checkout">
 	  <property name="visible">True</property>
-	  <property name="layout_style">GTK_BUTTONBOX_SPREAD</property>
-	  <property name="spacing">0</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
+	  <property name="spacing">3</property>
+
+	  <child>
+	    <widget class="GtkButton" id="button_checkout_cancel">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-cancel</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
+	      <signal name="clicked" handler="on_button_checkout_cancel_clicked" last_modification_time="Mon, 31 Jul 2006 16:44:19 GMT"/>
+	    </widget>
+	  </child>
 
 	  <child>
 	    <widget class="GtkButton" id="button_checkout_checkout">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
+	      <property name="has_default">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
@@ -2168,19 +2187,6 @@
 		  </child>
 		</widget>
 	      </child>
-	    </widget>
-	  </child>
-
-	  <child>
-	    <widget class="GtkButton" id="button_checkout_cancel">
-	      <property name="visible">True</property>
-	      <property name="can_default">True</property>
-	      <property name="can_focus">True</property>
-	      <property name="label">gtk-cancel</property>
-	      <property name="use_stock">True</property>
-	      <property name="relief">GTK_RELIEF_NORMAL</property>
-	      <property name="focus_on_click">True</property>
-	      <signal name="clicked" handler="on_button_checkout_cancel_clicked" last_modification_time="Mon, 31 Jul 2006 16:44:19 GMT"/>
 	    </widget>
 	  </child>
 	</widget>
@@ -2284,13 +2290,14 @@
       <child>
 	<widget class="GtkHButtonBox" id="hbuttonbox_diff">
 	  <property name="visible">True</property>
-	  <property name="layout_style">GTK_BUTTONBOX_DEFAULT_STYLE</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
 	  <property name="spacing">0</property>
 
 	  <child>
 	    <widget class="GtkButton" id="button_diff_close">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
+	      <property name="has_default">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="label">gtk-close</property>
 	      <property name="use_stock">True</property>
@@ -2368,13 +2375,14 @@
       <child>
 	<widget class="GtkHButtonBox" id="hbuttonbox_status">
 	  <property name="visible">True</property>
-	  <property name="layout_style">GTK_BUTTONBOX_DEFAULT_STYLE</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
 	  <property name="spacing">0</property>
 
 	  <child>
 	    <widget class="GtkButton" id="button_status_close">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
+	      <property name="has_default">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="label">gtk-close</property>
 	      <property name="use_stock">True</property>
@@ -2391,27 +2399,6 @@
 	</packing>
       </child>
     </widget>
-  </child>
-</widget>
-
-<widget class="GtkWindow" id="window_log">
-  <property name="visible">True</property>
-  <property name="title" translatable="yes">Olive - Log</property>
-  <property name="type">GTK_WINDOW_TOPLEVEL</property>
-  <property name="window_position">GTK_WIN_POS_NONE</property>
-  <property name="modal">False</property>
-  <property name="resizable">True</property>
-  <property name="destroy_with_parent">False</property>
-  <property name="decorated">True</property>
-  <property name="skip_taskbar_hint">False</property>
-  <property name="skip_pager_hint">False</property>
-  <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
-  <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
-  <property name="focus_on_map">True</property>
-  <property name="urgency_hint">False</property>
-
-  <child>
-    <placeholder/>
   </child>
 </widget>
 
@@ -2481,13 +2468,27 @@
       <child>
 	<widget class="GtkHButtonBox" id="hbuttonbox_mkdir">
 	  <property name="visible">True</property>
-	  <property name="layout_style">GTK_BUTTONBOX_SPREAD</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
 	  <property name="spacing">3</property>
+
+	  <child>
+	    <widget class="GtkButton" id="button_mkdir_cancel">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-cancel</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
+	      <signal name="clicked" handler="on_button_mkdir_cancel_clicked" last_modification_time="Wed, 09 Aug 2006 12:33:49 GMT"/>
+	    </widget>
+	  </child>
 
 	  <child>
 	    <widget class="GtkButton" id="button_mkdir_mkdir">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
+	      <property name="has_default">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
@@ -2556,19 +2557,6 @@
 		  </child>
 		</widget>
 	      </child>
-	    </widget>
-	  </child>
-
-	  <child>
-	    <widget class="GtkButton" id="button_mkdir_cancel">
-	      <property name="visible">True</property>
-	      <property name="can_default">True</property>
-	      <property name="can_focus">True</property>
-	      <property name="label">gtk-cancel</property>
-	      <property name="use_stock">True</property>
-	      <property name="relief">GTK_RELIEF_NORMAL</property>
-	      <property name="focus_on_click">True</property>
-	      <signal name="clicked" handler="on_button_mkdir_cancel_clicked" last_modification_time="Wed, 09 Aug 2006 12:33:49 GMT"/>
 	    </widget>
 	  </child>
 	</widget>
@@ -2664,13 +2652,27 @@
       <child>
 	<widget class="GtkHButtonBox" id="hbuttonbox_move">
 	  <property name="visible">True</property>
-	  <property name="layout_style">GTK_BUTTONBOX_SPREAD</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
 	  <property name="spacing">3</property>
+
+	  <child>
+	    <widget class="GtkButton" id="button_move_cancel">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-cancel</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
+	      <signal name="clicked" handler="on_button_move_cancel_clicked" last_modification_time="Wed, 09 Aug 2006 13:35:11 GMT"/>
+	    </widget>
+	  </child>
 
 	  <child>
 	    <widget class="GtkButton" id="button_move_move">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
+	      <property name="has_default">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
@@ -2739,19 +2741,6 @@
 		  </child>
 		</widget>
 	      </child>
-	    </widget>
-	  </child>
-
-	  <child>
-	    <widget class="GtkButton" id="button_move_cancel">
-	      <property name="visible">True</property>
-	      <property name="can_default">True</property>
-	      <property name="can_focus">True</property>
-	      <property name="label">gtk-cancel</property>
-	      <property name="use_stock">True</property>
-	      <property name="relief">GTK_RELIEF_NORMAL</property>
-	      <property name="focus_on_click">True</property>
-	      <signal name="clicked" handler="on_button_move_cancel_clicked" last_modification_time="Wed, 09 Aug 2006 13:35:11 GMT"/>
 	    </widget>
 	  </child>
 	</widget>
@@ -2849,13 +2838,27 @@
       <child>
 	<widget class="GtkHButtonBox" id="hbuttonbox_rename">
 	  <property name="visible">True</property>
-	  <property name="layout_style">GTK_BUTTONBOX_SPREAD</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
 	  <property name="spacing">3</property>
+
+	  <child>
+	    <widget class="GtkButton" id="button_rename_cancel">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-cancel</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
+	      <signal name="clicked" handler="on_button_rename_cancel_clicked" last_modification_time="Wed, 09 Aug 2006 14:29:00 GMT"/>
+	    </widget>
+	  </child>
 
 	  <child>
 	    <widget class="GtkButton" id="button_rename_rename">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
+	      <property name="has_default">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
@@ -2924,19 +2927,6 @@
 		  </child>
 		</widget>
 	      </child>
-	    </widget>
-	  </child>
-
-	  <child>
-	    <widget class="GtkButton" id="button_rename_cancel">
-	      <property name="visible">True</property>
-	      <property name="can_default">True</property>
-	      <property name="can_focus">True</property>
-	      <property name="label">gtk-cancel</property>
-	      <property name="use_stock">True</property>
-	      <property name="relief">GTK_RELIEF_NORMAL</property>
-	      <property name="focus_on_click">True</property>
-	      <signal name="clicked" handler="on_button_rename_cancel_clicked" last_modification_time="Wed, 09 Aug 2006 14:29:00 GMT"/>
 	    </widget>
 	  </child>
 	</widget>
@@ -5109,8 +5099,10 @@
       <child>
 	<widget class="GtkHButtonBox" id="hbuttonbox_info">
 	  <property name="visible">True</property>
-	  <property name="layout_style">GTK_BUTTONBOX_DEFAULT_STYLE</property>
-	  <property name="spacing">3</property>
+	  <property name="can_default">True</property>
+	  <property name="has_default">True</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
+	  <property name="spacing">0</property>
 
 	  <child>
 	    <widget class="GtkButton" id="button_info_close">

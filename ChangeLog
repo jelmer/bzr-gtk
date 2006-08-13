@@ -1,3 +1,10 @@
+2006-08-13  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * olive.glade: some GNOME HIG-compilant changes:
+       - place OK buttons to the right side
+       - align buttons to the right
+       - specify default buttons
+
 2006-08-10  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * olive/frontend/gtk/log.py: implemented OliveLog (calls BzrkApp)
