@@ -32,6 +32,8 @@ import olive.backend.commit as commit
 import olive.backend.errors as errors
 import olive.backend.info as info
 
+from dialog import OliveDialog
+
 class OlivePush:
     """ Display Push dialog and perform the needed actions. """
     def __init__(self, gladefile, comm):
@@ -40,6 +42,7 @@ class OlivePush:
         self.glade = gtk.glade.XML(self.gladefile, 'window_push')
         
         self.comm = comm
+        self.dialog = OliveDialog(self.gladefile)
         
         self.window = self.glade.get_widget('window_push')
         
@@ -60,14 +63,24 @@ class OlivePush:
         self.check_create = self.glade.get_widget('checkbutton_push_create')
         
         # Get stored location
-        loc = info.get_push_location(self.comm.get_path())
-        if loc != '':
+        self.notbranch = False
+        try:
+            loc = info.get_push_location(self.comm.get_path())
+        except errors.NotBranchError:
+            self.notbranch = True
+            return
+
+        if loc is not None:
             self.entry_stored.set_text(loc)
     
     def display(self):
         """ Display the Push dialog. """
-        self.window.show()
-        self.width, self.height = self.window.get_size()
+        if self.notbranch:
+            self.dialog.error_dialog('Directory is not a branch.')
+            self.close()
+        else:
+            self.window.show()
+            self.width, self.height = self.window.get_size()
     
     def stored_toggled(self, widget):
         if widget.get_active():
@@ -95,9 +108,6 @@ class OlivePush:
             self.check_create.hide()
     
     def push(self, widget):
-        from dialog import OliveDialog
-        dialog = OliveDialog(self.gladefile)
-        
         radio_stored = self.glade.get_widget('radiobutton_push_stored')
         radio_specific = self.glade.get_widget('radiobutton_push_specific')
         
@@ -108,23 +118,23 @@ class OlivePush:
                 revs = commit.push(self.comm.get_path(),
                                    overwrite=self.check_overwrite.get_active())
             except errors.NotBranchError:
-                dialog.error_dialog('Directory is not a branch.')
+                self.dialog.error_dialog('Directory is not a branch.')
                 return
             except errors.NoLocationKnown:
-                dialog.error_dialog('No location known.')
+                self.dialog.error_dialog('No location known.')
                 return
             except errors.NonExistingParent, errmsg:
-                dialog.error_dialog('Parent directory doesn\'t exist: %s', errmsg)
+                self.dialog.error_dialog('Parent directory doesn\'t exist: %s', errmsg)
                 return
             except errors.DivergedBranchesError:
-                dialog.error_dialog('Branches have been diverged.')
+                self.dialog.error_dialog('Branches have been diverged.')
                 return
             except:
                 raise
         elif radio_specific.get_active():
             location = self.entry_location.get_text()
             if location == '':
-                dialog.error_dialog('No location specified.')
+                self.dialog.error_dialog('No location specified.')
                 return
             
             try:
@@ -133,19 +143,19 @@ class OlivePush:
                                    self.check_overwrite.get_active(),
                                    self.check_create.get_active())
             except errors.NotBranchError:
-                dialog.error_dialog('Directory is not a branch.')
+                self.dialog.error_dialog('Directory is not a branch.')
                 self.comm.set_busy(self.window, False)
                 return
             except errors.NonExistingParent, errmsg:
-                dialog.error_dialog('Parent directory doesn\'t exist: %s', errmsg)
+                self.dialog.error_dialog('Parent directory doesn\'t exist: %s', errmsg)
                 self.comm.set_busy(self.window, False)
                 return
             except errors.DivergedBranchesError:
-                dialog.error_dialog('Branches have been diverged.')
+                self.dialog.error_dialog('Branches have been diverged.')
                 self.comm.set_busy(self.window, False)
                 return
             except errors.PathPrefixNotCreated:
-                dialog.error_dialog('Path prefix couldn\'t be created.')
+                self.dialog.error_dialog('Path prefix couldn\'t be created.')
                 self.comm.set_busy(self.window, False)
                 return
             except:
@@ -155,7 +165,7 @@ class OlivePush:
             pass
         
         self.close()
-        dialog.info_dialog('%d revision(s) pushed.' % revs)
+        self.dialog.info_dialog('%d revision(s) pushed.' % revs)
     
     def close(self, widget=None):
         self.window.destroy()

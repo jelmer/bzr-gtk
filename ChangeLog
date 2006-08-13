@@ -1,5 +1,9 @@
 2006-08-13  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * TODO: some more items added
+    * olive.glade: Push window should not be visible by default
+    * olive/frontend/gtk/push.py: fixed a bug if no push location known; user
+      gets an error if directory is not a branch
     * olive.glade: some GNOME HIG-compilant changes:
        - place OK buttons to the right side
        - align buttons to the right
