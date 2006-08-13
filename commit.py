@@ -19,7 +19,11 @@ pygtk.require("2.0")
 import gobject
 import gtk
 import pango
-from bzrlib.delta import compare_trees
+
+import bzrlib
+if bzrlib.version_info < (0, 9):
+    # function deprecated in 0.9
+    from bzrlib.delta import compare_trees
 
 class GCommitDialog(gtk.Dialog):
     """ Commit Dialog """
@@ -31,7 +35,10 @@ class GCommitDialog(gtk.Dialog):
 
         self.old_tree = tree.branch.repository.revision_tree(tree.branch.last_revision())
         self.pending_merges = tree.pending_merges()
-        self.delta = compare_trees(self.old_tree, tree)
+        if bzrlib.version_info < (0, 9):
+            self.delta = compare_trees(self.old_tree, tree)
+        else:
+            self.delta = tree.changes_from(self.old_tree)
 
         self._create()
 
