@@ -31,18 +31,17 @@ except:
 import olive.backend.errors as errors
 import olive.backend.fileops as fileops
 
-from dialog import OliveDialog
-
 class OliveRename:
     """ Display the Rename dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm):
+    def __init__(self, gladefile, comm, dialog):
         """ Initialize the Rename dialog. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_rename')
         
+        # Communication object
         self.comm = comm
-        
-        self.dialog = OliveDialog(self.gladefile)
+        # Dialog object
+        self.dialog = dialog
         
         self.window = self.glade.get_widget('window_rename')
         
@@ -65,11 +64,13 @@ class OliveRename:
         new_filename = entry.get_text()
             
         if old_filename is None:
-            self.dialog.error_dialog('No file was selected.')
+            self.dialog.error_dialog('No file was selected',
+                                     'Please select a file from the list to proceed.')
             return
         
         if new_filename == "":
-            self.dialog.error_dialog('New filename not specified.')
+            self.dialog.error_dialog('Filename not given',
+                                     'Please specify a new name for the file.')
             return
         
         source = self.comm.get_path() + '/' + old_filename
@@ -79,11 +80,15 @@ class OliveRename:
         try:
             fileops.rename(source, destination)
         except errors.NotBranchError:
-            self.dialog.error_dialog('Selected file is not in a branch.')
+            self.dialog.error_dialog('File is not in a branch',
+                                     'The selected file is not in a branch.')
             return
         except errors.NotSameBranchError:
-            self.dialog.error_dialog('The destination is not in the same branch.')
+            self.dialog.error_dialog('Not the same branch',
+                                     'The destination is not in the same branch.')
             return
+        except:
+            raise
 
         self.close()
         self.comm.refresh_right()

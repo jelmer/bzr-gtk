@@ -1,5 +1,9 @@
 2006-08-13  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive/frontend/gtk/branch.py: display number of revisions branched
+    * olive/frontend/gtk/*: use new dialog interface with detailed descriptions
+    * olive/frontend/gtk/dialog.py: modified according to GNOME HIG (primary
+      and secondary text)
     * TODO: some more items added
     * olive.glade: Push window should not be visible by default
     * olive/frontend/gtk/push.py: fixed a bug if no push location known; user

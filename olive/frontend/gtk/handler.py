@@ -48,25 +48,25 @@ class OliveHandler:
     def on_menuitem_add_files_activate(self, widget):
         """ Add file(s)... menu handler. """
         from add import OliveAdd
-        add = OliveAdd(self.gladefile, self.comm)
+        add = OliveAdd(self.gladefile, self.comm, self.dialog)
         add.display()
     
     def on_menuitem_branch_get_activate(self, widget):
         """ Branch/Get... menu handler. """
         from branch import OliveBranch
-        branch = OliveBranch(self.gladefile, self.comm)
+        branch = OliveBranch(self.gladefile, self.comm, self.dialog)
         branch.display()
     
     def on_menuitem_branch_checkout_activate(self, widget):
         """ Branch/Checkout... menu handler. """
         from checkout import OliveCheckout
-        checkout = OliveCheckout(self.gladefile, self.comm)
+        checkout = OliveCheckout(self.gladefile, self.comm, self.dialog)
         checkout.display()
     
     def on_menuitem_branch_commit_activate(self, widget):
         """ Branch/Commit... menu handler. """
         from commit import OliveCommit
-        commit = OliveCommit(self.gladefile, self.comm)
+        commit = OliveCommit(self.gladefile, self.comm, self.dialog)
         commit.display()
     
     def on_menuitem_branch_pull_activate(self, widget):
@@ -78,24 +78,27 @@ class OliveHandler:
         try:
             ret = update.pull(self.comm.get_path())
         except errors.NotBranchError:
-            self.dialog.error_dialog('Directory is not a branch.')
+            self.dialog.error_dialog('Directory is not a branch',
+                                     'You can perform this action only in a branch.')
         except errors.NoLocationKnown:
-            self.dialog.error_dialog('Parent location is unknown.')
+            self.dialog.error_dialog('Parent location is unknown',
+                                     'Pulling is not possible until there is no parent location.')
         else:
-            self.dialog.info_dialog('%d revision(s) pulled.' % ret)
+            self.dialog.info_dialog('Pull successful',
+                                    '%d revision(s) pulled.' % ret)
         
         self.comm.set_busy(self.comm.window_main, False)
     
     def on_menuitem_branch_push_activate(self, widget):
         """ Branch/Push... menu handler. """
         from push import OlivePush
-        push = OlivePush(self.gladefile, self.comm)
+        push = OlivePush(self.gladefile, self.comm, self.dialog)
         push.display()
     
     def on_menuitem_branch_status_activate(self, widget):
         """ Branch/Status... menu handler. """
         from status import OliveStatus
-        status = OliveStatus(self.gladefile, self.comm)
+        status = OliveStatus(self.gladefile, self.comm, self.dialog)
         status.display()
     
     def on_menuitem_branch_initialize_activate(self, widget):
@@ -105,53 +108,58 @@ class OliveHandler:
         try:
             init.init(self.comm.get_path())
         except errors.AlreadyBranchError, errmsg:
-            self.dialog.error_dialog('Directory is already a branch: %s' % errmsg)
+            self.dialog.error_dialog('Directory is already a branch',
+                                     'The current directory (%s) is already a branch.\nYou can start using it, or initialize another directory.' % errmsg)
         except errors.BranchExistsWithoutWorkingTree, errmsg:
-            self.dialog.error_dialog('Branch exists without a working tree: %s' % errmsg)
+            self.dialog.error_dialog('Branch without a working tree',
+                                     'The current directory (%s)\nis a branch without a working tree.' % errmsg)
+        except:
+            raise
         else:
-            self.dialog.info_dialog('Directory successfully initialized.')
+            self.dialog.info_dialog('Ininialize successful',
+                                    'Directory successfully initialized.')
             self.comm.refresh_right()
         
     def on_menuitem_file_make_directory_activate(self, widget):
         """ File/Make directory... menu handler. """
         from mkdir import OliveMkdir
-        mkdir = OliveMkdir(self.gladefile, self.comm)
+        mkdir = OliveMkdir(self.gladefile, self.comm, self.dialog)
         mkdir.display()
     
     def on_menuitem_file_move_activate(self, widget):
         """ File/Move... menu handler. """
         from move import OliveMove
-        move = OliveMove(self.gladefile, self.comm)
+        move = OliveMove(self.gladefile, self.comm, self.dialog)
         move.display()
     
     def on_menuitem_file_rename_activate(self, widget):
         """ File/Rename... menu handler. """
         from rename import OliveRename
-        rename = OliveRename(self.gladefile, self.comm)
+        rename = OliveRename(self.gladefile, self.comm, self.dialog)
         rename.display()
 
     def on_menuitem_remove_file_activate(self, widget):
         """ Remove (unversion) selected file. """
         from remove import OliveRemove
-        remove = OliveRemove(self.gladefile, self.comm)
+        remove = OliveRemove(self.gladefile, self.comm, self.dialog)
         remove.display()
     
     def on_menuitem_stats_diff_activate(self, widget):
         """ Statistics/Differences... menu handler. """
         from diff import OliveDiff
-        diff = OliveDiff(self.gladefile, self.comm)
+        diff = OliveDiff(self.gladefile, self.comm, self.dialog)
         diff.display()
     
     def on_menuitem_stats_infos_activate(self, widget):
         """ Statistics/Informations... menu handler. """
         from info import OliveInfo
-        info = OliveInfo(self.gladefile, self.comm)
+        info = OliveInfo(self.gladefile, self.comm, self.dialog)
         info.display()
     
     def on_menuitem_stats_log_activate(self, widget):
         """ Statistics/Log... menu handler. """
         from log import OliveLog
-        log = OliveLog(self.gladefile, self.comm)
+        log = OliveLog(self.gladefile, self.comm, self.dialog)
         log.display()
     
     def on_treeview_left_button_press_event(self, widget, event):
@@ -208,5 +216,6 @@ class OliveHandler:
 
     def not_implemented(self, widget):
         """ Display a Not implemented error message. """
-        self.dialog.error_dialog('This feature is not yet implemented.')
+        self.dialog.error_dialog('I feel sorry',
+                                 'This feature is not yet implemented.')
 

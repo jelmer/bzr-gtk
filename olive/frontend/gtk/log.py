@@ -32,17 +32,18 @@ except:
 from bzrlib.branch import Branch
 import bzrlib.errors as errors
 
-from dialog import OliveDialog
 from viz.bzrkapp import BzrkApp
 
 class OliveLog:
     """ Display Log (bzrk) window and perform the needed actions. """
-    def __init__(self, gladefile, comm):
+    def __init__(self, gladefile, comm, dialog):
         """ Initialize the Log (bzrk) window. """
         self.gladefile = gladefile
+
+        # Communication object
         self.comm = comm
-        
-        self.dialog = OliveDialog(self.gladefile)
+        # Dialog object
+        self.dialog = dialog
         
         # Check if current location is a branch
         self.notbranch = False
@@ -59,7 +60,8 @@ class OliveLog:
     def display(self):
         """ Display the Log (bzrk) window. """
         if self.notbranch:
-            self.dialog.error_dialog('Directory is not a branch.')
+            self.dialog.error_dialog('Directory is not a branch',
+                                     'You can perform this action only in a branch.')
         else:
             self.app = BzrkApp()
             self.app.show(self.branch, self.revid, None)

@@ -32,12 +32,15 @@ import olive.backend.fileops as fileops
 
 class OliveAdd:
     """ Display the Add file(s) dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm):
+    def __init__(self, gladefile, comm, dialog):
         """ Initialize the Add file(s) dialog. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_add')
         
+        # Communication object
         self.comm = comm
+        # Dialog object
+        self.dialog = dialog
         
         self.window = self.glade.get_widget('window_add')
         
@@ -53,9 +56,6 @@ class OliveAdd:
         self.window.show_all()
         
     def add(self, widget):
-        from dialog import OliveDialog
-        dialog = OliveDialog(self.gladefile)
-        
         radio_selected = self.glade.get_widget('radiobutton_add_selected')
         radio_unknown = self.glade.get_widget('radiobutton_add_unknown')
         
@@ -67,13 +67,15 @@ class OliveAdd:
             filename = self.comm.get_selected_right()
             
             if filename is None:
-                dialog.error_dialog('No file was selected.')
+                self.dialog.error_dialog('No file was selected',
+                                         'Please select a file from the list,\nor choose the other option.')
                 return
             
             try:
                 fileops.add([directory + '/' + filename])
             except errors.NotBranchError:
-                dialog.error_dialog('The directory is not a branch.')
+                self.dialog.error_dialog('Directory is not a branch',
+                                         'You can perform this action only in a branch.')
                 self.comm.set_busy(self.window, False)
                 return
             except:
@@ -83,7 +85,8 @@ class OliveAdd:
             try:
                 fileops.add([directory], True)
             except errors.NotBranchError:
-                dialog.error_dialog('The directory is not a branch.')
+                self.dialog.error_dialog('Directory is not a branch',
+                                         'You can perform this action only in a branch.')
                 self.comm.set_busy(self.window, False)
                 return
             except:

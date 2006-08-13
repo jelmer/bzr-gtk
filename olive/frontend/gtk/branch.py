@@ -1,15 +1,15 @@
 # Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
-
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
-
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -32,12 +32,15 @@ import olive.backend.errors as errors
 
 class OliveBranch:
     """ Display branch dialog and perform the needed operations. """
-    def __init__(self, gladefile, comm):
+    def __init__(self, gladefile, comm, dialog):
         """ Initialize the Branch dialog. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_branch')
         
+        # Communication object
         self.comm = comm
+        # Dialog object
+        self.dialog = dialog
         
         self.window = self.glade.get_widget('window_branch')
         
@@ -57,13 +60,11 @@ class OliveBranch:
         self.window.show_all()
     
     def branch(self, widget):
-        from dialog import OliveDialog
-        dialog = OliveDialog(self.gladefile)
-        
         entry_location = self.glade.get_widget('entry_branch_location')
         location = entry_location.get_text()
         if location is '':
-            dialog.error_dialog('You must specify a branch location.')
+            self.dialog.error_dialog('Missing branch location',
+                                     'You must specify a branch location.')
             return
         
         destination = self.filechooser.get_filename()
@@ -75,31 +76,38 @@ class OliveBranch:
         
         self.comm.set_busy(self.window)
         try:
-            init.branch(location, destination, revno)
+            revs = init.branch(location, destination, revno)
         except errors.NonExistingSource, errmsg:
-            dialog.error_dialog('Non existing source: %s' % errmsg)
+            self.dialog.error_dialog('Non existing source',
+                                     "The location (%s)\ndoesn't exist." % errmsg)
             self.comm.set_busy(self.window, False)
             return
         except errors.TargetAlreadyExists, errmsg:
-            dialog.error_dialog('Target already exists: %s' % errmsg)
+            self.dialog.error_dialog('Target already exists',
+                                     'Target directory (%s)\nalready exists. Please select another target.' % errmsg)
             self.comm.set_busy(self.window, False)
             return
         except errors.NonExistingParent, errmsg:
-            dialog.error_dialog('Parent directory doesn\'t exist: %s' % errmsg)
+            self.dialog.error_dialog("Non existing parent directory",
+                                     "The parent directory (%s)\ndoesn't exist." % errmsg)
             self.comm.set_busy(self.window, False)
             return
         except errors.NonExistingRevision:
-            dialog.error_dialog('The given revision doesn\'t exist.')
+            self.dialog.error_dialog('Non existing revision',
+                                     "The revision you specified doesn't exist.")
             self.comm.set_busy(self.window, False)
             return
         except errors.NotBranchError, errmsg:
-            dialog.error_dialog('Not a branch: %s' % errmsg)
+            self.dialog.error_dialog('Location is not a branch'
+                                     'The specified location has to be a branch')
             self.comm.set_busy(self.window, False)
             return
         except:
             raise
         
         self.close()
+        self.dialog.info_dialog('Branching successful',
+                                '%d revision(s) branched.' % revs)
         self.comm.refresh_right()
 
     def close(self, widget=None):

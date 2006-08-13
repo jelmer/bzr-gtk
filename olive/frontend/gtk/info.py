@@ -32,18 +32,17 @@ except:
 import olive.backend.errors as errors
 import olive.backend.info as info
 
-from dialog import OliveDialog
-
 class OliveInfo:
     """ Display Informations window and perform the needed actions. """
-    def __init__(self, gladefile, comm):
+    def __init__(self, gladefile, comm, dialog):
         """ Initialize the Informations window. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_info')
         
+        # Communication object
         self.comm = comm
-        
-        self.dialog = OliveDialog(self.gladefile)
+        # Dialog object
+        self.dialog = dialog
         
         # Get the Informations window widget
         self.window = self.glade.get_widget('window_info')
@@ -483,7 +482,8 @@ class OliveInfo:
     def display(self):
         """ Display the Informations window. """
         if self.notbranch:
-            self.dialog.error_dialog('Directory is not a branch.')
+            self.dialog.error_dialog('Directory is not a branch',
+                                     'You can perform this action only in a branch.')
             self.close()
         else:
             self.window.show()
