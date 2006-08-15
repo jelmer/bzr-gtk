@@ -1,5 +1,6 @@
 2006-08-15  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * icons/olive-gtk.png: added application icon
     * olive-gtk.desktop: added desktop entry
     * setup.py: modified respectively
 

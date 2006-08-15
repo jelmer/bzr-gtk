@@ -41,6 +41,7 @@ setup(name='Olive',
                                    'icons/push.png',
                                    'icons/push16.png',
                                    'icons/refresh.png']),
-                  ('share/applications', ['olive-gtk.desktop'])
+                  ('share/applications', ['olive-gtk.desktop']),
+                  ('share/pixmaps', ['icons/olive-gtk.png'])
                  ]
      )
