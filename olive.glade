@@ -52,7 +52,7 @@
 		      <signal name="activate" handler="on_menuitem_add_files_activate" last_modification_time="Fri, 21 Jul 2006 11:38:39 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image214">
+			<widget class="GtkImage" id="image220">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-add</property>
 			  <property name="icon_size">1</property>
@@ -73,7 +73,7 @@
 		      <signal name="activate" handler="on_menuitem_remove_file_activate" last_modification_time="Fri, 21 Jul 2006 13:54:07 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image215">
+			<widget class="GtkImage" id="image221">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-remove</property>
 			  <property name="icon_size">1</property>
@@ -233,7 +233,7 @@
 		      <signal name="activate" handler="on_menuitem_branch_pull_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image216">
+			<widget class="GtkImage" id="image222">
 			  <property name="visible">True</property>
 			  <property name="pixbuf">pull16.png</property>
 			  <property name="xalign">0.5</property>
@@ -253,7 +253,7 @@
 		      <signal name="activate" handler="on_menuitem_branch_push_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image217">
+			<widget class="GtkImage" id="image223">
 			  <property name="visible">True</property>
 			  <property name="pixbuf">push16.png</property>
 			  <property name="xalign">0.5</property>
@@ -279,7 +279,7 @@
 		      <signal name="activate" handler="on_menuitem_branch_commit_activate" last_modification_time="Mon, 17 Jul 2006 08:53:37 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image218">
+			<widget class="GtkImage" id="image224">
 			  <property name="visible">True</property>
 			  <property name="pixbuf">commit16.png</property>
 			  <property name="xalign">0.5</property>
@@ -327,7 +327,7 @@
 		      <signal name="activate" handler="on_menuitem_stats_diff_activate" last_modification_time="Thu, 03 Aug 2006 11:35:30 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image219">
+			<widget class="GtkImage" id="image225">
 			  <property name="visible">True</property>
 			  <property name="pixbuf">diff16.png</property>
 			  <property name="xalign">0.5</property>
@@ -347,7 +347,7 @@
 		      <signal name="activate" handler="on_menuitem_stats_log_activate" last_modification_time="Thu, 03 Aug 2006 11:35:43 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image220">
+			<widget class="GtkImage" id="image226">
 			  <property name="visible">True</property>
 			  <property name="pixbuf">log16.png</property>
 			  <property name="xalign">0.5</property>
@@ -5146,6 +5146,7 @@
 	    <widget class="GtkButton" id="button_info_close">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
+	      <property name="has_default">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="label">gtk-close</property>
 	      <property name="use_stock">True</property>

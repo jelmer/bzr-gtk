@@ -221,6 +221,9 @@ class OliveCommunicator:
         self.treeview_right = self.toplevel.get_widget('treeview_right')
         # Get some important menu items
         self.menuitem_view_show_hidden_files = self.toplevel.get_widget('menuitem_view_show_hidden_files')
+        self.menuitem_branch_commit = self.toplevel.get_widget('menuitem_branch_commit')
+        self.menuitem_stats_diff = self.toplevel.get_widget('menuitem_stats_diff')
+        self.menuitem_stats_log = self.toplevel.get_widget('menuitem_stats_log')
     
     def set_path(self, path):
         """ Set the current path while browsing the directories. """

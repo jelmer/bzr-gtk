@@ -1,5 +1,8 @@
 2006-08-15  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive/frontend/gtk/menu.py: upgraded according to the OliveDialog API
+      changes; HIGify; load proper icons
+    * olive.glade: Close button should be the default on the Informations window
     * olive.glade: added View menu
     * olive/frontend/gtk/handler.py: implement the signal handlers
     * olive/frontend/gtk/__init__.py: connect the signals

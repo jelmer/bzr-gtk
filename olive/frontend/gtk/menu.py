@@ -31,9 +31,6 @@ except:
 import olive.backend.fileops as fileops
 import olive.backend.errors as errors
 
-from commit import OliveCommit
-from diff import OliveDiff
-
 class OliveMenu:
     """ This class is responsible for building the context menus. """
     def __init__(self, gladefile, comm, dialog):
@@ -59,7 +56,7 @@ class OliveMenu:
                                        'Remove', None,
                                        'Remove the selected file',
                                        self.remove_file),
-                                      ('commit', gtk.STOCK_REDO,
+                                      ('commit', None,
                                        'Commit', None,
                                        'Commit the changes',
                                        self.commit),
@@ -87,6 +84,26 @@ class OliveMenu:
         self.cmenu_right = self.ui.get_widget('/context_right')
         
         self.cmenu_left = self.ui.get_widget('/context_left')
+        
+        # Set icons
+        commit_menu = self.ui.get_widget('/context_right/commit')
+        commit_image = self.comm.menuitem_branch_commit.get_image()
+        commit_pixbuf = commit_image.get_pixbuf()
+        commit_icon = gtk.Image()
+        commit_icon.set_from_pixbuf(commit_pixbuf)
+        commit_menu.set_image(commit_icon)
+        diff_menu = self.ui.get_widget('/context_right/diff')
+        diff_image = self.comm.menuitem_stats_diff.get_image()
+        diff_pixbuf = diff_image.get_pixbuf()
+        diff_icon = gtk.Image()
+        diff_icon.set_from_pixbuf(diff_pixbuf)
+        diff_menu.set_image(diff_icon)
+        log_menu = self.ui.get_widget('/context_right/log')
+        log_image = self.comm.menuitem_stats_log.get_image()
+        log_pixbuf = log_image.get_pixbuf()
+        log_icon = gtk.Image()
+        log_icon.set_from_pixbuf(log_pixbuf)
+        log_menu.set_image(log_icon)
 
     def right_context_menu(self):
         return self.cmenu_right
@@ -101,13 +118,15 @@ class OliveMenu:
         filename = self.comm.get_selected_right()
             
         if filename is None:
-            self.dialog.error_dialog('No file was selected.')
+            self.dialog.error_dialog('No file was selected',
+                                     'Please select a file from the list,\nor choose the other option.')
             return
         
         try:
             fileops.add([directory + '/' + filename])
         except errors.NotBranchError:
-            self.dialog.error_dialog('The directory is not a branch.')
+            self.dialog.error_dialog('Directory is not a branch',
+                                     'You can perform this action only in a branch.')
             return
         except:
             raise
@@ -121,16 +140,19 @@ class OliveMenu:
         filename = self.comm.get_selected_right()
         
         if filename is None:
-            self.dialog.error_dialog('No file was selected.')
+            self.dialog.error_dialog('No file was selected',
+                                     'Please select a file from the list,\nor choose the other option.')
             return
         
         try:
             fileops.remove([directory + '/' + filename])
         except errors.NotBranchError:
-            self.dialog.error_dialog('The directory is not a branch.')
+            self.dialog.error_dialog('Directory is not a branch',
+                                     'You can perform this action only in a branch.')
             return
         except errors.NotVersionedError:
-            self.dialog.error_dialog('Selected file is not versioned.')
+            self.dialog.error_dialog('File not versioned',
+                                     'The selected file is not versioned.')
             return
         except:
             raise
@@ -139,24 +161,30 @@ class OliveMenu:
 
     def commit(self, action):
         """ Right context menu -> Commit """
-        commit = OliveCommit(self.gladefile, self.comm)
+        from commit import OliveCommit
+        commit = OliveCommit(self.gladefile, self.comm, self.dialog)
         commit.display()
     
     def diff(self, action):
         """ Right context menu -> Diff """
-        diff = OliveDiff(self.gladefile, self.comm)
+        from diff import OliveDiff
+        diff = OliveDiff(self.gladefile, self.comm, self.dialog)
         diff.display()
     
     def log(self, action):
         """ Right context menu -> Log """
-        self.dialog.error_dialog('This feature is not yet implemented.')
+        from log import OliveLog
+        log = OliveLog(self.gladefile, self.comm, self.dialog)
+        log.display()
     
     def bookmark(self, action):
         """ Right context menu -> Bookmark """
         if self.comm.pref.add_bookmark(self.comm.get_path()):
-            self.dialog.info_dialog('Bookmark successfully added.')
+            self.dialog.info_dialog('Bookmark successfully added',
+                                    'The current directory was bookmarked. You can reach\nit by selecting it from the left panel.')
         else:
-            self.dialog.warning_dialog('Location already bookmarked.')
+            self.dialog.warning_dialog('Location already bookmarked'
+                                       'The current directory is already bookmarked.\nSee the left panel for reference.')
         
         self.comm.refresh_left()
 
