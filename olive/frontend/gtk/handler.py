@@ -162,6 +162,26 @@ class OliveHandler:
         log = OliveLog(self.gladefile, self.comm, self.dialog)
         log.display()
     
+    def on_menuitem_view_refresh_activate(self, widget):
+        """ View/Refresh menu handler. """
+        # Refresh the left pane
+        self.comm.refresh_left()
+        # Refresh the right pane
+        self.comm.refresh_right()
+    
+    def on_menuitem_view_show_hidden_files_activate(self, widget):
+        """ View/Show hidden files menu handler. """
+        if widget.get_active():
+            # Show hidden files
+            self.comm.pref.set_preference('dotted_files', True)
+            self.comm.pref.refresh()
+            self.comm.refresh_right()
+        else:
+            # Do not show hidden files
+            self.comm.pref.set_preference('dotted_files', False)
+            self.comm.pref.refresh()
+            self.comm.refresh_right()
+
     def on_treeview_left_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the bookmark list. """
         if event.button == 3:

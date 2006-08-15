@@ -2,18 +2,20 @@ TODO list for Olive
 -------------------
 
  - Be able to install into other locations than /usr (LarstiQ)
- - Investigate TortoiseSVN-like commit/add dialogs (LarstiQ)
-   http://samba.org/~jelmer/bzr/gcommit.png [DONE]
- - HIGify the interface (Matthieu Moy)
- - Consistent placement of buttons (Matthieu Moy)
- - Display the count of pushed revisions on push (phanatic) [DONE]
+[DONE] Investigate TortoiseSVN-like commit/add dialogs (LarstiQ)
+   http://samba.org/~jelmer/bzr/gcommit.png
+[DONE] HIGify the interface (Matthieu Moy)
+[DONE] Consistent placement of buttons (Matthieu Moy)
+[DONE] Display the count of pushed revisions on push (phanatic)
  - Display the commit file selector as a tree (so whole directories can be
    toggled) (j-a-meinel)
  - "Probe location" button on the Push dialog (test write access, etc.) (ddaa)
- - Save and restore main window position and size (phanatic)
+[DONE] Save and restore main window position and size (phanatic)
  - Real sensitive context menu - e.g. options are grey if not a branch
    (phanatic)
  - Implement 'bzr missing' (phanatic)
  - Implement 'bzr uncommit' (phanatic)
  - Implement bundle handling - at least creating them (phanatic)
  - Testing on Windows platform (phanatic)
+ - i18n/l10n with gettext (phanatic)
+ - Bookmarks should have a 'title' attribute (phanatic)

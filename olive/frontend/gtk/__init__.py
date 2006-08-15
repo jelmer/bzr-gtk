@@ -50,7 +50,6 @@ class OliveGtk:
         self.toplevel = gtk.glade.XML(self.gladefile, 'window_main')
         
         self.window = self.toplevel.get_widget('window_main')
-        self.window.show_all()
         
         self.pref = OlivePreferences()
         self.comm = OliveCommunicator(self.toplevel, self.pref)
@@ -66,6 +65,8 @@ class OliveGtk:
                 "on_menuitem_file_make_directory_activate": handler.on_menuitem_file_make_directory_activate,
                 "on_menuitem_file_move_activate": handler.on_menuitem_file_move_activate,
                 "on_menuitem_file_rename_activate": handler.on_menuitem_file_rename_activate,
+                "on_menuitem_view_show_hidden_files_activate": handler.on_menuitem_view_show_hidden_files_activate,
+                "on_menuitem_view_refresh_activate": handler.on_menuitem_view_refresh_activate,
                 "on_menuitem_branch_initialize_activate": handler.on_menuitem_branch_initialize_activate,
                 "on_menuitem_branch_get_activate": handler.on_menuitem_branch_get_activate,
                 "on_menuitem_branch_checkout_activate": handler.on_menuitem_branch_checkout_activate,
@@ -76,7 +77,7 @@ class OliveGtk:
                 "on_menuitem_stats_diff_activate": handler.on_menuitem_stats_diff_activate,
                 "on_menuitem_stats_log_activate": handler.on_menuitem_stats_log_activate,
                 "on_menuitem_stats_infos_activate": handler.on_menuitem_stats_infos_activate,
-                "on_toolbutton_update_clicked": handler.not_implemented,
+                "on_toolbutton_refresh_clicked": handler.on_menuitem_view_refresh_activate,
                 "on_toolbutton_commit_clicked": handler.on_menuitem_branch_commit_activate,
                 "on_toolbutton_pull_clicked": handler.on_menuitem_branch_pull_activate,
                 "on_toolbutton_push_clicked": handler.on_menuitem_branch_push_activate,
@@ -99,11 +100,17 @@ class OliveGtk:
         pos = self.pref.get_preference('paned_position', 'int')
         self.comm.hpaned_main.set_position(pos)
         
+        # Now we can show the window
+        self.window.show_all()
+        
         # Load default data into the panels
         self.treeview_left = self.toplevel.get_widget('treeview_left')
         self.treeview_right = self.toplevel.get_widget('treeview_right')
         self._load_left()
         self._load_right()
+
+        # Apply menu state
+        self.comm.menuitem_view_show_hidden_files.set_active(self.pref.get_preference('dotted_files', 'bool'))
         
     def _load_left(self):
         """ Load data into the left panel. (Bookmarks) """
@@ -151,7 +158,7 @@ class OliveGtk:
         
         # Fill the appropriate lists
         path = self.comm.get_path()
-        dotted_files = self.pref.get_preference('dotted_files')
+        dotted_files = self.pref.get_preference('dotted_files', 'bool')
         for item in os.listdir(path):
             if not dotted_files and item[0] == '.':
                 continue
@@ -212,6 +219,8 @@ class OliveCommunicator:
         # Get the TreeViews
         self.treeview_left = self.toplevel.get_widget('treeview_left')
         self.treeview_right = self.toplevel.get_widget('treeview_right')
+        # Get some important menu items
+        self.menuitem_view_show_hidden_files = self.toplevel.get_widget('menuitem_view_show_hidden_files')
     
     def set_path(self, path):
         """ Set the current path while browsing the directories. """
@@ -296,7 +305,7 @@ class OliveCommunicator:
         files = []
         
         # Fill the appropriate lists
-        dotted_files = self.pref.get_preference('dotted_files')
+        dotted_files = self.pref.get_preference('dotted_files', 'bool')
         for item in os.listdir(path):
             if not dotted_files and item[0] == '.':
                 continue

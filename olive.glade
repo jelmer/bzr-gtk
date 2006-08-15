@@ -52,7 +52,7 @@
 		      <signal name="activate" handler="on_menuitem_add_files_activate" last_modification_time="Fri, 21 Jul 2006 11:38:39 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image152">
+			<widget class="GtkImage" id="image214">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-add</property>
 			  <property name="icon_size">1</property>
@@ -73,7 +73,7 @@
 		      <signal name="activate" handler="on_menuitem_remove_file_activate" last_modification_time="Fri, 21 Jul 2006 13:54:07 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image153">
+			<widget class="GtkImage" id="image215">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-remove</property>
 			  <property name="icon_size">1</property>
@@ -145,6 +145,45 @@
 	  </child>
 
 	  <child>
+	    <widget class="GtkMenuItem" id="menuitem_view">
+	      <property name="visible">True</property>
+	      <property name="label" translatable="yes">_View</property>
+	      <property name="use_underline">True</property>
+	      <signal name="activate" handler="on_menuitem_view_activate" last_modification_time="Tue, 15 Aug 2006 18:14:04 GMT"/>
+
+	      <child>
+		<widget class="GtkMenu" id="menuitem_view_menu">
+
+		  <child>
+		    <widget class="GtkCheckMenuItem" id="menuitem_view_show_hidden_files">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">Show _hidden files</property>
+		      <property name="use_underline">True</property>
+		      <property name="active">False</property>
+		      <signal name="activate" handler="on_menuitem_view_show_hidden_files_activate" last_modification_time="Tue, 15 Aug 2006 18:13:36 GMT"/>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkSeparatorMenuItem" id="separator_view1">
+		      <property name="visible">True</property>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkMenuItem" id="menuitem_view_refresh">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">_Refresh</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="on_menuitem_view_refresh_activate" last_modification_time="Tue, 15 Aug 2006 18:15:01 GMT"/>
+		    </widget>
+		  </child>
+		</widget>
+	      </child>
+	    </widget>
+	  </child>
+
+	  <child>
 	    <widget class="GtkMenuItem" id="menuitem_branch">
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">_Branch</property>
@@ -194,7 +233,7 @@
 		      <signal name="activate" handler="on_menuitem_branch_pull_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image154">
+			<widget class="GtkImage" id="image216">
 			  <property name="visible">True</property>
 			  <property name="pixbuf">pull16.png</property>
 			  <property name="xalign">0.5</property>
@@ -214,7 +253,7 @@
 		      <signal name="activate" handler="on_menuitem_branch_push_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image155">
+			<widget class="GtkImage" id="image217">
 			  <property name="visible">True</property>
 			  <property name="pixbuf">push16.png</property>
 			  <property name="xalign">0.5</property>
@@ -240,7 +279,7 @@
 		      <signal name="activate" handler="on_menuitem_branch_commit_activate" last_modification_time="Mon, 17 Jul 2006 08:53:37 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image156">
+			<widget class="GtkImage" id="image218">
 			  <property name="visible">True</property>
 			  <property name="pixbuf">commit16.png</property>
 			  <property name="xalign">0.5</property>
@@ -288,7 +327,7 @@
 		      <signal name="activate" handler="on_menuitem_stats_diff_activate" last_modification_time="Thu, 03 Aug 2006 11:35:30 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image157">
+			<widget class="GtkImage" id="image219">
 			  <property name="visible">True</property>
 			  <property name="pixbuf">diff16.png</property>
 			  <property name="xalign">0.5</property>
@@ -308,7 +347,7 @@
 		      <signal name="activate" handler="on_menuitem_stats_log_activate" last_modification_time="Thu, 03 Aug 2006 11:35:43 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image158">
+			<widget class="GtkImage" id="image220">
 			  <property name="visible">True</property>
 			  <property name="pixbuf">log16.png</property>
 			  <property name="xalign">0.5</property>
@@ -371,15 +410,15 @@
 	  <property name="show_arrow">True</property>
 
 	  <child>
-	    <widget class="GtkToolButton" id="toolbutton_update">
+	    <widget class="GtkToolButton" id="toolbutton_refresh">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">Update</property>
+	      <property name="label" translatable="yes">Refresh</property>
 	      <property name="use_underline">True</property>
 	      <property name="icon">refresh.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
-	      <signal name="clicked" handler="on_toolbutton_update_clicked" last_modification_time="Mon, 17 Jul 2006 09:04:16 GMT"/>
+	      <signal name="clicked" handler="on_toolbutton_refresh_clicked" last_modification_time="Tue, 15 Aug 2006 18:08:06 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
