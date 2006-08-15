@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Olive
+GenericName=Version Control GUI
+Comment=Graphical User Interface for the Bazaar Version Control System
+Icon=/usr/share/olive/oliveicon2.png
+Exec=/usr/bin/olive-gtk
+Categories=Applications;Development

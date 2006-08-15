@@ -40,4 +40,7 @@ setup(name='Olive',
                                    'icons/pull16.png',
                                    'icons/push.png',
                                    'icons/push16.png',
-                                   'icons/refresh.png'])])
+                                   'icons/refresh.png']),
+                  ('share/applications', ['olive-gtk.desktop'])
+                 ]
+     )
