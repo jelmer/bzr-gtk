@@ -15,6 +15,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 """GTK+ frontends to Bazaar commands """
+
 from bzrlib.commands import Command, register_command, display_command
 from bzrlib.errors import NotVersionedError, BzrCommandError, NoSuchFile
 from bzrlib.commands import Command, register_command
@@ -22,6 +23,8 @@ from bzrlib.option import Option
 from bzrlib.branch import Branch
 from bzrlib.workingtree import WorkingTree
 from bzrlib.bzrdir import BzrDir
+
+__version__ = '0.9.0'
 
 class cmd_gbranch(Command):
     """GTK+ branching.
