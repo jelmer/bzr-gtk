@@ -73,10 +73,6 @@ class OliveMenu:
                                        'Diff', None,
                                        'Show the diff of the file',
                                        self.diff),
-                                      ('log', None,
-                                       'Log', None,
-                                       'Show the log of the file',
-                                       self.log),
                                       ('bookmark', None,
                                        'Bookmark', None,
                                        'Bookmark current location',
@@ -84,15 +80,23 @@ class OliveMenu:
                                       ('remove_bookmark', gtk.STOCK_REMOVE,
                                        'Remove', None,
                                        'Remove the selected bookmark',
-                                       self.remove_bookmark)
+                                       self.remove_bookmark),
+                                      ('diff_selected', None,
+                                       'Selected...', None,
+                                       'Show the differences of the selected file',
+                                       self.diff_selected),
+                                      ('diff_all', None,
+                                       'All...', None,
+                                       'Show the differences of all files',
+                                       self.diff_all)
                                      ])
         
         self.ui.insert_action_group(self.actiongroup, 0)
         self.ui.add_ui_from_file(self.uifile)
         
         self.cmenu_right = self.ui.get_widget('/context_right')
-        
         self.cmenu_left = self.ui.get_widget('/context_left')
+        self.toolbar_diff = self.ui.get_widget('/toolbar_diff')
         
         # Set icons
         commit_menu = self.ui.get_widget('/context_right/commit')
@@ -107,12 +111,6 @@ class OliveMenu:
         diff_icon = gtk.Image()
         diff_icon.set_from_pixbuf(diff_pixbuf)
         diff_menu.set_image(diff_icon)
-        log_menu = self.ui.get_widget('/context_right/log')
-        log_image = self.comm.menuitem_stats_log.get_image()
-        log_pixbuf = log_image.get_pixbuf()
-        log_icon = gtk.Image()
-        log_icon.set_from_pixbuf(log_pixbuf)
-        log_menu.set_image(log_icon)
 
     def right_context_menu(self):
         return self.cmenu_right
@@ -180,12 +178,6 @@ class OliveMenu:
         diff = OliveDiff(self.gladefile, self.comm, self.dialog)
         diff.display()
     
-    def log(self, action):
-        """ Right context menu -> Log """
-        from log import OliveLog
-        log = OliveLog(self.gladefile, self.comm, self.dialog)
-        log.display()
-    
     def bookmark(self, action):
         """ Right context menu -> Bookmark """
         if self.comm.pref.add_bookmark(self.comm.get_path()):
@@ -202,3 +194,13 @@ class OliveMenu:
         self.comm.pref.remove_bookmark(self.comm.get_selected_left())
         
         self.comm.refresh_left()
+    
+    def diff_selected(self, action):
+        """ Diff toolbutton -> Selected... """
+        print "DEBUG: not implemented."
+    
+    def diff_all(self, action):
+        """ Diff toolbutton -> All... """
+        from diff import OliveDiff
+        diff = OliveDiff(self.gladefile, self.comm, self.dialog)
+        diff.display()

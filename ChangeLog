@@ -1,5 +1,10 @@
 2006-08-19  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive/frontend/gtk/__init__.py: applied Diff toolbutton menu
+    * olive/frontend/gtk/menu.py: implemented the Diff toolbutton menu
+    * cmenu.ui: added Diff toolbutton menu; removed Log from right context menu
+    * olive.glade: swapped Diff and Log toolbuttons; coverted log button to an
+      ordinary GtkToolButton
     * olive/frontend/gtk/__init__.py: added win32 compatibility
     * olive/frontend/gtk/menu.py: added win32 compatibility
     * olive/frontend/gtk/branch.py: fixed a typo

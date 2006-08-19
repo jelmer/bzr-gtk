@@ -6,11 +6,14 @@
         <menuitem name="commit" action="commit" />
         <separator />
         <menuitem name="diff" action="diff" />
-        <menuitem name="log" action="log" />
         <separator />
         <menuitem name="bookmark" action="bookmark" />
     </popup>
     <popup name="context_left">
         <menuitem name="remove_bookmark" action="remove_bookmark" />
+    </popup>
+    <popup name="toolbar_diff">
+        <menuitem name="diff_selected" action="diff_selected" />
+        <menuitem name="diff_all" action="diff_all" />
     </popup>
 </ui>

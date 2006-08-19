@@ -427,24 +427,6 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkMenuToolButton" id="menutoolbutton_log">
-	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">Log</property>
-	      <property name="use_underline">True</property>
-	      <property name="icon">log.png</property>
-	      <property name="visible_horizontal">True</property>
-	      <property name="visible_vertical">True</property>
-	      <property name="is_important">False</property>
-	      <signal name="show_menu" handler="on_menutoolbutton_log_show_menu" last_modification_time="Mon, 17 Jul 2006 09:04:28 GMT"/>
-	      <signal name="clicked" handler="on_menutoolbutton_log_clicked" last_modification_time="Mon, 17 Jul 2006 09:04:37 GMT"/>
-	    </widget>
-	    <packing>
-	      <property name="expand">False</property>
-	      <property name="homogeneous">False</property>
-	    </packing>
-	  </child>
-
-	  <child>
 	    <widget class="GtkMenuToolButton" id="menutoolbutton_diff">
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Diff</property>
@@ -453,12 +435,28 @@
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
-	      <signal name="show_menu" handler="on_menutoolbutton_diff_show_menu" last_modification_time="Mon, 17 Jul 2006 09:04:43 GMT"/>
 	      <signal name="clicked" handler="on_menutoolbutton_diff_clicked" last_modification_time="Mon, 17 Jul 2006 09:04:46 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
 	      <property name="homogeneous">False</property>
+	    </packing>
+	  </child>
+
+	  <child>
+	    <widget class="GtkToolButton" id="toolbutton_log">
+	      <property name="visible">True</property>
+	      <property name="label" translatable="yes">Log</property>
+	      <property name="use_underline">True</property>
+	      <property name="icon">log.png</property>
+	      <property name="visible_horizontal">True</property>
+	      <property name="visible_vertical">True</property>
+	      <property name="is_important">False</property>
+	      <signal name="clicked" handler="on_toolbutton_log_clicked" last_modification_time="Sat, 19 Aug 2006 19:26:21 GMT"/>
+	    </widget>
+	    <packing>
+	      <property name="expand">False</property>
+	      <property name="homogeneous">True</property>
 	    </packing>
 	  </child>
 

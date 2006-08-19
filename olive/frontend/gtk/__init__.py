@@ -87,6 +87,8 @@ class OliveGtk:
                 "on_menuitem_stats_log_activate": handler.on_menuitem_stats_log_activate,
                 "on_menuitem_stats_infos_activate": handler.on_menuitem_stats_infos_activate,
                 "on_toolbutton_refresh_clicked": handler.on_menuitem_view_refresh_activate,
+                "on_toolbutton_log_clicked": handler.on_menuitem_stats_log_activate,
+                "on_menutoolbutton_diff_clicked": handler.on_menuitem_stats_diff_activate,
                 "on_toolbutton_commit_clicked": handler.on_menuitem_branch_commit_activate,
                 "on_toolbutton_pull_clicked": handler.on_menuitem_branch_pull_activate,
                 "on_toolbutton_push_clicked": handler.on_menuitem_branch_push_activate,
@@ -108,6 +110,10 @@ class OliveGtk:
         # Apply paned position
         pos = self.pref.get_preference('paned_position', 'int')
         self.comm.hpaned_main.set_position(pos)
+        
+        # Apply menu to the toolbutton
+        menubutton = self.toplevel.get_widget('menutoolbutton_diff')
+        menubutton.set_menu(handler.menu.toolbar_diff)
         
         # Now we can show the window
         self.window.show_all()
