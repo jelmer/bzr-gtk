@@ -11,7 +11,7 @@ TODO list for Olive
    toggled) (j-a-meinel)
  - "Probe location" button on the Push dialog (test write access, etc.) (ddaa)
 [DONE] Save and restore main window position and size (phanatic)
- - Real sensitive context menu - e.g. options are grey if not a branch
+[DONE] Real sensitive context menu - e.g. options are grey if not a branch
    (phanatic)
  - Implement 'bzr missing' (phanatic)
  - Implement 'bzr uncommit' (phanatic)
@@ -19,4 +19,4 @@ TODO list for Olive
 [DONE] Testing on Windows platform (phanatic)
  - i18n/l10n with gettext (phanatic)
  - Bookmarks should have a 'title' attribute (phanatic)
- - Open files on double-click, and add Open option to context menu (Aaadam)
+[PART-DONE] Open files on double-click, and add Open option to context menu (Aaadam)

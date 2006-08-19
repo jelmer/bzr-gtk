@@ -233,7 +233,17 @@ class OliveHandler:
         if newdir == '..':
             self.comm.set_path(os.path.split(self.comm.get_path())[0])
         else:
-            self.comm.set_path(self.comm.get_path() + '/' + newdir)
+            fullpath = self.comm.get_path() + '/' + newdir
+            if os.path.isdir(fullpath):
+                # selected item is an existant directory
+                self.comm.set_path(fullpath)
+            else:
+                if sys.platform == 'win32':
+                    # open the file with the default application
+                    os.startfile(fullpath)
+                else:
+                    # TODO: support other OSes
+                    print "DEBUG: double-click on non-Win32 platforms not supported."
         
         self.comm.refresh_right()
     

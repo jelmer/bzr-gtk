@@ -1,5 +1,7 @@
 2006-08-19  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive/frontend/handler.py: fixed a long existing bug: double-clicking a
+      file should open it with an application (supported under Windows)
     * olive/frontend/__init__.py: set menu and toolbar sensitivity
     * olive/frontend/handler.py: set context menu sensitivity
     * olive/backend/info.py: implemented is_branch()
