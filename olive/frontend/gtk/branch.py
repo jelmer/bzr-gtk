@@ -98,7 +98,7 @@ class OliveBranch:
             self.comm.set_busy(self.window, False)
             return
         except errors.NotBranchError, errmsg:
-            self.dialog.error_dialog('Location is not a branch'
+            self.dialog.error_dialog('Location is not a branch',
                                      'The specified location has to be a branch')
             self.comm.set_busy(self.window, False)
             return

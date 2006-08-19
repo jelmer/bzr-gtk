@@ -1,15 +1,15 @@
 # Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
-
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
-
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -35,10 +35,19 @@ class OliveMenu:
     """ This class is responsible for building the context menus. """
     def __init__(self, gladefile, comm, dialog):
         # Load the UI file
-        self.uifile = "/usr/share/olive/cmenu.ui"
+        if sys.platform == 'win32':
+            self.uifile = os.path.dirname(sys.executable) + "/share/olive/cmenu.ui"
+        else:
+            self.uifile = "/usr/share/olive/cmenu.ui"
+        
         if not os.path.exists(self.uifile):
             # Load from current directory if not installed
             self.uifile = "cmenu.ui"
+            # Check again
+            if not os.path.exists(self.uifile):
+                # Fail
+                print "UI description file cannot be found."
+                sys.exit(1)
         
         self.gladefile = gladefile
         self.comm = comm

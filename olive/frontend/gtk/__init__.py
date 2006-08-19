@@ -42,10 +42,19 @@ class OliveGtk:
     
     def __init__(self):
         # Load the glade file
-        self.gladefile = "/usr/share/olive/olive.glade"
+        if sys.platform == 'win32':
+            self.gladefile = os.path.dirname(sys.executable) + "/share/olive/olive.glade"
+        else:
+            self.gladefile = "/usr/share/olive/olive.glade"
+
         if not os.path.exists(self.gladefile):
             # Load from current directory if not installed
             self.gladefile = "olive.glade"
+            # Check again
+            if not os.path.exists(self.gladefile):
+                # Fail
+                print "Glade file cannot be found."
+                sys.exit(1)
 
         self.toplevel = gtk.glade.XML(self.gladefile, 'window_main')
         
