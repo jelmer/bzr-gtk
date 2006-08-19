@@ -32,6 +32,7 @@ except:
     sys.exit(1)
 
 from handler import OliveHandler
+from olive.backend.info import is_branch
 
 # Olive GTK UI version
 __version__ = '0.1'
@@ -209,6 +210,34 @@ class OliveGtk:
         tvcolumn_status.pack_start(cell, True)
         tvcolumn_status.add_attribute(cell, 'text', 2)
         
+        # Check if current directory is a branch
+        if is_branch(self.comm.get_path()):
+            self.comm.menuitem_branch.set_sensitive(True)
+            self.comm.menuitem_stats.set_sensitive(True)
+            self.comm.menuitem_add_files.set_sensitive(True)
+            self.comm.menuitem_remove_files.set_sensitive(True)
+            self.comm.menuitem_file_make_directory.set_sensitive(True)
+            self.comm.menuitem_file_rename.set_sensitive(True)
+            self.comm.menuitem_file_move.set_sensitive(True)
+            self.comm.menutoolbutton_diff.set_sensitive(True)
+            self.comm.toolbutton_log.set_sensitive(True)
+            self.comm.toolbutton_commit.set_sensitive(True)
+            self.comm.toolbutton_pull.set_sensitive(True)
+            self.comm.toolbutton_push.set_sensitive(True)
+        else:
+            self.comm.menuitem_branch.set_sensitive(False)
+            self.comm.menuitem_stats.set_sensitive(False)
+            self.comm.menuitem_add_files.set_sensitive(False)
+            self.comm.menuitem_remove_files.set_sensitive(False)
+            self.comm.menuitem_file_make_directory.set_sensitive(False)
+            self.comm.menuitem_file_rename.set_sensitive(False)
+            self.comm.menuitem_file_move.set_sensitive(False)
+            self.comm.menutoolbutton_diff.set_sensitive(False)
+            self.comm.toolbutton_log.set_sensitive(False)
+            self.comm.toolbutton_commit.set_sensitive(False)
+            self.comm.toolbutton_pull.set_sensitive(False)
+            self.comm.toolbutton_push.set_sensitive(False)
+        
         # set cursor to default
         self.comm.set_busy(self.treeview_right, False)
 
@@ -235,10 +264,23 @@ class OliveCommunicator:
         self.treeview_left = self.toplevel.get_widget('treeview_left')
         self.treeview_right = self.toplevel.get_widget('treeview_right')
         # Get some important menu items
+        self.menuitem_add_files = self.toplevel.get_widget('menuitem_add_files')
+        self.menuitem_remove_files = self.toplevel.get_widget('menuitem_remove_file')
+        self.menuitem_file_make_directory = self.toplevel.get_widget('menuitem_file_make_directory')
+        self.menuitem_file_rename = self.toplevel.get_widget('menuitem_file_rename')
+        self.menuitem_file_move = self.toplevel.get_widget('menuitem_file_move')
         self.menuitem_view_show_hidden_files = self.toplevel.get_widget('menuitem_view_show_hidden_files')
+        self.menuitem_branch = self.toplevel.get_widget('menuitem_branch')
         self.menuitem_branch_commit = self.toplevel.get_widget('menuitem_branch_commit')
+        self.menuitem_stats = self.toplevel.get_widget('menuitem_stats')
         self.menuitem_stats_diff = self.toplevel.get_widget('menuitem_stats_diff')
         self.menuitem_stats_log = self.toplevel.get_widget('menuitem_stats_log')
+        # Get some toolbuttons
+        self.menutoolbutton_diff = self.toplevel.get_widget('menutoolbutton_diff')
+        self.toolbutton_log = self.toplevel.get_widget('toolbutton_log')
+        self.toolbutton_commit = self.toplevel.get_widget('toolbutton_commit')
+        self.toolbutton_pull = self.toplevel.get_widget('toolbutton_pull')
+        self.toolbutton_push = self.toplevel.get_widget('toolbutton_push')
     
     def set_path(self, path):
         """ Set the current path while browsing the directories. """
@@ -344,6 +386,36 @@ class OliveCommunicator:
         
         # Add the ListStore to the TreeView
         self.treeview_right.set_model(liststore)
+        
+        # Check if current directory is a branch
+        if is_branch(self.get_path()):
+            # Activate some items
+            self.menuitem_branch.set_sensitive(True)
+            self.menuitem_stats.set_sensitive(True)
+            self.menuitem_add_files.set_sensitive(True)
+            self.menuitem_remove_files.set_sensitive(True)
+            self.menuitem_file_make_directory.set_sensitive(True)
+            self.menuitem_file_rename.set_sensitive(True)
+            self.menuitem_file_move.set_sensitive(True)
+            self.menutoolbutton_diff.set_sensitive(True)
+            self.toolbutton_log.set_sensitive(True)
+            self.toolbutton_commit.set_sensitive(True)
+            self.toolbutton_pull.set_sensitive(True)
+            self.toolbutton_push.set_sensitive(True)
+        else:
+            # Deactivate some items
+            self.menuitem_branch.set_sensitive(False)
+            self.menuitem_stats.set_sensitive(False)
+            self.menuitem_add_files.set_sensitive(False)
+            self.menuitem_remove_files.set_sensitive(False)
+            self.menuitem_file_make_directory.set_sensitive(False)
+            self.menuitem_file_rename.set_sensitive(False)
+            self.menuitem_file_move.set_sensitive(False)
+            self.menutoolbutton_diff.set_sensitive(False)
+            self.toolbutton_log.set_sensitive(False)
+            self.toolbutton_commit.set_sensitive(False)
+            self.toolbutton_pull.set_sensitive(False)
+            self.toolbutton_push.set_sensitive(False)
         
         self.set_busy(self.treeview_right, False)
 

@@ -246,6 +246,21 @@ def info(location):
     except errors.NoRepositoryPresent:
         pass
 
+def is_branch(location):
+    """ Check if the location is a branch.
+    
+    :param location: the location you want to check
+    
+    :return: True or False respectively
+    """
+    try:
+        branch = Branch.open_containing(location)[0]
+    except errors.NotBranchError:
+        return False
+    else:
+        return True
+        
+
 def is_checkout(location):
     """ Check if the location is a checkout.
     
@@ -274,7 +289,6 @@ def is_checkout(location):
         return True
     else:
         return False
-
 
 def log(location, timezone='original', verbose=False, show_ids=False,
         forward=False, revision=None, log_format=None, message=None,

@@ -27,6 +27,7 @@ try:
 except:
     sys.exit(1)
 
+from olive.backend.info import is_branch
 import olive.backend.errors as errors
 
 from dialog import OliveDialog
@@ -203,6 +204,22 @@ class OliveHandler:
     def on_treeview_right_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the file list. """
         if event.button == 3:
+            # get the menu items
+            m_add = self.menu.ui.get_widget('/context_right/add')
+            m_remove = self.menu.ui.get_widget('/context_right/remove')
+            m_commit = self.menu.ui.get_widget('/context_right/commit')
+            m_diff = self.menu.ui.get_widget('/context_right/diff')
+            # check if we're in a branch
+            if not is_branch(self.comm.get_path()):
+                m_add.set_sensitive(False)
+                m_remove.set_sensitive(False)
+                m_commit.set_sensitive(False)
+                m_diff.set_sensitive(False)
+            else:
+                m_add.set_sensitive(True)
+                m_remove.set_sensitive(True)
+                m_commit.set_sensitive(True)
+                m_diff.set_sensitive(True)
             self.menu.right_context_menu().popup(None, None, None, 0,
                                                  event.time)
         

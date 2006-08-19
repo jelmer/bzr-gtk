@@ -1,5 +1,8 @@
 2006-08-19  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive/frontend/__init__.py: set menu and toolbar sensitivity
+    * olive/frontend/handler.py: set context menu sensitivity
+    * olive/backend/info.py: implemented is_branch()
     * olive/frontend/gtk/__init__.py: applied Diff toolbutton menu
     * olive/frontend/gtk/menu.py: implemented the Diff toolbutton menu
     * cmenu.ui: added Diff toolbutton menu; removed Log from right context menu
