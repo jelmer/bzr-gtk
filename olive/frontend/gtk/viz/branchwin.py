@@ -110,7 +110,7 @@ class BranchWindow(gtk.Window):
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 40)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        column = gtk.TreeViewColumn("Message")
+        column = gtk.TreeViewColumn(_('Message'))
         column.set_resizable(True)
         column.pack_start(cell, expand=True)
         column.add_attribute(cell, "text", 4)
@@ -119,7 +119,7 @@ class BranchWindow(gtk.Window):
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 40)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        column = gtk.TreeViewColumn("Committer")
+        column = gtk.TreeViewColumn(_('Committer'))
         column.set_resizable(True)
         column.pack_start(cell, expand=True)
         column.add_attribute(cell, "text", 5)
@@ -127,7 +127,7 @@ class BranchWindow(gtk.Window):
 
         cell = gtk.CellRendererText()
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        column = gtk.TreeViewColumn("Date")
+        column = gtk.TreeViewColumn(_('Date'))
         column.set_resizable(True)
         column.pack_start(cell, expand=True)
         column.add_attribute(cell, "text", 6)
@@ -185,7 +185,7 @@ class BranchWindow(gtk.Window):
 
         align = gtk.Alignment(0.0, 0.5)
         label = gtk.Label()
-        label.set_markup("<b>Revision:</b>")
+        label.set_markup(_('<b>Revision:</b>'))
         align.add(label)
         table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
         label.show()
@@ -201,7 +201,7 @@ class BranchWindow(gtk.Window):
 
         align = gtk.Alignment(0.0, 0.5)
         label = gtk.Label()
-        label.set_markup("<b>Committer:</b>")
+        label.set_markup(_('<b>Committer:</b>'))
         align.add(label)
         table.attach(align, 0, 1, 1, 2, gtk.FILL, gtk.FILL)
         label.show()
@@ -217,7 +217,7 @@ class BranchWindow(gtk.Window):
 
         align = gtk.Alignment(0.0, 0.5)
         label = gtk.Label()
-        label.set_markup("<b>Branch nick:</b>")
+        label.set_markup(_('<b>Branch nick:</b>'))
         align.add(label)
         table.attach(align, 0, 1, 2, 3, gtk.FILL, gtk.FILL)
         label.show()
@@ -233,7 +233,7 @@ class BranchWindow(gtk.Window):
 
         align = gtk.Alignment(0.0, 0.5)
         label = gtk.Label()
-        label.set_markup("<b>Timestamp:</b>")
+        label.set_markup(_('<b>Timestamp:</b>'))
         align.add(label)
         table.attach(align, 0, 1, 3, 4, gtk.FILL, gtk.FILL)
         label.show()
@@ -255,7 +255,7 @@ class BranchWindow(gtk.Window):
         self.parents_widgets = []
 
         label = gtk.Label()
-        label.set_markup("<b>Parents:</b>")
+        label.set_markup(_('<b>Parents:</b>'))
         align = gtk.Alignment(0.0, 0.5)
         align.add(label)
         self.parents_table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)

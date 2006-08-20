@@ -67,20 +67,20 @@ class OliveRemove:
             filename = self.comm.get_selected_right()
             
             if filename is None:
-                self.dialog.error_dialog('No file was selected',
-                                         'Please select a file from the list,\nor choose the other option.')
+                self.dialog.error_dialog(_('No file was selected'),
+                                         _('Please select a file from the list,\nor choose the other option.'))
                 return
             
             try:
                 fileops.remove([directory + '/' + filename])
             except errors.NotBranchError:
-                self.dialog.error_dialog('Directory is not a branch',
-                                         'You can perform this action only in a branch.')
+                self.dialog.error_dialog(_('Directory is not a branch'),
+                                         _('You can perform this action only in a branch.'))
                 self.comm.set_busy(self.window, False)
                 return
             except errors.NotVersionedError:
-                self.dialog.error_dialog('File not versioned',
-                                         'The selected file is not versioned.')
+                self.dialog.error_dialog(_('File not versioned'),
+                                         _('The selected file is not versioned.'))
                 self.comm.set_busy(self.window, False)
                 return
             except:
@@ -90,13 +90,13 @@ class OliveRemove:
             try:
                 fileops.remove([directory], True)
             except errors.NotBranchError:
-                self.dialog.error_dialog('Directory is not a branch',
-                                         'You can perform this action only in a branch.')
+                self.dialog.error_dialog(_('Directory is not a branch'),
+                                         _('You can perform this action only in a branch.'))
                 self.comm.set_busy(self.window, False)
                 return
             except errors.NoMatchingFiles:
-                dialog.warning_dialog('No matching files',
-                                      'No added files were found in the working tree.')
+                dialog.warning_dialog(_('No matching files'),
+                                      _('No added files were found in the working tree.'))
                 self.comm.set_busy(self.window, False)
             except:
                 raise

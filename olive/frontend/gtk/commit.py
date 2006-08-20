@@ -29,9 +29,9 @@ try:
 except:
     sys.exit(1)
 
-import bzrlib
+from bzrlib import version_info
 
-if bzrlib.version_info < (0, 9):
+if version_info < (0, 9):
     # function deprecated after 0.9
     from bzrlib.delta import compare_trees
 
@@ -43,15 +43,18 @@ class OliveCommit:
     def __init__(self, gladefile, comm, dialog):
         """ Initialize the Commit dialog. """
         self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_commit')
+        self.glade = gtk.glade.XML(self.gladefile, 'window_commit', 'olive-gtk')
         
         # Communication object
         self.comm = comm
         # Dialog object
         self.dialog = dialog
         
-        # Get the Commit dialog widget
+        # Get some important widgets
         self.window = self.glade.get_widget('window_commit')
+        self.checkbutton_local = self.glade.get_widget('checkbutton_commit_local')
+        self.textview = self.glade.get_widget('textview_commit')
+        self.file_view = self.glade.get_widget('treeview_commit_select')
 
         # Check if current location is a branch
         try:
@@ -72,7 +75,7 @@ class OliveCommit:
         
         # Set the delta
         self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
-        if bzrlib.version_info < (0, 9):
+        if version_info < (0, 9):
             self.delta = compare_trees(self.old_tree, self.wt)
         else:
             self.delta = self.wt.changes_from(self.old_tree)
@@ -86,16 +89,12 @@ class OliveCommit:
         
         # Create the file list
         self._create_file_view()
-        
-        # Some additional widgets
-        self.checkbutton_local = self.glade.get_widget('checkbutton_commit_local')
-        self.textview = self.glade.get_widget('textview_commit')
     
     def display(self):
         """ Display the Push dialog. """
         if self.notbranch:
-            self.dialog.error_dialog('Directory is not a branch',
-                                     'You can perform this action only in a branch.')
+            self.dialog.error_dialog(_('Directory is not a branch'),
+                                     _('You can perform this action only in a branch.'))
             self.close()
         else:
             from olive.backend.info import is_checkout
@@ -112,29 +111,28 @@ class OliveCommit:
         self.file_store = gtk.ListStore(gobject.TYPE_BOOLEAN,
                                         gobject.TYPE_STRING,
                                         gobject.TYPE_STRING)
-        self.file_view = self.glade.get_widget('treeview_commit_select')
         self.file_view.set_model(self.file_store)
         crt = gtk.CellRendererToggle()
         crt.set_property("activatable", True)
         crt.connect("toggled", self._toggle_commit, self.file_store)
-        self.file_view.append_column(gtk.TreeViewColumn("Commit",
+        self.file_view.append_column(gtk.TreeViewColumn(_('Commit'),
                                      crt, active=0))
-        self.file_view.append_column(gtk.TreeViewColumn("Path",
+        self.file_view.append_column(gtk.TreeViewColumn(_('Path'),
                                      gtk.CellRendererText(), text=1))
-        self.file_view.append_column(gtk.TreeViewColumn("Type",
+        self.file_view.append_column(gtk.TreeViewColumn(_('Type'),
                                      gtk.CellRendererText(), text=2))
 
-        for path, _, _ in self.delta.added:
-            self.file_store.append([ True, path, "added" ])
+        for path, id, kind in self.delta.added:
+            self.file_store.append([ True, path, _('added') ])
 
-        for path, _, _ in self.delta.removed:
-            self.file_store.append([ True, path, "removed" ])
+        for path, id, kind in self.delta.removed:
+            self.file_store.append([ True, path, _('removed') ])
 
-        for oldpath, _, _, _, _, _ in self.delta.renamed:
-            self.file_store.append([ True, oldpath, "renamed"])
+        for oldpath, newpath, id, kind, text_modified, meta_modified in self.delta.renamed:
+            self.file_store.append([ True, oldpath, _('renamed') ])
 
-        for path, _, _, _, _ in self.delta.modified:
-            self.file_store.append([ True, path, "modified"])
+        for path, id, kind, text_modified, meta_modified in self.delta.modified:
+            self.file_store.append([ True, path, _('modified') ])
     
     def _get_specific_files(self):
         ret = []
@@ -170,33 +168,33 @@ class OliveCommit:
                            local=self.checkbutton_local.get_active(),
                            specific_files=specific_files)
         except errors.NotBranchError:
-            self.dialog.error_dialog('Directory is not a branch',
-                                     'You can perform this action only in a branch.')
+            self.dialog.error_dialog(_('Directory is not a branch'),
+                                     _('You can perform this action only in a branch.'))
             self.comm.set_busy(self.window, False)
             return
         except errors.LocalRequiresBoundBranch:
-            self.dialog.error_dialog('Directory is not a checkout',
-                                     'You can perform local commit only on checkouts.')
+            self.dialog.error_dialog(_('Directory is not a checkout'),
+                                     _('You can perform local commit only on checkouts.'))
             self.comm.set_busy(self.window, False)
             return
         except errors.PointlessCommit:
-            self.dialog.error_dialog('No changes to commit',
-                                     'Try force commit if you want to commit anyway.')
+            self.dialog.error_dialog(_('No changes to commit'),
+                                     _('Try force commit if you want to commit anyway.'))
             self.comm.set_busy(self.window, False)
             return
         except errors.ConflictsInTree:
-            self.dialog.error_dialog('Conflicts in tree'
-                                     'You need to resolve the conflicts before committing.')
+            self.dialog.error_dialog(_('Conflicts in tree'),
+                                     _('You need to resolve the conflicts before committing.'))
             self.comm.set_busy(self.window, False)
             return
         except errors.StrictCommitFailed:
-            self.dialog.error_dialog('Strict commit failed'
-                                     'There are unknown files in the working tree.\nPlease add or delete them.')
+            self.dialog.error_dialog(_('Strict commit failed'),
+                                     _('There are unknown files in the working tree.\nPlease add or delete them.'))
             self.comm.set_busy(self.window, False)
             return
         except errors.BoundBranchOutOfDate, errmsg:
-            self.dialog.error_dialog('Bound branch is out of date',
-                                     '%s' % errmsg)
+            self.dialog.error_dialog(_('Bound branch is out of date'),
+                                     _('%s') % errmsg)
             self.comm.set_busy(self.window, False)
             return
         except:

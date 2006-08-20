@@ -79,14 +79,14 @@ class OliveHandler:
         try:
             ret = update.pull(self.comm.get_path())
         except errors.NotBranchError:
-            self.dialog.error_dialog('Directory is not a branch',
-                                     'You can perform this action only in a branch.')
+            self.dialog.error_dialog(_('Directory is not a branch'),
+                                     _('You can perform this action only in a branch.'))
         except errors.NoLocationKnown:
-            self.dialog.error_dialog('Parent location is unknown',
-                                     'Pulling is not possible until there is no parent location.')
+            self.dialog.error_dialog(_('Parent location is unknown'),
+                                     _('Pulling is not possible until there is no parent location.'))
         else:
-            self.dialog.info_dialog('Pull successful',
-                                    '%d revision(s) pulled.' % ret)
+            self.dialog.info_dialog(_('Pull successful'),
+                                    _('%d revision(s) pulled.') % ret)
         
         self.comm.set_busy(self.comm.window_main, False)
     
@@ -109,16 +109,16 @@ class OliveHandler:
         try:
             init.init(self.comm.get_path())
         except errors.AlreadyBranchError, errmsg:
-            self.dialog.error_dialog('Directory is already a branch',
-                                     'The current directory (%s) is already a branch.\nYou can start using it, or initialize another directory.' % errmsg)
+            self.dialog.error_dialog(_('Directory is already a branch'),
+                                     _('The current directory (%s) is already a branch.\nYou can start using it, or initialize another directory.') % errmsg)
         except errors.BranchExistsWithoutWorkingTree, errmsg:
-            self.dialog.error_dialog('Branch without a working tree',
-                                     'The current directory (%s)\nis a branch without a working tree.' % errmsg)
+            self.dialog.error_dialog(_('Branch without a working tree'),
+                                     _('The current directory (%s)\nis a branch without a working tree.') % errmsg)
         except:
             raise
         else:
-            self.dialog.info_dialog('Ininialize successful',
-                                    'Directory successfully initialized.')
+            self.dialog.info_dialog(_('Ininialize successful'),
+                                    _('Directory successfully initialized.'))
             self.comm.refresh_right()
         
     def on_menuitem_file_make_directory_activate(self, widget):
@@ -263,6 +263,6 @@ class OliveHandler:
 
     def not_implemented(self, widget):
         """ Display a Not implemented error message. """
-        self.dialog.error_dialog('I feel sorry',
-                                 'This feature is not yet implemented.')
+        self.dialog.error_dialog(_('We feel sorry'),
+                                 _('This feature is not yet implemented.'))
 

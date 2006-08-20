@@ -1,3 +1,9 @@
+2006-08-20  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * po/hu.po: added Hungarian traslation
+    * Added gettext support to all files.
+    * genpot.sh: added olive-gtk.pot generator script
+
 2006-08-19  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * olive/frontend/handler.py: fixed a long existing bug: double-clicking a

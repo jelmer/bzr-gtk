@@ -54,10 +54,10 @@ class OliveGtk:
             # Check again
             if not os.path.exists(self.gladefile):
                 # Fail
-                print "Glade file cannot be found."
+                print _('Glade file cannot be found.')
                 sys.exit(1)
 
-        self.toplevel = gtk.glade.XML(self.gladefile, 'window_main')
+        self.toplevel = gtk.glade.XML(self.gladefile, 'window_main', 'olive-gtk')
         
         self.window = self.toplevel.get_widget('window_main')
         
@@ -140,13 +140,13 @@ class OliveGtk:
         bookmarks = self.comm.pref.get_bookmarks()
         
         # Add them to the TreeStore
-        titer = treestore.append(None, ['Bookmarks'])
+        titer = treestore.append(None, [_('Bookmarks')])
         for item in bookmarks:
             treestore.append(titer, [item])
         
         # Create the column and add it to the TreeView
         self.treeview_left.set_model(treestore)
-        tvcolumn_bookmark = gtk.TreeViewColumn('Bookmark')
+        tvcolumn_bookmark = gtk.TreeViewColumn(_('Bookmark'))
         self.treeview_left.append_column(tvcolumn_bookmark)
         
         # Set up the cells
@@ -191,12 +191,25 @@ class OliveGtk:
         for item in dirs:    
             liststore.append([gtk.STOCK_DIRECTORY, item, ''])
         for item in files:
-            liststore.append([gtk.STOCK_FILE, item, fileops.status(path + '/' + item)])
+            status = fileops.status(path + '/' + item)
+            if status == 'renamed':
+                st = _('renamed')
+            elif status == 'removed':
+                st = _('removed')
+            elif status == 'added':
+                st = _('added')
+            elif status == 'modified':
+                st = _('modified')
+            elif status == 'unchanged':
+                st = _('unchanged')
+            else:
+                st = _('unknown')
+            liststore.append([gtk.STOCK_FILE, item, st])
         
         # Create the columns and add them to the TreeView
         self.treeview_right.set_model(liststore)
-        tvcolumn_filename = gtk.TreeViewColumn('Filename')
-        tvcolumn_status = gtk.TreeViewColumn('Status')
+        tvcolumn_filename = gtk.TreeViewColumn(_('Filename'))
+        tvcolumn_status = gtk.TreeViewColumn(_('Status'))
         self.treeview_right.append_column(tvcolumn_filename)
         self.treeview_right.append_column(tvcolumn_status)
         
@@ -331,7 +344,7 @@ class OliveCommunicator:
         bookmarks = self.pref.get_bookmarks()
         
         # Add them to the TreeStore
-        titer = treestore.append(None, ['Bookmarks'])
+        titer = treestore.append(None, [_('Bookmarks')])
         for item in bookmarks:
             treestore.append(titer, [item])
         
@@ -382,7 +395,20 @@ class OliveCommunicator:
         for item in dirs:    
             liststore.append([gtk.STOCK_DIRECTORY, item, ''])
         for item in files:
-            liststore.append([gtk.STOCK_FILE, item, fileops.status(path + '/' + item)])
+            status = fileops.status(path + '/' + item)
+            if status == 'renamed':
+                st = _('renamed')
+            elif status == 'removed':
+                st = _('removed')
+            elif status == 'added':
+                st = _('added')
+            elif status == 'modified':
+                st = _('modified')
+            elif status == 'unchanged':
+                st = _('unchanged')
+            else:
+                st = _('unknown')
+            liststore.append([gtk.STOCK_FILE, item, st])
         
         # Add the ListStore to the TreeView
         self.treeview_right.set_model(liststore)

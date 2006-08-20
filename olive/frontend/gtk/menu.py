@@ -46,7 +46,7 @@ class OliveMenu:
             # Check again
             if not os.path.exists(self.uifile):
                 # Fail
-                print "UI description file cannot be found."
+                print _('UI description file cannot be found.')
                 sys.exit(1)
         
         self.gladefile = gladefile
@@ -58,36 +58,36 @@ class OliveMenu:
         
         self.actiongroup = gtk.ActionGroup('context')
         self.actiongroup.add_actions([('add', gtk.STOCK_ADD,
-                                       'Add', None,
-                                       'Add the selected file',
+                                       _('Add'), None,
+                                       _('Add the selected file'),
                                        self.add_file),
                                       ('remove', gtk.STOCK_REMOVE,
-                                       'Remove', None,
-                                       'Remove the selected file',
+                                       _('Remove'), None,
+                                       _('Remove the selected file'),
                                        self.remove_file),
                                       ('commit', None,
-                                       'Commit', None,
-                                       'Commit the changes',
+                                       _('Commit'), None,
+                                       _('Commit the changes'),
                                        self.commit),
                                       ('diff', None,
-                                       'Diff', None,
-                                       'Show the diff of the file',
+                                       _('Diff'), None,
+                                       _('Show the diff of the file'),
                                        self.diff),
                                       ('bookmark', None,
-                                       'Bookmark', None,
-                                       'Bookmark current location',
+                                       _('Bookmark'), None,
+                                       _('Bookmark current location'),
                                        self.bookmark),
                                       ('remove_bookmark', gtk.STOCK_REMOVE,
-                                       'Remove', None,
-                                       'Remove the selected bookmark',
+                                       _('Remove'), None,
+                                       _('Remove the selected bookmark'),
                                        self.remove_bookmark),
                                       ('diff_selected', None,
-                                       'Selected...', None,
-                                       'Show the differences of the selected file',
+                                       _('Selected...'), None,
+                                       _('Show the differences of the selected file'),
                                        self.diff_selected),
                                       ('diff_all', None,
-                                       'All...', None,
-                                       'Show the differences of all files',
+                                       _('All...'), None,
+                                       _('Show the differences of all files'),
                                        self.diff_all)
                                      ])
         
@@ -125,15 +125,15 @@ class OliveMenu:
         filename = self.comm.get_selected_right()
             
         if filename is None:
-            self.dialog.error_dialog('No file was selected',
-                                     'Please select a file from the list,\nor choose the other option.')
+            self.dialog.error_dialog(_('No file was selected'),
+                                     _('Please select a file from the list,\nor choose the other option.'))
             return
         
         try:
             fileops.add([directory + '/' + filename])
         except errors.NotBranchError:
-            self.dialog.error_dialog('Directory is not a branch',
-                                     'You can perform this action only in a branch.')
+            self.dialog.error_dialog(_('Directory is not a branch'),
+                                     _('You can perform this action only in a branch.'))
             return
         except:
             raise
@@ -147,19 +147,19 @@ class OliveMenu:
         filename = self.comm.get_selected_right()
         
         if filename is None:
-            self.dialog.error_dialog('No file was selected',
-                                     'Please select a file from the list,\nor choose the other option.')
+            self.dialog.error_dialog(_('No file was selected'),
+                                     _('Please select a file from the list,\nor choose the other option.'))
             return
         
         try:
             fileops.remove([directory + '/' + filename])
         except errors.NotBranchError:
-            self.dialog.error_dialog('Directory is not a branch',
-                                     'You can perform this action only in a branch.')
+            self.dialog.error_dialog(_('Directory is not a branch'),
+                                     _('You can perform this action only in a branch.'))
             return
         except errors.NotVersionedError:
-            self.dialog.error_dialog('File not versioned',
-                                     'The selected file is not versioned.')
+            self.dialog.error_dialog(_('File not versioned'),
+                                     _('The selected file is not versioned.'))
             return
         except:
             raise
@@ -181,11 +181,11 @@ class OliveMenu:
     def bookmark(self, action):
         """ Right context menu -> Bookmark """
         if self.comm.pref.add_bookmark(self.comm.get_path()):
-            self.dialog.info_dialog('Bookmark successfully added',
-                                    'The current directory was bookmarked. You can reach\nit by selecting it from the left panel.')
+            self.dialog.info_dialog(_('Bookmark successfully added'),
+                                    _('The current directory was bookmarked. You can reach\nit by selecting it from the left panel.'))
         else:
-            self.dialog.warning_dialog('Location already bookmarked'
-                                       'The current directory is already bookmarked.\nSee the left panel for reference.')
+            self.dialog.warning_dialog(_('Location already bookmarked'),
+                                       _('The current directory is already bookmarked.\nSee the left panel for reference.'))
         
         self.comm.refresh_left()
 

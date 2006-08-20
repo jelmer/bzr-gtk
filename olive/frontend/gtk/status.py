@@ -104,30 +104,30 @@ class OliveStatus:
             delta = self.wt.changes_from(self.old_tree)
 
         if len(delta.added):
-            titer = self.model.append(None, [ "Added", None ])
+            titer = self.model.append(None, [ _('Added'), None ])
             for path, id, kind in delta.added:
                 self.model.append(titer, [ path, path ])
 
         if len(delta.removed):
-            titer = self.model.append(None, [ "Removed", None ])
+            titer = self.model.append(None, [ _('Removed'), None ])
             for path, id, kind in delta.removed:
                 self.model.append(titer, [ path, path ])
 
         if len(delta.renamed):
-            titer = self.model.append(None, [ "Renamed", None ])
+            titer = self.model.append(None, [ _('Renamed'), None ])
             for oldpath, newpath, id, kind, text_modified, meta_modified \
                     in delta.renamed:
                 self.model.append(titer, [ oldpath, newpath ])
 
         if len(delta.modified):
-            titer = self.model.append(None, [ "Modified", None ])
+            titer = self.model.append(None, [ _('Modified'), None ])
             for path, id, kind, text_modified, meta_modified in delta.modified:
                 self.model.append(titer, [ path, path ])
         
         done_unknown = False
         for path in self.wt.unknowns():
             if not done_unknown:
-                titer = self.model.append(None, [ "Unknown", None ])
+                titer = self.model.append(None, [ _('Unknown'), None ])
                 done_unknown = True
             self.model.append(titer, [ path, path ])
 
@@ -136,8 +136,8 @@ class OliveStatus:
     def display(self):
         """ Display the Diff window. """
         if self.notbranch:
-            self.dialog.error_dialog('Directory is not a branch',
-                                     'You can perform this action only in a branch.')
+            self.dialog.error_dialog(_('Directory is not a branch'),
+                                     _('You can perform this action only in a branch.'))
             self.close()
         else:
             self.window.show_all()

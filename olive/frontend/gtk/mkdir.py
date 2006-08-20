@@ -36,7 +36,7 @@ class OliveMkdir:
     def __init__(self, gladefile, comm, dialog):
         """ Initialize the Make directory dialog. """
         self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_mkdir')
+        self.glade = gtk.glade.XML(self.gladefile, 'window_mkdir', 'olive-gtk')
         
         # Communication object
         self.comm = comm
@@ -64,8 +64,8 @@ class OliveMkdir:
         dirname = entry.get_text()
         
         if dirname == "":
-            self.dialog.error_dialog('No directory name given',
-                                     'Please specify a desired name for the new directory.')
+            self.dialog.error_dialog(_('No directory name given'),
+                                     _('Please specify a desired name for the new directory.'))
             return
         
         newdir = self.comm.get_path() + '/' + dirname
@@ -75,20 +75,20 @@ class OliveMkdir:
             try:
                 fileops.mkdir(newdir)
             except errors.DirectoryAlreadyExists:
-                self.dialog.error_dialog('Directory already exists',
-                                         'Please specify another name to continue.')
+                self.dialog.error_dialog(_('Directory already exists'),
+                                         _('Please specify another name to continue.'))
                 return
             except errors.NotBranchError:
-                self.dialog.warning_dialog('Directory is not in a branch',
-                                           'You can only create a non-versioned directory.')
+                self.dialog.warning_dialog(_('Directory is not in a branch'),
+                                           _('You can only create a non-versioned directory.'))
         else:
             # Just a simple directory
             try:
                 os.mkdir(newdir)
             except OSError, e:
                 if e.errno == 17:
-                    self.dialog.error_dialog('Directory already exists',
-                                             'Please specify another name to continue.')
+                    self.dialog.error_dialog(_('Directory already exists'),
+                                             _('Please specify another name to continue.'))
                     return
 
         self.close()

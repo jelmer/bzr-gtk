@@ -60,8 +60,8 @@ class OliveLog:
     def display(self):
         """ Display the Log (bzrk) window. """
         if self.notbranch:
-            self.dialog.error_dialog('Directory is not a branch',
-                                     'You can perform this action only in a branch.')
+            self.dialog.error_dialog(_('Directory is not a branch'),
+                                     _('You can perform this action only in a branch.'))
         else:
             self.app = BzrkApp()
             self.app.show(self.branch, self.revid, None)

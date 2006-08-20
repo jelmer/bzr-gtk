@@ -35,7 +35,7 @@ class OliveAdd:
     def __init__(self, gladefile, comm, dialog):
         """ Initialize the Add file(s) dialog. """
         self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_add')
+        self.glade = gtk.glade.XML(self.gladefile, 'window_add', 'olive-gtk')
         
         # Communication object
         self.comm = comm
@@ -67,15 +67,15 @@ class OliveAdd:
             filename = self.comm.get_selected_right()
             
             if filename is None:
-                self.dialog.error_dialog('No file was selected',
-                                         'Please select a file from the list,\nor choose the other option.')
+                self.dialog.error_dialog(_('No file was selected'),
+                                         _('Please select a file from the list,\nor choose the other option.'))
                 return
             
             try:
                 fileops.add([directory + '/' + filename])
             except errors.NotBranchError:
-                self.dialog.error_dialog('Directory is not a branch',
-                                         'You can perform this action only in a branch.')
+                self.dialog.error_dialog(_('Directory is not a branch'),
+                                         _('You can perform this action only in a branch.'))
                 self.comm.set_busy(self.window, False)
                 return
             except:
@@ -85,8 +85,8 @@ class OliveAdd:
             try:
                 fileops.add([directory], True)
             except errors.NotBranchError:
-                self.dialog.error_dialog('Directory is not a branch',
-                                         'You can perform this action only in a branch.')
+                self.dialog.error_dialog(_('Directory is not a branch'),
+                                         _('You can perform this action only in a branch.'))
                 self.comm.set_busy(self.window, False)
                 return
             except:

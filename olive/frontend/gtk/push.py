@@ -76,8 +76,8 @@ class OlivePush:
     def display(self):
         """ Display the Push dialog. """
         if self.notbranch:
-            self.dialog.error_dialog('Directory is not a branch',
-                                     'You can perform this action only in a branch.')
+            self.dialog.error_dialog(_('Directory is not a branch'),
+                                     _('You can perform this action only in a branch.'))
             self.close()
         else:
             self.window.show()
@@ -119,28 +119,28 @@ class OlivePush:
                 revs = commit.push(self.comm.get_path(),
                                    overwrite=self.check_overwrite.get_active())
             except errors.NotBranchError:
-                self.dialog.error_dialog('Directory is not a branch',
-                                         'You can perform this action only in a branch.')
+                self.dialog.error_dialog(_('Directory is not a branch'),
+                                         _('You can perform this action only in a branch.'))
                 return
             except errors.NoLocationKnown:
-                self.dialog.error_dialog('Push location is unknown',
-                                         'Please specify a location manually.')
+                self.dialog.error_dialog(_('Push location is unknown'),
+                                         _('Please specify a location manually.'))
                 return
             except errors.NonExistingParent, errmsg:
-                self.dialog.error_dialog("Non existing parent directory",
-                                         "The parent directory (%s)\ndoesn't exist." % errmsg)
+                self.dialog.error_dialog(_('Non existing parent directory'),
+                                         _("The parent directory (%s)\ndoesn't exist.") % errmsg)
                 return
             except errors.DivergedBranchesError:
-                self.dialog.error_dialog('Branches have been diverged',
-                                         'You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.')
+                self.dialog.error_dialog(_('Branches have been diverged'),
+                                         _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
                 return
             except:
                 raise
         elif radio_specific.get_active():
             location = self.entry_location.get_text()
             if location == '':
-                self.dialog.error_dialog('No location specified',
-                                         'Please specify a location or use the default.')
+                self.dialog.error_dialog(_('No location specified'),
+                                         _('Please specify a location or use the default.'))
                 return
             
             try:
@@ -149,23 +149,23 @@ class OlivePush:
                                    self.check_overwrite.get_active(),
                                    self.check_create.get_active())
             except errors.NotBranchError:
-                self.dialog.error_dialog('Directory is not a branch',
-                                         'You can perform this action only in a branch.')
+                self.dialog.error_dialog(_('Directory is not a branch'),
+                                         _('You can perform this action only in a branch.'))
                 self.comm.set_busy(self.window, False)
                 return
             except errors.NonExistingParent, errmsg:
-                self.dialog.error_dialog("Non existing parent directory",
-                                         "The parent directory (%s)\ndoesn't exist." % errmsg)
+                self.dialog.error_dialog(_('Non existing parent directory'),
+                                         _("The parent directory (%s)\ndoesn't exist.") % errmsg)
                 self.comm.set_busy(self.window, False)
                 return
             except errors.DivergedBranchesError:
-                self.dialog.error_dialog('Branches have been diverged',
-                                         'You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.')
+                self.dialog.error_dialog(_('Branches have been diverged'),
+                                         _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
                 self.comm.set_busy(self.window, False)
                 return
             except errors.PathPrefixNotCreated:
-                self.dialog.error_dialog("Path prefix not created",
-                                         "The path leading up to the specified location couldn't\nbe created.")
+                self.dialog.error_dialog(_('Path prefix not created'),
+                                         _("The path leading up to the specified location couldn't\nbe created."))
                 self.comm.set_busy(self.window, False)
                 return
             except:
@@ -175,8 +175,8 @@ class OlivePush:
             pass
         
         self.close()
-        self.dialog.info_dialog('Push successful',
-                                '%d revision(s) pushed.' % revs)
+        self.dialog.info_dialog(_('Push successful'),
+                                _('%d revision(s) pushed.') % revs)
     
     def close(self, widget=None):
         self.window.destroy()

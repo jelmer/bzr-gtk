@@ -136,26 +136,26 @@ class DiffWindow(gtk.Window):
         else:
             delta = self.rev_tree.changes_from(self.parent_tree)
 
-        self.model.append(None, [ "Complete Diff", "" ])
+        self.model.append(None, [ _('Complete Diff'), "" ])
 
         if len(delta.added):
-            titer = self.model.append(None, [ "Added", None ])
+            titer = self.model.append(None, [ _('Added'), None ])
             for path, id, kind in delta.added:
                 self.model.append(titer, [ path, path ])
 
         if len(delta.removed):
-            titer = self.model.append(None, [ "Removed", None ])
+            titer = self.model.append(None, [ _('Removed'), None ])
             for path, id, kind in delta.removed:
                 self.model.append(titer, [ path, path ])
 
         if len(delta.renamed):
-            titer = self.model.append(None, [ "Renamed", None ])
+            titer = self.model.append(None, [ _('Renamed'), None ])
             for oldpath, newpath, id, kind, text_modified, meta_modified \
                     in delta.renamed:
                 self.model.append(titer, [ oldpath, newpath ])
 
         if len(delta.modified):
-            titer = self.model.append(None, [ "Modified", None ])
+            titer = self.model.append(None, [ _('Modified'), None ])
             for path, id, kind, text_modified, meta_modified in delta.modified:
                 self.model.append(titer, [ path, path ])
 

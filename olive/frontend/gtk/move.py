@@ -36,7 +36,7 @@ class OliveMove:
     def __init__(self, gladefile, comm, dialog):
         """ Initialize the Move dialog. """
         self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_move')
+        self.glade = gtk.glade.XML(self.gladefile, 'window_move', 'olive-gtk')
         
         # Communication object
         self.comm = comm
@@ -66,8 +66,8 @@ class OliveMove:
         filename = self.comm.get_selected_right()
             
         if filename is None:
-            self.dialog.error_dialog('No file was selected',
-                                     'Please select a file from the list to proceed.')
+            self.dialog.error_dialog(_('No file was selected'),
+                                     _('Please select a file from the list to proceed.'))
             return
         
         source = self.comm.get_path() + '/' + filename
@@ -76,12 +76,12 @@ class OliveMove:
         try:
             fileops.move([source, destination])
         except errors.NotBranchError:
-            self.dialog.error_dialog('File is not in a branch',
-                                     'The selected file is not in a branch.')
+            self.dialog.error_dialog(_('File is not in a branch'),
+                                     _('The selected file is not in a branch.'))
             return
         except errors.NotSameBranchError:
-            self.dialog.error_dialog('Not the same branch',
-                                     'The destination is not in the same branch.')
+            self.dialog.error_dialog(_('Not the same branch'),
+                                     _('The destination is not in the same branch.'))
             return
         except:
             raise

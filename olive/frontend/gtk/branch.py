@@ -35,7 +35,7 @@ class OliveBranch:
     def __init__(self, gladefile, comm, dialog):
         """ Initialize the Branch dialog. """
         self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_branch')
+        self.glade = gtk.glade.XML(self.gladefile, 'window_branch', 'olive-gtk')
         
         # Communication object
         self.comm = comm
@@ -63,8 +63,8 @@ class OliveBranch:
         entry_location = self.glade.get_widget('entry_branch_location')
         location = entry_location.get_text()
         if location is '':
-            self.dialog.error_dialog('Missing branch location',
-                                     'You must specify a branch location.')
+            self.dialog.error_dialog(_('Missing branch location'),
+                                     _('You must specify a branch location.'))
             return
         
         destination = self.filechooser.get_filename()
@@ -78,36 +78,36 @@ class OliveBranch:
         try:
             revs = init.branch(location, destination, revno)
         except errors.NonExistingSource, errmsg:
-            self.dialog.error_dialog('Non existing source',
-                                     "The location (%s)\ndoesn't exist." % errmsg)
+            self.dialog.error_dialog(_('Non existing source'),
+                                     _("The location (%s)\ndoesn't exist.") % errmsg)
             self.comm.set_busy(self.window, False)
             return
         except errors.TargetAlreadyExists, errmsg:
-            self.dialog.error_dialog('Target already exists',
-                                     'Target directory (%s)\nalready exists. Please select another target.' % errmsg)
+            self.dialog.error_dialog(_('Target already exists'),
+                                     _('Target directory (%s)\nalready exists. Please select another target.') % errmsg)
             self.comm.set_busy(self.window, False)
             return
         except errors.NonExistingParent, errmsg:
-            self.dialog.error_dialog("Non existing parent directory",
-                                     "The parent directory (%s)\ndoesn't exist." % errmsg)
+            self.dialog.error_dialog(_('Non existing parent directory'),
+                                     _("The parent directory (%s)\ndoesn't exist.") % errmsg)
             self.comm.set_busy(self.window, False)
             return
         except errors.NonExistingRevision:
-            self.dialog.error_dialog('Non existing revision',
-                                     "The revision you specified doesn't exist.")
+            self.dialog.error_dialog(_('Non existing revision'),
+                                     _("The revision you specified doesn't exist."))
             self.comm.set_busy(self.window, False)
             return
         except errors.NotBranchError, errmsg:
-            self.dialog.error_dialog('Location is not a branch',
-                                     'The specified location has to be a branch')
+            self.dialog.error_dialog(_('Location is not a branch'),
+                                     _('The specified location has to be a branch.'))
             self.comm.set_busy(self.window, False)
             return
         except:
             raise
         
         self.close()
-        self.dialog.info_dialog('Branching successful',
-                                '%d revision(s) branched.' % revs)
+        self.dialog.info_dialog(_('Branching successful'),
+                                _('%d revision(s) branched.') % revs)
         self.comm.refresh_right()
 
     def close(self, widget=None):

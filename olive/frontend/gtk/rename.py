@@ -64,13 +64,13 @@ class OliveRename:
         new_filename = entry.get_text()
             
         if old_filename is None:
-            self.dialog.error_dialog('No file was selected',
-                                     'Please select a file from the list to proceed.')
+            self.dialog.error_dialog(_('No file was selected'),
+                                     _('Please select a file from the list to proceed.'))
             return
         
         if new_filename == "":
-            self.dialog.error_dialog('Filename not given',
-                                     'Please specify a new name for the file.')
+            self.dialog.error_dialog(_('Filename not given'),
+                                     _('Please specify a new name for the file.'))
             return
         
         source = self.comm.get_path() + '/' + old_filename
@@ -80,12 +80,12 @@ class OliveRename:
         try:
             fileops.rename(source, destination)
         except errors.NotBranchError:
-            self.dialog.error_dialog('File is not in a branch',
-                                     'The selected file is not in a branch.')
+            self.dialog.error_dialog(_('File is not in a branch'),
+                                     _('The selected file is not in a branch.'))
             return
         except errors.NotSameBranchError:
-            self.dialog.error_dialog('Not the same branch',
-                                     'The destination is not in the same branch.')
+            self.dialog.error_dialog(_('Not the same branch'),
+                                     _('The destination is not in the same branch.'))
             return
         except:
             raise
