@@ -49,6 +49,7 @@ class OlivePush:
         # Dictionary for signal_autoconnect
         dic = { "on_button_push_push_clicked": self.push,
                 "on_button_push_cancel_clicked": self.close,
+                "on_button_push_test_clicked": self.test,
                 "on_radiobutton_push_stored_toggled": self.stored_toggled,
                 "on_radiobutton_push_specific_toggled": self.specific_toggled, }
         
@@ -56,11 +57,15 @@ class OlivePush:
         self.glade.signal_autoconnect(dic)
         
         # Get some useful widgets
+        self.radio_stored = self.glade.get_widget('radiobutton_push_stored')
+        self.radio_specific = self.glade.get_widget('radiobutton_push_specific')
         self.entry_stored = self.glade.get_widget('entry_push_stored')
         self.entry_location = self.glade.get_widget('entry_push_location')
         self.check_remember = self.glade.get_widget('checkbutton_push_remember')
         self.check_overwrite = self.glade.get_widget('checkbutton_push_overwrite')
         self.check_create = self.glade.get_widget('checkbutton_push_create')
+        self.label_test = self.glade.get_widget('label_push_test')
+        self.image_test = self.glade.get_widget('image_push_test')
         
         # Get stored location
         self.notbranch = False
@@ -109,12 +114,9 @@ class OlivePush:
             self.check_create.hide()
     
     def push(self, widget):
-        radio_stored = self.glade.get_widget('radiobutton_push_stored')
-        radio_specific = self.glade.get_widget('radiobutton_push_specific')
-        
         revs = 0
         self.comm.set_busy(self.window)
-        if radio_stored.get_active():
+        if self.radio_stored.get_active():
             try:
                 revs = commit.push(self.comm.get_path(),
                                    overwrite=self.check_overwrite.get_active())
@@ -136,7 +138,7 @@ class OlivePush:
                 return
             except:
                 raise
-        elif radio_specific.get_active():
+        elif self.radio_specific.get_active():
             location = self.entry_location.get_text()
             if location == '':
                 self.dialog.error_dialog(_('No location specified'),
@@ -177,6 +179,32 @@ class OlivePush:
         self.close()
         self.dialog.info_dialog(_('Push successful'),
                                 _('%d revision(s) pushed.') % revs)
+    
+    def test(self, widget):
+        """ Test if write access possible. """
+        import re
+        _urlRE = re.compile(r'^(?P<proto>[^:/\\]+)://(?P<path>.*)$')
+        
+        if self.radio_stored.get_active():
+            url = self.entry_stored.get_text()
+        elif self.radio_specific.get_active():
+            url = self.entry_location.get_text()
+        
+        m = _urlRE.match(url)
+        if m:
+            proto = m.groupdict()['proto']
+            if (proto == 'sftp') or (proto == 'file'):
+                # have write acces (most probably)
+                self.image_test.set_from_stock(gtk.STOCK_YES, 4)
+                self.label_test.set_markup(_('<b>Write access is available most probably</b>'))
+            else:
+                # no write access
+                self.image_test.set_from_stock(gtk.STOCK_NO, 4)
+                self.label_test.set_markup(_('<b>No write access</b>'))
+        else:
+            # couldn't determine
+            self.image_test.set_from_stock(gtk.STOCK_DIALOG_QUESTION, 4)
+            self.label_test.set_markup(_('<b>Could not determine</b>'))
     
     def close(self, widget=None):
         self.window.destroy()
