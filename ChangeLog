@@ -1,5 +1,9 @@
 2006-08-20  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive/frontend/gtk/__init__.py: proper handling of permission denied cases
+    * olive/backend/info.py: handle permission denied exception in is_branch()
+    * olive/backend/fileops.py: handle permission denied exception in status()
+    * olive/backend/errors.py: added PermissionDenied exception
     * po/hu.po: added Hungarian traslation
     * Added gettext support to all files.
     * genpot.sh: added olive-gtk.pot generator script

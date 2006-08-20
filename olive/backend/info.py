@@ -22,8 +22,8 @@ import bzrlib.errors as errors
 from bzrlib.branch import Branch
 from bzrlib.workingtree import WorkingTree
 
-from errors import (DifferentBranchesError, NotBranchError, PrefixFormatError,
-                    RevisionValueError)
+from errors import (DifferentBranchesError, NotBranchError, PermissionDenied,
+                    PrefixFormatError, RevisionValueError)
 
 def diff(revision=None, file_list=None, diff_options=None, prefix=None):
     """ Save the diff into a temporary file.
@@ -257,6 +257,8 @@ def is_branch(location):
         branch = Branch.open_containing(location)[0]
     except errors.NotBranchError:
         return False
+    except errors.PermissionDenied:
+        raise PermissionDenied(location)
     else:
         return True
         

@@ -33,6 +33,7 @@ except:
 
 from handler import OliveHandler
 from olive.backend.info import is_branch
+import olive.backend.errors as errors
 
 # Olive GTK UI version
 __version__ = '0.1'
@@ -191,7 +192,11 @@ class OliveGtk:
         for item in dirs:    
             liststore.append([gtk.STOCK_DIRECTORY, item, ''])
         for item in files:
-            status = fileops.status(path + '/' + item)
+            try:
+                status = fileops.status(path + '/' + item)
+            except errors.PermissionDenied:
+                continue
+            
             if status == 'renamed':
                 st = _('renamed')
             elif status == 'removed':
@@ -224,32 +229,39 @@ class OliveGtk:
         tvcolumn_status.add_attribute(cell, 'text', 2)
         
         # Check if current directory is a branch
-        if is_branch(self.comm.get_path()):
-            self.comm.menuitem_branch.set_sensitive(True)
-            self.comm.menuitem_stats.set_sensitive(True)
-            self.comm.menuitem_add_files.set_sensitive(True)
-            self.comm.menuitem_remove_files.set_sensitive(True)
-            self.comm.menuitem_file_make_directory.set_sensitive(True)
-            self.comm.menuitem_file_rename.set_sensitive(True)
-            self.comm.menuitem_file_move.set_sensitive(True)
-            self.comm.menutoolbutton_diff.set_sensitive(True)
-            self.comm.toolbutton_log.set_sensitive(True)
-            self.comm.toolbutton_commit.set_sensitive(True)
-            self.comm.toolbutton_pull.set_sensitive(True)
-            self.comm.toolbutton_push.set_sensitive(True)
+        try:
+            br = is_branch(self.comm.get_path())
+        except errors.PermissionDenied:
+            pass
         else:
-            self.comm.menuitem_branch.set_sensitive(False)
-            self.comm.menuitem_stats.set_sensitive(False)
-            self.comm.menuitem_add_files.set_sensitive(False)
-            self.comm.menuitem_remove_files.set_sensitive(False)
-            self.comm.menuitem_file_make_directory.set_sensitive(False)
-            self.comm.menuitem_file_rename.set_sensitive(False)
-            self.comm.menuitem_file_move.set_sensitive(False)
-            self.comm.menutoolbutton_diff.set_sensitive(False)
-            self.comm.toolbutton_log.set_sensitive(False)
-            self.comm.toolbutton_commit.set_sensitive(False)
-            self.comm.toolbutton_pull.set_sensitive(False)
-            self.comm.toolbutton_push.set_sensitive(False)
+            if br:
+                # Activate some items
+                self.comm.menuitem_branch.set_sensitive(True)
+                self.comm.menuitem_stats.set_sensitive(True)
+                self.comm.menuitem_add_files.set_sensitive(True)
+                self.comm.menuitem_remove_files.set_sensitive(True)
+                self.comm.menuitem_file_make_directory.set_sensitive(True)
+                self.comm.menuitem_file_rename.set_sensitive(True)
+                self.comm.menuitem_file_move.set_sensitive(True)
+                self.comm.menutoolbutton_diff.set_sensitive(True)
+                self.comm.toolbutton_log.set_sensitive(True)
+                self.comm.toolbutton_commit.set_sensitive(True)
+                self.comm.toolbutton_pull.set_sensitive(True)
+                self.comm.toolbutton_push.set_sensitive(True)
+            else:
+                # Deactivate some items
+                self.comm.menuitem_branch.set_sensitive(False)
+                self.comm.menuitem_stats.set_sensitive(False)
+                self.comm.menuitem_add_files.set_sensitive(False)
+                self.comm.menuitem_remove_files.set_sensitive(False)
+                self.comm.menuitem_file_make_directory.set_sensitive(False)
+                self.comm.menuitem_file_rename.set_sensitive(False)
+                self.comm.menuitem_file_move.set_sensitive(False)
+                self.comm.menutoolbutton_diff.set_sensitive(False)
+                self.comm.toolbutton_log.set_sensitive(False)
+                self.comm.toolbutton_commit.set_sensitive(False)
+                self.comm.toolbutton_pull.set_sensitive(False)
+                self.comm.toolbutton_push.set_sensitive(False)
         
         # set cursor to default
         self.comm.set_busy(self.treeview_right, False)
@@ -395,7 +407,11 @@ class OliveCommunicator:
         for item in dirs:    
             liststore.append([gtk.STOCK_DIRECTORY, item, ''])
         for item in files:
-            status = fileops.status(path + '/' + item)
+            try:
+                status = fileops.status(path + '/' + item)
+            except errors.PermissionDenied:
+                continue
+            
             if status == 'renamed':
                 st = _('renamed')
             elif status == 'removed':
@@ -414,34 +430,39 @@ class OliveCommunicator:
         self.treeview_right.set_model(liststore)
         
         # Check if current directory is a branch
-        if is_branch(self.get_path()):
-            # Activate some items
-            self.menuitem_branch.set_sensitive(True)
-            self.menuitem_stats.set_sensitive(True)
-            self.menuitem_add_files.set_sensitive(True)
-            self.menuitem_remove_files.set_sensitive(True)
-            self.menuitem_file_make_directory.set_sensitive(True)
-            self.menuitem_file_rename.set_sensitive(True)
-            self.menuitem_file_move.set_sensitive(True)
-            self.menutoolbutton_diff.set_sensitive(True)
-            self.toolbutton_log.set_sensitive(True)
-            self.toolbutton_commit.set_sensitive(True)
-            self.toolbutton_pull.set_sensitive(True)
-            self.toolbutton_push.set_sensitive(True)
+        try:
+            br = is_branch(self.get_path())
+        except errors.PermissionDenied:
+            pass
         else:
-            # Deactivate some items
-            self.menuitem_branch.set_sensitive(False)
-            self.menuitem_stats.set_sensitive(False)
-            self.menuitem_add_files.set_sensitive(False)
-            self.menuitem_remove_files.set_sensitive(False)
-            self.menuitem_file_make_directory.set_sensitive(False)
-            self.menuitem_file_rename.set_sensitive(False)
-            self.menuitem_file_move.set_sensitive(False)
-            self.menutoolbutton_diff.set_sensitive(False)
-            self.toolbutton_log.set_sensitive(False)
-            self.toolbutton_commit.set_sensitive(False)
-            self.toolbutton_pull.set_sensitive(False)
-            self.toolbutton_push.set_sensitive(False)
+            if br:
+                # Activate some items
+                self.menuitem_branch.set_sensitive(True)
+                self.menuitem_stats.set_sensitive(True)
+                self.menuitem_add_files.set_sensitive(True)
+                self.menuitem_remove_files.set_sensitive(True)
+                self.menuitem_file_make_directory.set_sensitive(True)
+                self.menuitem_file_rename.set_sensitive(True)
+                self.menuitem_file_move.set_sensitive(True)
+                self.menutoolbutton_diff.set_sensitive(True)
+                self.toolbutton_log.set_sensitive(True)
+                self.toolbutton_commit.set_sensitive(True)
+                self.toolbutton_pull.set_sensitive(True)
+                self.toolbutton_push.set_sensitive(True)
+            else:
+                # Deactivate some items
+                self.menuitem_branch.set_sensitive(False)
+                self.menuitem_stats.set_sensitive(False)
+                self.menuitem_add_files.set_sensitive(False)
+                self.menuitem_remove_files.set_sensitive(False)
+                self.menuitem_file_make_directory.set_sensitive(False)
+                self.menuitem_file_rename.set_sensitive(False)
+                self.menuitem_file_move.set_sensitive(False)
+                self.menutoolbutton_diff.set_sensitive(False)
+                self.toolbutton_log.set_sensitive(False)
+                self.toolbutton_commit.set_sensitive(False)
+                self.toolbutton_pull.set_sensitive(False)
+                self.toolbutton_push.set_sensitive(False)
         
         self.set_busy(self.treeview_right, False)
 

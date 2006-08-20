@@ -187,6 +187,13 @@ class PathPrefixNotCreated(OliveError):
         commit.push()
     """
 
+class PermissionDenied(OliveError):
+    """ Permission denied.
+    
+    May occur in:
+        fileops.status()
+    """
+
 class PrefixFormatError(OliveError):
     """ Occurs if the prefix is badly formatted
     

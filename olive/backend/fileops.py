@@ -23,7 +23,7 @@ import bzrlib.errors as errors
 from errors import (DirectoryAlreadyExists, MissingArgumentError,
                     MultipleMoveError, NoFilesSpecified, NoMatchingFiles,
                     NonExistingSource, NotBranchError, NotSameBranchError,
-                    NotVersionedError)
+                    NotVersionedError, PermissionDenied)
 
 def add(file_list, recursive=False):
     """ Add listed files to the branch. 
@@ -160,6 +160,8 @@ def status(filename):
         tree1 = WorkingTree.open_containing(filename)[0]
     except errors.NotBranchError:
         return 'unknown'
+    except errors.PermissionDenied:
+        raise PermissionDenied(filename)
     
     branch = tree1.branch
     tree2 = tree1.branch.repository.revision_tree(branch.last_revision())
