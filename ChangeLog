@@ -1,5 +1,10 @@
 2006-08-20  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * po/olive-gtk.pot: generated new .pot file
+    * olive/frontend/gtk/bookmark.py: implemented Edit bookmark dialog
+    * cmenu.ui: added Edit item to left context menu
+    * olive.glade: added Edit bookmark dialog
+    * olive/frontend/gtk/__init__.py: added support for bookmark titles
     * olive/frontend/gtk/__init__.py: proper handling of permission denied cases
     * olive/backend/info.py: handle permission denied exception in is_branch()
     * olive/backend/fileops.py: handle permission denied exception in status()

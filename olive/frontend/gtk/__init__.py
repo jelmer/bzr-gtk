@@ -135,15 +135,16 @@ class OliveGtk:
         self.comm.set_busy(self.treeview_left)
         
         # Create TreeStore
-        treestore = gtk.TreeStore(str)
+        treestore = gtk.TreeStore(str, str)
         
         # Get bookmarks
         bookmarks = self.comm.pref.get_bookmarks()
         
         # Add them to the TreeStore
-        titer = treestore.append(None, [_('Bookmarks')])
+        titer = treestore.append(None, [_('Bookmarks'), None])
         for item in bookmarks:
-            treestore.append(titer, [item])
+            title = self.comm.pref.get_bookmark_title(item)
+            treestore.append(titer, [title, item])
         
         # Create the column and add it to the TreeView
         self.treeview_left.set_model(treestore)
@@ -333,7 +334,7 @@ class OliveCommunicator:
         if iter is None:
             return None
         else:
-            return model.get_value(iter, 0)
+            return model.get_value(iter, 1)
 
     def set_statusbar(self, message):
         """ Set the statusbar message. """
@@ -356,9 +357,10 @@ class OliveCommunicator:
         bookmarks = self.pref.get_bookmarks()
         
         # Add them to the TreeStore
-        titer = treestore.append(None, [_('Bookmarks')])
+        titer = treestore.append(None, [_('Bookmarks'), None])
         for item in bookmarks:
-            treestore.append(titer, [item])
+            title = self.pref.get_bookmark_title(item)
+            treestore.append(titer, [title, item])
         
         # Add the TreeStore to the TreeView
         self.treeview_left.set_model(treestore)
@@ -573,6 +575,19 @@ class OlivePreferences:
         else:
             return True
 
+    def get_bookmark_title(self, path):
+        """ Get bookmark title. """
+        try:
+            ret = self.config.get(path, 'title')
+        except ConfigParser.NoOptionError:
+            ret = path
+        
+        return ret
+    
+    def set_bookmark_title(self, path, title):
+        """ Set bookmark title. """
+        self.config.set(path, 'title', title)
+    
     def remove_bookmark(self, path):
         """ Remove bookmark. """
         return self.config.remove_section(path)

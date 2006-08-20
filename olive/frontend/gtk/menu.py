@@ -77,6 +77,10 @@ class OliveMenu:
                                        _('Bookmark'), None,
                                        _('Bookmark current location'),
                                        self.bookmark),
+                                      ('edit_bookmark', gtk.STOCK_EDIT,
+                                       _('Edit'), None,
+                                       _('Edit the selected bookmark'),
+                                       self.edit_bookmark),
                                       ('remove_bookmark', gtk.STOCK_REMOVE,
                                        _('Remove'), None,
                                        _('Remove the selected bookmark'),
@@ -188,6 +192,12 @@ class OliveMenu:
                                        _('The current directory is already bookmarked.\nSee the left panel for reference.'))
         
         self.comm.refresh_left()
+
+    def edit_bookmark(self, action):
+        """ Left context menu -> Edit """
+        from bookmark import OliveBookmark
+        bookmark = OliveBookmark(self.gladefile, self.comm, self.dialog)
+        bookmark.display()
 
     def remove_bookmark(self, action):
         """ Left context menu -> Remove """

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-08-20 13:47+0200\n"
+"POT-Creation-Date: 2006-08-20 18:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -133,7 +133,7 @@ msgstr ""
 msgid "Log"
 msgstr ""
 
-#: olive.glade:479 commit.py:120 menu.py:69
+#: olive.glade:479 commit.py:118 menu.py:69
 msgid "Commit"
 msgstr ""
 
@@ -381,7 +381,7 @@ msgstr ""
 msgid "(none)"
 msgstr ""
 
-#: olive.glade:3394
+#: olive.glade:3394 olive.glade:5203
 msgid "Location:"
 msgstr ""
 
@@ -517,26 +517,42 @@ msgstr ""
 msgid "Revision store:"
 msgstr ""
 
-#: add.py:70 menu.py:128 menu.py:150 move.py:69 remove.py:70 rename.py:67
+#: olive.glade:5169
+msgid "Edit bookmark - Olive"
+msgstr ""
+
+#: olive.glade:5231
+msgid "Title:"
+msgstr ""
+
+#: add.py:70 menu.py:132 menu.py:154 move.py:69 remove.py:70 rename.py:67
 msgid "No file was selected"
 msgstr ""
 
-#: add.py:71 menu.py:129 menu.py:151 remove.py:71
+#: add.py:71 menu.py:133 menu.py:155 remove.py:71
 msgid ""
 "Please select a file from the list,\n"
 "or choose the other option."
 msgstr ""
 
-#: add.py:77 add.py:88 commit.py:97 commit.py:173 diff.py:106 handler.py:82
-#: info.py:485 log.py:63 menu.py:135 menu.py:157 push.py:79 push.py:122
+#: add.py:77 add.py:88 commit.py:96 commit.py:171 diff.py:106 handler.py:82
+#: info.py:485 log.py:63 menu.py:139 menu.py:161 push.py:79 push.py:122
 #: push.py:152 remove.py:77 remove.py:93 status.py:139
 msgid "Directory is not a branch"
 msgstr ""
 
-#: add.py:78 add.py:89 commit.py:98 commit.py:174 diff.py:107 handler.py:83
-#: info.py:486 log.py:64 menu.py:136 menu.py:158 push.py:80 push.py:123
+#: add.py:78 add.py:89 commit.py:97 commit.py:172 diff.py:107 handler.py:83
+#: info.py:486 log.py:64 menu.py:140 menu.py:162 push.py:80 push.py:123
 #: push.py:153 remove.py:78 remove.py:94 status.py:140
 msgid "You can perform this action only in a branch."
+msgstr ""
+
+#: bookmark.py:64
+msgid "No title given"
+msgstr ""
+
+#: bookmark.py:65
+msgid "Please specify a title to continue."
 msgstr ""
 
 #: branch.py:66 checkout.py:66
@@ -605,69 +621,69 @@ msgstr ""
 msgid "%d revision(s) branched."
 msgstr ""
 
-#: commit.py:122
+#: commit.py:120
 msgid "Path"
 msgstr ""
 
-#: commit.py:124
+#: commit.py:122
 msgid "Type"
 msgstr ""
 
-#: commit.py:128 __init__.py:200
+#: commit.py:126 __init__.py:206 __init__.py:422
 msgid "added"
 msgstr ""
 
-#: commit.py:131 __init__.py:198
+#: commit.py:129 __init__.py:204 __init__.py:420
 msgid "removed"
 msgstr ""
 
-#: commit.py:134 __init__.py:196
+#: commit.py:132 __init__.py:202 __init__.py:418
 msgid "renamed"
 msgstr ""
 
-#: commit.py:137 __init__.py:202
+#: commit.py:135 __init__.py:208 __init__.py:424
 msgid "modified"
 msgstr ""
 
-#: commit.py:178
+#: commit.py:176
 msgid "Directory is not a checkout"
 msgstr ""
 
-#: commit.py:179
+#: commit.py:177
 msgid "You can perform local commit only on checkouts."
 msgstr ""
 
-#: commit.py:183
+#: commit.py:181
 msgid "No changes to commit"
 msgstr ""
 
-#: commit.py:184
+#: commit.py:182
 msgid "Try force commit if you want to commit anyway."
 msgstr ""
 
-#: commit.py:188
+#: commit.py:186
 msgid "Conflicts in tree"
 msgstr ""
 
-#: commit.py:189
+#: commit.py:187
 msgid "You need to resolve the conflicts before committing."
 msgstr ""
 
-#: commit.py:193
+#: commit.py:191
 msgid "Strict commit failed"
 msgstr ""
 
-#: commit.py:194
+#: commit.py:192
 msgid ""
 "There are unknown files in the working tree.\n"
 "Please add or delete them."
 msgstr ""
 
-#: commit.py:198
+#: commit.py:196
 msgid "Bound branch is out of date"
 msgstr ""
 
-#: commit.py:199
+#: commit.py:197
 #, python-format
 msgid "%s"
 msgstr ""
@@ -747,31 +763,31 @@ msgstr ""
 msgid "This feature is not yet implemented."
 msgstr ""
 
-#: __init__.py:57
+#: __init__.py:58
 msgid "Glade file cannot be found."
 msgstr ""
 
-#: __init__.py:143
+#: __init__.py:144 __init__.py:360
 msgid "Bookmarks"
 msgstr ""
 
-#: __init__.py:149 menu.py:77
+#: __init__.py:151 menu.py:77
 msgid "Bookmark"
 msgstr ""
 
-#: __init__.py:204
+#: __init__.py:210 __init__.py:426
 msgid "unchanged"
 msgstr ""
 
-#: __init__.py:206
+#: __init__.py:212 __init__.py:428
 msgid "unknown"
 msgstr ""
 
-#: __init__.py:211
+#: __init__.py:217
 msgid "Filename"
 msgstr ""
 
-#: __init__.py:212
+#: __init__.py:218
 msgid "Status"
 msgstr ""
 
@@ -787,7 +803,7 @@ msgstr ""
 msgid "Add the selected file"
 msgstr ""
 
-#: menu.py:65 menu.py:81
+#: menu.py:65 menu.py:85
 msgid "Remove"
 msgstr ""
 
@@ -807,49 +823,57 @@ msgstr ""
 msgid "Bookmark current location"
 msgstr ""
 
-#: menu.py:82
-msgid "Remove the selected bookmark"
+#: menu.py:81
+msgid "Edit"
 msgstr ""
 
-#: menu.py:85
-msgid "Selected..."
+#: menu.py:82
+msgid "Edit the selected bookmark"
 msgstr ""
 
 #: menu.py:86
-msgid "Show the differences of the selected file"
+msgid "Remove the selected bookmark"
 msgstr ""
 
 #: menu.py:89
-msgid "All..."
+msgid "Selected..."
 msgstr ""
 
 #: menu.py:90
+msgid "Show the differences of the selected file"
+msgstr ""
+
+#: menu.py:93
+msgid "All..."
+msgstr ""
+
+#: menu.py:94
 msgid "Show the differences of all files"
 msgstr ""
 
-#: menu.py:161 remove.py:82
+#: menu.py:165 remove.py:82
 msgid "File not versioned"
 msgstr ""
 
-#: menu.py:162 remove.py:83
+#: menu.py:166 remove.py:83
 msgid "The selected file is not versioned."
 msgstr ""
 
-#: menu.py:184
+#: menu.py:188
 msgid "Bookmark successfully added"
 msgstr ""
 
-#: menu.py:185
+#: menu.py:189
 msgid ""
 "The current directory was bookmarked. You can reach\n"
 "it by selecting it from the left panel."
 msgstr ""
 
-#: menu.py:187
+#: menu.py:191
 msgid "Location already bookmarked"
 msgstr ""
 
-#: menu.py:188
+#: menu.py:192
 msgid ""
 "The current directory is already bookmarked.\n"
 "See the left panel for reference."

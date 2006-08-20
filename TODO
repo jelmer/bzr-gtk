@@ -18,5 +18,5 @@ TODO list for Olive
  - Implement bundle handling - at least creating them (phanatic)
 [DONE] Testing on Windows platform (phanatic)
 [DONE] i18n/l10n with gettext (phanatic)
- - Bookmarks should have a 'title' attribute (phanatic)
+[DONE] Bookmarks should have a 'title' attribute (phanatic)
 [PART-DONE] Open files on double-click, and add Open option to context menu (Aaadam)

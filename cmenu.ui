@@ -10,6 +10,7 @@
         <menuitem name="bookmark" action="bookmark" />
     </popup>
     <popup name="context_left">
+        <menuitem name="edit_bookmark" action="edit_bookmark" />
         <menuitem name="remove_bookmark" action="remove_bookmark" />
     </popup>
     <popup name="toolbar_diff">
