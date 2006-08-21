@@ -427,7 +427,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkMenuToolButton" id="menutoolbutton_diff">
+	    <widget class="GtkToolButton" id="toolbutton_diff">
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Diff</property>
 	      <property name="use_underline">True</property>
@@ -435,11 +435,11 @@
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
-	      <signal name="clicked" handler="on_menutoolbutton_diff_clicked" last_modification_time="Mon, 17 Jul 2006 09:04:46 GMT"/>
+	      <signal name="clicked" handler="on_toolbutton_diff_clicked" last_modification_time="Mon, 21 Aug 2006 20:21:20 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="expand">False</property>
-	      <property name="homogeneous">False</property>
+	      <property name="homogeneous">True</property>
 	    </packing>
 	  </child>
 

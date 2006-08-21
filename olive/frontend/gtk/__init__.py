@@ -90,7 +90,8 @@ class OliveGtk:
                 "on_menuitem_stats_infos_activate": handler.on_menuitem_stats_infos_activate,
                 "on_toolbutton_refresh_clicked": handler.on_menuitem_view_refresh_activate,
                 "on_toolbutton_log_clicked": handler.on_menuitem_stats_log_activate,
-                "on_menutoolbutton_diff_clicked": handler.on_menuitem_stats_diff_activate,
+                #"on_menutoolbutton_diff_clicked": handler.on_menuitem_stats_diff_activate,
+                "on_toolbutton_diff_clicked": handler.on_menuitem_stats_diff_activate,
                 "on_toolbutton_commit_clicked": handler.on_menuitem_branch_commit_activate,
                 "on_toolbutton_pull_clicked": handler.on_menuitem_branch_pull_activate,
                 "on_toolbutton_push_clicked": handler.on_menuitem_branch_push_activate,
@@ -114,8 +115,8 @@ class OliveGtk:
         self.comm.hpaned_main.set_position(pos)
         
         # Apply menu to the toolbutton
-        menubutton = self.toplevel.get_widget('menutoolbutton_diff')
-        menubutton.set_menu(handler.menu.toolbar_diff)
+        #menubutton = self.toplevel.get_widget('menutoolbutton_diff')
+        #menubutton.set_menu(handler.menu.toolbar_diff)
         
         # Now we can show the window
         self.window.show_all()
@@ -244,7 +245,8 @@ class OliveGtk:
                 self.comm.menuitem_file_make_directory.set_sensitive(True)
                 self.comm.menuitem_file_rename.set_sensitive(True)
                 self.comm.menuitem_file_move.set_sensitive(True)
-                self.comm.menutoolbutton_diff.set_sensitive(True)
+                #self.comm.menutoolbutton_diff.set_sensitive(True)
+                self.comm.toolbutton_diff.set_sensitive(True)
                 self.comm.toolbutton_log.set_sensitive(True)
                 self.comm.toolbutton_commit.set_sensitive(True)
                 self.comm.toolbutton_pull.set_sensitive(True)
@@ -258,7 +260,8 @@ class OliveGtk:
                 self.comm.menuitem_file_make_directory.set_sensitive(False)
                 self.comm.menuitem_file_rename.set_sensitive(False)
                 self.comm.menuitem_file_move.set_sensitive(False)
-                self.comm.menutoolbutton_diff.set_sensitive(False)
+                #self.comm.menutoolbutton_diff.set_sensitive(False)
+                self.comm.toolbutton_diff.set_sensitive(False)
                 self.comm.toolbutton_log.set_sensitive(False)
                 self.comm.toolbutton_commit.set_sensitive(False)
                 self.comm.toolbutton_pull.set_sensitive(False)
@@ -302,7 +305,8 @@ class OliveCommunicator:
         self.menuitem_stats_diff = self.toplevel.get_widget('menuitem_stats_diff')
         self.menuitem_stats_log = self.toplevel.get_widget('menuitem_stats_log')
         # Get some toolbuttons
-        self.menutoolbutton_diff = self.toplevel.get_widget('menutoolbutton_diff')
+        #self.menutoolbutton_diff = self.toplevel.get_widget('menutoolbutton_diff')
+        self.toolbutton_diff = self.toplevel.get_widget('toolbutton_diff')
         self.toolbutton_log = self.toplevel.get_widget('toolbutton_log')
         self.toolbutton_commit = self.toplevel.get_widget('toolbutton_commit')
         self.toolbutton_pull = self.toplevel.get_widget('toolbutton_pull')
@@ -446,7 +450,8 @@ class OliveCommunicator:
                 self.menuitem_file_make_directory.set_sensitive(True)
                 self.menuitem_file_rename.set_sensitive(True)
                 self.menuitem_file_move.set_sensitive(True)
-                self.menutoolbutton_diff.set_sensitive(True)
+                #self.menutoolbutton_diff.set_sensitive(True)
+                self.toolbutton_diff.set_sensitive(True)
                 self.toolbutton_log.set_sensitive(True)
                 self.toolbutton_commit.set_sensitive(True)
                 self.toolbutton_pull.set_sensitive(True)
@@ -460,7 +465,8 @@ class OliveCommunicator:
                 self.menuitem_file_make_directory.set_sensitive(False)
                 self.menuitem_file_rename.set_sensitive(False)
                 self.menuitem_file_move.set_sensitive(False)
-                self.menutoolbutton_diff.set_sensitive(False)
+                #self.menutoolbutton_diff.set_sensitive(False)
+                self.toolbutton_diff.set_sensitive(False)
                 self.toolbutton_log.set_sensitive(False)
                 self.toolbutton_commit.set_sensitive(False)
                 self.toolbutton_pull.set_sensitive(False)
