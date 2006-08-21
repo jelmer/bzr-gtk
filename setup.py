@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 # Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
 #
@@ -20,10 +20,10 @@ from distutils.core import setup
 
 setup(name='Olive',
       version='0.1',
-      description='Olive - Graphical frontend for Bazaar-NG',
+      description='Olive - Graphical frontend for Bazaar',
       author='Szilveszter Farkas (Phanatic)',
       author_email='szilveszter.farkas@gmail.com',
-      url='https://launchpad.net/products/olive/',
+      url='http://bazaar-vcs.org/Olive',
       packages=['olive', 'olive.backend', 'olive.frontend',
                 'olive.frontend.gtk', 'olive.frontend.gtk.viz'],
       scripts=['olive-gtk'],
