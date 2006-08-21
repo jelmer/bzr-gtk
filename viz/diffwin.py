@@ -14,6 +14,7 @@ from cStringIO import StringIO
 
 import gtk
 import pango
+import sys
 
 try:
     import gtksourceview
@@ -171,4 +172,4 @@ class DiffWindow(gtk.Window):
 
         s = StringIO()
         show_diff_trees(self.parent_tree, self.rev_tree, s, specific_files)
-        self.buffer.set_text(s.getvalue())
+        self.buffer.set_text(s.getvalue().decode(sys.getdefaultencoding(), 'replace'))
