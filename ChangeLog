@@ -1,5 +1,6 @@
 2006-08-20  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * README: added important information about installing
     * po/olive-gtk.pot: regenerated
     * olive/frontend/gtk/push.py: added basic test functionality
     * olive.glade: added test related widgets to the Push dialog

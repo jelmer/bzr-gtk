@@ -193,7 +193,7 @@ class OlivePush:
         m = _urlRE.match(url)
         if m:
             proto = m.groupdict()['proto']
-            if (proto == 'sftp') or (proto == 'file'):
+            if (proto == 'sftp') or (proto == 'file') or (proto == 'ftp'):
                 # have write acces (most probably)
                 self.image_test.set_from_stock(gtk.STOCK_YES, 4)
                 self.label_test.set_markup(_('<b>Write access is available most probably</b>'))

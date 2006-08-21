@@ -1,7 +1,7 @@
 TODO list for Olive
 -------------------
 
- - Be able to install into other locations than /usr (LarstiQ)
+[DONE] Be able to install into other locations than /usr (LarstiQ)
 [DONE] Investigate TortoiseSVN-like commit/add dialogs (LarstiQ)
    http://samba.org/~jelmer/bzr/gcommit.png
 [DONE] HIGify the interface (Matthieu Moy)
