@@ -50,3 +50,18 @@ As an Administrator, you can install Olive with the standard command:
 You can run Olive with this command:
 
  > c:\Python24\python.exe c:\Python\Scripts\olive-gtk
+
+Reporting bugs
+--------------
+
+The official bug tracker of Olive can be found in the Launchpad system. The list
+of the opened bugs are here:
+
+ https://launchpad.net/products/olive/+bugs
+
+If you found a bug in Olive, please report it here:
+
+ https://launchpad.net/products/olive/+filebug
+
+Please run olive-gtk from the command line, so you can copy-paste the traceback
+of the exceptions.
