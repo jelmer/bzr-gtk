@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-08-21 22:22+0200\n"
+"POT-Creation-Date: 2006-08-29 19:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -637,19 +637,19 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-#: commit.py:126 __init__.py:206 __init__.py:422
+#: commit.py:126 __init__.py:207 __init__.py:426
 msgid "added"
 msgstr ""
 
-#: commit.py:129 __init__.py:204 __init__.py:420
+#: commit.py:129 __init__.py:205 __init__.py:424
 msgid "removed"
 msgstr ""
 
-#: commit.py:132 __init__.py:202 __init__.py:418
+#: commit.py:132 __init__.py:203 __init__.py:422
 msgid "renamed"
 msgstr ""
 
-#: commit.py:135 __init__.py:208 __init__.py:424
+#: commit.py:135 __init__.py:209 __init__.py:428
 msgid "modified"
 msgstr ""
 
@@ -775,27 +775,27 @@ msgstr ""
 msgid "Glade file cannot be found."
 msgstr ""
 
-#: __init__.py:144 __init__.py:360
+#: __init__.py:145 __init__.py:364
 msgid "Bookmarks"
 msgstr ""
 
-#: __init__.py:151 menu.py:77
+#: __init__.py:152 menu.py:77
 msgid "Bookmark"
 msgstr ""
 
-#: __init__.py:210 __init__.py:426
+#: __init__.py:211 __init__.py:430
 msgid "unchanged"
 msgstr ""
 
-#: __init__.py:212 __init__.py:428
+#: __init__.py:213 __init__.py:432
 msgid "unknown"
 msgstr ""
 
-#: __init__.py:217
+#: __init__.py:218
 msgid "Filename"
 msgstr ""
 
-#: __init__.py:218
+#: __init__.py:219
 msgid "Status"
 msgstr ""
 
