@@ -99,9 +99,15 @@ def pull(branch, location=None, remember=False, overwrite=False, revision=None):
     
     :return: number of revisions pulled
     """
+    nobundle = False
+    
     from bzrlib.branch import Branch
-    from bzrlib.bundle import read_bundle_from_url
-    from bzrlib.bundle.apply_bundle import install_bundle
+    try:
+        from bzrlib.bundle import read_bundle_from_url
+        from bzrlib.bundle.apply_bundle import install_bundle
+    except ImportError:
+        # no bundle support
+        nobundle = True
     
     try:
         tree_to = WorkingTree.open_containing(branch)[0]
@@ -116,7 +122,7 @@ def pull(branch, location=None, remember=False, overwrite=False, revision=None):
         raise NotBranchError(location)
 
     reader = None
-    if location is not None:
+    if location is not None and not nobundle:
         try:
             reader = read_bundle_from_url(location)
         except errors.NotABundle:
@@ -129,7 +135,7 @@ def pull(branch, location=None, remember=False, overwrite=False, revision=None):
         else:
             location = stored_loc
 
-    if reader is not None:
+    if reader is not None and not nobundle:
         install_bundle(branch_to.repository, reader)
         branch_from = branch_to
     else:

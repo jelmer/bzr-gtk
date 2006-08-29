@@ -1,3 +1,11 @@
+2006-08-29  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * olive/backend/update.py: fixed a bug if bundles not available under bzr
+      0.8.2 (Fixed: #57761)
+    * Merge from Stéphane's branch.
+    * po/olive-gtk.pot: regenerated
+    * po/hu.po: msginit'ed
+
 2006-08-20  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * setup.py: some little corrections (python path + bazaar branding)
