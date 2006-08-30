@@ -23,9 +23,6 @@ except ImportError:
     have_gtksourceview = False
 
 import bzrlib
-if bzrlib.version_info < (0, 9):
-    # function deprecated in 0.9
-    from bzrlib.delta import compare_trees
 
 from bzrlib.diff import show_diff_trees
 from bzrlib.errors import NoSuchFile
@@ -118,10 +115,7 @@ class DiffWindow(gtk.Window):
         self.parent_tree = parent_tree
 
         self.model.clear()
-        if bzrlib.version_info < (0, 9):
-            delta = compare_trees(self.parent_tree, self.rev_tree)
-        else:
-            delta = self.rev_tree.changes_from(self.parent_tree)
+        delta = self.rev_tree.changes_from(self.parent_tree)
 
         self.model.append(None, [ "Complete Diff", "" ])
 

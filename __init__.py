@@ -24,7 +24,7 @@ from bzrlib.branch import Branch
 from bzrlib.workingtree import WorkingTree
 from bzrlib.bzrdir import BzrDir
 
-__version__ = '0.9.0'
+__version__ = '0.10.0'
 
 class cmd_gbranch(Command):
     """GTK+ branching.
