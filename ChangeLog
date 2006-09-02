@@ -1,5 +1,11 @@
 2006-09-02  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * po/olive-gtk.pot: regenerated
+    * olive/backend/errors.py: added ConnectionError exception
+    * olive/frontend/gtk/handler.py: implemented Missing revisions menu handler
+    * olive.glade: added Branch/Missing revisions menu item
+    * olive/backend/update.py: added NotBranchError and ConnectionError
+      exceptions to missing()
     * olive/frontend/gtk/add.py: fixed a small bug (switch back to default
       cursor)
     * olive/frontend/gtk/remove.py: fixed a small bug (switch back to default

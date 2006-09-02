@@ -70,6 +70,33 @@ class OliveHandler:
         commit = OliveCommit(self.gladefile, self.comm, self.dialog)
         commit.display()
     
+    def on_menuitem_branch_missing_revisions_activate(self, widget):
+        """ Branch/Missing revisions menu handler. """
+        import olive.backend.update as update
+        
+        self.comm.set_busy(self.comm.window_main)
+        
+        try:
+            ret = update.missing(self.comm.get_path())
+        except errors.NotBranchError:
+            self.dialog.error_dialog(_('Directory is not a branch'),
+                                     _('You can perform this action only in a branch.'))
+        except errors.ConnectionError:
+            self.dialog.error_dialog(_('Connection error'),
+                                     _('Cannot connect to remote location.\nPlease try again later.'))
+        except errors.NoLocationKnown:
+            self.dialog.error_dialog(_('Parent location is unknown'),
+                                     _('Cannot determine missing revisions if no parent location is known.'))
+        else:
+            if ret > 0:
+                self.dialog.info_dialog(_('There are missing revisions'),
+                                        _('%d revision(s) missing.') % ret)
+            else:
+                self.dialog.info_dialog(_('Local branch up to date'),
+                                        _('There are no missing revisions.'))
+        
+        self.comm.set_busy(self.comm.window_main, False)
+    
     def on_menuitem_branch_pull_activate(self, widget):
         """ Branch/Pull menu handler. """
         import olive.backend.update as update

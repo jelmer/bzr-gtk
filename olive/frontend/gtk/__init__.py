@@ -85,6 +85,7 @@ class OliveGtk:
                 "on_menuitem_branch_push_activate": handler.on_menuitem_branch_push_activate,
                 "on_menuitem_branch_pull_activate": handler.on_menuitem_branch_pull_activate,
                 "on_menuitem_branch_status_activate": handler.on_menuitem_branch_status_activate,
+                "on_menuitem_branch_missing_revisions_activate": handler.on_menuitem_branch_missing_revisions_activate,
                 "on_menuitem_stats_diff_activate": handler.on_menuitem_stats_diff_activate,
                 "on_menuitem_stats_log_activate": handler.on_menuitem_stats_log_activate,
                 "on_menuitem_stats_infos_activate": handler.on_menuitem_stats_infos_activate,

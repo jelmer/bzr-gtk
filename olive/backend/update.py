@@ -20,7 +20,7 @@ import bzrlib.errors as errors
 
 from bzrlib.workingtree import WorkingTree
 
-from errors import NoLocationKnown, NotBranchError
+from errors import ConnectionError, NoLocationKnown, NotBranchError
 
 def missing(branch, other_branch=None, reverse=False):
     """ Get the number of missing or extra revisions of local branch.
@@ -36,13 +36,28 @@ def missing(branch, other_branch=None, reverse=False):
     import bzrlib
     from bzrlib.missing import find_unmerged
     
-    local_branch = bzrlib.branch.Branch.open_containing(branch)[0]
+    try:
+        local_branch = bzrlib.branch.Branch.open_containing(branch)[0]
+    except errors.NotBranchError:
+        raise NotBranchError(branch)
+    except:
+        raise
+    
     parent = local_branch.get_parent()
     if other_branch is None:
         other_branch = parent
         if other_branch is None:
             raise NoLocationKnown
-    remote_branch = bzrlib.branch.Branch.open(other_branch)
+    
+    try:
+        remote_branch = bzrlib.branch.Branch.open(other_branch)
+    except errors.NotBranchError:
+        raise NotBranchError(other_branch)
+    except errors.ConnectionError:
+        raise ConnectionError(other_branch)
+    except:
+        raise
+    
     if remote_branch.base == local_branch.base:
         remote_branch = local_branch
     local_branch.lock_read()

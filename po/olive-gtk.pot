@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2006-08-29 19:16+0200\n"
+"POT-Creation-Date: 2006-09-02 16:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -69,7 +69,7 @@ msgstr ""
 msgid "_Refresh"
 msgstr ""
 
-#: olive.glade:189 olive.glade:1228
+#: olive.glade:189 olive.glade:1237
 msgid "_Branch"
 msgstr ""
 
@@ -101,435 +101,439 @@ msgstr ""
 msgid "S_tatus..."
 msgstr ""
 
-#: olive.glade:316
-msgid "_Statistics"
+#: olive.glade:312
+msgid "_Missing revisions"
 msgstr ""
 
 #: olive.glade:325
+msgid "_Statistics"
+msgstr ""
+
+#: olive.glade:334
 msgid "_Differences..."
 msgstr ""
 
-#: olive.glade:345
+#: olive.glade:354
 msgid "_Log..."
 msgstr ""
 
-#: olive.glade:365
+#: olive.glade:374
 msgid "_Informations..."
 msgstr ""
 
-#: olive.glade:378
+#: olive.glade:387
 msgid "_Help"
 msgstr ""
 
-#: olive.glade:415
+#: olive.glade:424
 msgid "Refresh"
 msgstr ""
 
-#: olive.glade:432 menu.py:73
+#: olive.glade:441 menu.py:73
 msgid "Diff"
 msgstr ""
 
-#: olive.glade:449
+#: olive.glade:458
 msgid "Log"
 msgstr ""
 
-#: olive.glade:479 commit.py:118 menu.py:69
+#: olive.glade:488 commit.py:118 menu.py:69
 msgid "Commit"
 msgstr ""
 
-#: olive.glade:509
+#: olive.glade:518
 msgid "Pull"
 msgstr ""
 
-#: olive.glade:526
+#: olive.glade:535
 msgid "Push"
 msgstr ""
 
-#: olive.glade:640
+#: olive.glade:649
 msgid "Olive - Commit"
 msgstr ""
 
-#: olive.glade:677
+#: olive.glade:686
 msgid "Please select the file(s) to commit:"
 msgstr ""
 
-#: olive.glade:744
+#: olive.glade:753
 msgid "Please specify a commit message:"
 msgstr ""
 
-#: olive.glade:818
+#: olive.glade:827
 msgid "_Local only commit (works in checkouts)"
 msgstr ""
 
-#: olive.glade:837
+#: olive.glade:846
 msgid "_Strict commit (fails if unknown files are present)"
 msgstr ""
 
-#: olive.glade:856
+#: olive.glade:865
 msgid "_Force commit (even do it if nothing has changed)"
 msgstr ""
 
-#: olive.glade:938
+#: olive.glade:947
 msgid "_Commit"
 msgstr ""
 
-#: olive.glade:978
+#: olive.glade:987
 msgid "Olive - Branch"
 msgstr ""
 
-#: olive.glade:1012 olive.glade:2033
+#: olive.glade:1021 olive.glade:2042
 msgid "Branch location:"
 msgstr ""
 
-#: olive.glade:1040 olive.glade:2061
+#: olive.glade:1049 olive.glade:2070
 msgid "Destination:"
 msgstr ""
 
-#: olive.glade:1068 olive.glade:2089
+#: olive.glade:1077 olive.glade:2098
 msgid "Please select a folder"
 msgstr ""
 
-#: olive.glade:1108 olive.glade:2129
+#: olive.glade:1117 olive.glade:2138
 msgid "Revision number:"
 msgstr ""
 
-#: olive.glade:1269
+#: olive.glade:1278
 msgid "Olive"
 msgstr ""
 
-#: olive.glade:1270
+#: olive.glade:1279
 msgid "Copyright (C) 2006 Szilveszter Farkas (Phanatic)"
 msgstr ""
 
-#: olive.glade:1273
+#: olive.glade:1282
 msgid "https://launchpad.net/products/olive"
 msgstr ""
 
-#: olive.glade:1275
+#: olive.glade:1284
 msgid "translator-credits"
 msgstr ""
 
-#: olive.glade:1281
+#: olive.glade:1290
 msgid "Olive - Add file(s)"
 msgstr ""
 
-#: olive.glade:1306
+#: olive.glade:1315
 msgid "Which file(s) do you want to add?"
 msgstr ""
 
-#: olive.glade:1332 olive.glade:1525
+#: olive.glade:1341 olive.glade:1534
 msgid "Selected only"
 msgstr ""
 
-#: olive.glade:1351
+#: olive.glade:1360
 msgid "All unknowns recursively"
 msgstr ""
 
-#: olive.glade:1434
+#: olive.glade:1443
 msgid "_Add"
 msgstr ""
 
-#: olive.glade:1474
+#: olive.glade:1483
 msgid "Olive - Remove file(s)"
 msgstr ""
 
-#: olive.glade:1499
+#: olive.glade:1508
 msgid "Which file(s) do you want to remove?"
 msgstr ""
 
-#: olive.glade:1544
+#: olive.glade:1553
 msgid "All files with status 'added'"
 msgstr ""
 
-#: olive.glade:1627
+#: olive.glade:1636
 msgid "_Remove"
 msgstr ""
 
-#: olive.glade:1667
+#: olive.glade:1676
 msgid "Olive - Push"
 msgstr ""
 
-#: olive.glade:1693
+#: olive.glade:1702
 msgid "Push to _default location"
 msgstr ""
 
-#: olive.glade:1716
+#: olive.glade:1725
 msgid "(no location known)"
 msgstr ""
 
-#: olive.glade:1732
+#: olive.glade:1741
 msgid "Push to _specific location"
 msgstr ""
 
-#: olive.glade:1770
+#: olive.glade:1779
 msgid "_Remember as default location"
 msgstr ""
 
-#: olive.glade:1788
+#: olive.glade:1797
 msgid "_Create the path leading up to the location"
 msgstr ""
 
-#: olive.glade:1807
+#: olive.glade:1816
 msgid "_Overwrite target if diverged"
 msgstr ""
 
-#: olive.glade:1850
+#: olive.glade:1859
 msgid "(click the Test button to check write access)"
 msgstr ""
 
-#: olive.glade:1890
+#: olive.glade:1899
 msgid "_Test"
 msgstr ""
 
-#: olive.glade:1959
+#: olive.glade:1968
 msgid "_Push"
 msgstr ""
 
-#: olive.glade:1999
+#: olive.glade:2008
 msgid "Olive - Checkout"
 msgstr ""
 
-#: olive.glade:2179
+#: olive.glade:2188
 msgid "Lightweight checkout"
 msgstr ""
 
-#: olive.glade:2271
+#: olive.glade:2280
 msgid "C_heckout"
 msgstr ""
 
-#: olive.glade:2312
+#: olive.glade:2321
 msgid "Olive - Diff"
 msgstr ""
 
-#: olive.glade:2429
+#: olive.glade:2438
 msgid "Olive - Status"
 msgstr ""
 
-#: olive.glade:2513
+#: olive.glade:2522
 msgid "Olive - Make directory"
 msgstr ""
 
-#: olive.glade:2559
+#: olive.glade:2568
 msgid "_Versioned directory"
 msgstr ""
 
-#: olive.glade:2641
+#: olive.glade:2650
 msgid "_Make directory"
 msgstr ""
 
-#: olive.glade:2681
+#: olive.glade:2690
 msgid "Olive - Move"
 msgstr ""
 
-#: olive.glade:2712
+#: olive.glade:2721
 msgid "Move to"
 msgstr ""
 
-#: olive.glade:2737
+#: olive.glade:2746
 msgid "Select a directory"
 msgstr ""
 
-#: olive.glade:2825
+#: olive.glade:2834
 msgid "_Move"
 msgstr ""
 
-#: olive.glade:2864
+#: olive.glade:2873
 msgid "Olive - Rename"
 msgstr ""
 
-#: olive.glade:2895
+#: olive.glade:2904
 msgid "Rename to"
 msgstr ""
 
-#: olive.glade:3011
+#: olive.glade:3020
 msgid "_Rename"
 msgstr ""
 
-#: olive.glade:3050
+#: olive.glade:3059
 msgid "Olive - Informations"
 msgstr ""
 
-#: olive.glade:3090
+#: olive.glade:3099
 msgid "Light checkout root: "
 msgstr ""
 
-#: olive.glade:3117
+#: olive.glade:3126
 msgid "Shared repository: "
 msgstr ""
 
-#: olive.glade:3144
+#: olive.glade:3153
 msgid "Repository branch: "
 msgstr ""
 
-#: olive.glade:3171
+#: olive.glade:3180
 msgid "Checkout of branch: "
 msgstr ""
 
-#: olive.glade:3198
+#: olive.glade:3207
 msgid "Repository checkout: "
 msgstr ""
 
-#: olive.glade:3225
+#: olive.glade:3234
 msgid "Branch root: "
 msgstr ""
 
-#: olive.glade:3252
+#: olive.glade:3261
 msgid "Checkout root: "
 msgstr ""
 
-#: olive.glade:3279 olive.glade:3305 olive.glade:3331 olive.glade:3357
-#: olive.glade:3383 olive.glade:3409 olive.glade:3435 olive.glade:3563
-#: olive.glade:3589 olive.glade:3771 olive.glade:3797 olive.glade:3823
-#: olive.glade:3849 olive.glade:4004 olive.glade:4030 olive.glade:4056
-#: olive.glade:4184 olive.glade:4210 olive.glade:4500 olive.glade:4526
-#: olive.glade:4552 olive.glade:4578 olive.glade:4604 olive.glade:4630
-#: olive.glade:4656 olive.glade:4682 olive.glade:4891 olive.glade:4917
-#: olive.glade:4943 olive.glade:4969 olive.glade:4995 olive.glade:5123
-#: olive.glade:5149
+#: olive.glade:3288 olive.glade:3314 olive.glade:3340 olive.glade:3366
+#: olive.glade:3392 olive.glade:3418 olive.glade:3444 olive.glade:3572
+#: olive.glade:3598 olive.glade:3780 olive.glade:3806 olive.glade:3832
+#: olive.glade:3858 olive.glade:4013 olive.glade:4039 olive.glade:4065
+#: olive.glade:4193 olive.glade:4219 olive.glade:4509 olive.glade:4535
+#: olive.glade:4561 olive.glade:4587 olive.glade:4613 olive.glade:4639
+#: olive.glade:4665 olive.glade:4691 olive.glade:4900 olive.glade:4926
+#: olive.glade:4952 olive.glade:4978 olive.glade:5004 olive.glade:5132
+#: olive.glade:5158
 msgid "(none)"
 msgstr ""
 
-#: olive.glade:3464 olive.glade:5273
+#: olive.glade:3473 olive.glade:5282
 msgid "Location:"
 msgstr ""
 
-#: olive.glade:3509
+#: olive.glade:3518
 msgid "Parent branch: "
 msgstr ""
 
-#: olive.glade:3536
+#: olive.glade:3545
 msgid "Publish to branch: "
 msgstr ""
 
-#: olive.glade:3618
+#: olive.glade:3627
 msgid "Related branches:"
 msgstr ""
 
-#: olive.glade:3663
+#: olive.glade:3672
 msgid "Control format: "
 msgstr ""
 
-#: olive.glade:3690
+#: olive.glade:3699
 msgid "Working tree format: "
 msgstr ""
 
-#: olive.glade:3717
+#: olive.glade:3726
 msgid "Branch format: "
 msgstr ""
 
-#: olive.glade:3744
+#: olive.glade:3753
 msgid "Repository format: "
 msgstr ""
 
-#: olive.glade:3878
+#: olive.glade:3887
 msgid "Format:"
 msgstr ""
 
-#: olive.glade:3923
+#: olive.glade:3932
 msgid "Working tree lock status: "
 msgstr ""
 
-#: olive.glade:3950
+#: olive.glade:3959
 msgid "Branch lock status: "
 msgstr ""
 
-#: olive.glade:3977
+#: olive.glade:3986
 msgid "Repository lock status: "
 msgstr ""
 
-#: olive.glade:4085
+#: olive.glade:4094
 msgid "Lock status:"
 msgstr ""
 
-#: olive.glade:4130
+#: olive.glade:4139
 msgid "Missing revisions in working tree: "
 msgstr ""
 
-#: olive.glade:4157
+#: olive.glade:4166
 msgid "Missing revisions in branch: "
 msgstr ""
 
-#: olive.glade:4239
+#: olive.glade:4248
 msgid "Missing revisions:"
 msgstr ""
 
-#: olive.glade:4284
+#: olive.glade:4293
 msgid "Unchanged files: "
 msgstr ""
 
-#: olive.glade:4311
+#: olive.glade:4320
 msgid "Modified files: "
 msgstr ""
 
-#: olive.glade:4338
+#: olive.glade:4347
 msgid "Added files: "
 msgstr ""
 
-#: olive.glade:4365
+#: olive.glade:4374
 msgid "Removed files: "
 msgstr ""
 
-#: olive.glade:4392
+#: olive.glade:4401
 msgid "Renamed files: "
 msgstr ""
 
-#: olive.glade:4419
+#: olive.glade:4428
 msgid "Unknown files: "
 msgstr ""
 
-#: olive.glade:4446
+#: olive.glade:4455
 msgid "Ignored files: "
 msgstr ""
 
-#: olive.glade:4473
+#: olive.glade:4482
 msgid "Versioned subdirectories: "
 msgstr ""
 
-#: olive.glade:4711
+#: olive.glade:4720
 msgid "In the working tree:"
 msgstr ""
 
-#: olive.glade:4756
+#: olive.glade:4765
 msgid "Revisions in branch: "
 msgstr ""
 
-#: olive.glade:4783
+#: olive.glade:4792
 msgid "Number of commiters: "
 msgstr ""
 
-#: olive.glade:4810
+#: olive.glade:4819
 msgid "Age of branch in days: "
 msgstr ""
 
-#: olive.glade:4837
+#: olive.glade:4846
 msgid "Time of first revision: "
 msgstr ""
 
-#: olive.glade:4864
+#: olive.glade:4873
 msgid "Time of last revision: "
 msgstr ""
 
-#: olive.glade:5024
+#: olive.glade:5033
 msgid "Branch history:"
 msgstr ""
 
-#: olive.glade:5069
+#: olive.glade:5078
 msgid "Revisions in repository: "
 msgstr ""
 
-#: olive.glade:5096
+#: olive.glade:5105
 msgid "Size of repository: "
 msgstr ""
 
-#: olive.glade:5178
+#: olive.glade:5187
 msgid "Revision store:"
 msgstr ""
 
-#: olive.glade:5239
+#: olive.glade:5248
 msgid "Edit bookmark - Olive"
 msgstr ""
 
-#: olive.glade:5301
+#: olive.glade:5310
 msgid "Title:"
 msgstr ""
 
@@ -543,15 +547,15 @@ msgid ""
 "or choose the other option."
 msgstr ""
 
-#: add.py:77 add.py:88 commit.py:96 commit.py:171 diff.py:106 handler.py:82
-#: info.py:485 log.py:63 menu.py:139 menu.py:161 push.py:84 push.py:124
-#: push.py:154 remove.py:77 remove.py:93 status.py:139
+#: add.py:78 add.py:89 commit.py:96 commit.py:171 diff.py:106 handler.py:82
+#: handler.py:109 info.py:485 log.py:63 menu.py:139 menu.py:161 push.py:84
+#: push.py:124 push.py:154 remove.py:78 remove.py:94 status.py:139
 msgid "Directory is not a branch"
 msgstr ""
 
-#: add.py:78 add.py:89 commit.py:97 commit.py:172 diff.py:107 handler.py:83
-#: info.py:486 log.py:64 menu.py:140 menu.py:162 push.py:85 push.py:125
-#: push.py:155 remove.py:78 remove.py:94 status.py:140
+#: add.py:79 add.py:90 commit.py:97 commit.py:172 diff.py:107 handler.py:83
+#: handler.py:110 info.py:486 log.py:64 menu.py:140 menu.py:162 push.py:85
+#: push.py:125 push.py:155 remove.py:79 remove.py:95 status.py:140
 msgid "You can perform this action only in a branch."
 msgstr ""
 
@@ -637,19 +641,19 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-#: commit.py:126 __init__.py:207 __init__.py:426
+#: commit.py:126 __init__.py:208 __init__.py:427
 msgid "added"
 msgstr ""
 
-#: commit.py:129 __init__.py:205 __init__.py:424
+#: commit.py:129 __init__.py:206 __init__.py:425
 msgid "removed"
 msgstr ""
 
-#: commit.py:132 __init__.py:203 __init__.py:422
+#: commit.py:132 __init__.py:204 __init__.py:423
 msgid "renamed"
 msgstr ""
 
-#: commit.py:135 __init__.py:209 __init__.py:428
+#: commit.py:135 __init__.py:210 __init__.py:429
 msgid "modified"
 msgstr ""
 
@@ -696,78 +700,109 @@ msgstr ""
 msgid "%s"
 msgstr ""
 
-#: diff.py:149 diffwin.py:139
+#: diff.py:149 diffwin.py:144
 msgid "Complete Diff"
 msgstr ""
 
-#: diff.py:152 status.py:107 diffwin.py:142
+#: diff.py:152 status.py:107 diffwin.py:147
 msgid "Added"
 msgstr ""
 
-#: diff.py:157 status.py:112 diffwin.py:147
+#: diff.py:157 status.py:112 diffwin.py:152
 msgid "Removed"
 msgstr ""
 
-#: diff.py:162 status.py:117 diffwin.py:152
+#: diff.py:162 status.py:117 diffwin.py:157
 msgid "Renamed"
 msgstr ""
 
-#: diff.py:168 status.py:123 diffwin.py:158
+#: diff.py:168 status.py:123 diffwin.py:163
 msgid "Modified"
 msgstr ""
 
 #: handler.py:85
-msgid "Parent location is unknown"
+msgid "Connection error"
 msgstr ""
 
 #: handler.py:86
-msgid "Pulling is not possible until there is no parent location."
+msgid ""
+"Cannot connect to remote location.\n"
+"Please try again later."
 msgstr ""
 
-#: handler.py:88
-msgid "Pull successful"
+#: handler.py:88 handler.py:112
+msgid "Parent location is unknown"
 msgstr ""
 
 #: handler.py:89
+msgid "Cannot determine missing revisions if no parent location is known."
+msgstr ""
+
+#: handler.py:92
+msgid "There are missing revisions"
+msgstr ""
+
+#: handler.py:93
+#, python-format
+msgid "%d revision(s) missing."
+msgstr ""
+
+#: handler.py:95
+msgid "Local branch up to date"
+msgstr ""
+
+#: handler.py:96
+msgid "There are no missing revisions."
+msgstr ""
+
+#: handler.py:113
+msgid "Pulling is not possible until there is no parent location."
+msgstr ""
+
+#: handler.py:115
+msgid "Pull successful"
+msgstr ""
+
+#: handler.py:116
 #, python-format
 msgid "%d revision(s) pulled."
 msgstr ""
 
-#: handler.py:112
+#: handler.py:139
 msgid "Directory is already a branch"
 msgstr ""
 
-#: handler.py:113
+#: handler.py:140
 #, python-format
 msgid ""
 "The current directory (%s) is already a branch.\n"
 "You can start using it, or initialize another directory."
 msgstr ""
 
-#: handler.py:115
+#: handler.py:142
 msgid "Branch without a working tree"
 msgstr ""
 
-#: handler.py:116
+#: handler.py:143
 #, python-format
 msgid ""
 "The current directory (%s)\n"
 "is a branch without a working tree."
 msgstr ""
 
-#: handler.py:120
+#: handler.py:147
 msgid "Ininialize successful"
 msgstr ""
 
-#: handler.py:121
+#: handler.py:148
 msgid "Directory successfully initialized."
 msgstr ""
 
-#: handler.py:266
+#: handler.py:293
 msgid "We feel sorry"
 msgstr ""
 
-#: handler.py:267
+#: handler.py:294
 msgid "This feature is not yet implemented."
 msgstr ""
 
@@ -775,27 +810,27 @@ msgstr ""
 msgid "Glade file cannot be found."
 msgstr ""
 
-#: __init__.py:145 __init__.py:364
+#: __init__.py:146 __init__.py:365
 msgid "Bookmarks"
 msgstr ""
 
-#: __init__.py:152 menu.py:77
+#: __init__.py:153 menu.py:77
 msgid "Bookmark"
 msgstr ""
 
-#: __init__.py:211 __init__.py:430
+#: __init__.py:212 __init__.py:431
 msgid "unchanged"
 msgstr ""
 
-#: __init__.py:213 __init__.py:432
+#: __init__.py:214 __init__.py:433
 msgid "unknown"
 msgstr ""
 
-#: __init__.py:218
+#: __init__.py:219
 msgid "Filename"
 msgstr ""
 
-#: __init__.py:219
+#: __init__.py:220
 msgid "Status"
 msgstr ""
 
@@ -859,11 +894,11 @@ msgstr ""
 msgid "Show the differences of all files"
 msgstr ""
 
-#: menu.py:165 remove.py:82
+#: menu.py:165 remove.py:83
 msgid "File not versioned"
 msgstr ""
 
-#: menu.py:166 remove.py:83
+#: menu.py:166 remove.py:84
 msgid "The selected file is not versioned."
 msgstr ""
 
@@ -988,11 +1023,11 @@ msgstr ""
 msgid "<b>Could not determine</b>"
 msgstr ""
 
-#: remove.py:98
+#: remove.py:99
 msgid "No matching files"
 msgstr ""
 
-#: remove.py:99
+#: remove.py:100
 msgid "No added files were found in the working tree."
 msgstr ""
 

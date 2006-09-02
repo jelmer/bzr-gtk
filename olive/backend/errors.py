@@ -48,6 +48,13 @@ class ConflictsInTreeError(OliveError):
         commit.commit()
     """
 
+class ConnectionError(OliveError):
+    """ Occurs if cannot connect to remote host
+    
+    May occur in:
+        update.missing()
+    """
+
 class DifferentBranchesError(OliveError):
     """ Occurs if the specified files are in different branches
     
