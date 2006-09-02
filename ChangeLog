@@ -1,3 +1,15 @@
+2006-09-02  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * olive/frontend/gtk/add.py: fixed a small bug (switch back to default
+      cursor)
+    * olive/frontend/gtk/remove.py: fixed a small bug (switch back to default
+      cursor)
+
+2006-08-31  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * olive/frontend/gtk/viz/diffwin.py: merged from bzr-gtk 0.10
+    * olive/frontend/gtk/viz/branchwin.py: merged from bzr-gtk 0.10
+
 2006-08-29  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * olive/backend/update.py: fixed a bug if bundles not available under bzr

@@ -69,6 +69,7 @@ class OliveAdd:
             if filename is None:
                 self.dialog.error_dialog(_('No file was selected'),
                                          _('Please select a file from the list,\nor choose the other option.'))
+                self.comm.set_busy(self.window, False)
                 return
             
             try:

@@ -429,6 +429,9 @@ class BranchWindow(gtk.Window):
         # TODO: more than one parent
         """Callback for when a treeview row gets activated."""
         revision = self.model[path][0]
+        if len(self.parent_ids[revision]) == 0:
+            # Ignore revisions without parent
+            return
         parent_id = self.parent_ids[revision][0]
         if self.app is not None:
             self.app.show_diff(self.branch, revision.revision_id, parent_id)
