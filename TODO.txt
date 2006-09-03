@@ -13,7 +13,7 @@ TODO list for Olive
 [DONE] Save and restore main window position and size (phanatic)
 [DONE] Real sensitive context menu - e.g. options are grey if not a branch
    (phanatic)
- - Implement 'bzr missing' (phanatic)
+[DONE] Implement 'bzr missing' (phanatic)
  - Implement 'bzr uncommit' (phanatic)
  - Implement bundle handling - at least creating them (phanatic)
 [DONE] Testing on Windows platform (phanatic)

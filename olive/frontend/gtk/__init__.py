@@ -239,7 +239,14 @@ class OliveGtk:
         else:
             if br:
                 # Activate some items
-                self.comm.menuitem_branch.set_sensitive(True)
+                self.comm.menuitem_branch_init.set_sensitive(False)
+                self.comm.menuitem_branch_get.set_sensitive(True)
+                self.comm.menuitem_branch_checkout.set_sensitive(True)
+                self.comm.menuitem_branch_pull.set_sensitive(True)
+                self.comm.menuitem_branch_push.set_sensitive(True)
+                self.comm.menuitem_branch_commit.set_sensitive(True)
+                self.comm.menuitem_branch_status.set_sensitive(True)
+                self.comm.menuitem_branch_missing.set_sensitive(True)
                 self.comm.menuitem_stats.set_sensitive(True)
                 self.comm.menuitem_add_files.set_sensitive(True)
                 self.comm.menuitem_remove_files.set_sensitive(True)
@@ -254,7 +261,14 @@ class OliveGtk:
                 self.comm.toolbutton_push.set_sensitive(True)
             else:
                 # Deactivate some items
-                self.comm.menuitem_branch.set_sensitive(False)
+                self.comm.menuitem_branch_init.set_sensitive(True)
+                self.comm.menuitem_branch_get.set_sensitive(False)
+                self.comm.menuitem_branch_checkout.set_sensitive(False)
+                self.comm.menuitem_branch_pull.set_sensitive(False)
+                self.comm.menuitem_branch_push.set_sensitive(False)
+                self.comm.menuitem_branch_commit.set_sensitive(False)
+                self.comm.menuitem_branch_status.set_sensitive(False)
+                self.comm.menuitem_branch_missing.set_sensitive(False)
                 self.comm.menuitem_stats.set_sensitive(False)
                 self.comm.menuitem_add_files.set_sensitive(False)
                 self.comm.menuitem_remove_files.set_sensitive(False)
@@ -301,7 +315,14 @@ class OliveCommunicator:
         self.menuitem_file_move = self.toplevel.get_widget('menuitem_file_move')
         self.menuitem_view_show_hidden_files = self.toplevel.get_widget('menuitem_view_show_hidden_files')
         self.menuitem_branch = self.toplevel.get_widget('menuitem_branch')
+        self.menuitem_branch_init = self.toplevel.get_widget('menuitem_branch_initialize')
+        self.menuitem_branch_get = self.toplevel.get_widget('menuitem_branch_get')
+        self.menuitem_branch_checkout = self.toplevel.get_widget('menuitem_branch_checkout')
+        self.menuitem_branch_pull = self.toplevel.get_widget('menuitem_branch_pull')
+        self.menuitem_branch_push = self.toplevel.get_widget('menuitem_branch_push')
         self.menuitem_branch_commit = self.toplevel.get_widget('menuitem_branch_commit')
+        self.menuitem_branch_status = self.toplevel.get_widget('menuitem_branch_status')
+        self.menuitem_branch_missing = self.toplevel.get_widget('menuitem_branch_missing_revisions')
         self.menuitem_stats = self.toplevel.get_widget('menuitem_stats')
         self.menuitem_stats_diff = self.toplevel.get_widget('menuitem_stats_diff')
         self.menuitem_stats_log = self.toplevel.get_widget('menuitem_stats_log')
@@ -444,7 +465,14 @@ class OliveCommunicator:
         else:
             if br:
                 # Activate some items
-                self.menuitem_branch.set_sensitive(True)
+                self.menuitem_branch_init.set_sensitive(False)
+                self.menuitem_branch_get.set_sensitive(True)
+                self.menuitem_branch_checkout.set_sensitive(True)
+                self.menuitem_branch_pull.set_sensitive(True)
+                self.menuitem_branch_push.set_sensitive(True)
+                self.menuitem_branch_commit.set_sensitive(True)
+                self.menuitem_branch_status.set_sensitive(True)
+                self.menuitem_branch_missing.set_sensitive(True)
                 self.menuitem_stats.set_sensitive(True)
                 self.menuitem_add_files.set_sensitive(True)
                 self.menuitem_remove_files.set_sensitive(True)
@@ -459,7 +487,14 @@ class OliveCommunicator:
                 self.toolbutton_push.set_sensitive(True)
             else:
                 # Deactivate some items
-                self.menuitem_branch.set_sensitive(False)
+                self.menuitem_branch_init.set_sensitive(True)
+                self.menuitem_branch_get.set_sensitive(False)
+                self.menuitem_branch_checkout.set_sensitive(False)
+                self.menuitem_branch_pull.set_sensitive(False)
+                self.menuitem_branch_push.set_sensitive(False)
+                self.menuitem_branch_commit.set_sensitive(False)
+                self.menuitem_branch_status.set_sensitive(False)
+                self.menuitem_branch_missing.set_sensitive(False)
                 self.menuitem_stats.set_sensitive(False)
                 self.menuitem_add_files.set_sensitive(False)
                 self.menuitem_remove_files.set_sensitive(False)
