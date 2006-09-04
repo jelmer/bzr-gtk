@@ -1,0 +1,13 @@
+Olive NEWS
+==========
+
+Olive 0.10.0 (2006-09-04)
+
+ - Version number adjusted to Bazaar's plugin versioning policy.
+ - New 'bzr missing' functionality (Branch/Missing revisions menu item)
+ - po files get built and installed properly (thanks to Stéphane Raimbault)
+ - Fixed several minor bugs.
+
+Olive 0.1 (2006-08-22)
+
+ - The first public release.

@@ -1,4 +1,10 @@
-olive (0.1) edgy; urgency=low
+olive (0.10.0-0ubuntu1) edgy; urgency=low
+
+  * New upstream release.
+
+ -- Szilveszter Farkas (Phanatic) <Szilveszter.Farkas@gmail.com>  Mon,  4 Sep 2006 03:12:00 +0200
+
+olive (0.1-0ubuntu1) edgy; urgency=low
 
   * Initial Release.
 
