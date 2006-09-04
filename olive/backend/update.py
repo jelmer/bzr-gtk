@@ -16,11 +16,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import bzrlib.errors as errors
-
 from bzrlib.workingtree import WorkingTree
 
-from errors import ConnectionError, NoLocationKnown, NotBranchError
+from bzrlib.errors import NoLocationKnown
 
 def missing(branch, other_branch=None, reverse=False):
     """ Get the number of missing or extra revisions of local branch.
@@ -36,12 +34,7 @@ def missing(branch, other_branch=None, reverse=False):
     import bzrlib
     from bzrlib.missing import find_unmerged
     
-    try:
-        local_branch = bzrlib.branch.Branch.open_containing(branch)[0]
-    except errors.NotBranchError:
-        raise NotBranchError(branch)
-    except:
-        raise
+    local_branch = bzrlib.branch.Branch.open_containing(branch)[0]
     
     parent = local_branch.get_parent()
     if other_branch is None:
@@ -49,14 +42,7 @@ def missing(branch, other_branch=None, reverse=False):
         if other_branch is None:
             raise NoLocationKnown
     
-    try:
-        remote_branch = bzrlib.branch.Branch.open(other_branch)
-    except errors.NotBranchError:
-        raise NotBranchError(other_branch)
-    except errors.ConnectionError:
-        raise ConnectionError(other_branch)
-    except:
-        raise
+    remote_branch = bzrlib.branch.Branch.open(other_branch)
     
     if remote_branch.base == local_branch.base:
         remote_branch = local_branch
@@ -127,20 +113,15 @@ def pull(branch, location=None, remember=False, overwrite=False, revision=None):
     try:
         tree_to = WorkingTree.open_containing(branch)[0]
         branch_to = tree_to.branch
-    except errors.NoWorkingTree:
+    except NoWorkingTree:
         tree_to = None
-        try:
-            branch_to = Branch.open_containing(branch)[0]
-        except errors.NotBranchError:
-            raise NotBranchError(location)
-    except errors.NotBranchError:
-        raise NotBranchError(location)
+        branch_to = Branch.open_containing(branch)[0]
 
     reader = None
     if location is not None and not nobundle:
         try:
             reader = read_bundle_from_url(location)
-        except errors.NotABundle:
+        except NotABundle:
             pass # Continue on considering this url a Branch
 
     stored_loc = branch_to.get_parent()

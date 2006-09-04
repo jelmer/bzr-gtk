@@ -28,7 +28,7 @@ except:
     sys.exit(1)
 
 import olive.backend.init as init
-import olive.backend.errors as errors
+import bzrlib.errors as errors
 
 class OliveCheckout:
     """ Display checkout dialog and perform the needed operations. """

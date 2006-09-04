@@ -21,13 +21,10 @@ import os
 
 import bzrlib
 import bzrlib.bzrdir as bzrdir
-import bzrlib.errors as errors
 
 from bzrlib.branch import Branch
 
-from errors import (AlreadyBranchError, BranchExistsWithoutWorkingTree,
-                    NonExistingParent, NonExistingRevision,
-                    NonExistingSource, NotBranchError, TargetAlreadyExists)
+from bzrlib.errors import (AlreadyBranchError, BranchExistsWithoutWorkingTree)
 
 def branch(from_location, to_location, revision=None):
     """ Create a branch from a local/remote location.
@@ -42,15 +39,7 @@ def branch(from_location, to_location, revision=None):
     """
     from bzrlib.transport import get_transport
 
-    try:
-        br_from = Branch.open(from_location)
-    except OSError, e:
-        if e.errno == errno.ENOENT:
-            raise NonExistingSource(from_location)
-        else:
-            raise
-    except errors.NotBranchError:
-        raise NotBranchError(from_location)
+    br_from = Branch.open(from_location)
 
     br_from.lock_read()
 
@@ -65,19 +54,14 @@ def branch(from_location, to_location, revision=None):
         name = None
         to_transport = get_transport(to_location)
 
-        try:
-            to_transport.mkdir('.')
-        except errors.FileExists:
-            raise TargetAlreadyExists(to_location)
-        except errors.NoSuchFile:
-            raise NonExistingParent(to_location)
+        to_transport.mkdir('.')
 
         try:
             dir = br_from.bzrdir.sprout(to_transport.base, revision_id, basis_dir)
             branch = dir.open_branch()
-        except errors.NoSuchRevision:
+        except NoSuchRevision:
             to_transport.delete_tree('.')
-            raise NonExistingRevision(from_location, revision[0])
+            raise
 
         if name:
             branch.control_files.put_utf8('branch-name', name)
@@ -97,10 +81,7 @@ def checkout(branch_location, to_location, revision=None, lightweight=False):
     
     :param lightweight: perform a lightweight checkout (be aware!)
     """
-    try:
-        source = Branch.open(branch_location)
-    except errors.NotBranchError:
-        raise NotBranchError(branch_location)
+    source = Branch.open(branch_location)
     
     if revision is not None:
         revision_id = source.get_rev_id(revision)
@@ -114,21 +95,13 @@ def checkout(branch_location, to_location, revision=None, lightweight=False):
         bzrlib.osutils.abspath(branch_location)):
         try:
             source.bzrdir.open_workingtree()
-        except errors.NoWorkingTree:
+        except NoWorkingTree:
             source.bzrdir.create_workingtree()
             return
 
     to_location = to_location + '/' + os.path.basename(branch_location.rstrip("/\\"))
     
-    try:
-        os.mkdir(to_location)
-    except OSError, e:
-        if e.errno == errno.EEXIST:
-            raise TargetAlreadyExists(to_location)
-        if e.errno == errno.ENOENT:
-            raise NonExistingParent(to_location)
-        else:
-            raise
+    os.mkdir(to_location)
 
     old_format = bzrlib.bzrdir.BzrDirFormat.get_default_format()
     bzrlib.bzrdir.BzrDirFormat.set_default_format(bzrdir.BzrDirMetaFormat1())
@@ -164,7 +137,7 @@ def init(location):
  
     try:
         existing_bzrdir = bzrdir.BzrDir.open(location)
-    except errors.NotBranchError:
+    except NotBranchError:
         bzrdir.BzrDir.create_branch_convenience(location, format=format)
     else:
         if existing_bzrdir.has_branch():

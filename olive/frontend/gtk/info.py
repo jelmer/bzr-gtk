@@ -29,7 +29,7 @@ try:
 except:
     sys.exit(1)
 
-import olive.backend.errors as errors
+import bzrlib.errors as errors
 import olive.backend.info as info
 
 class OliveInfo:

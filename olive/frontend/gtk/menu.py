@@ -29,7 +29,7 @@ except:
     sys.exit(1)
 
 import olive.backend.fileops as fileops
-import olive.backend.errors as errors
+import bzrlib.errors as errors
 
 class OliveMenu:
     """ This class is responsible for building the context menus. """

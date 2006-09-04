@@ -22,8 +22,31 @@ import bzrlib.errors as errors
 from bzrlib.branch import Branch
 from bzrlib.workingtree import WorkingTree
 
-from errors import (DifferentBranchesError, NotBranchError, PermissionDenied,
-                    PrefixFormatError, RevisionValueError)
+from bzrlib.errors import (NotBranchError, PermissionDenied, BzrError)
+
+class DifferentBranchesError(BzrError):
+    """ Occurs if the specified files are in different branches
+    
+    May occur in:
+        info.diff()
+    """
+
+
+class PrefixFormatError(BzrError):
+    """ Occurs if the prefix is badly formatted
+    
+    May occur in:
+        info.diff()
+    """
+
+
+class RevisionValueError(BzrError):
+    """ Invalid revision value provided
+    
+    May occur in:
+        info.log()
+    """
+
 
 def diff(revision=None, file_list=None, diff_options=None, prefix=None):
     """ Save the diff into a temporary file.

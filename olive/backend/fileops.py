@@ -18,12 +18,33 @@
 
 import os
 
-import bzrlib.errors as errors
+from bzrlib.errors import (BzrError, NotBranchError, NotVersionedError, 
+                           PermissionDenied)
 
-from errors import (DirectoryAlreadyExists, MissingArgumentError,
-                    MultipleMoveError, NoFilesSpecified, NoMatchingFiles,
-                    NonExistingSource, NotBranchError, NotSameBranchError,
-                    NotVersionedError, PermissionDenied)
+
+class DirectoryAlreadyExists(BzrError):
+    """ The specified directory already exists
+    
+    May occur in:
+        fileops.mkdir()
+    """
+
+
+class MultipleMoveError(BzrError):
+    """ Occurs when moving/renaming more than 2 files, but the last argument is not a directory
+    
+    May occur in:
+        fileops.move()
+    """
+
+
+class NoMatchingFiles(BzrError):
+    """ No files found which could match the criteria
+    
+    May occur in:
+        fileops.remove()
+    """
+
 
 def add(file_list, recursive=False):
     """ Add listed files to the branch. 
@@ -36,12 +57,7 @@ def add(file_list, recursive=False):
     """
     import bzrlib.add
     
-    try:
-        added, ignored = bzrlib.add.smart_add(file_list, recursive)
-    except errors.NotBranchError:
-        raise NotBranchError
-    except:
-        raise
+    added, ignored = bzrlib.add.smart_add(file_list, recursive)
     
     match_len = 0
     for glob, paths in ignored.items():
@@ -62,12 +78,8 @@ def mkdir(directory):
         if e.errno == 17:
             raise DirectoryAlreadyExists(directory)
     else:
-        try:
-            wt, dd = WorkingTree.open_containing(directory)
-        except errors.NotBranchError:
-            raise NotBranchError
-        else:
-            wt.add([dd])
+        wt, dd = WorkingTree.open_containing(directory)
+        wt.add([dd])
 
 def move(names_list):
     """ Move or rename given files.
@@ -76,16 +88,7 @@ def move(names_list):
     """
     from bzrlib.builtins import tree_files
     
-    if len(names_list) < 2:
-        raise MissingArgumentError
-    
-    try:
-        tree, rel_names = tree_files(names_list)
-    except errors.NotBranchError:
-        raise NotBranchError
-    except errors.BzrCommandError:
-        # not the same branch presumably
-        raise NotSameBranchError
+    tree, rel_names = tree_files(names_list)
         
     if os.path.isdir(names_list[-1]):
         # move into existing directory
@@ -95,6 +98,7 @@ def move(names_list):
         if len(names_list) != 2:
             raise MultipleMoveError
         tree.rename_one(rel_names[0], rel_names[1])
+
 
 def remove(file_list, new=False):
     """ Make selected files unversioned.
@@ -106,17 +110,9 @@ def remove(file_list, new=False):
     import bzrlib
     from bzrlib.builtins import tree_files
     
-    try:
-        tree, file_list = tree_files(file_list)
-    except errors.NotBranchError:
-        raise NotBranchError
-    except:
-        raise
+    tree, file_list = tree_files(file_list)
     
-    if new is False:
-        if file_list is None:
-            raise NoFilesSpecified
-    else:
+    if new:
         from bzrlib.delta import compare_trees
         if (bzrlib.version_info[0] == 0) and (bzrlib.version_info[1] < 9):
             added = [compare_trees(tree.basis_tree(), tree,
@@ -128,10 +124,8 @@ def remove(file_list, new=False):
         if len(file_list) == 0:
             raise NoMatchingFiles
     
-    try:
-        tree.remove(file_list)
-    except errors.NotVersionedError:
-        raise NotVersionedError
+    tree.remove(file_list)
+
 
 def rename(source, target):
     """ Rename a versioned file
@@ -140,9 +134,6 @@ def rename(source, target):
     
     :param target: full path to the new file
     """
-    if os.access(source, os.F_OK) is not True:
-        raise NonExistingSource(source)
-    
     move([source, target])
 
 def status(filename):
@@ -158,10 +149,8 @@ def status(filename):
     
     try:
         tree1 = WorkingTree.open_containing(filename)[0]
-    except errors.NotBranchError:
+    except NotBranchError:
         return 'unknown'
-    except errors.PermissionDenied:
-        raise PermissionDenied(filename)
     
     branch = tree1.branch
     tree2 = tree1.branch.repository.revision_tree(branch.last_revision())

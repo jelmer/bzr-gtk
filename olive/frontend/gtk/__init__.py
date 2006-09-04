@@ -33,7 +33,7 @@ except:
 
 from handler import OliveHandler
 from olive.backend.info import is_branch
-import olive.backend.errors as errors
+import bzrlib.errors as errors
 
 # Olive GTK UI version
 __version__ = '0.10.0'

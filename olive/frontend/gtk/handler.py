@@ -28,7 +28,7 @@ except:
     sys.exit(1)
 
 from olive.backend.info import is_branch
-import olive.backend.errors as errors
+import bzrlib.errors as errors
 
 from dialog import OliveDialog
 from menu import OliveMenu

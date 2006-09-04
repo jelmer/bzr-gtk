@@ -19,16 +19,13 @@
 import codecs
 
 import bzrlib
-import bzrlib.errors as errors
+from bzrlib.errors import NoSuchFile
 
-from errors import (EmptyMessageError, NoMessageNoFileError,
-                    NoChangesToCommitError, ConflictsInTreeError,
-                    StrictCommitError, BoundBranchOutOfDate,
-                    LocalRequiresBoundBranch, NotBranchError, NonExistingParent,
+from errors import ( LocalRequiresBoundBranch, NotBranchError, NonExistingParent,
                     PathPrefixNotCreated, NoLocationKnown,
                     DivergedBranchesError)
 
-def commit(selected_list, message=None, file=None, unchanged=False,
+def commit(selected_list, message=None, unchanged=False,
            strict=False, local=False):
     """ Command to commit changes into the branch.
     
@@ -47,39 +44,19 @@ def commit(selected_list, message=None, file=None, unchanged=False,
     from bzrlib.builtins import tree_files
     from bzrlib.commit import NullCommitReporter
 
-    try:
-        tree, selected_list = tree_files(selected_list)
-    except errors.NotBranchError:
-        raise NotBranchError
+    tree, selected_list = tree_files(selected_list)
     
     if local and not tree.branch.get_bound_location():
         raise LocalRequiresBoundBranch
-    if message is None and not file:
-        if message is None:
-            raise NoMessageNoFileError
-    elif message and file:
-        raise NoMessageNoFileError
 
-    if file:
-        message = codecs.open(file, 'rt', bzrlib.user_encoding).read()
+    assert message is not None and len(message) > 0
 
-    if message == "":
-        raise EmptyMessageError
-
+    # FIXME: This should be a GtkCommitReporter!
     reporter = NullCommitReporter()
 
-    try:
-        tree.commit(message, specific_files=selected_list,
+    tree.commit(message, specific_files=selected_list,
                     allow_pointless=unchanged, strict=strict, local=local,
                     reporter=reporter)
-    except errors.PointlessCommit:
-        raise NoChangesToCommitError
-    except errors.ConflictsInTree:
-        raise ConflictsInTreeError
-    except errors.StrictCommitFailed:
-        raise StrictCommitError
-    except errors.BoundBranchOutOfDate, e:
-        raise BoundBranchOutOfDate(str(e))
 
 def push(branch, location=None, remember=False, overwrite=False,
          create_prefix=False):
@@ -100,12 +77,7 @@ def push(branch, location=None, remember=False, overwrite=False,
     from bzrlib.branch import Branch
     from bzrlib.transport import get_transport
         
-    try:
-        br_from = Branch.open_containing(branch)[0]
-    except errors.NotBranchError:
-        raise NotBranchError(branch)
-    except:
-        raise
+    br_from = Branch.open_containing(branch)[0]
     
     stored_loc = br_from.get_push_location()
     if location is None:
@@ -125,14 +97,14 @@ def push(branch, location=None, remember=False, overwrite=False,
     try:
         dir_to = bzrlib.bzrdir.BzrDir.open(location_url)
         br_to = dir_to.open_branch()
-    except errors.NotBranchError:
+    except NotBranchError:
         # create a branch.
         transport = transport.clone('..')
         if not create_prefix:
             try:
                 relurl = transport.relpath(location_url)
                 transport.mkdir(relurl)
-            except errors.NoSuchFile:
+            except NoSuchFile:
                 raise NonExistingParent(location)
         else:
             current = transport.base
@@ -142,7 +114,7 @@ def push(branch, location=None, remember=False, overwrite=False,
                     transport, relpath = needed[-1]
                     transport.mkdir(relpath)
                     needed.pop()
-                except errors.NoSuchFile:
+                except NoSuchFile:
                     new_transport = transport.clone('..')
                     needed.append((new_transport,
                                    new_transport.relpath(transport.base)))
@@ -157,16 +129,16 @@ def push(branch, location=None, remember=False, overwrite=False,
         try:
             try:
                 tree_to = dir_to.open_workingtree()
-            except errors.NotLocalUrl:
+            except NotLocalUrl:
                 # FIXME - what to do here? how should we warn the user?
                 #warning('This transport does not update the working '
                 #        'tree of: %s' % (br_to.base,))
                 count = br_to.pull(br_from, overwrite)
-            except errors.NoWorkingTree:
+            except NoWorkingTree:
                 count = br_to.pull(br_from, overwrite)
             else:
                 count = tree_to.pull(br_from, overwrite)
-        except errors.DivergedBranches:
+        except DivergedBranches:
             raise DivergedBranchesError
     
     return count
