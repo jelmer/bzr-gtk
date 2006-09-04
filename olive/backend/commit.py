@@ -16,47 +16,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import codecs
-
 import bzrlib
 from bzrlib.errors import NoSuchFile
 
 from errors import ( LocalRequiresBoundBranch, NotBranchError, NonExistingParent,
                     PathPrefixNotCreated, NoLocationKnown,
                     DivergedBranchesError)
-
-def commit(selected_list, message=None, unchanged=False,
-           strict=False, local=False):
-    """ Command to commit changes into the branch.
-    
-    :param selected_list: list of files you want to commit (at least the top working directory has to be specified)
-    
-    :param message: commit message
-    
-    :param file: the file which contains the commit message
-    
-    :param unchanged: force commit if nothing has changed since the last commit
-    
-    :param strict: refuse to commit if there are unknown files in the working tree
-    
-    :param local: perform a local only commit in a bound branch
-    """
-    from bzrlib.builtins import tree_files
-    from bzrlib.commit import NullCommitReporter
-
-    tree, selected_list = tree_files(selected_list)
-    
-    if local and not tree.branch.get_bound_location():
-        raise LocalRequiresBoundBranch
-
-    assert message is not None and len(message) > 0
-
-    # FIXME: This should be a GtkCommitReporter!
-    reporter = NullCommitReporter()
-
-    tree.commit(message, specific_files=selected_list,
-                    allow_pointless=unchanged, strict=strict, local=local,
-                    reporter=reporter)
 
 def push(branch, location=None, remember=False, overwrite=False,
          create_prefix=False):

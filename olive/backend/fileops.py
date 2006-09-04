@@ -157,9 +157,7 @@ def status(filename):
     
     # find the relative path to the given file (needed for proper delta)
     wtpath = tree1.basedir
-    #print "DEBUG: wtpath =", wtpath
     fullpath = filename
-    #print "DEBUG: fullpath =", fullpath
     i = 0
     wtsplit = wtpath.split('/')
     fpsplit = fullpath.split('/')
@@ -170,39 +168,10 @@ def status(filename):
                 del fpcopy[0]
             i = i + 1
     rel = '/'.join(fpcopy)
-    #print "DEBUG: rel =", rel
     
-    if bzrlib.version_info[1] < 9:
-        delta = compare_trees(old_tree=tree2,
-                              new_tree=tree1,
-                              want_unchanged=True,
-                              specific_files=[rel])
-    else:
-        delta = tree1.changes_from(tree2,
+    delta = tree1.changes_from(tree2,
                                    want_unchanged=True,
                                    specific_files=[rel])
-    
-    """ Debug information (could be usable in the future, so didn't cut out)
-    print "DEBUG: delta.renamed:"
-    for path, id, kind, text_modified, meta_modified in delta.renamed:
-        print path
-    print
-    print "DEBUG: delta.added:"
-    for path, id, kind in delta.added:
-        print path
-    print
-    print "DEBUG: delta.removed:"
-    for path, id, kind, text_modified, meta_modified in delta.removed:
-        print path
-    print
-    print "DEBUG: delta.modified:"
-    for path, id, kind, text_modified, meta_modified in delta.modified:
-        print path
-    print
-    print "DEBUG: delta.unchanged:"
-    for path, id, kind in delta.unchanged:
-        print path
-    """
     
     if len(delta.renamed):
         return 'renamed'

@@ -31,10 +31,6 @@ except:
 
 from bzrlib import version_info
 
-if version_info < (0, 9):
-    # function deprecated after 0.9
-    from bzrlib.delta import compare_trees
-
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 

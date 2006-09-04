@@ -150,12 +150,7 @@ def get_push_location(location):
     """
     from bzrlib.branch import Branch
     
-    try:
-        branch = Branch.open_containing(location)[0]
-    except errors.NotBranchError:
-        raise NotBranchError(location)
-    except:
-        raise
+    branch = Branch.open_containing(location)[0]
     
     return branch.get_push_location()
 
@@ -206,10 +201,7 @@ def info(location):
     import info_helper
     
     ret = {}
-    try:
-        a_bzrdir = bzrdir.BzrDir.open_containing(location)[0]
-    except errors.NotBranchError:
-        raise NotBranchError(location)
+    a_bzrdir = bzrdir.BzrDir.open_containing(location)[0]
 
     try:
         working = a_bzrdir.open_workingtree()
@@ -280,8 +272,6 @@ def is_branch(location):
         branch = Branch.open_containing(location)[0]
     except errors.NotBranchError:
         return False
-    except errors.PermissionDenied:
-        raise PermissionDenied(location)
     else:
         return True
         
@@ -293,10 +283,7 @@ def is_checkout(location):
     
     :return: True or False respectively
     """
-    try:
-        branch = Branch.open_containing(location)[0]
-    except errors.NotBranchError:
-        raise NotBranchError
+    branch = Branch.open_containing(location)[0]
     
     try:
         working = WorkingTree.open_containing(location)[0]
