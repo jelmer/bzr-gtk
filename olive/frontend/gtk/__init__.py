@@ -36,7 +36,7 @@ from olive.backend.info import is_branch
 import olive.backend.errors as errors
 
 # Olive GTK UI version
-__version__ = '0.1'
+__version__ = '0.10.0'
 
 class OliveGtk:
     """ The main Olive GTK frontend class. This is called when launching the

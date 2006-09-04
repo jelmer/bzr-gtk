@@ -35,7 +35,7 @@ class InstallData(install_data):
 			lang = os.path.basename(po[:-3])
 			# It's necessary to compile in this directory (not in po_dir)
 			# because install_data can't rename file
-			mo = os.path.join('build', 'mo', lang + '.mo')
+			mo = os.path.join('build', 'mo', lang, 'olive-gtk.mo')
 			
 			directory = os.path.dirname(mo)
 			if not os.path.exists(directory):
@@ -49,7 +49,7 @@ class InstallData(install_data):
 				if os.system(cmd) != 0:
 					raise SystemExit('Error while running msgfmt')
 
-				dest = os.path.dirname(os.path.join('share', 'locale', lang, 'LC_MESSAGES', 'olive.mo'))
+				dest = os.path.dirname(os.path.join('share', 'locale', lang, 'LC_MESSAGES', 'olive-gtk.mo'))
 				data_files.append((dest, [mo]))
 		
 		return data_files

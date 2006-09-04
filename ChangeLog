@@ -1,5 +1,12 @@
+2006-09-04  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
+
+    * RELEASE: Olive 0.10.0
+    * setup.py: tweaked the po building a bit
+
 2006-09-03  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
+    * olive/frontend/gtk/__init__.py: bumped the version number to be consistent
+      with Bazaar
     * olive/frontend/gtk/__init__.py: fixed a bug regarding menu item activation
 
 2006-09-02  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
