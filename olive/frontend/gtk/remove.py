@@ -28,7 +28,6 @@ except:
     sys.exit(1)
 
 import bzrlib.errors as errors
-import olive.backend.fileops as fileops
 
 class OliveRemove:
     """ Display the Remove file(s) dialog and perform the needed actions. """
@@ -73,7 +72,8 @@ class OliveRemove:
                 return
             
             try:
-                fileops.remove([directory + '/' + filename])
+                wt, path = WorkingTree.open_containing(directory + '/' + filename)
+                wt.remove(path)
             except errors.NotBranchError:
                 self.dialog.error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
@@ -89,7 +89,8 @@ class OliveRemove:
         elif radio_new.get_active():
             # Remove added files recursively
             try:
-                fileops.remove([directory], True)
+                wt, path = WorkingTree.open_containing(directory)
+                wt.remove(path)
             except errors.NotBranchError:
                 self.dialog.error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))

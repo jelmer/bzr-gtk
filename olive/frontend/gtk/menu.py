@@ -153,7 +153,9 @@ class OliveMenu:
             return
         
         try:
-            fileops.remove([directory + '/' + filename])
+            wt, path = WorkingTree.open_containing(directory+'/'+filename)
+            wt.remove(path)
+
         except errors.NotBranchError:
             self.dialog.error_dialog(_('Directory is not a branch'),
                                      _('You can perform this action only in a branch.'))

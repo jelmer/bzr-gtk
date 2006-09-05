@@ -29,7 +29,6 @@ except:
 
 import bzrlib
 import bzrlib.errors as errors
-import olive.backend.fileops as fileops
 
 class OliveAdd:
     """ Display the Add file(s) dialog and perform the needed actions. """

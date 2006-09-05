@@ -165,8 +165,6 @@ class OliveGtk:
         
     def _load_right(self):
         """ Load data into the right panel. (Filelist) """
-        import olive.backend.fileops as fileops
-        
         # set cursor to busy
         self.comm.set_busy(self.treeview_right)
         
@@ -196,7 +194,7 @@ class OliveGtk:
             liststore.append([gtk.STOCK_DIRECTORY, item, ''])
         for item in files:
             try:
-                status = fileops.status(path + '/' + item)
+                status = check_status(path + '/' + item)
             except errors.PermissionDenied:
                 continue
             
@@ -398,8 +396,6 @@ class OliveCommunicator:
     
     def refresh_right(self, path=None):
         """ Refresh the file list. """
-        import olive.backend.fileops as fileops
-        
         self.set_busy(self.treeview_right)
         
         if path is None:
@@ -436,7 +432,7 @@ class OliveCommunicator:
             liststore.append([gtk.STOCK_DIRECTORY, item, ''])
         for item in files:
             try:
-                status = fileops.status(path + '/' + item)
+                status = check_status(path + '/' + item)
             except errors.PermissionDenied:
                 continue
             
@@ -633,3 +629,53 @@ class OlivePreferences:
     def remove_bookmark(self, path):
         """ Remove bookmark. """
         return self.config.remove_section(path)
+
+def check_status(filename):
+    """ Get the status of a file.
+    
+    :param filename: the full path to the file
+    
+    :return: renamed | added | removed | modified | unchanged | unknown
+    """
+    import bzrlib
+    from bzrlib.delta import compare_trees
+    from bzrlib.workingtree import WorkingTree
+    
+    try:
+        tree1 = WorkingTree.open_containing(filename)[0]
+    except NotBranchError:
+        return 'unknown'
+    
+    branch = tree1.branch
+    tree2 = tree1.branch.repository.revision_tree(branch.last_revision())
+    
+    # find the relative path to the given file (needed for proper delta)
+    wtpath = tree1.basedir
+    fullpath = filename
+    i = 0
+    wtsplit = wtpath.split('/')
+    fpsplit = fullpath.split('/')
+    fpcopy = fullpath.split('/')
+    for item in fpsplit:
+        if i is not len(wtsplit):
+            if item == wtsplit[i]:
+                del fpcopy[0]
+            i = i + 1
+    rel = '/'.join(fpcopy)
+    
+    delta = tree1.changes_from(tree2,
+                                   want_unchanged=True,
+                                   specific_files=[rel])
+    
+    if len(delta.renamed):
+        return 'renamed'
+    elif len(delta.added):
+        return 'added'
+    elif len(delta.removed):
+        return 'removed'
+    elif len(delta.modified):
+        return 'modified'
+    elif len(delta.unchanged):
+        return 'unchanged'
+    else:
+        return 'unknown'

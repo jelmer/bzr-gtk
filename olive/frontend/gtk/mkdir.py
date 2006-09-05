@@ -29,7 +29,6 @@ except:
     sys.exit(1)
 
 import bzrlib.errors as errors
-import olive.backend.fileops as fileops
 
 class OliveMkdir:
     """ Display the Make directory dialog and perform the needed actions. """

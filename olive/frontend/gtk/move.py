@@ -29,7 +29,6 @@ except:
     sys.exit(1)
 
 import bzrlib.errors as errors
-import olive.backend.fileops as fileops
 
 class OliveMove:
     """ Display the Move dialog and perform the needed actions. """
@@ -74,17 +73,18 @@ class OliveMove:
         
         # Move the file to a directory
         try:
-            fileops.move([source, destination])
+            wt1, path1 = WorkingTree.open_containing(source)
+            wt2, path2 = WorkingTree.open_containing(destination)
+            if wt1.base != wt2.base:
+                self.dialog.error_dialog(_('Not the same branch'),
+                                         _('The destination is not in the same branch.'))
+                return
+
+            wt1.move([source], destination)
         except errors.NotBranchError:
             self.dialog.error_dialog(_('File is not in a branch'),
                                      _('The selected file is not in a branch.'))
             return
-        except errors.NotSameBranchError:
-            self.dialog.error_dialog(_('Not the same branch'),
-                                     _('The destination is not in the same branch.'))
-            return
-        except:
-            raise
 
         self.close()
         self.comm.refresh_right()
