@@ -84,7 +84,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_location_lightcoroot_label')
                 l = self.glade.get_widget('label_info_location_lightcoroot')
                 l.set_text(self.ret['location']['lightcoroot'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -95,7 +94,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_location_sharedrepo_label')
                 l = self.glade.get_widget('label_info_location_sharedrepo')
                 l.set_text(self.ret['location']['sharedrepo'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -106,7 +104,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_location_repobranch_label')
                 l = self.glade.get_widget('label_info_location_repobranch')
                 l.set_text(self.ret['location']['repobranch'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -117,7 +114,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_location_cobranch_label')
                 l = self.glade.get_widget('label_info_location_cobranch')
                 l.set_text(self.ret['location']['cobranch'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -128,7 +124,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_location_repoco_label')
                 l = self.glade.get_widget('label_info_location_repoco')
                 l.set_text(self.ret['location']['repoco'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -139,7 +134,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_location_coroot_label')
                 l = self.glade.get_widget('label_info_location_coroot')
                 l.set_text(self.ret['location']['coroot'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -150,7 +144,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_location_branchroot_label')
                 l = self.glade.get_widget('label_info_location_branchroot')
                 l.set_text(self.ret['location']['branchroot'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -165,7 +158,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_related_parentbranch_label')
                 l = self.glade.get_widget('label_info_related_parentbranch')
                 l.set_text(self.ret['related']['parentbranch'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -176,7 +168,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_related_publishbranch_label')
                 l = self.glade.get_widget('label_info_related_publishbranch')
                 l.set_text(self.ret['related']['publishbranch'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -191,7 +182,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_format_control_label')
                 l = self.glade.get_widget('label_info_format_control')
                 l.set_text(self.ret['format']['control'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -202,7 +192,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_format_workingtree_label')
                 l = self.glade.get_widget('label_info_format_workingtree')
                 l.set_text(self.ret['format']['workingtree'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -213,7 +202,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_format_branch_label')
                 l = self.glade.get_widget('label_info_format_branch')
                 l.set_text(self.ret['format']['branch'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -224,7 +212,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_format_repository_label')
                 l = self.glade.get_widget('label_info_format_repository')
                 l.set_text(self.ret['format']['repository'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -239,7 +226,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_locking_workingtree_label')
                 l = self.glade.get_widget('label_info_locking_workingtree')
                 l.set_text(self.ret['locking']['workingtree'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -250,7 +236,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_locking_branch_label')
                 l = self.glade.get_widget('label_info_locking_branch')
                 l.set_text(self.ret['locking']['branch'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -261,7 +246,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_locking_repository_label')
                 l = self.glade.get_widget('label_info_locking_repository')
                 l.set_text(self.ret['locking']['repository'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -304,7 +288,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_wtstats_unchanged_label')
                 l = self.glade.get_widget('label_info_wtstats_unchanged')
                 l.set_text(str(self.ret['wtstats']['unchanged']))
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -315,7 +298,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_wtstats_modified_label')
                 l = self.glade.get_widget('label_info_wtstats_modified')
                 l.set_text(str(self.ret['wtstats']['modified']))
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -326,7 +308,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_wtstats_added_label')
                 l = self.glade.get_widget('label_info_wtstats_added')
                 l.set_text(str(self.ret['wtstats']['added']))
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -337,7 +318,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_wtstats_removed_label')
                 l = self.glade.get_widget('label_info_wtstats_removed')
                 l.set_text(str(self.ret['wtstats']['removed']))
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -348,7 +328,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_wtstats_renamed_label')
                 l = self.glade.get_widget('label_info_wtstats_renamed')
                 l.set_text(str(self.ret['wtstats']['renamed']))
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -359,7 +338,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_wtstats_unknown_label')
                 l = self.glade.get_widget('label_info_wtstats_unknown')
                 l.set_text(str(self.ret['wtstats']['unknown']))
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -370,7 +348,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_wtstats_ignored_label')
                 l = self.glade.get_widget('label_info_wtstats_ignored')
                 l.set_text(str(self.ret['wtstats']['ignored']))
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -381,7 +358,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_wtstats_subdirs_label')
                 l = self.glade.get_widget('label_info_wtstats_subdirs')
                 l.set_text(str(self.ret['wtstats']['subdirs']))
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -396,7 +372,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_brstats_revno_label')
                 l = self.glade.get_widget('label_info_brstats_revno')
                 l.set_text(str(self.ret['brstats']['revno']))
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -407,7 +382,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_brstats_commiters_label')
                 l = self.glade.get_widget('label_info_brstats_commiters')
                 l.set_text(str(self.ret['brstats']['commiters']))
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -418,7 +392,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_brstats_age_label')
                 l = self.glade.get_widget('label_info_brstats_age')
                 l.set_text('%d days' % self.ret['brstats']['age'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -429,7 +402,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_brstats_firstrev_label')
                 l = self.glade.get_widget('label_info_brstats_firstrev')
                 l.set_text(self.ret['brstats']['firstrev'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -440,7 +412,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_brstats_lastrev_label')
                 l = self.glade.get_widget('label_info_brstats_lastrev')
                 l.set_text(self.ret['brstats']['lastrev'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -455,7 +426,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_repstats_revisions_label')
                 l = self.glade.get_widget('label_info_repstats_revisions')
                 l.set_text(str(self.ret['repstats']['revisions']))
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
@@ -466,7 +436,6 @@ class OliveInfo:
                 ll = self.glade.get_widget('label_info_repstats_size_label')
                 l = self.glade.get_widget('label_info_repstats_size')
                 l.set_text('%d KiB' % (self.ret['repstats']['size'] / 1024))
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
                 ll.show()
                 l.show()
                 if not display:
