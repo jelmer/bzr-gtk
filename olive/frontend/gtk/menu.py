@@ -65,6 +65,10 @@ class OliveMenu:
                                        _('Remove'), None,
                                        _('Remove the selected file'),
                                        self.remove_file),
+                                      ('open', gtk.STOCK_OPEN,
+                                       _('Open'), None,
+                                       _('Open the selected file'),
+                                       self.open_file),
                                       ('commit', None,
                                        _('Commit'), None,
                                        _('Commit the changes'),
@@ -173,6 +177,19 @@ class OliveMenu:
             raise
         
         self.comm.refresh_right()
+
+    def open_file(self, action):
+        """ Right context menu -> Open """
+        # Open only the selected file
+        directory = self.comm.get_path()
+        filename = self.comm.get_selected_right()
+        
+        if filename is None:
+            self.dialog.error_dialog(_('No file was selected'),
+                                     _('Please select a file from the list,\nor choose the other option.'))
+            return
+       
+        os.system("gnome-open %s/%s" % (directory, filename))
 
     def commit(self, action):
         """ Right context menu -> Commit """
