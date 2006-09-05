@@ -1,5 +1,10 @@
 2006-09-05  Richard Ferguson <ubuntu@fergusnet.com>
 
+    * cmenu.ui: add Open Folder to left context menu
+    * olive/frontend/gtk/menu.py: add Open Folder handler
+	
+2006-09-05  Richard Ferguson <ubuntu@fergusnet.com>
+
     * olive.glade: fixed push dialog to not hide/show widgets
     * olive/frontend/gtk/push.py:
 	

@@ -85,6 +85,10 @@ class OliveMenu:
                                        _('Remove'), None,
                                        _('Remove the selected bookmark'),
                                        self.remove_bookmark),
+                                      ('open_folder', gtk.STOCK_OPEN,
+                                       _('Open Folder'), None,
+                                       _('Open bookmark folder in Nautilus'),
+                                       self.open_folder),
                                       ('diff_selected', None,
                                        _('Selected...'), None,
                                        _('Show the differences of the selected file'),
@@ -196,14 +200,24 @@ class OliveMenu:
     def edit_bookmark(self, action):
         """ Left context menu -> Edit """
         from bookmark import OliveBookmark
-        bookmark = OliveBookmark(self.gladefile, self.comm, self.dialog)
-        bookmark.display()
+
+        if self.comm.get_selected_left() != None:
+            bookmark = OliveBookmark(self.gladefile, self.comm, self.dialog)
+            bookmark.display()
 
     def remove_bookmark(self, action):
         """ Left context menu -> Remove """
-        self.comm.pref.remove_bookmark(self.comm.get_selected_left())
         
-        self.comm.refresh_left()
+        if self.comm.get_selected_left() != None:
+            self.comm.pref.remove_bookmark(self.comm.get_selected_left())
+            self.comm.refresh_left()
+    
+    def open_folder(self, action):
+        """ Left context menu -> Open Folder """
+        path = self.comm.get_selected_left()
+
+        if path != None:
+            os.system("gnome-open %s" % path)
     
     def diff_selected(self, action):
         """ Diff toolbutton -> Selected... """
