@@ -22,14 +22,6 @@ from bzrlib.errors import (BzrError, NotBranchError, NotVersionedError,
                            PermissionDenied)
 
 
-class DirectoryAlreadyExists(BzrError):
-    """ The specified directory already exists
-    
-    May occur in:
-        fileops.mkdir()
-    """
-
-
 class MultipleMoveError(BzrError):
     """ Occurs when moving/renaming more than 2 files, but the last argument is not a directory
     
@@ -45,41 +37,6 @@ class NoMatchingFiles(BzrError):
         fileops.remove()
     """
 
-
-def add(file_list, recursive=False):
-    """ Add listed files to the branch. 
-    
-    :param file_list - list of files to be added (using full paths)
-    
-    :param recursive - if True, all unknown files will be added
-    
-    :return: count of ignored files
-    """
-    import bzrlib.add
-    
-    added, ignored = bzrlib.add.smart_add(file_list, recursive)
-    
-    match_len = 0
-    for glob, paths in ignored.items():
-        match_len += len(paths)
-    
-    return match_len
-
-def mkdir(directory):
-    """ Create new versioned directory.
-    
-    :param directory: the full path to the directory to be created
-    """
-    from bzrlib.workingtree import WorkingTree
-    
-    try:
-        os.mkdir(directory)
-    except OSError, e:
-        if e.errno == 17:
-            raise DirectoryAlreadyExists(directory)
-    else:
-        wt, dd = WorkingTree.open_containing(directory)
-        wt.add([dd])
 
 def move(names_list):
     """ Move or rename given files.
@@ -126,15 +83,6 @@ def remove(file_list, new=False):
     
     tree.remove(file_list)
 
-
-def rename(source, target):
-    """ Rename a versioned file
-    
-    :param source: full path to the original file
-    
-    :param target: full path to the new file
-    """
-    move([source, target])
 
 def status(filename):
     """ Get the status of a file.

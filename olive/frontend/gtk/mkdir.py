@@ -73,11 +73,18 @@ class OliveMkdir:
         if checkbox.get_active():
             # Want to create a versioned directory
             try:
-                fileops.mkdir(newdir)
-            except errors.DirectoryAlreadyExists:
-                self.dialog.error_dialog(_('Directory already exists'),
-                                         _('Please specify another name to continue.'))
-                return
+                from bzrlib.workingtree import WorkingTree
+    
+                os.mkdir(newdir)
+
+                wt, dd = WorkingTree.open_containing(newdir)
+                wt.add([dd])
+            except OSError, e:
+                if e.errno == 17:
+                    self.dialog.error_dialog(_('Directory already exists'),
+                                             _('Please specify another name to continue.'))
+                else:
+                    raise
             except errors.NotBranchError:
                 self.dialog.warning_dialog(_('Directory is not in a branch'),
                                            _('You can only create a non-versioned directory.'))

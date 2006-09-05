@@ -78,7 +78,7 @@ class OliveRename:
         
         # Rename the file
         try:
-            fileops.rename(source, destination)
+            fileops.move([source, destination])
         except errors.NotBranchError:
             self.dialog.error_dialog(_('File is not in a branch'),
                                      _('The selected file is not in a branch.'))
