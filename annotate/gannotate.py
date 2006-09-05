@@ -114,6 +114,7 @@ class GAnnotateWindow(gtk.Window):
             # bar?
             print("gannotate: Line number %d does't exist. Defaulting to "
                   "line 1." % lineno)
+	    return
         else:
             row = lineno - 1
 
@@ -145,6 +146,8 @@ class GAnnotateWindow(gtk.Window):
 
     def _set_oldest_newest(self):
         rev_dates = map(lambda i: self.revisions[i].timestamp, self.revisions)
+        if len(rev_dates) == 0:
+            return
         oldest = min(rev_dates)
         newest = max(rev_dates)
 
@@ -170,6 +173,8 @@ class GAnnotateWindow(gtk.Window):
 
     def _show_log(self, w):
         (path, col) = self.annoview.get_cursor()
+        if path is None:
+            return
         rev_id = self.annomodel[path][REVISION_ID_COL]
         self.logview.set_revision(self.revisions[rev_id])
 
