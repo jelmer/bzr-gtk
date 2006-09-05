@@ -1,5 +1,9 @@
 2006-09-05  Richard Ferguson <ubuntu@fergusnet.com>
 
+    * olive/frontend/gtk/push.py: string update
+	
+2006-09-05  Richard Ferguson <ubuntu@fergusnet.com>
+
     * cmenu.ui: add Open Folder to left context menu
     * olive/frontend/gtk/menu.py: add Open Folder handler
 	
