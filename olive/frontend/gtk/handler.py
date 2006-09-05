@@ -27,7 +27,6 @@ try:
 except:
     sys.exit(1)
 
-from olive.backend.info import is_branch
 import bzrlib.errors as errors
 from bzrlib.branch import Branch
 

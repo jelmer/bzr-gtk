@@ -93,8 +93,9 @@ class OliveCommit:
                                      _('You can perform this action only in a branch.'))
             self.close()
         else:
-            from olive.backend.info import is_checkout
-            if is_checkout(self.comm.get_path()):
+            branch = Branch.open_containing(self.comm.get_path())[0]
+
+            if branch.get_bound_location() is not None:
                 # we have a checkout, so the local commit checkbox must appear
                 self.checkbutton_local.show()
             
