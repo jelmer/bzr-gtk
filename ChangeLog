@@ -1,3 +1,8 @@
+2006-09-05  Richard Ferguson <ubuntu@fergusnet.com>
+
+    * olive.glade: cleaned up information dialog
+    * olive/frontend/gtk/info.py:
+	
 2006-09-04  Szilveszter Farkas <Szilveszter.Farkas@gmail.com>
 
     * RELEASE: Olive 0.10.0
