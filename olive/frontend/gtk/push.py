@@ -200,7 +200,7 @@ class OlivePush:
             if (proto == 'sftp') or (proto == 'file') or (proto == 'ftp'):
                 # have write acces (most probably)
                 self.image_test.set_from_stock(gtk.STOCK_YES, 4)
-                self.label_test.set_markup(_('<b>Write access is available most probably</b>'))
+                self.label_test.set_markup(_('<b>Write access is probably available</b>'))
             else:
                 # no write access
                 self.image_test.set_from_stock(gtk.STOCK_NO, 4)
