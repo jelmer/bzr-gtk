@@ -29,6 +29,7 @@ except:
 
 from olive.backend.info import is_branch
 import bzrlib.errors as errors
+from bzrlib.branch import Branch
 
 from dialog import OliveDialog
 from menu import OliveMenu
@@ -72,50 +73,83 @@ class OliveHandler:
     
     def on_menuitem_branch_missing_revisions_activate(self, widget):
         """ Branch/Missing revisions menu handler. """
-        import olive.backend.update as update
         
         self.comm.set_busy(self.comm.window_main)
         
         try:
-            ret = update.missing(self.comm.get_path())
-        except errors.NotBranchError:
-            self.dialog.error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
-        except errors.ConnectionError:
-            self.dialog.error_dialog(_('Connection error'),
-                                     _('Cannot connect to remote location.\nPlease try again later.'))
-        except errors.NoLocationKnown:
-            self.dialog.error_dialog(_('Parent location is unknown'),
-                                     _('Cannot determine missing revisions if no parent location is known.'))
-        else:
+            import bzrlib
+            
+            try:
+                local_branch = Branch.open_containing(self.comm.get_path())[0]
+            except NotBranchError:
+                self.dialog.error_dialog(_('Directory is not a branch'),
+                                         _('You can perform this action only in a branch.'))
+                return
+            
+            other_branch = local_branch.get_parent()
+            if other_branch is None:
+                self.dialog.error_dialog(_('Parent location is unknown'),
+                                         _('Cannot determine missing revisions if no parent location is known.'))
+                return
+            
+            remote_branch = Branch.open(other_branch)
+            
+            if remote_branch.base == local_branch.base:
+                remote_branch = local_branch
+
+            ret = len(local_branch.missing_revisions(remote_branch))
+
             if ret > 0:
                 self.dialog.info_dialog(_('There are missing revisions'),
                                         _('%d revision(s) missing.') % ret)
             else:
                 self.dialog.info_dialog(_('Local branch up to date'),
                                         _('There are no missing revisions.'))
-        
-        self.comm.set_busy(self.comm.window_main, False)
+        finally:
+            self.comm.set_busy(self.comm.window_main, False)
     
     def on_menuitem_branch_pull_activate(self, widget):
         """ Branch/Pull menu handler. """
-        import olive.backend.update as update
         
         self.comm.set_busy(self.comm.window_main)
-        
+
         try:
-            ret = update.pull(self.comm.get_path())
-        except errors.NotBranchError:
-            self.dialog.error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
-        except errors.NoLocationKnown:
-            self.dialog.error_dialog(_('Parent location is unknown'),
-                                     _('Pulling is not possible until there is no parent location.'))
-        else:
+            try:
+                tree_to = WorkingTree.open_containing(self.comm.get_path())[0]
+                branch_to = tree_to.branch
+            except NoWorkingTree:
+                tree_to = None
+                branch_to = Branch.open_containing(self.comm.get_path())[0]
+            except NoBranchError:
+                 self.dialog.error_dialog(_('Directory is not a branch'),
+                                         _('You can perform this action only in a branch.'))
+
+            location = branch_to.get_parent()
+            if location is None:
+                self.dialog.error_dialog(_('Parent location is unknown'),
+                                         _('Pulling is not possible until there is a parent location.'))
+                return
+
+            try:
+                branch_from = Branch.open(location)
+            except errors.NotBranchError:
+                self.dialog.error_dialog(_('Directory is not a branch'),
+                                         _('You can perform this action only in a branch.'))
+
+            if branch_to.get_parent() is None:
+                branch_to.set_parent(branch_from.base)
+
+            old_rh = branch_to.revision_history()
+            if tree_to is not None:
+                tree_to.pull(branch_from, overwrite)
+            else:
+                branch_to.pull(branch_from, overwrite)
+            
             self.dialog.info_dialog(_('Pull successful'),
                                     _('%d revision(s) pulled.') % ret)
-        
-        self.comm.set_busy(self.comm.window_main, False)
+            
+        finally:
+            self.comm.set_busy(self.comm.window_main, False)
     
     def on_menuitem_branch_push_activate(self, widget):
         """ Branch/Push... menu handler. """
