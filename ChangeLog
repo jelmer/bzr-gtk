@@ -1,5 +1,10 @@
 2006-09-05  Richard Ferguson <ubuntu@fergusnet.com>
 
+    * olive.glade: fixed push dialog to not hide/show widgets
+    * olive/frontend/gtk/push.py:
+	
+2006-09-05  Richard Ferguson <ubuntu@fergusnet.com>
+
     * olive.glade: cleaned up information dialog
     * olive/frontend/gtk/info.py:
 	

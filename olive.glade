@@ -1757,6 +1757,7 @@
 
       <child>
 	<widget class="GtkEntry" id="entry_push_location">
+	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="editable">True</property>
 	  <property name="visibility">True</property>
@@ -1775,6 +1776,7 @@
 
       <child>
 	<widget class="GtkCheckButton" id="checkbutton_push_remember">
+	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="label" translatable="yes">_Remember as default location</property>
 	  <property name="use_underline">True</property>
@@ -1793,6 +1795,7 @@
 
       <child>
 	<widget class="GtkCheckButton" id="checkbutton_push_create">
+	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="label" translatable="yes">_Create the path leading up to the location</property>
 	  <property name="use_underline">True</property>

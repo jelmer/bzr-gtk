@@ -67,6 +67,11 @@ class OlivePush:
         self.label_test = self.glade.get_widget('label_push_test')
         self.image_test = self.glade.get_widget('image_push_test')
         
+        # Set initial state
+        self.entry_location.set_sensitive(0)
+        self.check_remember.set_sensitive(0)
+        self.check_create.set_sensitive(0)
+		
         # Get stored location
         self.notbranch = False
         try:
@@ -90,28 +95,27 @@ class OlivePush:
     
     def stored_toggled(self, widget):
         if widget.get_active():
-            self.entry_stored.show()
-            self.entry_location.hide()
-            self.check_remember.hide()
-            self.check_create.hide()
-            self.window.resize(self.width, self.height)
+            self.entry_stored.set_sensitive(1)
+            self.entry_location.set_sensitive(0)
+            self.check_remember.set_sensitive(0)
+            self.check_create.set_sensitive(0)
         else:
-            self.entry_stored.hide()
-            self.entry_location.show()
-            self.check_remember.show()
-            self.check_create.show()
+            self.entry_stored.set_sensitive(0)
+            self.entry_location.set_sensitive(1)
+            self.check_remember.set_sensitive(1)
+            self.check_create.set_sensitive(1)
     
     def specific_toggled(self, widget):
         if widget.get_active():
-            self.entry_stored.hide()
-            self.entry_location.show()
-            self.check_remember.show()
-            self.check_create.show()
+            self.entry_stored.set_sensitive(0)
+            self.entry_location.set_sensitive(1)
+            self.check_remember.set_sensitive(1)
+            self.check_create.set_sensitive(1)
         else:
-            self.entry_stored.show()
-            self.entry_location.hide()
-            self.check_remember.hide()
-            self.check_create.hide()
+            self.entry_stored.set_sensitive(1)
+            self.entry_location.set_sensitive(0)
+            self.check_remember.set_sensitive(0)
+            self.check_create.set_sensitive(0)
     
     def push(self, widget):
         revs = 0
