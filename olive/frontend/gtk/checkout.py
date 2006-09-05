@@ -27,7 +27,6 @@ try:
 except:
     sys.exit(1)
 
-import olive.backend.init as init
 import bzrlib.errors as errors
 
 class OliveCheckout:
@@ -71,15 +70,49 @@ class OliveCheckout:
         
         spinbutton_revno = self.glade.get_widget('spinbutton_checkout_revno')
         revno = spinbutton_revno.get_value_as_int()
-        if revno == 0:
-            revno = None
+        rev_id = source.get_rev_id(revno)
         
         checkbutton_lightweight = self.glade.get_widget('checkbutton_checkout_lightweight')
         lightweight = checkbutton_lightweight.get_active()
         
         self.comm.set_busy(self.window)
         try:
-            init.checkout(location, destination, revno, lightweight)
+            source = Branch.open(location)
+            
+            # if the source and destination are the same, 
+            # and there is no working tree,
+            # then reconstitute a branch
+            if (bzrlib.osutils.abspath(destination) ==
+                bzrlib.osutils.abspath(location)):
+                try:
+                    source.bzrdir.open_workingtree()
+                except NoWorkingTree:
+                    source.bzrdir.create_workingtree()
+                    return
+
+            destination = destination + '/' + os.path.basename(location.rstrip("/\\"))
+            
+            os.mkdir(destination)
+
+            old_format = bzrlib.bzrdir.BzrDirFormat.get_default_format()
+            bzrlib.bzrdir.BzrDirFormat.set_default_format(bzrdir.BzrDirMetaFormat1())
+
+            try:
+                if lightweight:
+                    checkout = bzrdir.BzrDirMetaFormat1().initialize(destination)
+                    bzrlib.branch.BranchReferenceFormat().initialize(checkout, source)
+                else:
+                    checkout_branch = bzrlib.bzrdir.BzrDir.create_branch_convenience(
+                        destination, force_new_tree=False)
+                    checkout = checkout_branch.bzrdir
+                    checkout_branch.bind(source)
+                    if rev_id is not None:
+                        rh = checkout_branch.revno_history()
+                        checkout_branch.set_revno_history(rh[:rh.index(rev_id) + 1])
+
+                checkout.create_workingtree(rev_id)
+            finally:
+                bzrlib.bzrdir.BzrDirFormat.set_default_format(old_format)
         except errors.NotBranchError, errmsg:
             self.dialog.error_dialog(_('Location is not a branch'),
                                      _('The specified location has to be a branch.'))

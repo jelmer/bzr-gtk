@@ -165,20 +165,36 @@ class OliveHandler:
     
     def on_menuitem_branch_initialize_activate(self, widget):
         """ Initialize current directory. """
-        import olive.backend.init as init
-        
         try:
-            init.init(self.comm.get_path())
+            location = self.comm.get_path()
+            from bzrlib.builtins import get_format_type
+
+            format = get_format_type('default')
+ 
+            if not os.path.exists(location):
+                os.mkdir(location)
+     
+            try:
+                existing_bzrdir = bzrdir.BzrDir.open(location)
+            except NotBranchError:
+                bzrdir.BzrDir.create_branch_convenience(location, format=format)
+            else:
+                if existing_bzrdir.has_branch():
+                    if existing_bzrdir.has_workingtree():
+                        raise AlreadyBranchError(location)
+                    else:
+                        raise BranchExistsWithoutWorkingTree(location)
+                else:
+                    existing_bzrdir.create_branch()
+                    existing_bzrdir.create_workingtree()
         except errors.AlreadyBranchError, errmsg:
             self.dialog.error_dialog(_('Directory is already a branch'),
                                      _('The current directory (%s) is already a branch.\nYou can start using it, or initialize another directory.') % errmsg)
         except errors.BranchExistsWithoutWorkingTree, errmsg:
             self.dialog.error_dialog(_('Branch without a working tree'),
                                      _('The current directory (%s)\nis a branch without a working tree.') % errmsg)
-        except:
-            raise
         else:
-            self.dialog.info_dialog(_('Ininialize successful'),
+            self.dialog.info_dialog(_('Initialize successful'),
                                     _('Directory successfully initialized.'))
             self.comm.refresh_right()
         
