@@ -1,5 +1,5 @@
 bzr-gtk is a plugin that is based on a collection of earlier plugins for 
-Bazaar-NG.
+Bazaar. It is currently maintained by Jelmer Vernooij <jelmer@samba.org>.
 
 bzrk was written by Scott James Remnant <scott@ubuntu.com>. 
 
