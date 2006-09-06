@@ -31,6 +31,8 @@ except:
 import olive.backend.fileops as fileops
 import olive.backend.errors as errors
 
+from launch import launch
+
 class OliveMenu:
     """ This class is responsible for building the context menus. """
     def __init__(self, gladefile, comm, dialog):
@@ -189,7 +191,7 @@ class OliveMenu:
                                      _('Please select a file from the list,\nor choose the other option.'))
             return
        
-        os.system("gnome-open %s/%s" % (directory, filename))
+        launch(os.path.join(directory, filename))
 
     def commit(self, action):
         """ Right context menu -> Commit """
@@ -234,7 +236,7 @@ class OliveMenu:
         path = self.comm.get_selected_left()
 
         if path != None:
-            os.system("gnome-open %s" % path)
+            launch(path)
     
     def diff_selected(self, action):
         """ Diff toolbutton -> Selected... """
