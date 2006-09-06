@@ -230,6 +230,7 @@ class OliveGtk:
         
         # Check if current directory is versioned
         try:
+            from bzrlib.branch import Branch
             Branch.open_containing(self.comm.get_path())
             # Activate some items
             self.comm.menuitem_branch_init.set_sensitive(False)
@@ -252,7 +253,7 @@ class OliveGtk:
             self.comm.toolbutton_commit.set_sensitive(True)
             self.comm.toolbutton_pull.set_sensitive(True)
             self.comm.toolbutton_push.set_sensitive(True)
-        except NotBranchError:
+        except errors.NotBranchError:
             # Deactivate some items
             self.comm.menuitem_branch_init.set_sensitive(True)
             self.comm.menuitem_branch_get.set_sensitive(False)
@@ -450,54 +451,51 @@ class OliveCommunicator:
         
         # Check if current directory is a branch
         try:
-            br = is_branch(self.get_path())
-        except errors.PermissionDenied:
-            pass
-        else:
-            if br:
-                # Activate some items
-                self.menuitem_branch_init.set_sensitive(False)
-                self.menuitem_branch_get.set_sensitive(True)
-                self.menuitem_branch_checkout.set_sensitive(True)
-                self.menuitem_branch_pull.set_sensitive(True)
-                self.menuitem_branch_push.set_sensitive(True)
-                self.menuitem_branch_commit.set_sensitive(True)
-                self.menuitem_branch_status.set_sensitive(True)
-                self.menuitem_branch_missing.set_sensitive(True)
-                self.menuitem_stats.set_sensitive(True)
-                self.menuitem_add_files.set_sensitive(True)
-                self.menuitem_remove_files.set_sensitive(True)
-                self.menuitem_file_make_directory.set_sensitive(True)
-                self.menuitem_file_rename.set_sensitive(True)
-                self.menuitem_file_move.set_sensitive(True)
-                #self.menutoolbutton_diff.set_sensitive(True)
-                self.toolbutton_diff.set_sensitive(True)
-                self.toolbutton_log.set_sensitive(True)
-                self.toolbutton_commit.set_sensitive(True)
-                self.toolbutton_pull.set_sensitive(True)
-                self.toolbutton_push.set_sensitive(True)
-            else:
-                # Deactivate some items
-                self.menuitem_branch_init.set_sensitive(True)
-                self.menuitem_branch_get.set_sensitive(False)
-                self.menuitem_branch_checkout.set_sensitive(False)
-                self.menuitem_branch_pull.set_sensitive(False)
-                self.menuitem_branch_push.set_sensitive(False)
-                self.menuitem_branch_commit.set_sensitive(False)
-                self.menuitem_branch_status.set_sensitive(False)
-                self.menuitem_branch_missing.set_sensitive(False)
-                self.menuitem_stats.set_sensitive(False)
-                self.menuitem_add_files.set_sensitive(False)
-                self.menuitem_remove_files.set_sensitive(False)
-                self.menuitem_file_make_directory.set_sensitive(False)
-                self.menuitem_file_rename.set_sensitive(False)
-                self.menuitem_file_move.set_sensitive(False)
-                #self.menutoolbutton_diff.set_sensitive(False)
-                self.toolbutton_diff.set_sensitive(False)
-                self.toolbutton_log.set_sensitive(False)
-                self.toolbutton_commit.set_sensitive(False)
-                self.toolbutton_pull.set_sensitive(False)
-                self.toolbutton_push.set_sensitive(False)
+            from bzrlib.branch import Branch
+            Branch.open_containing(self.get_path())
+            # Activate some items
+            self.menuitem_branch_init.set_sensitive(False)
+            self.menuitem_branch_get.set_sensitive(True)
+            self.menuitem_branch_checkout.set_sensitive(True)
+            self.menuitem_branch_pull.set_sensitive(True)
+            self.menuitem_branch_push.set_sensitive(True)
+            self.menuitem_branch_commit.set_sensitive(True)
+            self.menuitem_branch_status.set_sensitive(True)
+            self.menuitem_branch_missing.set_sensitive(True)
+            self.menuitem_stats.set_sensitive(True)
+            self.menuitem_add_files.set_sensitive(True)
+            self.menuitem_remove_files.set_sensitive(True)
+            self.menuitem_file_make_directory.set_sensitive(True)
+            self.menuitem_file_rename.set_sensitive(True)
+            self.menuitem_file_move.set_sensitive(True)
+            #self.menutoolbutton_diff.set_sensitive(True)
+            self.toolbutton_diff.set_sensitive(True)
+            self.toolbutton_log.set_sensitive(True)
+            self.toolbutton_commit.set_sensitive(True)
+            self.toolbutton_pull.set_sensitive(True)
+            self.toolbutton_push.set_sensitive(True)
+        except errors.NotBranchError:
+            # Deactivate some items
+            self.menuitem_branch_init.set_sensitive(True)
+            self.menuitem_branch_get.set_sensitive(False)
+            self.menuitem_branch_checkout.set_sensitive(False)
+            self.menuitem_branch_pull.set_sensitive(False)
+            self.menuitem_branch_push.set_sensitive(False)
+            self.menuitem_branch_commit.set_sensitive(False)
+            self.menuitem_branch_status.set_sensitive(False)
+            self.menuitem_branch_missing.set_sensitive(False)
+            self.menuitem_stats.set_sensitive(False)
+            self.menuitem_add_files.set_sensitive(False)
+            self.menuitem_remove_files.set_sensitive(False)
+            self.menuitem_file_make_directory.set_sensitive(False)
+            self.menuitem_file_rename.set_sensitive(False)
+            self.menuitem_file_move.set_sensitive(False)
+            #self.menutoolbutton_diff.set_sensitive(False)
+            self.toolbutton_diff.set_sensitive(False)
+            self.toolbutton_log.set_sensitive(False)
+            self.toolbutton_commit.set_sensitive(False)
+            self.toolbutton_pull.set_sensitive(False)
+            self.toolbutton_push.set_sensitive(False)
         
         self.set_busy(self.treeview_right, False)
 
@@ -638,7 +636,7 @@ def check_status(filename):
     
     try:
         tree1 = WorkingTree.open_containing(filename)[0]
-    except NotBranchError:
+    except errors.NotBranchError:
         return 'unknown'
     
     branch = tree1.branch

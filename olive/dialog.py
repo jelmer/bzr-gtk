@@ -33,14 +33,14 @@ class OliveDialog:
         
     def about(self):
         """ Display the AboutDialog. """
-        import olive.frontend.gtk
+        import olive
 
         # Load AboutDialog description
         dglade = gtk.glade.XML(self.gladefile, 'aboutdialog')
         dialog = dglade.get_widget('aboutdialog')
 
         # Set version
-        dialog.set_version(olive.frontend.gtk.__version__)
+        dialog.set_version(olive.__version__)
     
     def _message_dialog(self, type, primary, secondary):
         """ Display a given type of MessageDialog with the given message.

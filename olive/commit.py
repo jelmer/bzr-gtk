@@ -93,6 +93,7 @@ class OliveCommit:
                                      _('You can perform this action only in a branch.'))
             self.close()
         else:
+            from bzrlib.branch import Branch
             branch = Branch.open_containing(self.comm.get_path())[0]
 
             if branch.get_bound_location() is not None:

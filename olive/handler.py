@@ -114,12 +114,13 @@ class OliveHandler:
 
         try:
             try:
+                from bzrlib.workingtree import WorkingTree
                 tree_to = WorkingTree.open_containing(self.comm.get_path())[0]
                 branch_to = tree_to.branch
-            except NoWorkingTree:
+            except errors.NoWorkingTree:
                 tree_to = None
                 branch_to = Branch.open_containing(self.comm.get_path())[0]
-            except NoBranchError:
+            except errors.NotBranchError:
                  self.dialog.error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
 
@@ -140,9 +141,9 @@ class OliveHandler:
 
             old_rh = branch_to.revision_history()
             if tree_to is not None:
-                tree_to.pull(branch_from, overwrite)
+                tree_to.pull(branch_from)
             else:
-                branch_to.pull(branch_from, overwrite)
+                branch_to.pull(branch_from)
             
             self.dialog.info_dialog(_('Pull successful'),
                                     _('%d revision(s) pulled.') % ret)
@@ -286,12 +287,14 @@ class OliveHandler:
             m_commit = self.menu.ui.get_widget('/context_right/commit')
             m_diff = self.menu.ui.get_widget('/context_right/diff')
             # check if we're in a branch
-            if not is_branch(self.comm.get_path()):
+            try:
+                from bzrlib.branch import Branch
+                Branch.open_containing(self.comm.get_path())
                 m_add.set_sensitive(False)
                 m_remove.set_sensitive(False)
                 m_commit.set_sensitive(False)
                 m_diff.set_sensitive(False)
-            else:
+            except errors.NotBranchError:
                 m_add.set_sensitive(True)
                 m_remove.set_sensitive(True)
                 m_commit.set_sensitive(True)
