@@ -57,6 +57,8 @@ import gettext
 gettext.install('olive-gtk')
 
 from olive import OliveGtk
+from bzrlib.plugin import load_plugins
+load_plugins()
 
 app = OliveGtk()
 gtk.main()
