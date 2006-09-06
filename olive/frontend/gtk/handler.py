@@ -214,6 +214,10 @@ class OliveHandler:
     def on_treeview_left_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the bookmark list. """
         if event.button == 3:
+            # Don't show context with nothing selected
+            if self.comm.get_selected_left() == None:
+                return
+
             self.menu.left_context_menu().popup(None, None, None, 0,
                                                 event.time)
         
@@ -262,7 +266,7 @@ class OliveHandler:
         if newdir == '..':
             self.comm.set_path(os.path.split(self.comm.get_path())[0])
         else:
-            fullpath = self.comm.get_path() + '/' + newdir
+            fullpath = self.comm.get_path() + os.sep + newdir
             if os.path.isdir(fullpath):
                 # selected item is an existant directory
                 self.comm.set_path(fullpath)

@@ -19,37 +19,37 @@ import os
 import string
 
 def launch(path):
-	""" Launch program associated with path """
+    """ Launch program associated with path """
 
-	# Normalize filepath
-	normpath = os.path.normpath(path) 
-	
-	if sys.platform == 'win32':
-		# Windows is easy
-		os.startfile(normpath)
-	else:
-		# Maybe Gnome?
-		exe = search_exe('gnome-open')
-		if exe != None:
-			os.system("gnome-open %s" % normpath)
-			return
-		# Maybe KDE?
-		exe = search_exe('kfmclient')
-		if exe != None:
-			os.system("kfmclient exec file:%s" % normpath)
-			return
+    # Normalize filepath
+    normpath = os.path.normpath(path) 
+    
+    if sys.platform == 'win32':
+        # Windows is easy
+        os.startfile(normpath)
+    else:
+        # Maybe Gnome?
+        exe = search_exe('gnome-open')
+        if exe != None:
+            os.system("gnome-open %s" % normpath)
+            return
+        # Maybe KDE?
+        exe = search_exe('kfmclient')
+        if exe != None:
+            os.system("kfmclient exec file:%s" % normpath)
+            return
 
-		# TODO: support other platforms
-		print "DEBUG: file launch not supported on this platform."
+        # TODO: support other platforms
+        print "DEBUG: file launch not supported on this platform."
 
 def search_exe(exe):
-	""" Search for given executable. """
-	found = 0
-	paths = os.environ['PATH'].split(":")
-	for path in paths:
-		if os.path.exists(os.path.join(path,exe)):
-			found = 1
-			break
-	if found:
-		return True
-	return None
+    """ Search for given executable. """
+    found = 0
+    paths = os.environ['PATH'].split(os.pathsep)
+    for path in paths:
+        if os.path.exists(os.path.join(path,exe)):
+            found = 1
+            break
+    if found:
+        return True
+    return None

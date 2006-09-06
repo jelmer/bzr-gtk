@@ -183,15 +183,24 @@ class OliveMenu:
     def open_file(self, action):
         """ Right context menu -> Open """
         # Open only the selected file
-        directory = self.comm.get_path()
         filename = self.comm.get_selected_right()
         
         if filename is None:
             self.dialog.error_dialog(_('No file was selected'),
                                      _('Please select a file from the list,\nor choose the other option.'))
             return
-       
-        launch(os.path.join(directory, filename))
+
+        if filename == '..':
+            self.comm.set_path(os.path.split(self.comm.get_path())[0])
+        else:
+            fullpath = self.comm.get_path() + os.sep + filename
+            if os.path.isdir(fullpath):
+                # selected item is an existant directory
+                self.comm.set_path(fullpath)
+            else:
+                launch(fullpath) 
+        
+        self.comm.refresh_right()
 
     def commit(self, action):
         """ Right context menu -> Commit """
