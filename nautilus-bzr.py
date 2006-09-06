@@ -7,11 +7,7 @@ from bzrlib.workingtree import WorkingTree
 from bzrlib.plugin import load_plugins
 load_plugins()
 
-try:
-    from bzrlib.plugins.gtk import cmd_visualise, cmd_gannotate
-    have_gtkplugin = True
-except ImportError:
-    have_gtkplugin = False
+from bzrlib.plugins.gtk import cmd_visualise, cmd_gannotate
 
 class BzrExtension(nautilus.MenuProvider):
     def __init__(self):
@@ -189,18 +185,17 @@ class BzrExtension(nautilus.MenuProvider):
             return items
 
         items = []
-        if have_gtkplugin:
-            item = nautilus.MenuItem('BzrNautilus::log',
-                                 'Log',
-                                 'Show Bazaar history')
-            item.connect('activate', self.log_cb, vfs_file)
-            items.append(item)
+        item = nautilus.MenuItem('BzrNautilus::log',
+                             'Log',
+                             'Show Bazaar history')
+        item.connect('activate', self.log_cb, vfs_file)
+        items.append(item)
 
-            item = nautilus.MenuItem('BzrNautilus::commit',
-                                 'Commit',
-                                 'Commit Changes')
-            item.connect('activate', self.commit_cb, vfs_file)
-            items.append(item)
+        item = nautilus.MenuItem('BzrNautilus::commit',
+                             'Commit',
+                             'Commit Changes')
+        item.connect('activate', self.commit_cb, vfs_file)
+        items.append(item)
 
         return items
 
@@ -246,18 +241,17 @@ class BzrExtension(nautilus.MenuProvider):
                 item.connect('activate', self.unignore_cb, vfs_file)
                 items.append(item)
             elif file_class == 'V':
-                if have_gtkplugin:
-                    item = nautilus.MenuItem('BzrNautilus::log',
-                                     'Log',
-                                     'List changes')
-                    item.connect('activate', self.log_cb, vfs_file)
-                    items.append(item)
+                item = nautilus.MenuItem('BzrNautilus::log',
+                                 'Log',
+                                 'List changes')
+                item.connect('activate', self.log_cb, vfs_file)
+                items.append(item)
 
-                    item = nautilus.MenuItem('BzrNautilus::diff',
-                                     'Diff',
-                                     'Show differences')
-                    item.connect('activate', self.diff_cb, vfs_file)
-                    items.append(item)
+                item = nautilus.MenuItem('BzrNautilus::diff',
+                                 'Diff',
+                                 'Show differences')
+                item.connect('activate', self.diff_cb, vfs_file)
+                items.append(item)
 
                 item = nautilus.MenuItem('BzrNautilus::remove',
                                      'Remove',
@@ -265,17 +259,16 @@ class BzrExtension(nautilus.MenuProvider):
                 item.connect('activate', self.remove_cb, vfs_file)
                 items.append(item)
 
-                if have_gtkplugin:
-                    item = nautilus.MenuItem('BzrNautilus::annotate',
-                                 'Annotate',
-                                 'Annotate File Data')
-                    item.connect('activate', self.annotate_cb, vfs_file)
-                    items.append(item)
+                item = nautilus.MenuItem('BzrNautilus::annotate',
+                             'Annotate',
+                             'Annotate File Data')
+                item.connect('activate', self.annotate_cb, vfs_file)
+                items.append(item)
 
-                    item = nautilus.MenuItem('BzrNautilus::commit',
-                                 'Commit',
-                                 'Commit Changes')
-                    item.connect('activate', self.commit_cb, vfs_file)
-                    items.append(item)
-    
+                item = nautilus.MenuItem('BzrNautilus::commit',
+                             'Commit',
+                             'Commit Changes')
+                item.connect('activate', self.commit_cb, vfs_file)
+                items.append(item)
+
         return items
