@@ -32,6 +32,7 @@ import olive.backend.errors as errors
 
 from dialog import OliveDialog
 from menu import OliveMenu
+from launch import launch
 
 class OliveHandler:
     """ Signal handler class for Olive. """
@@ -213,19 +214,24 @@ class OliveHandler:
     def on_treeview_left_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the bookmark list. """
         if event.button == 3:
+            # Don't show context with nothing selected
+            if self.comm.get_selected_left() == None:
+                return
+
             self.menu.left_context_menu().popup(None, None, None, 0,
                                                 event.time)
         
     def on_treeview_left_row_activated(self, treeview, path, view_column):
         """ Occurs when somebody double-clicks or enters an item in the
         bookmark list. """
-        self.comm.set_busy(treeview)
-        
+
         newdir = self.comm.get_selected_left()
+        if newdir == None:
+            return
+
+        self.comm.set_busy(treeview)
         self.comm.set_path(newdir)
-        
         self.comm.refresh_right()
-        
         self.comm.set_busy(treeview, False)
     
     def on_treeview_right_button_press_event(self, widget, event):
@@ -260,17 +266,12 @@ class OliveHandler:
         if newdir == '..':
             self.comm.set_path(os.path.split(self.comm.get_path())[0])
         else:
-            fullpath = self.comm.get_path() + '/' + newdir
+            fullpath = self.comm.get_path() + os.sep + newdir
             if os.path.isdir(fullpath):
                 # selected item is an existant directory
                 self.comm.set_path(fullpath)
             else:
-                if sys.platform == 'win32':
-                    # open the file with the default application
-                    os.startfile(fullpath)
-                else:
-                    # TODO: support other OSes
-                    print "DEBUG: double-click on non-Win32 platforms not supported."
+                launch(fullpath) 
         
         self.comm.refresh_right()
     

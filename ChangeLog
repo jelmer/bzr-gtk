@@ -1,3 +1,20 @@
+2006-09-06  Richard Ferguson <ubuntu@fergusnet.com>
+	
+    * olive/frontend/gtk/launch.py: change tabs to spaces
+    * olive/frontend/gtk/handler.py: platform independence fixes
+    * olive/frontend/gtk/menu.py: platform independence fixes
+
+2006-09-05  Richard Ferguson <ubuntu@fergusnet.com>
+	
+    * olive/frontend/gtk/launch.py: new file to assist in launching files
+    * olive/frontend/gtk/handler.py: use new launch functions
+    * olive/frontend/gtk/menu.py: use new launch functions
+
+2006-09-05  Richard Ferguson <ubuntu@fergusnet.com>
+
+    * cmenu.ui: add Open to right context menu
+    * olive/frontend/gtk/menu.py: add Open file handler
+	
 2006-09-05  Richard Ferguson <ubuntu@fergusnet.com>
 
     * olive/frontend/gtk/push.py: string update
