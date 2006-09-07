@@ -13,6 +13,8 @@
     <popup name="context_left">
         <menuitem name="edit_bookmark" action="edit_bookmark" />
         <menuitem name="remove_bookmark" action="remove_bookmark" />
+        <separator />
+        <menuitem name="open_folder" action="open_folder" />
     </popup>
     <popup name="toolbar_diff">
         <menuitem name="diff_selected" action="diff_selected" />
