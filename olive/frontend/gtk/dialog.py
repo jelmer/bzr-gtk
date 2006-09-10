@@ -41,6 +41,10 @@ class OliveDialog:
 
         # Set version
         dialog.set_version(olive.frontend.gtk.__version__)
+        
+        # Destroy the dialog
+        if dialog.run() == gtk.RESPONSE_CANCEL:
+            dialog.destroy()
     
     def _message_dialog(self, type, primary, secondary):
         """ Display a given type of MessageDialog with the given message.
