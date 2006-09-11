@@ -14,6 +14,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import os
 import sys
 
 try:
@@ -47,6 +48,9 @@ class OliveHandler:
     def on_about_activate(self, widget):
         self.dialog.about()
         
+    def on_drive_activate(self, widget):
+        self.comm.refresh_right(widget.get_name() + ':' + os.sep)
+    
     def on_menuitem_add_files_activate(self, widget):
         """ Add file(s)... menu handler. """
         from add import OliveAdd

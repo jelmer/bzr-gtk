@@ -99,7 +99,33 @@ class OliveGtk:
                 "on_treeview_right_button_press_event": handler.on_treeview_right_button_press_event,
                 "on_treeview_right_row_activated": handler.on_treeview_right_row_activated,
                 "on_treeview_left_button_press_event": handler.on_treeview_left_button_press_event,
-                "on_treeview_left_row_activated": handler.on_treeview_left_row_activated }
+                "on_treeview_left_row_activated": handler.on_treeview_left_row_activated,
+                "on_drive_a_activate": handler.on_drive_activate,
+                "on_drive_b_activate": handler.on_drive_activate,
+                "on_drive_c_activate": handler.on_drive_activate,
+                "on_drive_d_activate": handler.on_drive_activate,
+                "on_drive_e_activate": handler.on_drive_activate,
+                "on_drive_f_activate": handler.on_drive_activate,
+                "on_drive_g_activate": handler.on_drive_activate,
+                "on_drive_h_activate": handler.on_drive_activate,
+                "on_drive_i_activate": handler.on_drive_activate,
+                "on_drive_j_activate": handler.on_drive_activate,
+                "on_drive_k_activate": handler.on_drive_activate,
+                "on_drive_l_activate": handler.on_drive_activate,
+                "on_drive_m_activate": handler.on_drive_activate,
+                "on_drive_n_activate": handler.on_drive_activate,
+                "on_drive_o_activate": handler.on_drive_activate,
+                "on_drive_p_activate": handler.on_drive_activate,
+                "on_drive_q_activate": handler.on_drive_activate,
+                "on_drive_r_activate": handler.on_drive_activate,
+                "on_drive_s_activate": handler.on_drive_activate,
+                "on_drive_t_activate": handler.on_drive_activate,
+                "on_drive_u_activate": handler.on_drive_activate,
+                "on_drive_v_activate": handler.on_drive_activate,
+                "on_drive_w_activate": handler.on_drive_activate,
+                "on_drive_x_activate": handler.on_drive_activate,
+                "on_drive_y_activate": handler.on_drive_activate,
+                "on_drive_z_activate": handler.on_drive_activate }
         
         # Connect the signals to the handlers
         self.toplevel.signal_autoconnect(dic)
@@ -120,7 +146,12 @@ class OliveGtk:
         #menubutton.set_menu(handler.menu.toolbar_diff)
         
         # Now we can show the window
-        self.window.show_all()
+        self.window.show()
+        
+        # Show drive selector if under Win32
+        if sys.platform == 'win32':
+            self.comm.gen_hard_selector()
+            self.comm.optionmenu_drive.show()
         
         # Load default data into the panels
         self.treeview_left = self.toplevel.get_widget('treeview_left')
@@ -333,6 +364,8 @@ class OliveCommunicator:
         self.toolbutton_commit = self.toplevel.get_widget('toolbutton_commit')
         self.toolbutton_pull = self.toplevel.get_widget('toolbutton_pull')
         self.toolbutton_push = self.toplevel.get_widget('toolbutton_push')
+        # Get the drive selector
+        self.optionmenu_drive = self.toplevel.get_widget('optionmenu_drive')
     
     def set_path(self, path):
         """ Set the current path while browsing the directories. """
@@ -518,7 +551,7 @@ class OliveCommunicator:
 
         gtk.main_iteration(0)
 
-    def harddisks():
+    def harddisks(self):
         """ Returns hard drive letters under Win32. """
         try:
             import win32file
@@ -532,9 +565,17 @@ class OliveCommunicator:
         
         driveletters = []
         for drive in string.ascii_uppercase:
-            if win32file.GetDriveType(drive+":") == win32file.DRIVE_FIXED:
-                driveletters.append(drive+":")
+            if win32file.GetDriveType(drive) == win32file.DRIVE_FIXED:
+                driveletters.append(drive)
         return driveletters
+    
+    def gen_hard_selector(self):
+        """ Generate the hard drive selector under Win32. """
+        import string
+        drives = self.harddisks()
+        for drive in string.ascii_uppercase:
+            if drive not in drives:
+                self.toplevel.get_widget(drive).destroy()
 
 class OlivePreferences:
     """ A class which handles Olive's preferences. """
