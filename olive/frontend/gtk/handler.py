@@ -48,9 +48,6 @@ class OliveHandler:
     def on_about_activate(self, widget):
         self.dialog.about()
         
-    def on_drive_activate(self, widget):
-        self.comm.refresh_right(widget.get_name() + ':' + os.sep)
-    
     def on_menuitem_add_files_activate(self, widget):
         """ Add file(s)... menu handler. """
         from add import OliveAdd
