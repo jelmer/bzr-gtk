@@ -160,7 +160,7 @@ class OliveGtk:
         
         # Expand the tree
         self.treeview_left.expand_all()
-        
+
         self.comm.set_busy(self.treeview_left, False)
         
     def _load_right(self):
@@ -295,7 +295,7 @@ class OliveCommunicator:
         self.pref = pref
         # Default path
         self._path = os.getcwd()
-        
+
         # Initialize the statusbar
         self.statusbar = self.toplevel.get_widget('statusbar')
         self.context_id = self.statusbar.get_context_id('olive')
@@ -378,33 +378,33 @@ class OliveCommunicator:
         # Get TreeStore and clear it
         treestore = self.treeview_left.get_model()
         treestore.clear()
-        
+
         # Get bookmarks
         bookmarks = self.pref.get_bookmarks()
-        
+
         # Add them to the TreeStore
         titer = treestore.append(None, [_('Bookmarks'), None])
         for item in bookmarks:
             title = self.pref.get_bookmark_title(item)
             treestore.append(titer, [title, item])
-        
+
         # Add the TreeStore to the TreeView
         self.treeview_left.set_model(treestore)
-        
+
         # Expand the tree
         self.treeview_left.expand_all()
-        
+
         self.set_busy(self.treeview_left, False)
-    
+
     def refresh_right(self, path=None):
         """ Refresh the file list. """
         import olive.backend.fileops as fileops
-        
+
         self.set_busy(self.treeview_right)
-        
+
         if path is None:
             path = self.get_path()
-        
+
         # A workaround for double-clicking Bookmarks
         if not os.path.exists(path):
             self.set_busy(self.treeview_right, False)
@@ -413,10 +413,10 @@ class OliveCommunicator:
         # Get ListStore and clear it
         liststore = self.treeview_right.get_model()
         liststore.clear()
-        
+
         dirs = ['..']
         files = []
-        
+
         # Fill the appropriate lists
         dotted_files = self.pref.get_preference('dotted_files', 'bool')
         for item in os.listdir(path):
@@ -426,20 +426,20 @@ class OliveCommunicator:
                 dirs.append(item)
             else:
                 files.append(item)
-            
+
         # Sort'em
         dirs.sort()
         files.sort()
-        
+
         # Add'em to the ListStore
-        for item in dirs:    
+        for item in dirs:
             liststore.append([gtk.STOCK_DIRECTORY, item, ''])
         for item in files:
             try:
                 status = fileops.status(path + '/' + item)
             except errors.PermissionDenied:
                 continue
-            
+
             if status == 'renamed':
                 st = _('renamed')
             elif status == 'removed':
@@ -453,10 +453,10 @@ class OliveCommunicator:
             else:
                 st = _('unknown')
             liststore.append([gtk.STOCK_FILE, item, st])
-        
+
         # Add the ListStore to the TreeView
         self.treeview_right.set_model(liststore)
-        
+
         # Check if current directory is a branch
         try:
             br = is_branch(self.get_path())
@@ -507,7 +507,7 @@ class OliveCommunicator:
                 self.toolbutton_commit.set_sensitive(False)
                 self.toolbutton_pull.set_sensitive(False)
                 self.toolbutton_push.set_sensitive(False)
-        
+
         self.set_busy(self.treeview_right, False)
 
     def set_busy(self, widget, busy=True):
@@ -517,6 +517,24 @@ class OliveCommunicator:
             widget.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR))
 
         gtk.main_iteration(0)
+
+    def harddisks():
+        """ Returns hard drive letters under Win32. """
+        try:
+            import win32file
+            import string
+        except ImportError:
+            if sys.platform == 'win32':
+                print "pyWin32 modules needed to run Olive on Win32."
+                sys.exit(1)
+            else:
+                pass
+        
+        driveletters = []
+        for drive in string.ascii_uppercase:
+            if win32file.GetDriveType(drive+":") == win32file.DRIVE_FIXED:
+                driveletters.append(drive+":")
+        return driveletters
 
 class OlivePreferences:
     """ A class which handles Olive's preferences. """
@@ -530,7 +548,7 @@ class OlivePreferences:
                           'window_x'      : 40,
                           'window_y'      : 40,
                           'paned_position': 200 }
-        
+
         # Create a config parser object
         self.config = ConfigParser.RawConfigParser()
         
