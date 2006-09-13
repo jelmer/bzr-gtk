@@ -30,6 +30,8 @@ except:
 
 import bzrlib.errors as errors
 
+from launch import launch
+
 class OliveMenu:
     """ This class is responsible for building the context menus. """
     def __init__(self, gladefile, comm, dialog):
@@ -64,6 +66,10 @@ class OliveMenu:
                                        _('Remove'), None,
                                        _('Remove the selected file'),
                                        self.remove_file),
+                                      ('open', gtk.STOCK_OPEN,
+                                       _('Open'), None,
+                                       _('Open the selected file'),
+                                       self.open_file),
                                       ('commit', None,
                                        _('Commit'), None,
                                        _('Commit the changes'),
@@ -84,6 +90,10 @@ class OliveMenu:
                                        _('Remove'), None,
                                        _('Remove the selected bookmark'),
                                        self.remove_bookmark),
+                                      ('open_folder', gtk.STOCK_OPEN,
+                                       _('Open Folder'), None,
+                                       _('Open bookmark folder in Nautilus'),
+                                       self.open_folder),
                                       ('diff_selected', None,
                                        _('Selected...'), None,
                                        _('Show the differences of the selected file'),
@@ -169,6 +179,28 @@ class OliveMenu:
         
         self.comm.refresh_right()
 
+    def open_file(self, action):
+        """ Right context menu -> Open """
+        # Open only the selected file
+        filename = self.comm.get_selected_right()
+        
+        if filename is None:
+            self.dialog.error_dialog(_('No file was selected'),
+                                     _('Please select a file from the list,\nor choose the other option.'))
+            return
+
+        if filename == '..':
+            self.comm.set_path(os.path.split(self.comm.get_path())[0])
+        else:
+            fullpath = self.comm.get_path() + os.sep + filename
+            if os.path.isdir(fullpath):
+                # selected item is an existant directory
+                self.comm.set_path(fullpath)
+            else:
+                launch(fullpath) 
+        
+        self.comm.refresh_right()
+
     def commit(self, action):
         """ Right context menu -> Commit """
         from commit import OliveCommit
@@ -195,14 +227,24 @@ class OliveMenu:
     def edit_bookmark(self, action):
         """ Left context menu -> Edit """
         from bookmark import OliveBookmark
-        bookmark = OliveBookmark(self.gladefile, self.comm, self.dialog)
-        bookmark.display()
+
+        if self.comm.get_selected_left() != None:
+            bookmark = OliveBookmark(self.gladefile, self.comm, self.dialog)
+            bookmark.display()
 
     def remove_bookmark(self, action):
         """ Left context menu -> Remove """
-        self.comm.pref.remove_bookmark(self.comm.get_selected_left())
         
-        self.comm.refresh_left()
+        if self.comm.get_selected_left() != None:
+            self.comm.pref.remove_bookmark(self.comm.get_selected_left())
+            self.comm.refresh_left()
+    
+    def open_folder(self, action):
+        """ Left context menu -> Open Folder """
+        path = self.comm.get_selected_left()
+
+        if path != None:
+            launch(path)
     
     def diff_selected(self, action):
         """ Diff toolbutton -> Selected... """

@@ -1,6 +1,12 @@
 Olive NEWS
 ==========
 
+Olive 0.10.1 ?
+
+ - Fixed bug #53963: Close button in About box.
+ - Drive selection is now available under Win32 platforms. That means new
+   dependency (pyWin32)
+
 Olive 0.10.0 (2006-09-04)
 
  - Version number adjusted to Bazaar's plugin versioning policy.

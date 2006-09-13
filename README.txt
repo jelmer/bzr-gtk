@@ -16,6 +16,7 @@ Requirements
  - GTK (>= 2.8)
  - PyGTK (>= 2.8)
  - Bazaar (>= 0.8.2)
+ - pyWin32 (only for Windows, tested with build 209)
 
 Install on Linux
 ----------------
@@ -42,6 +43,7 @@ You can download the dependencies from the following locations:
  - GTK: http://gladewin32.sourceforge.net/
  - PyGTK: http://www.mapr.ucl.ac.be/~gustin/win32_ports/pygtk.html (pycairo too)
  - Bazaar: http://bazaar-vcs.org/WindowsDownloads (Python-based should be okay)
+ - pyWin32: http://sourceforge.net/project/showfiles.php?group_id=78018
 
 As an Administrator, you can install Olive with the standard command:
 

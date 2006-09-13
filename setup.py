@@ -20,8 +20,9 @@ from distutils.core import setup
 from distutils.command.install_data import install_data
 from distutils.dep_util import newer
 from distutils.log import info
-import os
 import glob
+import os
+import sys
 
 class InstallData(install_data):
 	def run(self):
@@ -30,6 +31,11 @@ class InstallData(install_data):
 
 	def _compile_po_files(self):
 		data_files = []
+		
+		# Don't install language files on Win32
+		if sys.platform == 'win32':
+		    return data_files
+		
 		PO_DIR = 'po'
 		for po in glob.glob(os.path.join(PO_DIR,'*.po')):
 			lang = os.path.basename(po[:-3])
@@ -60,8 +66,7 @@ setup(name='Olive',
       author='Szilveszter Farkas (Phanatic)',
       author_email='szilveszter.farkas@gmail.com',
       url='http://bazaar-vcs.org/Olive',
-      packages=['olive', 'olive.frontend',
-                'olive.frontend.gtk', 'olive.frontend.gtk.viz'],
+      packages=['olive'],
       scripts=['olive-gtk'],
       data_files=[('share/olive', ['olive.glade',
                                    'oliveicon2.png',
