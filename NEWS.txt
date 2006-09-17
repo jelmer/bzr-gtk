@@ -6,6 +6,8 @@ Olive 0.10.1 ?
  - Fixed bug #53963: Close button in About box.
  - Drive selection is now available under Win32 platforms. That means new
    dependency (pyWin32)
+ - If the TreeView in the Status window would be empty, display a "No changes."
+   message.
 
 Olive 0.10.0 (2006-09-04)
 

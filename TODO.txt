@@ -20,4 +20,4 @@ TODO list for Olive
 [DONE] i18n/l10n with gettext (phanatic)
 [DONE] Bookmarks should have a 'title' attribute (phanatic)
 [PART-DONE] Open files on double-click, and add Open option to context menu (Aaadam)
- - Display a "No changes." text in the Status window, if tree is empty (Áron Novák)
+[DONE] Display a "No changes." text in the Status window, if tree is empty (Áron Novák)
