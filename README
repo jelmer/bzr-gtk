@@ -14,7 +14,7 @@ bzr-gtk is written in Python, so doesn't need compiling, however you will
 need the following runtime dependencies:
 
   * Python 2.4
-  * bzr 0.8 or later
+  * bzr 0.10 or later
   * PyGTK 2.8 or later
 
 In order to see graphs in the visualisation tool, you will also need:
@@ -25,6 +25,10 @@ In order to see syntax highlighted diffs:
 
   * gtksourceview python bindings
 
+In order to use the nautilus integration, you will need:
+
+ * python-nautilus
+
 Installation
 ------------
 
@@ -34,6 +38,9 @@ directory into your ~/.bazaar/plugins directory.
 Other ways include doing the same in the bzrlib/plugins directory of
 your bzr working tree, or adding the location of bzr-gtk to your
 BZR_PLUGIN_PATH environment variable.
+
+To use the nautilus integration, either place the nautilus-bzr.py file in
+~/.nautilus/python-extensions or in /usr/lib/nautilus/extensions-1.0/python
 
 Usage - Visualisation
 ---------------------

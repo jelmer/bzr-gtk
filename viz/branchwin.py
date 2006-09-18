@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: UTF-8 -*-
 """Branch window.
 
@@ -358,6 +357,7 @@ class BranchWindow(gtk.Window):
             button.show()
 
             button = gtk.Button(parent_id)
+            button.set_use_underline(False)
             button.connect("clicked", self._go_clicked_cb, parent_id)
             hbox.pack_start(button, expand=False, fill=True)
             button.show()
@@ -411,6 +411,9 @@ class BranchWindow(gtk.Window):
         # TODO: more than one parent
         """Callback for when a treeview row gets activated."""
         revision = self.model[path][0]
+        if len(self.parent_ids[revision]) == 0:
+            # Ignore revisions without parent
+            return
         parent_id = self.parent_ids[revision][0]
         if self.app is not None:
             self.app.show_diff(self.branch, revision.revision_id, parent_id)

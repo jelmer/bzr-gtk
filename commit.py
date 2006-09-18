@@ -19,7 +19,8 @@ pygtk.require("2.0")
 import gobject
 import gtk
 import pango
-from bzrlib.delta import compare_trees
+
+import bzrlib
 
 class GCommitDialog(gtk.Dialog):
     """ Commit Dialog """
@@ -31,15 +32,18 @@ class GCommitDialog(gtk.Dialog):
 
         self.old_tree = tree.branch.repository.revision_tree(tree.branch.last_revision())
         self.pending_merges = tree.pending_merges()
-        self.delta = compare_trees(self.old_tree, tree)
+        self.delta = tree.changes_from(self.old_tree)
 
         self._create()
 
     def _create_file_view(self):
         self.file_store = gtk.ListStore(gobject.TYPE_BOOLEAN, gobject.TYPE_STRING, gobject.TYPE_STRING)
         self.file_view = gtk.TreeView(self.file_store)
+        crt = gtk.CellRendererToggle()
+        crt.set_property("activatable", True)
+        crt.connect("toggled", self._toggle_commit, self.file_store)
         self.file_view.append_column(gtk.TreeViewColumn("Commit", 
-                                     gtk.CellRendererToggle(), active=0))
+                                     crt, active=0))
         self.file_view.append_column(gtk.TreeViewColumn("Path", 
                                      gtk.CellRendererText(), text=1))
         self.file_view.append_column(gtk.TreeViewColumn("Type", 
@@ -59,6 +63,10 @@ class GCommitDialog(gtk.Dialog):
 
         self.file_view.show()
 
+    def _toggle_commit(self, cell, path, model):
+        model[path][0] = not model[path][0]
+        return
+    
     def _get_specific_files(self):
         ret = []
         it = self.file_store.get_iter_first()

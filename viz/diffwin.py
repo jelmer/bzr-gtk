@@ -14,6 +14,7 @@ from cStringIO import StringIO
 
 import gtk
 import pango
+import sys
 
 try:
     import gtksourceview
@@ -21,7 +22,8 @@ try:
 except ImportError:
     have_gtksourceview = False
 
-from bzrlib.delta import compare_trees
+import bzrlib
+
 from bzrlib.diff import show_diff_trees
 from bzrlib.errors import NoSuchFile
 
@@ -49,15 +51,18 @@ class DiffWindow(gtk.Window):
 
     def construct(self):
         """Construct the window contents."""
-        hbox = gtk.HBox(spacing=6)
-        hbox.set_border_width(0)
-        self.add(hbox)
-        hbox.show()
+        # The   window  consists  of   a  pane   containing:  the
+        # hierarchical list  of files on  the left, and  the diff
+        # for the currently selected file on the right.
+        pane = gtk.HPaned()
+        self.add(pane)
+        pane.show()
 
+        # The file hierarchy: a scrollable treeview
         scrollwin = gtk.ScrolledWindow()
         scrollwin.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         scrollwin.set_shadow_type(gtk.SHADOW_IN)
-        hbox.pack_start(scrollwin, expand=False, fill=True)
+        pane.pack1(scrollwin)
         scrollwin.show()
 
         self.model = gtk.TreeStore(str, str)
@@ -75,11 +80,12 @@ class DiffWindow(gtk.Window):
         column.add_attribute(cell, "text", 0)
         self.treeview.append_column(column)
 
-
+        # The diffs of the  selected file: a scrollable source or
+        # text view
         scrollwin = gtk.ScrolledWindow()
         scrollwin.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrollwin.set_shadow_type(gtk.SHADOW_IN)
-        hbox.pack_start(scrollwin, expand=True, fill=True)
+        pane.pack2(scrollwin)
         scrollwin.show()
 
         if have_gtksourceview:
@@ -109,7 +115,7 @@ class DiffWindow(gtk.Window):
         self.parent_tree = parent_tree
 
         self.model.clear()
-        delta = compare_trees(self.parent_tree, self.rev_tree)
+        delta = self.rev_tree.changes_from(self.parent_tree)
 
         self.model.append(None, [ "Complete Diff", "" ])
 
@@ -160,4 +166,4 @@ class DiffWindow(gtk.Window):
 
         s = StringIO()
         show_diff_trees(self.parent_tree, self.rev_tree, s, specific_files)
-        self.buffer.set_text(s.getvalue())
+        self.buffer.set_text(s.getvalue().decode(sys.getdefaultencoding(), 'replace'))
