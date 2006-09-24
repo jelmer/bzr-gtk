@@ -27,8 +27,7 @@ try:
 except:
     sys.exit(1)
 
-import olive.backend.init as init
-import olive.backend.errors as errors
+import bzrlib.errors as errors
 
 class OliveBranch:
     """ Display branch dialog and perform the needed operations. """
@@ -71,12 +70,36 @@ class OliveBranch:
         
         spinbutton_revno = self.glade.get_widget('spinbutton_branch_revno')
         revno = spinbutton_revno.get_value_as_int()
-        if revno == 0:
-            revno = None
+        revision_id = br_from.get_rev_id(revno)
         
         self.comm.set_busy(self.window)
         try:
-            revs = init.branch(location, destination, revno)
+            from bzrlib.transport import get_transport
+
+            br_from = Branch.open(location)
+
+            br_from.lock_read()
+
+            try:
+                destination = destination + '/' + os.path.basename(location.rstrip("/\\"))
+                to_transport = get_transport(destination)
+
+                to_transport.mkdir('.')
+
+                try:
+                    dir = br_from.bzrdir.sprout(to_transport.base, revision_id)
+                    branch = dir.open_branch()
+                except NoSuchRevision:
+                    to_transport.delete_tree('.')
+                    raise
+
+            finally:
+                br_from.unlock()
+                
+            self.close()
+            self.dialog.info_dialog(_('Branching successful'),
+                                _('%d revision(s) branched.') % revs)
+            self.comm.refresh_right()
         except errors.NonExistingSource, errmsg:
             self.dialog.error_dialog(_('Non existing source'),
                                      _("The location (%s)\ndoesn't exist.") % errmsg)
@@ -102,13 +125,7 @@ class OliveBranch:
                                      _('The specified location has to be a branch.'))
             self.comm.set_busy(self.window, False)
             return
-        except:
-            raise
         
-        self.close()
-        self.dialog.info_dialog(_('Branching successful'),
-                                _('%d revision(s) branched.') % revs)
-        self.comm.refresh_right()
 
     def close(self, widget=None):
         self.window.destroy()

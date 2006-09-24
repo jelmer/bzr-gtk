@@ -27,43 +27,43 @@ try:
 except:
     sys.exit(1)
 
-import olive.backend.errors as errors
-import olive.backend.fileops as fileops
+import bzrlib
+import bzrlib.errors as errors
 
-class OliveRemove:
-    """ Display the Remove file(s) dialog and perform the needed actions. """
+class OliveAdd:
+    """ Display the Add file(s) dialog and perform the needed actions. """
     def __init__(self, gladefile, comm, dialog):
-        """ Initialize the Remove file(s) dialog. """
+        """ Initialize the Add file(s) dialog. """
         self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_remove')
+        self.glade = gtk.glade.XML(self.gladefile, 'window_add', 'olive-gtk')
         
         # Communication object
         self.comm = comm
         # Dialog object
         self.dialog = dialog
         
-        self.window = self.glade.get_widget('window_remove')
+        self.window = self.glade.get_widget('window_add')
         
         # Dictionary for signal_autoconnect
-        dic = { "on_button_remove_remove_clicked": self.remove,
-                "on_button_remove_cancel_clicked": self.close }
+        dic = { "on_button_add_add_clicked": self.add,
+                "on_button_add_cancel_clicked": self.close }
         
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
 
     def display(self):
-        """ Display the Remove file(s) dialog. """
+        """ Display the Add file(s) dialog. """
         self.window.show_all()
         
-    def remove(self, widget):
-        radio_selected = self.glade.get_widget('radiobutton_remove_selected')
-        radio_new = self.glade.get_widget('radiobutton_remove_new')
+    def add(self, widget):
+        radio_selected = self.glade.get_widget('radiobutton_add_selected')
+        radio_unknown = self.glade.get_widget('radiobutton_add_unknown')
         
         directory = self.comm.get_path()
         
         self.comm.set_busy(self.window)
         if radio_selected.get_active():
-            # Remove only the selected file
+            # Add only the selected file
             filename = self.comm.get_selected_right()
             
             if filename is None:
@@ -73,32 +73,23 @@ class OliveRemove:
                 return
             
             try:
-                fileops.remove([directory + '/' + filename])
+                bzrlib.add.smart_add([directory + '/' + filename])
             except errors.NotBranchError:
                 self.dialog.error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
-                self.comm.set_busy(self.window, False)
-                return
-            except errors.NotVersionedError:
-                self.dialog.error_dialog(_('File not versioned'),
-                                         _('The selected file is not versioned.'))
                 self.comm.set_busy(self.window, False)
                 return
             except:
                 raise
-        elif radio_new.get_active():
-            # Remove added files recursively
+        elif radio_unknown.get_active():
+            # Add unknown files recursively
             try:
-                fileops.remove([directory], True)
+                bzrlib.add.smart_add([directory], True)
             except errors.NotBranchError:
                 self.dialog.error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
                 self.comm.set_busy(self.window, False)
                 return
-            except errors.NoMatchingFiles:
-                dialog.warning_dialog(_('No matching files'),
-                                      _('No added files were found in the working tree.'))
-                self.comm.set_busy(self.window, False)
             except:
                 raise
         else:

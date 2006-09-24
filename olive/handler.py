@@ -28,8 +28,8 @@ try:
 except:
     sys.exit(1)
 
-from olive.backend.info import is_branch
-import olive.backend.errors as errors
+import bzrlib.errors as errors
+from bzrlib.branch import Branch
 
 from dialog import OliveDialog
 from menu import OliveMenu
@@ -74,50 +74,84 @@ class OliveHandler:
     
     def on_menuitem_branch_missing_revisions_activate(self, widget):
         """ Branch/Missing revisions menu handler. """
-        import olive.backend.update as update
         
         self.comm.set_busy(self.comm.window_main)
         
         try:
-            ret = update.missing(self.comm.get_path())
-        except errors.NotBranchError:
-            self.dialog.error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
-        except errors.ConnectionError:
-            self.dialog.error_dialog(_('Connection error'),
-                                     _('Cannot connect to remote location.\nPlease try again later.'))
-        except errors.NoLocationKnown:
-            self.dialog.error_dialog(_('Parent location is unknown'),
-                                     _('Cannot determine missing revisions if no parent location is known.'))
-        else:
+            import bzrlib
+            
+            try:
+                local_branch = Branch.open_containing(self.comm.get_path())[0]
+            except NotBranchError:
+                self.dialog.error_dialog(_('Directory is not a branch'),
+                                         _('You can perform this action only in a branch.'))
+                return
+            
+            other_branch = local_branch.get_parent()
+            if other_branch is None:
+                self.dialog.error_dialog(_('Parent location is unknown'),
+                                         _('Cannot determine missing revisions if no parent location is known.'))
+                return
+            
+            remote_branch = Branch.open(other_branch)
+            
+            if remote_branch.base == local_branch.base:
+                remote_branch = local_branch
+
+            ret = len(local_branch.missing_revisions(remote_branch))
+
             if ret > 0:
                 self.dialog.info_dialog(_('There are missing revisions'),
                                         _('%d revision(s) missing.') % ret)
             else:
                 self.dialog.info_dialog(_('Local branch up to date'),
                                         _('There are no missing revisions.'))
-        
-        self.comm.set_busy(self.comm.window_main, False)
+        finally:
+            self.comm.set_busy(self.comm.window_main, False)
     
     def on_menuitem_branch_pull_activate(self, widget):
         """ Branch/Pull menu handler. """
-        import olive.backend.update as update
         
         self.comm.set_busy(self.comm.window_main)
-        
+
         try:
-            ret = update.pull(self.comm.get_path())
-        except errors.NotBranchError:
-            self.dialog.error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
-        except errors.NoLocationKnown:
-            self.dialog.error_dialog(_('Parent location is unknown'),
-                                     _('Pulling is not possible until there is no parent location.'))
-        else:
+            try:
+                from bzrlib.workingtree import WorkingTree
+                tree_to = WorkingTree.open_containing(self.comm.get_path())[0]
+                branch_to = tree_to.branch
+            except errors.NoWorkingTree:
+                tree_to = None
+                branch_to = Branch.open_containing(self.comm.get_path())[0]
+            except errors.NotBranchError:
+                 self.dialog.error_dialog(_('Directory is not a branch'),
+                                         _('You can perform this action only in a branch.'))
+
+            location = branch_to.get_parent()
+            if location is None:
+                self.dialog.error_dialog(_('Parent location is unknown'),
+                                         _('Pulling is not possible until there is a parent location.'))
+                return
+
+            try:
+                branch_from = Branch.open(location)
+            except errors.NotBranchError:
+                self.dialog.error_dialog(_('Directory is not a branch'),
+                                         _('You can perform this action only in a branch.'))
+
+            if branch_to.get_parent() is None:
+                branch_to.set_parent(branch_from.base)
+
+            old_rh = branch_to.revision_history()
+            if tree_to is not None:
+                tree_to.pull(branch_from)
+            else:
+                branch_to.pull(branch_from)
+            
             self.dialog.info_dialog(_('Pull successful'),
                                     _('%d revision(s) pulled.') % ret)
-        
-        self.comm.set_busy(self.comm.window_main, False)
+            
+        finally:
+            self.comm.set_busy(self.comm.window_main, False)
     
     def on_menuitem_branch_push_activate(self, widget):
         """ Branch/Push... menu handler. """
@@ -133,20 +167,36 @@ class OliveHandler:
     
     def on_menuitem_branch_initialize_activate(self, widget):
         """ Initialize current directory. """
-        import olive.backend.init as init
-        
         try:
-            init.init(self.comm.get_path())
+            location = self.comm.get_path()
+            from bzrlib.builtins import get_format_type
+
+            format = get_format_type('default')
+ 
+            if not os.path.exists(location):
+                os.mkdir(location)
+     
+            try:
+                existing_bzrdir = bzrdir.BzrDir.open(location)
+            except NotBranchError:
+                bzrdir.BzrDir.create_branch_convenience(location, format=format)
+            else:
+                if existing_bzrdir.has_branch():
+                    if existing_bzrdir.has_workingtree():
+                        raise AlreadyBranchError(location)
+                    else:
+                        raise BranchExistsWithoutWorkingTree(location)
+                else:
+                    existing_bzrdir.create_branch()
+                    existing_bzrdir.create_workingtree()
         except errors.AlreadyBranchError, errmsg:
             self.dialog.error_dialog(_('Directory is already a branch'),
                                      _('The current directory (%s) is already a branch.\nYou can start using it, or initialize another directory.') % errmsg)
         except errors.BranchExistsWithoutWorkingTree, errmsg:
             self.dialog.error_dialog(_('Branch without a working tree'),
                                      _('The current directory (%s)\nis a branch without a working tree.') % errmsg)
-        except:
-            raise
         else:
-            self.dialog.info_dialog(_('Ininialize successful'),
+            self.dialog.info_dialog(_('Initialize successful'),
                                     _('Directory successfully initialized.'))
             self.comm.refresh_right()
         
@@ -244,12 +294,14 @@ class OliveHandler:
             m_commit = self.menu.ui.get_widget('/context_right/commit')
             m_diff = self.menu.ui.get_widget('/context_right/diff')
             # check if we're in a branch
-            if not is_branch(self.comm.get_path()):
+            try:
+                from bzrlib.branch import Branch
+                Branch.open_containing(self.comm.get_path())
                 m_add.set_sensitive(False)
                 m_remove.set_sensitive(False)
                 m_commit.set_sensitive(False)
                 m_diff.set_sensitive(False)
-            else:
+            except errors.NotBranchError:
                 m_add.set_sensitive(True)
                 m_remove.set_sensitive(True)
                 m_commit.set_sensitive(True)
