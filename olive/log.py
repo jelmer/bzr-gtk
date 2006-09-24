@@ -32,7 +32,7 @@ except:
 from bzrlib.branch import Branch
 import bzrlib.errors as errors
 
-from viz.bzrkapp import BzrkApp
+from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
 
 class OliveLog:
     """ Display Log (bzrk) window and perform the needed actions. """
@@ -63,5 +63,6 @@ class OliveLog:
             self.dialog.error_dialog(_('Directory is not a branch'),
                                      _('You can perform this action only in a branch.'))
         else:
-            self.app = BzrkApp()
-            self.app.show(self.branch, self.revid, None)
+			window = BranchWindow()
+			window.set_branch(self.branch, self.revid, None)
+			window.show()
