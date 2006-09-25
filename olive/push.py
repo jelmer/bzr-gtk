@@ -122,20 +122,12 @@ class OlivePush:
         if self.radio_stored.get_active():
             try:
                 revs = do_push(self.comm.get_path(),
-                                   overwrite=self.check_overwrite.get_active())
+                               overwrite=self.check_overwrite.get_active())
             except errors.NotBranchError:
                 self.dialog.error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
                 return
-            except errors.NoLocationKnown:
-                self.dialog.error_dialog(_('Push location is unknown'),
-                                         _('Please specify a location manually.'))
-                return
-            except errors.NonExistingParent, errmsg:
-                self.dialog.error_dialog(_('Non existing parent directory'),
-                                         _("The parent directory (%s)\ndoesn't exist.") % errmsg)
-                return
-            except errors.DivergedBranchesError:
+            except errors.DivergedBranches:
                 self.dialog.error_dialog(_('Branches have been diverged'),
                                          _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
                 return
@@ -150,27 +142,17 @@ class OlivePush:
             
             try:
                 revs = do_push(self.comm.get_path(), location,
-                                   self.check_remember.get_active(),
-                                   self.check_overwrite.get_active(),
-                                   self.check_create.get_active())
+                               self.check_remember.get_active(),
+                               self.check_overwrite.get_active(),
+                               self.check_create.get_active())
             except errors.NotBranchError:
                 self.dialog.error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
                 self.comm.set_busy(self.window, False)
                 return
-            except errors.NonExistingParent, errmsg:
-                self.dialog.error_dialog(_('Non existing parent directory'),
-                                         _("The parent directory (%s)\ndoesn't exist.") % errmsg)
-                self.comm.set_busy(self.window, False)
-                return
-            except errors.DivergedBranchesError:
+            except errors.DivergedBranches:
                 self.dialog.error_dialog(_('Branches have been diverged'),
                                          _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
-                self.comm.set_busy(self.window, False)
-                return
-            except errors.PathPrefixNotCreated:
-                self.dialog.error_dialog(_('Path prefix not created'),
-                                         _("The path leading up to the specified location couldn't\nbe created."))
                 self.comm.set_busy(self.window, False)
                 return
             except:
@@ -229,6 +211,7 @@ def do_push(branch, location=None, remember=False, overwrite=False,
     :return: number of revisions pushed
     """
     from bzrlib.branch import Branch
+    from bzrlib.bzrdir import BzrDir
     from bzrlib.transport import get_transport
         
     br_from = Branch.open_containing(branch)[0]
@@ -236,7 +219,9 @@ def do_push(branch, location=None, remember=False, overwrite=False,
     stored_loc = br_from.get_push_location()
     if location is None:
         if stored_loc is None:
-            raise NoLocationKnown
+            self.dialog.error_dialog(_('Push location is unknown'),
+                                     _('Please specify a location manually.'))
+            return
         else:
             location = stored_loc
 
@@ -249,17 +234,19 @@ def do_push(branch, location=None, remember=False, overwrite=False,
     old_rh = []
 
     try:
-        dir_to = bzrlib.bzrdir.BzrDir.open(location_url)
+        dir_to = BzrDir.open(location_url)
         br_to = dir_to.open_branch()
-    except NotBranchError:
+    except errors.NotBranchError:
         # create a branch.
         transport = transport.clone('..')
         if not create_prefix:
             try:
                 relurl = transport.relpath(location_url)
                 transport.mkdir(relurl)
-            except NoSuchFile:
-                raise NonExistingParent(location)
+            except errors.NoSuchFile:
+                self.dialog.error_dialog(_('Non existing parent directory'),
+                                         _("The parent directory (%s)\ndoesn't exist.") % location)
+                return
         else:
             current = transport.base
             needed = [(transport, transport.relpath(location_url))]
@@ -268,12 +255,14 @@ def do_push(branch, location=None, remember=False, overwrite=False,
                     transport, relpath = needed[-1]
                     transport.mkdir(relpath)
                     needed.pop()
-                except NoSuchFile:
+                except errors.NoSuchFile:
                     new_transport = transport.clone('..')
                     needed.append((new_transport,
                                    new_transport.relpath(transport.base)))
                     if new_transport.base == transport.base:
-                        raise PathPrefixNotCreated
+                        self.dialog.error_dialog(_('Path prefix not created'),
+                                                 _("The path leading up to the specified location couldn't\nbe created."))
+                        return
         dir_to = br_from.bzrdir.clone(location_url,
             revision_id=br_from.last_revision())
         br_to = dir_to.open_branch()
@@ -283,16 +272,16 @@ def do_push(branch, location=None, remember=False, overwrite=False,
         try:
             try:
                 tree_to = dir_to.open_workingtree()
-            except NotLocalUrl:
+            except errors.NotLocalUrl:
                 # FIXME - what to do here? how should we warn the user?
                 #warning('This transport does not update the working '
                 #        'tree of: %s' % (br_to.base,))
                 count = br_to.pull(br_from, overwrite)
-            except NoWorkingTree:
+            except errors.NoWorkingTree:
                 count = br_to.pull(br_from, overwrite)
             else:
                 count = tree_to.pull(br_from, overwrite)
-        except DivergedBranches:
-            raise DivergedBranchesError
+        except errors.DivergedBranches:
+            raise
     
     return count
