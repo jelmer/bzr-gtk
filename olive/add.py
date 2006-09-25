@@ -27,7 +27,7 @@ try:
 except:
     sys.exit(1)
 
-import bzrlib
+import bzrlib.add
 import bzrlib.errors as errors
 
 class OliveAdd:

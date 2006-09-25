@@ -61,7 +61,7 @@ class InstallData(install_data):
 		return data_files
 
 setup(name='Olive',
-      version='0.1',
+      version='0.11.0',
       description='Olive - Graphical frontend for Bazaar',
       author='Szilveszter Farkas (Phanatic)',
       author_email='szilveszter.farkas@gmail.com',

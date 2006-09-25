@@ -28,6 +28,7 @@ except:
     sys.exit(1)
 
 import bzrlib.errors as errors
+from bzrlib.workingtree import WorkingTree
 
 class OliveRemove:
     """ Display the Remove file(s) dialog and perform the needed actions. """
@@ -90,18 +91,22 @@ class OliveRemove:
             # Remove added files recursively
             try:
                 wt, path = WorkingTree.open_containing(directory)
-                wt.remove(path)
             except errors.NotBranchError:
                 self.dialog.error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
                 self.comm.set_busy(self.window, False)
                 return
-            except errors.NoMatchingFiles:
+            except:
+                raise
+            
+            added = wt.changes_from(wt.basis_tree()).added
+            file_list = sorted([f[0] for f in added], reverse=True)
+            if len(file_list) == 0:
                 dialog.warning_dialog(_('No matching files'),
                                       _('No added files were found in the working tree.'))
                 self.comm.set_busy(self.window, False)
-            except:
-                raise
+                return
+            wt.remove(file_list)
         else:
             # This should really never happen.
             pass

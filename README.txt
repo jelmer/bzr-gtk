@@ -15,7 +15,8 @@ Requirements
  - Python (>= 2.4)
  - GTK (>= 2.8)
  - PyGTK (>= 2.8)
- - Bazaar (>= 0.8.2)
+ - Bazaar (>= 0.11)
+ - bzr-gtk (>= 0.11)
  - pyWin32 (only for Windows, tested with build 209)
 
 Install on Linux
