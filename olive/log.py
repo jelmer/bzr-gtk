@@ -32,11 +32,11 @@ except:
 from bzrlib.branch import Branch
 import bzrlib.errors as errors
 
+nobzrgtk = False
 try:
     from bzrlib.plugins.gtk.viz.bzrkapp import BzrkApp
 except ImportError:
-    print "bzr-gtk visualize plugin not available."
-    sys.exit(1)
+    nobzrgtk = True
 
 class OliveLog:
     """ Display Log (bzrk) window and perform the needed actions. """
@@ -66,6 +66,9 @@ class OliveLog:
         if self.notbranch:
             self.dialog.error_dialog(_('Directory is not a branch'),
                                      _('You can perform this action only in a branch.'))
+        elif nobzrgtk:
+            self.dialog.error_dialog(_('bzr-gtk plugin not available'),
+                                     _('Please install the bzr-gtk plugin in order to have visual log support.'))
         else:
             self.app = BzrkApp()
             self.app.show(self.branch, self.revid, None, False)
