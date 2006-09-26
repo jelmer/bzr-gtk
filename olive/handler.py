@@ -30,6 +30,7 @@ except:
 
 import bzrlib.errors as errors
 from bzrlib.branch import Branch
+from bzrlib.workingtree import WorkingTree
 
 from dialog import OliveDialog
 from menu import OliveMenu
@@ -162,7 +163,8 @@ class OliveHandler:
     def on_menuitem_branch_status_activate(self, widget):
         """ Branch/Status... menu handler. """
         from status import OliveStatus
-        status = OliveStatus(self.gladefile, self.comm, self.dialog)
+        wt, wtpath = WorkingTree.open_containing(self.comm.get_path())
+        status = OliveStatus(self.gladefile, wt, wtpath, self.dialog)
         status.display()
     
     def on_menuitem_branch_initialize_activate(self, widget):

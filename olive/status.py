@@ -43,30 +43,29 @@ from dialog import OliveDialog
 
 class OliveStatus:
     """ Display Status window and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, gladefile, wt, wtpath, dialog):
         """ Initialize the Status window. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_status')
         
-        # Communication object
-        self.comm = comm
         # Dialog object
         self.dialog = dialog
         
         # Get the Status window widget
         self.window = self.glade.get_widget('window_status')
+        self.wt = wt
+        self.wtpath = wtpath
         
         # Check if current location is a branch
         try:
-            (self.wt, path) = WorkingTree.open_containing(self.comm.get_path())
-            branch = self.wt.branch
+            branch = wt.branch
         except errors.NotBranchError:
             self.notbranch = True
             return
         except:
             raise
         
-        file_id = self.wt.path2id(path)
+        file_id = self.wt.path2id(wtpath)
 
         self.notbranch = False
         if file_id is None:
@@ -98,10 +97,7 @@ class OliveStatus:
         column.add_attribute(cell, "text", 0)
         self.treeview.append_column(column)
         
-        if bzrlib.version_info < (0, 9):
-            delta = compare_trees(self.old_tree, self.wt)
-        else:
-            delta = self.wt.changes_from(self.old_tree)
+        delta = self.wt.changes_from(self.old_tree)
 
         changes = False
         
