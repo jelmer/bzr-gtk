@@ -1,7 +1,7 @@
 Olive NEWS
 ==========
 
-Olive 0.11.0 ?
+Olive 0.11.0 (2006-09-27)
 
  - Got rid of the backend code. (Jelmer Vernooij)
  - Some cleanups.

@@ -297,15 +297,15 @@ class OliveHandler:
             try:
                 from bzrlib.branch import Branch
                 Branch.open_containing(self.comm.get_path())
-                m_add.set_sensitive(False)
-                m_remove.set_sensitive(False)
-                m_commit.set_sensitive(False)
-                m_diff.set_sensitive(False)
-            except errors.NotBranchError:
                 m_add.set_sensitive(True)
                 m_remove.set_sensitive(True)
                 m_commit.set_sensitive(True)
                 m_diff.set_sensitive(True)
+            except errors.NotBranchError:
+                m_add.set_sensitive(False)
+                m_remove.set_sensitive(False)
+                m_commit.set_sensitive(False)
+                m_diff.set_sensitive(False)
             self.menu.right_context_menu().popup(None, None, None, 0,
                                                  event.time)
         
