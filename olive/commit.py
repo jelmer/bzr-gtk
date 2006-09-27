@@ -21,13 +21,10 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-    import gobject
-    import pango
-except:
-    sys.exit(1)
+import gtk
+import gtk.glade
+import gobject
+import pango
 
 from bzrlib import version_info
 

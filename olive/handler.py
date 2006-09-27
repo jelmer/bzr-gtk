@@ -31,15 +31,12 @@ from bzrlib.branch import Branch
 from bzrlib.workingtree import WorkingTree
 
 from dialog import about, error_dialog, info_dialog
-from menu import OliveMenu
 from launch import launch
 
 class OliveHandler:
     """ Signal handler class for Olive. """
-    def __init__(self,  comm):
-        self.comm = comm
-        
-        self.menu = OliveMenu(self.comm)
+    def __init__(self, path):
+        self.wt, self.path = WorkingTree.open_containing(path)
     
     def on_about_activate(self, widget):
         about()
@@ -47,28 +44,25 @@ class OliveHandler:
     def on_menuitem_add_files_activate(self, widget):
         """ Add file(s)... menu handler. """
         from add import OliveAdd
-        wt, path = WorkingTree.open_containing(self.comm.get_path())
-        add = OliveAdd(wt, path, 
-                self.comm.get_selected_right())
+        add = OliveAdd(self.wt, self.path, self.comm.get_selected_right())
         add.display()
     
     def on_menuitem_branch_get_activate(self, widget):
         """ Branch/Get... menu handler. """
         from branch import OliveBranch
-        branch = OliveBranch(self.comm)
+        branch = OliveBranch()
         branch.display()
     
     def on_menuitem_branch_checkout_activate(self, widget):
         """ Branch/Checkout... menu handler. """
         from checkout import OliveCheckout
-        checkout = OliveCheckout(self.comm)
+        checkout = OliveCheckout()
         checkout.display()
     
     def on_menuitem_branch_commit_activate(self, widget):
         """ Branch/Commit... menu handler. """
         from commit import OliveCommit
-        wt, path = WorkingTree.open_containing(self.comm.get_path())
-        commit = OliveCommit(wt, path)
+        commit = OliveCommit(self.wt, self.path)
         commit.display()
     
     def on_menuitem_branch_missing_revisions_activate(self, widget):
@@ -79,12 +73,7 @@ class OliveHandler:
         try:
             import bzrlib
             
-            try:
-                local_branch = Branch.open_containing(self.comm.get_path())[0]
-            except NotBranchError:
-                error_dialog(_('Directory is not a branch'),
-                                         _('You can perform this action only in a branch.'))
-                return
+            local_branch = self.wt.branch
             
             other_branch = local_branch.get_parent()
             if other_branch is None:
@@ -113,44 +102,30 @@ class OliveHandler:
         
         self.comm.set_busy(self.comm.window_main)
 
+        branch_to = self.wt.branch
+
+        location = branch_to.get_parent()
+        if location is None:
+            error_dialog(_('Parent location is unknown'),
+                                     _('Pulling is not possible until there is a parent location.'))
+            return
+
         try:
-            try:
-                from bzrlib.workingtree import WorkingTree
-                tree_to = WorkingTree.open_containing(self.comm.get_path())[0]
-                branch_to = tree_to.branch
-            except errors.NoWorkingTree:
-                tree_to = None
-                branch_to = Branch.open_containing(self.comm.get_path())[0]
-            except errors.NotBranchError:
-                 error_dialog(_('Directory is not a branch'),
-                                         _('You can perform this action only in a branch.'))
+            branch_from = Branch.open(location)
+        except errors.NotBranchError:
+            error_dialog(_('Directory is not a branch'),
+                                     _('You can perform this action only in a branch.'))
 
-            location = branch_to.get_parent()
-            if location is None:
-                error_dialog(_('Parent location is unknown'),
-                                         _('Pulling is not possible until there is a parent location.'))
-                return
+        if branch_to.get_parent() is None:
+            branch_to.set_parent(branch_from.base)
 
-            try:
-                branch_from = Branch.open(location)
-            except errors.NotBranchError:
-                error_dialog(_('Directory is not a branch'),
-                                         _('You can perform this action only in a branch.'))
-
-            if branch_to.get_parent() is None:
-                branch_to.set_parent(branch_from.base)
-
-            old_rh = branch_to.revision_history()
-            if tree_to is not None:
-                tree_to.pull(branch_from)
-            else:
-                branch_to.pull(branch_from)
-            
-            info_dialog(_('Pull successful'),
-                                    _('%d revision(s) pulled.') % ret)
-            
-        finally:
-            self.comm.set_busy(self.comm.window_main, False)
+        old_rh = branch_to.revision_history()
+        if tree_to is not None:
+            tree_to.pull(branch_from)
+        else:
+            branch_to.pull(branch_from)
+        
+        info_dialog(_('Pull successful'), _('%d revision(s) pulled.') % ret)
     
     def on_menuitem_branch_push_activate(self, widget):
         """ Branch/Push... menu handler. """
@@ -161,8 +136,7 @@ class OliveHandler:
     def on_menuitem_branch_status_activate(self, widget):
         """ Branch/Status... menu handler. """
         from status import OliveStatus
-        wt, wtpath = WorkingTree.open_containing(self.comm.get_path())
-        status = OliveStatus(wt, wtpath)
+        status = OliveStatus(self.wt, self.path)
         status.display()
     
     def on_menuitem_branch_initialize_activate(self, widget):
@@ -228,9 +202,8 @@ class OliveHandler:
         """ Statistics/Differences... menu handler. """
         from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
         window = DiffWindow()
-        wt = WorkingTree.open_containing(self.comm.get_path())[0]
-        parent_tree = wt.branch.repository.revision_tree(wt.branch.last_revision())
-        window.set_diff(wt.branch.nick, wt, parent_tree)
+        parent_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
+        window.set_diff(self.wt.branch.nick, self.wt, parent_tree)
         window.show()
     
     def on_menuitem_stats_infos_activate(self, widget):

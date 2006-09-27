@@ -24,12 +24,9 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.gdk
-    import gtk.glade
-except:
-    sys.exit(1)
+import gtk
+import gtk.gdk
+import gtk.glade
 
 from handler import OliveHandler
 import bzrlib.errors as errors
@@ -63,7 +60,7 @@ class OliveGtk:
         
         self.pref = OlivePreferences()
         self.comm = OliveCommunicator(self.toplevel, self.pref)
-        handler = OliveHandler(self.comm)
+        handler = OliveHandler(self.comm.get_path())
         
         # Dictionary for signal_autoconnect
         dic = { "on_window_main_destroy": gtk.main_quit,

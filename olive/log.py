@@ -21,13 +21,10 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-    import gobject
-    import pango
-except:
-    sys.exit(1)
+import gtk
+import gtk.glade
+import gobject
+import pango
 
 from bzrlib.branch import Branch
 import bzrlib.errors as errors
@@ -53,17 +50,11 @@ class OliveLog:
         except errors.NotBranchError:
             self.notbranch = True
             return
-        except:
-            raise
         
         self.revid = self.branch.last_revision()
 
     def display(self):
-        """ Display the Log (bzrk) window. """
-        if self.notbranch:
-            error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
-        else:
-            window = BranchWindow()
-            window.set_branch(self.branch, self.revid, None)
-            window.show()
+		""" Display the Log (bzrk) window. """
+		window = BranchWindow()
+		window.set_branch(self.branch, self.revid, None)
+		window.show()

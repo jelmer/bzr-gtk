@@ -31,12 +31,9 @@ from olive import gladefile
 
 class OliveCheckout:
     """ Display checkout dialog and perform the needed operations. """
-    def __init__(self, comm):
+    def __init__(self, path=None):
         """ Initialize the Checkout dialog. """
         self.glade = gtk.glade.XML('window_checkout', 'olive-gtk')
-        
-        # Communication object
-        self.comm = comm
         
         self.window = self.glade.get_widget('window_checkout')
         
@@ -49,7 +46,8 @@ class OliveCheckout:
         
         # Save FileChooser state
         self.filechooser = self.glade.get_widget('filechooserbutton_checkout')
-        self.filechooser.set_filename(self.comm.get_path())
+        if path is not None:
+            self.filechooser.set_filename(path)
 
     def display(self):
         """ Display the Checkout dialog. """
@@ -125,8 +123,6 @@ class OliveCheckout:
                                      _("The parent directory (%s)\ndoesn't exist.") % errmsg)
             self.comm.set_busy(self.window, False)
             return
-        except:
-            raise
         
         self.close()
         self.comm.refresh_right()

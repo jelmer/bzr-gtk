@@ -32,7 +32,7 @@ from launch import launch
 
 class OliveMenu:
     """ This class is responsible for building the context menus. """
-    def __init__(self, comm):
+    def __init__(self):
         # Load the UI file
         if sys.platform == 'win32':
             self.uifile = os.path.dirname(sys.executable) + "/share/olive/cmenu.ui"
@@ -47,8 +47,6 @@ class OliveMenu:
                 # Fail
                 print _('UI description file cannot be found.')
                 sys.exit(1)
-        
-        self.comm = comm
         
         # Create the file list context menu
         self.ui = gtk.UIManager()
@@ -135,14 +133,14 @@ class OliveMenu:
             
         if filename is None:
             error_dialog(_('No file was selected'),
-                                     _('Please select a file from the list,\nor choose the other option.'))
+                         _('Please select a file from the list,\nor choose the other option.'))
             return
         
         try:
             bzrlib.add.smart_add([directory + '/' + filename])
         except errors.NotBranchError:
             error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
+                         _('You can perform this action only in a branch.'))
             return
         
         self.comm.refresh_right()
@@ -155,7 +153,7 @@ class OliveMenu:
         
         if filename is None:
             error_dialog(_('No file was selected'),
-                                     _('Please select a file from the list,\nor choose the other option.'))
+                         _('Please select a file from the list,\nor choose the other option.'))
             return
         
         try:
@@ -170,8 +168,6 @@ class OliveMenu:
             error_dialog(_('File not versioned'),
                                      _('The selected file is not versioned.'))
             return
-        except:
-            raise
         
         self.comm.refresh_right()
 

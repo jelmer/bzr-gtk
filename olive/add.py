@@ -74,8 +74,6 @@ class OliveAdd:
                                          _('You can perform this action only in a branch.'))
                 self.comm.set_busy(self.window, False)
                 return
-            except:
-                raise
         elif radio_unknown.get_active():
             # Add unknown files recursively
             try:
@@ -85,8 +83,6 @@ class OliveAdd:
                                          _('You can perform this action only in a branch.'))
                 self.comm.set_busy(self.window, False)
                 return
-            except:
-                raise
         else:
             # This should really never happen.
             pass

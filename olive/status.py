@@ -21,13 +21,11 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-    import gobject
-    import pango
-except:
-    sys.exit(1)
+
+import gtk
+import gtk.glade
+import gobject
+import pango
 
 import bzrlib
 import bzrlib.errors as errors
@@ -56,8 +54,6 @@ class OliveStatus:
         except errors.NotBranchError:
             self.notbranch = True
             return
-        except:
-            raise
         
         file_id = self.wt.path2id(wtpath)
 

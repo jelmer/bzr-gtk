@@ -26,17 +26,14 @@ import gtk
 import gtk.glade
 
 import bzrlib.errors as errors
-from olive import gladefile
+from __init__ import gladefile
 
 class OliveBranch:
     """ Display branch dialog and perform the needed operations. """
-    def __init__(self, comm):
+    def __init__(self, path=None):
         """ Initialize the Branch dialog. """
         self.glade = gtk.glade.XML(gladefile, 'window_branch', 'olive-gtk')
-        
-        # Communication object
-        self.comm = comm
-        
+
         self.window = self.glade.get_widget('window_branch')
         
         # Dictionary for signal_autoconnect
@@ -48,7 +45,8 @@ class OliveBranch:
         
         # Save FileChooser state
         self.filechooser = self.glade.get_widget('filechooserbutton_branch')
-        self.filechooser.set_filename(self.comm.get_path())
+        if path is not None:
+            self.filechooser.set_filename(path)
 
     def display(self):
         """ Display the Branch dialog. """
@@ -68,18 +66,15 @@ class OliveBranch:
         revno = spinbutton_revno.get_value_as_int()
         revision_id = br_from.get_rev_id(revno)
         
-        self.comm.set_busy(self.window)
         try:
             from bzrlib.transport import get_transport
 
             br_from = Branch.open(location)
-
             br_from.lock_read()
 
             try:
                 destination = destination + '/' + os.path.basename(location.rstrip("/\\"))
                 to_transport = get_transport(destination)
-
                 to_transport.mkdir('.')
 
                 try:
@@ -94,32 +89,26 @@ class OliveBranch:
                 
             self.close()
             info_dialog(_('Branching successful'),
-                                _('%d revision(s) branched.') % revs)
-            self.comm.refresh_right()
+                        _('%d revision(s) branched.') % revs)
         except errors.NonExistingSource, errmsg:
             error_dialog(_('Non existing source'),
                                      _("The location (%s)\ndoesn't exist.") % errmsg)
-            self.comm.set_busy(self.window, False)
             return
         except errors.TargetAlreadyExists, errmsg:
             error_dialog(_('Target already exists'),
                                      _('Target directory (%s)\nalready exists. Please select another target.') % errmsg)
-            self.comm.set_busy(self.window, False)
             return
         except errors.NonExistingParent, errmsg:
             error_dialog(_('Non existing parent directory'),
                                      _("The parent directory (%s)\ndoesn't exist.") % errmsg)
-            self.comm.set_busy(self.window, False)
             return
         except errors.NonExistingRevision:
             error_dialog(_('Non existing revision'),
                                      _("The revision you specified doesn't exist."))
-            self.comm.set_busy(self.window, False)
             return
         except errors.NotBranchError, errmsg:
             error_dialog(_('Location is not a branch'),
                                      _('The specified location has to be a branch.'))
-            self.comm.set_busy(self.window, False)
             return
         
 

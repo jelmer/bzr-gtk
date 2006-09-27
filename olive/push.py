@@ -128,8 +128,6 @@ class OlivePush:
                 error_dialog(_('Branches have been diverged'),
                                          _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
                 return
-            except:
-                raise
         elif self.radio_specific.get_active():
             location = self.entry_location.get_text()
             if location == '':
@@ -152,11 +150,6 @@ class OlivePush:
                                          _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
                 self.comm.set_busy(self.window, False)
                 return
-            except:
-                raise
-        else:
-            # This should really never happen
-            pass
         
         self.close()
         info_dialog(_('Push successful'),

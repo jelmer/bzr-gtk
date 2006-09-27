@@ -22,6 +22,7 @@ try:
     pygtk.require("2.0")
 except:
     pass
+
 import gtk
 import gtk.glade
 
