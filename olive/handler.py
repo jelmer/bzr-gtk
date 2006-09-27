@@ -50,7 +50,9 @@ class OliveHandler:
     def on_menuitem_add_files_activate(self, widget):
         """ Add file(s)... menu handler. """
         from add import OliveAdd
-        add = OliveAdd(self.gladefile, self.comm)
+        wt, path = WorkingTree.open_containing(self.comm.get_path())
+        add = OliveAdd(self.gladefile, wt, path, 
+                self.comm.get_selected_right())
         add.display()
     
     def on_menuitem_branch_get_activate(self, widget):
