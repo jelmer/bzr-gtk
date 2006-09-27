@@ -56,7 +56,9 @@ except:
 import gettext
 gettext.install('olive-gtk')
 
-from olive.frontend.gtk import OliveGtk
+from olive import OliveGtk
+from bzrlib.plugin import load_plugins
+load_plugins()
 
 app = OliveGtk()
 gtk.main()

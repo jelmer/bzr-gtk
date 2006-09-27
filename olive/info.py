@@ -29,8 +29,118 @@ try:
 except:
     sys.exit(1)
 
-import olive.backend.errors as errors
-import olive.backend.info as info
+import bzrlib.errors as errors
+
+def info(location):
+    """ Get info about branch, working tree, and repository
+    
+    :param location: the location of the branch/working tree/repository
+    
+    :return: the information in dictionary format
+    
+    The following informations are delivered (if available):
+    ret['location']['lightcoroot']: Light checkout root
+    ret['location']['sharedrepo']: Shared repository
+    ret['location']['repobranch']: Repository branch
+    ret['location']['cobranch']: Checkout of branch
+    ret['location']['repoco']: Repository checkout
+    ret['location']['coroot']: Checkout root
+    ret['location']['branchroot']: Branch root
+    ret['related']['parentbranch']: Parent branch
+    ret['related']['publishbranch']: Publish to branch
+    ret['format']['control']: Control format
+    ret['format']['workingtree']: Working tree format
+    ret['format']['branch']: Branch format
+    ret['format']['repository']: Repository format
+    ret['locking']['workingtree']: Working tree lock status
+    ret['locking']['branch']: Branch lock status
+    ret['locking']['repository']: Repository lock status
+    ret['missing']['branch']: Missing revisions in branch
+    ret['missing']['workingtree']: Missing revisions in working tree
+    ret['wtstats']['unchanged']: Unchanged files
+    ret['wtstats']['modified']: Modified files
+    ret['wtstats']['added']: Added files
+    ret['wtstats']['removed']: Removed files
+    ret['wtstats']['renamed']: Renamed files
+    ret['wtstats']['unknown']: Unknown files
+    ret['wtstats']['ignored']: Ingnored files
+    ret['wtstats']['subdirs']: Versioned subdirectories
+    ret['brstats']['revno']: Revisions in branch
+    ret['brstats']['commiters']: Number of commiters
+    ret['brstats']['age']: Age of branch in days
+    ret['brstats']['firstrev']: Time of first revision
+    ret['brstats']['lastrev']: Time of last revision
+    ret['repstats']['revisions']: Revisions in repository
+    ret['repstats']['size']: Size of repository in bytes
+    """
+    import bzrlib.bzrdir as bzrdir
+    
+    import info_helper
+    
+    ret = {}
+    try:
+        a_bzrdir = bzrdir.BzrDir.open_containing(location)[0]
+    except errors.NotBranchError:
+        raise NotBranchError(location)
+
+    try:
+        working = a_bzrdir.open_workingtree()
+        working.lock_read()
+        try:
+            branch = working.branch
+            repository = branch.repository
+            control = working.bzrdir
+            
+            ret['location'] = info_helper.get_location_info(repository, branch, working)
+            ret['related'] = info_helper.get_related_info(branch)
+            ret['format'] = info_helper.get_format_info(control, repository, branch, working)
+            ret['locking'] = info_helper.get_locking_info(repository, branch, working)
+            ret['missing'] = {}
+            ret['missing']['branch'] = info_helper.get_missing_revisions_branch(branch)
+            ret['missing']['workingtree'] = info_helper.get_missing_revisions_working(working)
+            ret['wtstats'] = info_helper.get_working_stats(working)
+            ret['brstats'] = info_helper.get_branch_stats(branch)
+            ret['repstats'] = info_helper.get_repository_stats(repository)
+        finally:
+            working.unlock()
+            return ret
+        return
+    except (errors.NoWorkingTree, errors.NotLocalUrl):
+        pass
+
+    try:
+        branch = a_bzrdir.open_branch()
+        branch.lock_read()
+        try:
+            ret['location'] = info_helper.get_location_info(repository, branch)
+            ret['related'] = info_helper.get_related_info(branch)
+            ret['format'] = info_helper.get_format_info(control, repository, branch)
+            ret['locking'] = info_helper.get_locking_info(repository, branch)
+            ret['missing']['branch'] = info_helper.get_missing_revisions_branch(branch)
+            ret['brstats'] = info_helper.get_branch_stats(branch)
+            ret['repstats'] = info_helper.get_repository_stats(repository)
+        finally:
+            branch.unlock()
+            return ret
+        return
+    except errors.NotBranchError:
+        pass
+
+    try:
+        repository = a_bzrdir.open_repository()
+        repository.lock_read()
+        try:
+            ret['location'] = info_helper.get_location_info(repository)
+            ret['format'] = info_helper.get_format_info(control, repository)
+            ret['locking'] = info_helper.get_locking_info(repository)
+            ret['repstats'] = info_helper.get_repository_stats(repository)
+        finally:
+            repository.unlock()
+            return ret
+        return
+    except errors.NoRepositoryPresent:
+        pass
+
 
 class OliveInfo:
     """ Display Informations window and perform the needed actions. """
@@ -50,12 +160,10 @@ class OliveInfo:
         # Check if current location is a branch
         self.notbranch = False
         try:
-            self.ret = info.info(self.comm.get_path())
+            self.ret = info(self.comm.get_path())
         except errors.NotBranchError:
             self.notbranch = True
             return
-        except:
-            raise
         
         # Dictionary for signal_autoconnect
         dic = { "on_button_info_close_clicked": self.close,

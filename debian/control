@@ -8,7 +8,7 @@ Standards-Version: 3.7.2
 
 Package: olive
 Architecture: all
-Depends: ${python:Depends}, bzr (>= 0.8.2), python-gtk2 (>= 2.8.6)
+Depends: ${python:Depends}, bzr (>= 0.8.2), python-gtk2 (>= 2.8.6), bzr-gtk (>= 0.10.0)
 XB-Python-Version: ${python:Versions}
 Description: Graphical User Interface for Bazaar Version Control System
  Olive provides an integrated GUI for the Bazaar Version Control System. It has

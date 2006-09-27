@@ -28,63 +28,67 @@ try:
 except:
     sys.exit(1)
 
-import olive.backend.errors as errors
-import olive.backend.fileops as fileops
+import bzrlib.errors as errors
 
-class OliveMove:
-    """ Display the Move dialog and perform the needed actions. """
+class OliveRename:
+    """ Display the Rename dialog and perform the needed actions. """
     def __init__(self, gladefile, comm, dialog):
-        """ Initialize the Move dialog. """
+        """ Initialize the Rename dialog. """
         self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_move', 'olive-gtk')
+        self.glade = gtk.glade.XML(self.gladefile, 'window_rename')
         
         # Communication object
         self.comm = comm
         # Dialog object
         self.dialog = dialog
         
-        self.window = self.glade.get_widget('window_move')
+        self.window = self.glade.get_widget('window_rename')
         
         # Dictionary for signal_autoconnect
-        dic = { "on_button_move_move_clicked": self.move,
-                "on_button_move_cancel_clicked": self.close }
+        dic = { "on_button_rename_rename_clicked": self.rename,
+                "on_button_rename_cancel_clicked": self.close }
         
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
         
-        # Set FileChooser directory
-        self.filechooser = self.glade.get_widget('filechooserbutton_move')
-        self.filechooser.set_filename(self.comm.get_path())
-
     def display(self):
-        """ Display the Move dialog. """
+        """ Display the Rename dialog. """
         self.window.show_all()
 
-    def move(self, widget):
-        destination = self.filechooser.get_filename()
-
-        filename = self.comm.get_selected_right()
+    def rename(self, widget):
+        # Get entry
+        entry = self.glade.get_widget('entry_rename')
+        
+        old_filename = self.comm.get_selected_right()
+        new_filename = entry.get_text()
             
-        if filename is None:
+        if old_filename is None:
             self.dialog.error_dialog(_('No file was selected'),
                                      _('Please select a file from the list to proceed.'))
             return
         
-        source = self.comm.get_path() + '/' + filename
+        if new_filename == "":
+            self.dialog.error_dialog(_('Filename not given'),
+                                     _('Please specify a new name for the file.'))
+            return
         
-        # Move the file to a directory
+        source = self.comm.get_path() + '/' + old_filename
+        destination = self.comm.get_path() + '/' + new_filename
+        
+        # Rename the file
         try:
-            fileops.move([source, destination])
+            wt1, path1 = WorkingTree.open_containing(source)
+            wt2, path2 = WorkingTree.open_containing(source)
+
+            if wt1.base != wt2.base:
+                self.dialog.error_dialog(_('Not the same branch'),
+                                         _('The destination is not in the same branch.'))
+                return
+            wt1.rename_one(source, destination)
         except errors.NotBranchError:
             self.dialog.error_dialog(_('File is not in a branch'),
                                      _('The selected file is not in a branch.'))
             return
-        except errors.NotSameBranchError:
-            self.dialog.error_dialog(_('Not the same branch'),
-                                     _('The destination is not in the same branch.'))
-            return
-        except:
-            raise
 
         self.close()
         self.comm.refresh_right()

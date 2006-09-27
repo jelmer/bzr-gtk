@@ -28,8 +28,7 @@ try:
 except:
     sys.exit(1)
 
-import olive.backend.fileops as fileops
-import olive.backend.errors as errors
+import bzrlib.errors as errors
 
 from launch import launch
 
@@ -144,13 +143,11 @@ class OliveMenu:
             return
         
         try:
-            fileops.add([directory + '/' + filename])
+            bzrlib.add.smart_add([directory + '/' + filename])
         except errors.NotBranchError:
             self.dialog.error_dialog(_('Directory is not a branch'),
                                      _('You can perform this action only in a branch.'))
             return
-        except:
-            raise
         
         self.comm.refresh_right()
     
@@ -166,7 +163,9 @@ class OliveMenu:
             return
         
         try:
-            fileops.remove([directory + '/' + filename])
+            wt, path = WorkingTree.open_containing(directory+'/'+filename)
+            wt.remove(path)
+
         except errors.NotBranchError:
             self.dialog.error_dialog(_('Directory is not a branch'),
                                      _('You can perform this action only in a branch.'))

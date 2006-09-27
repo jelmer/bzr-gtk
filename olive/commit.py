@@ -31,10 +31,6 @@ except:
 
 from bzrlib import version_info
 
-if version_info < (0, 9):
-    # function deprecated after 0.9
-    from bzrlib.delta import compare_trees
-
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
@@ -97,8 +93,10 @@ class OliveCommit:
                                      _('You can perform this action only in a branch.'))
             self.close()
         else:
-            from olive.backend.info import is_checkout
-            if is_checkout(self.comm.get_path()):
+            from bzrlib.branch import Branch
+            branch = Branch.open_containing(self.comm.get_path())[0]
+
+            if branch.get_bound_location() is not None:
                 # we have a checkout, so the local commit checkbox must appear
                 self.checkbutton_local.show()
             

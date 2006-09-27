@@ -27,8 +27,8 @@ try:
 except:
     sys.exit(1)
 
-import olive.backend.errors as errors
-import olive.backend.fileops as fileops
+import bzrlib.add
+import bzrlib.errors as errors
 
 class OliveAdd:
     """ Display the Add file(s) dialog and perform the needed actions. """
@@ -73,7 +73,7 @@ class OliveAdd:
                 return
             
             try:
-                fileops.add([directory + '/' + filename])
+                bzrlib.add.smart_add([directory + '/' + filename])
             except errors.NotBranchError:
                 self.dialog.error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
@@ -84,7 +84,7 @@ class OliveAdd:
         elif radio_unknown.get_active():
             # Add unknown files recursively
             try:
-                fileops.add([directory], True)
+                bzrlib.add.smart_add([directory], True)
             except errors.NotBranchError:
                 self.dialog.error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))

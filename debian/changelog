@@ -1,3 +1,10 @@
+olive (0.11.0-0ubuntu1) edgy; urgency=low
+
+  * New upstream release.
+  * Added bzr-gtk as a dependency.
+
+ -- Szilveszter Farkas (Phanatic) <Szilveszter.Farkas@gmail.com>  Sun, 27 Sep 2006 15:15:00 +0200
+
 olive (0.10.1-0ubuntu1) edgy; urgency=low
 
   * New upstream release.

@@ -61,13 +61,12 @@ class InstallData(install_data):
 		return data_files
 
 setup(name='Olive',
-      version='0.1',
+      version='0.11.0',
       description='Olive - Graphical frontend for Bazaar',
       author='Szilveszter Farkas (Phanatic)',
       author_email='szilveszter.farkas@gmail.com',
       url='http://bazaar-vcs.org/Olive',
-      packages=['olive', 'olive.backend', 'olive.frontend',
-                'olive.frontend.gtk', 'olive.frontend.gtk.viz'],
+      packages=['olive'],
       scripts=['olive-gtk'],
       data_files=[('share/olive', ['olive.glade',
                                    'oliveicon2.png',
