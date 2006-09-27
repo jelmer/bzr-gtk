@@ -43,25 +43,19 @@ except ImportError:
 
 import bzrlib
 
-if bzrlib.version_info < (0, 9):
-    # function deprecated after 0.9
-    from bzrlib.delta import compare_trees
-
 from bzrlib.diff import show_diff_trees
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
 class OliveDiff:
     """ Display Diff window and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, gladefile, comm):
         """ Initialize the Diff window. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_diff', 'olive-gtk')
         
         # Communication object
         self.comm = comm
-        # Dialog object
-        self.dialog = dialog
         
         # Get some important widgets
         self.window = self.glade.get_widget('window_diff')
@@ -103,7 +97,7 @@ class OliveDiff:
     def display(self):
         """ Display the Diff window. """
         if self.notbranch:
-            self.dialog.error_dialog(_('Directory is not a branch'),
+            error_dialog(_('Directory is not a branch'),
                                      _('You can perform this action only in a branch.'))
             self.close()
         else:
@@ -141,10 +135,7 @@ class OliveDiff:
     def _init_diff(self):
         """ Generate initial diff. """
         self.model.clear()
-        if bzrlib.version_info < (0, 9):
-            delta = compare_trees(self.old_tree, self.wt)
-        else:
-            delta = self.wt.changes_from(self.old_tree)
+        delta = self.wt.changes_from(self.old_tree)
 
         self.model.append(None, [ _('Complete Diff'), "" ])
 

@@ -29,15 +29,13 @@ except:
 
 class OliveBookmark:
     """ Display the Edit bookmark dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, gladefile, comm):
         """ Initialize the Edit bookmark dialog. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_bookmark', 'olive-gtk')
         
         # Communication object
         self.comm = comm
-        # Dialog object
-        self.dialog = dialog
         
         self.window = self.glade.get_widget('window_bookmark')
         
@@ -61,7 +59,7 @@ class OliveBookmark:
         
     def bookmark(self, widget):
         if self.entry_title.get_text() == '':
-            self.dialog.error_dialog(_('No title given'),
+            error_dialog(_('No title given'),
                                      _('Please specify a title to continue.'))
             return
         

@@ -32,15 +32,13 @@ import bzrlib.errors as errors
 
 class OliveAdd:
     """ Display the Add file(s) dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, gladefile, comm):
         """ Initialize the Add file(s) dialog. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_add', 'olive-gtk')
         
         # Communication object
         self.comm = comm
-        # Dialog object
-        self.dialog = dialog
         
         self.window = self.glade.get_widget('window_add')
         
@@ -67,7 +65,7 @@ class OliveAdd:
             filename = self.comm.get_selected_right()
             
             if filename is None:
-                self.dialog.error_dialog(_('No file was selected'),
+                error_dialog(_('No file was selected'),
                                          _('Please select a file from the list,\nor choose the other option.'))
                 self.comm.set_busy(self.window, False)
                 return
@@ -75,7 +73,7 @@ class OliveAdd:
             try:
                 bzrlib.add.smart_add([directory + '/' + filename])
             except errors.NotBranchError:
-                self.dialog.error_dialog(_('Directory is not a branch'),
+                error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
                 self.comm.set_busy(self.window, False)
                 return
@@ -86,7 +84,7 @@ class OliveAdd:
             try:
                 bzrlib.add.smart_add([directory], True)
             except errors.NotBranchError:
-                self.dialog.error_dialog(_('Directory is not a branch'),
+                error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
                 self.comm.set_busy(self.window, False)
                 return

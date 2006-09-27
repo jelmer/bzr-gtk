@@ -31,15 +31,13 @@ import bzrlib.errors as errors
 
 class OliveCheckout:
     """ Display checkout dialog and perform the needed operations. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, gladefile, comm):
         """ Initialize the Checkout dialog. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_checkout', 'olive-gtk')
         
         # Communication object
         self.comm = comm
-        # Dialog object
-        self.dialog = dialog
         
         self.window = self.glade.get_widget('window_checkout')
         
@@ -62,7 +60,7 @@ class OliveCheckout:
         entry_location = self.glade.get_widget('entry_checkout_location')
         location = entry_location.get_text()
         if location is '':
-            self.dialog.error_dialog(_('Missing branch location'),
+            error_dialog(_('Missing branch location'),
                                      _('You must specify a branch location.'))
             return
         
@@ -114,17 +112,17 @@ class OliveCheckout:
             finally:
                 bzrlib.bzrdir.BzrDirFormat.set_default_format(old_format)
         except errors.NotBranchError, errmsg:
-            self.dialog.error_dialog(_('Location is not a branch'),
+            error_dialog(_('Location is not a branch'),
                                      _('The specified location has to be a branch.'))
             self.comm.set_busy(self.window, False)
             return
         except errors.TargetAlreadyExists, errmsg:
-            self.dialog.error_dialog(_('Target already exists'),
+            error_dialog(_('Target already exists'),
                                      _('Target directory (%s)\nalready exists. Please select another target.') % errmsg)
             self.comm.set_busy(self.window, False)
             return
         except errors.NonExistingParent, errmsg:
-            self.dialog.error_dialog(_('Non existing parent directory'),
+            error_dialog(_('Non existing parent directory'),
                                      _("The parent directory (%s)\ndoesn't exist.") % errmsg)
             self.comm.set_busy(self.window, False)
             return

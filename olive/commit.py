@@ -61,10 +61,7 @@ class OliveCommit:
         
         # Set the delta
         self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
-        if version_info < (0, 9):
-            self.delta = compare_trees(self.old_tree, self.wt)
-        else:
-            self.delta = self.wt.changes_from(self.old_tree)
+        self.delta = self.wt.changes_from(self.old_tree)
         
         # Dictionary for signal_autoconnect
         dic = { "on_button_commit_commit_clicked": self.commit,

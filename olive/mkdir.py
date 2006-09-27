@@ -38,7 +38,7 @@ class OliveMkdir:
         self.glade = gtk.glade.XML(self.gladefile, 'window_mkdir', 'olive-gtk')
         
         # Dialog object
-        self.dialog = dialog
+        = dialog
         
         self.window = self.glade.get_widget('window_mkdir')
         
@@ -61,7 +61,7 @@ class OliveMkdir:
         dirname = entry.get_text()
         
         if dirname == "":
-            self.dialog.error_dialog(_('No directory name given'),
+            error_dialog(_('No directory name given'),
                                      _('Please specify a desired name for the new directory.'))
             return
         
@@ -75,12 +75,12 @@ class OliveMkdir:
                 wt.add([wtpath])
             except OSError, e:
                 if e.errno == 17:
-                    self.dialog.error_dialog(_('Directory already exists'),
+                    error_dialog(_('Directory already exists'),
                                              _('Please specify another name to continue.'))
                 else:
                     raise
             except errors.NotBranchError:
-                self.dialog.warning_dialog(_('Directory is not in a branch'),
+                warning_dialog(_('Directory is not in a branch'),
                                            _('You can only create a non-versioned directory.'))
         else:
             # Just a simple directory
@@ -88,7 +88,7 @@ class OliveMkdir:
                 os.mkdir(os.path.join(wt.base, wtpath))
             except OSError, e:
                 if e.errno == 17:
-                    self.dialog.error_dialog(_('Directory already exists'),
+                    error_dialog(_('Directory already exists'),
                                              _('Please specify another name to continue.'))
                     return
 

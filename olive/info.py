@@ -144,15 +144,13 @@ def info(location):
 
 class OliveInfo:
     """ Display Informations window and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, gladefile, comm):
         """ Initialize the Informations window. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_info', 'olive-gtk')
         
         # Communication object
         self.comm = comm
-        # Dialog object
-        self.dialog = dialog
         
         # Get the Informations window widget
         self.window = self.glade.get_widget('window_info')
@@ -559,7 +557,7 @@ class OliveInfo:
     def display(self):
         """ Display the Informations window. """
         if self.notbranch:
-            self.dialog.error_dialog(_('Directory is not a branch'),
+            error_dialog(_('Directory is not a branch'),
                                      _('You can perform this action only in a branch.'))
             self.close()
         else:

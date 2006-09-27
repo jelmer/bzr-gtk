@@ -32,15 +32,13 @@ from bzrlib.workingtree import WorkingTree
 
 class OliveRemove:
     """ Display the Remove file(s) dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, gladefile, comm):
         """ Initialize the Remove file(s) dialog. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_remove')
         
         # Communication object
         self.comm = comm
-        # Dialog object
-        self.dialog = dialog
         
         self.window = self.glade.get_widget('window_remove')
         
@@ -67,7 +65,7 @@ class OliveRemove:
             filename = self.comm.get_selected_right()
             
             if filename is None:
-                self.dialog.error_dialog(_('No file was selected'),
+                error_dialog(_('No file was selected'),
                                          _('Please select a file from the list,\nor choose the other option.'))
                 self.comm.set_busy(self.window, False)
                 return
@@ -76,12 +74,12 @@ class OliveRemove:
                 wt, path = WorkingTree.open_containing(directory + '/' + filename)
                 wt.remove(path)
             except errors.NotBranchError:
-                self.dialog.error_dialog(_('Directory is not a branch'),
+                error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
                 self.comm.set_busy(self.window, False)
                 return
             except errors.NotVersionedError:
-                self.dialog.error_dialog(_('File not versioned'),
+                error_dialog(_('File not versioned'),
                                          _('The selected file is not versioned.'))
                 self.comm.set_busy(self.window, False)
                 return
@@ -92,12 +90,10 @@ class OliveRemove:
             try:
                 wt, path = WorkingTree.open_containing(directory)
             except errors.NotBranchError:
-                self.dialog.error_dialog(_('Directory is not a branch'),
+                error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
                 self.comm.set_busy(self.window, False)
                 return
-            except:
-                raise
             
             added = wt.changes_from(wt.basis_tree()).added
             file_list = sorted([f[0] for f in added], reverse=True)

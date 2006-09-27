@@ -32,15 +32,13 @@ import bzrlib.errors as errors
 
 class OlivePush:
     """ Display Push dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, gladefile, comm):
         """ Initialize the Push dialog. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_push')
         
         # Communication object
         self.comm = comm
-        # Dialog object
-        self.dialog = dialog
         
         self.window = self.glade.get_widget('window_push')
         
@@ -69,7 +67,7 @@ class OlivePush:
         self.entry_location.set_sensitive(0)
         self.check_remember.set_sensitive(0)
         self.check_create.set_sensitive(0)
-		
+        
         # Get stored location
         self.notbranch = False
         try:
@@ -85,7 +83,7 @@ class OlivePush:
     def display(self):
         """ Display the Push dialog. """
         if self.notbranch:
-            self.dialog.error_dialog(_('Directory is not a branch'),
+            error_dialog(_('Directory is not a branch'),
                                      _('You can perform this action only in a branch.'))
             self.close()
         else:
@@ -124,11 +122,11 @@ class OlivePush:
                 revs = do_push(self.comm.get_path(),
                                overwrite=self.check_overwrite.get_active())
             except errors.NotBranchError:
-                self.dialog.error_dialog(_('Directory is not a branch'),
+                error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
                 return
             except errors.DivergedBranches:
-                self.dialog.error_dialog(_('Branches have been diverged'),
+                error_dialog(_('Branches have been diverged'),
                                          _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
                 return
             except:
@@ -136,7 +134,7 @@ class OlivePush:
         elif self.radio_specific.get_active():
             location = self.entry_location.get_text()
             if location == '':
-                self.dialog.error_dialog(_('No location specified'),
+                error_dialog(_('No location specified'),
                                          _('Please specify a location or use the default.'))
                 return
             
@@ -146,12 +144,12 @@ class OlivePush:
                                self.check_overwrite.get_active(),
                                self.check_create.get_active())
             except errors.NotBranchError:
-                self.dialog.error_dialog(_('Directory is not a branch'),
+                error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
                 self.comm.set_busy(self.window, False)
                 return
             except errors.DivergedBranches:
-                self.dialog.error_dialog(_('Branches have been diverged'),
+                error_dialog(_('Branches have been diverged'),
                                          _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
                 self.comm.set_busy(self.window, False)
                 return
@@ -162,7 +160,7 @@ class OlivePush:
             pass
         
         self.close()
-        self.dialog.info_dialog(_('Push successful'),
+        info_dialog(_('Push successful'),
                                 _('%d revision(s) pushed.') % revs)
     
     def test(self, widget):
@@ -219,7 +217,7 @@ def do_push(branch, location=None, remember=False, overwrite=False,
     stored_loc = br_from.get_push_location()
     if location is None:
         if stored_loc is None:
-            self.dialog.error_dialog(_('Push location is unknown'),
+            error_dialog(_('Push location is unknown'),
                                      _('Please specify a location manually.'))
             return
         else:
@@ -244,7 +242,7 @@ def do_push(branch, location=None, remember=False, overwrite=False,
                 relurl = transport.relpath(location_url)
                 transport.mkdir(relurl)
             except errors.NoSuchFile:
-                self.dialog.error_dialog(_('Non existing parent directory'),
+                error_dialog(_('Non existing parent directory'),
                                          _("The parent directory (%s)\ndoesn't exist.") % location)
                 return
         else:
@@ -260,7 +258,7 @@ def do_push(branch, location=None, remember=False, overwrite=False,
                     needed.append((new_transport,
                                    new_transport.relpath(transport.base)))
                     if new_transport.base == transport.base:
-                        self.dialog.error_dialog(_('Path prefix not created'),
+                        error_dialog(_('Path prefix not created'),
                                                  _("The path leading up to the specified location couldn't\nbe created."))
                         return
         dir_to = br_from.bzrdir.clone(location_url,

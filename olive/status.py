@@ -32,10 +32,6 @@ except:
 import bzrlib
 import bzrlib.errors as errors
 
-if bzrlib.version_info < (0, 9):
-    # function deprecated after 0.9
-    from bzrlib.delta import compare_trees
-
 from bzrlib.status import show_tree_status
 from bzrlib.workingtree import WorkingTree
 
@@ -43,13 +39,10 @@ from dialog import OliveDialog
 
 class OliveStatus:
     """ Display Status window and perform the needed actions. """
-    def __init__(self, gladefile, wt, wtpath, dialog):
+    def __init__(self, gladefile, wt, wtpath):
         """ Initialize the Status window. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_status')
-        
-        # Dialog object
-        self.dialog = dialog
         
         # Get the Status window widget
         self.window = self.glade.get_widget('window_status')
@@ -142,7 +135,7 @@ class OliveStatus:
     def display(self):
         """ Display the Diff window. """
         if self.notbranch:
-            self.dialog.error_dialog(_('Directory is not a branch'),
+            error_dialog(_('Directory is not a branch'),
                                      _('You can perform this action only in a branch.'))
             self.close()
         else:
