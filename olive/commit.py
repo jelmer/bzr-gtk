@@ -174,6 +174,9 @@ class OliveCommit:
                                      _('%s') % errmsg)
             return
         except errors.BzrError, msg:
+            error_dialog(_('Unknown bzr error'), str(msg))
+            return
+        except Exception, msg:
             error_dialog(_('Unknown error'), str(msg))
             return
         
