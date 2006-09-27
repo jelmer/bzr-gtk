@@ -37,12 +37,13 @@ from bzrlib.workingtree import WorkingTree
 
 from dialog import OliveDialog
 
+from olive import gladefile
+
 class OliveStatus:
     """ Display Status window and perform the needed actions. """
     def __init__(self, gladefile, wt, wtpath):
         """ Initialize the Status window. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_status')
+        self.glade = gtk.glade.XML(gladefile, 'window_status')
         
         # Get the Status window widget
         self.window = self.glade.get_widget('window_status')

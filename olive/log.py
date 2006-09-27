@@ -36,11 +36,12 @@ from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
 
 from dialog import error_dialog
 
+from olive import gladefile
+
 class OliveLog:
     """ Display Log (bzrk) window and perform the needed actions. """
-    def __init__(self, gladefile, comm):
+    def __init__(self, comm):
         """ Initialize the Log (bzrk) window. """
-        self.gladefile = gladefile
 
         # Communication object
         self.comm = comm

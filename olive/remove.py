@@ -21,21 +21,19 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    sys.exit(1)
+import gtk
+import gtk.glade
 
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
+from olive import gladefile
+
 class OliveRemove:
     """ Display the Remove file(s) dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm):
+    def __init__(self, comm):
         """ Initialize the Remove file(s) dialog. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_remove')
+        self.glade = gtk.glade.XML(gladefile, 'window_remove')
         
         # Communication object
         self.comm = comm

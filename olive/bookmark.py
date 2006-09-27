@@ -21,18 +21,16 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    sys.exit(1)
+
+import gtk
+import gtk.glade
+from olive import gladefile
 
 class OliveBookmark:
     """ Display the Edit bookmark dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm):
+    def __init__(self, comm):
         """ Initialize the Edit bookmark dialog. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_bookmark', 'olive-gtk')
+        self.glade = gtk.glade.XML(gladefile, 'window_bookmark', 'olive-gtk')
         
         # Communication object
         self.comm = comm

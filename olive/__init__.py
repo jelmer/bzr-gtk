@@ -37,33 +37,33 @@ import bzrlib.errors as errors
 # Olive GTK UI version
 __version__ = '0.11.0'
 
+# Load the glade file
+if sys.platform == 'win32':
+	gladefile = os.path.dirname(sys.executable) + "/share/olive/olive.glade"
+else:
+	gladefile = "/usr/share/olive/olive.glade"
+
+if not os.path.exists(gladefile):
+	# Load from current directory if not installed
+	gladefile = "olive.glade"
+	# Check again
+	if not os.path.exists(gladefile):
+		# Fail
+		print _('Glade file cannot be found.')
+		sys.exit(1)
+
 class OliveGtk:
     """ The main Olive GTK frontend class. This is called when launching the
     program. """
     
     def __init__(self):
-        # Load the glade file
-        if sys.platform == 'win32':
-            self.gladefile = os.path.dirname(sys.executable) + "/share/olive/olive.glade"
-        else:
-            self.gladefile = "/usr/share/olive/olive.glade"
-
-        if not os.path.exists(self.gladefile):
-            # Load from current directory if not installed
-            self.gladefile = "olive.glade"
-            # Check again
-            if not os.path.exists(self.gladefile):
-                # Fail
-                print _('Glade file cannot be found.')
-                sys.exit(1)
-
-        self.toplevel = gtk.glade.XML(self.gladefile, 'window_main', 'olive-gtk')
+        self.toplevel = gtk.glade.XML(gladefile, 'window_main', 'olive-gtk')
         
         self.window = self.toplevel.get_widget('window_main')
         
         self.pref = OlivePreferences()
         self.comm = OliveCommunicator(self.toplevel, self.pref)
-        handler = OliveHandler(self.gladefile, self.comm)
+        handler = OliveHandler(self.comm)
         
         # Dictionary for signal_autoconnect
         dic = { "on_window_main_destroy": gtk.main_quit,
@@ -226,7 +226,7 @@ class OliveGtk:
                 for rpath, id, kind in delta.added:
                     if rpath == filename:
                         status = 'added'
-                for rpath, id, kind, text_modified, meta_modified in delta.removed:
+                for rpath, id, kind in delta.removed:
                     if rpath == filename:
                         status = 'removed'
                 for rpath, id, kind, text_modified, meta_modified in delta.modified:

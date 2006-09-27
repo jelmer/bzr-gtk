@@ -21,15 +21,15 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-    import gobject
-    import pango
-except:
-    sys.exit(1)
+
+import gtk
+import gtk.glade
+import gobject
+import pango
 
 import bzrlib.errors as errors
+
+from olive import gladefile
 
 def info(location):
     """ Get info about branch, working tree, and repository
@@ -144,10 +144,9 @@ def info(location):
 
 class OliveInfo:
     """ Display Informations window and perform the needed actions. """
-    def __init__(self, gladefile, comm):
+    def __init__(self, comm):
         """ Initialize the Informations window. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_info', 'olive-gtk')
+        self.glade = gtk.glade.XML(gladefile, 'window_info', 'olive-gtk')
         
         # Communication object
         self.comm = comm

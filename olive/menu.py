@@ -22,11 +22,8 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    sys.exit(1)
+
+import gtk
 
 import bzrlib.errors as errors
 from dialog import error_dialog
@@ -35,7 +32,7 @@ from launch import launch
 
 class OliveMenu:
     """ This class is responsible for building the context menus. """
-    def __init__(self, gladefile, comm):
+    def __init__(self, comm):
         # Load the UI file
         if sys.platform == 'win32':
             self.uifile = os.path.dirname(sys.executable) + "/share/olive/cmenu.ui"
@@ -51,7 +48,6 @@ class OliveMenu:
                 print _('UI description file cannot be found.')
                 sys.exit(1)
         
-        self.gladefile = gladefile
         self.comm = comm
         
         # Create the file list context menu
@@ -205,13 +201,13 @@ class OliveMenu:
         """ Right context menu -> Commit """
         from commit import OliveCommit
         wt, path = WorkingTree.open_containing(self.comm.get_path())
-        commit = OliveCommit(self.gladefile, wt, path)
+        commit = OliveCommit(wt, path)
         commit.display()
     
     def diff(self, action):
         """ Right context menu -> Diff """
         from diff import OliveDiff
-        diff = OliveDiff(self.gladefile, self.comm)
+        diff = OliveDiff(self.comm)
         diff.display()
     
     def bookmark(self, action):
@@ -230,7 +226,7 @@ class OliveMenu:
         from bookmark import OliveBookmark
 
         if self.comm.get_selected_left() != None:
-            bookmark = OliveBookmark(self.gladefile, self.comm)
+            bookmark = OliveBookmark(self.comm)
             bookmark.display()
 
     def remove_bookmark(self, action):
@@ -254,5 +250,5 @@ class OliveMenu:
     def diff_all(self, action):
         """ Diff toolbutton -> All... """
         from diff import OliveDiff
-        diff = OliveDiff(self.gladefile, self.comm)
+        diff = OliveDiff(self.comm)
         diff.display()

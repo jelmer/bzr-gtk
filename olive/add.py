@@ -21,21 +21,20 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    sys.exit(1)
+
+import gtk
+import gtk.glade
 
 import bzrlib.add
 import bzrlib.errors as errors
 
+from olive import gladefile
+
 class OliveAdd:
     """ Display the Add file(s) dialog and perform the needed actions. """
-    def __init__(self, gladefile, wt, wtpath, selected=[]):
+    def __init__(self, wt, wtpath, selected=[]):
         """ Initialize the Add file(s) dialog. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_add', 'olive-gtk')
+        self.glade = gtk.glade.XML(gladefile, 'window_add', 'olive-gtk')
         
         self.window = self.glade.get_widget('window_add')
         

@@ -22,11 +22,9 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    sys.exit(1)
+
+import gtk
+import gtk.glade
 
 import bzrlib.errors as errors
 from bzrlib.branch import Branch
@@ -38,11 +36,10 @@ from launch import launch
 
 class OliveHandler:
     """ Signal handler class for Olive. """
-    def __init__(self, gladefile, comm):
-        self.gladefile = gladefile
+    def __init__(self,  comm):
         self.comm = comm
         
-        self.menu = OliveMenu(self.gladefile, self.comm)
+        self.menu = OliveMenu(self.comm)
     
     def on_about_activate(self, widget):
         about()
@@ -51,27 +48,27 @@ class OliveHandler:
         """ Add file(s)... menu handler. """
         from add import OliveAdd
         wt, path = WorkingTree.open_containing(self.comm.get_path())
-        add = OliveAdd(self.gladefile, wt, path, 
+        add = OliveAdd(wt, path, 
                 self.comm.get_selected_right())
         add.display()
     
     def on_menuitem_branch_get_activate(self, widget):
         """ Branch/Get... menu handler. """
         from branch import OliveBranch
-        branch = OliveBranch(self.gladefile, self.comm)
+        branch = OliveBranch(self.comm)
         branch.display()
     
     def on_menuitem_branch_checkout_activate(self, widget):
         """ Branch/Checkout... menu handler. """
         from checkout import OliveCheckout
-        checkout = OliveCheckout(self.gladefile, self.comm)
+        checkout = OliveCheckout(self.comm)
         checkout.display()
     
     def on_menuitem_branch_commit_activate(self, widget):
         """ Branch/Commit... menu handler. """
         from commit import OliveCommit
         wt, path = WorkingTree.open_containing(self.comm.get_path())
-        commit = OliveCommit(self.gladefile, wt, path)
+        commit = OliveCommit(wt, path)
         commit.display()
     
     def on_menuitem_branch_missing_revisions_activate(self, widget):
@@ -158,14 +155,14 @@ class OliveHandler:
     def on_menuitem_branch_push_activate(self, widget):
         """ Branch/Push... menu handler. """
         from push import OlivePush
-        push = OlivePush(self.gladefile, self.comm)
+        push = OlivePush(self.comm)
         push.display()
     
     def on_menuitem_branch_status_activate(self, widget):
         """ Branch/Status... menu handler. """
         from status import OliveStatus
         wt, wtpath = WorkingTree.open_containing(self.comm.get_path())
-        status = OliveStatus(self.gladefile, wt, wtpath)
+        status = OliveStatus(wt, wtpath)
         status.display()
     
     def on_menuitem_branch_initialize_activate(self, widget):
@@ -206,25 +203,25 @@ class OliveHandler:
     def on_menuitem_file_make_directory_activate(self, widget):
         """ File/Make directory... menu handler. """
         from mkdir import OliveMkdir
-        mkdir = OliveMkdir(self.gladefile, self.comm)
+        mkdir = OliveMkdir(self.comm)
         mkdir.display()
     
     def on_menuitem_file_move_activate(self, widget):
         """ File/Move... menu handler. """
         from move import OliveMove
-        move = OliveMove(self.gladefile, self.comm)
+        move = OliveMove(self.comm)
         move.display()
     
     def on_menuitem_file_rename_activate(self, widget):
         """ File/Rename... menu handler. """
         from rename import OliveRename
-        rename = OliveRename(self.gladefile, self.comm)
+        rename = OliveRename(self.comm)
         rename.display()
 
     def on_menuitem_remove_file_activate(self, widget):
         """ Remove (unversion) selected file. """
         from remove import OliveRemove
-        remove = OliveRemove(self.gladefile, self.comm)
+        remove = OliveRemove(self.comm)
         remove.display()
     
     def on_menuitem_stats_diff_activate(self, widget):
@@ -239,13 +236,13 @@ class OliveHandler:
     def on_menuitem_stats_infos_activate(self, widget):
         """ Statistics/Informations... menu handler. """
         from info import OliveInfo
-        info = OliveInfo(self.gladefile, self.comm)
+        info = OliveInfo(self.comm)
         info.display()
     
     def on_menuitem_stats_log_activate(self, widget):
         """ Statistics/Log... menu handler. """
         from log import OliveLog
-        log = OliveLog(self.gladefile, self.comm)
+        log = OliveLog(self.comm)
         log.display()
     
     def on_menuitem_view_refresh_activate(self, widget):

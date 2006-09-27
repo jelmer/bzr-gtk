@@ -32,10 +32,9 @@ import bzrlib.errors as errors
 
 class OliveRename:
     """ Display the Rename dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm):
+    def __init__(self, comm):
         """ Initialize the Rename dialog. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_rename')
+        self.glade = gtk.glade.XML(gladefile, 'window_rename')
         
         # Communication object
         self.comm = comm

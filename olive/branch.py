@@ -21,20 +21,18 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    sys.exit(1)
+
+import gtk
+import gtk.glade
 
 import bzrlib.errors as errors
+from olive import gladefile
 
 class OliveBranch:
     """ Display branch dialog and perform the needed operations. """
-    def __init__(self, gladefile, comm):
+    def __init__(self, comm):
         """ Initialize the Branch dialog. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_branch', 'olive-gtk')
+        self.glade = gtk.glade.XML(gladefile, 'window_branch', 'olive-gtk')
         
         # Communication object
         self.comm = comm
