@@ -70,7 +70,8 @@ class OliveHandler:
     def on_menuitem_branch_commit_activate(self, widget):
         """ Branch/Commit... menu handler. """
         from commit import OliveCommit
-        commit = OliveCommit(self.gladefile, self.comm, self.dialog)
+        wt, path = WorkingTree.open_containing(self.comm.get_path())
+        commit = OliveCommit(self.gladefile, wt, path, self.dialog)
         commit.display()
     
     def on_menuitem_branch_missing_revisions_activate(self, widget):

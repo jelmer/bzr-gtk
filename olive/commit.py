@@ -36,13 +36,14 @@ from bzrlib.workingtree import WorkingTree
 
 class OliveCommit:
     """ Display Commit dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, gladefile, wt, wtpath, dialog):
         """ Initialize the Commit dialog. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_commit', 'olive-gtk')
         
-        # Communication object
-        self.comm = comm
+        self.wt = wt
+        self.wtpath = wtpath
+
         # Dialog object
         self.dialog = dialog
         
@@ -52,17 +53,7 @@ class OliveCommit:
         self.textview = self.glade.get_widget('textview_commit')
         self.file_view = self.glade.get_widget('treeview_commit_select')
 
-        # Check if current location is a branch
-        try:
-            (self.wt, path) = WorkingTree.open_containing(self.comm.get_path())
-            branch = self.wt.branch
-        except errors.NotBranchError:
-            self.notbranch = True
-            return
-        except:
-            raise
-
-        file_id = self.wt.path2id(path)
+        file_id = self.wt.path2id(wtpath)
 
         self.notbranch = False
         if file_id is None:
@@ -93,10 +84,7 @@ class OliveCommit:
                                      _('You can perform this action only in a branch.'))
             self.close()
         else:
-            from bzrlib.branch import Branch
-            branch = Branch.open_containing(self.comm.get_path())[0]
-
-            if branch.get_bound_location() is not None:
+            if self.wt.branch.get_bound_location() is not None:
                 # we have a checkout, so the local commit checkbox must appear
                 self.checkbutton_local.show()
             
@@ -104,7 +92,6 @@ class OliveCommit:
             self.window.show()
             
     
-    # This code is from Jelmer Vernooij's bzr-gtk branch
     def _create_file_view(self):
         self.file_store = gtk.ListStore(gobject.TYPE_BOOLEAN,
                                         gobject.TYPE_STRING,
@@ -157,8 +144,6 @@ class OliveCommit:
         
         specific_files = self._get_specific_files()
         
-        self.comm.set_busy(self.window)
-        # merged from Jelmer Vernooij's olive integration branch
         try:
             self.wt.commit(message, 
                            allow_pointless=checkbutton_force.get_active(),
@@ -168,32 +153,26 @@ class OliveCommit:
         except errors.NotBranchError:
             self.dialog.error_dialog(_('Directory is not a branch'),
                                      _('You can perform this action only in a branch.'))
-            self.comm.set_busy(self.window, False)
             return
         except errors.LocalRequiresBoundBranch:
             self.dialog.error_dialog(_('Directory is not a checkout'),
                                      _('You can perform local commit only on checkouts.'))
-            self.comm.set_busy(self.window, False)
             return
         except errors.PointlessCommit:
             self.dialog.error_dialog(_('No changes to commit'),
                                      _('Try force commit if you want to commit anyway.'))
-            self.comm.set_busy(self.window, False)
             return
         except errors.ConflictsInTree:
             self.dialog.error_dialog(_('Conflicts in tree'),
                                      _('You need to resolve the conflicts before committing.'))
-            self.comm.set_busy(self.window, False)
             return
         except errors.StrictCommitFailed:
             self.dialog.error_dialog(_('Strict commit failed'),
                                      _('There are unknown files in the working tree.\nPlease add or delete them.'))
-            self.comm.set_busy(self.window, False)
             return
         except errors.BoundBranchOutOfDate, errmsg:
             self.dialog.error_dialog(_('Bound branch is out of date'),
                                      _('%s') % errmsg)
-            self.comm.set_busy(self.window, False)
             return
         except:
             raise

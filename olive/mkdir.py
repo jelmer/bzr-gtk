@@ -32,13 +32,11 @@ import bzrlib.errors as errors
 
 class OliveMkdir:
     """ Display the Make directory dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, gladefile, wt, wtpath, dialog):
         """ Initialize the Make directory dialog. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_mkdir', 'olive-gtk')
         
-        # Communication object
-        self.comm = comm
         # Dialog object
         self.dialog = dialog
         
@@ -67,17 +65,14 @@ class OliveMkdir:
                                      _('Please specify a desired name for the new directory.'))
             return
         
-        newdir = self.comm.get_path() + '/' + dirname
-        
         if checkbox.get_active():
             # Want to create a versioned directory
             try:
                 from bzrlib.workingtree import WorkingTree
     
-                os.mkdir(newdir)
+                os.mkdir(os.path.join(wt.base, wtpath))
 
-                wt, dd = WorkingTree.open_containing(newdir)
-                wt.add([dd])
+                wt.add([wtpath])
             except OSError, e:
                 if e.errno == 17:
                     self.dialog.error_dialog(_('Directory already exists'),
@@ -90,7 +85,7 @@ class OliveMkdir:
         else:
             # Just a simple directory
             try:
-                os.mkdir(newdir)
+                os.mkdir(os.path.join(wt.base, wtpath))
             except OSError, e:
                 if e.errno == 17:
                     self.dialog.error_dialog(_('Directory already exists'),
