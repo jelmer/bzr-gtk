@@ -32,13 +32,10 @@ import bzrlib.errors as errors
 
 class OliveAdd:
     """ Display the Add file(s) dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm):
+    def __init__(self, gladefile, wt, wtpath):
         """ Initialize the Add file(s) dialog. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_add', 'olive-gtk')
-        
-        # Communication object
-        self.comm = comm
         
         self.window = self.glade.get_widget('window_add')
         
@@ -49,6 +46,9 @@ class OliveAdd:
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
 
+		self.wt = wt
+		self.wtpath = wtpath
+
     def display(self):
         """ Display the Add file(s) dialog. """
         self.window.show_all()
@@ -57,9 +57,6 @@ class OliveAdd:
         radio_selected = self.glade.get_widget('radiobutton_add_selected')
         radio_unknown = self.glade.get_widget('radiobutton_add_unknown')
         
-        directory = self.comm.get_path()
-        
-        self.comm.set_busy(self.window)
         if radio_selected.get_active():
             # Add only the selected file
             filename = self.comm.get_selected_right()

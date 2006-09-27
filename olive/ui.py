@@ -91,10 +91,7 @@ class GtkUIFactory(UIFactory):
         dialog = PromptDialog(prompt)
         response = dialog.run()
         dialog.destroy()
-        if response == gtk.RESPONSE_YES:
-            return True
-        else:
-            return False
+        return (response == gtk.RESPONSE_YES)
         
     @deprecated_method(zero_eight)
     def progress_bar(self):
