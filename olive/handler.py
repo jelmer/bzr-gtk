@@ -229,9 +229,12 @@ class OliveHandler:
     
     def on_menuitem_stats_diff_activate(self, widget):
         """ Statistics/Differences... menu handler. """
-        from diff import OliveDiff
-        diff = OliveDiff(self.gladefile, self.comm)
-        diff.display()
+        from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
+        window = DiffWindow()
+        wt = WorkingTree.open_containing(self.comm.get_path())[0]
+        parent_tree = wt.branch.repository.revision_tree(wt.branch.last_revision())
+        window.set_diff(wt.branch.nick, wt, parent_tree)
+        window.show()
     
     def on_menuitem_stats_infos_activate(self, widget):
         """ Statistics/Informations... menu handler. """
