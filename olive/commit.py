@@ -34,9 +34,11 @@ from bzrlib import version_info
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
+from dialog import error_dialog
+
 class OliveCommit:
     """ Display Commit dialog and perform the needed actions. """
-    def __init__(self, gladefile, wt, wtpath, dialog):
+    def __init__(self, gladefile, wt, wtpath):
         """ Initialize the Commit dialog. """
         self.gladefile = gladefile
         self.glade = gtk.glade.XML(self.gladefile, 'window_commit', 'olive-gtk')
@@ -44,9 +46,6 @@ class OliveCommit:
         self.wt = wt
         self.wtpath = wtpath
 
-        # Dialog object
-        self.dialog = dialog
-        
         # Get some important widgets
         self.window = self.glade.get_widget('window_commit')
         self.checkbutton_local = self.glade.get_widget('checkbutton_commit_local')
@@ -80,7 +79,7 @@ class OliveCommit:
     def display(self):
         """ Display the Push dialog. """
         if self.notbranch:
-            self.dialog.error_dialog(_('Directory is not a branch'),
+            error_dialog(_('Directory is not a branch'),
                                      _('You can perform this action only in a branch.'))
             self.close()
         else:
@@ -151,31 +150,31 @@ class OliveCommit:
                            local=self.checkbutton_local.get_active(),
                            specific_files=specific_files)
         except errors.NotBranchError:
-            self.dialog.error_dialog(_('Directory is not a branch'),
+            error_dialog(_('Directory is not a branch'),
                                      _('You can perform this action only in a branch.'))
             return
         except errors.LocalRequiresBoundBranch:
-            self.dialog.error_dialog(_('Directory is not a checkout'),
+            error_dialog(_('Directory is not a checkout'),
                                      _('You can perform local commit only on checkouts.'))
             return
         except errors.PointlessCommit:
-            self.dialog.error_dialog(_('No changes to commit'),
+            error_dialog(_('No changes to commit'),
                                      _('Try force commit if you want to commit anyway.'))
             return
         except errors.ConflictsInTree:
-            self.dialog.error_dialog(_('Conflicts in tree'),
+            error_dialog(_('Conflicts in tree'),
                                      _('You need to resolve the conflicts before committing.'))
             return
         except errors.StrictCommitFailed:
-            self.dialog.error_dialog(_('Strict commit failed'),
+            error_dialog(_('Strict commit failed'),
                                      _('There are unknown files in the working tree.\nPlease add or delete them.'))
             return
         except errors.BoundBranchOutOfDate, errmsg:
-            self.dialog.error_dialog(_('Bound branch is out of date'),
+            error_dialog(_('Bound branch is out of date'),
                                      _('%s') % errmsg)
             return
         except errors.BzrError, msg:
-            self.dialog.error_dialog(_('Unknown error'), str(msg))
+            error_dialog(_('Unknown error'), str(msg))
             return
         
         self.close()

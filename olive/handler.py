@@ -32,7 +32,7 @@ import bzrlib.errors as errors
 from bzrlib.branch import Branch
 from bzrlib.workingtree import WorkingTree
 
-from dialog import OliveDialog
+from dialog import about, error_dialog, info_dialog
 from menu import OliveMenu
 from launch import launch
 
@@ -42,36 +42,34 @@ class OliveHandler:
         self.gladefile = gladefile
         self.comm = comm
         
-        self.dialog = OliveDialog(self.gladefile)
-        
-        self.menu = OliveMenu(self.gladefile, self.comm, self.dialog)
+        self.menu = OliveMenu(self.gladefile, self.comm)
     
     def on_about_activate(self, widget):
-        self.dialog.about()
+        about()
         
     def on_menuitem_add_files_activate(self, widget):
         """ Add file(s)... menu handler. """
         from add import OliveAdd
-        add = OliveAdd(self.gladefile, self.comm, self.dialog)
+        add = OliveAdd(self.gladefile, self.comm)
         add.display()
     
     def on_menuitem_branch_get_activate(self, widget):
         """ Branch/Get... menu handler. """
         from branch import OliveBranch
-        branch = OliveBranch(self.gladefile, self.comm, self.dialog)
+        branch = OliveBranch(self.gladefile, self.comm)
         branch.display()
     
     def on_menuitem_branch_checkout_activate(self, widget):
         """ Branch/Checkout... menu handler. """
         from checkout import OliveCheckout
-        checkout = OliveCheckout(self.gladefile, self.comm, self.dialog)
+        checkout = OliveCheckout(self.gladefile, self.comm)
         checkout.display()
     
     def on_menuitem_branch_commit_activate(self, widget):
         """ Branch/Commit... menu handler. """
         from commit import OliveCommit
         wt, path = WorkingTree.open_containing(self.comm.get_path())
-        commit = OliveCommit(self.gladefile, wt, path, self.dialog)
+        commit = OliveCommit(self.gladefile, wt, path)
         commit.display()
     
     def on_menuitem_branch_missing_revisions_activate(self, widget):
@@ -85,13 +83,13 @@ class OliveHandler:
             try:
                 local_branch = Branch.open_containing(self.comm.get_path())[0]
             except NotBranchError:
-                self.dialog.error_dialog(_('Directory is not a branch'),
+                error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
                 return
             
             other_branch = local_branch.get_parent()
             if other_branch is None:
-                self.dialog.error_dialog(_('Parent location is unknown'),
+                error_dialog(_('Parent location is unknown'),
                                          _('Cannot determine missing revisions if no parent location is known.'))
                 return
             
@@ -103,10 +101,10 @@ class OliveHandler:
             ret = len(local_branch.missing_revisions(remote_branch))
 
             if ret > 0:
-                self.dialog.info_dialog(_('There are missing revisions'),
+                info_dialog(_('There are missing revisions'),
                                         _('%d revision(s) missing.') % ret)
             else:
-                self.dialog.info_dialog(_('Local branch up to date'),
+                info_dialog(_('Local branch up to date'),
                                         _('There are no missing revisions.'))
         finally:
             self.comm.set_busy(self.comm.window_main, False)
@@ -125,19 +123,19 @@ class OliveHandler:
                 tree_to = None
                 branch_to = Branch.open_containing(self.comm.get_path())[0]
             except errors.NotBranchError:
-                 self.dialog.error_dialog(_('Directory is not a branch'),
+                 error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
 
             location = branch_to.get_parent()
             if location is None:
-                self.dialog.error_dialog(_('Parent location is unknown'),
+                error_dialog(_('Parent location is unknown'),
                                          _('Pulling is not possible until there is a parent location.'))
                 return
 
             try:
                 branch_from = Branch.open(location)
             except errors.NotBranchError:
-                self.dialog.error_dialog(_('Directory is not a branch'),
+                error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
 
             if branch_to.get_parent() is None:
@@ -149,7 +147,7 @@ class OliveHandler:
             else:
                 branch_to.pull(branch_from)
             
-            self.dialog.info_dialog(_('Pull successful'),
+            info_dialog(_('Pull successful'),
                                     _('%d revision(s) pulled.') % ret)
             
         finally:
@@ -158,14 +156,14 @@ class OliveHandler:
     def on_menuitem_branch_push_activate(self, widget):
         """ Branch/Push... menu handler. """
         from push import OlivePush
-        push = OlivePush(self.gladefile, self.comm, self.dialog)
+        push = OlivePush(self.gladefile, self.comm)
         push.display()
     
     def on_menuitem_branch_status_activate(self, widget):
         """ Branch/Status... menu handler. """
         from status import OliveStatus
         wt, wtpath = WorkingTree.open_containing(self.comm.get_path())
-        status = OliveStatus(self.gladefile, wt, wtpath, self.dialog)
+        status = OliveStatus(self.gladefile, wt, wtpath)
         status.display()
     
     def on_menuitem_branch_initialize_activate(self, widget):
@@ -193,56 +191,56 @@ class OliveHandler:
                     existing_bzrdir.create_branch()
                     existing_bzrdir.create_workingtree()
         except errors.AlreadyBranchError, errmsg:
-            self.dialog.error_dialog(_('Directory is already a branch'),
+            error_dialog(_('Directory is already a branch'),
                                      _('The current directory (%s) is already a branch.\nYou can start using it, or initialize another directory.') % errmsg)
         except errors.BranchExistsWithoutWorkingTree, errmsg:
-            self.dialog.error_dialog(_('Branch without a working tree'),
+            error_dialog(_('Branch without a working tree'),
                                      _('The current directory (%s)\nis a branch without a working tree.') % errmsg)
         else:
-            self.dialog.info_dialog(_('Initialize successful'),
+            info_dialog(_('Initialize successful'),
                                     _('Directory successfully initialized.'))
             self.comm.refresh_right()
         
     def on_menuitem_file_make_directory_activate(self, widget):
         """ File/Make directory... menu handler. """
         from mkdir import OliveMkdir
-        mkdir = OliveMkdir(self.gladefile, self.comm, self.dialog)
+        mkdir = OliveMkdir(self.gladefile, self.comm)
         mkdir.display()
     
     def on_menuitem_file_move_activate(self, widget):
         """ File/Move... menu handler. """
         from move import OliveMove
-        move = OliveMove(self.gladefile, self.comm, self.dialog)
+        move = OliveMove(self.gladefile, self.comm)
         move.display()
     
     def on_menuitem_file_rename_activate(self, widget):
         """ File/Rename... menu handler. """
         from rename import OliveRename
-        rename = OliveRename(self.gladefile, self.comm, self.dialog)
+        rename = OliveRename(self.gladefile, self.comm)
         rename.display()
 
     def on_menuitem_remove_file_activate(self, widget):
         """ Remove (unversion) selected file. """
         from remove import OliveRemove
-        remove = OliveRemove(self.gladefile, self.comm, self.dialog)
+        remove = OliveRemove(self.gladefile, self.comm)
         remove.display()
     
     def on_menuitem_stats_diff_activate(self, widget):
         """ Statistics/Differences... menu handler. """
         from diff import OliveDiff
-        diff = OliveDiff(self.gladefile, self.comm, self.dialog)
+        diff = OliveDiff(self.gladefile, self.comm)
         diff.display()
     
     def on_menuitem_stats_infos_activate(self, widget):
         """ Statistics/Informations... menu handler. """
         from info import OliveInfo
-        info = OliveInfo(self.gladefile, self.comm, self.dialog)
+        info = OliveInfo(self.gladefile, self.comm)
         info.display()
     
     def on_menuitem_stats_log_activate(self, widget):
         """ Statistics/Log... menu handler. """
         from log import OliveLog
-        log = OliveLog(self.gladefile, self.comm, self.dialog)
+        log = OliveLog(self.gladefile, self.comm)
         log.display()
     
     def on_menuitem_view_refresh_activate(self, widget):
@@ -345,8 +343,4 @@ class OliveHandler:
         self.comm.pref.write()
         self.comm.window_main.destroy()
 
-    def not_implemented(self, widget):
-        """ Display a Not implemented error message. """
-        self.dialog.error_dialog(_('We feel sorry'),
-                                 _('This feature is not yet implemented.'))
 
