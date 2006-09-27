@@ -70,7 +70,6 @@ class OliveCheckout:
         checkbutton_lightweight = self.glade.get_widget('checkbutton_checkout_lightweight')
         lightweight = checkbutton_lightweight.get_active()
         
-        self.comm.set_busy(self.window)
         try:
             source = Branch.open(location)
             
@@ -111,17 +110,14 @@ class OliveCheckout:
         except errors.NotBranchError, errmsg:
             error_dialog(_('Location is not a branch'),
                                      _('The specified location has to be a branch.'))
-            self.comm.set_busy(self.window, False)
             return
         except errors.TargetAlreadyExists, errmsg:
             error_dialog(_('Target already exists'),
                                      _('Target directory (%s)\nalready exists. Please select another target.') % errmsg)
-            self.comm.set_busy(self.window, False)
             return
         except errors.NonExistingParent, errmsg:
             error_dialog(_('Non existing parent directory'),
                                      _("The parent directory (%s)\ndoesn't exist.") % errmsg)
-            self.comm.set_busy(self.window, False)
             return
         
         self.close()

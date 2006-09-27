@@ -63,7 +63,7 @@ class PasswordDialog(gtk.Dialog):
 
 
 class GtkUIFactory(UIFactory):
-    """A UI factory for GTK user interefaces."""
+    """A UI factory for GTK user interfaces."""
 
     def __init__(self,
                  bar_type=None,

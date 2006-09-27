@@ -3,4 +3,9 @@ TODO list for Olive
 
 - Use networkmanager to figure out whether to do local or bound commits  
   in case of bound branches/checkouts.
+- Strict commit should not be a checkbox. The GUI should rather ask the 
+  user whether (s)he wants to continue if there were no changes.
+- Commit with unknowns should not be a checkbox. The GUI should rather ask 
+  the user whether (s)he wants to continue while there were unknown files.
+- It should be possible to add unknown files from the commit dialog.
 - Generic wrapper that displays dialogs for bzr exceptions

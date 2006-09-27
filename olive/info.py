@@ -144,12 +144,9 @@ def info(location):
 
 class OliveInfo:
     """ Display Informations window and perform the needed actions. """
-    def __init__(self, comm):
+    def __init__(self, wt):
         """ Initialize the Informations window. """
         self.glade = gtk.glade.XML(gladefile, 'window_info', 'olive-gtk')
-        
-        # Communication object
-        self.comm = comm
         
         # Get the Informations window widget
         self.window = self.glade.get_widget('window_info')
@@ -157,7 +154,7 @@ class OliveInfo:
         # Check if current location is a branch
         self.notbranch = False
         try:
-            self.ret = info(self.comm.get_path())
+            self.ret = info(wt.basedir)
         except errors.NotBranchError:
             self.notbranch = True
             return

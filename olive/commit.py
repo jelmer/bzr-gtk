@@ -121,7 +121,6 @@ class OliveCommit:
             it = self.file_store.iter_next(it)
 
         return ret
-    # end of bzr-gtk code
     
     def _toggle_commit(self, cell, path, model):
         model[path][0] = not model[path][0]
@@ -175,7 +174,6 @@ class OliveCommit:
             return
         
         self.close()
-        self.comm.refresh_right()
         
     def close(self, widget=None):
         self.window.destroy()

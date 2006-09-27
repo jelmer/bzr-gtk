@@ -64,7 +64,6 @@ class OliveAdd:
             if filename is None:
                 error_dialog(_('No file was selected'),
                                          _('Please select a file from the list,\nor choose the other option.'))
-                self.comm.set_busy(self.window, False)
                 return
             
             try:
@@ -72,7 +71,6 @@ class OliveAdd:
             except errors.NotBranchError:
                 error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
-                self.comm.set_busy(self.window, False)
                 return
         elif radio_unknown.get_active():
             # Add unknown files recursively
@@ -81,14 +79,9 @@ class OliveAdd:
             except errors.NotBranchError:
                 error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
-                self.comm.set_busy(self.window, False)
                 return
-        else:
-            # This should really never happen.
-            pass
         
         self.close()
-        self.comm.refresh_right()
     
     def close(self, widget=None):
         self.window.destroy()

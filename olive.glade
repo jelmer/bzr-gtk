@@ -664,7 +664,7 @@
   <property name="width_request">400</property>
   <property name="height_request">400</property>
   <property name="title" translatable="yes">Olive - Commit</property>
-  <property name="type">GTK_WINDOW_POPUP</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
   <property name="modal">False</property>
   <property name="resizable">True</property>
@@ -679,7 +679,7 @@
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
 
-  <child>
+  <child internal-child="vbox">
     <widget class="GtkVBox" id="vbox_commit">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
@@ -894,7 +894,7 @@
 	</packing>
       </child>
 
-      <child>
+      <child internal-child="action_area">
 	<widget class="GtkHButtonBox" id="hbuttonbox_commit">
 	  <property name="visible">True</property>
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>
@@ -1017,7 +1017,7 @@
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
 
-  <child>
+  <child internal-child="vbox">
     <widget class="GtkVBox" id="vbox_branch">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
@@ -1184,7 +1184,7 @@
 	</packing>
       </child>
 
-      <child>
+      <child internal-child="action_area">
 	<widget class="GtkHButtonBox" id="hbuttonbox_branch">
 	  <property name="visible">True</property>
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>
@@ -1320,7 +1320,7 @@
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
 
-  <child>
+  <child internal-child="vbox">
     <widget class="GtkVBox" id="vbox_add">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
@@ -1390,7 +1390,7 @@
 	</packing>
       </child>
 
-      <child>
+      <child internal-child="action_area">
 	<widget class="GtkHButtonBox" id="hbuttonbox_add">
 	  <property name="visible">True</property>
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>
@@ -1513,7 +1513,7 @@
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
 
-  <child>
+  <child internal-child="vbox">
     <widget class="GtkVBox" id="vbox_remove">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
@@ -1583,7 +1583,7 @@
 	</packing>
       </child>
 
-      <child>
+      <child internal-child="action_area">
 	<widget class="GtkHButtonBox" id="hbuttonbox_remove">
 	  <property name="visible">True</property>
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>
@@ -1706,7 +1706,7 @@
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
 
-  <child>
+  <child internal-child="vbox">
     <widget class="GtkVBox" id="vbox_push">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
@@ -1905,7 +1905,7 @@
 	</packing>
       </child>
 
-      <child>
+      <child internal-child="action_area">
 	<widget class="GtkHButtonBox" id="hbuttonbox_push">
 	  <property name="visible">True</property>
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>
@@ -2041,7 +2041,7 @@
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
 
-  <child>
+  <child internal-child="vbox">
     <widget class="GtkVBox" id="vbox_checkout">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
@@ -2230,7 +2230,7 @@
 	</packing>
       </child>
 
-      <child>
+      <child internal-child="action_area">
 	<widget class="GtkHButtonBox" id="hbuttonbox_checkout">
 	  <property name="visible">True</property>
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>
@@ -2354,7 +2354,7 @@
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
 
-  <child>
+  <child internal-child="vbox">
     <widget class="GtkVBox" id="vbox_status">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
@@ -2390,7 +2390,7 @@
 	</packing>
       </child>
 
-      <child>
+      <child internal-child="action_area">
 	<widget class="GtkHButtonBox" id="hbuttonbox_status">
 	  <property name="visible">True</property>
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>
@@ -2438,7 +2438,7 @@
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
 
-  <child>
+  <child internal-child="vbox">
     <widget class="GtkVBox" id="vbox_mkdir">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
@@ -2483,7 +2483,7 @@
 	</packing>
       </child>
 
-      <child>
+      <child internal-child="action_area">
 	<widget class="GtkHButtonBox" id="hbuttonbox_mkdir">
 	  <property name="visible">True</property>
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>
@@ -2606,7 +2606,7 @@
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
 
-  <child>
+  <child internal-child="vbox">
     <widget class="GtkVBox" id="vbox_move">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
@@ -2789,7 +2789,7 @@
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
 
-  <child>
+  <child internal-child="vbox">
     <widget class="GtkVBox" id="vbox_rename">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
@@ -2975,7 +2975,7 @@
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
 
-  <child>
+  <child internal-child="vbox">
     <widget class="GtkVBox" id="vbox_info">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
@@ -5226,7 +5226,7 @@
 	</packing>
       </child>
 
-      <child>
+      <child internal-child="action_area">
 	<widget class="GtkHButtonBox" id="hbuttonbox_info">
 	  <property name="visible">True</property>
 	  <property name="can_default">True</property>
@@ -5276,7 +5276,7 @@
   <property name="urgency_hint">False</property>
   <property name="has_separator">True</property>
 
-  <child>
+  <child internal-child="vbox">
     <widget class="GtkVBox" id="vbox_bookmark">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
@@ -5397,7 +5397,7 @@
 	</packing>
       </child>
 
-      <child>
+      <child internal-child="action_area">
 	<widget class="GtkHButtonBox" id="hbuttonbox_bookmark">
 	  <property name="visible">True</property>
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>
@@ -5439,5 +5439,4 @@
     </widget>
   </child>
 </widget>
-
 </glade-interface>

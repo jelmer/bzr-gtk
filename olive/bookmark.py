@@ -32,9 +32,6 @@ class OliveBookmark:
         """ Initialize the Edit bookmark dialog. """
         self.glade = gtk.glade.XML(gladefile, 'window_bookmark', 'olive-gtk')
         
-        # Communication object
-        self.comm = comm
-        
         self.window = self.glade.get_widget('window_bookmark')
         
         # Dictionary for signal_autoconnect
@@ -65,7 +62,6 @@ class OliveBookmark:
                                           self.entry_title.get_text())
         
         self.close()
-        self.comm.refresh_left()
     
     def close(self, widget=None):
         self.window.destroy()

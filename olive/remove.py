@@ -36,9 +36,6 @@ class OliveRemove:
         """ Initialize the Remove file(s) dialog. """
         self.glade = gtk.glade.XML(gladefile, 'window_remove')
         
-        # Communication object
-        self.comm = comm
-        
         self.window = self.glade.get_widget('window_remove')
         
         # Dictionary for signal_autoconnect
@@ -85,7 +82,6 @@ class OliveRemove:
             except errors.NotBranchError:
                 error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
-                self.comm.set_busy(self.window, False)
                 return
             
             added = wt.changes_from(wt.basis_tree()).added
@@ -93,12 +89,10 @@ class OliveRemove:
             if len(file_list) == 0:
                 dialog.warning_dialog(_('No matching files'),
                                       _('No added files were found in the working tree.'))
-                self.comm.set_busy(self.window, False)
                 return
             wt.remove(file_list)
         
         self.close()
-        self.comm.refresh_right()
     
     def close(self, widget=None):
         self.window.destroy()

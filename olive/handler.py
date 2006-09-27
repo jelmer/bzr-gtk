@@ -68,40 +68,33 @@ class OliveHandler:
     def on_menuitem_branch_missing_revisions_activate(self, widget):
         """ Branch/Missing revisions menu handler. """
         
-        self.comm.set_busy(self.comm.window_main)
+        import bzrlib
         
-        try:
-            import bzrlib
-            
-            local_branch = self.wt.branch
-            
-            other_branch = local_branch.get_parent()
-            if other_branch is None:
-                error_dialog(_('Parent location is unknown'),
-                                         _('Cannot determine missing revisions if no parent location is known.'))
-                return
-            
-            remote_branch = Branch.open(other_branch)
-            
-            if remote_branch.base == local_branch.base:
-                remote_branch = local_branch
+        local_branch = self.wt.branch
+        
+        other_branch = local_branch.get_parent()
+        if other_branch is None:
+            error_dialog(_('Parent location is unknown'),
+                                     _('Cannot determine missing revisions if no parent location is known.'))
+            return
+        
+        remote_branch = Branch.open(other_branch)
+        
+        if remote_branch.base == local_branch.base:
+            remote_branch = local_branch
 
-            ret = len(local_branch.missing_revisions(remote_branch))
+        ret = len(local_branch.missing_revisions(remote_branch))
 
-            if ret > 0:
-                info_dialog(_('There are missing revisions'),
-                                        _('%d revision(s) missing.') % ret)
-            else:
-                info_dialog(_('Local branch up to date'),
-                                        _('There are no missing revisions.'))
-        finally:
-            self.comm.set_busy(self.comm.window_main, False)
-    
+        if ret > 0:
+            info_dialog(_('There are missing revisions'),
+                                    _('%d revision(s) missing.') % ret)
+        else:
+            info_dialog(_('Local branch up to date'),
+                                    _('There are no missing revisions.'))
+
     def on_menuitem_branch_pull_activate(self, widget):
         """ Branch/Pull menu handler. """
         
-        self.comm.set_busy(self.comm.window_main)
-
         branch_to = self.wt.branch
 
         location = branch_to.get_parent()
@@ -209,14 +202,15 @@ class OliveHandler:
     def on_menuitem_stats_infos_activate(self, widget):
         """ Statistics/Informations... menu handler. """
         from info import OliveInfo
-        info = OliveInfo(self.comm)
+        info = OliveInfo(self.wt)
         info.display()
     
     def on_menuitem_stats_log_activate(self, widget):
         """ Statistics/Log... menu handler. """
-        from log import OliveLog
-        log = OliveLog(self.comm)
-        log.display()
+        from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
+        window = BranchWindow()
+        window.set_branch(self.wt.branch, self.wt.branch.last_revision(), None)
+        window.show()
     
     def on_menuitem_view_refresh_activate(self, widget):
         """ View/Refresh menu handler. """
@@ -256,10 +250,8 @@ class OliveHandler:
         if newdir == None:
             return
 
-        self.comm.set_busy(treeview)
         self.comm.set_path(newdir)
         self.comm.refresh_right()
-        self.comm.set_busy(treeview, False)
     
     def on_treeview_right_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the file list. """

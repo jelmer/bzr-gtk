@@ -136,9 +136,6 @@ class OliveGtk:
         
     def _load_left(self):
         """ Load data into the left panel. (Bookmarks) """
-        # set cursor to busy
-        self.comm.set_busy(self.treeview_left)
-        
         # Create TreeStore
         treestore = gtk.TreeStore(str, str)
         
@@ -164,14 +161,9 @@ class OliveGtk:
         # Expand the tree
         self.treeview_left.expand_all()
 
-        self.comm.set_busy(self.treeview_left, False)
-        
     def _load_right(self):
         """ Load data into the right panel. (Filelist) """
         from bzrlib.workingtree import WorkingTree
-        
-        # set cursor to busy
-        self.comm.set_busy(self.treeview_right)
         
         # Create ListStore
         liststore = gtk.ListStore(str, str, str)
@@ -315,9 +307,6 @@ class OliveGtk:
             self.comm.toolbutton_pull.set_sensitive(False)
             self.comm.toolbutton_push.set_sensitive(False)
         
-        # set cursor to default
-        self.comm.set_busy(self.treeview_right, False)
-
 class OliveCommunicator:
     """ This class is responsible for the communication between the different
     modules. """
@@ -410,8 +399,6 @@ class OliveCommunicator:
     
     def refresh_left(self):
         """ Refresh the bookmark list. """
-        # set cursor to busy
-        self.set_busy(self.treeview_left)
         
         # Get TreeStore and clear it
         treestore = self.treeview_left.get_model()
@@ -432,20 +419,15 @@ class OliveCommunicator:
         # Expand the tree
         self.treeview_left.expand_all()
 
-        self.set_busy(self.treeview_left, False)
-
     def refresh_right(self, path=None):
         """ Refresh the file list. """
         from bzrlib.workingtree import WorkingTree
-
-        self.set_busy(self.treeview_right)
 
         if path is None:
             path = self.get_path()
 
         # A workaround for double-clicking Bookmarks
         if not os.path.exists(path):
-            self.set_busy(self.treeview_right, False)
             return
 
         # Get ListStore and clear it
@@ -575,8 +557,6 @@ class OliveCommunicator:
             self.toolbutton_commit.set_sensitive(False)
             self.toolbutton_pull.set_sensitive(False)
             self.toolbutton_push.set_sensitive(False)
-
-        self.set_busy(self.treeview_right, False)
 
     def set_busy(self, widget, busy=True):
         if busy:

@@ -115,7 +115,6 @@ class OlivePush:
     
     def push(self, widget):
         revs = 0
-        self.comm.set_busy(self.window)
         if self.radio_stored.get_active():
             try:
                 revs = do_push(self.comm.get_path(),
@@ -143,12 +142,10 @@ class OlivePush:
             except errors.NotBranchError:
                 error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
-                self.comm.set_busy(self.window, False)
                 return
             except errors.DivergedBranches:
                 error_dialog(_('Branches have been diverged'),
                                          _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
-                self.comm.set_busy(self.window, False)
                 return
         
         self.close()
@@ -271,7 +268,5 @@ def do_push(branch, location=None, remember=False, overwrite=False,
                 count = br_to.pull(br_from, overwrite)
             else:
                 count = tree_to.pull(br_from, overwrite)
-        except errors.DivergedBranches:
-            raise
     
     return count
