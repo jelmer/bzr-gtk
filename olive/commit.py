@@ -174,8 +174,9 @@ class OliveCommit:
             self.dialog.error_dialog(_('Bound branch is out of date'),
                                      _('%s') % errmsg)
             return
-        except:
-            raise
+        except errors.BzrError, msg:
+            self.dialog.error_dialog(_('Unknown error'), str(msg))
+            return
         
         self.close()
         self.comm.refresh_right()
