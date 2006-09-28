@@ -21,7 +21,7 @@ try:
     pygtk.require("2.0")
 except:
     pass
-	
+    
 import gtk
 import gtk.gdk
 import gtk.glade
@@ -32,14 +32,13 @@ from olive import gladefile
 
 class OlivePush:
     """ Display Push dialog and perform the needed actions. """
-    def __init__(self, comm):
+    def __init__(self, branch):
         """ Initialize the Push dialog. """
         self.glade = gtk.glade.XML(gladefile, 'window_push')
         
-        # Communication object
-        self.comm = comm
-        
         self.window = self.glade.get_widget('window_push')
+
+        self.branch = branch
         
         # Dictionary for signal_autoconnect
         dic = { "on_button_push_push_clicked": self.push,
@@ -67,27 +66,12 @@ class OlivePush:
         self.check_remember.set_sensitive(0)
         self.check_create.set_sensitive(0)
         
-        # Get stored location
-        self.notbranch = False
-        try:
-            from bzrlib.branch import Branch
-    
-            branch = Branch.open_containing(self.comm.get_path())[0]
-    
-            self.entry_stored.set_text(branch.get_push_location())
-        except errors.NotBranchError:
-            self.notbranch = True
-            return
+        self.entry_stored.set_text(branch.get_push_location())
     
     def display(self):
         """ Display the Push dialog. """
-        if self.notbranch:
-            error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
-            self.close()
-        else:
-            self.window.show()
-            self.width, self.height = self.window.get_size()
+        self.window.show()
+        self.width, self.height = self.window.get_size()
     
     def stored_toggled(self, widget):
         if widget.get_active():
@@ -117,7 +101,7 @@ class OlivePush:
         revs = 0
         if self.radio_stored.get_active():
             try:
-                revs = do_push(self.comm.get_path(),
+                revs = do_push(self.branch,
                                overwrite=self.check_overwrite.get_active())
             except errors.NotBranchError:
                 error_dialog(_('Directory is not a branch'),
@@ -135,7 +119,7 @@ class OlivePush:
                 return
             
             try:
-                revs = do_push(self.comm.get_path(), location,
+                revs = do_push(self.branch, location,
                                self.check_remember.get_active(),
                                self.check_overwrite.get_active(),
                                self.check_create.get_active())
@@ -257,16 +241,15 @@ def do_push(branch, location=None, remember=False, overwrite=False,
     else:
         old_rh = br_to.revision_history()
         try:
-            try:
-                tree_to = dir_to.open_workingtree()
-            except errors.NotLocalUrl:
-                # FIXME - what to do here? how should we warn the user?
-                #warning('This transport does not update the working '
-                #        'tree of: %s' % (br_to.base,))
-                count = br_to.pull(br_from, overwrite)
-            except errors.NoWorkingTree:
-                count = br_to.pull(br_from, overwrite)
-            else:
-                count = tree_to.pull(br_from, overwrite)
-    
+            tree_to = dir_to.open_workingtree()
+        except errors.NotLocalUrl:
+            # FIXME - what to do here? how should we warn the user?
+            #warning('This transport does not update the working '
+            #        'tree of: %s' % (br_to.base,))
+            count = br_to.pull(br_from, overwrite)
+        except errors.NoWorkingTree:
+            count = br_to.pull(br_from, overwrite)
+        else:
+            count = tree_to.pull(br_from, overwrite)
+
     return count

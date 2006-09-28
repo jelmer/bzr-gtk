@@ -33,7 +33,7 @@ class OliveCheckout:
     """ Display checkout dialog and perform the needed operations. """
     def __init__(self, path=None):
         """ Initialize the Checkout dialog. """
-        self.glade = gtk.glade.XML('window_checkout', 'olive-gtk')
+        self.glade = gtk.glade.XML(gladefile, 'window_checkout', 'olive-gtk')
         
         self.window = self.glade.get_widget('window_checkout')
         
