@@ -73,7 +73,7 @@ class OliveRemove:
                 return
             
             try:
-                wt, path = WorkingTree.open_containing(directory + '/' + filename)
+                wt, path = WorkingTree.open_containing(directory + os.sep + filename)
                 wt.remove(path)
             except errors.NotBranchError:
                 self.dialog.error_dialog(_('Directory is not a branch'),

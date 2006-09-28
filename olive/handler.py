@@ -167,6 +167,8 @@ class OliveHandler:
     
     def on_menuitem_branch_initialize_activate(self, widget):
         """ Initialize current directory. """
+        import bzrlib.bzrdir as bzrdir
+        
         try:
             location = self.comm.get_path()
             from bzrlib.builtins import get_format_type
@@ -178,14 +180,14 @@ class OliveHandler:
      
             try:
                 existing_bzrdir = bzrdir.BzrDir.open(location)
-            except NotBranchError:
+            except errors.NotBranchError:
                 bzrdir.BzrDir.create_branch_convenience(location, format=format)
             else:
                 if existing_bzrdir.has_branch():
                     if existing_bzrdir.has_workingtree():
-                        raise AlreadyBranchError(location)
+                        raise errors.AlreadyBranchError(location)
                     else:
-                        raise BranchExistsWithoutWorkingTree(location)
+                        raise errors.BranchExistsWithoutWorkingTree(location)
                 else:
                     existing_bzrdir.create_branch()
                     existing_bzrdir.create_workingtree()

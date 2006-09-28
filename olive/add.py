@@ -73,7 +73,7 @@ class OliveAdd:
                 return
             
             try:
-                bzrlib.add.smart_add([directory + '/' + filename])
+                bzrlib.add.smart_add([directory + os.sep + filename])
             except errors.NotBranchError:
                 self.dialog.error_dialog(_('Directory is not a branch'),
                                          _('You can perform this action only in a branch.'))
