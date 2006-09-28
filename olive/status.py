@@ -21,35 +21,27 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-    import gobject
-    import pango
-except:
-    sys.exit(1)
+
+import gtk
+import gtk.glade
+import gobject
+import pango
 
 import bzrlib
 import bzrlib.errors as errors
 
-if bzrlib.version_info < (0, 9):
-    # function deprecated after 0.9
-    from bzrlib.delta import compare_trees
-
 from bzrlib.status import show_tree_status
 from bzrlib.workingtree import WorkingTree
 
-from dialog import OliveDialog
+from dialog import error_dialog
+
+from olive import gladefile
 
 class OliveStatus:
     """ Display Status window and perform the needed actions. """
-    def __init__(self, gladefile, wt, wtpath, dialog):
+    def __init__(self, wt, wtpath):
         """ Initialize the Status window. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_status')
-        
-        # Dialog object
-        self.dialog = dialog
+        self.glade = gtk.glade.XML(gladefile, 'window_status')
         
         # Get the Status window widget
         self.window = self.glade.get_widget('window_status')
@@ -57,21 +49,8 @@ class OliveStatus:
         self.wtpath = wtpath
         
         # Check if current location is a branch
-        try:
-            branch = wt.branch
-        except errors.NotBranchError:
-            self.notbranch = True
-            return
-        except:
-            raise
-        
         file_id = self.wt.path2id(wtpath)
 
-        self.notbranch = False
-        if file_id is None:
-            self.notbranch = True
-            return
-        
         # Set the old working tree
         self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
         
@@ -141,12 +120,7 @@ class OliveStatus:
     
     def display(self):
         """ Display the Diff window. """
-        if self.notbranch:
-            self.dialog.error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
-            self.close()
-        else:
-            self.window.show_all()
+        self.window.show_all()
 
     def close(self, widget=None):
         self.window.destroy()

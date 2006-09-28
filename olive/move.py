@@ -22,25 +22,22 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    sys.exit(1)
+
+import gtk
+import gtk.glade
 
 import bzrlib.errors as errors
 
+from olive import gladefile
+
 class OliveMove:
     """ Display the Move dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, comm):
         """ Initialize the Move dialog. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_move', 'olive-gtk')
+        self.glade = gtk.glade.XML(gladefile, 'window_move', 'olive-gtk')
         
         # Communication object
         self.comm = comm
-        # Dialog object
-        self.dialog = dialog
         
         self.window = self.glade.get_widget('window_move')
         
@@ -65,7 +62,7 @@ class OliveMove:
         filename = self.comm.get_selected_right()
             
         if filename is None:
-            self.dialog.error_dialog(_('No file was selected'),
+            error_dialog(_('No file was selected'),
                                      _('Please select a file from the list to proceed.'))
             return
         
@@ -76,13 +73,13 @@ class OliveMove:
             wt1, path1 = WorkingTree.open_containing(source)
             wt2, path2 = WorkingTree.open_containing(destination)
             if wt1.base != wt2.base:
-                self.dialog.error_dialog(_('Not the same branch'),
+                error_dialog(_('Not the same branch'),
                                          _('The destination is not in the same branch.'))
                 return
 
             wt1.move([source], destination)
         except errors.NotBranchError:
-            self.dialog.error_dialog(_('File is not in a branch'),
+            error_dialog(_('File is not in a branch'),
                                      _('The selected file is not in a branch.'))
             return
 

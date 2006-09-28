@@ -21,23 +21,16 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    sys.exit(1)
+
+import gtk
+import gtk.glade
+from olive import gladefile
 
 class OliveBookmark:
     """ Display the Edit bookmark dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, comm):
         """ Initialize the Edit bookmark dialog. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_bookmark', 'olive-gtk')
-        
-        # Communication object
-        self.comm = comm
-        # Dialog object
-        self.dialog = dialog
+        self.glade = gtk.glade.XML(gladefile, 'window_bookmark', 'olive-gtk')
         
         self.window = self.glade.get_widget('window_bookmark')
         
@@ -61,7 +54,7 @@ class OliveBookmark:
         
     def bookmark(self, widget):
         if self.entry_title.get_text() == '':
-            self.dialog.error_dialog(_('No title given'),
+            error_dialog(_('No title given'),
                                      _('Please specify a title to continue.'))
             return
         
@@ -69,7 +62,6 @@ class OliveBookmark:
                                           self.entry_title.get_text())
         
         self.close()
-        self.comm.refresh_left()
     
     def close(self, widget=None):
         self.window.destroy()

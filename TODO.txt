@@ -1,23 +1,23 @@
 TODO list for Olive
 -------------------
 
-[DONE] Be able to install into other locations than /usr (LarstiQ)
-[DONE] Investigate TortoiseSVN-like commit/add dialogs (LarstiQ)
-   http://samba.org/~jelmer/bzr/gcommit.png
-[DONE] HIGify the interface (Matthieu Moy)
-[DONE] Consistent placement of buttons (Matthieu Moy)
-[DONE] Display the count of pushed revisions on push (phanatic)
- - Display the commit file selector as a tree (so whole directories can be
-   toggled) (j-a-meinel)
-[DONE] "Probe location" button on the Push dialog (test write access, etc.) (ddaa)
-[DONE] Save and restore main window position and size (phanatic)
-[DONE] Real sensitive context menu - e.g. options are grey if not a branch
-   (phanatic)
-[DONE] Implement 'bzr missing' (phanatic)
- - Implement 'bzr uncommit' (phanatic)
- - Implement bundle handling - at least creating them (phanatic)
-[DONE] Testing on Windows platform (phanatic)
-[DONE] i18n/l10n with gettext (phanatic)
-[DONE] Bookmarks should have a 'title' attribute (phanatic)
-[PART-DONE] Open files on double-click, and add Open option to context menu (Aaadam)
-[DONE] Display a "No changes." text in the Status window, if tree is empty (Áron Novák)
+- Use networkmanager to figure out whether to do local or bound commits  
+  in case of bound branches/checkouts.
+- Strict commit should not be a checkbox. The GUI should rather ask the 
+  user whether (s)he wants to continue if there were no changes.
+- Commit with unknowns should not be a checkbox. The GUI should rather ask 
+  the user whether (s)he wants to continue while there were unknown files.
+- It should be possible to add unknown files from the commit dialog.
+- Generic wrapper that displays dialogs for bzr exceptions
+- Store list of previously seen branch locations and list them in 
+  a combo box in the "branch location" field in the get branch window
+- Allow selecting a particular revision (actually browsing the revisions 
+  rather than specifying a particular revno) in the get branch window
+- Eliminate radiobuttons in push but rather show the default location and 
+  allow the user to change it
+- Don't have an overwrite checkbox but instead ask the user if (s)he wants 
+  to overwrite if the branches have diverged
+- Remove the status window as it's pointless since the status is already shown
+  in the main window.
+- Is there any reason why on win32 bzr branches have to be on fixed drives and 
+  not on, e.g., cdroms?
