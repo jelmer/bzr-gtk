@@ -1,0 +1,23 @@
+<ui>
+    <popup name="context_right">
+        <menuitem name="add" action="add" />
+        <menuitem name="remove" action="remove" />
+        <menuitem name="open" action="open" />
+        <separator />
+        <menuitem name="commit" action="commit" />
+        <separator />
+        <menuitem name="diff" action="diff" />
+        <separator />
+        <menuitem name="bookmark" action="bookmark" />
+    </popup>
+    <popup name="context_left">
+        <menuitem name="edit_bookmark" action="edit_bookmark" />
+        <menuitem name="remove_bookmark" action="remove_bookmark" />
+        <separator />
+        <menuitem name="open_folder" action="open_folder" />
+    </popup>
+    <popup name="toolbar_diff">
+        <menuitem name="diff_selected" action="diff_selected" />
+        <menuitem name="diff_all" action="diff_all" />
+    </popup>
+</ui>

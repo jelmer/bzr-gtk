@@ -1,0 +1,64 @@
+#!/usr/bin/python
+
+# Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+import os
+import sys
+
+try:
+    version_info = sys.version_info
+except AttributeError:
+    version_info = 1, 5 # 1.5 or older
+
+REINVOKE = "__BZR_REINVOKE"
+NEED_VERS = (2, 4)
+KNOWN_PYTHONS = ('python2.4',)
+
+if version_info < NEED_VERS:
+    if not os.environ.has_key(REINVOKE):
+        # mutating os.environ doesn't work in old Pythons
+        os.putenv(REINVOKE, "1")
+        for python in KNOWN_PYTHONS:
+            try:
+                os.execvp(python, [python] + sys.argv)
+            except OSError:
+                pass
+    print >>sys.stderr, _('bzr: error: cannot find a suitable python interpreter (need %d.%d or later)') % NEED_VERS
+    sys.exit(1)
+
+try:
+ 	import pygtk
+  	pygtk.require("2.0")
+except:
+  	pass
+try:
+	import gtk
+	import gtk.glade
+except:
+    print >>sys.stderr, _('You need to install python-glade2 and/or pygtk2 (gtk2) or set your PYTHONPATH correctly.\ntry: export PYTHONPATH=/usr/local/lib/python2.4/site-packages/')
+    sys.exit(1)
+
+# gettext support
+import gettext
+gettext.install('olive-gtk')
+
+from olive import OliveGtk
+from bzrlib.plugin import load_plugins
+load_plugins()
+
+app = OliveGtk()
+gtk.main()
