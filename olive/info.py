@@ -21,15 +21,15 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-    import gobject
-    import pango
-except:
-    sys.exit(1)
+
+import gtk
+import gtk.glade
+import gobject
+import pango
 
 import bzrlib.errors as errors
+
+from olive import gladefile
 
 def info(location):
     """ Get info about branch, working tree, and repository
@@ -144,15 +144,9 @@ def info(location):
 
 class OliveInfo:
     """ Display Informations window and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, wt):
         """ Initialize the Informations window. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_info', 'olive-gtk')
-        
-        # Communication object
-        self.comm = comm
-        # Dialog object
-        self.dialog = dialog
+        self.glade = gtk.glade.XML(gladefile, 'window_info', 'olive-gtk')
         
         # Get the Informations window widget
         self.window = self.glade.get_widget('window_info')
@@ -160,7 +154,7 @@ class OliveInfo:
         # Check if current location is a branch
         self.notbranch = False
         try:
-            self.ret = info(self.comm.get_path())
+            self.ret = info(wt.basedir)
         except errors.NotBranchError:
             self.notbranch = True
             return
@@ -559,7 +553,7 @@ class OliveInfo:
     def display(self):
         """ Display the Informations window. """
         if self.notbranch:
-            self.dialog.error_dialog(_('Directory is not a branch'),
+            error_dialog(_('Directory is not a branch'),
                                      _('You can perform this action only in a branch.'))
             self.close()
         else:

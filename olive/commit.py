@@ -21,48 +21,35 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-    import gobject
-    import pango
-except:
-    sys.exit(1)
+import gtk
+import gtk.glade
+import gobject
+import pango
 
 from bzrlib import version_info
 
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
+from dialog import error_dialog
+from olive import gladefile
+
 class OliveCommit:
     """ Display Commit dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, wt, wtpath):
         """ Initialize the Commit dialog. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_commit', 'olive-gtk')
+        self.glade = gtk.glade.XML(gladefile, 'window_commit', 'olive-gtk')
         
-        # Communication object
-        self.comm = comm
-        # Dialog object
-        self.dialog = dialog
-        
+        self.wt = wt
+        self.wtpath = wtpath
+
         # Get some important widgets
         self.window = self.glade.get_widget('window_commit')
         self.checkbutton_local = self.glade.get_widget('checkbutton_commit_local')
         self.textview = self.glade.get_widget('textview_commit')
         self.file_view = self.glade.get_widget('treeview_commit_select')
 
-        # Check if current location is a branch
-        try:
-            (self.wt, path) = WorkingTree.open_containing(self.comm.get_path())
-            branch = self.wt.branch
-        except errors.NotBranchError:
-            self.notbranch = True
-            return
-        except:
-            raise
-
-        file_id = self.wt.path2id(path)
+        file_id = self.wt.path2id(wtpath)
 
         self.notbranch = False
         if file_id is None:
@@ -71,10 +58,7 @@ class OliveCommit:
         
         # Set the delta
         self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
-        if version_info < (0, 9):
-            self.delta = compare_trees(self.old_tree, self.wt)
-        else:
-            self.delta = self.wt.changes_from(self.old_tree)
+        self.delta = self.wt.changes_from(self.old_tree)
         
         # Dictionary for signal_autoconnect
         dic = { "on_button_commit_commit_clicked": self.commit,
@@ -89,14 +73,11 @@ class OliveCommit:
     def display(self):
         """ Display the Push dialog. """
         if self.notbranch:
-            self.dialog.error_dialog(_('Directory is not a branch'),
+            error_dialog(_('Directory is not a branch'),
                                      _('You can perform this action only in a branch.'))
             self.close()
         else:
-            from bzrlib.branch import Branch
-            branch = Branch.open_containing(self.comm.get_path())[0]
-
-            if branch.get_bound_location() is not None:
+            if self.wt.branch.get_bound_location() is not None:
                 # we have a checkout, so the local commit checkbox must appear
                 self.checkbutton_local.show()
             
@@ -104,7 +85,6 @@ class OliveCommit:
             self.window.show()
             
     
-    # This code is from Jelmer Vernooij's bzr-gtk branch
     def _create_file_view(self):
         self.file_store = gtk.ListStore(gobject.TYPE_BOOLEAN,
                                         gobject.TYPE_STRING,
@@ -141,7 +121,6 @@ class OliveCommit:
             it = self.file_store.iter_next(it)
 
         return ret
-    # end of bzr-gtk code
     
     def _toggle_commit(self, cell, path, model):
         model[path][0] = not model[path][0]
@@ -157,8 +136,6 @@ class OliveCommit:
         
         specific_files = self._get_specific_files()
         
-        self.comm.set_busy(self.window)
-        # merged from Jelmer Vernooij's olive integration branch
         try:
             self.wt.commit(message, 
                            allow_pointless=checkbutton_force.get_active(),
@@ -166,40 +143,37 @@ class OliveCommit:
                            local=self.checkbutton_local.get_active(),
                            specific_files=specific_files)
         except errors.NotBranchError:
-            self.dialog.error_dialog(_('Directory is not a branch'),
+            error_dialog(_('Directory is not a branch'),
                                      _('You can perform this action only in a branch.'))
-            self.comm.set_busy(self.window, False)
             return
         except errors.LocalRequiresBoundBranch:
-            self.dialog.error_dialog(_('Directory is not a checkout'),
+            error_dialog(_('Directory is not a checkout'),
                                      _('You can perform local commit only on checkouts.'))
-            self.comm.set_busy(self.window, False)
             return
         except errors.PointlessCommit:
-            self.dialog.error_dialog(_('No changes to commit'),
+            error_dialog(_('No changes to commit'),
                                      _('Try force commit if you want to commit anyway.'))
-            self.comm.set_busy(self.window, False)
             return
         except errors.ConflictsInTree:
-            self.dialog.error_dialog(_('Conflicts in tree'),
+            error_dialog(_('Conflicts in tree'),
                                      _('You need to resolve the conflicts before committing.'))
-            self.comm.set_busy(self.window, False)
             return
         except errors.StrictCommitFailed:
-            self.dialog.error_dialog(_('Strict commit failed'),
+            error_dialog(_('Strict commit failed'),
                                      _('There are unknown files in the working tree.\nPlease add or delete them.'))
-            self.comm.set_busy(self.window, False)
             return
         except errors.BoundBranchOutOfDate, errmsg:
-            self.dialog.error_dialog(_('Bound branch is out of date'),
+            error_dialog(_('Bound branch is out of date'),
                                      _('%s') % errmsg)
-            self.comm.set_busy(self.window, False)
             return
-        except:
-            raise
+        except errors.BzrError, msg:
+            error_dialog(_('Unknown bzr error'), str(msg))
+            return
+        except Exception, msg:
+            error_dialog(_('Unknown error'), str(msg))
+            return
         
         self.close()
-        self.comm.refresh_right()
         
     def close(self, widget=None):
         self.window.destroy()

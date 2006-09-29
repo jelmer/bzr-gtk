@@ -22,19 +22,17 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    sys.exit(1)
+
+import gtk
 
 import bzrlib.errors as errors
+from dialog import error_dialog
 
 from launch import launch
 
 class OliveMenu:
     """ This class is responsible for building the context menus. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self):
         # Load the UI file
         if sys.platform == 'win32':
             self.uifile = os.path.dirname(sys.executable) + "/share/olive/cmenu.ui"
@@ -49,10 +47,6 @@ class OliveMenu:
                 # Fail
                 print _('UI description file cannot be found.')
                 sys.exit(1)
-        
-        self.gladefile = gladefile
-        self.comm = comm
-        self.dialog = dialog
         
         # Create the file list context menu
         self.ui = gtk.UIManager()
@@ -138,15 +132,15 @@ class OliveMenu:
         filename = self.comm.get_selected_right()
             
         if filename is None:
-            self.dialog.error_dialog(_('No file was selected'),
-                                     _('Please select a file from the list,\nor choose the other option.'))
+            error_dialog(_('No file was selected'),
+                         _('Please select a file from the list,\nor choose the other option.'))
             return
         
         try:
             bzrlib.add.smart_add([directory + '/' + filename])
         except errors.NotBranchError:
-            self.dialog.error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
+            error_dialog(_('Directory is not a branch'),
+                         _('You can perform this action only in a branch.'))
             return
         
         self.comm.refresh_right()
@@ -158,8 +152,8 @@ class OliveMenu:
         filename = self.comm.get_selected_right()
         
         if filename is None:
-            self.dialog.error_dialog(_('No file was selected'),
-                                     _('Please select a file from the list,\nor choose the other option.'))
+            error_dialog(_('No file was selected'),
+                         _('Please select a file from the list,\nor choose the other option.'))
             return
         
         try:
@@ -167,15 +161,13 @@ class OliveMenu:
             wt.remove(path)
 
         except errors.NotBranchError:
-            self.dialog.error_dialog(_('Directory is not a branch'),
+            error_dialog(_('Directory is not a branch'),
                                      _('You can perform this action only in a branch.'))
             return
         except errors.NotVersionedError:
-            self.dialog.error_dialog(_('File not versioned'),
+            error_dialog(_('File not versioned'),
                                      _('The selected file is not versioned.'))
             return
-        except:
-            raise
         
         self.comm.refresh_right()
 
@@ -185,7 +177,7 @@ class OliveMenu:
         filename = self.comm.get_selected_right()
         
         if filename is None:
-            self.dialog.error_dialog(_('No file was selected'),
+            error_dialog(_('No file was selected'),
                                      _('Please select a file from the list,\nor choose the other option.'))
             return
 
@@ -204,22 +196,23 @@ class OliveMenu:
     def commit(self, action):
         """ Right context menu -> Commit """
         from commit import OliveCommit
-        commit = OliveCommit(self.gladefile, self.comm, self.dialog)
+        wt, path = WorkingTree.open_containing(self.comm.get_path())
+        commit = OliveCommit(wt, path)
         commit.display()
     
     def diff(self, action):
         """ Right context menu -> Diff """
         from diff import OliveDiff
-        diff = OliveDiff(self.gladefile, self.comm, self.dialog)
+        diff = OliveDiff(self.comm)
         diff.display()
     
     def bookmark(self, action):
         """ Right context menu -> Bookmark """
         if self.comm.pref.add_bookmark(self.comm.get_path()):
-            self.dialog.info_dialog(_('Bookmark successfully added'),
+            info_dialog(_('Bookmark successfully added'),
                                     _('The current directory was bookmarked. You can reach\nit by selecting it from the left panel.'))
         else:
-            self.dialog.warning_dialog(_('Location already bookmarked'),
+            warning_dialog(_('Location already bookmarked'),
                                        _('The current directory is already bookmarked.\nSee the left panel for reference.'))
         
         self.comm.refresh_left()
@@ -229,7 +222,7 @@ class OliveMenu:
         from bookmark import OliveBookmark
 
         if self.comm.get_selected_left() != None:
-            bookmark = OliveBookmark(self.gladefile, self.comm, self.dialog)
+            bookmark = OliveBookmark(self.comm)
             bookmark.display()
 
     def remove_bookmark(self, action):
@@ -253,5 +246,5 @@ class OliveMenu:
     def diff_all(self, action):
         """ Diff toolbutton -> All... """
         from diff import OliveDiff
-        diff = OliveDiff(self.gladefile, self.comm, self.dialog)
+        diff = OliveDiff(self.comm)
         diff.display()
