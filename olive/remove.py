@@ -14,7 +14,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import sys
+import os
 
 try:
     import pygtk
@@ -26,13 +26,13 @@ import gtk
 import gtk.glade
 
 import bzrlib.errors as errors
-from bzrlib.workingtree import WorkingTree
 
 from olive import gladefile
+from dialog import error_dialog, warning_dialog
 
 class OliveRemove:
     """ Display the Remove file(s) dialog and perform the needed actions. """
-    def __init__(self):
+    def __init__(self, wt, wtpath, selected=[]):
         """ Initialize the Remove file(s) dialog. """
         self.glade = gtk.glade.XML(gladefile, 'window_remove')
         
@@ -44,6 +44,10 @@ class OliveRemove:
         
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
+        
+        self.wt = wt
+        self.wtpath = wtpath
+        self.selected = selected
 
     def display(self):
         """ Display the Remove file(s) dialog. """
@@ -53,44 +57,39 @@ class OliveRemove:
         radio_selected = self.glade.get_widget('radiobutton_remove_selected')
         radio_new = self.glade.get_widget('radiobutton_remove_new')
         
-        directory = self.comm.get_path()
-        
         if radio_selected.get_active():
             # Remove only the selected file
-            filename = self.comm.get_selected_right()
+            filename = self.selected
             
             if filename is None:
                 error_dialog(_('No file was selected'),
-                                         _('Please select a file from the list,\nor choose the other option.'))
+                             _('Please select a file from the list,\nor choose the other option.'))
                 return
             
+            if self.wtpath == "":
+                fullpath = self.wt.abspath(filename)
+            else:
+                fullpath = self.wt.abspath(self.wtpath + os.sep + filename)
+            
             try:
-                wt, path = WorkingTree.open_containing(directory + '/' + filename)
-                wt.remove(path)
+                self.wt.remove(fullpath)
             except errors.NotBranchError:
                 error_dialog(_('Directory is not a branch'),
-                                         _('You can perform this action only in a branch.'))
+                             _('You can perform this action only in a branch.'))
                 return
             except errors.NotVersionedError:
                 error_dialog(_('File not versioned'),
-                                         _('The selected file is not versioned.'))
+                             _('The selected file is not versioned.'))
                 return
         elif radio_new.get_active():
             # Remove added files recursively
-            try:
-                wt, path = WorkingTree.open_containing(directory)
-            except errors.NotBranchError:
-                error_dialog(_('Directory is not a branch'),
-                                         _('You can perform this action only in a branch.'))
-                return
-            
-            added = wt.changes_from(wt.basis_tree()).added
+            added = self.wt.changes_from(self.wt.basis_tree()).added
             file_list = sorted([f[0] for f in added], reverse=True)
             if len(file_list) == 0:
-                dialog.warning_dialog(_('No matching files'),
-                                      _('No added files were found in the working tree.'))
+                warning_dialog(_('No matching files'),
+                               _('No added files were found in the working tree.'))
                 return
-            wt.remove(file_list)
+            self.wt.remove(file_list)
         
         self.close()
     

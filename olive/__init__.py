@@ -366,7 +366,6 @@ class OliveGtk:
         self.refresh_left()
         # Refresh the right pane
         self.refresh_right()
-
    
     def on_menuitem_view_show_hidden_files_activate(self, widget):
         """ View/Show hidden files menu handler. """
@@ -379,8 +378,15 @@ class OliveGtk:
             if self.get_selected_left() == None:
                 return
 
-            self.menu.left_context_menu().popup(None, None, None, 0,
-                                                event.time)
+            # Create a menu
+            from menu import OliveMenu
+            menu = OliveMenu(self.get_path(), self.get_selected_left())
+            
+            menu.left_context_menu().popup(None, None, None, 0,
+                                           event.time)
+            
+            # Bookmarks might have changed
+            self.pref.read()
         
     def on_treeview_left_row_activated(self, treeview, path, view_column):
         """ Occurs when somebody double-clicks or enters an item in the
@@ -785,13 +791,7 @@ class OlivePreferences:
         self.config = ConfigParser.RawConfigParser()
         
         # Load the configuration
-        if sys.platform == 'win32':
-            # Windows - no dotted files
-            self.config.read([os.path.expanduser('~/olive.conf')])
-        else:
-            self.config.read([os.path.expanduser('~/.olive.conf')])
- 
-
+        self.read()
         
     def _get_default(self, option):
         """ Get the default option for a preference. """
@@ -807,12 +807,16 @@ class OlivePreferences:
         # First write out the changes
         self.write()
         # Then load the configuration again
+        self.read()
+
+    def read(self):
+        """ Just read the configuration. """
         if sys.platform == 'win32':
             # Windows - no dotted files
             self.config.read([os.path.expanduser('~/olive.conf')])
         else:
             self.config.read([os.path.expanduser('~/.olive.conf')])
-
+    
     def write(self):
         """ Write the configuration to the appropriate files. """
         if sys.platform == 'win32':

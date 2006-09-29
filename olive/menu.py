@@ -230,7 +230,7 @@ class OliveMenu:
         from bookmark import OliveBookmark
 
         if self.selected != None:
-            bookmark = OliveBookmark()
+            bookmark = OliveBookmark(self.selected)
             bookmark.display()
 
     def remove_bookmark(self, action):
