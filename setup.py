@@ -5,7 +5,7 @@ from distutils.core import setup
 
 setup(
     name = "gtk",
-    version = "0.10.0",
+    version = "0.11.0",
     maintainer = "Jelmer Vernooij",
     maintainer_email = "jelmer@samba.org",
     description = "GTK+ Frontends for various Bazaar commands",
