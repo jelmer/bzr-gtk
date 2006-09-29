@@ -14,6 +14,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import os
 import sys
 
 try:
@@ -29,6 +30,7 @@ import bzrlib.add
 import bzrlib.errors as errors
 
 from olive import gladefile
+from dialog import error_dialog
 
 class OliveAdd:
     """ Display the Add file(s) dialog and perform the needed actions. """
@@ -63,22 +65,27 @@ class OliveAdd:
             
             if filename is None:
                 error_dialog(_('No file was selected'),
-                                         _('Please select a file from the list,\nor choose the other option.'))
+                             _('Please select a file from the list,\nor choose the other option.'))
                 return
             
+            if self.wtpath == "":
+                fullpath = self.wt.abspath(filename)
+            else:
+                fullpath = self.wt.abspath(self.wtpath + os.sep + filename)
+            
             try:
-                bzrlib.add.smart_add([directory + '/' + filename])
+                bzrlib.add.smart_add([fullpath])
             except errors.NotBranchError:
                 error_dialog(_('Directory is not a branch'),
-                                         _('You can perform this action only in a branch.'))
+                             _('You can perform this action only in a branch.'))
                 return
         elif radio_unknown.get_active():
             # Add unknown files recursively
             try:
-                bzrlib.add.smart_add([directory], True)
+                bzrlib.add.smart_add([self.wtpath], True)
             except errors.NotBranchError:
                 error_dialog(_('Directory is not a branch'),
-                                         _('You can perform this action only in a branch.'))
+                             _('You can perform this action only in a branch.'))
                 return
         
         self.close()

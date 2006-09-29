@@ -21,8 +21,11 @@ try:
     pygtk.require("2.0")
 except:
     pass
+
 import gtk
 import gtk.glade
+
+from olive import gladefile
 
 def about():
 	""" Display the AboutDialog. """

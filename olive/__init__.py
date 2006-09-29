@@ -15,7 +15,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import os
-import os.path
 import sys
 
 try:
@@ -23,10 +22,12 @@ try:
     pygtk.require("2.0")
 except:
     pass
+
 import gtk
 import gtk.gdk
 import gtk.glade
 
+from bzrlib.branch import Branch
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
@@ -47,6 +48,8 @@ if not os.path.exists(gladefile):
         # Fail
         print _('Glade file cannot be found.')
         sys.exit(1)
+
+from dialog import error_dialog, info_dialog
 
 class OliveGtk:
     """ The main Olive GTK frontend class. This is called when launching the
@@ -166,29 +169,27 @@ class OliveGtk:
             self.combobox_drive.show()
             self.gen_hard_selector()
         
-        # Load default data into the panels
-        self.treeview_left = self.toplevel.get_widget('treeview_left')
-        self.treeview_right = self.toplevel.get_widget('treeview_right')
         self._load_left()
 
         # Apply menu state
         self.menuitem_view_show_hidden_files.set_active(self.pref.get_preference('dotted_files', 'bool'))
 
         self.set_path(os.getcwd())
+        self._load_right()
 
     def set_path(self, path):
         self.path = path
         self.notbranch = False
         try:
             self.wt, self.wtpath = WorkingTree.open_containing(self.path)
-        except NotBranchError:
+        except errors.NotBranchError:
             self.notbranch = True
-        self._load_right()
 
     def get_path(self):
         return self.path
    
     def on_about_activate(self, widget):
+        from dialog import about
         about()
         
     def on_menuitem_add_files_activate(self, widget):
@@ -217,9 +218,6 @@ class OliveGtk:
     
     def on_menuitem_branch_missing_revisions_activate(self, widget):
         """ Branch/Missing revisions menu handler. """
-        
-        import bzrlib
-        
         local_branch = self.wt.branch
         
         other_branch = local_branch.get_parent()
@@ -244,7 +242,6 @@ class OliveGtk:
 
     def on_menuitem_branch_pull_activate(self, widget):
         """ Branch/Pull menu handler. """
-        
         branch_to = self.wt.branch
 
         location = branch_to.get_parent()
@@ -262,11 +259,15 @@ class OliveGtk:
         if branch_to.get_parent() is None:
             branch_to.set_parent(branch_from.base)
 
-        old_rh = branch_to.revision_history()
-        if tree_to is not None:
-            tree_to.pull(branch_from)
-        else:
-            branch_to.pull(branch_from)
+        #old_rh = branch_to.revision_history()
+        #if tree_to is not None:
+        #    tree_to.pull(branch_from)
+        #else:
+        #    branch_to.pull(branch_from)
+        branch_to.pull(branch_from)
+        
+        # TODO: get the number of pulled revisions
+        ret = 0
         
         info_dialog(_('Pull successful'), _('%d revision(s) pulled.') % ret)
     
@@ -284,20 +285,22 @@ class OliveGtk:
     
     def on_menuitem_branch_initialize_activate(self, widget):
         """ Initialize current directory. """
+        import bzrlib.bzrdir as bzrdir
+        
         try:
             if not os.path.exists(self.path):
                 os.mkdir(self.path)
      
             try:
                 existing_bzrdir = bzrdir.BzrDir.open(self.path)
-            except NotBranchError:
+            except errors.NotBranchError:
                 bzrdir.BzrDir.create_branch_convenience(self.path)
             else:
                 if existing_bzrdir.has_branch():
                     if existing_bzrdir.has_workingtree():
-                        raise AlreadyBranchError(self.path)
+                        raise errors.AlreadyBranchError(self.path)
                     else:
-                        raise BranchExistsWithoutWorkingTree(self.path)
+                        raise errors.BranchExistsWithoutWorkingTree(self.path)
                 else:
                     existing_bzrdir.create_branch()
                     existing_bzrdir.create_workingtree()
@@ -367,7 +370,7 @@ class OliveGtk:
    
     def on_menuitem_view_show_hidden_files_activate(self, widget):
         """ View/Show hidden files menu handler. """
-        self.set_preference('dotted_files', widget.get_active())
+        self.pref.set_preference('dotted_files', widget.get_active())
 
     def on_treeview_left_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the bookmark list. """
@@ -393,31 +396,36 @@ class OliveGtk:
     def on_treeview_right_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the file list. """
         if event.button == 3:
+            # Create a menu
+            from menu import OliveMenu
+            menu = OliveMenu(self.get_path(), self.get_selected_right())
             # get the menu items
-            m_add = self.menu.ui.get_widget('/context_right/add')
-            m_remove = self.menu.ui.get_widget('/context_right/remove')
-            m_commit = self.menu.ui.get_widget('/context_right/commit')
-            m_diff = self.menu.ui.get_widget('/context_right/diff')
+            m_add = menu.ui.get_widget('/context_right/add')
+            m_remove = menu.ui.get_widget('/context_right/remove')
+            m_commit = menu.ui.get_widget('/context_right/commit')
+            m_diff = menu.ui.get_widget('/context_right/diff')
             # check if we're in a branch
             try:
                 from bzrlib.branch import Branch
                 Branch.open_containing(self.get_path())
-                m_add.set_sensitive(False)
-                m_remove.set_sensitive(False)
-                m_commit.set_sensitive(False)
-                m_diff.set_sensitive(False)
-            except errors.NotBranchError:
                 m_add.set_sensitive(True)
                 m_remove.set_sensitive(True)
                 m_commit.set_sensitive(True)
                 m_diff.set_sensitive(True)
-            self.menu.right_context_menu().popup(None, None, None, 0,
-                                                 event.time)
+            except errors.NotBranchError:
+                m_add.set_sensitive(False)
+                m_remove.set_sensitive(False)
+                m_commit.set_sensitive(False)
+                m_diff.set_sensitive(False)
+            menu.right_context_menu().popup(None, None, None, 0,
+                                            event.time)
         
     def on_treeview_right_row_activated(self, treeview, path, view_column):
         """ Occurs when somebody double-clicks or enters an item in the
         file list. """
         import os.path
+        
+        from launch import launch
         
         newdir = self.get_selected_right()
         
@@ -865,7 +873,8 @@ class OlivePreferences:
         """
         if self.config.has_option('preferences', option):
             if kind == 'bool':
-                return self.config.getboolean('preferences', option)
+                #return self.config.getboolean('preferences', option)
+                return True
             elif kind == 'int':
                 return self.config.getint('preferences', option)
             elif kind == 'float':
