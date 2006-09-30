@@ -14,8 +14,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import sys
-
 try:
     import pygtk
     pygtk.require("2.0")
@@ -29,6 +27,7 @@ import gtk.glade
 import bzrlib.errors as errors
 
 from olive import gladefile
+from dialog import error_dialog, info_dialog
 
 class OlivePush:
     """ Display Push dialog and perform the needed actions. """
@@ -105,17 +104,17 @@ class OlivePush:
                                overwrite=self.check_overwrite.get_active())
             except errors.NotBranchError:
                 error_dialog(_('Directory is not a branch'),
-                                         _('You can perform this action only in a branch.'))
+                             _('You can perform this action only in a branch.'))
                 return
             except errors.DivergedBranches:
                 error_dialog(_('Branches have been diverged'),
-                                         _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
+                             _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
                 return
         elif self.radio_specific.get_active():
             location = self.entry_location.get_text()
             if location == '':
                 error_dialog(_('No location specified'),
-                                         _('Please specify a location or use the default.'))
+                             _('Please specify a location or use the default.'))
                 return
             
             try:
@@ -125,16 +124,16 @@ class OlivePush:
                                self.check_create.get_active())
             except errors.NotBranchError:
                 error_dialog(_('Directory is not a branch'),
-                                         _('You can perform this action only in a branch.'))
+                             _('You can perform this action only in a branch.'))
                 return
             except errors.DivergedBranches:
                 error_dialog(_('Branches have been diverged'),
-                                         _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
+                             _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
                 return
         
         self.close()
         info_dialog(_('Push successful'),
-                                _('%d revision(s) pushed.') % revs)
+                    _('%d revision(s) pushed.') % revs)
     
     def test(self, widget):
         """ Test if write access possible. """
@@ -216,7 +215,7 @@ def do_push(branch, location=None, remember=False, overwrite=False,
                 transport.mkdir(relurl)
             except errors.NoSuchFile:
                 error_dialog(_('Non existing parent directory'),
-                                         _("The parent directory (%s)\ndoesn't exist.") % location)
+                             _("The parent directory (%s)\ndoesn't exist.") % location)
                 return
         else:
             current = transport.base
@@ -232,7 +231,7 @@ def do_push(branch, location=None, remember=False, overwrite=False,
                                    new_transport.relpath(transport.base)))
                     if new_transport.base == transport.base:
                         error_dialog(_('Path prefix not created'),
-                                                 _("The path leading up to the specified location couldn't\nbe created."))
+                                     _("The path leading up to the specified location couldn't\nbe created."))
                         return
         dir_to = br_from.bzrdir.clone(location_url,
             revision_id=br_from.last_revision())

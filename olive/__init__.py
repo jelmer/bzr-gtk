@@ -521,8 +521,8 @@ class OliveGtk:
             if not self.notbranch:
                 filename = self.wt.relpath(self.path + os.sep + item)
                 
-                for rpath, id, kind, text_modified, meta_modified in delta.renamed:
-                    if rpath == filename:
+                for rpath, rpathnew, id, kind, text_modified, meta_modified in delta.renamed:
+                    if rpathnew == filename:
                         status = 'renamed'
                 for rpath, id, kind in delta.added:
                     if rpath == filename:
@@ -707,12 +707,12 @@ class OliveGtk:
             if not notbranch:
                 filename = tree1.relpath(path + os.sep + item)
                 
-                for rpath, id, kind, text_modified, meta_modified in delta.renamed:
-                    if rpath == filename:
+                for rpath, rpathnew, id, kind, text_modified, meta_modified in delta.renamed:
+                    if rpathnew == filename:
                         status = 'renamed'
                 for rpath, id, kind in delta.added:
                     if rpath == filename:
-                        status = 'added'
+                        status = 'added'                
                 for rpath, id, kind, text_modified, meta_modified in delta.removed:
                     if rpath == filename:
                         status = 'removed'

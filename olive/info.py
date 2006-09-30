@@ -14,8 +14,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import sys
-
 try:
     import pygtk
     pygtk.require("2.0")
@@ -24,12 +22,11 @@ except:
 
 import gtk
 import gtk.glade
-import gobject
-import pango
 
 import bzrlib.errors as errors
 
 from olive import gladefile
+from dialog import error_dialog
 
 def info(location):
     """ Get info about branch, working tree, and repository
@@ -81,7 +78,7 @@ def info(location):
     try:
         a_bzrdir = bzrdir.BzrDir.open_containing(location)[0]
     except errors.NotBranchError:
-        raise NotBranchError(location)
+        raise errors.NotBranchError(location)
 
     try:
         working = a_bzrdir.open_workingtree()
@@ -554,7 +551,7 @@ class OliveInfo:
         """ Display the Informations window. """
         if self.notbranch:
             error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
+                         _('You can perform this action only in a branch.'))
             self.close()
         else:
             self.window.show()

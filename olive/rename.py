@@ -71,19 +71,15 @@ class OliveRename:
                          _('Please specify a new name for the file.'))
             return
         
-        if self.wtpath == "":
-            source = self.wt.abspath(old_filename)
-            destination = self.wt.abspath(new_filename)
-        else:
-            source = self.wt.abspath(self.wtpath + os.sep + old_filename)
-            destination = self.wt.abspath(self.wtpath + os.sep + new_filename)
+        source = os.path.join(self.wtpath, old_filename)
+        destination = os.path.join(self.wtpath, new_filename)
         
         # Rename the file
         try:
-            wt1, path1 = WorkingTree.open_containing(source)
-            wt2, path2 = WorkingTree.open_containing(source)
+            wt1, path1 = WorkingTree.open_containing(self.wt.abspath(source))
+            wt2, path2 = WorkingTree.open_containing(self.wt.abspath(source))
 
-            if wt1.base != wt2.base:
+            if wt1.basedir != wt2.basedir:
                 error_dialog(_('Not the same branch'),
                              _('The destination is not in the same branch.'))
                 return
@@ -92,6 +88,8 @@ class OliveRename:
             error_dialog(_('File is not in a branch'),
                          _('The selected file is not in a branch.'))
             return
+        except errors.BzrError, msg:
+            error_dialog(_('Unknown bzr error'), str(msg))
 
         self.close()
     

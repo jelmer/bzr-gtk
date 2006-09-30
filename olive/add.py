@@ -15,7 +15,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import os
-import sys
 
 try:
     import pygtk
@@ -68,10 +67,7 @@ class OliveAdd:
                              _('Please select a file from the list,\nor choose the other option.'))
                 return
             
-            if self.wtpath == "":
-                fullpath = self.wt.abspath(filename)
-            else:
-                fullpath = self.wt.abspath(self.wtpath + os.sep + filename)
+            fullpath = self.wt.abspath(os.path.join(self.wtpath, filename))
             
             try:
                 bzrlib.add.smart_add([fullpath])
@@ -81,8 +77,10 @@ class OliveAdd:
                 return
         elif radio_unknown.get_active():
             # Add unknown files recursively
+            fullpath = self.wt.abspath(self.wtpath)
+            
             try:
-                bzrlib.add.smart_add([self.wtpath], True)
+                bzrlib.add.smart_add([fullpath], True)
             except errors.NotBranchError:
                 error_dialog(_('Directory is not a branch'),
                              _('You can perform this action only in a branch.'))

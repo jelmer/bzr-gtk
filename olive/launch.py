@@ -16,7 +16,6 @@
 
 import sys
 import os
-import string
 
 def launch(path):
     """ Launch program associated with path """

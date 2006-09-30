@@ -77,21 +77,18 @@ class OliveMove:
                          _('Please select a file from the list to proceed.'))
             return
         
-        if self.wtpath == "":
-            source = self.wt.abspath(filename)
-        else:
-            source = self.wt.abspath(self.wtpath + os.sep + filename)
+        source = os.path.join(self.wtpath, filename)
         
         # Move the file to a directory
         try:
-            wt1, path1 = WorkingTree.open_containing(source)
+            wt1, path1 = WorkingTree.open_containing(self.wt.abspath(source))
             wt2, path2 = WorkingTree.open_containing(destination)
-            if wt1.base != wt2.base:
+            if wt1.basedir != wt2.basedir:
                 error_dialog(_('Not the same branch'),
                              _('The destination is not in the same branch.'))
                 return
 
-            wt1.move([source], destination)
+            wt1.move([source], wt1.relpath(destination))
         except errors.NotBranchError:
             error_dialog(_('File is not in a branch'),
                          _('The selected file is not in a branch.'))

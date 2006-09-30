@@ -14,22 +14,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import sys
-
 try:
     import pygtk
     pygtk.require("2.0")
 except:
     pass
+
 import gtk
 import gtk.glade
 import gobject
 import pango
 
-from bzrlib import version_info
-
 import bzrlib.errors as errors
-from bzrlib.workingtree import WorkingTree
 
 from dialog import error_dialog
 from olive import gladefile
@@ -74,7 +70,7 @@ class OliveCommit:
         """ Display the Push dialog. """
         if self.notbranch:
             error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
+                         _('You can perform this action only in a branch.'))
             self.close()
         else:
             if self.wt.branch.get_bound_location() is not None:
@@ -144,27 +140,27 @@ class OliveCommit:
                            specific_files=specific_files)
         except errors.NotBranchError:
             error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
+                         _('You can perform this action only in a branch.'))
             return
         except errors.LocalRequiresBoundBranch:
             error_dialog(_('Directory is not a checkout'),
-                                     _('You can perform local commit only on checkouts.'))
+                         _('You can perform local commit only on checkouts.'))
             return
         except errors.PointlessCommit:
             error_dialog(_('No changes to commit'),
-                                     _('Try force commit if you want to commit anyway.'))
+                         _('Try force commit if you want to commit anyway.'))
             return
         except errors.ConflictsInTree:
             error_dialog(_('Conflicts in tree'),
-                                     _('You need to resolve the conflicts before committing.'))
+                         _('You need to resolve the conflicts before committing.'))
             return
         except errors.StrictCommitFailed:
             error_dialog(_('Strict commit failed'),
-                                     _('There are unknown files in the working tree.\nPlease add or delete them.'))
+                         _('There are unknown files in the working tree.\nPlease add or delete them.'))
             return
         except errors.BoundBranchOutOfDate, errmsg:
             error_dialog(_('Bound branch is out of date'),
-                                     _('%s') % errmsg)
+                         _('%s') % errmsg)
             return
         except errors.BzrError, msg:
             error_dialog(_('Unknown bzr error'), str(msg))
