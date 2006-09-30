@@ -223,7 +223,7 @@ class OliveGtk:
         other_branch = local_branch.get_parent()
         if other_branch is None:
             error_dialog(_('Parent location is unknown'),
-                                     _('Cannot determine missing revisions if no parent location is known.'))
+                         _('Cannot determine missing revisions if no parent location is known.'))
             return
         
         remote_branch = Branch.open(other_branch)
@@ -235,10 +235,10 @@ class OliveGtk:
 
         if ret > 0:
             info_dialog(_('There are missing revisions'),
-                                    _('%d revision(s) missing.') % ret)
+                        _('%d revision(s) missing.') % ret)
         else:
             info_dialog(_('Local branch up to date'),
-                                    _('There are no missing revisions.'))
+                        _('There are no missing revisions.'))
 
     def on_menuitem_branch_pull_activate(self, widget):
         """ Branch/Pull menu handler. """
@@ -384,10 +384,7 @@ class OliveGtk:
             
             menu.left_context_menu().popup(None, None, None, 0,
                                            event.time)
-            
-            # Bookmarks might have changed
-            self.pref.read()
-        
+
     def on_treeview_left_row_activated(self, treeview, path, view_column):
         """ Occurs when somebody double-clicks or enters an item in the
         bookmark list. """
@@ -398,7 +395,7 @@ class OliveGtk:
 
         self.set_path(newdir)
         self.refresh_right()
-    
+
     def on_treeview_right_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the file list. """
         if event.button == 3:
@@ -576,8 +573,8 @@ class OliveGtk:
         tvcolumn_status.pack_start(cell, True)
         tvcolumn_status.add_attribute(cell, 'text', 2)
 
+        # Set menu and toolbar sensitivity
         self.menuitem_branch_init.set_sensitive(self.notbranch)
-        # Check if current directory is a branch
         self.menuitem_branch_get.set_sensitive(not self.notbranch)
         self.menuitem_branch_checkout.set_sensitive(not self.notbranch)
         self.menuitem_branch_pull.set_sensitive(not self.notbranch)
@@ -632,6 +629,9 @@ class OliveGtk:
         # Get TreeStore and clear it
         treestore = self.treeview_left.get_model()
         treestore.clear()
+
+        # Re-read preferences
+        self.pref.read()
 
         # Get bookmarks
         bookmarks = self.pref.get_bookmarks()
@@ -740,6 +740,28 @@ class OliveGtk:
 
         # Add the ListStore to the TreeView
         self.treeview_right.set_model(liststore)
+        
+        # Set menu and toolbar sensitivity
+        self.menuitem_branch_init.set_sensitive(self.notbranch)
+        self.menuitem_branch_get.set_sensitive(not self.notbranch)
+        self.menuitem_branch_checkout.set_sensitive(not self.notbranch)
+        self.menuitem_branch_pull.set_sensitive(not self.notbranch)
+        self.menuitem_branch_push.set_sensitive(not self.notbranch)
+        self.menuitem_branch_commit.set_sensitive(not self.notbranch)
+        self.menuitem_branch_status.set_sensitive(not self.notbranch)
+        self.menuitem_branch_missing.set_sensitive(not self.notbranch)
+        self.menuitem_stats.set_sensitive(not self.notbranch)
+        self.menuitem_add_files.set_sensitive(not self.notbranch)
+        self.menuitem_remove_files.set_sensitive(not self.notbranch)
+        self.menuitem_file_make_directory.set_sensitive(not self.notbranch)
+        self.menuitem_file_rename.set_sensitive(not self.notbranch)
+        self.menuitem_file_move.set_sensitive(not self.notbranch)
+        #self.menutoolbutton_diff.set_sensitive(True)
+        self.toolbutton_diff.set_sensitive(not self.notbranch)
+        self.toolbutton_log.set_sensitive(not self.notbranch)
+        self.toolbutton_commit.set_sensitive(not self.notbranch)
+        self.toolbutton_pull.set_sensitive(not self.notbranch)
+        self.toolbutton_push.set_sensitive(not self.notbranch)
 
     def _harddisks(self):
         """ Returns hard drive letters under Win32. """

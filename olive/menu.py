@@ -56,8 +56,6 @@ class OliveMenu:
         # Set default values
         self.path = path
         self.selected = selected
-        print "DEBUG: path =", self.path
-        print "DEBUG: selected =", self.selected
         
         # Create the file list context menu
         self.ui = gtk.UIManager()
