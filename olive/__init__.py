@@ -207,7 +207,7 @@ class OliveGtk:
     def on_menuitem_branch_checkout_activate(self, widget):
         """ Branch/Checkout... menu handler. """
         from checkout import OliveCheckout
-        checkout = OliveCheckout()
+        checkout = OliveCheckout(self.get_path())
         checkout.display()
     
     def on_menuitem_branch_commit_activate(self, widget):
