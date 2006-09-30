@@ -15,7 +15,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import os
-import sys
 
 try:
     import pygtk
@@ -27,15 +26,16 @@ import gtk
 import gtk.glade
 
 import bzrlib.errors as errors
+from bzrlib.workingtree import WorkingTree
+
+from olive import gladefile
+from dialog import error_dialog
 
 class OliveRename:
     """ Display the Rename dialog and perform the needed actions. """
-    def __init__(self, comm):
+    def __init__(self, wt, wtpath, selected=[]):
         """ Initialize the Rename dialog. """
         self.glade = gtk.glade.XML(gladefile, 'window_rename')
-        
-        # Communication object
-        self.comm = comm
         
         self.window = self.glade.get_widget('window_rename')
         
@@ -46,6 +46,10 @@ class OliveRename:
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
         
+        self.wt = wt
+        self.wtpath = wtpath
+        self.selected = selected
+        
     def display(self):
         """ Display the Rename dialog. """
         self.window.show_all()
@@ -54,21 +58,25 @@ class OliveRename:
         # Get entry
         entry = self.glade.get_widget('entry_rename')
         
-        old_filename = self.comm.get_selected_right()
+        old_filename = self.selected
         new_filename = entry.get_text()
             
         if old_filename is None:
             error_dialog(_('No file was selected'),
-                                     _('Please select a file from the list to proceed.'))
+                         _('Please select a file from the list to proceed.'))
             return
         
         if new_filename == "":
             error_dialog(_('Filename not given'),
-                                     _('Please specify a new name for the file.'))
+                         _('Please specify a new name for the file.'))
             return
         
-        source = self.comm.get_path() + '/' + old_filename
-        destination = self.comm.get_path() + '/' + new_filename
+        if self.wtpath == "":
+            source = self.wt.abspath(old_filename)
+            destination = self.wt.abspath(new_filename)
+        else:
+            source = self.wt.abspath(self.wtpath + os.sep + old_filename)
+            destination = self.wt.abspath(self.wtpath + os.sep + new_filename)
         
         # Rename the file
         try:
@@ -77,16 +85,15 @@ class OliveRename:
 
             if wt1.base != wt2.base:
                 error_dialog(_('Not the same branch'),
-                                         _('The destination is not in the same branch.'))
+                             _('The destination is not in the same branch.'))
                 return
             wt1.rename_one(source, destination)
         except errors.NotBranchError:
             error_dialog(_('File is not in a branch'),
-                                     _('The selected file is not in a branch.'))
+                         _('The selected file is not in a branch.'))
             return
 
         self.close()
-        self.comm.refresh_right()
     
     def close(self, widget=None):
         self.window.destroy()

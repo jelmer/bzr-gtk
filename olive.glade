@@ -1305,7 +1305,7 @@
 <widget class="GtkDialog" id="window_add">
   <property name="visible">True</property>
   <property name="title" translatable="yes">Olive - Add file(s)</property>
-  <property name="type">GTK_WINDOW_POPUP</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
   <property name="modal">False</property>
   <property name="resizable">False</property>
@@ -2423,7 +2423,7 @@
 <widget class="GtkDialog" id="window_mkdir">
   <property name="visible">True</property>
   <property name="title" translatable="yes">Olive - Make directory</property>
-  <property name="type">GTK_WINDOW_POPUP</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
   <property name="modal">False</property>
   <property name="resizable">True</property>
@@ -2591,7 +2591,7 @@
 <widget class="GtkDialog" id="window_move">
   <property name="width_request">250</property>
   <property name="title" translatable="yes">Olive - Move</property>
-  <property name="type">GTK_WINDOW_POPUP</property>
+  <property name="type">GTK_WINDOW_TOPLEVEL</property>
   <property name="window_position">GTK_WIN_POS_NONE</property>
   <property name="modal">False</property>
   <property name="resizable">True</property>

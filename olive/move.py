@@ -15,7 +15,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import os
-import sys
+from os.path import dirname
 
 try:
     import pygtk
@@ -27,17 +27,16 @@ import gtk
 import gtk.glade
 
 import bzrlib.errors as errors
+from bzrlib.workingtree import WorkingTree
 
 from olive import gladefile
+from dialog import error_dialog
 
 class OliveMove:
     """ Display the Move dialog and perform the needed actions. """
-    def __init__(self, comm):
+    def __init__(self, wt, wtpath, selected=[]):
         """ Initialize the Move dialog. """
         self.glade = gtk.glade.XML(gladefile, 'window_move', 'olive-gtk')
-        
-        # Communication object
-        self.comm = comm
         
         self.window = self.glade.get_widget('window_move')
         
@@ -48,9 +47,21 @@ class OliveMove:
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
         
+        self.wt = wt
+        self.wtpath = wtpath
+        self.selected = selected
+        
+        if self.selected is None:
+            self.selected = ""
+        
+        if self.wtpath == "":
+            directory = dirname(self.wt.abspath(self.selected))
+        else:
+            directory = dirname(self.wt.abspath(self.wtpath + os.sep + self.selected))
+        
         # Set FileChooser directory
         self.filechooser = self.glade.get_widget('filechooserbutton_move')
-        self.filechooser.set_filename(self.comm.get_path())
+        self.filechooser.set_filename(directory)
 
     def display(self):
         """ Display the Move dialog. """
@@ -59,14 +70,17 @@ class OliveMove:
     def move(self, widget):
         destination = self.filechooser.get_filename()
 
-        filename = self.comm.get_selected_right()
+        filename = self.selected
             
         if filename is None:
             error_dialog(_('No file was selected'),
-                                     _('Please select a file from the list to proceed.'))
+                         _('Please select a file from the list to proceed.'))
             return
         
-        source = self.comm.get_path() + '/' + filename
+        if self.wtpath == "":
+            source = self.wt.abspath(filename)
+        else:
+            source = self.wt.abspath(self.wtpath + os.sep + filename)
         
         # Move the file to a directory
         try:
@@ -74,17 +88,16 @@ class OliveMove:
             wt2, path2 = WorkingTree.open_containing(destination)
             if wt1.base != wt2.base:
                 error_dialog(_('Not the same branch'),
-                                         _('The destination is not in the same branch.'))
+                             _('The destination is not in the same branch.'))
                 return
 
             wt1.move([source], destination)
         except errors.NotBranchError:
             error_dialog(_('File is not in a branch'),
-                                     _('The selected file is not in a branch.'))
+                         _('The selected file is not in a branch.'))
             return
 
         self.close()
-        self.comm.refresh_right()
     
     def close(self, widget=None):
         self.window.destroy()
