@@ -29,6 +29,10 @@ In order to use the nautilus integration, you will need:
 
  * python-nautilus
 
+For Olive on Windows:
+
+ * pyWin32 (tested with build 209)
+
 Installation
 ------------
 
@@ -79,3 +83,24 @@ Time spans are scaled; for instance by selecting "1 Day", lines older than a
 day will be highlighted blue, but changes in the past hour will be red and
 lines 2 hours old may be orange. Highlighting can be turned off with --plain
 if overwhelming.
+
+Install on Windows
+------------------
+
+You can download the dependencies from the following locations:
+
+ - Python: http://www.python.org/download/releases/2.4.3/
+ - GTK: http://gladewin32.sourceforge.net/
+ - PyGTK: http://www.mapr.ucl.ac.be/~gustin/win32_ports/pygtk.html (pycairo too)
+ - Bazaar: http://bazaar-vcs.org/WindowsDownloads (Python-based should be okay)
+ - pyWin32: http://sourceforge.net/project/showfiles.php?group_id=78018
+
+As an Administrator, you can install Olive with the standard command:
+
+ > c:\Python24\python.exe setup.py install
+
+You can run Olive with this command:
+
+ > c:\Python24\python.exe c:\Python\Scripts\olive-gtk
+
+

@@ -9,8 +9,6 @@ import glob
 import os
 import sys
 
-
-
 class InstallData(install_data):
 	def run(self):
 		self.data_files.extend(self._compile_po_files())
