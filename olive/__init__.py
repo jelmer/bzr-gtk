@@ -201,7 +201,7 @@ class OliveGtk:
     def on_menuitem_branch_get_activate(self, widget):
         """ Branch/Get... menu handler. """
         from branch import OliveBranch
-        branch = OliveBranch()
+        branch = OliveBranch(self.get_path())
         branch.display()
     
     def on_menuitem_branch_checkout_activate(self, widget):
@@ -572,28 +572,9 @@ class OliveGtk:
         tvcolumn_filename.add_attribute(cell, 'text', 1)
         tvcolumn_status.pack_start(cell, True)
         tvcolumn_status.add_attribute(cell, 'text', 2)
-
-        # Set menu and toolbar sensitivity
-        self.menuitem_branch_init.set_sensitive(self.notbranch)
-        self.menuitem_branch_get.set_sensitive(not self.notbranch)
-        self.menuitem_branch_checkout.set_sensitive(not self.notbranch)
-        self.menuitem_branch_pull.set_sensitive(not self.notbranch)
-        self.menuitem_branch_push.set_sensitive(not self.notbranch)
-        self.menuitem_branch_commit.set_sensitive(not self.notbranch)
-        self.menuitem_branch_status.set_sensitive(not self.notbranch)
-        self.menuitem_branch_missing.set_sensitive(not self.notbranch)
-        self.menuitem_stats.set_sensitive(not self.notbranch)
-        self.menuitem_add_files.set_sensitive(not self.notbranch)
-        self.menuitem_remove_files.set_sensitive(not self.notbranch)
-        self.menuitem_file_make_directory.set_sensitive(not self.notbranch)
-        self.menuitem_file_rename.set_sensitive(not self.notbranch)
-        self.menuitem_file_move.set_sensitive(not self.notbranch)
-        #self.menutoolbutton_diff.set_sensitive(True)
-        self.toolbutton_diff.set_sensitive(not self.notbranch)
-        self.toolbutton_log.set_sensitive(not self.notbranch)
-        self.toolbutton_commit.set_sensitive(not self.notbranch)
-        self.toolbutton_pull.set_sensitive(not self.notbranch)
-        self.toolbutton_push.set_sensitive(not self.notbranch)
+        
+        # Set sensitivity
+        self.set_sensitivity()
         
     def get_selected_right(self):
         """ Get the selected filename. """
@@ -622,6 +603,29 @@ class OliveGtk:
     def clear_statusbar(self):
         """ Clean the last message from the statusbar. """
         self.statusbar.pop(self.context_id)
+    
+    def set_sensitivity(self):
+        """ Set menu and toolbar sensitivity. """
+        self.menuitem_branch_init.set_sensitive(self.notbranch)
+        self.menuitem_branch_get.set_sensitive(self.notbranch)
+        self.menuitem_branch_checkout.set_sensitive(self.notbranch)
+        self.menuitem_branch_pull.set_sensitive(not self.notbranch)
+        self.menuitem_branch_push.set_sensitive(not self.notbranch)
+        self.menuitem_branch_commit.set_sensitive(not self.notbranch)
+        self.menuitem_branch_status.set_sensitive(not self.notbranch)
+        self.menuitem_branch_missing.set_sensitive(not self.notbranch)
+        self.menuitem_stats.set_sensitive(not self.notbranch)
+        self.menuitem_add_files.set_sensitive(not self.notbranch)
+        self.menuitem_remove_files.set_sensitive(not self.notbranch)
+        self.menuitem_file_make_directory.set_sensitive(not self.notbranch)
+        self.menuitem_file_rename.set_sensitive(not self.notbranch)
+        self.menuitem_file_move.set_sensitive(not self.notbranch)
+        #self.menutoolbutton_diff.set_sensitive(True)
+        self.toolbutton_diff.set_sensitive(not self.notbranch)
+        self.toolbutton_log.set_sensitive(not self.notbranch)
+        self.toolbutton_commit.set_sensitive(not self.notbranch)
+        self.toolbutton_pull.set_sensitive(not self.notbranch)
+        self.toolbutton_push.set_sensitive(not self.notbranch)
     
     def refresh_left(self):
         """ Refresh the bookmark list. """
@@ -741,27 +745,8 @@ class OliveGtk:
         # Add the ListStore to the TreeView
         self.treeview_right.set_model(liststore)
         
-        # Set menu and toolbar sensitivity
-        self.menuitem_branch_init.set_sensitive(self.notbranch)
-        self.menuitem_branch_get.set_sensitive(not self.notbranch)
-        self.menuitem_branch_checkout.set_sensitive(not self.notbranch)
-        self.menuitem_branch_pull.set_sensitive(not self.notbranch)
-        self.menuitem_branch_push.set_sensitive(not self.notbranch)
-        self.menuitem_branch_commit.set_sensitive(not self.notbranch)
-        self.menuitem_branch_status.set_sensitive(not self.notbranch)
-        self.menuitem_branch_missing.set_sensitive(not self.notbranch)
-        self.menuitem_stats.set_sensitive(not self.notbranch)
-        self.menuitem_add_files.set_sensitive(not self.notbranch)
-        self.menuitem_remove_files.set_sensitive(not self.notbranch)
-        self.menuitem_file_make_directory.set_sensitive(not self.notbranch)
-        self.menuitem_file_rename.set_sensitive(not self.notbranch)
-        self.menuitem_file_move.set_sensitive(not self.notbranch)
-        #self.menutoolbutton_diff.set_sensitive(True)
-        self.toolbutton_diff.set_sensitive(not self.notbranch)
-        self.toolbutton_log.set_sensitive(not self.notbranch)
-        self.toolbutton_commit.set_sensitive(not self.notbranch)
-        self.toolbutton_pull.set_sensitive(not self.notbranch)
-        self.toolbutton_push.set_sensitive(not self.notbranch)
+        # Set sensitivity
+        self.set_sensitivity()
 
     def _harddisks(self):
         """ Returns hard drive letters under Win32. """
