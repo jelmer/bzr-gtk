@@ -66,10 +66,7 @@ class OliveRemove:
                              _('Please select a file from the list,\nor choose the other option.'))
                 return
             
-            if self.wtpath == "":
-                fullpath = self.wt.abspath(filename)
-            else:
-                fullpath = self.wt.abspath(self.wtpath + os.sep + filename)
+            fullpath = self.wt.abspath(os.path.join(self.wtpath, filename))
             
             try:
                 self.wt.remove(fullpath)

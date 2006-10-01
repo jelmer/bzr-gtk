@@ -14,8 +14,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import sys
-
 try:
     import pygtk
     pygtk.require("2.0")
@@ -24,16 +22,6 @@ except:
 
 import gtk
 import gtk.glade
-import gobject
-import pango
-
-import bzrlib
-import bzrlib.errors as errors
-
-from bzrlib.status import show_tree_status
-from bzrlib.workingtree import WorkingTree
-
-from dialog import error_dialog
 
 from olive import gladefile
 
@@ -45,6 +33,7 @@ class OliveStatus:
         
         # Get the Status window widget
         self.window = self.glade.get_widget('window_status')
+        
         self.wt = wt
         self.wtpath = wtpath
         

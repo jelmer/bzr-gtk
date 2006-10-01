@@ -56,8 +56,6 @@ class OliveMenu:
         # Set default values
         self.path = path
         self.selected = selected
-        print "DEBUG: path =", self.path
-        print "DEBUG: selected =", self.selected
         
         # Create the file list context menu
         self.ui = gtk.UIManager()
@@ -212,15 +210,26 @@ class OliveMenu:
     
     def diff(self, action):
         """ Right context menu -> Diff """
-        from diff import OliveDiff
-        diff = OliveDiff(self.comm)
-        diff.display()
+        from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
+        
+        try:
+            wt = WorkingTree.open_containing(self.path)[0]
+        except errors.NotBranchError:
+            error_dialog(_('File is not in a branch'),
+                         _('The selected file is not in a branch.'))
+            return
+        
+        window = DiffWindow()
+        parent_tree = wt.branch.repository.revision_tree(wt.branch.last_revision())
+        window.set_diff(wt.branch.nick, wt, parent_tree)
+        window.show()
     
     def bookmark(self, action):
         """ Right context menu -> Bookmark """
-        if self.pref.add_bookmark(self.comm.get_path()):
+        if self.pref.add_bookmark(self.path):
             info_dialog(_('Bookmark successfully added'),
                         _('The current directory was bookmarked. You can reach\nit by selecting it from the left panel.'))
+            self.pref.write()
         else:
             warning_dialog(_('Location already bookmarked'),
                            _('The current directory is already bookmarked.\nSee the left panel for reference.'))

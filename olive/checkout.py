@@ -14,7 +14,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import sys
+import os
 
 try:
     import pygtk
@@ -25,9 +25,13 @@ except:
 import gtk
 import gtk.glade
 
+from bzrlib.branch import Branch
+import bzrlib.bzrdir as bzrdir
 import bzrlib.errors as errors
+import bzrlib.osutils
 
 from olive import gladefile
+from dialog import error_dialog
 
 class OliveCheckout:
     """ Display checkout dialog and perform the needed operations. """
@@ -58,20 +62,20 @@ class OliveCheckout:
         location = entry_location.get_text()
         if location is '':
             error_dialog(_('Missing branch location'),
-                                     _('You must specify a branch location.'))
+                         _('You must specify a branch location.'))
             return
         
         destination = self.filechooser.get_filename()
         
         spinbutton_revno = self.glade.get_widget('spinbutton_checkout_revno')
         revno = spinbutton_revno.get_value_as_int()
-        rev_id = source.get_rev_id(revno)
         
         checkbutton_lightweight = self.glade.get_widget('checkbutton_checkout_lightweight')
         lightweight = checkbutton_lightweight.get_active()
         
         try:
             source = Branch.open(location)
+            rev_id = source.get_rev_id(revno)
             
             # if the source and destination are the same, 
             # and there is no working tree,
@@ -80,7 +84,7 @@ class OliveCheckout:
                 bzrlib.osutils.abspath(location)):
                 try:
                     source.bzrdir.open_workingtree()
-                except NoWorkingTree:
+                except errors.NoWorkingTree:
                     source.bzrdir.create_workingtree()
                     return
 
@@ -89,7 +93,7 @@ class OliveCheckout:
             os.mkdir(destination)
 
             old_format = bzrlib.bzrdir.BzrDirFormat.get_default_format()
-            bzrlib.bzrdir.BzrDirFormat.set_default_format(bzrdir.BzrDirMetaFormat1())
+            bzrdir.BzrDirFormat.set_default_format(bzrdir.BzrDirMetaFormat1())
 
             try:
                 if lightweight:
@@ -109,15 +113,15 @@ class OliveCheckout:
                 bzrlib.bzrdir.BzrDirFormat.set_default_format(old_format)
         except errors.NotBranchError, errmsg:
             error_dialog(_('Location is not a branch'),
-                                     _('The specified location has to be a branch.'))
+                         _('The specified location has to be a branch.'))
             return
         except errors.TargetAlreadyExists, errmsg:
             error_dialog(_('Target already exists'),
-                                     _('Target directory (%s)\nalready exists. Please select another target.') % errmsg)
+                         _('Target directory (%s)\nalready exists. Please select another target.') % errmsg)
             return
         except errors.NonExistingParent, errmsg:
             error_dialog(_('Non existing parent directory'),
-                                     _("The parent directory (%s)\ndoesn't exist.") % errmsg)
+                         _("The parent directory (%s)\ndoesn't exist.") % errmsg)
             return
         
         self.close()

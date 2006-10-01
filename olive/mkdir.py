@@ -15,7 +15,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import os
-import sys
 
 try:
     import pygtk
@@ -29,6 +28,7 @@ import gtk.glade
 import bzrlib.errors as errors
 
 from olive import gladefile
+from dialog import error_dialog, warning_dialog
 
 class OliveMkdir:
     """ Display the Make directory dialog and perform the needed actions. """
@@ -44,6 +44,9 @@ class OliveMkdir:
         
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
+        
+        self.wt = wt
+        self.wtpath = wtpath
 
     def display(self):
         """ Display the Make directory dialog. """
@@ -58,38 +61,35 @@ class OliveMkdir:
         
         if dirname == "":
             error_dialog(_('No directory name given'),
-                                     _('Please specify a desired name for the new directory.'))
+                         _('Please specify a desired name for the new directory.'))
             return
         
         if checkbox.get_active():
             # Want to create a versioned directory
             try:
-                from bzrlib.workingtree import WorkingTree
-    
-                os.mkdir(os.path.join(wt.base, wtpath))
+                os.mkdir(os.path.join(self.wt.basedir, self.wtpath, dirname))
 
-                wt.add([wtpath])
+                self.wt.add([os.path.join(self.wtpath, dirname)])
             except OSError, e:
                 if e.errno == 17:
                     error_dialog(_('Directory already exists'),
-                                             _('Please specify another name to continue.'))
+                                 _('Please specify another name to continue.'))
                 else:
                     raise
             except errors.NotBranchError:
                 warning_dialog(_('Directory is not in a branch'),
-                                           _('You can only create a non-versioned directory.'))
+                               _('You can only create a non-versioned directory.'))
         else:
             # Just a simple directory
             try:
-                os.mkdir(os.path.join(wt.base, wtpath))
+                os.mkdir(os.path.join(self.wt.basedir, self.wtpath, dirname))
             except OSError, e:
                 if e.errno == 17:
                     error_dialog(_('Directory already exists'),
-                                             _('Please specify another name to continue.'))
+                                 _('Please specify another name to continue.'))
                     return
 
         self.close()
-        self.comm.refresh_right()
     
     def close(self, widget=None):
         self.window.destroy()
