@@ -3,13 +3,14 @@ import bzrlib
 from bzrlib.bzrdir import BzrDir
 from bzrlib.errors import NotBranchError
 from bzrlib.workingtree import WorkingTree
+from bzrlib.tree import file_status
 
 from bzrlib.plugin import load_plugins
 load_plugins()
 
 from bzrlib.plugins.gtk import cmd_visualise, cmd_gannotate
 
-class BzrExtension(nautilus.MenuProvider):
+class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.InfoProvider):
     def __init__(self):
         pass
 
@@ -272,3 +273,50 @@ class BzrExtension(nautilus.MenuProvider):
                 items.append(item)
 
         return items
+
+    def get_columns(self):
+        return nautilus.Column("BzrNautilus::bzr_status",
+                               "bzr_status",
+                               "Bzr Status",
+                               "Version control status"),
+
+    def update_file_info(self, file):
+        if file.get_uri_scheme() != 'file':
+            return
+        
+        try:
+            tree, path = WorkingTree.open_containing(file.get_uri())
+        except NotBranchError:
+            return
+
+        emblem = None
+        status = None
+
+        if tree.has_filename(path):
+            emblem = 'cvs-controlled'
+            status = 'unchanged'
+            id = tree.path2id(path)
+
+            delta = tree.changes_from(tree.branch.basis_tree())
+            if delta.touches_file_id(id):
+                emblem = 'cvs-modified'
+                status = 'modified'
+            for f, _, _ in delta.added:
+                if f == path:
+                    emblem = 'cvs-added'
+                    status = 'added'
+
+            for of, f, _, _, _, _ in delta.renamed:
+                if f == path:
+                    status = 'renamed from %s' % f
+
+        elif tree.branch.basis_tree().has_filename(path):
+            emblem = 'cvs-removed'
+            status = 'removed'
+        else:
+            # FIXME: Check for ignored files
+            status = 'unversioned'
+        
+        if emblem is not None:
+            file.add_emblem(emblem)
+        file.add_string_attribute('bzr_status', status)
