@@ -15,32 +15,27 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import os
-import sys
 
 try:
     import pygtk
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    sys.exit(1)
+
+import gtk
+import gtk.glade
 
 import bzrlib.errors as errors
+from bzrlib.workingtree import WorkingTree
+
+from olive import gladefile
+from dialog import error_dialog
 
 class OliveRename:
     """ Display the Rename dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, wt, wtpath, selected=[]):
         """ Initialize the Rename dialog. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_rename')
-        
-        # Communication object
-        self.comm = comm
-        # Dialog object
-        self.dialog = dialog
+        self.glade = gtk.glade.XML(gladefile, 'window_rename')
         
         self.window = self.glade.get_widget('window_rename')
         
@@ -51,6 +46,10 @@ class OliveRename:
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
         
+        self.wt = wt
+        self.wtpath = wtpath
+        self.selected = selected
+        
     def display(self):
         """ Display the Rename dialog. """
         self.window.show_all()
@@ -59,39 +58,40 @@ class OliveRename:
         # Get entry
         entry = self.glade.get_widget('entry_rename')
         
-        old_filename = self.comm.get_selected_right()
+        old_filename = self.selected
         new_filename = entry.get_text()
             
         if old_filename is None:
-            self.dialog.error_dialog(_('No file was selected'),
-                                     _('Please select a file from the list to proceed.'))
+            error_dialog(_('No file was selected'),
+                         _('Please select a file from the list to proceed.'))
             return
         
         if new_filename == "":
-            self.dialog.error_dialog(_('Filename not given'),
-                                     _('Please specify a new name for the file.'))
+            error_dialog(_('Filename not given'),
+                         _('Please specify a new name for the file.'))
             return
         
-        source = self.comm.get_path() + '/' + old_filename
-        destination = self.comm.get_path() + '/' + new_filename
+        source = os.path.join(self.wtpath, old_filename)
+        destination = os.path.join(self.wtpath, new_filename)
         
         # Rename the file
         try:
-            wt1, path1 = WorkingTree.open_containing(source)
-            wt2, path2 = WorkingTree.open_containing(source)
+            wt1, path1 = WorkingTree.open_containing(self.wt.abspath(source))
+            wt2, path2 = WorkingTree.open_containing(self.wt.abspath(source))
 
-            if wt1.base != wt2.base:
-                self.dialog.error_dialog(_('Not the same branch'),
-                                         _('The destination is not in the same branch.'))
+            if wt1.basedir != wt2.basedir:
+                error_dialog(_('Not the same branch'),
+                             _('The destination is not in the same branch.'))
                 return
             wt1.rename_one(source, destination)
         except errors.NotBranchError:
-            self.dialog.error_dialog(_('File is not in a branch'),
-                                     _('The selected file is not in a branch.'))
+            error_dialog(_('File is not in a branch'),
+                         _('The selected file is not in a branch.'))
             return
+        except errors.BzrError, msg:
+            error_dialog(_('Unknown bzr error'), str(msg))
 
         self.close()
-        self.comm.refresh_right()
     
     def close(self, widget=None):
         self.window.destroy()

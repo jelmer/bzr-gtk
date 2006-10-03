@@ -14,35 +14,30 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import sys
-
 try:
     import pygtk
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.gdk
-    import gtk.glade
-except:
-    sys.exit(1)
+    
+import gtk
+import gtk.gdk
+import gtk.glade
 
 import bzrlib.errors as errors
 
+from olive import gladefile
+from dialog import error_dialog, info_dialog
+
 class OlivePush:
     """ Display Push dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, branch):
         """ Initialize the Push dialog. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_push')
-        
-        # Communication object
-        self.comm = comm
-        # Dialog object
-        self.dialog = dialog
+        self.glade = gtk.glade.XML(gladefile, 'window_push')
         
         self.window = self.glade.get_widget('window_push')
+
+        self.branch = branch
         
         # Dictionary for signal_autoconnect
         dic = { "on_button_push_push_clicked": self.push,
@@ -69,28 +64,13 @@ class OlivePush:
         self.entry_location.set_sensitive(0)
         self.check_remember.set_sensitive(0)
         self.check_create.set_sensitive(0)
-		
-        # Get stored location
-        self.notbranch = False
-        try:
-            from bzrlib.branch import Branch
-    
-            branch = Branch.open_containing(self.comm.get_path())[0]
-    
-            self.entry_stored.set_text(branch.get_push_location())
-        except errors.NotBranchError:
-            self.notbranch = True
-            return
+        
+        self.entry_stored.set_text(branch.get_push_location())
     
     def display(self):
         """ Display the Push dialog. """
-        if self.notbranch:
-            self.dialog.error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
-            self.close()
-        else:
-            self.window.show()
-            self.width, self.height = self.window.get_size()
+        self.window.show()
+        self.width, self.height = self.window.get_size()
     
     def stored_toggled(self, widget):
         if widget.get_active():
@@ -118,52 +98,42 @@ class OlivePush:
     
     def push(self, widget):
         revs = 0
-        self.comm.set_busy(self.window)
         if self.radio_stored.get_active():
             try:
-                revs = do_push(self.comm.get_path(),
+                revs = do_push(self.branch,
                                overwrite=self.check_overwrite.get_active())
             except errors.NotBranchError:
-                self.dialog.error_dialog(_('Directory is not a branch'),
-                                         _('You can perform this action only in a branch.'))
+                error_dialog(_('Directory is not a branch'),
+                             _('You can perform this action only in a branch.'))
                 return
             except errors.DivergedBranches:
-                self.dialog.error_dialog(_('Branches have been diverged'),
-                                         _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
+                error_dialog(_('Branches have been diverged'),
+                             _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
                 return
-            except:
-                raise
         elif self.radio_specific.get_active():
             location = self.entry_location.get_text()
             if location == '':
-                self.dialog.error_dialog(_('No location specified'),
-                                         _('Please specify a location or use the default.'))
+                error_dialog(_('No location specified'),
+                             _('Please specify a location or use the default.'))
                 return
             
             try:
-                revs = do_push(self.comm.get_path(), location,
+                revs = do_push(self.branch, location,
                                self.check_remember.get_active(),
                                self.check_overwrite.get_active(),
                                self.check_create.get_active())
             except errors.NotBranchError:
-                self.dialog.error_dialog(_('Directory is not a branch'),
-                                         _('You can perform this action only in a branch.'))
-                self.comm.set_busy(self.window, False)
+                error_dialog(_('Directory is not a branch'),
+                             _('You can perform this action only in a branch.'))
                 return
             except errors.DivergedBranches:
-                self.dialog.error_dialog(_('Branches have been diverged'),
-                                         _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
-                self.comm.set_busy(self.window, False)
+                error_dialog(_('Branches have been diverged'),
+                             _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
                 return
-            except:
-                raise
-        else:
-            # This should really never happen
-            pass
         
         self.close()
-        self.dialog.info_dialog(_('Push successful'),
-                                _('%d revision(s) pushed.') % revs)
+        info_dialog(_('Push successful'),
+                    _('%d revision(s) pushed.') % revs)
     
     def test(self, widget):
         """ Test if write access possible. """
@@ -219,7 +189,7 @@ def do_push(branch, location=None, remember=False, overwrite=False,
     stored_loc = br_from.get_push_location()
     if location is None:
         if stored_loc is None:
-            self.dialog.error_dialog(_('Push location is unknown'),
+            error_dialog(_('Push location is unknown'),
                                      _('Please specify a location manually.'))
             return
         else:
@@ -244,8 +214,8 @@ def do_push(branch, location=None, remember=False, overwrite=False,
                 relurl = transport.relpath(location_url)
                 transport.mkdir(relurl)
             except errors.NoSuchFile:
-                self.dialog.error_dialog(_('Non existing parent directory'),
-                                         _("The parent directory (%s)\ndoesn't exist.") % location)
+                error_dialog(_('Non existing parent directory'),
+                             _("The parent directory (%s)\ndoesn't exist.") % location)
                 return
         else:
             current = transport.base
@@ -260,8 +230,8 @@ def do_push(branch, location=None, remember=False, overwrite=False,
                     needed.append((new_transport,
                                    new_transport.relpath(transport.base)))
                     if new_transport.base == transport.base:
-                        self.dialog.error_dialog(_('Path prefix not created'),
-                                                 _("The path leading up to the specified location couldn't\nbe created."))
+                        error_dialog(_('Path prefix not created'),
+                                     _("The path leading up to the specified location couldn't\nbe created."))
                         return
         dir_to = br_from.bzrdir.clone(location_url,
             revision_id=br_from.last_revision())
@@ -270,18 +240,15 @@ def do_push(branch, location=None, remember=False, overwrite=False,
     else:
         old_rh = br_to.revision_history()
         try:
-            try:
-                tree_to = dir_to.open_workingtree()
-            except errors.NotLocalUrl:
-                # FIXME - what to do here? how should we warn the user?
-                #warning('This transport does not update the working '
-                #        'tree of: %s' % (br_to.base,))
-                count = br_to.pull(br_from, overwrite)
-            except errors.NoWorkingTree:
-                count = br_to.pull(br_from, overwrite)
-            else:
-                count = tree_to.pull(br_from, overwrite)
-        except errors.DivergedBranches:
-            raise
-    
+            tree_to = dir_to.open_workingtree()
+        except errors.NotLocalUrl:
+            # FIXME - what to do here? how should we warn the user?
+            #warning('This transport does not update the working '
+            #        'tree of: %s' % (br_to.base,))
+            count = br_to.pull(br_from, overwrite)
+        except errors.NoWorkingTree:
+            count = br_to.pull(br_from, overwrite)
+        else:
+            count = tree_to.pull(br_from, overwrite)
+
     return count

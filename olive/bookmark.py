@@ -14,32 +14,27 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import sys
-
 try:
     import pygtk
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    sys.exit(1)
+
+import gtk
+import gtk.glade
+
+from olive import gladefile, OlivePreferences
+from dialog import error_dialog
 
 class OliveBookmark:
     """ Display the Edit bookmark dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, selected):
         """ Initialize the Edit bookmark dialog. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_bookmark', 'olive-gtk')
-        
-        # Communication object
-        self.comm = comm
-        # Dialog object
-        self.dialog = dialog
+        self.glade = gtk.glade.XML(gladefile, 'window_bookmark', 'olive-gtk')
         
         self.window = self.glade.get_widget('window_bookmark')
+        
+        self.pref = self.pref = OlivePreferences()
         
         # Dictionary for signal_autoconnect
         dic = { "on_button_bookmark_save_clicked": self.bookmark,
@@ -51,25 +46,27 @@ class OliveBookmark:
         # Get some important widgets
         self.entry_location = self.glade.get_widget('entry_bookmark_location')
         self.entry_title = self.glade.get_widget('entry_bookmark_title')
+        
+        self.selected = selected
 
     def display(self):
         """ Display the Edit bookmark dialog. """
-        path = self.comm.get_selected_left()
+        path = self.selected
         self.entry_location.set_text(path)
-        self.entry_title.set_text(self.comm.pref.get_bookmark_title(path))
+        self.entry_title.set_text(self.pref.get_bookmark_title(path))
         self.window.show_all()
         
     def bookmark(self, widget):
         if self.entry_title.get_text() == '':
-            self.dialog.error_dialog(_('No title given'),
-                                     _('Please specify a title to continue.'))
+            error_dialog(_('No title given'),
+                         _('Please specify a title to continue.'))
             return
         
-        self.comm.pref.set_bookmark_title(self.entry_location.get_text(),
-                                          self.entry_title.get_text())
+        self.pref.set_bookmark_title(self.entry_location.get_text(),
+                                     self.entry_title.get_text())
+        self.pref.write()
         
         self.close()
-        self.comm.refresh_left()
     
     def close(self, widget=None):
         self.window.destroy()

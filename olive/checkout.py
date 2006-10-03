@@ -14,32 +14,30 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import sys
+import os
 
 try:
     import pygtk
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    sys.exit(1)
 
+import gtk
+import gtk.glade
+
+from bzrlib.branch import Branch
+import bzrlib.bzrdir as bzrdir
 import bzrlib.errors as errors
+import bzrlib.osutils
+
+from olive import gladefile
+from dialog import error_dialog
 
 class OliveCheckout:
     """ Display checkout dialog and perform the needed operations. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, path=None):
         """ Initialize the Checkout dialog. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_checkout', 'olive-gtk')
-        
-        # Communication object
-        self.comm = comm
-        # Dialog object
-        self.dialog = dialog
+        self.glade = gtk.glade.XML(gladefile, 'window_checkout', 'olive-gtk')
         
         self.window = self.glade.get_widget('window_checkout')
         
@@ -52,7 +50,8 @@ class OliveCheckout:
         
         # Save FileChooser state
         self.filechooser = self.glade.get_widget('filechooserbutton_checkout')
-        self.filechooser.set_filename(self.comm.get_path())
+        if path is not None:
+            self.filechooser.set_filename(path)
 
     def display(self):
         """ Display the Checkout dialog. """
@@ -62,22 +61,21 @@ class OliveCheckout:
         entry_location = self.glade.get_widget('entry_checkout_location')
         location = entry_location.get_text()
         if location is '':
-            self.dialog.error_dialog(_('Missing branch location'),
-                                     _('You must specify a branch location.'))
+            error_dialog(_('Missing branch location'),
+                         _('You must specify a branch location.'))
             return
         
         destination = self.filechooser.get_filename()
         
         spinbutton_revno = self.glade.get_widget('spinbutton_checkout_revno')
         revno = spinbutton_revno.get_value_as_int()
-        rev_id = source.get_rev_id(revno)
         
         checkbutton_lightweight = self.glade.get_widget('checkbutton_checkout_lightweight')
         lightweight = checkbutton_lightweight.get_active()
         
-        self.comm.set_busy(self.window)
         try:
             source = Branch.open(location)
+            rev_id = source.get_rev_id(revno)
             
             # if the source and destination are the same, 
             # and there is no working tree,
@@ -86,7 +84,7 @@ class OliveCheckout:
                 bzrlib.osutils.abspath(location)):
                 try:
                     source.bzrdir.open_workingtree()
-                except NoWorkingTree:
+                except errors.NoWorkingTree:
                     source.bzrdir.create_workingtree()
                     return
 
@@ -95,7 +93,7 @@ class OliveCheckout:
             os.mkdir(destination)
 
             old_format = bzrlib.bzrdir.BzrDirFormat.get_default_format()
-            bzrlib.bzrdir.BzrDirFormat.set_default_format(bzrdir.BzrDirMetaFormat1())
+            bzrdir.BzrDirFormat.set_default_format(bzrdir.BzrDirMetaFormat1())
 
             try:
                 if lightweight:
@@ -114,22 +112,17 @@ class OliveCheckout:
             finally:
                 bzrlib.bzrdir.BzrDirFormat.set_default_format(old_format)
         except errors.NotBranchError, errmsg:
-            self.dialog.error_dialog(_('Location is not a branch'),
-                                     _('The specified location has to be a branch.'))
-            self.comm.set_busy(self.window, False)
+            error_dialog(_('Location is not a branch'),
+                         _('The specified location has to be a branch.'))
             return
         except errors.TargetAlreadyExists, errmsg:
-            self.dialog.error_dialog(_('Target already exists'),
-                                     _('Target directory (%s)\nalready exists. Please select another target.') % errmsg)
-            self.comm.set_busy(self.window, False)
+            error_dialog(_('Target already exists'),
+                         _('Target directory (%s)\nalready exists. Please select another target.') % errmsg)
             return
         except errors.NonExistingParent, errmsg:
-            self.dialog.error_dialog(_('Non existing parent directory'),
-                                     _("The parent directory (%s)\ndoesn't exist.") % errmsg)
-            self.comm.set_busy(self.window, False)
+            error_dialog(_('Non existing parent directory'),
+                         _("The parent directory (%s)\ndoesn't exist.") % errmsg)
             return
-        except:
-            raise
         
         self.close()
         self.comm.refresh_right()

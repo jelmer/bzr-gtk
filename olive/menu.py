@@ -22,19 +22,19 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    sys.exit(1)
+
+import gtk
 
 import bzrlib.errors as errors
+from bzrlib.workingtree import WorkingTree
 
+from dialog import error_dialog, info_dialog, warning_dialog
 from launch import launch
+from olive import OlivePreferences
 
 class OliveMenu:
     """ This class is responsible for building the context menus. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, path, selected):
         # Load the UI file
         if sys.platform == 'win32':
             self.uifile = os.path.dirname(sys.executable) + "/share/olive/cmenu.ui"
@@ -50,9 +50,12 @@ class OliveMenu:
                 print _('UI description file cannot be found.')
                 sys.exit(1)
         
-        self.gladefile = gladefile
-        self.comm = comm
-        self.dialog = dialog
+        # Preferences handler
+        self.pref = OlivePreferences()
+        
+        # Set default values
+        self.path = path
+        self.selected = selected
         
         # Create the file list context menu
         self.ui = gtk.UIManager()
@@ -112,18 +115,19 @@ class OliveMenu:
         self.toolbar_diff = self.ui.get_widget('/toolbar_diff')
         
         # Set icons
-        commit_menu = self.ui.get_widget('/context_right/commit')
-        commit_image = self.comm.menuitem_branch_commit.get_image()
-        commit_pixbuf = commit_image.get_pixbuf()
-        commit_icon = gtk.Image()
-        commit_icon.set_from_pixbuf(commit_pixbuf)
-        commit_menu.set_image(commit_icon)
-        diff_menu = self.ui.get_widget('/context_right/diff')
-        diff_image = self.comm.menuitem_stats_diff.get_image()
-        diff_pixbuf = diff_image.get_pixbuf()
-        diff_icon = gtk.Image()
-        diff_icon.set_from_pixbuf(diff_pixbuf)
-        diff_menu.set_image(diff_icon)
+        # TODO: do it without using deprecated comm
+        #commit_menu = self.ui.get_widget('/context_right/commit')
+        #commit_image = self.comm.menuitem_branch_commit.get_image()
+        #commit_pixbuf = commit_image.get_pixbuf()
+        #commit_icon = gtk.Image()
+        #commit_icon.set_from_pixbuf(commit_pixbuf)
+        #commit_menu.set_image(commit_icon)
+        #diff_menu = self.ui.get_widget('/context_right/diff')
+        #diff_image = self.comm.menuitem_stats_diff.get_image()
+        #diff_pixbuf = diff_image.get_pixbuf()
+        #diff_icon = gtk.Image()
+        #diff_icon.set_from_pixbuf(diff_pixbuf)
+        #diff_menu.set_image(diff_icon)
 
     def right_context_menu(self):
         return self.cmenu_right
@@ -133,33 +137,33 @@ class OliveMenu:
     
     def add_file(self, action):
         """ Right context menu -> Add """
+        import bzrlib.add
+        
         # Add only the selected file
-        directory = self.comm.get_path()
-        filename = self.comm.get_selected_right()
+        directory = self.path
+        filename = self.selected
             
         if filename is None:
-            self.dialog.error_dialog(_('No file was selected'),
-                                     _('Please select a file from the list,\nor choose the other option.'))
+            error_dialog(_('No file was selected'),
+                         _('Please select a file from the list,\nor choose the other option.'))
             return
         
         try:
             bzrlib.add.smart_add([directory + os.sep + filename])
         except errors.NotBranchError:
-            self.dialog.error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
+            error_dialog(_('Directory is not a branch'),
+                         _('You can perform this action only in a branch.'))
             return
-        
-        self.comm.refresh_right()
     
     def remove_file(self, action):
         """ Right context menu -> Remove """
         # Remove only the selected file
-        directory = self.comm.get_path()
-        filename = self.comm.get_selected_right()
+        directory = self.path
+        filename = self.selected
         
         if filename is None:
-            self.dialog.error_dialog(_('No file was selected'),
-                                     _('Please select a file from the list,\nor choose the other option.'))
+            error_dialog(_('No file was selected'),
+                         _('Please select a file from the list,\nor choose the other option.'))
             return
         
         try:
@@ -167,81 +171,87 @@ class OliveMenu:
             wt.remove(path)
 
         except errors.NotBranchError:
-            self.dialog.error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
+            error_dialog(_('Directory is not a branch'),
+                         _('You can perform this action only in a branch.'))
             return
         except errors.NotVersionedError:
-            self.dialog.error_dialog(_('File not versioned'),
-                                     _('The selected file is not versioned.'))
+            error_dialog(_('File not versioned'),
+                         _('The selected file is not versioned.'))
             return
-        except:
-            raise
-        
-        self.comm.refresh_right()
 
     def open_file(self, action):
         """ Right context menu -> Open """
         # Open only the selected file
-        filename = self.comm.get_selected_right()
+        filename = self.selected
         
         if filename is None:
-            self.dialog.error_dialog(_('No file was selected'),
-                                     _('Please select a file from the list,\nor choose the other option.'))
+            error_dialog(_('No file was selected'),
+                         _('Please select a file from the list,\nor choose the other option.'))
             return
 
         if filename == '..':
-            self.comm.set_path(os.path.split(self.comm.get_path())[0])
+            # TODO: how to enter a directory?
+            return
         else:
-            fullpath = self.comm.get_path() + os.sep + filename
+            fullpath = self.path + os.sep + filename
             if os.path.isdir(fullpath):
                 # selected item is an existant directory
-                self.comm.set_path(fullpath)
+                # TODO: how to enter a directory?
+                return
             else:
                 launch(fullpath) 
-        
-        self.comm.refresh_right()
 
     def commit(self, action):
         """ Right context menu -> Commit """
         from commit import OliveCommit
-        commit = OliveCommit(self.gladefile, self.comm, self.dialog)
+        wt, path = WorkingTree.open_containing(self.path)
+        commit = OliveCommit(wt, path)
         commit.display()
     
     def diff(self, action):
         """ Right context menu -> Diff """
-        from diff import OliveDiff
-        diff = OliveDiff(self.gladefile, self.comm, self.dialog)
-        diff.display()
+        from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
+        
+        try:
+            wt = WorkingTree.open_containing(self.path)[0]
+        except errors.NotBranchError:
+            error_dialog(_('File is not in a branch'),
+                         _('The selected file is not in a branch.'))
+            return
+        
+        window = DiffWindow()
+        parent_tree = wt.branch.repository.revision_tree(wt.branch.last_revision())
+        window.set_diff(wt.branch.nick, wt, parent_tree)
+        window.show()
     
     def bookmark(self, action):
         """ Right context menu -> Bookmark """
-        if self.comm.pref.add_bookmark(self.comm.get_path()):
-            self.dialog.info_dialog(_('Bookmark successfully added'),
-                                    _('The current directory was bookmarked. You can reach\nit by selecting it from the left panel.'))
+        if self.pref.add_bookmark(self.path):
+            info_dialog(_('Bookmark successfully added'),
+                        _('The current directory was bookmarked. You can reach\nit by selecting it from the left panel.'))
+            self.pref.write()
         else:
-            self.dialog.warning_dialog(_('Location already bookmarked'),
-                                       _('The current directory is already bookmarked.\nSee the left panel for reference.'))
-        
-        self.comm.refresh_left()
+            warning_dialog(_('Location already bookmarked'),
+                           _('The current directory is already bookmarked.\nSee the left panel for reference.'))
 
     def edit_bookmark(self, action):
         """ Left context menu -> Edit """
         from bookmark import OliveBookmark
 
-        if self.comm.get_selected_left() != None:
-            bookmark = OliveBookmark(self.gladefile, self.comm, self.dialog)
+        if self.selected != None:
+            bookmark = OliveBookmark(self.selected)
             bookmark.display()
 
     def remove_bookmark(self, action):
         """ Left context menu -> Remove """
         
-        if self.comm.get_selected_left() != None:
-            self.comm.pref.remove_bookmark(self.comm.get_selected_left())
+        if self.selected != None:
+            self.pref.remove_bookmark(self.comm.get_selected_left())
             self.comm.refresh_left()
     
     def open_folder(self, action):
         """ Left context menu -> Open Folder """
-        path = self.comm.get_selected_left()
+        path = self.selected
 
         if path != None:
             launch(path)
@@ -253,5 +263,5 @@ class OliveMenu:
     def diff_all(self, action):
         """ Diff toolbutton -> All... """
         from diff import OliveDiff
-        diff = OliveDiff(self.gladefile, self.comm, self.dialog)
+        diff = OliveDiff(self.comm)
         diff.display()

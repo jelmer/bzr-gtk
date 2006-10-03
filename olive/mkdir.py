@@ -15,32 +15,26 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import os
-import sys
 
 try:
     import pygtk
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-except:
-    sys.exit(1)
+
+import gtk
+import gtk.glade
 
 import bzrlib.errors as errors
 
+from olive import gladefile
+from dialog import error_dialog, warning_dialog
+
 class OliveMkdir:
     """ Display the Make directory dialog and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, wt, wtpath):
         """ Initialize the Make directory dialog. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_mkdir', 'olive-gtk')
-        
-        # Communication object
-        self.comm = comm
-        # Dialog object
-        self.dialog = dialog
+        self.glade = gtk.glade.XML(gladefile, 'window_mkdir', 'olive-gtk')
         
         self.window = self.glade.get_widget('window_mkdir')
         
@@ -50,6 +44,9 @@ class OliveMkdir:
         
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
+        
+        self.wt = wt
+        self.wtpath = wtpath
 
     def display(self):
         """ Display the Make directory dialog. """
@@ -63,42 +60,36 @@ class OliveMkdir:
         dirname = entry.get_text()
         
         if dirname == "":
-            self.dialog.error_dialog(_('No directory name given'),
-                                     _('Please specify a desired name for the new directory.'))
+            error_dialog(_('No directory name given'),
+                         _('Please specify a desired name for the new directory.'))
             return
-        
-        newdir = self.comm.get_path() + '/' + dirname
         
         if checkbox.get_active():
             # Want to create a versioned directory
             try:
-                from bzrlib.workingtree import WorkingTree
-    
-                os.mkdir(newdir)
+                os.mkdir(os.path.join(self.wt.basedir, self.wtpath, dirname))
 
-                wt, dd = WorkingTree.open_containing(newdir)
-                wt.add([dd])
+                self.wt.add([os.path.join(self.wtpath, dirname)])
             except OSError, e:
                 if e.errno == 17:
-                    self.dialog.error_dialog(_('Directory already exists'),
-                                             _('Please specify another name to continue.'))
+                    error_dialog(_('Directory already exists'),
+                                 _('Please specify another name to continue.'))
                 else:
                     raise
             except errors.NotBranchError:
-                self.dialog.warning_dialog(_('Directory is not in a branch'),
-                                           _('You can only create a non-versioned directory.'))
+                warning_dialog(_('Directory is not in a branch'),
+                               _('You can only create a non-versioned directory.'))
         else:
             # Just a simple directory
             try:
-                os.mkdir(newdir)
+                os.mkdir(os.path.join(self.wt.basedir, self.wtpath, dirname))
             except OSError, e:
                 if e.errno == 17:
-                    self.dialog.error_dialog(_('Directory already exists'),
-                                             _('Please specify another name to continue.'))
+                    error_dialog(_('Directory already exists'),
+                                 _('Please specify another name to continue.'))
                     return
 
         self.close()
-        self.comm.refresh_right()
     
     def close(self, widget=None):
         self.window.destroy()

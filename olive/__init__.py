@@ -14,9 +14,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import ConfigParser
 import os
-import os.path
 import sys
 
 try:
@@ -24,81 +22,124 @@ try:
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.gdk
-    import gtk.glade
-except:
-    sys.exit(1)
 
-from handler import OliveHandler
+import gtk
+import gtk.gdk
+import gtk.glade
+
+from bzrlib.branch import Branch
 import bzrlib.errors as errors
+from bzrlib.workingtree import WorkingTree
 
 # Olive GTK UI version
 __version__ = '0.11.0'
+
+# Load the glade file
+if sys.platform == 'win32':
+    gladefile = os.path.dirname(sys.executable) + "/share/olive/olive.glade"
+else:
+    gladefile = "/usr/share/olive/olive.glade"
+
+if not os.path.exists(gladefile):
+    # Load from current directory if not installed
+    gladefile = "olive.glade"
+    # Check again
+    if not os.path.exists(gladefile):
+        # Fail
+        print _('Glade file cannot be found.')
+        sys.exit(1)
+
+from dialog import error_dialog, info_dialog
 
 class OliveGtk:
     """ The main Olive GTK frontend class. This is called when launching the
     program. """
     
     def __init__(self):
-        # Load the glade file
-        if sys.platform == 'win32':
-            self.gladefile = os.path.dirname(sys.executable) + "/share/olive/olive.glade"
-        else:
-            self.gladefile = "/usr/share/olive/olive.glade"
-
-        if not os.path.exists(self.gladefile):
-            # Load from current directory if not installed
-            self.gladefile = "olive.glade"
-            # Check again
-            if not os.path.exists(self.gladefile):
-                # Fail
-                print _('Glade file cannot be found.')
-                sys.exit(1)
-
-        self.toplevel = gtk.glade.XML(self.gladefile, 'window_main', 'olive-gtk')
+        self.toplevel = gtk.glade.XML(gladefile, 'window_main', 'olive-gtk')
         
         self.window = self.toplevel.get_widget('window_main')
         
         self.pref = OlivePreferences()
-        self.comm = OliveCommunicator(self.toplevel, self.pref)
-        handler = OliveHandler(self.gladefile, self.comm)
+
+        # Initialize the statusbar
+        self.statusbar = self.toplevel.get_widget('statusbar')
+        self.context_id = self.statusbar.get_context_id('olive')
+        
+        # Get the main window
+        self.window_main = self.toplevel.get_widget('window_main')
+        # Get the HPaned
+        self.hpaned_main = self.toplevel.get_widget('hpaned_main')
+        # Get the TreeViews
+        self.treeview_left = self.toplevel.get_widget('treeview_left')
+        self.treeview_right = self.toplevel.get_widget('treeview_right')
+        # Get some important menu items
+        self.menuitem_add_files = self.toplevel.get_widget('menuitem_add_files')
+        self.menuitem_remove_files = self.toplevel.get_widget('menuitem_remove_file')
+        self.menuitem_file_make_directory = self.toplevel.get_widget('menuitem_file_make_directory')
+        self.menuitem_file_rename = self.toplevel.get_widget('menuitem_file_rename')
+        self.menuitem_file_move = self.toplevel.get_widget('menuitem_file_move')
+        self.menuitem_view_show_hidden_files = self.toplevel.get_widget('menuitem_view_show_hidden_files')
+        self.menuitem_branch = self.toplevel.get_widget('menuitem_branch')
+        self.menuitem_branch_init = self.toplevel.get_widget('menuitem_branch_initialize')
+        self.menuitem_branch_get = self.toplevel.get_widget('menuitem_branch_get')
+        self.menuitem_branch_checkout = self.toplevel.get_widget('menuitem_branch_checkout')
+        self.menuitem_branch_pull = self.toplevel.get_widget('menuitem_branch_pull')
+        self.menuitem_branch_push = self.toplevel.get_widget('menuitem_branch_push')
+        self.menuitem_branch_commit = self.toplevel.get_widget('menuitem_branch_commit')
+        self.menuitem_branch_status = self.toplevel.get_widget('menuitem_branch_status')
+        self.menuitem_branch_missing = self.toplevel.get_widget('menuitem_branch_missing_revisions')
+        self.menuitem_stats = self.toplevel.get_widget('menuitem_stats')
+        self.menuitem_stats_diff = self.toplevel.get_widget('menuitem_stats_diff')
+        self.menuitem_stats_log = self.toplevel.get_widget('menuitem_stats_log')
+        # Get some toolbuttons
+        #self.menutoolbutton_diff = self.toplevel.get_widget('menutoolbutton_diff')
+        self.toolbutton_diff = self.toplevel.get_widget('toolbutton_diff')
+        self.toolbutton_log = self.toplevel.get_widget('toolbutton_log')
+        self.toolbutton_commit = self.toplevel.get_widget('toolbutton_commit')
+        self.toolbutton_pull = self.toplevel.get_widget('toolbutton_pull')
+        self.toolbutton_push = self.toplevel.get_widget('toolbutton_push')
+        # Get the drive selector
+        self.combobox_drive = gtk.combo_box_new_text()
+        self.combobox_drive.connect("changed", self._refresh_drives)
+        
+        self.vbox_main_right = self.toplevel.get_widget('vbox_main_right')
+ 
         
         # Dictionary for signal_autoconnect
         dic = { "on_window_main_destroy": gtk.main_quit,
-                "on_window_main_delete_event": handler.on_window_main_delete_event,
-                "on_quit_activate": handler.on_window_main_delete_event,
-                "on_about_activate": handler.on_about_activate,
-                "on_menuitem_add_files_activate": handler.on_menuitem_add_files_activate,
-                "on_menuitem_remove_file_activate": handler.on_menuitem_remove_file_activate,
-                "on_menuitem_file_make_directory_activate": handler.on_menuitem_file_make_directory_activate,
-                "on_menuitem_file_move_activate": handler.on_menuitem_file_move_activate,
-                "on_menuitem_file_rename_activate": handler.on_menuitem_file_rename_activate,
-                "on_menuitem_view_show_hidden_files_activate": handler.on_menuitem_view_show_hidden_files_activate,
-                "on_menuitem_view_refresh_activate": handler.on_menuitem_view_refresh_activate,
-                "on_menuitem_branch_initialize_activate": handler.on_menuitem_branch_initialize_activate,
-                "on_menuitem_branch_get_activate": handler.on_menuitem_branch_get_activate,
-                "on_menuitem_branch_checkout_activate": handler.on_menuitem_branch_checkout_activate,
-                "on_menuitem_branch_commit_activate": handler.on_menuitem_branch_commit_activate,
-                "on_menuitem_branch_push_activate": handler.on_menuitem_branch_push_activate,
-                "on_menuitem_branch_pull_activate": handler.on_menuitem_branch_pull_activate,
-                "on_menuitem_branch_status_activate": handler.on_menuitem_branch_status_activate,
-                "on_menuitem_branch_missing_revisions_activate": handler.on_menuitem_branch_missing_revisions_activate,
-                "on_menuitem_stats_diff_activate": handler.on_menuitem_stats_diff_activate,
-                "on_menuitem_stats_log_activate": handler.on_menuitem_stats_log_activate,
-                "on_menuitem_stats_infos_activate": handler.on_menuitem_stats_infos_activate,
-                "on_toolbutton_refresh_clicked": handler.on_menuitem_view_refresh_activate,
-                "on_toolbutton_log_clicked": handler.on_menuitem_stats_log_activate,
-                #"on_menutoolbutton_diff_clicked": handler.on_menuitem_stats_diff_activate,
-                "on_toolbutton_diff_clicked": handler.on_menuitem_stats_diff_activate,
-                "on_toolbutton_commit_clicked": handler.on_menuitem_branch_commit_activate,
-                "on_toolbutton_pull_clicked": handler.on_menuitem_branch_pull_activate,
-                "on_toolbutton_push_clicked": handler.on_menuitem_branch_push_activate,
-                "on_treeview_right_button_press_event": handler.on_treeview_right_button_press_event,
-                "on_treeview_right_row_activated": handler.on_treeview_right_row_activated,
-                "on_treeview_left_button_press_event": handler.on_treeview_left_button_press_event,
-                "on_treeview_left_row_activated": handler.on_treeview_left_row_activated }
+                "on_window_main_delete_event": self.on_window_main_delete_event,
+                "on_quit_activate": self.on_window_main_delete_event,
+                "on_about_activate": self.on_about_activate,
+                "on_menuitem_add_files_activate": self.on_menuitem_add_files_activate,
+                "on_menuitem_remove_file_activate": self.on_menuitem_remove_file_activate,
+                "on_menuitem_file_make_directory_activate": self.on_menuitem_file_make_directory_activate,
+                "on_menuitem_file_move_activate": self.on_menuitem_file_move_activate,
+                "on_menuitem_file_rename_activate": self.on_menuitem_file_rename_activate,
+                "on_menuitem_view_show_hidden_files_activate": self.on_menuitem_view_show_hidden_files_activate,
+                "on_menuitem_view_refresh_activate": self.on_menuitem_view_refresh_activate,
+                "on_menuitem_branch_initialize_activate": self.on_menuitem_branch_initialize_activate,
+                "on_menuitem_branch_get_activate": self.on_menuitem_branch_get_activate,
+                "on_menuitem_branch_checkout_activate": self.on_menuitem_branch_checkout_activate,
+                "on_menuitem_branch_commit_activate": self.on_menuitem_branch_commit_activate,
+                "on_menuitem_branch_push_activate": self.on_menuitem_branch_push_activate,
+                "on_menuitem_branch_pull_activate": self.on_menuitem_branch_pull_activate,
+                "on_menuitem_branch_status_activate": self.on_menuitem_branch_status_activate,
+                "on_menuitem_branch_missing_revisions_activate": self.on_menuitem_branch_missing_revisions_activate,
+                "on_menuitem_stats_diff_activate": self.on_menuitem_stats_diff_activate,
+                "on_menuitem_stats_log_activate": self.on_menuitem_stats_log_activate,
+                "on_menuitem_stats_infos_activate": self.on_menuitem_stats_infos_activate,
+                "on_toolbutton_refresh_clicked": self.on_menuitem_view_refresh_activate,
+                "on_toolbutton_log_clicked": self.on_menuitem_stats_log_activate,
+                #"on_menutoolbutton_diff_clicked": self.on_menuitem_stats_diff_activate,
+                "on_toolbutton_diff_clicked": self.on_menuitem_stats_diff_activate,
+                "on_toolbutton_commit_clicked": self.on_menuitem_branch_commit_activate,
+                "on_toolbutton_pull_clicked": self.on_menuitem_branch_pull_activate,
+                "on_toolbutton_push_clicked": self.on_menuitem_branch_push_activate,
+                "on_treeview_right_button_press_event": self.on_treeview_right_button_press_event,
+                "on_treeview_right_row_activated": self.on_treeview_right_row_activated,
+                "on_treeview_left_button_press_event": self.on_treeview_left_button_press_event,
+                "on_treeview_left_row_activated": self.on_treeview_left_row_activated }
         
         # Connect the signals to the handlers
         self.toplevel.signal_autoconnect(dic)
@@ -112,7 +153,7 @@ class OliveGtk:
         self.window.move(x, y)
         # Apply paned position
         pos = self.pref.get_preference('paned_position', 'int')
-        self.comm.hpaned_main.set_position(pos)
+        self.hpaned_main.set_position(pos)
         
         # Apply menu to the toolbutton
         #menubutton = self.toplevel.get_widget('menutoolbutton_diff')
@@ -123,35 +164,312 @@ class OliveGtk:
         
         # Show drive selector if under Win32
         if sys.platform == 'win32':
-            self.comm.vbox_main_right.pack_start(self.comm.combobox_drive, False, True, 0)
-            self.comm.vbox_main_right.reorder_child(self.comm.combobox_drive, 0)
-            self.comm.combobox_drive.show()
-            self.comm.gen_hard_selector()
+            self.vbox_main_right.pack_start(self.combobox_drive, False, True, 0)
+            self.vbox_main_right.reorder_child(self.combobox_drive, 0)
+            self.combobox_drive.show()
+            self.gen_hard_selector()
         
-        # Load default data into the panels
-        self.treeview_left = self.toplevel.get_widget('treeview_left')
-        self.treeview_right = self.toplevel.get_widget('treeview_right')
         self._load_left()
-        self._load_right()
 
         # Apply menu state
-        self.comm.menuitem_view_show_hidden_files.set_active(self.pref.get_preference('dotted_files', 'bool'))
+        self.menuitem_view_show_hidden_files.set_active(self.pref.get_preference('dotted_files', 'bool'))
+
+        self.set_path(os.getcwd())
+        self._load_right()
+
+    def set_path(self, path):
+        self.path = path
+        self.notbranch = False
+        try:
+            self.wt, self.wtpath = WorkingTree.open_containing(self.path)
+        except errors.NotBranchError:
+            self.notbranch = True
+
+    def get_path(self):
+        return self.path
+   
+    def on_about_activate(self, widget):
+        from dialog import about
+        about()
+        
+    def on_menuitem_add_files_activate(self, widget):
+        """ Add file(s)... menu handler. """
+        from add import OliveAdd
+        add = OliveAdd(self.wt, self.wtpath, self.get_selected_right())
+        add.display()
+    
+    def on_menuitem_branch_get_activate(self, widget):
+        """ Branch/Get... menu handler. """
+        from branch import OliveBranch
+        branch = OliveBranch(self.get_path())
+        branch.display()
+    
+    def on_menuitem_branch_checkout_activate(self, widget):
+        """ Branch/Checkout... menu handler. """
+        from checkout import OliveCheckout
+        checkout = OliveCheckout(self.get_path())
+        checkout.display()
+    
+    def on_menuitem_branch_commit_activate(self, widget):
+        """ Branch/Commit... menu handler. """
+        from commit import OliveCommit
+        commit = OliveCommit(self.wt, self.wtpath)
+        commit.display()
+    
+    def on_menuitem_branch_missing_revisions_activate(self, widget):
+        """ Branch/Missing revisions menu handler. """
+        local_branch = self.wt.branch
+        
+        other_branch = local_branch.get_parent()
+        if other_branch is None:
+            error_dialog(_('Parent location is unknown'),
+                         _('Cannot determine missing revisions if no parent location is known.'))
+            return
+        
+        remote_branch = Branch.open(other_branch)
+        
+        if remote_branch.base == local_branch.base:
+            remote_branch = local_branch
+
+        ret = len(local_branch.missing_revisions(remote_branch))
+
+        if ret > 0:
+            info_dialog(_('There are missing revisions'),
+                        _('%d revision(s) missing.') % ret)
+        else:
+            info_dialog(_('Local branch up to date'),
+                        _('There are no missing revisions.'))
+
+    def on_menuitem_branch_pull_activate(self, widget):
+        """ Branch/Pull menu handler. """
+        branch_to = self.wt.branch
+
+        location = branch_to.get_parent()
+        if location is None:
+            error_dialog(_('Parent location is unknown'),
+                                     _('Pulling is not possible until there is a parent location.'))
+            return
+
+        try:
+            branch_from = Branch.open(location)
+        except errors.NotBranchError:
+            error_dialog(_('Directory is not a branch'),
+                                     _('You can perform this action only in a branch.'))
+
+        if branch_to.get_parent() is None:
+            branch_to.set_parent(branch_from.base)
+
+        #old_rh = branch_to.revision_history()
+        #if tree_to is not None:
+        #    tree_to.pull(branch_from)
+        #else:
+        #    branch_to.pull(branch_from)
+        branch_to.pull(branch_from)
+        
+        # TODO: get the number of pulled revisions
+        ret = 0
+        
+        info_dialog(_('Pull successful'), _('%d revision(s) pulled.') % ret)
+    
+    def on_menuitem_branch_push_activate(self, widget):
+        """ Branch/Push... menu handler. """
+        from push import OlivePush
+        push = OlivePush(self.wt.branch)
+        push.display()
+    
+    def on_menuitem_branch_status_activate(self, widget):
+        """ Branch/Status... menu handler. """
+        from status import OliveStatus
+        status = OliveStatus(self.wt, self.wtpath)
+        status.display()
+    
+    def on_menuitem_branch_initialize_activate(self, widget):
+        """ Initialize current directory. """
+        import bzrlib.bzrdir as bzrdir
+        
+        try:
+            if not os.path.exists(self.path):
+                os.mkdir(self.path)
+     
+            try:
+                existing_bzrdir = bzrdir.BzrDir.open(self.path)
+            except errors.NotBranchError:
+                bzrdir.BzrDir.create_branch_convenience(self.path)
+            else:
+                if existing_bzrdir.has_branch():
+                    if existing_bzrdir.has_workingtree():
+                        raise errors.AlreadyBranchError(self.path)
+                    else:
+                        raise errors.BranchExistsWithoutWorkingTree(self.path)
+                else:
+                    existing_bzrdir.create_branch()
+                    existing_bzrdir.create_workingtree()
+        except errors.AlreadyBranchError, errmsg:
+            error_dialog(_('Directory is already a branch'),
+                                     _('The current directory (%s) is already a branch.\nYou can start using it, or initialize another directory.') % errmsg)
+        except errors.BranchExistsWithoutWorkingTree, errmsg:
+            error_dialog(_('Branch without a working tree'),
+                                     _('The current directory (%s)\nis a branch without a working tree.') % errmsg)
+        else:
+            info_dialog(_('Initialize successful'),
+                                    _('Directory successfully initialized.'))
+            self.refresh_right()
+        
+    def on_menuitem_file_make_directory_activate(self, widget):
+        """ File/Make directory... menu handler. """
+        from mkdir import OliveMkdir
+        mkdir = OliveMkdir(self.wt, self.wtpath)
+        mkdir.display()
+    
+    def on_menuitem_file_move_activate(self, widget):
+        """ File/Move... menu handler. """
+        from move import OliveMove
+        move = OliveMove(self.wt, self.wtpath, self.get_selected_right())
+        move.display()
+    
+    def on_menuitem_file_rename_activate(self, widget):
+        """ File/Rename... menu handler. """
+        from rename import OliveRename
+        rename = OliveRename(self.wt, self.wtpath, self.get_selected_right())
+        rename.display()
+
+    def on_menuitem_remove_file_activate(self, widget):
+        """ Remove (unversion) selected file. """
+        from remove import OliveRemove
+        remove = OliveRemove(self.wt, self.wtpath, self.get_selected_right())
+        remove.display()
+    
+    def on_menuitem_stats_diff_activate(self, widget):
+        """ Statistics/Differences... menu handler. """
+        from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
+        window = DiffWindow()
+        parent_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
+        window.set_diff(self.wt.branch.nick, self.wt, parent_tree)
+        window.show()
+    
+    def on_menuitem_stats_infos_activate(self, widget):
+        """ Statistics/Informations... menu handler. """
+        from info import OliveInfo
+        info = OliveInfo(self.wt)
+        info.display()
+    
+    def on_menuitem_stats_log_activate(self, widget):
+        """ Statistics/Log... menu handler. """
+        from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
+        window = BranchWindow()
+        window.set_branch(self.wt.branch, self.wt.branch.last_revision(), None)
+        window.show()
+    
+    def on_menuitem_view_refresh_activate(self, widget):
+        """ View/Refresh menu handler. """
+        # Refresh the left pane
+        self.refresh_left()
+        # Refresh the right pane
+        self.refresh_right()
+   
+    def on_menuitem_view_show_hidden_files_activate(self, widget):
+        """ View/Show hidden files menu handler. """
+        self.pref.set_preference('dotted_files', widget.get_active())
+
+    def on_treeview_left_button_press_event(self, widget, event):
+        """ Occurs when somebody right-clicks in the bookmark list. """
+        if event.button == 3:
+            # Don't show context with nothing selected
+            if self.get_selected_left() == None:
+                return
+
+            # Create a menu
+            from menu import OliveMenu
+            menu = OliveMenu(self.get_path(), self.get_selected_left())
+            
+            menu.left_context_menu().popup(None, None, None, 0,
+                                           event.time)
+
+    def on_treeview_left_row_activated(self, treeview, path, view_column):
+        """ Occurs when somebody double-clicks or enters an item in the
+        bookmark list. """
+
+        newdir = self.get_selected_left()
+        if newdir == None:
+            return
+
+        self.set_path(newdir)
+        self.refresh_right()
+
+    def on_treeview_right_button_press_event(self, widget, event):
+        """ Occurs when somebody right-clicks in the file list. """
+        if event.button == 3:
+            # Create a menu
+            from menu import OliveMenu
+            menu = OliveMenu(self.get_path(), self.get_selected_right())
+            # get the menu items
+            m_add = menu.ui.get_widget('/context_right/add')
+            m_remove = menu.ui.get_widget('/context_right/remove')
+            m_commit = menu.ui.get_widget('/context_right/commit')
+            m_diff = menu.ui.get_widget('/context_right/diff')
+            # check if we're in a branch
+            try:
+                from bzrlib.branch import Branch
+                Branch.open_containing(self.get_path())
+                m_add.set_sensitive(True)
+                m_remove.set_sensitive(True)
+                m_commit.set_sensitive(True)
+                m_diff.set_sensitive(True)
+            except errors.NotBranchError:
+                m_add.set_sensitive(False)
+                m_remove.set_sensitive(False)
+                m_commit.set_sensitive(False)
+                m_diff.set_sensitive(False)
+            menu.right_context_menu().popup(None, None, None, 0,
+                                            event.time)
+        
+    def on_treeview_right_row_activated(self, treeview, path, view_column):
+        """ Occurs when somebody double-clicks or enters an item in the
+        file list. """
+        import os.path
+        
+        from launch import launch
+        
+        newdir = self.get_selected_right()
+        
+        if newdir == '..':
+            self.set_path(os.path.split(self.get_path())[0])
+        else:
+            fullpath = self.get_path() + os.sep + newdir
+            if os.path.isdir(fullpath):
+                # selected item is an existant directory
+                self.set_path(fullpath)
+            else:
+                launch(fullpath) 
+        
+        self.refresh_right()
+    
+    def on_window_main_delete_event(self, widget, event=None):
+        """ Do some stuff before exiting. """
+        width, height = self.window_main.get_size()
+        self.pref.set_preference('window_width', width)
+        self.pref.set_preference('window_height', height)
+        x, y = self.window_main.get_position()
+        self.pref.set_preference('window_x', x)
+        self.pref.set_preference('window_y', y)
+        self.pref.set_preference('paned_position',
+                                      self.hpaned_main.get_position())
+        
+        self.pref.write()
+        self.window_main.destroy()
         
     def _load_left(self):
         """ Load data into the left panel. (Bookmarks) """
-        # set cursor to busy
-        self.comm.set_busy(self.treeview_left)
-        
         # Create TreeStore
         treestore = gtk.TreeStore(str, str)
         
         # Get bookmarks
-        bookmarks = self.comm.pref.get_bookmarks()
+        bookmarks = self.pref.get_bookmarks()
         
         # Add them to the TreeStore
         titer = treestore.append(None, [_('Bookmarks'), None])
         for item in bookmarks:
-            title = self.comm.pref.get_bookmark_title(item)
+            title = self.pref.get_bookmark_title(item)
             treestore.append(titer, [title, item])
         
         # Create the column and add it to the TreeView
@@ -167,15 +485,8 @@ class OliveGtk:
         # Expand the tree
         self.treeview_left.expand_all()
 
-        self.comm.set_busy(self.treeview_left, False)
-        
     def _load_right(self):
         """ Load data into the right panel. (Filelist) """
-        from bzrlib.workingtree import WorkingTree
-        
-        # set cursor to busy
-        self.comm.set_busy(self.treeview_right)
-        
         # Create ListStore
         liststore = gtk.ListStore(str, str, str)
         
@@ -183,12 +494,11 @@ class OliveGtk:
         files = []
         
         # Fill the appropriate lists
-        path = self.comm.get_path()
         dotted_files = self.pref.get_preference('dotted_files', 'bool')
-        for item in os.listdir(path):
+        for item in os.listdir(self.path):
             if not dotted_files and item[0] == '.':
                 continue
-            if os.path.isdir(path + os.sep + item):
+            if os.path.isdir(self.path + os.sep + item):
                 dirs.append(item)
             else:
                 files.append(item)
@@ -197,36 +507,27 @@ class OliveGtk:
         dirs.sort()
         files.sort()
         
-        # Try to open the working tree
-        notbranch = False
-        try:
-            tree1 = WorkingTree.open_containing(path)[0]
-        except errors.NotBranchError:
-            notbranch = True
-        except errors.PermissionDenied:
-            print "DEBUG: permission denied."
+        if not self.notbranch:
+            branch = self.wt.branch
+            tree2 = self.wt.branch.repository.revision_tree(branch.last_revision())
         
-        if not notbranch:
-            branch = tree1.branch
-            tree2 = tree1.branch.repository.revision_tree(branch.last_revision())
-        
-            delta = tree1.changes_from(tree2, want_unchanged=True)
+            delta = self.wt.changes_from(tree2, want_unchanged=True)
         
         # Add'em to the ListStore
         for item in dirs:    
             liststore.append([gtk.STOCK_DIRECTORY, item, ''])
         for item in files:
             status = 'unknown'
-            if not notbranch:
-                filename = tree1.relpath(path + os.sep + item)
+            if not self.notbranch:
+                filename = self.wt.relpath(self.path + os.sep + item)
                 
-                for rpath, id, kind, text_modified, meta_modified in delta.renamed:
-                    if rpath == filename:
+                for rpath, rpathnew, id, kind, text_modified, meta_modified in delta.renamed:
+                    if rpathnew == filename:
                         status = 'renamed'
                 for rpath, id, kind in delta.added:
                     if rpath == filename:
                         status = 'added'
-                for rpath, id, kind, text_modified, meta_modified in delta.removed:
+                for rpath, id, kind in delta.removed:
                     if rpath == filename:
                         status = 'removed'
                 for rpath, id, kind, text_modified, meta_modified in delta.modified:
@@ -272,117 +573,9 @@ class OliveGtk:
         tvcolumn_status.pack_start(cell, True)
         tvcolumn_status.add_attribute(cell, 'text', 2)
         
-        # Check if current directory is a branch
-        if not notbranch:
-            # Activate some items
-            self.comm.menuitem_branch_init.set_sensitive(False)
-            self.comm.menuitem_branch_get.set_sensitive(True)
-            self.comm.menuitem_branch_checkout.set_sensitive(True)
-            self.comm.menuitem_branch_pull.set_sensitive(True)
-            self.comm.menuitem_branch_push.set_sensitive(True)
-            self.comm.menuitem_branch_commit.set_sensitive(True)
-            self.comm.menuitem_branch_status.set_sensitive(True)
-            self.comm.menuitem_branch_missing.set_sensitive(True)
-            self.comm.menuitem_stats.set_sensitive(True)
-            self.comm.menuitem_add_files.set_sensitive(True)
-            self.comm.menuitem_remove_files.set_sensitive(True)
-            self.comm.menuitem_file_make_directory.set_sensitive(True)
-            self.comm.menuitem_file_rename.set_sensitive(True)
-            self.comm.menuitem_file_move.set_sensitive(True)
-            #self.comm.menutoolbutton_diff.set_sensitive(True)
-            self.comm.toolbutton_diff.set_sensitive(True)
-            self.comm.toolbutton_log.set_sensitive(True)
-            self.comm.toolbutton_commit.set_sensitive(True)
-            self.comm.toolbutton_pull.set_sensitive(True)
-            self.comm.toolbutton_push.set_sensitive(True)
-        else:
-            # Deactivate some items
-            self.comm.menuitem_branch_init.set_sensitive(True)
-            self.comm.menuitem_branch_get.set_sensitive(False)
-            self.comm.menuitem_branch_checkout.set_sensitive(False)
-            self.comm.menuitem_branch_pull.set_sensitive(False)
-            self.comm.menuitem_branch_push.set_sensitive(False)
-            self.comm.menuitem_branch_commit.set_sensitive(False)
-            self.comm.menuitem_branch_status.set_sensitive(False)
-            self.comm.menuitem_branch_missing.set_sensitive(False)
-            self.comm.menuitem_stats.set_sensitive(False)
-            self.comm.menuitem_add_files.set_sensitive(False)
-            self.comm.menuitem_remove_files.set_sensitive(False)
-            self.comm.menuitem_file_make_directory.set_sensitive(False)
-            self.comm.menuitem_file_rename.set_sensitive(False)
-            self.comm.menuitem_file_move.set_sensitive(False)
-            #self.comm.menutoolbutton_diff.set_sensitive(False)
-            self.comm.toolbutton_diff.set_sensitive(False)
-            self.comm.toolbutton_log.set_sensitive(False)
-            self.comm.toolbutton_commit.set_sensitive(False)
-            self.comm.toolbutton_pull.set_sensitive(False)
-            self.comm.toolbutton_push.set_sensitive(False)
+        # Set sensitivity
+        self.set_sensitivity()
         
-        # set cursor to default
-        self.comm.set_busy(self.treeview_right, False)
-
-class OliveCommunicator:
-    """ This class is responsible for the communication between the different
-    modules. """
-    def __init__(self, toplevel, pref):
-        # Get glade main component
-        self.toplevel = toplevel
-        # Preferences object
-        self.pref = pref
-        # Default path
-        self._path = os.getcwd()
-
-        # Initialize the statusbar
-        self.statusbar = self.toplevel.get_widget('statusbar')
-        self.context_id = self.statusbar.get_context_id('olive')
-        
-        # Get the main window
-        self.window_main = self.toplevel.get_widget('window_main')
-        # Get the HPaned
-        self.hpaned_main = self.toplevel.get_widget('hpaned_main')
-        # Get the TreeViews
-        self.treeview_left = self.toplevel.get_widget('treeview_left')
-        self.treeview_right = self.toplevel.get_widget('treeview_right')
-        # Get some important menu items
-        self.menuitem_add_files = self.toplevel.get_widget('menuitem_add_files')
-        self.menuitem_remove_files = self.toplevel.get_widget('menuitem_remove_file')
-        self.menuitem_file_make_directory = self.toplevel.get_widget('menuitem_file_make_directory')
-        self.menuitem_file_rename = self.toplevel.get_widget('menuitem_file_rename')
-        self.menuitem_file_move = self.toplevel.get_widget('menuitem_file_move')
-        self.menuitem_view_show_hidden_files = self.toplevel.get_widget('menuitem_view_show_hidden_files')
-        self.menuitem_branch = self.toplevel.get_widget('menuitem_branch')
-        self.menuitem_branch_init = self.toplevel.get_widget('menuitem_branch_initialize')
-        self.menuitem_branch_get = self.toplevel.get_widget('menuitem_branch_get')
-        self.menuitem_branch_checkout = self.toplevel.get_widget('menuitem_branch_checkout')
-        self.menuitem_branch_pull = self.toplevel.get_widget('menuitem_branch_pull')
-        self.menuitem_branch_push = self.toplevel.get_widget('menuitem_branch_push')
-        self.menuitem_branch_commit = self.toplevel.get_widget('menuitem_branch_commit')
-        self.menuitem_branch_status = self.toplevel.get_widget('menuitem_branch_status')
-        self.menuitem_branch_missing = self.toplevel.get_widget('menuitem_branch_missing_revisions')
-        self.menuitem_stats = self.toplevel.get_widget('menuitem_stats')
-        self.menuitem_stats_diff = self.toplevel.get_widget('menuitem_stats_diff')
-        self.menuitem_stats_log = self.toplevel.get_widget('menuitem_stats_log')
-        # Get some toolbuttons
-        #self.menutoolbutton_diff = self.toplevel.get_widget('menutoolbutton_diff')
-        self.toolbutton_diff = self.toplevel.get_widget('toolbutton_diff')
-        self.toolbutton_log = self.toplevel.get_widget('toolbutton_log')
-        self.toolbutton_commit = self.toplevel.get_widget('toolbutton_commit')
-        self.toolbutton_pull = self.toplevel.get_widget('toolbutton_pull')
-        self.toolbutton_push = self.toplevel.get_widget('toolbutton_push')
-        # Get the drive selector
-        self.combobox_drive = gtk.combo_box_new_text()
-        self.combobox_drive.connect("changed", self._refresh_drives)
-        
-        self.vbox_main_right = self.toplevel.get_widget('vbox_main_right')
-    
-    def set_path(self, path):
-        """ Set the current path while browsing the directories. """
-        self._path = path
-    
-    def get_path(self):
-        """ Get the current path. """
-        return self._path
-    
     def get_selected_right(self):
         """ Get the selected filename. """
         treeselection = self.treeview_right.get_selection()
@@ -411,14 +604,38 @@ class OliveCommunicator:
         """ Clean the last message from the statusbar. """
         self.statusbar.pop(self.context_id)
     
+    def set_sensitivity(self):
+        """ Set menu and toolbar sensitivity. """
+        self.menuitem_branch_init.set_sensitive(self.notbranch)
+        self.menuitem_branch_get.set_sensitive(self.notbranch)
+        self.menuitem_branch_checkout.set_sensitive(self.notbranch)
+        self.menuitem_branch_pull.set_sensitive(not self.notbranch)
+        self.menuitem_branch_push.set_sensitive(not self.notbranch)
+        self.menuitem_branch_commit.set_sensitive(not self.notbranch)
+        self.menuitem_branch_status.set_sensitive(not self.notbranch)
+        self.menuitem_branch_missing.set_sensitive(not self.notbranch)
+        self.menuitem_stats.set_sensitive(not self.notbranch)
+        self.menuitem_add_files.set_sensitive(not self.notbranch)
+        self.menuitem_remove_files.set_sensitive(not self.notbranch)
+        self.menuitem_file_make_directory.set_sensitive(not self.notbranch)
+        self.menuitem_file_rename.set_sensitive(not self.notbranch)
+        self.menuitem_file_move.set_sensitive(not self.notbranch)
+        #self.menutoolbutton_diff.set_sensitive(True)
+        self.toolbutton_diff.set_sensitive(not self.notbranch)
+        self.toolbutton_log.set_sensitive(not self.notbranch)
+        self.toolbutton_commit.set_sensitive(not self.notbranch)
+        self.toolbutton_pull.set_sensitive(not self.notbranch)
+        self.toolbutton_push.set_sensitive(not self.notbranch)
+    
     def refresh_left(self):
         """ Refresh the bookmark list. """
-        # set cursor to busy
-        self.set_busy(self.treeview_left)
         
         # Get TreeStore and clear it
         treestore = self.treeview_left.get_model()
         treestore.clear()
+
+        # Re-read preferences
+        self.pref.read()
 
         # Get bookmarks
         bookmarks = self.pref.get_bookmarks()
@@ -435,20 +652,15 @@ class OliveCommunicator:
         # Expand the tree
         self.treeview_left.expand_all()
 
-        self.set_busy(self.treeview_left, False)
-
     def refresh_right(self, path=None):
         """ Refresh the file list. """
         from bzrlib.workingtree import WorkingTree
-
-        self.set_busy(self.treeview_right)
 
         if path is None:
             path = self.get_path()
 
         # A workaround for double-clicking Bookmarks
         if not os.path.exists(path):
-            self.set_busy(self.treeview_right, False)
             return
 
         # Get ListStore and clear it
@@ -495,12 +707,12 @@ class OliveCommunicator:
             if not notbranch:
                 filename = tree1.relpath(path + os.sep + item)
                 
-                for rpath, id, kind, text_modified, meta_modified in delta.renamed:
-                    if rpath == filename:
+                for rpath, rpathnew, id, kind, text_modified, meta_modified in delta.renamed:
+                    if rpathnew == filename:
                         status = 'renamed'
                 for rpath, id, kind in delta.added:
                     if rpath == filename:
-                        status = 'added'
+                        status = 'added'                
                 for rpath, id, kind, text_modified, meta_modified in delta.removed:
                     if rpath == filename:
                         status = 'removed'
@@ -532,62 +744,9 @@ class OliveCommunicator:
 
         # Add the ListStore to the TreeView
         self.treeview_right.set_model(liststore)
-
-        # Check if current directory is a branch
-        if not notbranch:
-            # Activate some items
-            self.menuitem_branch_init.set_sensitive(False)
-            self.menuitem_branch_get.set_sensitive(True)
-            self.menuitem_branch_checkout.set_sensitive(True)
-            self.menuitem_branch_pull.set_sensitive(True)
-            self.menuitem_branch_push.set_sensitive(True)
-            self.menuitem_branch_commit.set_sensitive(True)
-            self.menuitem_branch_status.set_sensitive(True)
-            self.menuitem_branch_missing.set_sensitive(True)
-            self.menuitem_stats.set_sensitive(True)
-            self.menuitem_add_files.set_sensitive(True)
-            self.menuitem_remove_files.set_sensitive(True)
-            self.menuitem_file_make_directory.set_sensitive(True)
-            self.menuitem_file_rename.set_sensitive(True)
-            self.menuitem_file_move.set_sensitive(True)
-            #self.menutoolbutton_diff.set_sensitive(True)
-            self.toolbutton_diff.set_sensitive(True)
-            self.toolbutton_log.set_sensitive(True)
-            self.toolbutton_commit.set_sensitive(True)
-            self.toolbutton_pull.set_sensitive(True)
-            self.toolbutton_push.set_sensitive(True)
-        else:
-            # Deactivate some items
-            self.menuitem_branch_init.set_sensitive(True)
-            self.menuitem_branch_get.set_sensitive(False)
-            self.menuitem_branch_checkout.set_sensitive(False)
-            self.menuitem_branch_pull.set_sensitive(False)
-            self.menuitem_branch_push.set_sensitive(False)
-            self.menuitem_branch_commit.set_sensitive(False)
-            self.menuitem_branch_status.set_sensitive(False)
-            self.menuitem_branch_missing.set_sensitive(False)
-            self.menuitem_stats.set_sensitive(False)
-            self.menuitem_add_files.set_sensitive(False)
-            self.menuitem_remove_files.set_sensitive(False)
-            self.menuitem_file_make_directory.set_sensitive(False)
-            self.menuitem_file_rename.set_sensitive(False)
-            self.menuitem_file_move.set_sensitive(False)
-            #self.menutoolbutton_diff.set_sensitive(False)
-            self.toolbutton_diff.set_sensitive(False)
-            self.toolbutton_log.set_sensitive(False)
-            self.toolbutton_commit.set_sensitive(False)
-            self.toolbutton_pull.set_sensitive(False)
-            self.toolbutton_push.set_sensitive(False)
-
-        self.set_busy(self.treeview_right, False)
-
-    def set_busy(self, widget, busy=True):
-        if busy:
-            widget.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
-        else:
-            widget.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_PTR))
-
-        gtk.main_iteration(0)
+        
+        # Set sensitivity
+        self.set_sensitivity()
 
     def _harddisks(self):
         """ Returns hard drive letters under Win32. """
@@ -620,6 +779,8 @@ class OliveCommunicator:
             drive = model[active][0]
             self.refresh_right(drive + '\\')
 
+import ConfigParser
+
 class OlivePreferences:
     """ A class which handles Olive's preferences. """
     def __init__(self):
@@ -637,11 +798,7 @@ class OlivePreferences:
         self.config = ConfigParser.RawConfigParser()
         
         # Load the configuration
-        if sys.platform == 'win32':
-            # Windows - no dotted files
-            self.config.read([os.path.expanduser('~/olive.conf')])
-        else:
-            self.config.read([os.path.expanduser('~/.olive.conf')])
+        self.read()
         
     def _get_default(self, option):
         """ Get the default option for a preference. """
@@ -657,12 +814,16 @@ class OlivePreferences:
         # First write out the changes
         self.write()
         # Then load the configuration again
+        self.read()
+
+    def read(self):
+        """ Just read the configuration. """
         if sys.platform == 'win32':
             # Windows - no dotted files
             self.config.read([os.path.expanduser('~/olive.conf')])
         else:
             self.config.read([os.path.expanduser('~/.olive.conf')])
-
+    
     def write(self):
         """ Write the configuration to the appropriate files. """
         if sys.platform == 'win32':
@@ -675,34 +836,6 @@ class OlivePreferences:
             self.config.write(fp)
             fp.close()
 
-    def get_preference(self, option, kind='str'):
-        """ Get the value of the given option.
-        
-        :param kind: str/bool/int/float. default: str
-        """
-        if self.config.has_option('preferences', option):
-            if kind == 'bool':
-                return self.config.getboolean('preferences', option)
-            elif kind == 'int':
-                return self.config.getint('preferences', option)
-            elif kind == 'float':
-                return self.config.getfloat('preferences', option)
-            else:
-                return self.config.get('preferences', option)
-        else:
-            try:
-                return self._get_default(option)
-            except KeyError:
-                return None
-    
-    def set_preference(self, option, value):
-        """ Set the value of the given option. """
-        if self.config.has_section('preferences'):
-            self.config.set('preferences', option, value)
-        else:
-            self.config.add_section('preferences')
-            self.config.set('preferences', option, value)
-    
     def get_bookmarks(self):
         """ Return the list of bookmarks. """
         bookmarks = self.config.sections()
@@ -735,3 +868,33 @@ class OlivePreferences:
     def remove_bookmark(self, path):
         """ Remove bookmark. """
         return self.config.remove_section(path)
+
+    def set_preference(self, option, value):
+        """ Set the value of the given option. """
+        if self.config.has_section('preferences'):
+            self.config.set('preferences', option, value)
+        else:
+            self.config.add_section('preferences')
+            self.config.set('preferences', option, value)
+
+    def get_preference(self, option, kind='str'):
+        """ Get the value of the given option.
+        
+        :param kind: str/bool/int/float. default: str
+        """
+        if self.config.has_option('preferences', option):
+            if kind == 'bool':
+                #return self.config.getboolean('preferences', option)
+                return True
+            elif kind == 'int':
+                return self.config.getint('preferences', option)
+            elif kind == 'float':
+                return self.config.getfloat('preferences', option)
+            else:
+                return self.config.get('preferences', option)
+        else:
+            try:
+                return self._get_default(option)
+            except KeyError:
+                return None
+ 

@@ -63,7 +63,7 @@ class PasswordDialog(gtk.Dialog):
 
 
 class GtkUIFactory(UIFactory):
-    """A UI factory for GTK user interefaces."""
+    """A UI factory for GTK user interfaces."""
 
     def __init__(self,
                  bar_type=None,
@@ -91,10 +91,7 @@ class GtkUIFactory(UIFactory):
         dialog = PromptDialog(prompt)
         response = dialog.run()
         dialog.destroy()
-        if response == gtk.RESPONSE_YES:
-            return True
-        else:
-            return False
+        return (response == gtk.RESPONSE_YES)
         
     @deprecated_method(zero_eight)
     def progress_bar(self):

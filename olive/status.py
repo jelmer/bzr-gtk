@@ -14,65 +14,32 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import sys
-
 try:
     import pygtk
     pygtk.require("2.0")
 except:
     pass
-try:
-    import gtk
-    import gtk.glade
-    import gobject
-    import pango
-except:
-    sys.exit(1)
 
-import bzrlib
-import bzrlib.errors as errors
+import gtk
+import gtk.glade
 
-if bzrlib.version_info < (0, 9):
-    # function deprecated after 0.9
-    from bzrlib.delta import compare_trees
-
-from bzrlib.status import show_tree_status
-from bzrlib.workingtree import WorkingTree
-
-from dialog import OliveDialog
+from olive import gladefile
 
 class OliveStatus:
     """ Display Status window and perform the needed actions. """
-    def __init__(self, gladefile, comm, dialog):
+    def __init__(self, wt, wtpath):
         """ Initialize the Status window. """
-        self.gladefile = gladefile
-        self.glade = gtk.glade.XML(self.gladefile, 'window_status')
-        
-        # Communication object
-        self.comm = comm
-        # Dialog object
-        self.dialog = dialog
+        self.glade = gtk.glade.XML(gladefile, 'window_status')
         
         # Get the Status window widget
         self.window = self.glade.get_widget('window_status')
         
+        self.wt = wt
+        self.wtpath = wtpath
+        
         # Check if current location is a branch
-        try:
-            (self.wt, path) = WorkingTree.open_containing(self.comm.get_path())
-            branch = self.wt.branch
-        except errors.NotBranchError:
-            self.notbranch = True
-            return
-        except:
-            raise
-        
-        file_id = self.wt.path2id(path)
+        file_id = self.wt.path2id(wtpath)
 
-        self.notbranch = False
-        if file_id is None:
-            self.notbranch = True
-            return
-        
         # Set the old working tree
         self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
         
@@ -98,10 +65,7 @@ class OliveStatus:
         column.add_attribute(cell, "text", 0)
         self.treeview.append_column(column)
         
-        if bzrlib.version_info < (0, 9):
-            delta = compare_trees(self.old_tree, self.wt)
-        else:
-            delta = self.wt.changes_from(self.old_tree)
+        delta = self.wt.changes_from(self.old_tree)
 
         changes = False
         
@@ -145,12 +109,7 @@ class OliveStatus:
     
     def display(self):
         """ Display the Diff window. """
-        if self.notbranch:
-            self.dialog.error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
-            self.close()
-        else:
-            self.window.show_all()
+        self.window.show_all()
 
     def close(self, widget=None):
         self.window.destroy()
