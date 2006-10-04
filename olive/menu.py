@@ -203,9 +203,9 @@ class OliveMenu:
 
     def commit(self, action):
         """ Right context menu -> Commit """
-        from commit import OliveCommit
+        from commit import CommitDialog
         wt, path = WorkingTree.open_containing(self.path)
-        commit = OliveCommit(wt, path)
+        commit = CommitDialog(wt, path)
         commit.display()
     
     def diff(self, action):

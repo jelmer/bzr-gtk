@@ -28,10 +28,10 @@ import gtk.glade
 from bzrlib.branch import Branch
 import bzrlib.errors as errors
 
-from olive import gladefile
+from __init__ import gladefile
 from dialog import error_dialog, info_dialog
 
-class OliveBranch:
+class BranchDialog:
     """ Display branch dialog and perform the needed operations. """
     def __init__(self, path=None):
         """ Initialize the Branch dialog. """

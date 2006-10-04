@@ -17,6 +17,10 @@
 import os
 import sys
 
+# gettext support
+import gettext
+gettext.install('olive-gtk')
+
 try:
     import pygtk
     pygtk.require("2.0")
@@ -200,8 +204,8 @@ class OliveGtk:
     
     def on_menuitem_branch_get_activate(self, widget):
         """ Branch/Get... menu handler. """
-        from branch import OliveBranch
-        branch = OliveBranch(self.get_path())
+        from branch import BranchDialog
+        branch = BranchDialog(self.get_path())
         branch.display()
     
     def on_menuitem_branch_checkout_activate(self, widget):
@@ -212,8 +216,8 @@ class OliveGtk:
     
     def on_menuitem_branch_commit_activate(self, widget):
         """ Branch/Commit... menu handler. """
-        from commit import OliveCommit
-        commit = OliveCommit(self.wt, self.wtpath)
+        from commit import CommitDialog
+        commit = CommitDialog(self.wt, self.wtpath)
         commit.display()
     
     def on_menuitem_branch_missing_revisions_activate(self, widget):
@@ -607,7 +611,6 @@ class OliveGtk:
     def set_sensitivity(self):
         """ Set menu and toolbar sensitivity. """
         self.menuitem_branch_init.set_sensitive(self.notbranch)
-        self.menuitem_branch_get.set_sensitive(self.notbranch)
         self.menuitem_branch_checkout.set_sensitive(self.notbranch)
         self.menuitem_branch_pull.set_sensitive(not self.notbranch)
         self.menuitem_branch_push.set_sensitive(not self.notbranch)
@@ -713,7 +716,7 @@ class OliveGtk:
                 for rpath, id, kind in delta.added:
                     if rpath == filename:
                         status = 'added'                
-                for rpath, id, kind, text_modified, meta_modified in delta.removed:
+                for rpath, id, kind in delta.removed:
                     if rpath == filename:
                         status = 'removed'
                 for rpath, id, kind, text_modified, meta_modified in delta.modified:

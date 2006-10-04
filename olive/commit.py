@@ -30,7 +30,7 @@ import bzrlib.errors as errors
 from dialog import error_dialog
 from olive import gladefile
 
-class OliveCommit:
+class CommitDialog:
     """ Display Commit dialog and perform the needed actions. """
     def __init__(self, wt, wtpath):
         """ Initialize the Commit dialog. """
