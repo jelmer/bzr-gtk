@@ -71,6 +71,8 @@ setup(name='Olive',
       data_files=[('share/olive', ['olive.glade',
                                    'oliveicon2.png',
                                    'cmenu.ui',
+                                  ]),
+                  ('share/olive/icons', [\
                                    'icons/commit.png',
                                    'icons/commit16.png',
                                    'icons/diff.png',
