@@ -65,7 +65,7 @@ class OlivePush:
         self.check_remember.set_sensitive(0)
         self.check_create.set_sensitive(0)
         
-        self.entry_stored.set_text(branch.get_push_location())
+        self.entry_stored.set_text(branch.get_push_location() or '')
     
     def display(self):
         """ Display the Push dialog. """
