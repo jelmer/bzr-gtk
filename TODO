@@ -23,3 +23,8 @@ TODO list for Olive
   not on, e.g., cdroms?
 - Add a 'merge' window, allowing merges from other branches.
 - Show list of pending merges in the commit window
+- Dialog for applying a bundle
+- Switch dialog
+- Ability to bind/unbind the branch
+- List Bzr options in context menu in a way that makes sense (alphabetically?)
+- Allow specifying two revisions in the diff window rather then always diffing between base and working tree

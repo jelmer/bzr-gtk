@@ -164,13 +164,13 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
             tree, path = WorkingTree.open_containing(file)
         except NotBranchError:
             item = nautilus.MenuItem('BzrNautilus::newtree',
-                                 'Create new Bazaar tree',
+                                 'Make directory versioned',
                                  'Create new Bazaar tree in this folder')
             item.connect('activate', self.newtree_cb, vfs_file)
             items.append(item)
 
             item = nautilus.MenuItem('BzrNautilus::clone',
-                                 'Checkout',
+                                 'Checkout Bazaar branch',
                                  'Checkout Existing Bazaar Branch')
             item.connect('activate', self.clone_cb, vfs_file)
             items.append(item)
@@ -207,7 +207,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
                 if not vfs_file.is_directory():
                     return
                 item = nautilus.MenuItem('BzrNautilus::newtree',
-                                     'Create new Bazaar tree',
+                                     'Make directory versioned',
                                      'Create new Bazaar tree in %s' % vfs_file.get_name())
                 item.connect('activate', self.newtree_cb, vfs_file)
                 return item,
