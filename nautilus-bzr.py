@@ -118,17 +118,10 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         if vfs_file.get_uri_scheme() != 'file':
             return
 
-        file = vfs_file.get_uri()
-        try:
-            tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            return
-
-        from bzrlib.plugins.gtk.clone import CloneDialog
-        dialog = CloneDialog(file)
-        if dialog.run() != gtk.RESPONSE_CANCEL:
-            bzrdir = BzrDir.open(dialog.url)
-            bzrdir.sprout(dialog.dest_path)
+        from bzrlib.plugins.gtk.olive.branch import BranchDialog
+        
+        dialog = BranchDialog(vfs_file.get_name())
+        dialog.display()
  
     def commit_cb(self, menu, vfs_file=None):
         # We can only cope with local files
@@ -141,12 +134,10 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         except NotBranchError:
             return
 
-        from bzrlib.plugins.gtk.commit import GCommitDialog
-        dialog = GCommitDialog(tree)
-        dialog.set_title(path + " - Commit")
-        if dialog.run() != gtk.RESPONSE_CANCEL:
-            Commit().commit(working_tree=wt,message=dialog.message,
-                            specific_files=dialog.specific_files)
+        from bzrlib.plugins.gtk.olive.commit import CommitDialog
+        dialog = CommitDialog(tree, path)
+        dialog.display()
+        gtk.main()
 
     def log_cb(self, menu, vfs_file):
         # We can only cope with local files
@@ -167,6 +158,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         return
 
     def get_background_items(self, window, vfs_file):
+        items = []
         file = vfs_file.get_uri()
         try:
             tree, path = WorkingTree.open_containing(file)
@@ -185,7 +177,6 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
 
             return items
 
-        items = []
         item = nautilus.MenuItem('BzrNautilus::log',
                              'Log',
                              'Show Bazaar history')

@@ -38,12 +38,10 @@ class cmd_gbranch(Command):
             if str(e) == "could not open display":
                 raise NoDisplayError
 
-        from clone import CloneDialog
+        from bzrlib.plugins.gtk.olive.branch import BranchDialog
 
-        window = CloneDialog()
-        if window.run() == gtk.RESPONSE_OK:
-            bzrdir = BzrDir.open(window.url)
-            bzrdir.sprout(window.dest_path)
+        window = BranchDialog('.')
+        window.display()
 
 register_command(cmd_gbranch)
 
@@ -210,24 +208,16 @@ class cmd_gcommit(Command):
             if str(e) == "could not open display":
                 raise NoDisplayError
 
-        from commit import GCommitDialog
+        from olive.commit import CommitDialog
         from bzrlib.commit import Commit
         from bzrlib.errors import (BzrCommandError, PointlessCommit, ConflictsInTree, 
            StrictCommitFailed)
 
         (wt, path) = WorkingTree.open_containing(filename)
-        branch = wt.branch
 
-        file_id = wt.path2id(path)
-
-        if file_id is None:
-            raise NotVersionedError(filename)
-
-        dialog = GCommitDialog(wt)
-        dialog.set_title(path + " - Commit")
-        if dialog.run() != gtk.RESPONSE_CANCEL:
-            Commit().commit(working_tree=wt,message=dialog.message,
-                specific_files=dialog.specific_files)
+        dialog = CommitDialog(wt, path)
+        dialog.display()
+        gtk.main()
 
 register_command(cmd_gcommit)
 
