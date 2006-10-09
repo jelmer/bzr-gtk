@@ -52,7 +52,7 @@
 		      <signal name="activate" handler="on_menuitem_add_files_activate" last_modification_time="Fri, 21 Jul 2006 11:38:39 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image232">
+			<widget class="GtkImage" id="image241">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-add</property>
 			  <property name="icon_size">1</property>
@@ -73,7 +73,7 @@
 		      <signal name="activate" handler="on_menuitem_remove_file_activate" last_modification_time="Fri, 21 Jul 2006 13:54:07 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image233">
+			<widget class="GtkImage" id="image242">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-remove</property>
 			  <property name="icon_size">1</property>
@@ -233,7 +233,7 @@
 		      <signal name="activate" handler="on_menuitem_branch_pull_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image234">
+			<widget class="GtkImage" id="image243">
 			  <property name="visible">True</property>
 			  <property name="pixbuf">pull16.png</property>
 			  <property name="xalign">0.5</property>
@@ -253,7 +253,7 @@
 		      <signal name="activate" handler="on_menuitem_branch_push_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image235">
+			<widget class="GtkImage" id="image244">
 			  <property name="visible">True</property>
 			  <property name="pixbuf">push16.png</property>
 			  <property name="xalign">0.5</property>
@@ -272,6 +272,15 @@
 		  </child>
 
 		  <child>
+		    <widget class="GtkMenuItem" id="menuitem_branch_merge">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">_Merge...</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="on_menuitem_branch_merge_activate" last_modification_time="Mon, 09 Oct 2006 18:24:06 GMT"/>
+		    </widget>
+		  </child>
+
+		  <child>
 		    <widget class="GtkImageMenuItem" id="menuitem_branch_commit">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">_Commit...</property>
@@ -279,7 +288,7 @@
 		      <signal name="activate" handler="on_menuitem_branch_commit_activate" last_modification_time="Mon, 17 Jul 2006 08:53:37 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image236">
+			<widget class="GtkImage" id="image245">
 			  <property name="visible">True</property>
 			  <property name="pixbuf">commit16.png</property>
 			  <property name="xalign">0.5</property>
@@ -309,7 +318,7 @@
 		  <child>
 		    <widget class="GtkMenuItem" id="menuitem_branch_missing_revisions">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">_Missing revisions</property>
+		      <property name="label" translatable="yes">Missing _revisions</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="on_menuitem_branch_missing_revisions_activate" last_modification_time="Sat, 02 Sep 2006 14:01:29 GMT"/>
 		    </widget>
@@ -336,7 +345,7 @@
 		      <signal name="activate" handler="on_menuitem_stats_diff_activate" last_modification_time="Thu, 03 Aug 2006 11:35:30 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image237">
+			<widget class="GtkImage" id="image246">
 			  <property name="visible">True</property>
 			  <property name="pixbuf">diff16.png</property>
 			  <property name="xalign">0.5</property>
@@ -356,7 +365,7 @@
 		      <signal name="activate" handler="on_menuitem_stats_log_activate" last_modification_time="Thu, 03 Aug 2006 11:35:43 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image238">
+			<widget class="GtkImage" id="image247">
 			  <property name="visible">True</property>
 			  <property name="pixbuf">log16.png</property>
 			  <property name="xalign">0.5</property>
@@ -2632,7 +2641,6 @@
 	<widget class="GtkHButtonBox" id="hbuttonbox_move">
 	  <property name="visible">True</property>
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>
-	  <property name="spacing">3</property>
 
 	  <child>
 	    <widget class="GtkButton" id="button_move_cancel">
@@ -2643,6 +2651,7 @@
 	      <property name="use_stock">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
+	      <property name="response_id">0</property>
 	      <signal name="clicked" handler="on_button_move_cancel_clicked" last_modification_time="Wed, 09 Aug 2006 13:35:11 GMT"/>
 	    </widget>
 	  </child>
@@ -2655,6 +2664,7 @@
 	      <property name="can_focus">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
+	      <property name="response_id">0</property>
 	      <signal name="clicked" handler="on_button_move_move_clicked" last_modification_time="Wed, 09 Aug 2006 13:35:24 GMT"/>
 
 	      <child>
@@ -2816,7 +2826,6 @@
 	<widget class="GtkHButtonBox" id="hbuttonbox_rename">
 	  <property name="visible">True</property>
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>
-	  <property name="spacing">3</property>
 
 	  <child>
 	    <widget class="GtkButton" id="button_rename_cancel">
@@ -2827,6 +2836,7 @@
 	      <property name="use_stock">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
+	      <property name="response_id">0</property>
 	      <signal name="clicked" handler="on_button_rename_cancel_clicked" last_modification_time="Wed, 09 Aug 2006 14:29:00 GMT"/>
 	    </widget>
 	  </child>
@@ -2839,6 +2849,7 @@
 	      <property name="can_focus">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
+	      <property name="response_id">0</property>
 	      <signal name="clicked" handler="on_button_rename_rename_clicked" last_modification_time="Wed, 09 Aug 2006 14:28:53 GMT"/>
 
 	      <child>
@@ -5469,6 +5480,7 @@
   <property name="modal">False</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
+  <property name="icon">oliveicon2.png</property>
   <property name="decorated">True</property>
   <property name="skip_taskbar_hint">False</property>
   <property name="skip_pager_hint">False</property>
@@ -5476,13 +5488,117 @@
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
+  <property name="has_separator">True</property>
 
   <child internal-child="vbox">
     <widget class="GtkVBox" id="vbox_merge">
-      <property name="border_width">5</property>
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
       <property name="spacing">3</property>
+
+      <child internal-child="action_area">
+	<widget class="GtkHButtonBox" id="hbuttonbox_merge">
+	  <property name="visible">True</property>
+	  <property name="layout_style">GTK_BUTTONBOX_END</property>
+
+	  <child>
+	    <widget class="GtkButton" id="button_merge_cancel">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="label">gtk-cancel</property>
+	      <property name="use_stock">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
+	      <property name="response_id">0</property>
+	      <signal name="clicked" handler="on_button_merge_cancel_clicked" last_modification_time="Mon, 09 Oct 2006 13:35:13 GMT"/>
+	    </widget>
+	  </child>
+	  
+	  <child>
+	    <widget class="GtkButton" id="button_merge_merge">
+	      <property name="visible">True</property>
+	      <property name="can_default">True</property>
+	      <property name="has_default">True</property>
+	      <property name="can_focus">True</property>
+	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
+	      <property name="response_id">0</property>
+	      <signal name="clicked" handler="on_button_merge_merge_clicked" last_modification_time="Mon, 09 Oct 2006 13:35:07 GMT"/>
+
+	      <child>
+		<widget class="GtkAlignment" id="alignment19">
+		  <property name="visible">True</property>
+		  <property name="xalign">0.5</property>
+		  <property name="yalign">0.5</property>
+		  <property name="xscale">0</property>
+		  <property name="yscale">0</property>
+		  <property name="top_padding">0</property>
+		  <property name="bottom_padding">0</property>
+		  <property name="left_padding">0</property>
+		  <property name="right_padding">0</property>
+
+		  <child>
+		    <widget class="GtkHBox" id="hbox14">
+		      <property name="visible">True</property>
+		      <property name="homogeneous">False</property>
+		      <property name="spacing">2</property>
+
+		      <child>
+			<widget class="GtkImage" id="image239">
+			  <property name="visible">True</property>
+			  <property name="stock">gtk-apply</property>
+			  <property name="icon_size">4</property>
+			  <property name="xalign">0.5</property>
+			  <property name="yalign">0.5</property>
+			  <property name="xpad">0</property>
+			  <property name="ypad">0</property>
+			</widget>
+			<packing>
+			  <property name="padding">0</property>
+			  <property name="expand">False</property>
+			  <property name="fill">False</property>
+			</packing>
+		      </child>
+
+		      <child>
+			<widget class="GtkLabel" id="label21">
+			  <property name="visible">True</property>
+			  <property name="label" translatable="yes">_Merge</property>
+			  <property name="use_underline">True</property>
+			  <property name="use_markup">False</property>
+			  <property name="justify">GTK_JUSTIFY_LEFT</property>
+			  <property name="wrap">False</property>
+			  <property name="selectable">False</property>
+			  <property name="xalign">0.5</property>
+			  <property name="yalign">0.5</property>
+			  <property name="xpad">0</property>
+			  <property name="ypad">0</property>
+			  <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
+			  <property name="width_chars">-1</property>
+			  <property name="single_line_mode">False</property>
+			  <property name="angle">0</property>
+			</widget>
+			<packing>
+			  <property name="padding">0</property>
+			  <property name="expand">False</property>
+			  <property name="fill">False</property>
+			</packing>
+		      </child>
+		    </widget>
+		  </child>
+		</widget>
+	      </child>
+	    </widget>
+	  </child>	  
+	</widget>
+	<packing>
+	  <property name="padding">0</property>
+	  <property name="expand">False</property>
+	  <property name="fill">False</property>
+	  <property name="pack_type">GTK_PACK_END</property>
+	</packing>
+      </child>
 
       <child>
 	<widget class="GtkHBox" id="hbox_merge">
@@ -5559,108 +5675,6 @@
 	      <property name="expand">False</property>
 	      <property name="fill">False</property>
 	    </packing>
-	  </child>
-	</widget>
-	<packing>
-	  <property name="padding">0</property>
-	  <property name="expand">False</property>
-	  <property name="fill">False</property>
-	</packing>
-      </child>
-
-      <child internal-child="action_area">
-	<widget class="GtkHButtonBox" id="hbuttonbox_merge">
-	  <property name="visible">True</property>
-	  <property name="layout_style">GTK_BUTTONBOX_END</property>
-	  <property name="spacing">3</property>
-
-	  <child>
-	    <widget class="GtkButton" id="button_merge_merge">
-	      <property name="visible">True</property>
-	      <property name="can_default">True</property>
-	      <property name="has_default">True</property>
-	      <property name="can_focus">True</property>
-	      <property name="relief">GTK_RELIEF_NORMAL</property>
-	      <property name="focus_on_click">True</property>
-	      <signal name="clicked" handler="on_button_merge_merge_clicked" last_modification_time="Mon, 09 Oct 2006 13:35:07 GMT"/>
-
-	      <child>
-		<widget class="GtkAlignment" id="alignment19">
-		  <property name="visible">True</property>
-		  <property name="xalign">0.5</property>
-		  <property name="yalign">0.5</property>
-		  <property name="xscale">0</property>
-		  <property name="yscale">0</property>
-		  <property name="top_padding">0</property>
-		  <property name="bottom_padding">0</property>
-		  <property name="left_padding">0</property>
-		  <property name="right_padding">0</property>
-
-		  <child>
-		    <widget class="GtkHBox" id="hbox14">
-		      <property name="visible">True</property>
-		      <property name="homogeneous">False</property>
-		      <property name="spacing">2</property>
-
-		      <child>
-			<widget class="GtkImage" id="image239">
-			  <property name="visible">True</property>
-			  <property name="stock">gtk-apply</property>
-			  <property name="icon_size">4</property>
-			  <property name="xalign">0.5</property>
-			  <property name="yalign">0.5</property>
-			  <property name="xpad">0</property>
-			  <property name="ypad">0</property>
-			</widget>
-			<packing>
-			  <property name="padding">0</property>
-			  <property name="expand">False</property>
-			  <property name="fill">False</property>
-			</packing>
-		      </child>
-
-		      <child>
-			<widget class="GtkLabel" id="label21">
-			  <property name="visible">True</property>
-			  <property name="label" translatable="yes">_Merge</property>
-			  <property name="use_underline">True</property>
-			  <property name="use_markup">False</property>
-			  <property name="justify">GTK_JUSTIFY_LEFT</property>
-			  <property name="wrap">False</property>
-			  <property name="selectable">False</property>
-			  <property name="xalign">0.5</property>
-			  <property name="yalign">0.5</property>
-			  <property name="xpad">0</property>
-			  <property name="ypad">0</property>
-			  <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
-			  <property name="width_chars">-1</property>
-			  <property name="single_line_mode">False</property>
-			  <property name="angle">0</property>
-			</widget>
-			<packing>
-			  <property name="padding">0</property>
-			  <property name="expand">False</property>
-			  <property name="fill">False</property>
-			</packing>
-		      </child>
-		    </widget>
-		  </child>
-		</widget>
-	      </child>
-	    </widget>
-	  </child>
-
-	  <child>
-	    <widget class="GtkButton" id="button_merge_cancel">
-	      <property name="visible">True</property>
-	      <property name="can_default">True</property>
-	      <property name="can_focus">True</property>
-	      <property name="label">gtk-cancel</property>
-	      <property name="use_stock">True</property>
-	      <property name="relief">GTK_RELIEF_NORMAL</property>
-	      <property name="focus_on_click">True</property>
-	      <signal name="clicked" handler="on_button_merge_cancel_clicked" last_modification_time="Mon, 09 Oct 2006 13:35:13 GMT"/>
-	    </widget>
 	  </child>
 	</widget>
 	<packing>

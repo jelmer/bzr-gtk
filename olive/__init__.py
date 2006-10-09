@@ -90,6 +90,7 @@ class OliveGtk:
         self.menuitem_branch_checkout = self.toplevel.get_widget('menuitem_branch_checkout')
         self.menuitem_branch_pull = self.toplevel.get_widget('menuitem_branch_pull')
         self.menuitem_branch_push = self.toplevel.get_widget('menuitem_branch_push')
+        self.menuitem_branch_merge = self.toplevel.get_widget('menuitem_branch_merge')
         self.menuitem_branch_commit = self.toplevel.get_widget('menuitem_branch_commit')
         self.menuitem_branch_status = self.toplevel.get_widget('menuitem_branch_status')
         self.menuitem_branch_missing = self.toplevel.get_widget('menuitem_branch_missing_revisions')
@@ -125,6 +126,7 @@ class OliveGtk:
                 "on_menuitem_branch_initialize_activate": self.on_menuitem_branch_initialize_activate,
                 "on_menuitem_branch_get_activate": self.on_menuitem_branch_get_activate,
                 "on_menuitem_branch_checkout_activate": self.on_menuitem_branch_checkout_activate,
+                "on_menuitem_branch_merge_activate": self.on_menuitem_branch_merge_activate,
                 "on_menuitem_branch_commit_activate": self.on_menuitem_branch_commit_activate,
                 "on_menuitem_branch_push_activate": self.on_menuitem_branch_push_activate,
                 "on_menuitem_branch_pull_activate": self.on_menuitem_branch_pull_activate,
@@ -220,6 +222,12 @@ class OliveGtk:
         commit = CommitDialog(self.wt, self.wtpath)
         commit.display()
     
+    def on_menuitem_branch_merge_activate(self, widget):
+        """ Branch/Merge... menu handler. """
+        from merge import MergeDialog
+        merge = MergeDialog(self.wt, self.wtpath)
+        merge.display()
+
     def on_menuitem_branch_missing_revisions_activate(self, widget):
         """ Branch/Missing revisions menu handler. """
         local_branch = self.wt.branch
@@ -614,6 +622,7 @@ class OliveGtk:
         self.menuitem_branch_checkout.set_sensitive(self.notbranch)
         self.menuitem_branch_pull.set_sensitive(not self.notbranch)
         self.menuitem_branch_push.set_sensitive(not self.notbranch)
+        self.menuitem_branch_merge.set_sensitive(not self.notbranch)
         self.menuitem_branch_commit.set_sensitive(not self.notbranch)
         self.menuitem_branch_status.set_sensitive(not self.notbranch)
         self.menuitem_branch_missing.set_sensitive(not self.notbranch)
