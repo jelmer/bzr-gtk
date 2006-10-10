@@ -427,8 +427,6 @@ class OliveGtk:
     def on_treeview_right_row_activated(self, treeview, path, view_column):
         """ Occurs when somebody double-clicks or enters an item in the
         file list. """
-        import os.path
-        
         from launch import launch
         
         newdir = self.get_selected_right()
@@ -436,7 +434,7 @@ class OliveGtk:
         if newdir == '..':
             self.set_path(os.path.split(self.get_path())[0])
         else:
-            fullpath = self.get_path() + os.sep + newdir
+            fullpath = os.path.join(self.get_path(), newdir)
             if os.path.isdir(fullpath):
                 # selected item is an existant directory
                 self.set_path(fullpath)
@@ -778,6 +776,7 @@ class OliveGtk:
         active = combobox.get_active()
         if active >= 0:
             drive = model[active][0]
+            self.set_path(drive + '\\')
             self.refresh_right(drive + '\\')
 
 import ConfigParser
