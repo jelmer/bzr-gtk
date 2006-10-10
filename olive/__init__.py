@@ -265,10 +265,7 @@ class OliveGtk:
         #    tree_to.pull(branch_from)
         #else:
         #    branch_to.pull(branch_from)
-        branch_to.pull(branch_from)
-        
-        # TODO: get the number of pulled revisions
-        ret = 0
+        ret = branch_to.pull(branch_from)
         
         info_dialog(_('Pull successful'), _('%d revision(s) pulled.') % ret)
     
