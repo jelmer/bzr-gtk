@@ -183,7 +183,7 @@ class OliveGtk:
         self.notbranch = False
         try:
             self.wt, self.wtpath = WorkingTree.open_containing(self.path)
-        except errors.NotBranchError:
+        except (errors.NotBranchError, errors.NoWorkingTree):
             self.notbranch = True
 
     def get_path(self):
@@ -689,7 +689,7 @@ class OliveGtk:
         notbranch = False
         try:
             tree1 = WorkingTree.open_containing(path)[0]
-        except errors.NotBranchError:
+        except (errors.NotBranchError, errors.NoWorkingTree):
             notbranch = True
         except errors.PermissionDenied:
             print "DEBUG: permission denied."
