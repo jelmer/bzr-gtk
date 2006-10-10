@@ -41,8 +41,9 @@ else:
     gladefile = "/usr/share/olive/olive.glade"
 
 if not os.path.exists(gladefile):
-    # Load from current directory if not installed
-    gladefile = "olive.glade"
+    # Load from sources directory if not installed
+    dir_ = os.path.split(os.path.dirname(__file__))[0]
+    gladefile = os.path.join(dir_, "olive.glade")
     # Check again
     if not os.path.exists(gladefile):
         # Fail
