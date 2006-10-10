@@ -484,12 +484,33 @@ class OliveGtk:
         # Expand the tree
         self.treeview_left.expand_all()
 
+    def _add_updir_to_dirlist(self, dirlist, curdir):
+        """Add .. to the top of directories list if we not in root directory
+
+        @param  dirlist:    list of directories (modified in place)
+        @param  curdir:     current directory
+        @return:            nothing
+        """
+        if curdir is None:
+            curdir = self.path
+
+        if sys.platform == 'win32':
+            drive, tail = os.path.splitdrive(curdir)
+            if tail in ('', '/', '\\'):
+                return
+        else:
+            if curdir == '/':
+                return
+
+        # insert always as first element
+        dirlist.insert(0, '..')
+
     def _load_right(self):
         """ Load data into the right panel. (Filelist) """
         # Create ListStore
         liststore = gtk.ListStore(str, str, str)
         
-        dirs = ['..']
+        dirs = []
         files = []
         
         # Fill the appropriate lists
@@ -505,6 +526,9 @@ class OliveGtk:
         # Sort'em
         dirs.sort()
         files.sort()
+
+        # add updir link to dirs
+        self._add_updir_to_dirlist(dirs, self.path)
         
         if not self.notbranch:
             branch = self.wt.branch
@@ -666,7 +690,7 @@ class OliveGtk:
         liststore = self.treeview_right.get_model()
         liststore.clear()
 
-        dirs = ['..']
+        dirs = []
         files = []
 
         # Fill the appropriate lists
@@ -682,7 +706,10 @@ class OliveGtk:
         # Sort'em
         dirs.sort()
         files.sort()
-        
+
+        # add updir link to dirs
+        self._add_updir_to_dirlist(dirs, path)
+
         # Try to open the working tree
         notbranch = False
         try:
