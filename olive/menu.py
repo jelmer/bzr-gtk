@@ -149,7 +149,7 @@ class OliveMenu:
             return
         
         try:
-            bzrlib.add.smart_add([directory + '/' + filename])
+            bzrlib.add.smart_add([os.path.join(directory, filename)])
         except errors.NotBranchError:
             error_dialog(_('Directory is not a branch'),
                          _('You can perform this action only in a branch.'))
