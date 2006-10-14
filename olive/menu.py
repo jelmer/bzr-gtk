@@ -30,7 +30,7 @@ from bzrlib.workingtree import WorkingTree
 
 from dialog import error_dialog, info_dialog, warning_dialog
 from launch import launch
-from olive import OlivePreferences
+from olive import OlivePreferences, DiffWindow
 
 class OliveMenu:
     """ This class is responsible for building the context menus. """
@@ -210,8 +210,6 @@ class OliveMenu:
     
     def diff(self, action):
         """ Right context menu -> Diff """
-        from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
-        
         try:
             wt = WorkingTree.open_containing(self.path)[0]
         except errors.NotBranchError:

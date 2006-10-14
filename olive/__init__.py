@@ -56,6 +56,19 @@ if not os.path.exists(gladefile):
 
 from dialog import error_dialog, info_dialog
 
+# import this classes only once
+try:
+    from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
+    from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
+except ImportError:
+    # olive+bzr-gtk not installed. try to import from sources
+    path = os.path.dirname(os.path.dirname(__file__))
+    if path not in sys.path:
+        sys.path.append(path)
+    from viz.diffwin import DiffWindow
+    from viz.branchwin import BranchWindow
+
+
 class OliveGtk:
     """ The main Olive GTK frontend class. This is called when launching the
     program. """
@@ -351,7 +364,6 @@ class OliveGtk:
     
     def on_menuitem_stats_diff_activate(self, widget):
         """ Statistics/Differences... menu handler. """
-        from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
         window = DiffWindow()
         parent_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
         window.set_diff(self.wt.branch.nick, self.wt, parent_tree)
@@ -365,7 +377,6 @@ class OliveGtk:
     
     def on_menuitem_stats_log_activate(self, widget):
         """ Statistics/Log... menu handler. """
-        from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
         window = BranchWindow()
         window.set_branch(self.wt.branch, self.wt.branch.last_revision(), None)
         window.show()
