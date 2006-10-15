@@ -619,6 +619,7 @@ class OliveGtk:
     def set_sensitivity(self):
         """ Set menu and toolbar sensitivity. """
         self.menuitem_branch_init.set_sensitive(self.notbranch)
+        self.menuitem_branch_get.set_sensitive(self.notbranch)
         self.menuitem_branch_checkout.set_sensitive(self.notbranch)
         self.menuitem_branch_pull.set_sensitive(not self.notbranch)
         self.menuitem_branch_push.set_sensitive(not self.notbranch)

@@ -44,6 +44,8 @@ class CommitDialog:
         self.checkbutton_local = self.glade.get_widget('checkbutton_commit_local')
         self.textview = self.glade.get_widget('textview_commit')
         self.file_view = self.glade.get_widget('treeview_commit_select')
+        self.pending_label = self.glade.get_widget('label_commit_pending')
+        self.pending_view = self.glade.get_widget('treeview_commit_pending')
 
         file_id = self.wt.path2id(wtpath)
 
@@ -56,6 +58,9 @@ class CommitDialog:
         self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
         self.delta = self.wt.changes_from(self.old_tree)
         
+        # Get pending merges
+        self.pending = self._pending_merges(self.wt)
+        
         # Dictionary for signal_autoconnect
         dic = { "on_button_commit_commit_clicked": self.commit,
                 "on_button_commit_cancel_clicked": self.close }
@@ -65,6 +70,8 @@ class CommitDialog:
         
         # Create the file list
         self._create_file_view()
+        # Create the pending merges
+        self._create_pending_merges()
     
     def display(self):
         """ Display the Push dialog. """
@@ -76,6 +83,13 @@ class CommitDialog:
             if self.wt.branch.get_bound_location() is not None:
                 # we have a checkout, so the local commit checkbox must appear
                 self.checkbutton_local.show()
+            
+            if self.pending:
+                # There are pending merges, file selection not supported
+                self.file_view.set_sensitive(False)
+            else:
+                # No pending merges
+                self.pending_view.set_sensitive(False)
             
             self.textview.modify_font(pango.FontDescription("Monospace"))
             self.window.show()
@@ -108,6 +122,27 @@ class CommitDialog:
         for path, id, kind, text_modified, meta_modified in self.delta.modified:
             self.file_store.append([ True, path, _('modified') ])
     
+    def _create_pending_merges(self):
+        liststore = gtk.ListStore(gobject.TYPE_STRING,
+                                  gobject.TYPE_STRING,
+                                  gobject.TYPE_STRING)
+        self.pending_view.set_model(liststore)
+        
+        self.pending_view.append_column(gtk.TreeViewColumn(_('Date'),
+                                        gtk.CellRendererText(), text=0))
+        self.pending_view.append_column(gtk.TreeViewColumn(_('Committer'),
+                                        gtk.CellRendererText(), text=1))
+        self.pending_view.append_column(gtk.TreeViewColumn(_('Summary'),
+                                        gtk.CellRendererText(), text=2))
+        
+        if not self.pending:
+            return
+        
+        for item in self.pending:
+            liststore.append([ item['date'],
+                               item['committer'],
+                               item['summary'] ])
+    
     def _get_specific_files(self):
         ret = []
         it = self.file_store.get_iter_first()
@@ -122,6 +157,70 @@ class CommitDialog:
         model[path][0] = not model[path][0]
         return
     
+    def _pending_merges(self, wt):
+        """ Return a list of pending merges or None if there are none of them. """
+        parents = wt.get_parent_ids()
+        if len(parents) < 2:
+            return None
+        
+        import re
+        from bzrlib.osutils import format_date
+        
+        pending = parents[1:]
+        branch = wt.branch
+        last_revision = parents[0]
+        
+        if last_revision is not None:
+            try:
+                ignore = set(branch.repository.get_ancestry(last_revision))
+            except errors.NoSuchRevision:
+                # the last revision is a ghost : assume everything is new 
+                # except for it
+                ignore = set([None, last_revision])
+        else:
+            ignore = set([None])
+        
+        pm = []
+        for merge in pending:
+            ignore.add(merge)
+            try:
+                m_revision = branch.repository.get_revision(merge)
+                
+                rev = {}
+                rev['committer'] = re.sub('<.*@.*>', '', m_revision.committer).strip(' ')
+                rev['summary'] = m_revision.get_summary()
+                rev['date'] = format_date(m_revision.timestamp,
+                                          m_revision.timezone or 0, 
+                                          'original', date_fmt="%Y-%m-%d",
+                                          show_offset=False)
+                
+                pm.append(rev)
+                
+                inner_merges = branch.repository.get_ancestry(merge)
+                assert inner_merges[0] is None
+                inner_merges.pop(0)
+                inner_merges.reverse()
+                for mmerge in inner_merges:
+                    if mmerge in ignore:
+                        continue
+                    mm_revision = branch.repository.get_revision(mmerge)
+                    
+                    rev = {}
+                    rev['committer'] = re.sub('<.*@.*>', '', mm_revision.committer).strip(' ')
+                    rev['summary'] = mm_revision.get_summary()
+                    rev['date'] = format_date(mm_revision.timestamp,
+                                              mm_revision.timezone or 0, 
+                                              'original', date_fmt="%Y-%m-%d",
+                                              show_offset=False)
+                
+                    pm.append(rev)
+                    
+                    ignore.add(mmerge)
+            except errors.NoSuchRevision:
+                print "DEBUG: NoSuchRevision:", merge
+        
+        return pm
+
     def commit(self, widget):
         textbuffer = self.textview.get_buffer()
         start, end = textbuffer.get_bounds()
@@ -130,7 +229,10 @@ class CommitDialog:
         checkbutton_strict = self.glade.get_widget('checkbutton_commit_strict')
         checkbutton_force = self.glade.get_widget('checkbutton_commit_force')
         
-        specific_files = self._get_specific_files()
+        if not self.pending:
+            specific_files = self._get_specific_files()
+        else:
+            specific_files = None
         
         try:
             self.wt.commit(message, 
