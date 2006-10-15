@@ -157,6 +157,42 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
 
         return
 
+    def pull_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+
+        # We only want to continue here if we get a NotBranchError
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
+        from bzrlib.plugins.gtk.olive.pull import PullDialog
+        dialog = PullDialog(tree, path)
+        dialog.display()
+        gtk.main()
+
+    def merge_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+
+        # We only want to continue here if we get a NotBranchError
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
+        from bzrlib.plugins.gtk.olive.merge import MergeDialog
+        dialog = MergeDialog(tree, path)
+        dialog.display()
+        gtk.main()
+
     def get_background_items(self, window, vfs_file):
         items = []
         file = vfs_file.get_uri()
@@ -181,6 +217,18 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
                              'Log',
                              'Show Bazaar history')
         item.connect('activate', self.log_cb, vfs_file)
+        items.append(item)
+
+        item = nautilus.MenuItem('BzrNautilus::pull',
+                             'Pull',
+                             'Pull from another branch')
+        item.connect('activate', self.pull_cb, vfs_file)
+        items.append(item)
+
+        item = nautilus.MenuItem('BzrNautilus::merge',
+                             'Merge',
+                             'Merge from another branch')
+        item.connect('activate', self.merge_cb, vfs_file)
         items.append(item)
 
         item = nautilus.MenuItem('BzrNautilus::commit',
