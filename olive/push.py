@@ -184,13 +184,13 @@ def do_push(branch, location=None, remember=False, overwrite=False,
     from bzrlib.bzrdir import BzrDir
     from bzrlib.transport import get_transport
         
-    br_from = Branch.open_containing(branch)[0]
+    br_from = branch
     
     stored_loc = br_from.get_push_location()
     if location is None:
         if stored_loc is None:
             error_dialog(_('Push location is unknown'),
-                                     _('Please specify a location manually.'))
+                         _('Please specify a location manually.'))
             return
         else:
             location = stored_loc
