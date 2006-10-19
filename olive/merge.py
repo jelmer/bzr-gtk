@@ -25,10 +25,11 @@ except:
 import gtk
 import gtk.glade
 
+from bzrlib.branch import Branch
 import bzrlib.errors as errors
 
 from __init__ import gladefile
-from dialog import error_dialog
+from dialog import error_dialog, info_dialog, warning_dialog
 
 class MergeDialog:
     """ Display the Merge dialog and perform the needed actions. """
@@ -48,16 +49,56 @@ class MergeDialog:
 
         self.wt = wt
         self.wtpath = wtpath
+        
+        # Get some widgets
+        self.entry = self.glade.get_widget('entry_merge')
 
     def display(self):
         """ Display the Add file(s) dialog. """
         self.window.show_all()
 
     def merge(self, widget):
-        print "DEBUG: Merge button pressed."
+        branch = self.entry.get_text()
+        if branch == "":
+            error_dialog(_('Branch not given'),
+                         _('Please specify a branch to merge from.'))
+            return
+
+        try:
+            other_branch = Branch.open_containing(branch)[0]
+        except errors.NotBranchError:
+            error_dialog(_('Specified location not a branch'),
+                         _('Please specify a branch you want to merge from.'))
+            return
+        
+        try:
+            conflicts = self.wt.merge_from_branch(other_branch)
+        except errors.BzrCommandError, errmsg:
+            error_dialog(_('Bazaar command error'), str(errmsg))
+            return
+        
+        self.close()
+        if conflicts == 0:
+            # No conflicts found.
+            info_dialog(_('Merge successful'),
+                        _('All changes applied successfully.'))
+        else:
+            # There are conflicts to be resolved.
+            warning_dialog(_('Conflicts encountered'),
+                           _('Please resolve the conflicts manually before committing.'))
     
     def open(self, widget):
-        print "DEBUG: Open branch button pressed."
-    
+        fcd = gtk.FileChooserDialog(title="Please select a folder",
+                                    parent=self.window,
+                                    action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                    buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                                             gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+        fcd.set_default_response(gtk.RESPONSE_OK)
+        
+        if fcd.run() == gtk.RESPONSE_OK:
+            self.entry.set_text(fcd.get_filename())
+        
+        fcd.destroy()
+        
     def close(self, widget=None):
         self.window.destroy()
