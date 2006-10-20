@@ -65,6 +65,8 @@ class OliveGtk:
         self.window = self.toplevel.get_widget('window_main')
         
         self.pref = OlivePreferences()
+        
+        self.path = None
 
         # Initialize the statusbar
         self.statusbar = self.toplevel.get_widget('statusbar')
@@ -186,10 +188,13 @@ class OliveGtk:
     def set_path(self, path):
         self.path = path
         self.notbranch = False
+        
         try:
             self.wt, self.wtpath = WorkingTree.open_containing(self.path)
         except errors.NotBranchError:
             self.notbranch = True
+        
+        self.statusbar.push(self.context_id, path)
 
     def get_path(self):
         return self.path
@@ -382,7 +387,8 @@ class OliveGtk:
     def on_menuitem_view_show_hidden_files_activate(self, widget):
         """ View/Show hidden files menu handler. """
         self.pref.set_preference('dotted_files', widget.get_active())
-        self.refresh_right()
+        if self.path is not None:
+            self.refresh_right()
 
     def on_treeview_left_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the bookmark list. """
