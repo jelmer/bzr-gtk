@@ -4,3 +4,4 @@ MANIFEST
 *.pyc
 *.bak
 *.gladep
+dist
