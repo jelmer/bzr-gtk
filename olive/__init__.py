@@ -79,6 +79,8 @@ class OliveGtk:
         self.window = self.toplevel.get_widget('window_main')
         
         self.pref = OlivePreferences()
+        
+        self.path = None
 
         # Initialize the statusbar
         self.statusbar = self.toplevel.get_widget('statusbar')
@@ -200,10 +202,13 @@ class OliveGtk:
     def set_path(self, path):
         self.path = path
         self.notbranch = False
+        
         try:
             self.wt, self.wtpath = WorkingTree.open_containing(self.path)
         except (errors.NotBranchError, errors.NoWorkingTree):
             self.notbranch = True
+        
+        self.statusbar.push(self.context_id, path)
 
     def get_path(self):
         return self.path
@@ -329,13 +334,13 @@ class OliveGtk:
                     existing_bzrdir.create_workingtree()
         except errors.AlreadyBranchError, errmsg:
             error_dialog(_('Directory is already a branch'),
-                                     _('The current directory (%s) is already a branch.\nYou can start using it, or initialize another directory.') % errmsg)
+                         _('The current directory (%s) is already a branch.\nYou can start using it, or initialize another directory.') % errmsg)
         except errors.BranchExistsWithoutWorkingTree, errmsg:
             error_dialog(_('Branch without a working tree'),
-                                     _('The current directory (%s)\nis a branch without a working tree.') % errmsg)
+                         _('The current directory (%s)\nis a branch without a working tree.') % errmsg)
         else:
             info_dialog(_('Initialize successful'),
-                                    _('Directory successfully initialized.'))
+                        _('Directory successfully initialized.'))
             self.refresh_right()
         
     def on_menuitem_file_make_directory_activate(self, widget):
@@ -391,6 +396,8 @@ class OliveGtk:
     def on_menuitem_view_show_hidden_files_activate(self, widget):
         """ View/Show hidden files menu handler. """
         self.pref.set_preference('dotted_files', widget.get_active())
+        if self.path is not None:
+            self.refresh_right()
 
     def on_treeview_left_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the bookmark list. """
@@ -441,6 +448,7 @@ class OliveGtk:
                 m_remove.set_sensitive(False)
                 m_commit.set_sensitive(False)
                 m_diff.set_sensitive(False)
+
             menu.right_context_menu().popup(None, None, None, 0,
                                             event.time)
         
@@ -472,7 +480,7 @@ class OliveGtk:
         self.pref.set_preference('window_x', x)
         self.pref.set_preference('window_y', y)
         self.pref.set_preference('paned_position',
-                                      self.hpaned_main.get_position())
+                                 self.hpaned_main.get_position())
         
         self.pref.write()
         self.window_main.destroy()
@@ -919,6 +927,11 @@ class OlivePreferences:
 
     def set_preference(self, option, value):
         """ Set the value of the given option. """
+        if value == True:
+            value = 'yes'
+        elif value == False:
+            value = 'no'
+        
         if self.config.has_section('preferences'):
             self.config.set('preferences', option, value)
         else:
@@ -932,8 +945,7 @@ class OlivePreferences:
         """
         if self.config.has_option('preferences', option):
             if kind == 'bool':
-                #return self.config.getboolean('preferences', option)
-                return True
+                return self.config.getboolean('preferences', option)
             elif kind == 'int':
                 return self.config.getint('preferences', option)
             elif kind == 'float':

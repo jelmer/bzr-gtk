@@ -21,8 +21,6 @@ TODO list for Olive
   in the main window.
 - Is there any reason why on win32 bzr branches have to be on fixed drives and 
   not on, e.g., cdroms?
-- Add a 'merge' window, allowing merges from other branches.
-- Show list of pending merges in the commit window
 - Dialog for applying a bundle
 - Switch dialog
 - Ability to bind/unbind the branch
