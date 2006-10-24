@@ -56,6 +56,29 @@ except:
 import gettext
 gettext.install('olive-gtk')
 
+
+# make sure we could import bzrlib
+try:
+    import bzrlib
+except ImportError:
+    # try to find bzr if it exist in $PATH
+    p = os.popen('bzr version')
+    s = p.read()
+    r = p.close()
+    if r not in (None, 0):
+        print >>sys.stderr, "bzr not found"
+        sys.exit(1)
+    else:
+        for i in s.splitlines():
+            if i.startswith("Using bzrlib: "):
+                path = os.path.split(i[14:])[0]
+                sys.path.append(path)
+                break
+        else:
+            print >>sys.stderr, "Can't find bzrlib location"
+            sys.exit(1)
+
+
 from olive import OliveGtk
 from bzrlib.plugin import load_plugins
 load_plugins()

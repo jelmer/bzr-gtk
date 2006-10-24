@@ -30,7 +30,7 @@ from bzrlib.workingtree import WorkingTree
 
 from dialog import error_dialog, info_dialog, warning_dialog
 from launch import launch
-from olive import OlivePreferences
+from olive import OlivePreferences, DiffWindow
 
 class OliveMenu:
     """ This class is responsible for building the context menus. """
@@ -149,7 +149,7 @@ class OliveMenu:
             return
         
         try:
-            bzrlib.add.smart_add([directory + '/' + filename])
+            bzrlib.add.smart_add([os.path.join(directory, filename)])
         except errors.NotBranchError:
             error_dialog(_('Directory is not a branch'),
                          _('You can perform this action only in a branch.'))
@@ -210,8 +210,6 @@ class OliveMenu:
     
     def diff(self, action):
         """ Right context menu -> Diff """
-        from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
-        
         try:
             wt = WorkingTree.open_containing(self.path)[0]
         except errors.NotBranchError:

@@ -235,7 +235,7 @@
 		      <child internal-child="image">
 			<widget class="GtkImage" id="image243">
 			  <property name="visible">True</property>
-			  <property name="pixbuf">pull16.png</property>
+			  <property name="pixbuf">icons/pull16.png</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -255,7 +255,7 @@
 		      <child internal-child="image">
 			<widget class="GtkImage" id="image244">
 			  <property name="visible">True</property>
-			  <property name="pixbuf">push16.png</property>
+			  <property name="pixbuf">icons/push16.png</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -290,7 +290,7 @@
 		      <child internal-child="image">
 			<widget class="GtkImage" id="image245">
 			  <property name="visible">True</property>
-			  <property name="pixbuf">commit16.png</property>
+			  <property name="pixbuf">icons/commit16.png</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -347,7 +347,7 @@
 		      <child internal-child="image">
 			<widget class="GtkImage" id="image246">
 			  <property name="visible">True</property>
-			  <property name="pixbuf">diff16.png</property>
+			  <property name="pixbuf">icons/diff16.png</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -367,7 +367,7 @@
 		      <child internal-child="image">
 			<widget class="GtkImage" id="image247">
 			  <property name="visible">True</property>
-			  <property name="pixbuf">log16.png</property>
+			  <property name="pixbuf">icons/log16.png</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
@@ -432,7 +432,7 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Refresh</property>
 	      <property name="use_underline">True</property>
-	      <property name="icon">refresh.png</property>
+	      <property name="icon">icons/refresh.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
@@ -449,7 +449,7 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Diff</property>
 	      <property name="use_underline">True</property>
-	      <property name="icon">diff.png</property>
+	      <property name="icon">icons/diff.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
@@ -466,7 +466,7 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Log</property>
 	      <property name="use_underline">True</property>
-	      <property name="icon">log.png</property>
+	      <property name="icon">icons/log.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
@@ -496,7 +496,7 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Commit</property>
 	      <property name="use_underline">True</property>
-	      <property name="icon">commit.png</property>
+	      <property name="icon">icons/commit.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
@@ -526,7 +526,7 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Pull</property>
 	      <property name="use_underline">True</property>
-	      <property name="icon">pull.png</property>
+	      <property name="icon">icons/pull.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>
@@ -543,7 +543,7 @@
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">Push</property>
 	      <property name="use_underline">True</property>
-	      <property name="icon">push.png</property>
+	      <property name="icon">icons/push.png</property>
 	      <property name="visible_horizontal">True</property>
 	      <property name="visible_vertical">True</property>
 	      <property name="is_important">False</property>

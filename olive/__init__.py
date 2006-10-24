@@ -45,8 +45,9 @@ else:
     gladefile = "/usr/share/olive/olive.glade"
 
 if not os.path.exists(gladefile):
-    # Load from current directory if not installed
-    gladefile = "olive.glade"
+    # Load from sources directory if not installed
+    dir_ = os.path.split(os.path.dirname(__file__))[0]
+    gladefile = os.path.join(dir_, "olive.glade")
     # Check again
     if not os.path.exists(gladefile):
         # Fail
@@ -54,6 +55,19 @@ if not os.path.exists(gladefile):
         sys.exit(1)
 
 from dialog import error_dialog, info_dialog
+
+# import this classes only once
+try:
+    from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
+    from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
+except ImportError:
+    # olive+bzr-gtk not installed. try to import from sources
+    path = os.path.dirname(os.path.dirname(__file__))
+    if path not in sys.path:
+        sys.path.append(path)
+    from viz.diffwin import DiffWindow
+    from viz.branchwin import BranchWindow
+
 
 class OliveGtk:
     """ The main Olive GTK frontend class. This is called when launching the
@@ -65,6 +79,8 @@ class OliveGtk:
         self.window = self.toplevel.get_widget('window_main')
         
         self.pref = OlivePreferences()
+        
+        self.path = None
 
         # Initialize the statusbar
         self.statusbar = self.toplevel.get_widget('statusbar')
@@ -186,10 +202,13 @@ class OliveGtk:
     def set_path(self, path):
         self.path = path
         self.notbranch = False
+        
         try:
             self.wt, self.wtpath = WorkingTree.open_containing(self.path)
-        except errors.NotBranchError:
+        except (errors.NotBranchError, errors.NoWorkingTree):
             self.notbranch = True
+        
+        self.statusbar.push(self.context_id, path)
 
     def get_path(self):
         return self.path
@@ -276,10 +295,7 @@ class OliveGtk:
         #    tree_to.pull(branch_from)
         #else:
         #    branch_to.pull(branch_from)
-        branch_to.pull(branch_from)
-        
-        # TODO: get the number of pulled revisions
-        ret = 0
+        ret = branch_to.pull(branch_from)
         
         info_dialog(_('Pull successful'), _('%d revision(s) pulled.') % ret)
     
@@ -318,13 +334,13 @@ class OliveGtk:
                     existing_bzrdir.create_workingtree()
         except errors.AlreadyBranchError, errmsg:
             error_dialog(_('Directory is already a branch'),
-                                     _('The current directory (%s) is already a branch.\nYou can start using it, or initialize another directory.') % errmsg)
+                         _('The current directory (%s) is already a branch.\nYou can start using it, or initialize another directory.') % errmsg)
         except errors.BranchExistsWithoutWorkingTree, errmsg:
             error_dialog(_('Branch without a working tree'),
-                                     _('The current directory (%s)\nis a branch without a working tree.') % errmsg)
+                         _('The current directory (%s)\nis a branch without a working tree.') % errmsg)
         else:
             info_dialog(_('Initialize successful'),
-                                    _('Directory successfully initialized.'))
+                        _('Directory successfully initialized.'))
             self.refresh_right()
         
     def on_menuitem_file_make_directory_activate(self, widget):
@@ -353,7 +369,6 @@ class OliveGtk:
     
     def on_menuitem_stats_diff_activate(self, widget):
         """ Statistics/Differences... menu handler. """
-        from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
         window = DiffWindow()
         parent_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
         window.set_diff(self.wt.branch.nick, self.wt, parent_tree)
@@ -367,7 +382,6 @@ class OliveGtk:
     
     def on_menuitem_stats_log_activate(self, widget):
         """ Statistics/Log... menu handler. """
-        from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
         window = BranchWindow()
         window.set_branch(self.wt.branch, self.wt.branch.last_revision(), None)
         window.show()
@@ -382,6 +396,8 @@ class OliveGtk:
     def on_menuitem_view_show_hidden_files_activate(self, widget):
         """ View/Show hidden files menu handler. """
         self.pref.set_preference('dotted_files', widget.get_active())
+        if self.path is not None:
+            self.refresh_right()
 
     def on_treeview_left_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the bookmark list. """
@@ -432,14 +448,13 @@ class OliveGtk:
                 m_remove.set_sensitive(False)
                 m_commit.set_sensitive(False)
                 m_diff.set_sensitive(False)
+
             menu.right_context_menu().popup(None, None, None, 0,
                                             event.time)
         
     def on_treeview_right_row_activated(self, treeview, path, view_column):
         """ Occurs when somebody double-clicks or enters an item in the
         file list. """
-        import os.path
-        
         from launch import launch
         
         newdir = self.get_selected_right()
@@ -447,7 +462,7 @@ class OliveGtk:
         if newdir == '..':
             self.set_path(os.path.split(self.get_path())[0])
         else:
-            fullpath = self.get_path() + os.sep + newdir
+            fullpath = os.path.join(self.get_path(), newdir)
             if os.path.isdir(fullpath):
                 # selected item is an existant directory
                 self.set_path(fullpath)
@@ -465,7 +480,7 @@ class OliveGtk:
         self.pref.set_preference('window_x', x)
         self.pref.set_preference('window_y', y)
         self.pref.set_preference('paned_position',
-                                      self.hpaned_main.get_position())
+                                 self.hpaned_main.get_position())
         
         self.pref.write()
         self.window_main.destroy()
@@ -497,12 +512,33 @@ class OliveGtk:
         # Expand the tree
         self.treeview_left.expand_all()
 
+    def _add_updir_to_dirlist(self, dirlist, curdir):
+        """Add .. to the top of directories list if we not in root directory
+
+        @param  dirlist:    list of directories (modified in place)
+        @param  curdir:     current directory
+        @return:            nothing
+        """
+        if curdir is None:
+            curdir = self.path
+
+        if sys.platform == 'win32':
+            drive, tail = os.path.splitdrive(curdir)
+            if tail in ('', '/', '\\'):
+                return
+        else:
+            if curdir == '/':
+                return
+
+        # insert always as first element
+        dirlist.insert(0, '..')
+
     def _load_right(self):
         """ Load data into the right panel. (Filelist) """
         # Create ListStore
         liststore = gtk.ListStore(str, str, str)
         
-        dirs = ['..']
+        dirs = []
         files = []
         
         # Fill the appropriate lists
@@ -518,6 +554,9 @@ class OliveGtk:
         # Sort'em
         dirs.sort()
         files.sort()
+
+        # add updir link to dirs
+        self._add_updir_to_dirlist(dirs, self.path)
         
         if not self.notbranch:
             branch = self.wt.branch
@@ -680,7 +719,7 @@ class OliveGtk:
         liststore = self.treeview_right.get_model()
         liststore.clear()
 
-        dirs = ['..']
+        dirs = []
         files = []
 
         # Fill the appropriate lists
@@ -696,12 +735,15 @@ class OliveGtk:
         # Sort'em
         dirs.sort()
         files.sort()
-        
+
+        # add updir link to dirs
+        self._add_updir_to_dirlist(dirs, path)
+
         # Try to open the working tree
         notbranch = False
         try:
             tree1 = WorkingTree.open_containing(path)[0]
-        except errors.NotBranchError:
+        except (errors.NotBranchError, errors.NoWorkingTree):
             notbranch = True
         except errors.PermissionDenied:
             print "DEBUG: permission denied."
@@ -790,6 +832,7 @@ class OliveGtk:
         active = combobox.get_active()
         if active >= 0:
             drive = model[active][0]
+            self.set_path(drive + '\\')
             self.refresh_right(drive + '\\')
 
 import ConfigParser
@@ -884,6 +927,11 @@ class OlivePreferences:
 
     def set_preference(self, option, value):
         """ Set the value of the given option. """
+        if value == True:
+            value = 'yes'
+        elif value == False:
+            value = 'no'
+        
         if self.config.has_section('preferences'):
             self.config.set('preferences', option, value)
         else:
@@ -897,8 +945,7 @@ class OlivePreferences:
         """
         if self.config.has_option('preferences', option):
             if kind == 'bool':
-                #return self.config.getboolean('preferences', option)
-                return True
+                return self.config.getboolean('preferences', option)
             elif kind == 'int':
                 return self.config.getint('preferences', option)
             elif kind == 'float':
