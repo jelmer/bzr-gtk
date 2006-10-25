@@ -31,7 +31,7 @@ import bzrlib.errors as errors
 import bzrlib.osutils
 
 from dialog import error_dialog
-from gladefile import GLADEFILENAME
+from guifiles import GLADEFILENAME
 
 
 class OliveCheckout:

@@ -27,7 +27,7 @@ import gtk.glade
 import bzrlib.errors as errors
 
 from dialog import error_dialog, info_dialog
-from gladefile import GLADEFILENAME
+from guifiles import GLADEFILENAME
 
 
 class OlivePush:

@@ -29,7 +29,7 @@ import bzrlib.errors as errors
 from bzrlib import osutils
 
 from dialog import error_dialog
-from gladefile import GLADEFILENAME
+from guifiles import GLADEFILENAME
 
 
 class CommitDialog:

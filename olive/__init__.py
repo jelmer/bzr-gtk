@@ -39,7 +39,7 @@ from bzrlib.workingtree import WorkingTree
 __version__ = '0.11.0'
 
 from dialog import error_dialog, info_dialog
-from gladefile import GLADEFILENAME
+from guifiles import GLADEFILENAME
 
 # import this classes only once
 try:
