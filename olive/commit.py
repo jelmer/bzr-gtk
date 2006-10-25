@@ -76,6 +76,7 @@ class CommitDialog:
 
         if self.standalone:
             dic["on_button_commit_cancel_clicked"] = self.quit
+            self.window.connect("delete_event", gtk.main_quit)
         
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
