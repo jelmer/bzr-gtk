@@ -26,6 +26,7 @@ import gobject
 import pango
 
 import bzrlib.errors as errors
+from bzrlib import osutils
 
 from dialog import error_dialog
 from gladefile import GLADEFILENAME
@@ -122,16 +123,22 @@ class CommitDialog:
                                      gtk.CellRendererText(), text=2))
 
         for path, id, kind in self.delta.added:
-            self.file_store.append([ True, path, _('added') ])
+            marker = osutils.kind_marker(kind)
+            self.file_store.append([ True, path+marker, _('added') ])
 
         for path, id, kind in self.delta.removed:
-            self.file_store.append([ True, path, _('removed') ])
+            marker = osutils.kind_marker(kind)
+            self.file_store.append([ True, path+marker, _('removed') ])
 
         for oldpath, newpath, id, kind, text_modified, meta_modified in self.delta.renamed:
-            self.file_store.append([ True, oldpath, _('renamed') ])
+            marker = osutils.kind_marker(kind)
+            self.file_store.append([ True,
+                                     oldpath+marker + '  =>  ' + newpath+marker,
+                                     _('renamed') ])
 
         for path, id, kind, text_modified, meta_modified in self.delta.modified:
-            self.file_store.append([ True, path, _('modified') ])
+            marker = osutils.kind_marker(kind)
+            self.file_store.append([ True, path+marker, _('modified') ])
     
     def _create_pending_merges(self):
         liststore = gtk.ListStore(gobject.TYPE_STRING,
