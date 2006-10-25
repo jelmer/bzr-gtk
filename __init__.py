@@ -71,7 +71,7 @@ class cmd_gdiff(Command):
             tree1 = wt
             tree2 = tree1.basis_tree()
 
-        from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
+        from viz.diffwin import DiffWindow
         import gtk
         window = DiffWindow()
         window.connect("destroy", lambda w: gtk.main_quit())
