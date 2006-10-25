@@ -215,7 +215,7 @@ class cmd_gcommit(Command):
 
         (wt, path) = WorkingTree.open_containing(filename)
 
-        dialog = CommitDialog(wt, path)
+        dialog = CommitDialog(wt, path, standalone=True)
         dialog.display()
         gtk.main()
 
