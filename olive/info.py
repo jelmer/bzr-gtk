@@ -25,8 +25,9 @@ import gtk.glade
 
 import bzrlib.errors as errors
 
-from olive import gladefile
 from dialog import error_dialog
+from gladefile import GLADEFILENAME
+
 
 def info(location):
     """ Get info about branch, working tree, and repository
@@ -143,7 +144,7 @@ class OliveInfo:
     """ Display Informations window and perform the needed actions. """
     def __init__(self, wt):
         """ Initialize the Informations window. """
-        self.glade = gtk.glade.XML(gladefile, 'window_info', 'olive-gtk')
+        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_info', 'olive-gtk')
         
         # Get the Informations window widget
         self.window = self.glade.get_widget('window_info')

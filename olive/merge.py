@@ -28,14 +28,15 @@ import gtk.glade
 from bzrlib.branch import Branch
 import bzrlib.errors as errors
 
-from __init__ import gladefile
 from dialog import error_dialog, info_dialog, warning_dialog
+from gladefile import GLADEFILENAME
+
 
 class MergeDialog:
     """ Display the Merge dialog and perform the needed actions. """
     def __init__(self, wt, wtpath):
         """ Initialize the Merge dialog. """
-        self.glade = gtk.glade.XML(gladefile, 'window_merge', 'olive-gtk')
+        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_merge', 'olive-gtk')
         
         self.window = self.glade.get_widget('window_merge')
         

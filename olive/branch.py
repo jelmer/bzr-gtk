@@ -28,14 +28,15 @@ import gtk.glade
 from bzrlib.branch import Branch
 import bzrlib.errors as errors
 
-from __init__ import gladefile
 from dialog import error_dialog, info_dialog
+from gladefile import GLADEFILENAME
+
 
 class BranchDialog:
     """ Display branch dialog and perform the needed operations. """
     def __init__(self, path=None):
         """ Initialize the Branch dialog. """
-        self.glade = gtk.glade.XML(gladefile, 'window_branch', 'olive-gtk')
+        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_branch', 'olive-gtk')
 
         self.window = self.glade.get_widget('window_branch')
         

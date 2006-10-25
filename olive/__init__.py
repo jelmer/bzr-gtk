@@ -38,23 +38,8 @@ from bzrlib.workingtree import WorkingTree
 # Olive GTK UI version
 __version__ = '0.11.0'
 
-# Load the glade file
-if sys.platform == 'win32':
-    gladefile = os.path.dirname(sys.executable) + "/share/olive/olive.glade"
-else:
-    gladefile = "/usr/share/olive/olive.glade"
-
-if not os.path.exists(gladefile):
-    # Load from sources directory if not installed
-    dir_ = os.path.split(os.path.dirname(__file__))[0]
-    gladefile = os.path.join(dir_, "olive.glade")
-    # Check again
-    if not os.path.exists(gladefile):
-        # Fail
-        print _('Glade file cannot be found.')
-        sys.exit(1)
-
 from dialog import error_dialog, info_dialog
+from gladefile import GLADEFILENAME
 
 # import this classes only once
 try:
@@ -74,7 +59,7 @@ class OliveGtk:
     program. """
     
     def __init__(self):
-        self.toplevel = gtk.glade.XML(gladefile, 'window_main', 'olive-gtk')
+        self.toplevel = gtk.glade.XML(GLADEFILENAME, 'window_main', 'olive-gtk')
         
         self.window = self.toplevel.get_widget('window_main')
         

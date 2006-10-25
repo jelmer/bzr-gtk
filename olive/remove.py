@@ -27,14 +27,15 @@ import gtk.glade
 
 import bzrlib.errors as errors
 
-from olive import gladefile
 from dialog import error_dialog, warning_dialog
+from gladefile import GLADEFILENAME
+
 
 class OliveRemove:
     """ Display the Remove file(s) dialog and perform the needed actions. """
     def __init__(self, wt, wtpath, selected=[]):
         """ Initialize the Remove file(s) dialog. """
-        self.glade = gtk.glade.XML(gladefile, 'window_remove')
+        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_remove')
         
         self.window = self.glade.get_widget('window_remove')
         

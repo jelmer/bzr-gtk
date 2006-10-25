@@ -28,16 +28,24 @@ import pango
 import bzrlib.errors as errors
 
 from dialog import error_dialog
-from olive import gladefile
+from gladefile import GLADEFILENAME
+
 
 class CommitDialog:
     """ Display Commit dialog and perform the needed actions. """
-    def __init__(self, wt, wtpath):
-        """ Initialize the Commit dialog. """
-        self.glade = gtk.glade.XML(gladefile, 'window_commit', 'olive-gtk')
+    def __init__(self, wt, wtpath, standalone=False):
+        """ Initialize the Commit dialog.
+        @param  wt:         bzr working tree object
+        @param  wtpath:     path to working tree root
+        @param  standalone: when used in gcommit command as standalone window
+                            this argument should be True
+        """
+        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_commit', 'olive-gtk')
         
         self.wt = wt
         self.wtpath = wtpath
+
+        self.standalone = standalone
 
         # Get some important widgets
         self.window = self.glade.get_widget('window_commit')
@@ -64,6 +72,9 @@ class CommitDialog:
         # Dictionary for signal_autoconnect
         dic = { "on_button_commit_commit_clicked": self.commit,
                 "on_button_commit_cancel_clicked": self.close }
+
+        if self.standalone:
+            dic["on_button_commit_cancel_clicked"] = self.quit
         
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
@@ -270,8 +281,15 @@ class CommitDialog:
         except Exception, msg:
             error_dialog(_('Unknown error'), str(msg))
             return
-        
-        self.close()
+
+        if not self.standalone:
+            self.close()
+        else:
+            self.quit()
         
     def close(self, widget=None):
         self.window.destroy()
+
+    def quit(self, widget=None):
+        self.close(widget)
+        gtk.main_quit()

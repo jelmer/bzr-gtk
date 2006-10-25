@@ -26,14 +26,15 @@ import gtk.glade
 
 import bzrlib.errors as errors
 
-from olive import gladefile
 from dialog import error_dialog, info_dialog
+from gladefile import GLADEFILENAME
+
 
 class OlivePush:
     """ Display Push dialog and perform the needed actions. """
     def __init__(self, branch):
         """ Initialize the Push dialog. """
-        self.glade = gtk.glade.XML(gladefile, 'window_push')
+        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_push')
         
         self.window = self.glade.get_widget('window_push')
 
