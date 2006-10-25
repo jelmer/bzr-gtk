@@ -235,7 +235,7 @@ class CommitDialog:
     def commit(self, widget):
         textbuffer = self.textview.get_buffer()
         start, end = textbuffer.get_bounds()
-        message = textbuffer.get_text(start, end)
+        message = textbuffer.get_text(start, end).decode('utf-8')
         
         checkbutton_strict = self.glade.get_widget('checkbutton_commit_strict')
         checkbutton_force = self.glade.get_widget('checkbutton_commit_force')
