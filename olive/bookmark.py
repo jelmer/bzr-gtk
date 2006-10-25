@@ -23,14 +23,16 @@ except:
 import gtk
 import gtk.glade
 
-from olive import gladefile, OlivePreferences
+from olive import OlivePreferences
 from dialog import error_dialog
+from gladefile import GLADEFILENAME
+
 
 class OliveBookmark:
     """ Display the Edit bookmark dialog and perform the needed actions. """
     def __init__(self, selected):
         """ Initialize the Edit bookmark dialog. """
-        self.glade = gtk.glade.XML(gladefile, 'window_bookmark', 'olive-gtk')
+        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_bookmark', 'olive-gtk')
         
         self.window = self.glade.get_widget('window_bookmark')
         

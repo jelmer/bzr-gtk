@@ -27,14 +27,15 @@ import gtk.glade
 
 import bzrlib.errors as errors
 
-from olive import gladefile
 from dialog import error_dialog, warning_dialog
+from gladefile import GLADEFILENAME
+
 
 class OliveMkdir:
     """ Display the Make directory dialog and perform the needed actions. """
     def __init__(self, wt, wtpath):
         """ Initialize the Make directory dialog. """
-        self.glade = gtk.glade.XML(gladefile, 'window_mkdir', 'olive-gtk')
+        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_mkdir', 'olive-gtk')
         
         self.window = self.glade.get_widget('window_mkdir')
         

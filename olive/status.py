@@ -23,13 +23,14 @@ except:
 import gtk
 import gtk.glade
 
-from olive import gladefile
+from gladefile import GLADEFILENAME
+
 
 class OliveStatus:
     """ Display Status window and perform the needed actions. """
     def __init__(self, wt, wtpath):
         """ Initialize the Status window. """
-        self.glade = gtk.glade.XML(gladefile, 'window_status')
+        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_status')
         
         # Get the Status window widget
         self.window = self.glade.get_widget('window_status')

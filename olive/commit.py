@@ -28,13 +28,14 @@ import pango
 import bzrlib.errors as errors
 
 from dialog import error_dialog
-from olive import gladefile
+from gladefile import GLADEFILENAME
+
 
 class CommitDialog:
     """ Display Commit dialog and perform the needed actions. """
     def __init__(self, wt, wtpath):
         """ Initialize the Commit dialog. """
-        self.glade = gtk.glade.XML(gladefile, 'window_commit', 'olive-gtk')
+        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_commit', 'olive-gtk')
         
         self.wt = wt
         self.wtpath = wtpath
