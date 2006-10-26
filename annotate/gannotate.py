@@ -22,6 +22,7 @@ import gobject
 import gtk
 import pango
 
+import bzrlib
 from bzrlib.errors import NoSuchRevision
 from bzrlib.revision import NULL_REVISION
 
@@ -58,6 +59,8 @@ class GAnnotateWindow(gtk.Window):
             self.span_selector.hide()
 
     def annotate(self, branch, file_id):
+        import codecs
+
         self.revisions = {}
         self.annotations = []
         self.branch = branch
@@ -75,6 +78,17 @@ class GAnnotateWindow(gtk.Window):
         try:
             branch.lock_read()
             branch.repository.lock_read()
+
+            # determine encoding of file
+            revid = branch.revision_history()[-1]
+            tree = branch.repository.revision_tree(revid)
+            text = tree.get_file_text(file_id)
+            if text.startswith(codecs.BOM_UTF8):
+                encoding = None     # 'utf-8'
+            else:
+                encoding = bzrlib.user_encoding
+
+            # get annotation
             for line_no, (revision, revno, line)\
                     in enumerate(self._annotate(branch, file_id)):
                 if revision.revision_id == last_seen and not self.all:
@@ -85,6 +99,9 @@ class GAnnotateWindow(gtk.Window):
 
                 if revision.revision_id not in self.revisions:
                     self.revisions[revision.revision_id] = revision
+
+                if encoding:
+                    line = line.decode(encoding).encode('utf-8')
 
                 self.annomodel.append([revision.revision_id,
                                        line_no + 1,
