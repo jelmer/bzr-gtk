@@ -109,9 +109,10 @@ class CommitDialog:
             
     
     def _create_file_view(self):
-        self.file_store = gtk.ListStore(gobject.TYPE_BOOLEAN,
-                                        gobject.TYPE_STRING,
-                                        gobject.TYPE_STRING)
+        self.file_store = gtk.ListStore(gobject.TYPE_BOOLEAN,   # [0] checkbox
+                                        gobject.TYPE_STRING,    # [1] path to display
+                                        gobject.TYPE_STRING,    # [2] changes type
+                                        gobject.TYPE_STRING)    # [3] real path
         self.file_view.set_model(self.file_store)
         crt = gtk.CellRendererToggle()
         crt.set_property("activatable", True)
@@ -125,21 +126,27 @@ class CommitDialog:
 
         for path, id, kind in self.delta.added:
             marker = osutils.kind_marker(kind)
-            self.file_store.append([ True, path+marker, _('added') ])
+            self.file_store.append([ True, path+marker, _('added'), path ])
 
         for path, id, kind in self.delta.removed:
             marker = osutils.kind_marker(kind)
-            self.file_store.append([ True, path+marker, _('removed') ])
+            self.file_store.append([ True, path+marker, _('removed'), path ])
 
         for oldpath, newpath, id, kind, text_modified, meta_modified in self.delta.renamed:
             marker = osutils.kind_marker(kind)
+            if text_modified or meta_modified:
+                changes = _('renamed and modified')
+            else:
+                changes = _('renamed')
             self.file_store.append([ True,
                                      oldpath+marker + '  =>  ' + newpath+marker,
-                                     _('renamed') ])
+                                     changes,
+                                     newpath
+                                   ])
 
         for path, id, kind, text_modified, meta_modified in self.delta.modified:
             marker = osutils.kind_marker(kind)
-            self.file_store.append([ True, path+marker, _('modified') ])
+            self.file_store.append([ True, path+marker, _('modified'), path ])
     
     def _create_pending_merges(self):
         liststore = gtk.ListStore(gobject.TYPE_STRING,
@@ -167,7 +174,8 @@ class CommitDialog:
         it = self.file_store.get_iter_first()
         while it:
             if self.file_store.get_value(it, 0):
-                ret.append(self.file_store.get_value(it, 1))
+                # get real path from hidden column 3
+                ret.append(self.file_store.get_value(it, 3))
             it = self.file_store.iter_next(it)
 
         return ret
