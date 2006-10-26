@@ -77,7 +77,7 @@ class cmd_gdiff(Command):
         window.connect("destroy", lambda w: gtk.main_quit())
         window.set_diff("Working Tree", tree1, tree2)
         if filename is not None:
-            tree_filename = tree1.relpath(filename)
+            tree_filename = wt.relpath(filename)
             try:
                 window.set_file(tree_filename)
             except NoSuchFile:

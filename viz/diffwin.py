@@ -166,4 +166,10 @@ class DiffWindow(gtk.Window):
 
         s = StringIO()
         show_diff_trees(self.parent_tree, self.rev_tree, s, specific_files)
-        self.buffer.set_text(s.getvalue().decode(sys.getdefaultencoding(), 'replace'))
+        # bialix: it's a quick and dirty hack but it's works
+        # I think is better to cache diff for each file
+        # and for each file try to determine actual encoding
+        # and instead of printing diff to StringIO buffer
+        # create text by hands
+        encoding = bzrlib.user_encoding
+        self.buffer.set_text(s.getvalue().decode(encoding, 'replace').encode('utf-8'))
