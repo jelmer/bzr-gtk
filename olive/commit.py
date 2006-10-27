@@ -34,19 +34,18 @@ from guifiles import GLADEFILENAME
 
 class CommitDialog:
     """ Display Commit dialog and perform the needed actions. """
-    def __init__(self, wt, wtpath, standalone=False):
+    def __init__(self, wt, wtpath, notbranch):
         """ Initialize the Commit dialog.
-        @param  wt:         bzr working tree object
+        @param  wt:         bzr WorkingTree object
         @param  wtpath:     path to working tree root
-        @param  standalone: when used in gcommit command as standalone window
-                            this argument should be True
+        @param  notbranch:  flag that path is not a brach
+        @type   notbranch:  bool
         """
         self.glade = gtk.glade.XML(GLADEFILENAME, 'window_commit', 'olive-gtk')
         
         self.wt = wt
         self.wtpath = wtpath
-
-        self.standalone = standalone
+        self.notbranch = notbranch
 
         # Get some important widgets
         self.window = self.glade.get_widget('window_commit')
@@ -56,11 +55,7 @@ class CommitDialog:
         self.pending_label = self.glade.get_widget('label_commit_pending')
         self.pending_view = self.glade.get_widget('treeview_commit_pending')
 
-        file_id = self.wt.path2id(wtpath)
-
-        self.notbranch = False
-        if file_id is None:
-            self.notbranch = True
+        if wt is None or notbranch:
             return
         
         # Set the delta
@@ -74,10 +69,6 @@ class CommitDialog:
         dic = { "on_button_commit_commit_clicked": self.commit,
                 "on_button_commit_cancel_clicked": self.close }
 
-        if self.standalone:
-            dic["on_button_commit_cancel_clicked"] = self.quit
-            self.window.connect("delete_event", gtk.main_quit)
-        
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
         
@@ -87,11 +78,19 @@ class CommitDialog:
         self._create_pending_merges()
     
     def display(self):
-        """ Display the Push dialog. """
+        """ Display the Push dialog.
+        @return:    True if dialog is shown.
+        """
+        if self.wt is None and not self.notbranch:
+            error_dialog(_('Directory does not have a working tree'),
+                         _('Operation aborted.'))
+            self.close()
+            return False
         if self.notbranch:
             error_dialog(_('Directory is not a branch'),
                          _('You can perform this action only in a branch.'))
             self.close()
+            return False
         else:
             if self.wt.branch.get_bound_location() is not None:
                 # we have a checkout, so the local commit checkbox must appear
@@ -106,7 +105,7 @@ class CommitDialog:
             
             self.textview.modify_font(pango.FontDescription("Monospace"))
             self.window.show()
-            
+            return True
     
     def _create_file_view(self):
         self.file_store = gtk.ListStore(gobject.TYPE_BOOLEAN,   # [0] checkbox
@@ -298,14 +297,7 @@ class CommitDialog:
             error_dialog(_('Unknown error'), str(msg))
             return
 
-        if not self.standalone:
-            self.close()
-        else:
-            self.quit()
-        
+        self.close()
+
     def close(self, widget=None):
         self.window.destroy()
-
-    def quit(self, widget=None):
-        self.close(widget)
-        gtk.main_quit()
