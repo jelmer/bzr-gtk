@@ -36,9 +36,9 @@ class CommitDialog:
     """ Display Commit dialog and perform the needed actions. """
     def __init__(self, wt, wtpath, standalone=False):
         """ Initialize the Commit dialog.
-        @param  wt:         bzr working tree object
-        @param  wtpath:     path to working tree root
-        @param  standalone: when used in gcommit command as standalone window
+        :param  wt:         bzr working tree object
+        :param  wtpath:     path to working tree root
+        :param  standalone: when used in gcommit command as standalone window
                             this argument should be True
         """
         self.glade = gtk.glade.XML(GLADEFILENAME, 'window_commit', 'olive-gtk')

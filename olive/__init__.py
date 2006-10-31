@@ -500,9 +500,9 @@ class OliveGtk:
     def _add_updir_to_dirlist(self, dirlist, curdir):
         """Add .. to the top of directories list if we not in root directory
 
-        @param  dirlist:    list of directories (modified in place)
-        @param  curdir:     current directory
-        @return:            nothing
+        :param dirlist:     list of directories (modified in place)
+        :param curdir:      current directory
+        :return:            nothing
         """
         if curdir is None:
             curdir = self.path
