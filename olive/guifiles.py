@@ -34,3 +34,21 @@ if not os.path.isfile(GLADEFILENAME):
         # Fail
         print _('Glade file cannot be found.')
         sys.exit(1)
+
+# Get the cmenu.ui file name
+if sys.platform == 'win32':
+    UIFILENAME = os.path.dirname(sys.executable) + "/share/olive/cmenu.ui"
+else:
+    UIFILENAME = "/usr/share/olive/cmenu.ui"
+
+if not os.path.isfile(UIFILENAME):
+    # Load from current directory if not installed
+    dir_ = os.path.split(os.path.dirname(__file__))[0]
+    UIFILENAME = os.path.join(dir_, "cmenu.ui")
+    # Check again
+    if not os.path.isfile(UIFILENAME):
+        # Fail
+        print _('UI description file cannot be found.')
+        sys.exit(1)
+
+

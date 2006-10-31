@@ -29,7 +29,7 @@ import bzrlib.add
 import bzrlib.errors as errors
 
 from dialog import error_dialog
-from gladefile import GLADEFILENAME
+from guifiles import GLADEFILENAME
 
 
 class OliveAdd:

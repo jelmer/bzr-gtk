@@ -30,7 +30,7 @@ import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
 from dialog import error_dialog
-from gladefile import GLADEFILENAME
+from guifiles import GLADEFILENAME
 
 
 class OliveMove:

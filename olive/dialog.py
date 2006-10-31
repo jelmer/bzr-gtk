@@ -27,7 +27,7 @@ import gtk.glade
 def about():
     """ Display the AboutDialog. """
     import olive
-    from gladefile import GLADEFILENAME
+    from guifiles import GLADEFILENAME
 
     # Load AboutDialog description
     dglade = gtk.glade.XML(GLADEFILENAME, 'aboutdialog')

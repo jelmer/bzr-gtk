@@ -23,7 +23,7 @@ except:
 import gtk
 import gtk.glade
 
-from gladefile import GLADEFILENAME
+from guifiles import GLADEFILENAME
 
 
 class OliveStatus:
