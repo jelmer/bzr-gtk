@@ -36,20 +36,10 @@ class OliveMenu:
     """ This class is responsible for building the context menus. """
     def __init__(self, path, selected):
         # Load the UI file
-        if sys.platform == 'win32':
-            self.uifile = os.path.dirname(sys.executable) + "/share/olive/cmenu.ui"
-        else:
-            self.uifile = "/usr/share/olive/cmenu.ui"
-        
-        if not os.path.exists(self.uifile):
-            # Load from current directory if not installed
-            self.uifile = "cmenu.ui"
-            # Check again
-            if not os.path.exists(self.uifile):
-                # Fail
-                print _('UI description file cannot be found.')
-                sys.exit(1)
-        
+        from guifiles import UIFILENAME
+
+        self.uifile = UIFILENAME
+
         # Preferences handler
         self.pref = OlivePreferences()
         

@@ -26,18 +26,27 @@ import gobject
 import pango
 
 import bzrlib.errors as errors
+from bzrlib import osutils
 
 from dialog import error_dialog
-from olive import gladefile
+from guifiles import GLADEFILENAME
+
 
 class CommitDialog:
     """ Display Commit dialog and perform the needed actions. """
-    def __init__(self, wt, wtpath):
-        """ Initialize the Commit dialog. """
-        self.glade = gtk.glade.XML(gladefile, 'window_commit', 'olive-gtk')
+    def __init__(self, wt, wtpath, standalone=False):
+        """ Initialize the Commit dialog.
+        @param  wt:         bzr working tree object
+        @param  wtpath:     path to working tree root
+        @param  standalone: when used in gcommit command as standalone window
+                            this argument should be True
+        """
+        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_commit', 'olive-gtk')
         
         self.wt = wt
         self.wtpath = wtpath
+
+        self.standalone = standalone
 
         # Get some important widgets
         self.window = self.glade.get_widget('window_commit')
@@ -64,6 +73,10 @@ class CommitDialog:
         # Dictionary for signal_autoconnect
         dic = { "on_button_commit_commit_clicked": self.commit,
                 "on_button_commit_cancel_clicked": self.close }
+
+        if self.standalone:
+            dic["on_button_commit_cancel_clicked"] = self.quit
+            self.window.connect("delete_event", gtk.main_quit)
         
         # Connect the signals to the handlers
         self.glade.signal_autoconnect(dic)
@@ -96,9 +109,10 @@ class CommitDialog:
             
     
     def _create_file_view(self):
-        self.file_store = gtk.ListStore(gobject.TYPE_BOOLEAN,
-                                        gobject.TYPE_STRING,
-                                        gobject.TYPE_STRING)
+        self.file_store = gtk.ListStore(gobject.TYPE_BOOLEAN,   # [0] checkbox
+                                        gobject.TYPE_STRING,    # [1] path to display
+                                        gobject.TYPE_STRING,    # [2] changes type
+                                        gobject.TYPE_STRING)    # [3] real path
         self.file_view.set_model(self.file_store)
         crt = gtk.CellRendererToggle()
         crt.set_property("activatable", True)
@@ -111,16 +125,28 @@ class CommitDialog:
                                      gtk.CellRendererText(), text=2))
 
         for path, id, kind in self.delta.added:
-            self.file_store.append([ True, path, _('added') ])
+            marker = osutils.kind_marker(kind)
+            self.file_store.append([ True, path+marker, _('added'), path ])
 
         for path, id, kind in self.delta.removed:
-            self.file_store.append([ True, path, _('removed') ])
+            marker = osutils.kind_marker(kind)
+            self.file_store.append([ True, path+marker, _('removed'), path ])
 
         for oldpath, newpath, id, kind, text_modified, meta_modified in self.delta.renamed:
-            self.file_store.append([ True, oldpath, _('renamed') ])
+            marker = osutils.kind_marker(kind)
+            if text_modified or meta_modified:
+                changes = _('renamed and modified')
+            else:
+                changes = _('renamed')
+            self.file_store.append([ True,
+                                     oldpath+marker + '  =>  ' + newpath+marker,
+                                     changes,
+                                     newpath
+                                   ])
 
         for path, id, kind, text_modified, meta_modified in self.delta.modified:
-            self.file_store.append([ True, path, _('modified') ])
+            marker = osutils.kind_marker(kind)
+            self.file_store.append([ True, path+marker, _('modified'), path ])
     
     def _create_pending_merges(self):
         liststore = gtk.ListStore(gobject.TYPE_STRING,
@@ -148,7 +174,8 @@ class CommitDialog:
         it = self.file_store.get_iter_first()
         while it:
             if self.file_store.get_value(it, 0):
-                ret.append(self.file_store.get_value(it, 1))
+                # get real path from hidden column 3
+                ret.append(self.file_store.get_value(it, 3))
             it = self.file_store.iter_next(it)
 
         return ret
@@ -224,7 +251,7 @@ class CommitDialog:
     def commit(self, widget):
         textbuffer = self.textview.get_buffer()
         start, end = textbuffer.get_bounds()
-        message = textbuffer.get_text(start, end)
+        message = textbuffer.get_text(start, end).decode('utf-8')
         
         checkbutton_strict = self.glade.get_widget('checkbutton_commit_strict')
         checkbutton_force = self.glade.get_widget('checkbutton_commit_force')
@@ -270,8 +297,15 @@ class CommitDialog:
         except Exception, msg:
             error_dialog(_('Unknown error'), str(msg))
             return
-        
-        self.close()
+
+        if not self.standalone:
+            self.close()
+        else:
+            self.quit()
         
     def close(self, widget=None):
         self.window.destroy()
+
+    def quit(self, widget=None):
+        self.close(widget)
+        gtk.main_quit()

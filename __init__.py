@@ -71,7 +71,7 @@ class cmd_gdiff(Command):
             tree1 = wt
             tree2 = tree1.basis_tree()
 
-        from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
+        from viz.diffwin import DiffWindow
         import gtk
         window = DiffWindow()
         window.connect("destroy", lambda w: gtk.main_quit())
@@ -215,7 +215,7 @@ class cmd_gcommit(Command):
 
         (wt, path) = WorkingTree.open_containing(filename)
 
-        dialog = CommitDialog(wt, path)
+        dialog = CommitDialog(wt, path, standalone=True)
         dialog.display()
         gtk.main()
 

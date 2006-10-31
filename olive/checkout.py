@@ -30,14 +30,15 @@ import bzrlib.bzrdir as bzrdir
 import bzrlib.errors as errors
 import bzrlib.osutils
 
-from olive import gladefile
 from dialog import error_dialog
+from guifiles import GLADEFILENAME
+
 
 class OliveCheckout:
     """ Display checkout dialog and perform the needed operations. """
     def __init__(self, path=None):
         """ Initialize the Checkout dialog. """
-        self.glade = gtk.glade.XML(gladefile, 'window_checkout', 'olive-gtk')
+        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_checkout', 'olive-gtk')
         
         self.window = self.glade.get_widget('window_checkout')
         
