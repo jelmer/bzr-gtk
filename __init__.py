@@ -199,6 +199,7 @@ class cmd_gcommit(Command):
     takes_options = []
 
     def run(self, filename=None):
+        import os
         import pygtk
         pygtk.require("2.0")
 
@@ -210,14 +211,31 @@ class cmd_gcommit(Command):
 
         from olive.commit import CommitDialog
         from bzrlib.commit import Commit
-        from bzrlib.errors import (BzrCommandError, PointlessCommit, ConflictsInTree, 
-           StrictCommitFailed)
+        from bzrlib.errors import (BzrCommandError,
+                                   NotBranchError,
+                                   NoWorkingTree,
+                                   PointlessCommit,
+                                   ConflictsInTree,
+                                   StrictCommitFailed)
 
-        (wt, path) = WorkingTree.open_containing(filename)
+        wt = None
+        branch = None
+        try:
+            (wt, path) = WorkingTree.open_containing(filename)
+            branch = wt.branch
+        except NotBranchError, e:
+            path = e.path
+        except NoWorkingTree, e:
+            path = e.base
+            try:
+                (branch, path) = Branch.open_containing(path)
+            except NotBranchError, e:
+                path = e.path
 
-        dialog = CommitDialog(wt, path, standalone=True)
-        dialog.display()
-        gtk.main()
+        dialog = CommitDialog(wt, path, not branch)
+        if dialog.display():
+            dialog.window.connect("destroy", lambda w: gtk.main_quit())
+            gtk.main()
 
 register_command(cmd_gcommit)
 
