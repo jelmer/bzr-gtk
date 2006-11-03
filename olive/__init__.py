@@ -912,9 +912,9 @@ class OlivePreferences:
 
     def set_preference(self, option, value):
         """ Set the value of the given option. """
-        if value == True:
+        if value is True:
             value = 'yes'
-        elif value == False:
+        elif value is False:
             value = 'no'
         
         if self.config.has_section('preferences'):
