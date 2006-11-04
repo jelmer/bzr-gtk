@@ -36,7 +36,7 @@ import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
 # Olive GTK UI version
-__version__ = '0.11.0'
+__version__ = '0.12.0'
 
 from dialog import error_dialog, info_dialog
 from guifiles import GLADEFILENAME
