@@ -148,6 +148,15 @@ class CommitDialog:
             self.file_store.append([ True, path+marker, _('modified'), path ])
     
     def _create_pending_merges(self):
+        if not self.pending:
+            # hide unused pending merge part
+            scrolled_window = self.glade.get_widget('scrolledwindow_commit_pending')
+            parent = scrolled_window.get_parent()
+            parent.remove(scrolled_window)
+            parent = self.pending_label.get_parent()
+            parent.remove(self.pending_label)
+            return
+        
         liststore = gtk.ListStore(gobject.TYPE_STRING,
                                   gobject.TYPE_STRING,
                                   gobject.TYPE_STRING)
@@ -159,9 +168,6 @@ class CommitDialog:
                                         gtk.CellRendererText(), text=1))
         self.pending_view.append_column(gtk.TreeViewColumn(_('Summary'),
                                         gtk.CellRendererText(), text=2))
-        
-        if not self.pending:
-            return
         
         for item in self.pending:
             liststore.append([ item['date'],
