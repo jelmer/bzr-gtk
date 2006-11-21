@@ -3,13 +3,14 @@ import bzrlib
 from bzrlib.bzrdir import BzrDir
 from bzrlib.errors import NotBranchError
 from bzrlib.workingtree import WorkingTree
+from bzrlib.tree import file_status
 
 from bzrlib.plugin import load_plugins
 load_plugins()
 
 from bzrlib.plugins.gtk import cmd_visualise, cmd_gannotate
 
-class BzrExtension(nautilus.MenuProvider):
+class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.InfoProvider):
     def __init__(self):
         pass
 
@@ -71,7 +72,7 @@ class BzrExtension(nautilus.MenuProvider):
 
         from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
         window = DiffWindow()
-        window.set_diff(tree.branch, tree, tree.branch.revision_tree())
+        window.set_diff(tree.branch.nick, tree, tree.branch.basis_tree())
         window.show()
 
         return
@@ -117,17 +118,10 @@ class BzrExtension(nautilus.MenuProvider):
         if vfs_file.get_uri_scheme() != 'file':
             return
 
-        file = vfs_file.get_uri()
-        try:
-            tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            return
-
-        from bzrlib.plugins.gtk.clone import CloneDialog
-        dialog = CloneDialog(file)
-        if dialog.run() != gtk.RESPONSE_CANCEL:
-            bzrdir = BzrDir.open(dialog.url)
-            bzrdir.sprout(dialog.dest_path)
+        from bzrlib.plugins.gtk.olive.branch import BranchDialog
+        
+        dialog = BranchDialog(vfs_file.get_name())
+        dialog.display()
  
     def commit_cb(self, menu, vfs_file=None):
         # We can only cope with local files
@@ -140,12 +134,10 @@ class BzrExtension(nautilus.MenuProvider):
         except NotBranchError:
             return
 
-        from bzrlib.plugins.gtk.commit import GCommitDialog
-        dialog = GCommitDialog(tree)
-        dialog.set_title(path + " - Commit")
-        if dialog.run() != gtk.RESPONSE_CANCEL:
-            Commit().commit(working_tree=wt,message=dialog.message,
-                            specific_files=dialog.specific_files)
+        from bzrlib.plugins.gtk.olive.commit import CommitDialog
+        dialog = CommitDialog(tree, path)
+        dialog.display()
+        gtk.main()
 
     def log_cb(self, menu, vfs_file):
         # We can only cope with local files
@@ -165,30 +157,78 @@ class BzrExtension(nautilus.MenuProvider):
 
         return
 
+    def pull_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+
+        # We only want to continue here if we get a NotBranchError
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
+        from bzrlib.plugins.gtk.olive.pull import PullDialog
+        dialog = PullDialog(tree, path)
+        dialog.display()
+        gtk.main()
+
+    def merge_cb(self, menu, vfs_file):
+        # We can only cope with local files
+        if vfs_file.get_uri_scheme() != 'file':
+            return
+
+        file = vfs_file.get_uri()
+
+        # We only want to continue here if we get a NotBranchError
+        try:
+            tree, path = WorkingTree.open_containing(file)
+        except NotBranchError:
+            return
+
+        from bzrlib.plugins.gtk.olive.merge import MergeDialog
+        dialog = MergeDialog(tree, path)
+        dialog.display()
+        gtk.main()
+
     def get_background_items(self, window, vfs_file):
+        items = []
         file = vfs_file.get_uri()
         try:
             tree, path = WorkingTree.open_containing(file)
         except NotBranchError:
             item = nautilus.MenuItem('BzrNautilus::newtree',
-                                 'Create new Bazaar tree',
+                                 'Make directory versioned',
                                  'Create new Bazaar tree in this folder')
             item.connect('activate', self.newtree_cb, vfs_file)
             items.append(item)
 
             item = nautilus.MenuItem('BzrNautilus::clone',
-                                 'Checkout',
+                                 'Checkout Bazaar branch',
                                  'Checkout Existing Bazaar Branch')
             item.connect('activate', self.clone_cb, vfs_file)
             items.append(item)
 
             return items
 
-        items = []
         item = nautilus.MenuItem('BzrNautilus::log',
                              'Log',
                              'Show Bazaar history')
         item.connect('activate', self.log_cb, vfs_file)
+        items.append(item)
+
+        item = nautilus.MenuItem('BzrNautilus::pull',
+                             'Pull',
+                             'Pull from another branch')
+        item.connect('activate', self.pull_cb, vfs_file)
+        items.append(item)
+
+        item = nautilus.MenuItem('BzrNautilus::merge',
+                             'Merge',
+                             'Merge from another branch')
+        item.connect('activate', self.merge_cb, vfs_file)
         items.append(item)
 
         item = nautilus.MenuItem('BzrNautilus::commit',
@@ -215,7 +255,7 @@ class BzrExtension(nautilus.MenuProvider):
                 if not vfs_file.is_directory():
                     return
                 item = nautilus.MenuItem('BzrNautilus::newtree',
-                                     'Create new Bazaar tree',
+                                     'Make directory versioned',
                                      'Create new Bazaar tree in %s' % vfs_file.get_name())
                 item.connect('activate', self.newtree_cb, vfs_file)
                 return item,
@@ -272,3 +312,50 @@ class BzrExtension(nautilus.MenuProvider):
                 items.append(item)
 
         return items
+
+    def get_columns(self):
+        return nautilus.Column("BzrNautilus::bzr_status",
+                               "bzr_status",
+                               "Bzr Status",
+                               "Version control status"),
+
+    def update_file_info(self, file):
+        if file.get_uri_scheme() != 'file':
+            return
+        
+        try:
+            tree, path = WorkingTree.open_containing(file.get_uri())
+        except NotBranchError:
+            return
+
+        emblem = None
+        status = None
+
+        if tree.has_filename(path):
+            emblem = 'cvs-controlled'
+            status = 'unchanged'
+            id = tree.path2id(path)
+
+            delta = tree.changes_from(tree.branch.basis_tree())
+            if delta.touches_file_id(id):
+                emblem = 'cvs-modified'
+                status = 'modified'
+            for f, _, _ in delta.added:
+                if f == path:
+                    emblem = 'cvs-added'
+                    status = 'added'
+
+            for of, f, _, _, _, _ in delta.renamed:
+                if f == path:
+                    status = 'renamed from %s' % f
+
+        elif tree.branch.basis_tree().has_filename(path):
+            emblem = 'cvs-removed'
+            status = 'removed'
+        else:
+            # FIXME: Check for ignored files
+            status = 'unversioned'
+        
+        if emblem is not None:
+            file.add_emblem(emblem)
+        file.add_string_attribute('bzr_status', status)

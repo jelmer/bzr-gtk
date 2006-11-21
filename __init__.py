@@ -22,7 +22,7 @@ from bzrlib.branch import Branch
 from bzrlib.workingtree import WorkingTree
 from bzrlib.bzrdir import BzrDir
 
-__version__ = '0.10.0'
+__version__ = '0.12.0'
 
 class cmd_gbranch(Command):
     """GTK+ branching.
@@ -38,12 +38,10 @@ class cmd_gbranch(Command):
             if str(e) == "could not open display":
                 raise NoDisplayError
 
-        from clone import CloneDialog
+        from bzrlib.plugins.gtk.olive.branch import BranchDialog
 
-        window = CloneDialog()
-        if window.run() == gtk.RESPONSE_OK:
-            bzrdir = BzrDir.open(window.url)
-            bzrdir.sprout(window.dest_path)
+        window = BranchDialog('.')
+        window.display()
 
 register_command(cmd_gbranch)
 
@@ -73,7 +71,7 @@ class cmd_gdiff(Command):
             tree1 = wt
             tree2 = tree1.basis_tree()
 
-        from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
+        from viz.diffwin import DiffWindow
         import gtk
         window = DiffWindow()
         window.connect("destroy", lambda w: gtk.main_quit())
@@ -208,6 +206,7 @@ class cmd_gcommit(Command):
     takes_options = []
 
     def run(self, filename=None):
+        import os
         import pygtk
         pygtk.require("2.0")
 
@@ -217,24 +216,33 @@ class cmd_gcommit(Command):
             if str(e) == "could not open display":
                 raise NoDisplayError
 
-        from commit import GCommitDialog
+        from olive.commit import CommitDialog
         from bzrlib.commit import Commit
-        from bzrlib.errors import (BzrCommandError, PointlessCommit, ConflictsInTree, 
-           StrictCommitFailed)
+        from bzrlib.errors import (BzrCommandError,
+                                   NotBranchError,
+                                   NoWorkingTree,
+                                   PointlessCommit,
+                                   ConflictsInTree,
+                                   StrictCommitFailed)
 
-        (wt, path) = WorkingTree.open_containing(filename)
-        branch = wt.branch
+        wt = None
+        branch = None
+        try:
+            (wt, path) = WorkingTree.open_containing(filename)
+            branch = wt.branch
+        except NotBranchError, e:
+            path = e.path
+        except NoWorkingTree, e:
+            path = e.base
+            try:
+                (branch, path) = Branch.open_containing(path)
+            except NotBranchError, e:
+                path = e.path
 
-        file_id = wt.path2id(path)
-
-        if file_id is None:
-            raise NotVersionedError(filename)
-
-        dialog = GCommitDialog(wt)
-        dialog.set_title(path + " - Commit")
-        if dialog.run() != gtk.RESPONSE_CANCEL:
-            Commit().commit(working_tree=wt,message=dialog.message,
-                specific_files=dialog.specific_files)
+        dialog = CommitDialog(wt, path, not branch)
+        if dialog.display():
+            dialog.window.connect("destroy", lambda w: gtk.main_quit())
+            gtk.main()
 
 register_command(cmd_gcommit)
 

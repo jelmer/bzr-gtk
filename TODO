@@ -1,0 +1,28 @@
+TODO list for Olive
+-------------------
+
+- Use networkmanager to figure out whether to do local or bound commits  
+  in case of bound branches/checkouts.
+- Strict commit should not be a checkbox. The GUI should rather ask the 
+  user whether (s)he wants to continue if there were no changes.
+- Commit with unknowns should not be a checkbox. The GUI should rather ask 
+  the user whether (s)he wants to continue while there were unknown files.
+- It should be possible to add unknown files from the commit dialog.
+- Generic wrapper that displays dialogs for bzr exceptions
+- Store list of previously seen branch locations and list them in 
+  a combo box in the "branch location" field in the get branch window
+- Allow selecting a particular revision (actually browsing the revisions 
+  rather than specifying a particular revno) in the get branch window
+- Eliminate radiobuttons in push but rather show the default location and 
+  allow the user to change it
+- Don't have an overwrite checkbox but instead ask the user if (s)he wants 
+  to overwrite if the branches have diverged
+- Remove the status window as it's pointless since the status is already shown
+  in the main window.
+- Is there any reason why on win32 bzr branches have to be on fixed drives and 
+  not on, e.g., cdroms?
+- Dialog for applying a bundle
+- Switch dialog
+- Ability to bind/unbind the branch
+- List Bzr options in context menu in a way that makes sense (alphabetically?)
+- Allow specifying two revisions in the diff window rather then always diffing between base and working tree

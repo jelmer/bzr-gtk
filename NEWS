@@ -1,0 +1,29 @@
+Olive NEWS
+==========
+
+Olive 0.11.0 (2006-09-27)
+
+ - Got rid of the backend code. (Jelmer Vernooij)
+ - Some cleanups.
+ - Directory listing much faster due to native bzrlib usage.
+ - bzrk used from bzr-gtk.
+
+Olive 0.10.1 (2006-09-17)
+
+ - Fixed bug #53963: Close button in About box.
+ - Drive selection is now available under Win32 platforms. That means new
+   dependency (pyWin32)
+ - If the TreeView in the Status window would be empty, display a "No changes."
+   message.
+ - Fixed setup.py install failure on Win32.
+
+Olive 0.10.0 (2006-09-04)
+
+ - Version number adjusted to Bazaar's plugin versioning policy.
+ - New 'bzr missing' functionality (Branch/Missing revisions menu item)
+ - po files get built and installed properly (thanks to Stéphane Raimbault)
+ - Fixed several minor bugs.
+
+Olive 0.1 (2006-08-22)
+
+ - The first public release.

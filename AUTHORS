@@ -1,8 +1,8 @@
 bzr-gtk is a plugin that is based on a collection of earlier plugins for 
-Bazaar. It is currently maintained by Jelmer Vernooij <jelmer@samba.org>.
+Bazaar. It is currently maintained by Jelmer Vernooij <jelmer@samba.org> and 
+Szilveszter Farkas <Szilveszter.Farkas@gmail.com>.
 
 bzrk was written by Scott James Remnant <scott@ubuntu.com>. 
-
 It's vaguely based on a screenshot of gitk (the equivalent tool for git)
 shown to me by Fabio M. Di Nitto <fabbione@ubuntu.com>.
 
@@ -11,4 +11,7 @@ by Aaron Bentley <abentley@panoramicfeedback.com>.
 
 nautilus-bzr was written by Jelmer Vernooij and Jeff Bailey.
 
-See the Bazaar history of this branch for a full list of authors.
+Olive was written by Szilveszter Farkas <Szilveszter.Farkas@gmail.com>.
+
+Numerous other people have contributed useful patches.  See the Bazaar history 
+of this branch for a full list of authors.
