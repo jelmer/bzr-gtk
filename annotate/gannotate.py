@@ -22,6 +22,7 @@ import gobject
 import gtk
 import pango
 
+from bzrlib import tsort
 from bzrlib.errors import NoSuchRevision
 from bzrlib.revision import NULL_REVISION
 
@@ -122,11 +123,25 @@ class GAnnotateWindow(gtk.Window):
         self.annoview.set_cursor(row)
         self.annoview.scroll_to_cell(row, use_align=True)
 
+    def _dotted_revnos(self, repository, revision_id):
+        """Return a dict of revision_id -> dotted revno
+        
+        :param repository: The repository to get the graph from
+        :param revision_id: The last revision for which this info is needed
+        """
+        graph = repository.get_revision_graph(revision_id)
+        dotted = {}
+        for n, revision_id, d, revno, e in tsort.merge_sort(graph, 
+            revision_id, generate_revno=True):
+            dotted[revision_id] = '.'.join(str(num) for num in revno)
+        return dotted
+
     def _annotate(self, branch, file_id, revision_id):
         rev_hist = branch.revision_history()
         repository = branch.repository
         if revision_id is None:
             revision_id = branch.last_revision()
+        dotted = self._dotted_revnos(repository, revision_id)
         rev_tree = repository.revision_tree(revision_id)
         revision_id = rev_tree.inventory[file_id].revision
         weave = repository.weave_store.get_weave(file_id,
@@ -140,7 +155,7 @@ class GAnnotateWindow(gtk.Window):
                 if rev_id in rev_hist:
                     revno = branch.revision_id_to_revno(rev_id)
                 else:
-                    revno = "merge"
+                    revno = dotted.get(rev_id, "merge")
             except NoSuchRevision:
                 revision = NoneRevision(rev_id)
                 revno = "?"
