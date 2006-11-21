@@ -137,7 +137,6 @@ class GAnnotateWindow(gtk.Window):
         return dotted
 
     def _annotate(self, branch, file_id, revision_id):
-        rev_hist = branch.revision_history()
         repository = branch.repository
         if revision_id is None:
             revision_id = branch.last_revision()
@@ -152,10 +151,9 @@ class GAnnotateWindow(gtk.Window):
             rev_id = origin
             try:
                 revision = revision_cache.get_revision(rev_id)
-                if rev_id in rev_hist:
-                    revno = branch.revision_id_to_revno(rev_id)
-                else:
-                    revno = dotted.get(rev_id, "merge")
+                revno = dotted.get(rev_id, 'merge')
+                if len(revno) > 15:
+                    revno = 'merge'
             except NoSuchRevision:
                 revision = NoneRevision(rev_id)
                 revno = "?"
