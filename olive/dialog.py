@@ -35,10 +35,10 @@ def about():
 
     # Set version
     dialog.set_version(olive.__version__)
-    
+
+    dialog.run()
     # Destroy the dialog
-    if dialog.run() == gtk.RESPONSE_CANCEL:
-        dialog.destroy()
+    dialog.destroy()
 
 def _message_dialog(type, primary, secondary):
     """ Display a given type of MessageDialog with the given message.
@@ -62,22 +62,33 @@ def _message_dialog(type, primary, secondary):
                                    type=gtk.MESSAGE_INFO,
                                    buttons=gtk.BUTTONS_OK)
         dialog.set_markup('<big><b>' + primary + '</b></big>')
+    elif type == 'question':
+        dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL,
+                                   type=gtk.MESSAGE_QUESTION,
+                                   buttons=gtk.BUTTONS_YES_NO)
+        dialog.set_markup('<big><b>' + primary + '</b></big>')
     else:
         return
-    
+
     dialog.format_secondary_markup(secondary)
-    
-    if dialog.run() == gtk.RESPONSE_OK:
-        dialog.destroy()
+
+    response = dialog.run()
+    dialog.destroy()
+
+    return response
 
 def error_dialog(primary, secondary):
     """ Display an error dialog with the given message. """
-    _message_dialog('error', primary, secondary)
+    return _message_dialog('error', primary, secondary)
 
 def info_dialog(primary, secondary):
     """ Display an info dialog with the given message. """
-    _message_dialog('info', primary, secondary)
+    return _message_dialog('info', primary, secondary)
 
 def warning_dialog(primary, secondary):
     """ Display a warning dialog with the given message. """
-    _message_dialog('warning', primary, secondary)
+    return _message_dialog('warning', primary, secondary)
+
+def question_dialog(primary, secondary):
+    """ Display a dialog with the given question. """
+    return _message_dialog('question', primary, secondary)
