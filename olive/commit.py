@@ -28,7 +28,7 @@ import pango
 import bzrlib.errors as errors
 from bzrlib import osutils
 
-from dialog import error_dialog
+from dialog import error_dialog, question_dialog
 from guifiles import GLADEFILENAME
 
 
@@ -85,12 +85,12 @@ class CommitDialog:
             error_dialog(_('Directory does not have a working tree'),
                          _('Operation aborted.'))
             self.close()
-            return False
+            dialog_shown = False
         if self.notbranch:
             error_dialog(_('Directory is not a branch'),
                          _('You can perform this action only in a branch.'))
             self.close()
-            return False
+            dialog_shown = False
         else:
             if self.wt.branch.get_bound_location() is not None:
                 # we have a checkout, so the local commit checkbox must appear
@@ -105,7 +105,11 @@ class CommitDialog:
             
             self.textview.modify_font(pango.FontDescription("Monospace"))
             self.window.show()
-            return True
+            dialog_shown = True
+        if dialog_shown:
+            # Gives the focus to the commit message area
+            self.textview.grab_focus()
+        return dialog_shown
     
     def _create_file_view(self):
         self.file_store = gtk.ListStore(gobject.TYPE_BOOLEAN,   # [0] checkbox
@@ -259,9 +263,18 @@ class CommitDialog:
             specific_files = self._get_specific_files()
         else:
             specific_files = None
-        
+
+        if message == '':
+            response = question_dialog('Commit with an empty message ?',
+                                       'You can describe your commit intent'
+                                       +' in the message')
+            if response == gtk.RESPONSE_NO:
+                # Kindly give focus to message area
+                self.textview.grab_focus()
+                return
+
         try:
-            self.wt.commit(message, 
+            self.wt.commit(message,
                            allow_pointless=checkbutton_force.get_active(),
                            strict=checkbutton_strict.get_active(),
                            local=self.checkbutton_local.get_active(),
