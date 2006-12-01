@@ -673,7 +673,7 @@ class OliveGtk:
 
         # Re-read preferences
         self.pref.read()
-
+        
         # Get bookmarks
         bookmarks = self.pref.get_bookmarks()
 
@@ -859,6 +859,8 @@ class OlivePreferences:
 
     def read(self):
         """ Just read the configuration. """
+        # Re-initialize the config parser object to avoid some bugs
+        self.config = ConfigParser.RawConfigParser()
         if sys.platform == 'win32':
             # Windows - no dotted files
             self.config.read([os.path.expanduser('~/olive.conf')])
@@ -912,9 +914,9 @@ class OlivePreferences:
 
     def set_preference(self, option, value):
         """ Set the value of the given option. """
-        if value == True:
+        if value is True:
             value = 'yes'
-        elif value == False:
+        elif value is False:
             value = 'no'
         
         if self.config.has_section('preferences'):

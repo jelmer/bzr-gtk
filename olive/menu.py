@@ -234,8 +234,8 @@ class OliveMenu:
         """ Left context menu -> Remove """
         
         if self.selected != None:
-            self.pref.remove_bookmark(self.comm.get_selected_left())
-            self.comm.refresh_left()
+            self.pref.remove_bookmark(self.selected)
+            self.pref.write()
     
     def open_folder(self, action):
         """ Left context menu -> Open Folder """
