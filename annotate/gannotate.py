@@ -292,9 +292,21 @@ class GAnnotateWindow(gtk.Window):
         col.add_attribute(cell, "text", TEXT_LINE_COL)
         tv.append_column(col)
 
-        tv.set_search_column(LINE_NUM_COL)
-        
+        tv.set_search_column(TEXT_LINE_COL)
+        tv.set_search_equal_func(self._match_text)
+
         return tv
+
+    def _match_text(self, model, column, key, iterator):
+        """Returns 0 if text entered by user matches the line."""
+
+        line, = self.annomodel.get(iterator, column)
+        if line == '':
+            match = False
+        else:
+            match = (line.find(key) != -1)
+        # Gtk excepts False when we match
+        return not match
 
     def _create_span_selector(self):
         ss = SpanSelector()
