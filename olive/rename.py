@@ -39,6 +39,7 @@ class OliveRename:
         self.glade = gtk.glade.XML(GLADEFILENAME, 'window_rename')
         
         self.window = self.glade.get_widget('window_rename')
+        self.entry = self.glade.get_widget('entry_rename')
         
         # Dictionary for signal_autoconnect
         dic = { "on_button_rename_rename_clicked": self.rename,
@@ -53,14 +54,15 @@ class OliveRename:
         
     def display(self):
         """ Display the Rename dialog. """
+        if self.selected is not None:
+            self.entry.set_text(self.selected)
+        
         self.window.show_all()
 
     def rename(self, widget):
         # Get entry
-        entry = self.glade.get_widget('entry_rename')
-        
         old_filename = self.selected
-        new_filename = entry.get_text()
+        new_filename = self.entry.get_text()
             
         if old_filename is None:
             error_dialog(_('No file was selected'),
