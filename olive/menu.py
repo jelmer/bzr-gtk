@@ -210,6 +210,10 @@ class OliveMenu:
         window = DiffWindow()
         parent_tree = wt.branch.repository.revision_tree(wt.branch.last_revision())
         window.set_diff(wt.branch.nick, wt, parent_tree)
+        try:
+            window.set_file(wt.relpath(self.path + os.sep + self.selected))
+        except errors.NoSuchFile:
+            pass
         window.show()
     
     def bookmark(self, action):
