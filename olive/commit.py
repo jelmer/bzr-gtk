@@ -51,7 +51,9 @@ class CommitDialog:
         self.window = self.glade.get_widget('window_commit')
         self.checkbutton_local = self.glade.get_widget('checkbutton_commit_local')
         self.textview = self.glade.get_widget('textview_commit')
+        self.file_expander = self.glade.get_widget('expander_commit_select')
         self.file_view = self.glade.get_widget('treeview_commit_select')
+        self.pending_expander = self.glade.get_widget('expander_commit_pending')
         self.pending_label = self.glade.get_widget('label_commit_pending')
         self.pending_view = self.glade.get_widget('treeview_commit_pending')
 
@@ -98,10 +100,11 @@ class CommitDialog:
             
             if self.pending:
                 # There are pending merges, file selection not supported
+                self.file_expander.set_expanded(False)
                 self.file_view.set_sensitive(False)
             else:
                 # No pending merges
-                self.pending_view.set_sensitive(False)
+                self.pending_expander.hide()
             
             self.textview.modify_font(pango.FontDescription("Monospace"))
             self.window.show()

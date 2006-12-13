@@ -59,6 +59,10 @@ class OliveMenu:
                                        _('Remove'), None,
                                        _('Remove the selected file'),
                                        self.remove_file),
+                                      ('rename', None,
+                                       _('Rename'), None,
+                                       _('Rename the selected file'),
+                                       self.rename_file),
                                       ('open', gtk.STOCK_OPEN,
                                        _('Open'), None,
                                        _('Open the selected file'),
@@ -169,6 +173,13 @@ class OliveMenu:
                          _('The selected file is not versioned.'))
             return
 
+    def rename_file(self, action):
+        """ Right context menu -> Rename """
+        from rename import OliveRename
+        wt = WorkingTree.open_containing(self.path + os.sep + self.selected)[0]
+        rename = OliveRename(wt, wt.relpath(self.path), self.selected)
+        rename.display()
+    
     def open_file(self, action):
         """ Right context menu -> Open """
         # Open only the selected file
@@ -210,6 +221,10 @@ class OliveMenu:
         window = DiffWindow()
         parent_tree = wt.branch.repository.revision_tree(wt.branch.last_revision())
         window.set_diff(wt.branch.nick, wt, parent_tree)
+        try:
+            window.set_file(wt.relpath(self.path + os.sep + self.selected))
+        except errors.NoSuchFile:
+            pass
         window.show()
     
     def bookmark(self, action):
