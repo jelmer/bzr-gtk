@@ -58,13 +58,15 @@ setup(
     package_dir = {
         "bzrlib.plugins.gtk": ".",
         "bzrlib.plugins.gtk.viz": "viz", 
-        "bzrlib.plugins.gtk.annotate": "annotate"
+        "bzrlib.plugins.gtk.annotate": "annotate",
+        "bzrlib.plugins.gtk.olive": "olive"
         },
     packages = [
 		"olive",
         "bzrlib.plugins.gtk",
         "bzrlib.plugins.gtk.viz",
-        "bzrlib.plugins.gtk.annotate"
+        "bzrlib.plugins.gtk.annotate",
+        "bzrlib.plugins.gtk.olive"
         ],
       data_files=[('share/olive', ['olive.glade',
                                    'oliveicon2.png',
