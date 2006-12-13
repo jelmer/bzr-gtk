@@ -87,12 +87,12 @@ class CommitDialog:
             error_dialog(_('Directory does not have a working tree'),
                          _('Operation aborted.'))
             self.close()
-            dialog_shown = False
+            return False
         if self.notbranch:
             error_dialog(_('Directory is not a branch'),
                          _('You can perform this action only in a branch.'))
             self.close()
-            dialog_shown = False
+            return False
         else:
             if self.wt.branch.get_bound_location() is not None:
                 # we have a checkout, so the local commit checkbox must appear
@@ -108,11 +108,7 @@ class CommitDialog:
             
             self.textview.modify_font(pango.FontDescription("Monospace"))
             self.window.show()
-            dialog_shown = True
-        if dialog_shown:
-            # Gives the focus to the commit message area
-            self.textview.grab_focus()
-        return dialog_shown
+            return True
     
     def _create_file_view(self):
         self.file_store = gtk.ListStore(gobject.TYPE_BOOLEAN,   # [0] checkbox
@@ -155,6 +151,15 @@ class CommitDialog:
             self.file_store.append([ True, path+marker, _('modified'), path ])
     
     def _create_pending_merges(self):
+        if not self.pending:
+            # hide unused pending merge part
+            scrolled_window = self.glade.get_widget('scrolledwindow_commit_pending')
+            parent = scrolled_window.get_parent()
+            parent.remove(scrolled_window)
+            parent = self.pending_label.get_parent()
+            parent.remove(self.pending_label)
+            return
+        
         liststore = gtk.ListStore(gobject.TYPE_STRING,
                                   gobject.TYPE_STRING,
                                   gobject.TYPE_STRING)
@@ -166,9 +171,6 @@ class CommitDialog:
                                         gtk.CellRendererText(), text=1))
         self.pending_view.append_column(gtk.TreeViewColumn(_('Summary'),
                                         gtk.CellRendererText(), text=2))
-        
-        if not self.pending:
-            return
         
         for item in self.pending:
             liststore.append([ item['date'],
