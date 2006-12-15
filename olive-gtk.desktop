@@ -1,4 +1,5 @@
 [Desktop Entry]
+Encoding=UTF-8
 Type=Application
 Version=1.0
 Name=Olive
@@ -6,4 +7,4 @@ GenericName=Version Control GUI
 Comment=Graphical User Interface for the Bazaar Version Control System
 Icon=olive-gtk.png
 Exec=/usr/bin/olive-gtk
-Categories=Application;Development
+Categories=Application;Development;

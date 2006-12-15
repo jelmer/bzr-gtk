@@ -205,8 +205,13 @@ class OliveMenu:
     def commit(self, action):
         """ Right context menu -> Commit """
         from commit import CommitDialog
-        wt, path = WorkingTree.open_containing(self.path)
-        commit = CommitDialog(wt, path)
+        branch = None
+        try:
+            wt, path = WorkingTree.open_containing(self.path)
+            branch = wt.branch
+        except NotBranchError, e:
+            path = e.path
+        commit = CommitDialog(wt, path, not branch)
         commit.display()
     
     def diff(self, action):

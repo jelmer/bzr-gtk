@@ -49,7 +49,7 @@ class InstallData(install_data):
 
 setup(
     name = "bzr-gtk",
-    version = "0.12.0",
+    version = "0.13.0",
     maintainer = "Jelmer Vernooij",
     maintainer_email = "jelmer@samba.org",
     description = "GTK+ Frontends for various Bazaar commands",
@@ -58,13 +58,15 @@ setup(
     package_dir = {
         "bzrlib.plugins.gtk": ".",
         "bzrlib.plugins.gtk.viz": "viz", 
-        "bzrlib.plugins.gtk.annotate": "annotate"
+        "bzrlib.plugins.gtk.annotate": "annotate",
+        "bzrlib.plugins.gtk.olive": "olive"
         },
     packages = [
 		"olive",
         "bzrlib.plugins.gtk",
         "bzrlib.plugins.gtk.viz",
-        "bzrlib.plugins.gtk.annotate"
+        "bzrlib.plugins.gtk.annotate",
+        "bzrlib.plugins.gtk.olive"
         ],
       data_files=[('share/olive', ['olive.glade',
                                    'oliveicon2.png',
