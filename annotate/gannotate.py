@@ -143,7 +143,7 @@ class GAnnotateWindow(gtk.Window):
         current_revision.committer = self.branch.get_config().username()
         current_revision.timestamp = time.time()
         current_revision.message = '[Not yet committed]'
-        current_revno = '%d?' % self.branch.revno()
+        current_revno = '%d?' % (self.branch.revno() + 1)
         repository = self.branch.repository
         if self.revision_id == CURRENT_REVISION:
             revision_id = self.branch.last_revision()
