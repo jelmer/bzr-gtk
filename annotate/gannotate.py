@@ -24,7 +24,7 @@ import pango
 
 from bzrlib import tsort
 from bzrlib.errors import NoSuchRevision
-from bzrlib.revision import NULL_REVISION
+from bzrlib.revision import NULL_REVISION, CURRENT_REVISION
 
 from colormap import AnnotateColorMap, AnnotateColorSaturation
 from logview import LogView
@@ -58,12 +58,14 @@ class GAnnotateWindow(gtk.Window):
         if self.plain:
             self.span_selector.hide()
 
-    def annotate(self, branch, file_id, revision_id=None):
+    def annotate(self, tree, branch, file_id):
         self.revisions = {}
         self.annotations = []
         self.branch = branch
+        self.tree = tree
         self.file_id = file_id
-        self.revision_id = revision_id
+        self.revision_id = getattr(tree, 'get_revision_id', 
+                                   lambda: CURRENT_REVISION)()
         
         # [revision id, line number, committer, revno, highlight color, line]
         self.annomodel = gtk.ListStore(gobject.TYPE_STRING,
@@ -78,7 +80,7 @@ class GAnnotateWindow(gtk.Window):
             branch.lock_read()
             branch.repository.lock_read()
             for line_no, (revision, revno, line)\
-                    in enumerate(self._annotate(branch, file_id, revision_id)):
+                    in enumerate(self._annotate(tree, file_id)):
                 if revision.revision_id == last_seen and not self.all:
                     revno = committer = ""
                 else:
@@ -136,18 +138,20 @@ class GAnnotateWindow(gtk.Window):
             dotted[revision_id] = '.'.join(str(num) for num in revno)
         return dotted
 
-    def _annotate(self, branch, file_id, revision_id):
-        repository = branch.repository
-        if revision_id is None:
-            revision_id = branch.last_revision()
+    def _annotate(self, tree, file_id):
+        current_revision = FakeRevision(CURRENT_REVISION)
+        current_revision.committer = self.branch.get_config().username()
+        current_revision.timestamp = time.time()
+        current_revision.message = '[Not yet committed]'
+        current_revno = '%d?' % self.branch.revno()
+        repository = self.branch.repository
+        if self.revision_id == CURRENT_REVISION:
+            revision_id = self.branch.last_revision()
+        else:
+            revision_id = self.revision_id
         dotted = self._dotted_revnos(repository, revision_id)
-        rev_tree = repository.revision_tree(revision_id)
-        revision_id = rev_tree.inventory[file_id].revision
-        weave = repository.weave_store.get_weave(file_id,
-                                                 branch.get_transaction())
-        
         revision_cache = RevisionCache(repository)
-        for origin, text in weave.annotate_iter(revision_id):
+        for origin, text in tree.annotate_iter(file_id):
             rev_id = origin
             try:
                 revision = revision_cache.get_revision(rev_id)
@@ -155,8 +159,13 @@ class GAnnotateWindow(gtk.Window):
                 if len(revno) > 15:
                     revno = 'merge'
             except NoSuchRevision:
-                revision = NoneRevision(rev_id)
-                revno = "?"
+                committer = "?"
+                if rev_id == CURRENT_REVISION:
+                    revision = current_revision
+                    revno = current_revno
+                else:
+                    revision = FakeRevision(rev_id)
+                    revno = "?"
 
             yield revision, revno, text
 
@@ -228,11 +237,15 @@ class GAnnotateWindow(gtk.Window):
         row = path[0]
         revision = self.annotations[row]
         repository = self.branch.repository
-        tree1 = repository.revision_tree(revision.revision_id)
-        if len(revision.parent_ids) > 0:
-            tree2 = repository.revision_tree(revision.parent_ids[0])
+        if revision.revision_id == CURRENT_REVISION:
+            tree1 = self.tree
+            tree2 = self.tree.basis_tree()
         else:
-            tree2 = repository.revision_tree(NULL_REVISION)
+            tree1 = repository.revision_tree(revision.revision_id)
+            if len(revision.parent_ids) > 0:
+                tree2 = repository.revision_tree(revision.parent_ids[0])
+            else:
+                tree2 = repository.revision_tree(NULL_REVISION)
         from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
         window = DiffWindow()
         window.set_diff("Diff for row %d" % (row+1), tree1, tree2)
@@ -325,16 +338,16 @@ class GAnnotateWindow(gtk.Window):
         return box
 
 
-class NoneRevision:
+class FakeRevision:
     """ A fake revision.
 
     For when a revision is referenced but not present.
     """
 
-    def __init__(self, revision_id):
+    def __init__(self, revision_id, committer='?'):
         self.revision_id = revision_id
         self.parent_ids = []
-        self.committer = "?"
+        self.committer = committer
         self.message = "?"
         self.timestamp = 0.0
         self.timezone = 0

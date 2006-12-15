@@ -178,8 +178,10 @@ class cmd_gannotate(Command):
             if len(revision) != 1:
                 raise BzrCommandError("Only 1 revion may be specified.")
             revision_id = revision[0].in_history(branch).rev_id
+            tree = branch.repository.revision_tree(revision_id)
         else:
             revision_id = None
+            tree = wt
 
         window = GAnnotateWindow(all, plain)
         window.connect("destroy", lambda w: gtk.main_quit())
@@ -188,7 +190,7 @@ class cmd_gannotate(Command):
         window.show()
         branch.lock_read()
         try:
-            window.annotate(branch, file_id, revision_id)
+            window.annotate(tree, branch, file_id)
         finally:
             branch.unlock()
         window.jump_to_line(line)
