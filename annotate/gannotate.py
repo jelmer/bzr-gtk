@@ -238,11 +238,11 @@ class GAnnotateWindow(gtk.Window):
 
     def _search_by_text(self, accel_group, window, key, modifiers):
         self._search.show_for('text')
-        self._search.set_target(self.annoview, self.annomodel, TEXT_LINE_COL)
+        self._search.set_target(self.annoview, TEXT_LINE_COL)
 
     def _search_by_line(self, accel_group, window, key, modifiers):
         self._search.show_for('line')
-        self._search.set_target(self.annoview, self.annomodel, LINE_NUM_COL)
+        self._search.set_target(self.annoview, LINE_NUM_COL)
 
     def row_diff(self, tv, path, tvc):
         row = path[0]
