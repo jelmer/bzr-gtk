@@ -348,9 +348,21 @@ class OliveGtk:
 
     def on_menuitem_remove_file_activate(self, widget):
         """ Remove (unversion) selected file. """
-        from remove import OliveRemove
-        remove = OliveRemove(self.wt, self.wtpath, self.get_selected_right())
-        remove.display()
+        from remove import OliveRemoveDialog
+        remove = OliveRemoveDialog(self.wt, self.wtpath,
+                                   selected=self.get_selected_right(),
+                                   parent=self.window,
+                                   single=False)
+        response = remove.run()
+        
+        if response != gtk.RESPONSE_NONE:
+            remove.hide()
+        
+            if response == gtk.RESPONSE_OK:
+                self.set_path(self.path)
+                self.refresh_right()
+            
+            remove.destroy()
     
     def on_menuitem_stats_diff_activate(self, widget):
         """ Statistics/Differences... menu handler. """
@@ -414,7 +426,9 @@ class OliveGtk:
         if event.button == 3:
             # Create a menu
             from menu import OliveMenu
-            menu = OliveMenu(self.get_path(), self.get_selected_right())
+            menu = OliveMenu(path=self.get_path(),
+                             selected=self.get_selected_right(),
+                             app=self)
             # get the menu items
             m_add = menu.ui.get_widget('/context_right/add')
             m_remove = menu.ui.get_widget('/context_right/remove')
