@@ -351,8 +351,7 @@ class OliveGtk:
         from remove import OliveRemoveDialog
         remove = OliveRemoveDialog(self.wt, self.wtpath,
                                    selected=self.get_selected_right(),
-                                   parent=self.window,
-                                   single=False)
+                                   parent=self.window)
         response = remove.run()
         
         if response != gtk.RESPONSE_NONE:
@@ -405,7 +404,9 @@ class OliveGtk:
 
             # Create a menu
             from menu import OliveMenu
-            menu = OliveMenu(self.get_path(), self.get_selected_left())
+            menu = OliveMenu(path=self.get_path(),
+                             selected=self.get_selected_left(),
+                             app=self)
             
             menu.left_context_menu().popup(None, None, None, 0,
                                            event.time)
