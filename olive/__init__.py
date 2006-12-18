@@ -595,6 +595,9 @@ class OliveGtk:
                 for rpath, id, kind in delta.unchanged:
                     if rpath == filename:
                         status = 'unchanged'
+                for rpath, file_class, kind, id, entry in self.wt.list_files():
+                    if rpath == filename and file_class == 'I':
+                        status = 'ignored'
             
             #try:
             #    status = fileops.status(path + os.sep + item)
@@ -611,6 +614,8 @@ class OliveGtk:
                 st = _('modified')
             elif status == 'unchanged':
                 st = _('unchanged')
+            elif status == 'ignored':
+                st = _('ignored')
             else:
                 st = _('unknown')
             liststore.append([gtk.STOCK_FILE, item, st])
@@ -761,7 +766,7 @@ class OliveGtk:
             tree2 = tree1.branch.repository.revision_tree(branch.last_revision())
         
             delta = tree1.changes_from(tree2, want_unchanged=True)
-
+            
         # Add'em to the ListStore
         for item in dirs:
             liststore.append([gtk.STOCK_DIRECTORY, item, ''])
@@ -785,6 +790,9 @@ class OliveGtk:
                 for rpath, id, kind in delta.unchanged:
                     if rpath == filename:
                         status = 'unchanged'
+                for rpath, file_class, kind, id, entry in self.wt.list_files():
+                    if rpath == filename and file_class == 'I':
+                        status = 'ignored'
             
             #try:
             #    status = fileops.status(path + os.sep + item)
@@ -801,6 +809,8 @@ class OliveGtk:
                 st = _('modified')
             elif status == 'unchanged':
                 st = _('unchanged')
+            elif status == 'ignored':
+                st = _('ignored')
             else:
                 st = _('unknown')
             liststore.append([gtk.STOCK_FILE, item, st])
