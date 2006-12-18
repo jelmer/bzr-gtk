@@ -229,8 +229,13 @@ class OliveGtk:
     def on_menuitem_branch_merge_activate(self, widget):
         """ Branch/Merge... menu handler. """
         from merge import MergeDialog
-        merge = MergeDialog(self.wt, self.wtpath)
-        merge.display()
+        
+        if self.check_for_changes():
+            error_dialog(_('There are local changes in the branch'),
+                         _('Please commit or revert the changes before merging.'))
+        else:
+            merge = MergeDialog(self.wt, self.wtpath)
+            merge.display()
 
     def on_menuitem_branch_missing_revisions_activate(self, widget):
         """ Branch/Missing revisions menu handler. """
@@ -837,6 +842,18 @@ class OliveGtk:
             drive = model[active][0]
             self.set_path(drive + '\\')
             self.refresh_right(drive + '\\')
+    
+    def check_for_changes(self):
+        """ Check whether there were changes in the current working tree. """
+        old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
+        delta = self.wt.changes_from(old_tree)
+
+        changes = False
+        
+        if len(delta.added) or len(delta.removed) or len(delta.renamed) or len(delta.modified):
+            changes = True
+        
+        return changes
 
 import ConfigParser
 
