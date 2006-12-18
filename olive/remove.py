@@ -97,7 +97,7 @@ class OliveRemove:
 class OliveRemoveDialog(gtk.Dialog):
     """ This class wraps the old Remove window into a gtk.Dialog. """
     
-    def __init__(self, wt, wtpath, selected=[], parent=None, single=False):
+    def __init__(self, wt, wtpath, selected=[], parent=None):
         """ Initialize the Remove file(s) dialog. """
         gtk.Dialog.__init__(self, title="Remove files - Olive",
                                   parent=parent,
@@ -108,7 +108,6 @@ class OliveRemoveDialog(gtk.Dialog):
         self.wt = wt
         self.wtpath = wtpath
         self.selected = selected
-        self.single = single
         
         # Create widgets
         self._label = gtk.Label(_("Which file(s) do you want to remove?"))

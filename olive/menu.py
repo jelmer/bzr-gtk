@@ -245,14 +245,24 @@ class OliveMenu:
         else:
             warning_dialog(_('Location already bookmarked'),
                            _('The current directory is already bookmarked.\nSee the left panel for reference.'))
+        
+        self.app.refresh_left()
 
     def edit_bookmark(self, action):
         """ Left context menu -> Edit """
-        from bookmark import OliveBookmark
-
+        from bookmark import OliveBookmarkDialog
+        
         if self.selected != None:
-            bookmark = OliveBookmark(self.selected)
-            bookmark.display()
+            bookmark = OliveBookmarkDialog(self.selected, self.app.window)
+            response = bookmark.run()
+            
+            if response != gtk.RESPONSE_NONE:
+                bookmark.hide()
+        
+                if response == gtk.RESPONSE_OK:
+                    self.app.refresh_left()
+            
+                bookmark.destroy()
 
     def remove_bookmark(self, action):
         """ Left context menu -> Remove """
@@ -260,6 +270,8 @@ class OliveMenu:
         if self.selected != None:
             self.pref.remove_bookmark(self.selected)
             self.pref.write()
+        
+        self.app.refresh_left()
     
     def open_folder(self, action):
         """ Left context menu -> Open Folder """
