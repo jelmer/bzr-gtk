@@ -45,6 +45,8 @@ from guifiles import GLADEFILENAME
 try:
     from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
     from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
+    from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
+    from bzrlib.plugins.gtk.annotate.config import GAnnotateConfig
 except ImportError:
     # olive+bzr-gtk not installed. try to import from sources
     path = os.path.dirname(os.path.dirname(__file__))
@@ -52,6 +54,8 @@ except ImportError:
         sys.path.append(path)
     from viz.diffwin import DiffWindow
     from viz.branchwin import BranchWindow
+    from annotate.gannotate import GAnnotateWindow
+    from annotate.config import GAnnotateConfig
 
 
 class OliveGtk:
@@ -84,6 +88,7 @@ class OliveGtk:
         self.menuitem_file_make_directory = self.toplevel.get_widget('menuitem_file_make_directory')
         self.menuitem_file_rename = self.toplevel.get_widget('menuitem_file_rename')
         self.menuitem_file_move = self.toplevel.get_widget('menuitem_file_move')
+        self.menuitem_file_annotate = self.toplevel.get_widget('menuitem_file_annotate')
         self.menuitem_view_show_hidden_files = self.toplevel.get_widget('menuitem_view_show_hidden_files')
         self.menuitem_branch = self.toplevel.get_widget('menuitem_branch')
         self.menuitem_branch_init = self.toplevel.get_widget('menuitem_branch_initialize')
@@ -122,6 +127,7 @@ class OliveGtk:
                 "on_menuitem_file_make_directory_activate": self.on_menuitem_file_make_directory_activate,
                 "on_menuitem_file_move_activate": self.on_menuitem_file_move_activate,
                 "on_menuitem_file_rename_activate": self.on_menuitem_file_rename_activate,
+                "on_menuitem_file_annotate_activate": self.on_menuitem_file_annotate_activate,
                 "on_menuitem_view_show_hidden_files_activate": self.on_menuitem_view_show_hidden_files_activate,
                 "on_menuitem_view_refresh_activate": self.on_menuitem_view_refresh_activate,
                 "on_menuitem_branch_initialize_activate": self.on_menuitem_branch_initialize_activate,
@@ -333,6 +339,27 @@ class OliveGtk:
                         _('Directory successfully initialized.'))
             self.refresh_right()
         
+    def on_menuitem_file_annotate_activate(self, widget):
+        """ File/Annotate... menu handler. """
+        if self.get_selected_right() is None:
+            error_dialog(_('No file was selected'),
+                         _('Please select a file from the list.'))
+            return
+        
+        branch = self.wt.branch
+        file_id = self.wt.path2id(self.wt.relpath(os.path.join(self.path, self.get_selected_right())))
+        revision_id = None
+        
+        window = GAnnotateWindow(all=False, plain=False)
+        window.set_title(os.path.join(self.path, self.get_selected_right()) + " - Annotate")
+        config = GAnnotateConfig(window)
+        window.show()
+        branch.lock_read()
+        try:
+            window.annotate(branch, file_id, revision_id)
+        finally:
+            branch.unlock()
+    
     def on_menuitem_file_make_directory_activate(self, widget):
         """ File/Make directory... menu handler. """
         from mkdir import OliveMkdir
@@ -685,6 +712,7 @@ class OliveGtk:
         self.menuitem_file_make_directory.set_sensitive(not self.notbranch)
         self.menuitem_file_rename.set_sensitive(not self.notbranch)
         self.menuitem_file_move.set_sensitive(not self.notbranch)
+        self.menuitem_file_annotate.set_sensitive(not self.notbranch)
         #self.menutoolbutton_diff.set_sensitive(True)
         self.toolbutton_diff.set_sensitive(not self.notbranch)
         self.toolbutton_log.set_sensitive(not self.notbranch)

@@ -124,6 +124,15 @@
 		      <signal name="activate" handler="on_menuitem_file_move_activate" last_modification_time="Mon, 17 Jul 2006 08:56:08 GMT"/>
 		    </widget>
 		  </child>
+		  
+		  <child>
+		    <widget class="GtkMenuItem" id="menuitem_file_annotate">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">_Annotate...</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="on_menuitem_file_annotate_activate" last_modification_time="Mon, 18 Dec 2006 10:17:00 GMT"/>
+		    </widget>
+		  </child>
 
 		  <child>
 		    <widget class="GtkSeparatorMenuItem" id="separator_file2">
