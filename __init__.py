@@ -14,6 +14,7 @@
 
 """GTK+ frontends to Bazaar commands """
 
+from bzrlib import errors
 from bzrlib.commands import Command, register_command, display_command
 from bzrlib.errors import NotVersionedError, BzrCommandError, NoSuchFile
 from bzrlib.commands import Command, register_command
@@ -167,10 +168,14 @@ class cmd_gannotate(Command):
         from annotate.gannotate import GAnnotateWindow
         from annotate.config import GAnnotateConfig
 
-        (wt, path) = WorkingTree.open_containing(filename)
-        branch = wt.branch
+        try:
+            (tree, path) = WorkingTree.open_containing(filename)
+            branch = tree.branch
+        except errors.NoWorkingTree:
+            (branch, path) = Branch.open_containing(filename)
+            tree = branch.basis_tree()
 
-        file_id = wt.path2id(path)
+        file_id = tree.path2id(path)
 
         if file_id is None:
             raise NotVersionedError(filename)
@@ -180,8 +185,7 @@ class cmd_gannotate(Command):
             revision_id = revision[0].in_history(branch).rev_id
             tree = branch.repository.revision_tree(revision_id)
         else:
-            revision_id = None
-            tree = wt
+            revision_id = getattr(tree, 'get_revision_id', lambda: None)()
 
         window = GAnnotateWindow(all, plain)
         window.connect("destroy", lambda w: gtk.main_quit())
