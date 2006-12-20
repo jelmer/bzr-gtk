@@ -34,7 +34,7 @@ from olive import OlivePreferences, DiffWindow
 
 class OliveMenu:
     """ This class is responsible for building the context menus. """
-    def __init__(self, path, selected):
+    def __init__(self, path, selected, app=None):
         # Load the UI file
         from guifiles import UIFILENAME
 
@@ -46,6 +46,7 @@ class OliveMenu:
         # Set default values
         self.path = path
         self.selected = selected
+        self.app = app
         
         # Create the file list context menu
         self.ui = gtk.UIManager()
@@ -161,7 +162,7 @@ class OliveMenu:
             return
         
         try:
-            wt, path = WorkingTree.open_containing(directory + os.sep + filename)
+            wt, path = WorkingTree.open_containing(os.path.join(directory, filename))
             wt.remove(path)
 
         except errors.NotBranchError:
@@ -172,6 +173,9 @@ class OliveMenu:
             error_dialog(_('File not versioned'),
                          _('The selected file is not versioned.'))
             return
+
+        self.app.set_path(self.path)
+        self.app.refresh_right()
 
     def rename_file(self, action):
         """ Right context menu -> Rename """
@@ -241,14 +245,24 @@ class OliveMenu:
         else:
             warning_dialog(_('Location already bookmarked'),
                            _('The current directory is already bookmarked.\nSee the left panel for reference.'))
+        
+        self.app.refresh_left()
 
     def edit_bookmark(self, action):
         """ Left context menu -> Edit """
-        from bookmark import OliveBookmark
-
+        from bookmark import OliveBookmarkDialog
+        
         if self.selected != None:
-            bookmark = OliveBookmark(self.selected)
-            bookmark.display()
+            bookmark = OliveBookmarkDialog(self.selected, self.app.window)
+            response = bookmark.run()
+            
+            if response != gtk.RESPONSE_NONE:
+                bookmark.hide()
+        
+                if response == gtk.RESPONSE_OK:
+                    self.app.refresh_left()
+            
+                bookmark.destroy()
 
     def remove_bookmark(self, action):
         """ Left context menu -> Remove """
@@ -256,6 +270,8 @@ class OliveMenu:
         if self.selected != None:
             self.pref.remove_bookmark(self.selected)
             self.pref.write()
+        
+        self.app.refresh_left()
     
     def open_folder(self, action):
         """ Left context menu -> Open Folder """

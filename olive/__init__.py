@@ -36,7 +36,7 @@ import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
 # Olive GTK UI version
-__version__ = '0.12.0'
+__version__ = '0.14.0'
 
 from dialog import error_dialog, info_dialog
 from guifiles import GLADEFILENAME
@@ -45,6 +45,8 @@ from guifiles import GLADEFILENAME
 try:
     from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
     from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
+    from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
+    from bzrlib.plugins.gtk.annotate.config import GAnnotateConfig
 except ImportError:
     # olive+bzr-gtk not installed. try to import from sources
     path = os.path.dirname(os.path.dirname(__file__))
@@ -52,6 +54,8 @@ except ImportError:
         sys.path.append(path)
     from viz.diffwin import DiffWindow
     from viz.branchwin import BranchWindow
+    from annotate.gannotate import GAnnotateWindow
+    from annotate.config import GAnnotateConfig
 
 
 class OliveGtk:
@@ -84,6 +88,7 @@ class OliveGtk:
         self.menuitem_file_make_directory = self.toplevel.get_widget('menuitem_file_make_directory')
         self.menuitem_file_rename = self.toplevel.get_widget('menuitem_file_rename')
         self.menuitem_file_move = self.toplevel.get_widget('menuitem_file_move')
+        self.menuitem_file_annotate = self.toplevel.get_widget('menuitem_file_annotate')
         self.menuitem_view_show_hidden_files = self.toplevel.get_widget('menuitem_view_show_hidden_files')
         self.menuitem_branch = self.toplevel.get_widget('menuitem_branch')
         self.menuitem_branch_init = self.toplevel.get_widget('menuitem_branch_initialize')
@@ -122,6 +127,7 @@ class OliveGtk:
                 "on_menuitem_file_make_directory_activate": self.on_menuitem_file_make_directory_activate,
                 "on_menuitem_file_move_activate": self.on_menuitem_file_move_activate,
                 "on_menuitem_file_rename_activate": self.on_menuitem_file_rename_activate,
+                "on_menuitem_file_annotate_activate": self.on_menuitem_file_annotate_activate,
                 "on_menuitem_view_show_hidden_files_activate": self.on_menuitem_view_show_hidden_files_activate,
                 "on_menuitem_view_refresh_activate": self.on_menuitem_view_refresh_activate,
                 "on_menuitem_branch_initialize_activate": self.on_menuitem_branch_initialize_activate,
@@ -229,8 +235,13 @@ class OliveGtk:
     def on_menuitem_branch_merge_activate(self, widget):
         """ Branch/Merge... menu handler. """
         from merge import MergeDialog
-        merge = MergeDialog(self.wt, self.wtpath)
-        merge.display()
+        
+        if self.check_for_changes():
+            error_dialog(_('There are local changes in the branch'),
+                         _('Please commit or revert the changes before merging.'))
+        else:
+            merge = MergeDialog(self.wt, self.wtpath)
+            merge.display()
 
     def on_menuitem_branch_missing_revisions_activate(self, widget):
         """ Branch/Missing revisions menu handler. """
@@ -328,6 +339,27 @@ class OliveGtk:
                         _('Directory successfully initialized.'))
             self.refresh_right()
         
+    def on_menuitem_file_annotate_activate(self, widget):
+        """ File/Annotate... menu handler. """
+        if self.get_selected_right() is None:
+            error_dialog(_('No file was selected'),
+                         _('Please select a file from the list.'))
+            return
+        
+        branch = self.wt.branch
+        file_id = self.wt.path2id(self.wt.relpath(os.path.join(self.path, self.get_selected_right())))
+        revision_id = None
+        
+        window = GAnnotateWindow(all=False, plain=False)
+        window.set_title(os.path.join(self.path, self.get_selected_right()) + " - Annotate")
+        config = GAnnotateConfig(window)
+        window.show()
+        branch.lock_read()
+        try:
+            window.annotate(branch, file_id, revision_id)
+        finally:
+            branch.unlock()
+    
     def on_menuitem_file_make_directory_activate(self, widget):
         """ File/Make directory... menu handler. """
         from mkdir import OliveMkdir
@@ -348,9 +380,20 @@ class OliveGtk:
 
     def on_menuitem_remove_file_activate(self, widget):
         """ Remove (unversion) selected file. """
-        from remove import OliveRemove
-        remove = OliveRemove(self.wt, self.wtpath, self.get_selected_right())
-        remove.display()
+        from remove import OliveRemoveDialog
+        remove = OliveRemoveDialog(self.wt, self.wtpath,
+                                   selected=self.get_selected_right(),
+                                   parent=self.window)
+        response = remove.run()
+        
+        if response != gtk.RESPONSE_NONE:
+            remove.hide()
+        
+            if response == gtk.RESPONSE_OK:
+                self.set_path(self.path)
+                self.refresh_right()
+            
+            remove.destroy()
     
     def on_menuitem_stats_diff_activate(self, widget):
         """ Statistics/Differences... menu handler. """
@@ -393,7 +436,9 @@ class OliveGtk:
 
             # Create a menu
             from menu import OliveMenu
-            menu = OliveMenu(self.get_path(), self.get_selected_left())
+            menu = OliveMenu(path=self.get_path(),
+                             selected=self.get_selected_left(),
+                             app=self)
             
             menu.left_context_menu().popup(None, None, None, 0,
                                            event.time)
@@ -414,7 +459,9 @@ class OliveGtk:
         if event.button == 3:
             # Create a menu
             from menu import OliveMenu
-            menu = OliveMenu(self.get_path(), self.get_selected_right())
+            menu = OliveMenu(path=self.get_path(),
+                             selected=self.get_selected_right(),
+                             app=self)
             # get the menu items
             m_add = menu.ui.get_widget('/context_right/add')
             m_remove = menu.ui.get_widget('/context_right/remove')
@@ -575,6 +622,9 @@ class OliveGtk:
                 for rpath, id, kind in delta.unchanged:
                     if rpath == filename:
                         status = 'unchanged'
+                for rpath, file_class, kind, id, entry in self.wt.list_files():
+                    if rpath == filename and file_class == 'I':
+                        status = 'ignored'
             
             #try:
             #    status = fileops.status(path + os.sep + item)
@@ -591,6 +641,8 @@ class OliveGtk:
                 st = _('modified')
             elif status == 'unchanged':
                 st = _('unchanged')
+            elif status == 'ignored':
+                st = _('ignored')
             else:
                 st = _('unknown')
             liststore.append([gtk.STOCK_FILE, item, st])
@@ -660,6 +712,7 @@ class OliveGtk:
         self.menuitem_file_make_directory.set_sensitive(not self.notbranch)
         self.menuitem_file_rename.set_sensitive(not self.notbranch)
         self.menuitem_file_move.set_sensitive(not self.notbranch)
+        self.menuitem_file_annotate.set_sensitive(not self.notbranch)
         #self.menutoolbutton_diff.set_sensitive(True)
         self.toolbutton_diff.set_sensitive(not self.notbranch)
         self.toolbutton_log.set_sensitive(not self.notbranch)
@@ -741,7 +794,7 @@ class OliveGtk:
             tree2 = tree1.branch.repository.revision_tree(branch.last_revision())
         
             delta = tree1.changes_from(tree2, want_unchanged=True)
-
+            
         # Add'em to the ListStore
         for item in dirs:
             liststore.append([gtk.STOCK_DIRECTORY, item, ''])
@@ -765,6 +818,9 @@ class OliveGtk:
                 for rpath, id, kind in delta.unchanged:
                     if rpath == filename:
                         status = 'unchanged'
+                for rpath, file_class, kind, id, entry in self.wt.list_files():
+                    if rpath == filename and file_class == 'I':
+                        status = 'ignored'
             
             #try:
             #    status = fileops.status(path + os.sep + item)
@@ -781,6 +837,8 @@ class OliveGtk:
                 st = _('modified')
             elif status == 'unchanged':
                 st = _('unchanged')
+            elif status == 'ignored':
+                st = _('ignored')
             else:
                 st = _('unknown')
             liststore.append([gtk.STOCK_FILE, item, st])
@@ -822,6 +880,18 @@ class OliveGtk:
             drive = model[active][0]
             self.set_path(drive + '\\')
             self.refresh_right(drive + '\\')
+    
+    def check_for_changes(self):
+        """ Check whether there were changes in the current working tree. """
+        old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
+        delta = self.wt.changes_from(old_tree)
+
+        changes = False
+        
+        if len(delta.added) or len(delta.removed) or len(delta.renamed) or len(delta.modified):
+            changes = True
+        
+        return changes
 
 import ConfigParser
 
