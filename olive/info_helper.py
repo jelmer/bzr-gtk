@@ -22,7 +22,7 @@ import bzrlib
 
 import bzrlib.osutils as osutils
 
-from bzrlib.info import _repo_relpath
+from bzrlib.info import _repo_rel_url
 from bzrlib.missing import find_unmerged
 
 def get_location_info(repository, branch=None, working=None):
@@ -41,14 +41,14 @@ def get_location_info(repository, branch=None, working=None):
             if repository.is_shared():
                 # lightweight checkout of branch in shared repository
                 ret['sharedrepo'] = repository_path
-                ret['repobranch'] = _repo_relpath(repository_path, branch_path)
+                ret['repobranch'] = _repo_rel_url(repository_path, branch_path)
             else:
                 # lightweight checkout of standalone branch
                 ret['cobranch'] = branch_path
         elif repository.is_shared():
             # branch with tree inside shared repository
             ret['sharedrepo'] = repository_path
-            ret['repoco'] = _repo_relpath(repository_path, branch_path)
+            ret['repoco'] = _repo_rel_url(repository_path, branch_path)
         elif branch.get_bound_location():
             # normal checkout
             ret['coroot'] = working_path
@@ -61,7 +61,7 @@ def get_location_info(repository, branch=None, working=None):
         if repository.is_shared():
             # branch is part of shared repository
             ret['sharedrepo'] = repository_path
-            ret['repobranch'] = _repo_relpath(repository_path, branch_path)
+            ret['repobranch'] = _repo_rel_url(repository_path, branch_path)
         else:
             # standalone branch
             ret['branchroot'] = branch_path

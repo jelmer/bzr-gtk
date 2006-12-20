@@ -348,7 +348,6 @@ class OliveGtk:
         
         branch = self.wt.branch
         file_id = self.wt.path2id(self.wt.relpath(os.path.join(self.path, self.get_selected_right())))
-        revision_id = None
         
         window = GAnnotateWindow(all=False, plain=False)
         window.set_title(os.path.join(self.path, self.get_selected_right()) + " - Annotate")
@@ -356,7 +355,7 @@ class OliveGtk:
         window.show()
         branch.lock_read()
         try:
-            window.annotate(branch, file_id, revision_id)
+            window.annotate(self.wt, branch, file_id)
         finally:
             branch.unlock()
     
