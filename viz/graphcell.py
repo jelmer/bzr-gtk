@@ -107,7 +107,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         to be, we let the TreeViewColumn take care of making them all
         line up.
         """
-        box_size = self.box_size(widget)
+        box_size = self.box_size(widget) + 1
 
         cols = self.node[0]
         for start, end, colour in self.in_lines + self.out_lines:
