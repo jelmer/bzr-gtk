@@ -55,9 +55,6 @@ class GAnnotateWindow(gtk.Window):
 
         self._create()
 
-        if self.plain:
-            self.span_selector.hide()
-
     def annotate(self, tree, branch, file_id):
         self.revisions = {}
         self.annotations = []
@@ -101,9 +98,8 @@ class GAnnotateWindow(gtk.Window):
 
             if not self.plain:
                 self._set_oldest_newest()
-                # Recall that calling activate_default will emit "span-changed",
-                # so self._span_changed_cb will take care of initial highlighting
-                self.span_selector.activate_default()
+                now = time.time()
+                self.annomodel.foreach(self._highlight_annotation, now)
         finally:
             branch.repository.unlock()
             branch.unlock()
@@ -176,20 +172,6 @@ class GAnnotateWindow(gtk.Window):
         oldest = min(rev_dates)
         newest = max(rev_dates)
 
-        span = self._span_from_seconds(time.time() - oldest)
-        self.span_selector.set_to_oldest_span(span)
-        
-        span = self._span_from_seconds(newest - oldest)
-        self.span_selector.set_newest_to_oldest_span(span)
-
-    def _span_from_seconds(self, seconds):
-        return (seconds / (24 * 60 * 60))
-    
-    def _span_changed_cb(self, w, span):
-        self.annotate_colormap.set_span(span)
-        now = time.time()
-        self.annomodel.foreach(self._highlight_annotation, now)
-
     def _highlight_annotation(self, model, path, iter, now):
         revision_id, = model.get(iter, REVISION_ID_COL)
         revision = self.revisions[revision_id]
@@ -206,7 +188,6 @@ class GAnnotateWindow(gtk.Window):
     def _create(self):
         self.logview = self._create_log_view()
         self.annoview = self._create_annotate_view()
-        self.span_selector = self._create_span_selector()
 
         vbox = gtk.VBox(False, 12)
         vbox.set_border_width(12)
@@ -226,7 +207,6 @@ class GAnnotateWindow(gtk.Window):
         vbox.pack_start(pane, expand=True, fill=True)
         
         hbox = gtk.HBox(True, 6)
-        hbox.pack_start(self.span_selector, expand=False, fill=True)
         hbox.pack_start(self._create_button_box(), expand=False, fill=True)
         hbox.show()
         vbox.pack_start(hbox, expand=False, fill=True)
@@ -308,13 +288,6 @@ class GAnnotateWindow(gtk.Window):
         tv.set_search_column(LINE_NUM_COL)
         
         return tv
-
-    def _create_span_selector(self):
-        ss = SpanSelector()
-        ss.connect("span-changed", self._span_changed_cb)
-        ss.show()
-
-        return ss
 
     def _create_log_view(self):
         lv = LogView()
