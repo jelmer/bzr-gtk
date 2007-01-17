@@ -97,7 +97,6 @@ class GAnnotateWindow(gtk.Window):
                 self.annotations.append(revision)
 
             if not self.plain:
-                self._set_oldest_newest()
                 now = time.time()
                 self.annomodel.foreach(self._highlight_annotation, now)
         finally:
@@ -164,13 +163,6 @@ class GAnnotateWindow(gtk.Window):
                     revno = "?"
 
             yield revision, revno, text
-
-    def _set_oldest_newest(self):
-        rev_dates = map(lambda i: self.revisions[i].timestamp, self.revisions)
-        if len(rev_dates) == 0:
-            return
-        oldest = min(rev_dates)
-        newest = max(rev_dates)
 
     def _highlight_annotation(self, model, path, iter, now):
         revision_id, = model.get(iter, REVISION_ID_COL)
