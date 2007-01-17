@@ -170,11 +170,16 @@ class GAnnotateWindow(gtk.Window):
         model.set(iter, HIGHLIGHT_COLOR_COL,
                   self.annotate_colormap.get_color(revision, now))
 
-    def _show_log(self, w):
+    def _selected_revision(self):
         (path, col) = self.annoview.get_cursor()
         if path is None:
+            return None
+        return self.annomodel[path][REVISION_ID_COL]
+
+    def _show_log(self, w):
+        rev_id = self._selected_revision()
+        if rev_id is None:
             return
-        rev_id = self.annomodel[path][REVISION_ID_COL]
         self.logview.set_revision(self.revisions[rev_id])
 
     def _create(self):
@@ -199,7 +204,8 @@ class GAnnotateWindow(gtk.Window):
         vbox.pack_start(pane, expand=True, fill=True)
         
         hbox = gtk.HBox(True, 6)
-        hbox.pack_start(self._create_button_box(), expand=False, fill=True)
+        hbox.pack_start(self._create_prev_button(), expand=False, fill=True)
+        hbox.pack_end(self._create_button_box(), expand=False, fill=True)
         hbox.show()
         vbox.pack_start(hbox, expand=False, fill=True)
 
@@ -301,6 +307,26 @@ class GAnnotateWindow(gtk.Window):
         box.pack_start(button, expand=False, fill=False)
 
         return box
+
+    def _create_prev_button(self):
+        box = gtk.HButtonBox()
+        box.set_layout(gtk.BUTTONBOX_START)
+        box.show()
+        
+        button = gtk.Button()
+        button.set_use_stock(True)
+        button.set_label("gtk-go-back")
+        button.connect("clicked", lambda w: self.go_back())
+        button.show()
+        box.pack_start(button, expand=False, fill=False)
+        return box
+
+    def go_back(self):
+        rev_id = self._selected_revision()
+        parent_id = self.revisions[rev_id].parent_ids[0]
+        tree = self.branch.repository.revision_tree(parent_id)
+        if self.file_id in tree:
+            self.annotate(tree, self.branch, self.file_id)
 
 
 class FakeRevision:
