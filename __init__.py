@@ -25,14 +25,23 @@ from bzrlib.bzrdir import BzrDir
 
 __version__ = '0.13.0'
 
+
+def import_pygtk():
+    try:
+        import pygtk
+    except ImportError:
+        raise errors.BzrCommandError("PyGTK not installed.")
+    pygtk.require('2.0')
+    return pygtk
+
+
 class cmd_gbranch(Command):
     """GTK+ branching.
     
     """
 
     def run(self):
-        import pygtk
-        pygtk.require("2.0")
+        pygtk = import_pygtk()
         try:
             import gtk
         except RuntimeError, e:
@@ -150,8 +159,7 @@ class cmd_gannotate(Command):
     aliases = ["gblame", "gpraise"]
     
     def run(self, filename, all=False, plain=False, line='1', revision=None):
-        import pygtk
-        pygtk.require("2.0")
+        pygtk = import_pygtk()
 
         try:
             import gtk
@@ -213,8 +221,7 @@ class cmd_gcommit(Command):
 
     def run(self, filename=None):
         import os
-        import pygtk
-        pygtk.require("2.0")
+        pygtk = import_pygtk()
 
         try:
             import gtk
