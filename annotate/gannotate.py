@@ -22,7 +22,7 @@ import gobject
 import gtk
 import pango
 
-from bzrlib import tsort
+from bzrlib import patiencediff, tsort
 from bzrlib.errors import NoSuchRevision
 from bzrlib.revision import NULL_REVISION, CURRENT_REVISION
 
@@ -138,6 +138,7 @@ class GAnnotateWindow(gtk.Window):
         current_revision.committer = self.branch.get_config().username()
         current_revision.timestamp = time.time()
         current_revision.message = '[Not yet committed]'
+        current_revision.parent_ids = tree.get_parent_ids()
         current_revno = '%d?' % (self.branch.revno() + 1)
         repository = self.branch.repository
         if self.revision_id == CURRENT_REVISION:
@@ -326,7 +327,21 @@ class GAnnotateWindow(gtk.Window):
         parent_id = self.revisions[rev_id].parent_ids[0]
         tree = self.branch.repository.revision_tree(parent_id)
         if self.file_id in tree:
+            offset = self.get_scroll_offset(tree)
+            (row,), col = self.annoview.get_cursor()
             self.annotate(tree, self.branch, self.file_id)
+            self.annoview.set_cursor(row+offset)
+
+    def get_scroll_offset(self, tree):
+        old = self.tree.get_file(self.file_id)
+        new = tree.get_file(self.file_id)
+        (row,), col = self.annoview.get_cursor()
+        matcher = patiencediff.PatienceSequenceMatcher(None, old.readlines(),
+                                                       new.readlines())
+        for i, j, n in matcher.get_matching_blocks():
+            if i + n >= row:
+                return j - i
+
 
 
 class FakeRevision:
