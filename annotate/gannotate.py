@@ -54,9 +54,9 @@ class GAnnotateWindow(gtk.Window):
         self.annotate_colormap = AnnotateColorSaturation()
 
         self._create()
+        self.revisions = {}
 
     def annotate(self, tree, branch, file_id):
-        self.revisions = {}
         self.annotations = []
         self.branch = branch
         self.tree = tree
@@ -145,7 +145,7 @@ class GAnnotateWindow(gtk.Window):
         else:
             revision_id = self.revision_id
         dotted = self._dotted_revnos(repository, revision_id)
-        revision_cache = RevisionCache(repository)
+        revision_cache = RevisionCache(repository, self.revisions)
         for origin, text in tree.annotate_iter(file_id):
             rev_id = origin
             try:
@@ -346,9 +346,12 @@ class FakeRevision:
 
 class RevisionCache(object):
     """A caching revision source"""
-    def __init__(self, real_source):
+    def __init__(self, real_source, seed_cache=None):
         self.__real_source = real_source
-        self.__cache = {}
+        if seed_cache is None:
+            self.__cache = {}
+        else:
+            self.__cache = dict(seed_cache)
 
     def get_revision(self, revision_id):
         if revision_id not in self.__cache:
