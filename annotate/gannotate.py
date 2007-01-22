@@ -21,6 +21,7 @@ pygtk.require("2.0")
 import gobject
 import gtk
 import pango
+import re
 
 from bzrlib import tsort
 from bzrlib.errors import NoSuchRevision
@@ -224,7 +225,18 @@ class GAnnotateWindow(gtk.Window):
         pane.add2(self.logview)
         pane.show()
         vbox.pack_start(pane, expand=True, fill=True)
-        
+
+        self._search = SearchBox()
+        vbox.pack_start(self._search, expand=False, fill=True)
+        accels = gtk.AccelGroup()
+        accels.connect_group(gtk.keysyms.f, gtk.gdk.CONTROL_MASK,
+                             gtk.ACCEL_LOCKED,
+                             self._search_by_text)
+        accels.connect_group(gtk.keysyms.g, gtk.gdk.CONTROL_MASK,
+                             gtk.ACCEL_LOCKED,
+                             self._search_by_line)
+        self.add_accel_group(accels)
+
         hbox = gtk.HBox(True, 6)
         hbox.pack_start(self.span_selector, expand=False, fill=True)
         hbox.pack_start(self._create_button_box(), expand=False, fill=True)
@@ -232,6 +244,14 @@ class GAnnotateWindow(gtk.Window):
         vbox.pack_start(hbox, expand=False, fill=True)
 
         self.add(vbox)
+
+    def _search_by_text(self, accel_group, window, key, modifiers):
+        self._search.show_for('text')
+        self._search.set_target(self.annoview, TEXT_LINE_COL)
+
+    def _search_by_line(self, accel_group, window, key, modifiers):
+        self._search.show_for('line')
+        self._search.set_target(self.annoview, LINE_NUM_COL)
 
     def row_diff(self, tv, path, tvc):
         row = path[0]
@@ -305,8 +325,10 @@ class GAnnotateWindow(gtk.Window):
         col.add_attribute(cell, "text", TEXT_LINE_COL)
         tv.append_column(col)
 
+        # FIXME: Now that C-f is now used for search by text we
+        # may as well disable the auto search.
         tv.set_search_column(LINE_NUM_COL)
-        
+
         return tv
 
     def _create_span_selector(self):
@@ -326,13 +348,13 @@ class GAnnotateWindow(gtk.Window):
         box = gtk.HButtonBox()
         box.set_layout(gtk.BUTTONBOX_END)
         box.show()
-        
+
         button = gtk.Button()
         button.set_use_stock(True)
         button.set_label("gtk-close")
         button.connect("clicked", lambda w: self.destroy())
         button.show()
-        
+
         box.pack_start(button, expand=False, fill=False)
 
         return box
@@ -364,3 +386,139 @@ class RevisionCache(object):
             revision = self.__real_source.get_revision(revision_id)
             self.__cache[revision_id] = revision
         return self.__cache[revision_id]
+
+class SearchBox(gtk.HBox):
+    """A button box for searching in text or lines of annotations"""
+    def __init__(self):
+        gtk.HBox.__init__(self, False, 6)
+
+        # Close button
+        button = gtk.Button()
+        image = gtk.Image()
+        image.set_from_stock('gtk-stop', gtk.ICON_SIZE_BUTTON)
+        button.set_image(image)
+        button.set_relief(gtk.RELIEF_NONE)
+        button.connect("clicked", lambda w: self.hide_all())
+        self.pack_start(button, expand=False, fill=False)
+
+        # Search entry
+        label = gtk.Label()
+        self._label = label
+        self.pack_start(label, expand=False, fill=False)
+
+        entry = gtk.Entry()
+        self._entry = entry
+        entry.connect("activate", lambda w, d: self._do_search(d),
+                      'forward')
+        self.pack_start(entry, expand=False, fill=False)
+
+        # Next/previous buttons
+        button = gtk.Button('_Next')
+        image = gtk.Image()
+        image.set_from_stock('gtk-go-forward', gtk.ICON_SIZE_BUTTON)
+        button.set_image(image)
+        button.connect("clicked", lambda w, d: self._do_search(d),
+                       'forward')
+        self.pack_start(button, expand=False, fill=False)
+
+        button = gtk.Button('_Previous')
+        image = gtk.Image()
+        image.set_from_stock('gtk-go-back', gtk.ICON_SIZE_BUTTON)
+        button.set_image(image)
+        button.connect("clicked", lambda w, d: self._do_search(d),
+                       'backward')
+        self.pack_start(button, expand=False, fill=False)
+
+        # Search options
+        check = gtk.CheckButton('Match case')
+        self._match_case = check
+        self.pack_start(check, expand=False, fill=False)
+
+        check = gtk.CheckButton('Regexp')
+        check.connect("toggled", lambda w: self._set_label())
+        self._regexp = check
+        self.pack_start(check, expand=False, fill=False)
+
+        self._view = None
+        self._column = None
+        # Note that we stay hidden (we do not call self.show_all())
+
+
+    def show_for(self, kind):
+        self._kind = kind
+        self.show_all()
+        self._set_label()
+        # Hide unrelated buttons
+        if kind == 'line':
+            self._match_case.hide()
+            self._regexp.hide()
+        # Be ready
+        self._entry.grab_focus()
+
+    def _set_label(self):
+        if self._kind == 'line':
+            self._label.set_text('Find Line: ')
+        else:
+            if self._regexp.get_active():
+                self._label.set_text('Find Regexp: ')
+            else:
+                self._label.set_text('Find Text: ')
+
+    def set_target(self, view,column):
+        self._view = view
+        self._column = column
+
+    def _match(self, model, iterator, column):
+        matching_case = self._match_case.get_active()
+        string, = model.get(iterator, column)
+        key = self._entry.get_text()
+        if self._regexp.get_active():
+            if matching_case:
+                match = re.compile(key).search(string, 1)
+            else:
+                match = re.compile(key, re.I).search(string, 1)
+        else:
+            if not matching_case:
+                string = string.lower()
+                key = key.lower()
+            match = string.find(key) != -1
+
+        return match
+
+    def _iterate_rows_forward(self, model, start):
+        model_size = len(model)
+        current = start + 1
+        while model_size != 0:
+            if current >= model_size: current =  0
+            yield model.get_iter_from_string('%d' % current)
+            if current == start: raise StopIteration
+            current += 1
+
+    def _iterate_rows_backward(self, model, start):
+        model_size = len(model)
+        current = start - 1
+        while model_size != 0:
+            if current < 0: current = model_size - 1
+            yield model.get_iter_from_string('%d' % current)
+            if current == start: raise StopIteration
+            current -= 1
+
+    def _do_search(self, direction):
+        if direction == 'forward':
+            iterate = self._iterate_rows_forward
+        else:
+            iterate = self._iterate_rows_backward
+
+        model, sel = self._view.get_selection().get_selected()
+        if sel is None:
+            start = 0
+        else:
+            path = model.get_string_from_iter(sel)
+            start = int(path)
+
+        for row in iterate(model, start):
+            if self._match(model, row, self._column):
+                path = model.get_path(row)
+                self._view.set_cursor(path)
+                self._view.scroll_to_cell(path, use_align=True)
+                break
