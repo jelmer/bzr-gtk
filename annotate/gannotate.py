@@ -149,17 +149,16 @@ class GAnnotateWindow(gtk.Window):
         revision_cache = RevisionCache(repository, self.revisions)
         for origin, text in tree.annotate_iter(file_id):
             rev_id = origin
-            try:
-                revision = revision_cache.get_revision(rev_id)
-                revno = dotted.get(rev_id, 'merge')
-                if len(revno) > 15:
-                    revno = 'merge'
-            except NoSuchRevision:
-                committer = "?"
-                if rev_id == CURRENT_REVISION:
-                    revision = current_revision
-                    revno = current_revno
-                else:
+            if rev_id == CURRENT_REVISION:
+                revision = current_revision
+                revno = current_revno
+            else:
+                try:
+                    revision = revision_cache.get_revision(rev_id)
+                    revno = dotted.get(rev_id, 'merge')
+                    if len(revno) > 15:
+                        revno = 'merge'
+                except NoSuchRevision:
                     revision = FakeRevision(rev_id)
                     revno = "?"
 
