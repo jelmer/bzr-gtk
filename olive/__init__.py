@@ -228,9 +228,16 @@ class OliveGtk:
     
     def on_menuitem_branch_commit_activate(self, widget):
         """ Branch/Commit... menu handler. """
-        from commit import CommitDialog
-        commit = CommitDialog(self.wt, self.wtpath, self.notbranch)
-        commit.display()
+        from commit import CommitDialogNew
+        commit = CommitDialogNew(self.wt, self.wtpath, self.notbranch, self.get_selected_right(), self.window)
+        response = commit.run()
+        if response != gtk.RESPONSE_NONE:
+            commit.hide()
+        
+            if response == gtk.RESPONSE_OK:
+                self.refresh_right()
+            
+            commit.destroy()
     
     def on_menuitem_branch_merge_activate(self, widget):
         """ Branch/Merge... menu handler. """
