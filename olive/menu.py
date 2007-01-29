@@ -233,7 +233,9 @@ class OliveMenu:
         try:
             window.set_file(wt.relpath(self.path + os.sep + self.selected))
         except errors.NoSuchFile:
-            pass
+            error_dialog(_("No diff output"),
+                         _("The selected file hasn't changed."))
+            return
         window.show()
     
     def bookmark(self, action):
