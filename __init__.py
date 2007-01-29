@@ -35,6 +35,13 @@ def import_pygtk():
     return pygtk
 
 
+def set_ui_factory():
+    pygtk = import_pygtk()
+    from olive.ui import GtkUIFactory
+    import bzrlib.ui
+    bzrlib.ui.ui_factory = GtkUIFactory()
+
+
 class cmd_gbranch(Command):
     """GTK+ branching.
     
@@ -50,6 +57,7 @@ class cmd_gbranch(Command):
 
         from bzrlib.plugins.gtk.olive.branch import BranchDialog
 
+        set_ui_factory()
         window = BranchDialog('.')
         window.display()
 
@@ -65,6 +73,7 @@ class cmd_gdiff(Command):
 
     @display_command
     def run(self, revision=None, filename=None):
+        set_ui_factory()
         wt = WorkingTree.open_containing(".")[0]
         branch = wt.branch
         if revision is not None:
@@ -119,6 +128,7 @@ class cmd_visualise(Command):
     aliases = [ "visualize", "vis", "viz" ]
 
     def run(self, location=".", revision=None, limit=None):
+        set_ui_factory()
         (branch, path) = Branch.open_containing(location)
         branch.lock_read()
         branch.repository.lock_read()
@@ -166,6 +176,7 @@ class cmd_gannotate(Command):
         except RuntimeError, e:
             if str(e) == "could not open display":
                 raise NoDisplayError
+        set_ui_factory()
 
         try:
             line = int(line)
@@ -229,6 +240,7 @@ class cmd_gcommit(Command):
             if str(e) == "could not open display":
                 raise NoDisplayError
 
+        set_ui_factory()
         from olive.commit import CommitDialog
         from bzrlib.commit import Commit
         from bzrlib.errors import (BzrCommandError,
@@ -263,4 +275,6 @@ class NoDisplayError(BzrCommandError):
     """gtk could not find a proper display"""
 
     def __str__(self):
-        return "No DISPLAY. gannotate is disabled."
+        return "No DISPLAY. Unable to run GTK+ application."
+
+
