@@ -51,7 +51,6 @@ class GAnnotateConfig(configobj.ConfigObj):
                                      configspec=gannotate_configspec)
         self.window = window
         self.pane = window.pane
-        self.span_selector = window.span_selector
         
         self.initial_comment = ["gannotate plugin configuration"]
         self['window']['width'] = 750
@@ -77,24 +76,13 @@ class GAnnotateConfig(configobj.ConfigObj):
         if self["window"]["maximized"]:
             self.window.maximize()
 
-        self.span_selector.max_custom_spans =\
-                self["spans"]["max_custom_spans"]
-
         # XXX Don't know how to set an empty list as default in
         # gannotate_configspec.
-        try:
-            for span in self["spans"]["custom_spans"]:
-                self.span_selector.add_custom_span(span)
-        except KeyError:
-            pass
-
     def _connect_signals(self):
         self.window.connect("destroy", self._write)
         self.window.connect("configure-event", self._save_window_props)
         self.window.connect("window-state-event", self._save_window_props)
         self.pane.connect("notify", self._save_pane_props)
-        self.span_selector.connect("custom-span-added",
-                                   self._save_custom_spans)
 
     def _save_window_props(self, w, e, *args):
         if e.window.get_state() & gtk.gdk.WINDOW_STATE_MAXIMIZED:
