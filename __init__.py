@@ -23,6 +23,8 @@ from bzrlib.branch import Branch
 from bzrlib.workingtree import WorkingTree
 from bzrlib.bzrdir import BzrDir
 
+import os.path
+
 __version__ = '0.13.0'
 
 
@@ -58,8 +60,11 @@ class cmd_gbranch(Command):
         from bzrlib.plugins.gtk.olive.branch import BranchDialog
 
         set_ui_factory()
-        window = BranchDialog('.')
-        window.display()
+        dialog = BranchDialog(os.path.abspath('.'))
+        dialog.window.connect("destroy", lambda w: gtk.main_quit())
+        dialog.display()
+        
+        gtk.main()
 
 register_command(cmd_gbranch)
 
