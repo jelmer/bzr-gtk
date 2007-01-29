@@ -157,6 +157,8 @@ class OliveGtk:
         # Connect the signals to the handlers
         self.toplevel.signal_autoconnect(dic)
         
+        self._just_started = True
+        
         # Apply window size and position
         width = self.pref.get_preference('window_width', 'int')
         height = self.pref.get_preference('window_height', 'int')
@@ -189,6 +191,8 @@ class OliveGtk:
 
         self.set_path(os.getcwd())
         self._load_right()
+        
+        self._just_started = False
 
     def set_path(self, path):
         self.path = path
@@ -878,8 +882,11 @@ class OliveGtk:
         drives = self._harddisks()
         for drive in drives:
             self.combobox_drive.append_text(drive)
+        self.combobox_drive.set_active(drives.index(os.getcwd()[0:2]))
     
     def _refresh_drives(self, combobox):
+        if self._just_started:
+            return
         model = combobox.get_model()
         active = combobox.get_active()
         if active >= 0:
