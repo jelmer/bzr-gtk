@@ -54,6 +54,7 @@ class OliveRemove:
         """ Display the Remove file(s) dialog. """
         self.window.show_all()
         
+    @show_bzr_error
     def remove(self, widget):
         radio_selected = self.glade.get_widget('radiobutton_remove_selected')
         radio_new = self.glade.get_widget('radiobutton_remove_new')
@@ -69,16 +70,7 @@ class OliveRemove:
             
             fullpath = self.wt.abspath(os.path.join(self.wtpath, filename))
             
-            try:
-                self.wt.remove(fullpath)
-            except errors.NotBranchError:
-                error_dialog(_('Directory is not a branch'),
-                             _('You can perform this action only in a branch.'))
-                return
-            except errors.NotVersionedError:
-                error_dialog(_('File not versioned'),
-                             _('The selected file is not versioned.'))
-                return
+            self.wt.remove(fullpath)
         elif radio_new.get_active():
             # Remove added files recursively
             added = self.wt.changes_from(self.wt.basis_tree()).added
@@ -126,6 +118,7 @@ class OliveRemoveDialog(gtk.Dialog):
         self.vbox.set_spacing(3)
         self.vbox.show_all()
         
+    @show_bzr_error
     def _on_remove_clicked(self, button):
         """ Remove button clicked handler. """
         if self._radio_selected.get_active():
@@ -137,16 +130,7 @@ class OliveRemoveDialog(gtk.Dialog):
                              _('Please select a file from the list,\nor choose the other option.'))
                 return
             
-            try:
-                self.wt.remove(os.path.join(self.wtpath, filename))
-            except errors.NotBranchError:
-                error_dialog(_('Directory is not a branch'),
-                             _('You can perform this action only in a branch.'))
-                return
-            except errors.NotVersionedError:
-                error_dialog(_('File not versioned'),
-                             _('The selected file is not versioned.'))
-                return
+            self.wt.remove(os.path.join(self.wtpath, filename))
         elif self._radio_added.get_active():
             # Remove added files recursively
             added = self.wt.changes_from(self.wt.basis_tree()).added

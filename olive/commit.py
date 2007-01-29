@@ -29,6 +29,7 @@ import bzrlib.errors as errors
 from bzrlib import osutils
 
 from dialog import error_dialog, question_dialog
+from errors import show_bzr_error
 from guifiles import GLADEFILENAME
 
 
@@ -465,6 +466,7 @@ class CommitDialogNew(gtk.Dialog):
                 pass
             diff.show()
     
+    @show_bzr_error
     def _on_commit_clicked(self, button):
         """ Commit button clicked handler. """
         textbuffer = self._textview_message.get_buffer()
@@ -491,54 +493,19 @@ class CommitDialogNew(gtk.Dialog):
         
         try:
             self.wt.commit(message,
-                           allow_pointless=False,
-                           strict=self._check_strict.get_active(),
-                           local=local,
-                           specific_files=specific_files)
-        except errors.NotBranchError:
-            error_dialog(_('Directory is not a branch'),
-                         _('You can perform this action only in a branch.'))
-            return
-        except errors.LocalRequiresBoundBranch:
-            error_dialog(_('Directory is not a checkout'),
-                         _('You can perform local commit only on checkouts.'))
-            return
-        except errors.ConflictsInTree:
-            error_dialog(_('Conflicts in tree'),
-                         _('You need to resolve the conflicts before committing.'))
-            return
-        except errors.StrictCommitFailed:
-            error_dialog(_('Strict commit failed'),
-                         _('There are unknown files in the working tree.\nPlease add or delete them.'))
-            return
-        except errors.BoundBranchOutOfDate, errmsg:
-            error_dialog(_('Bound branch is out of date'),
-                         _('%s') % errmsg)
-            return
+                       allow_pointless=False,
+                       strict=self._check_strict.get_active(),
+                       local=local,
+                       specific_files=specific_files)
         except errors.PointlessCommit:
             response = question_dialog(_('Commit with no changes?'),
                                        _('There are no changes in the working tree.'))
             if response == gtk.RESPONSE_YES:
-                # Try to commit again
-                try:
-                    self.wt.commit(message,
-                                   allow_pointless=True,
-                                   strict=self._check_strict.get_active(),
-                                   local=local,
-                                   specific_files=specific_files)
-                except errors.BzrError, msg:
-                    error_dialog(_('Unknown bzr error'), str(msg))
-                    return
-                except Exception, msg:
-                    error_dialog(_('Unknown error'), str(msg))
-                    return
-        except errors.BzrError, msg:
-            error_dialog(_('Unknown bzr error'), str(msg))
-            return
-        except Exception, msg:
-            error_dialog(_('Unknown error'), str(msg))
-            return
-        
+                self.wt.commit(message,
+                               allow_pointless=True,
+                               strict=self._check_strict.get_active(),
+                               local=local,
+                               specific_files=specific_files)
         self.response(gtk.RESPONSE_OK)
 
     def _pending_merges(self, wt):

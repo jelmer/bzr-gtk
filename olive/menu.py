@@ -29,6 +29,7 @@ import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
 from dialog import error_dialog, info_dialog, warning_dialog
+from errors import show_bzr_error
 from launch import launch
 from olive import OlivePreferences, DiffWindow
 
@@ -130,6 +131,7 @@ class OliveMenu:
     def left_context_menu(self):
         return self.cmenu_left
     
+    @show_bzr_error
     def add_file(self, action):
         """ Right context menu -> Add """
         import bzrlib.add
@@ -143,13 +145,9 @@ class OliveMenu:
                          _('Please select a file from the list,\nor choose the other option.'))
             return
         
-        try:
-            bzrlib.add.smart_add([os.path.join(directory, filename)])
-        except errors.NotBranchError:
-            error_dialog(_('Directory is not a branch'),
-                         _('You can perform this action only in a branch.'))
-            return
+        bzrlib.add.smart_add([os.path.join(directory, filename)])
     
+    @show_bzr_error
     def remove_file(self, action):
         """ Right context menu -> Remove """
         # Remove only the selected file
@@ -161,19 +159,8 @@ class OliveMenu:
                          _('Please select a file from the list,\nor choose the other option.'))
             return
         
-        try:
-            wt, path = WorkingTree.open_containing(os.path.join(directory, filename))
-            wt.remove(path)
-
-        except errors.NotBranchError:
-            error_dialog(_('Directory is not a branch'),
-                         _('You can perform this action only in a branch.'))
-            return
-        except errors.NotVersionedError:
-            error_dialog(_('File not versioned'),
-                         _('The selected file is not versioned.'))
-            return
-
+        wt, path = WorkingTree.open_containing(os.path.join(directory, filename))
+        wt.remove(path)
         self.app.set_path(self.path)
         self.app.refresh_right()
 
@@ -218,24 +205,14 @@ class OliveMenu:
         commit = CommitDialog(wt, path, not branch)
         commit.display()
     
+    @show_bzr_error
     def diff(self, action):
         """ Right context menu -> Diff """
-        try:
-            wt = WorkingTree.open_containing(self.path)[0]
-        except errors.NotBranchError:
-            error_dialog(_('File is not in a branch'),
-                         _('The selected file is not in a branch.'))
-            return
-        
+        wt = WorkingTree.open_containing(self.path)[0]
         window = DiffWindow()
         parent_tree = wt.branch.repository.revision_tree(wt.branch.last_revision())
         window.set_diff(wt.branch.nick, wt, parent_tree)
-        try:
-            window.set_file(wt.relpath(self.path + os.sep + self.selected))
-        except errors.NoSuchFile:
-            error_dialog(_("No diff output"),
-                         _("The selected file hasn't changed."))
-            return
+        window.set_file(wt.relpath(self.path + os.sep + self.selected))
         window.show()
     
     def bookmark(self, action):

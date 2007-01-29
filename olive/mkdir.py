@@ -53,6 +53,7 @@ class OliveMkdir:
         """ Display the Make directory dialog. """
         self.window.show_all()
 
+    @show_bzr_error
     def mkdir(self, widget):
         # Get the widgets
         entry = self.glade.get_widget('entry_mkdir')
@@ -77,9 +78,6 @@ class OliveMkdir:
                                  _('Please specify another name to continue.'))
                 else:
                     raise
-            except errors.NotBranchError:
-                warning_dialog(_('Directory is not in a branch'),
-                               _('You can only create a non-versioned directory.'))
         else:
             # Just a simple directory
             try:

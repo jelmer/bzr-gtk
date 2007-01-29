@@ -102,14 +102,11 @@ class OlivePush:
         if self.radio_stored.get_active():
             try:
                 revs = do_push(self.branch,
-                               overwrite=self.check_overwrite.get_active())
-            except errors.NotBranchError:
-                error_dialog(_('Directory is not a branch'),
-                             _('You can perform this action only in a branch.'))
-                return
             except errors.DivergedBranches:
-                error_dialog(_('Branches have been diverged'),
-                             _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
+                response = question_dialog(_('Branches have been diverged'),
+                             _('You cannot push if branches have diverged. \nOverwrite?'))
+                if response == gtk.RESPONSE_OK:
+                    revs = do_push(self.branch, overwrite=True)
                 return
         elif self.radio_specific.get_active():
             location = self.entry_location.get_text()
@@ -121,16 +118,18 @@ class OlivePush:
             try:
                 revs = do_push(self.branch, location,
                                self.check_remember.get_active(),
-                               self.check_overwrite.get_active(),
+                               False,
                                self.check_create.get_active())
-            except errors.NotBranchError:
-                error_dialog(_('Directory is not a branch'),
-                             _('You can perform this action only in a branch.'))
-                return
             except errors.DivergedBranches:
-                error_dialog(_('Branches have been diverged'),
-                             _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
-                return
+                response = question_dialog(_('Branches have been diverged'),
+                             _('You cannot push if branches have diverged. \nOverwrite?'))
+                if response == gtk.RESPONSE_OK:
+                    revs = do_push(self.branch, location,
+                        self.check_remember.get_active(),
+                            True,
+                            self.check_create.get_active())
+                else:
+                    return
         
         self.close()
         info_dialog(_('Push successful'),

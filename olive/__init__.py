@@ -35,10 +35,8 @@ from bzrlib.branch import Branch
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
-# Olive GTK UI version
-__version__ = '0.14.0'
-
 from dialog import error_dialog, info_dialog
+from errors import show_bzr_error
 from guifiles import GLADEFILENAME
 
 # import this classes only once
@@ -278,6 +276,7 @@ class OliveGtk:
             info_dialog(_('Local branch up to date'),
                         _('There are no missing revisions.'))
 
+    @show_bzr_error
     def on_menuitem_branch_pull_activate(self, widget):
         """ Branch/Pull menu handler. """
         branch_to = self.wt.branch
@@ -288,11 +287,7 @@ class OliveGtk:
                                      _('Pulling is not possible until there is a parent location.'))
             return
 
-        try:
-            branch_from = Branch.open(location)
-        except errors.NotBranchError:
-            error_dialog(_('Directory is not a branch'),
-                                     _('You can perform this action only in a branch.'))
+        branch_from = Branch.open(location)
 
         if branch_to.get_parent() is None:
             branch_to.set_parent(branch_from.base)
@@ -318,37 +313,30 @@ class OliveGtk:
         status = OliveStatus(self.wt, self.wtpath)
         status.display()
     
+    @show_bzr_error
     def on_menuitem_branch_initialize_activate(self, widget):
         """ Initialize current directory. """
         import bzrlib.bzrdir as bzrdir
         
+        if not os.path.exists(self.path):
+            os.mkdir(self.path)
+ 
         try:
-            if not os.path.exists(self.path):
-                os.mkdir(self.path)
-     
-            try:
-                existing_bzrdir = bzrdir.BzrDir.open(self.path)
-            except errors.NotBranchError:
-                bzrdir.BzrDir.create_branch_convenience(self.path)
-            else:
-                if existing_bzrdir.has_branch():
-                    if existing_bzrdir.has_workingtree():
-                        raise errors.AlreadyBranchError(self.path)
-                    else:
-                        raise errors.BranchExistsWithoutWorkingTree(self.path)
-                else:
-                    existing_bzrdir.create_branch()
-                    existing_bzrdir.create_workingtree()
-        except errors.AlreadyBranchError, errmsg:
-            error_dialog(_('Directory is already a branch'),
-                         _('The current directory (%s) is already a branch.\nYou can start using it, or initialize another directory.') % errmsg)
-        except errors.BranchExistsWithoutWorkingTree, errmsg:
-            error_dialog(_('Branch without a working tree'),
-                         _('The current directory (%s)\nis a branch without a working tree.') % errmsg)
+            existing_bzrdir = bzrdir.BzrDir.open(self.path)
+        except errors.NotBranchError:
+            bzrdir.BzrDir.create_branch_convenience(self.path)
         else:
-            info_dialog(_('Initialize successful'),
-                        _('Directory successfully initialized.'))
-            self.refresh_right()
+            if existing_bzrdir.has_branch():
+                if existing_bzrdir.has_workingtree():
+                    raise errors.AlreadyBranchError(self.path)
+                else:
+                    raise errors.BranchExistsWithoutWorkingTree(self.path)
+            else:
+                existing_bzrdir.create_branch()
+                existing_bzrdir.create_workingtree()
+        info_dialog(_('Initialize successful'),
+                    _('Directory successfully initialized.'))
+        self.refresh_right()
         
     def on_menuitem_file_annotate_activate(self, widget):
         """ File/Annotate... menu handler. """
@@ -796,8 +784,6 @@ class OliveGtk:
             tree1 = WorkingTree.open_containing(path)[0]
         except (errors.NotBranchError, errors.NoWorkingTree):
             notbranch = True
-        except errors.PermissionDenied:
-            print "DEBUG: permission denied."
         
         if not notbranch:
             branch = tree1.branch
