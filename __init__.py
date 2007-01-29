@@ -269,10 +269,9 @@ class cmd_gcommit(Command):
             except NotBranchError, e:
                 path = e.path
 
-        dialog = CommitDialog(wt, path, not branch)
-        if dialog.display():
-            dialog.window.connect("destroy", lambda w: gtk.main_quit())
-            gtk.main()
+
+        commit = CommitDialog(wt, path, not branch)
+        commit.run()
 
 register_command(cmd_gcommit)
 
