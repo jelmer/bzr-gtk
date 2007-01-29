@@ -30,6 +30,7 @@ import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
 from dialog import error_dialog
+from errors import show_bzr_error
 from guifiles import GLADEFILENAME
 
 
@@ -68,6 +69,7 @@ class OliveMove:
         """ Display the Move dialog. """
         self.window.show_all()
 
+    @show_bzr_error
     def move(self, widget):
         destination = self.filechooser.get_filename()
 
@@ -81,20 +83,14 @@ class OliveMove:
         source = os.path.join(self.wtpath, filename)
         
         # Move the file to a directory
-        try:
-            wt1, path1 = WorkingTree.open_containing(self.wt.abspath(source))
-            wt2, path2 = WorkingTree.open_containing(destination)
-            if wt1.basedir != wt2.basedir:
-                error_dialog(_('Not the same branch'),
-                             _('The destination is not in the same branch.'))
-                return
-
-            wt1.move([source], wt1.relpath(destination))
-        except errors.NotBranchError:
-            error_dialog(_('File is not in a branch'),
-                         _('The selected file is not in a branch.'))
+        wt1, path1 = WorkingTree.open_containing(self.wt.abspath(source))
+        wt2, path2 = WorkingTree.open_containing(destination)
+        if wt1.basedir != wt2.basedir:
+            error_dialog(_('Not the same branch'),
+                         _('The destination is not in the same branch.'))
             return
 
+        wt1.move([source], wt1.relpath(destination))
         self.close()
     
     def close(self, widget=None):

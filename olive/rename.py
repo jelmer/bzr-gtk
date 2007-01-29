@@ -59,6 +59,7 @@ class OliveRename:
         
         self.window.show_all()
 
+    @show_bzr_error
     def rename(self, widget):
         # Get entry
         old_filename = self.selected
@@ -78,22 +79,14 @@ class OliveRename:
         destination = os.path.join(self.wtpath, new_filename)
         
         # Rename the file
-        try:
-            wt1, path1 = WorkingTree.open_containing(self.wt.abspath(source))
-            wt2, path2 = WorkingTree.open_containing(self.wt.abspath(source))
+        wt1, path1 = WorkingTree.open_containing(self.wt.abspath(source))
+        wt2, path2 = WorkingTree.open_containing(self.wt.abspath(source))
 
-            if wt1.basedir != wt2.basedir:
-                error_dialog(_('Not the same branch'),
-                             _('The destination is not in the same branch.'))
-                return
-            wt1.rename_one(source, destination)
-        except errors.NotBranchError:
-            error_dialog(_('File is not in a branch'),
-                         _('The selected file is not in a branch.'))
+        if wt1.basedir != wt2.basedir:
+            error_dialog(_('Not the same branch'),
+                         _('The destination is not in the same branch.'))
             return
-        except errors.BzrError, msg:
-            error_dialog(_('Unknown bzr error'), str(msg))
-
+        wt1.rename_one(source, destination)
         self.close()
     
     def close(self, widget=None):

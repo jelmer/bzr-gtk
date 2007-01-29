@@ -29,6 +29,7 @@ from bzrlib.branch import Branch
 import bzrlib.errors as errors
 
 from dialog import error_dialog, info_dialog, warning_dialog
+from errors import show_bzr_error
 from guifiles import GLADEFILENAME
 
 
@@ -58,6 +59,7 @@ class MergeDialog:
         """ Display the Add file(s) dialog. """
         self.window.show_all()
 
+    @show_bzr_error
     def merge(self, widget):
         branch = self.entry.get_text()
         if branch == "":
@@ -65,13 +67,8 @@ class MergeDialog:
                          _('Please specify a branch to merge from.'))
             return
 
-        try:
-            other_branch = Branch.open_containing(branch)[0]
-        except errors.NotBranchError:
-            error_dialog(_('Specified location not a branch'),
-                         _('Please specify a branch you want to merge from.'))
-            return
-        
+        other_branch = Branch.open_containing(branch)[0]
+
         try:
             conflicts = self.wt.merge_from_branch(other_branch)
         except errors.BzrCommandError, errmsg:
