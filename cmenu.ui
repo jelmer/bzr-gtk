@@ -5,6 +5,7 @@
         <menuitem name="rename" action="rename" />
         <menuitem name="open" action="open" />
         <separator />
+        <menuitem name="revert" action="revert" />
         <menuitem name="commit" action="commit" />
         <separator />
         <menuitem name="diff" action="diff" />

@@ -32,10 +32,10 @@ import gtk.gdk
 import gtk.glade
 
 from bzrlib.branch import Branch
-import bzrlib.errors as errors
+import bzrlib.errors as bzrerrors
 from bzrlib.workingtree import WorkingTree
 
-from dialog import error_dialog, info_dialog
+from dialog import error_dialog, info_dialog, warning_dialog
 from errors import show_bzr_error
 from guifiles import GLADEFILENAME
 
@@ -94,6 +94,7 @@ class OliveGtk:
         self.menuitem_branch_checkout = self.toplevel.get_widget('menuitem_branch_checkout')
         self.menuitem_branch_pull = self.toplevel.get_widget('menuitem_branch_pull')
         self.menuitem_branch_push = self.toplevel.get_widget('menuitem_branch_push')
+        self.menuitem_branch_revert = self.toplevel.get_widget('menuitem_branch_revert')
         self.menuitem_branch_merge = self.toplevel.get_widget('menuitem_branch_merge')
         self.menuitem_branch_commit = self.toplevel.get_widget('menuitem_branch_commit')
         self.menuitem_branch_status = self.toplevel.get_widget('menuitem_branch_status')
@@ -131,6 +132,7 @@ class OliveGtk:
                 "on_menuitem_branch_initialize_activate": self.on_menuitem_branch_initialize_activate,
                 "on_menuitem_branch_get_activate": self.on_menuitem_branch_get_activate,
                 "on_menuitem_branch_checkout_activate": self.on_menuitem_branch_checkout_activate,
+                "on_menuitem_branch_revert_activate": self.on_menuitem_branch_revert_activate,
                 "on_menuitem_branch_merge_activate": self.on_menuitem_branch_merge_activate,
                 "on_menuitem_branch_commit_activate": self.on_menuitem_branch_commit_activate,
                 "on_menuitem_branch_push_activate": self.on_menuitem_branch_push_activate,
@@ -198,7 +200,7 @@ class OliveGtk:
         
         try:
             self.wt, self.wtpath = WorkingTree.open_containing(self.path)
-        except (errors.NotBranchError, errors.NoWorkingTree):
+        except (bzrerrors.NotBranchError, bzrerrors.NoWorkingTree):
             self.notbranch = True
         
         self.statusbar.push(self.context_id, path)
@@ -307,6 +309,18 @@ class OliveGtk:
         push = OlivePush(self.wt.branch)
         push.display()
     
+    @show_bzr_error
+    def on_menuitem_branch_revert_activate(self, widget):
+        """ Branch/Revert all changes menu handler. """
+        ret = self.wt.revert([])
+        if ret:
+            warning_dialog(_('Conflicts detected'),
+                           _('Please have a look at the working tree before continuing.'))
+        else:
+            info_dialog(_('Revert successful'),
+                        _('All files reverted to last revision.'))
+        self.refresh_right()
+    
     def on_menuitem_branch_status_activate(self, widget):
         """ Branch/Status... menu handler. """
         from status import OliveStatus
@@ -323,14 +337,14 @@ class OliveGtk:
  
         try:
             existing_bzrdir = bzrdir.BzrDir.open(self.path)
-        except errors.NotBranchError:
+        except bzrerrors.NotBranchError:
             bzrdir.BzrDir.create_branch_convenience(self.path)
         else:
             if existing_bzrdir.has_branch():
                 if existing_bzrdir.has_workingtree():
-                    raise errors.AlreadyBranchError(self.path)
+                    raise bzrerrors.AlreadyBranchError(self.path)
                 else:
-                    raise errors.BranchExistsWithoutWorkingTree(self.path)
+                    raise bzrerrors.BranchExistsWithoutWorkingTree(self.path)
             else:
                 existing_bzrdir.create_branch()
                 existing_bzrdir.create_workingtree()
@@ -464,6 +478,7 @@ class OliveGtk:
             m_add = menu.ui.get_widget('/context_right/add')
             m_remove = menu.ui.get_widget('/context_right/remove')
             m_rename = menu.ui.get_widget('/context_right/rename')
+            m_revert = menu.ui.get_widget('/context_right/revert')
             m_commit = menu.ui.get_widget('/context_right/commit')
             m_diff = menu.ui.get_widget('/context_right/diff')
             # check if we're in a branch
@@ -473,12 +488,14 @@ class OliveGtk:
                 m_add.set_sensitive(True)
                 m_remove.set_sensitive(True)
                 m_rename.set_sensitive(True)
+                m_revert.set_sensitive(True)
                 m_commit.set_sensitive(True)
                 m_diff.set_sensitive(True)
-            except errors.NotBranchError:
+            except bzrerrors.NotBranchError:
                 m_add.set_sensitive(False)
                 m_remove.set_sensitive(False)
                 m_rename.set_sensitive(False)
+                m_revert.set_sensitive(False)
                 m_commit.set_sensitive(False)
                 m_diff.set_sensitive(False)
 
@@ -700,6 +717,7 @@ class OliveGtk:
         self.menuitem_branch_checkout.set_sensitive(self.notbranch)
         self.menuitem_branch_pull.set_sensitive(not self.notbranch)
         self.menuitem_branch_push.set_sensitive(not self.notbranch)
+        self.menuitem_branch_revert.set_sensitive(not self.notbranch)
         self.menuitem_branch_merge.set_sensitive(not self.notbranch)
         self.menuitem_branch_commit.set_sensitive(not self.notbranch)
         self.menuitem_branch_status.set_sensitive(not self.notbranch)
@@ -782,7 +800,7 @@ class OliveGtk:
         notbranch = False
         try:
             tree1 = WorkingTree.open_containing(path)[0]
-        except (errors.NotBranchError, errors.NoWorkingTree):
+        except (bzrerrors.NotBranchError, bzrerrors.NoWorkingTree):
             notbranch = True
         
         if not notbranch:

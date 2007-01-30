@@ -25,6 +25,8 @@ import gtk.glade
 import gobject
 import pango
 
+import os.path
+
 import bzrlib.errors as errors
 from bzrlib import osutils
 
@@ -301,11 +303,23 @@ class CommitDialog(gtk.Dialog):
 
         for path, id, kind in self.delta.added:
             marker = osutils.kind_marker(kind)
-            self._file_store.append([ True, path+marker, _('added'), path ])
+            if self.selected is not None:
+                if path == os.path.join(self.wtpath, self.selected):
+                    self._file_store.append([ True, path+marker, _('added'), path ])
+                else:
+                    self._file_store.append([ False, path+marker, _('added'), path ])
+            else:
+                self._file_store.append([ True, path+marker, _('added'), path ])
 
         for path, id, kind in self.delta.removed:
             marker = osutils.kind_marker(kind)
-            self._file_store.append([ True, path+marker, _('removed'), path ])
+            if self.selected is not None:
+                if path == os.path.join(self.wtpath, self.selected):
+                    self._file_store.append([ True, path+marker, _('removed'), path ])
+                else:
+                    self._file_store.append([ False, path+marker, _('removed'), path ])
+            else:
+                self._file_store.append([ True, path+marker, _('removed'), path ])
 
         for oldpath, newpath, id, kind, text_modified, meta_modified in self.delta.renamed:
             marker = osutils.kind_marker(kind)
@@ -313,15 +327,35 @@ class CommitDialog(gtk.Dialog):
                 changes = _('renamed and modified')
             else:
                 changes = _('renamed')
-            self._file_store.append([ True,
-                                      oldpath+marker + '  =>  ' + newpath+marker,
-                                      changes,
-                                      newpath
-                                    ])
+            if self.selected is not None:
+                if newpath == os.path.join(self.wtpath, self.selected):
+                    self._file_store.append([ True,
+                                              oldpath+marker + '  =>  ' + newpath+marker,
+                                              changes,
+                                              newpath
+                                            ])
+                else:
+                    self._file_store.append([ False,
+                                              oldpath+marker + '  =>  ' + newpath+marker,
+                                              changes,
+                                              newpath
+                                            ])
+            else:
+                self._file_store.append([ True,
+                                          oldpath+marker + '  =>  ' + newpath+marker,
+                                          changes,
+                                          newpath
+                                        ])
 
         for path, id, kind, text_modified, meta_modified in self.delta.modified:
             marker = osutils.kind_marker(kind)
-            self._file_store.append([ True, path+marker, _('modified'), path ])
+            if self.selected is not None:
+                if path == os.path.join(self.wtpath, self.selected):
+                    self._file_store.append([ True, path+marker, _('modified'), path ])
+                else:
+                    self._file_store.append([ False, path+marker, _('modified'), path ])
+            else:
+                self._file_store.append([ True, path+marker, _('modified'), path ])
     
     def _create_pending_merges(self):
         if not self.pending:
