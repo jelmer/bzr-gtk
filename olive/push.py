@@ -102,6 +102,7 @@ class OlivePush:
         if self.radio_stored.get_active():
             try:
                 revs = do_push(self.branch,
+                               overwrite=self.check_overwrite.get_active())
             except errors.DivergedBranches:
                 response = question_dialog(_('Branches have been diverged'),
                              _('You cannot push if branches have diverged. \nOverwrite?'))
