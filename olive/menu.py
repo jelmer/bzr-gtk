@@ -69,6 +69,10 @@ class OliveMenu:
                                        _('Open'), None,
                                        _('Open the selected file'),
                                        self.open_file),
+                                      ('revert', None,
+                                       _('Revert'), None,
+                                       _('Revert the changes'),
+                                       self.revert),
                                       ('commit', None,
                                        _('Commit'), None,
                                        _('Commit the changes'),
@@ -193,6 +197,18 @@ class OliveMenu:
             else:
                 launch(fullpath) 
 
+    def revert(self, action):
+        """ Right context menu -> Revert """
+        wt, path = WorkingTree.open_containing(self.path)
+        ret = wt.revert([os.path.join(path, self.selected)])
+        if ret:
+            warning_dialog(_('Conflicts detected'),
+                           _('Please have a look at the working tree before continuing.'))
+        else:
+            info_dialog(_('Revert successful'),
+                        _('All files reverted to last revision.'))
+        self.app.refresh_right()       
+    
     def commit(self, action):
         """ Right context menu -> Commit """
         from commit import CommitDialog

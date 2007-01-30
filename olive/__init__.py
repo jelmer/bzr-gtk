@@ -478,6 +478,7 @@ class OliveGtk:
             m_add = menu.ui.get_widget('/context_right/add')
             m_remove = menu.ui.get_widget('/context_right/remove')
             m_rename = menu.ui.get_widget('/context_right/rename')
+            m_revert = menu.ui.get_widget('/context_right/revert')
             m_commit = menu.ui.get_widget('/context_right/commit')
             m_diff = menu.ui.get_widget('/context_right/diff')
             # check if we're in a branch
@@ -487,12 +488,14 @@ class OliveGtk:
                 m_add.set_sensitive(True)
                 m_remove.set_sensitive(True)
                 m_rename.set_sensitive(True)
+                m_revert.set_sensitive(True)
                 m_commit.set_sensitive(True)
                 m_diff.set_sensitive(True)
             except bzrerrors.NotBranchError:
                 m_add.set_sensitive(False)
                 m_remove.set_sensitive(False)
                 m_rename.set_sensitive(False)
+                m_revert.set_sensitive(False)
                 m_commit.set_sensitive(False)
                 m_diff.set_sensitive(False)
 
