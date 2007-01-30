@@ -202,8 +202,16 @@ class OliveMenu:
             branch = wt.branch
         except NotBranchError, e:
             path = e.path
-        commit = CommitDialog(wt, path, not branch)
-        commit.display()
+        
+        commit = CommitDialog(wt, path, not branch, self.selected)
+        response = commit.run()
+        if response != gtk.RESPONSE_NONE:
+            commit.hide()
+        
+            if response == gtk.RESPONSE_OK:
+                self.app.refresh_right()
+            
+            commit.destroy()
     
     @show_bzr_error
     def diff(self, action):
