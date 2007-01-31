@@ -96,10 +96,7 @@ class cmd_gbranch(Command):
 
         set_ui_factory()
         dialog = BranchDialog(os.path.abspath('.'))
-        dialog.window.connect("destroy", lambda w: gtk.main_quit())
-        dialog.display()
-        
-        gtk.main()
+        dialog.run()
 
 register_command(cmd_gbranch)
 

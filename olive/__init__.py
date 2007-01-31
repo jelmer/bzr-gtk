@@ -221,8 +221,15 @@ class OliveGtk:
     def on_menuitem_branch_get_activate(self, widget):
         """ Branch/Get... menu handler. """
         from branch import BranchDialog
-        branch = BranchDialog(self.get_path())
-        branch.display()
+        branch = BranchDialog(self.get_path(), self.window)
+        response = branch.run()
+        if response != gtk.RESPONSE_NONE:
+            branch.hide()
+        
+            if response == gtk.RESPONSE_OK:
+                self.refresh_right()
+            
+            branch.destroy()
     
     def on_menuitem_branch_checkout_activate(self, widget):
         """ Branch/Checkout... menu handler. """

@@ -26,96 +26,209 @@ import gtk
 import gtk.glade
 
 from bzrlib.branch import Branch
+from bzrlib.config import GlobalConfig
 import bzrlib.errors as errors
 
 from dialog import error_dialog, info_dialog
-from guifiles import GLADEFILENAME
 
 
-class BranchDialog:
-    """ Display branch dialog and perform the needed operations. """
-    def __init__(self, path=None):
+class BranchDialog(gtk.Dialog):
+    """ New implementation of the Branch dialog. """
+    def __init__(self, path=None, parent=None):
         """ Initialize the Branch dialog. """
-        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_branch', 'olive-gtk')
-
-        self.window = self.glade.get_widget('window_branch')
+        gtk.Dialog.__init__(self, title="Branch - Olive",
+                                  parent=parent,
+                                  flags=0,
+                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         
-        # Dictionary for signal_autoconnect
-        dic = { "on_button_branch_branch_clicked": self.branch,
-                "on_button_branch_cancel_clicked": self.close }
+        # Get arguments
+        self.path = path
         
-        # Connect the signals to the handlers
-        self.glade.signal_autoconnect(dic)
+        # Create the widgets
+        self._button_branch = gtk.Button(_("_Branch"), use_underline=True)
+        self._button_revision = gtk.Button('')
+        self._image_browse = gtk.Image()
+        self._filechooser = gtk.FileChooserButton(_("Please select a folder"))
+        self._combo = gtk.ComboBoxEntry()
+        self._label_location = gtk.Label(_("Branch location:"))
+        self._label_destination = gtk.Label(_("Destination:"))
+        self._label_revision = gtk.Label(_("Revision:"))
+        self._hbox_revision = gtk.HBox()
+        self._entry_revision = gtk.Entry()
         
-        # Save FileChooser state
-        self.filechooser = self.glade.get_widget('filechooserbutton_branch')
-        if path is not None:
-            self.filechooser.set_filename(path)
-
-    def display(self):
-        """ Display the Branch dialog. """
-        self.window.show_all()
+        # Set callbacks
+        self._button_branch.connect('clicked', self._on_branch_clicked)
+        self._button_revision.connect('clicked', self._on_revision_clicked)
+        self._combo.connect('changed', self._on_combo_changed)
+        
+        # Create the table and pack the widgets into it
+        self._table = gtk.Table(rows=3, columns=2)
+        self._table.attach(self._label_location, 0, 1, 0, 1)
+        self._table.attach(self._label_destination, 0, 1, 1, 2)
+        self._table.attach(self._label_revision, 0, 1, 2, 3)
+        self._table.attach(self._combo, 1, 2, 0, 1)
+        self._table.attach(self._filechooser, 1, 2, 1, 2)
+        self._table.attach(self._hbox_revision, 1, 2, 2, 3)
+        
+        # Set properties
+        self._image_browse.set_from_stock(gtk.STOCK_OPEN, gtk.ICON_SIZE_BUTTON)
+        self._button_revision.set_image(self._image_browse)
+        self._button_revision.set_sensitive(False)
+        self._filechooser.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
+        self._label_location.set_alignment(0, 0.5)
+        self._label_destination.set_alignment(0, 0.5)
+        self._label_revision.set_alignment(0, 0.5)
+        self._table.set_row_spacings(3)
+        self._table.set_col_spacings(3)
+        self.vbox.set_spacing(3)
+        if self.path is not None:
+            self._filechooser.set_filename(self.path)
+        
+        # Pack some widgets
+        self._hbox_revision.pack_start(self._entry_revision, True, True)
+        self._hbox_revision.pack_start(self._button_revision, False, False)
+        self.vbox.add(self._table)
+        self.action_area.pack_end(self._button_branch)
+        
+        # Show the dialog
+        self.vbox.show_all()
+        
+        # Build branch history
+        self._build_history()
     
-    def branch(self, widget):
-        entry_location = self.glade.get_widget('entry_branch_location')
-        location = entry_location.get_text()
+    def _build_history(self):
+        """ Build up the branch history. """
+        config = GlobalConfig()
+        history = config.get_user_option('gbranch_history')
+        if history is not None:
+            self._combo_model = gtk.ListStore(str)
+            for item in history.split('|'):
+                self._combo_model.append([ item ])
+            self._combo.set_model(self._combo_model)
+            self._combo.set_text_column(0)
+    
+    def _add_to_history(self, location):
+        """ Add specified location to the history (if not yet added). """
+        config = GlobalConfig()
+        history = config.get_user_option('gbranch_history')
+        if history is None:
+            config.set_user_option('gbranch_history', location)
+        else:
+            h = history.split('|')
+            if location not in h:
+                h.append(location)
+            config.set_user_option('gbranch_history', '|'.join(h))                
+    
+    def _get_last_revno(self):
+        """ Get the revno of the last revision (if any). """
+        location = self._combo.get_child().get_text()
+        try:
+            br = Branch.open(location)
+        except:
+            return None
+        else:
+            return br.revno()
+    
+    def _on_revision_clicked(self, button):
+        """ Browse for revision button clicked handler. """
+        from revbrowser import RevisionBrowser
+        
+        location = self._combo.get_child().get_text()
+        try:
+            br = Branch.open(location)
+        except:
+            return
+        else:
+            revb = RevisionBrowser(br, self)
+            response = revb.run()
+            if response != gtk.RESPONSE_NONE:
+                revb.hide()
+        
+                if response == gtk.RESPONSE_OK:
+                    if revb.selected_revno is not None:
+                        self._entry_revision.set_text(revb.selected_revno)
+            
+                revb.destroy()
+    
+    def _on_branch_clicked(self, button):
+        """ Branch button clicked handler. """
+        location = self._combo.get_child().get_text()
         if location is '':
             error_dialog(_('Missing branch location'),
                          _('You must specify a branch location.'))
             return
         
-        destination = self.filechooser.get_filename()
-        
-        spinbutton_revno = self.glade.get_widget('spinbutton_branch_revno')
-        revno = spinbutton_revno.get_value_as_int()
+        destination = self._filechooser.get_filename()
+        if self._button_revision.get_label() != 'N/A':
+            revno = int(self._entry_revision.get_text())
+        else:
+            revno = None
         
         try:
-            from bzrlib.transport import get_transport
-
             br_from = Branch.open(location)
-            br_from.lock_read()
-            
-            revision_id = br_from.get_rev_id(revno)
-
-            try:
-                destination = destination + '/' + os.path.basename(location.rstrip("/\\"))
-                to_transport = get_transport(destination)
-                to_transport.mkdir('.')
-
-                try:
-                    dir = br_from.bzrdir.sprout(to_transport.base, revision_id)
-                    branch = dir.open_branch()
-                    revs = branch.revno()
-                except errors.NoSuchRevision:
-                    to_transport.delete_tree('.')
-                    raise
-
-            finally:
-                br_from.unlock()
-                
-            self.close()
-            info_dialog(_('Branching successful'),
-                        _('%d revision(s) branched.') % revs)
-        except errors.NonExistingSource, errmsg:
-            error_dialog(_('Non existing source'),
-                         _("The location (%s)\ndoesn't exist.") % errmsg)
-            return
-        except errors.TargetAlreadyExists, errmsg:
-            error_dialog(_('Target already exists'),
-                         _('Target directory (%s)\nalready exists. Please select another target.') % errmsg)
-            return
-        except errors.NonExistingParent, errmsg:
-            error_dialog(_('Non existing parent directory'),
-                         _("The parent directory (%s)\ndoesn't exist.") % errmsg)
-            return
-        except errors.NonExistingRevision:
-            error_dialog(_('Non existing revision'),
-                         _("The revision you specified doesn't exist."))
-            return
-        except errors.NotBranchError, errmsg:
+        except errors.NotBranchError:
             error_dialog(_('Location is not a branch'),
                          _('The specified location has to be a branch.'))
             return
+        except OSError, e:
+            if e.errno == errno.ENOENT:
+                error_dialog(_('Non existing source'),
+                             _("The location (%s)\ndoesn't exist.") % location)
         
-    def close(self, widget=None):
-        self.window.destroy()
+        br_from.lock_read()
+        try:
+            from bzrlib.transport import get_transport
+
+            try:
+                revision_id = br_from.get_rev_id(revno)
+            except errors.NoSuchRevision:
+                error_dialog(_('No such revision'),
+                             _("The revision you specified doesn't exist."))
+                return
+
+            basis_dir = None
+            
+            to_location = destination + '/' + os.path.basename(location.rstrip("/\\"))
+            to_transport = get_transport(to_location)
+            
+            try:
+                to_transport.mkdir('.')
+            except errors.FileExists:
+                error_dialog(_('Target already exists'),
+                             _("Target directory (%s)\nalready exists. Please select another target.") % location)
+                return
+            except errors.NoSuchFile:
+                error_dialog(_('Non existing parent directory'),
+                             _("The parent directory of %s\ndoesn't exist.") % location)
+                return
+            
+            try:
+                # preserve whatever source format we have.
+                dir = br_from.bzrdir.sprout(to_transport.base,
+                                            revision_id,
+                                            basis_dir)
+                branch = dir.open_branch()
+                revs = branch.revno()
+            except errors.NoSuchRevision:
+                to_transport.delete_tree('.')
+                error_dialog(_('Non existing revision'),
+                             _("The branch has no revision %s.") % revision[0])
+                return
+        finally:
+            br_from.unlock()
+                
+        self._add_to_history(location)
+        info_dialog(_('Branching successful'),
+                    _('%d revision(s) branched.') % revs)
+        
+        self.response(gtk.RESPONSE_OK)
+    
+    def _on_combo_changed(self, widget):
+        """ We try to get the last revision if focus lost. """
+        rev = self._get_last_revno()
+        if rev is None:
+            self._entry_revision.set_text(_('N/A'))
+            self._button_revision.set_sensitive(False)
+        else:
+            self._entry_revision.set_text(str(rev))
+            self._button_revision.set_sensitive(True)
