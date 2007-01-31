@@ -14,6 +14,44 @@
 
 """GTK+ frontends to Bazaar commands """
 
+import bzrlib
+
+__version__ = '0.15.0'
+version_info = tuple(int(n) for n in __version__.split('.'))
+
+
+def check_bzrlib_version(desired):
+    """Check that bzrlib is compatible.
+
+    If version is < bzr-gtk version, assume incompatible.
+    If version == bzr-gtk version, assume completely compatible
+    If version == bzr-gtk version + 1, assume compatible, with deprecations
+    Otherwise, assume incompatible.
+    """
+    desired_plus = (desired[0], desired[1]+1)
+    bzrlib_version = bzrlib.version_info[:2]
+    if bzrlib_version == desired:
+        return
+    try:
+        from bzrlib.trace import warning
+    except ImportError:
+        # get the message out any way we can
+        from warnings import warn as warning
+    if bzrlib_version < desired:
+        warning('Installed bzr version %s is too old to be used with bzr-gtk'
+                ' %s.' % (bzrlib.__version__, __version__))
+        # Not using BzrNewError, because it may not exist.
+        raise Exception, ('Version mismatch', version_info)
+    else:
+        warning('bzr-gtk is not up to date with installed bzr version %s.'
+                ' \nThere should be a newer version available, e.g. %i.%i.' 
+                % (bzrlib.__version__, bzrlib_version[0], bzrlib_version[1]))
+        if bzrlib_version != desired_plus:
+            raise Exception, 'Version mismatch'
+
+
+check_bzrlib_version(version_info[:2])
+
 from bzrlib import errors
 from bzrlib.commands import Command, register_command, display_command
 from bzrlib.errors import NotVersionedError, BzrCommandError, NoSuchFile
@@ -24,9 +62,6 @@ from bzrlib.workingtree import WorkingTree
 from bzrlib.bzrdir import BzrDir
 
 import os.path
-
-__version__ = '0.13.0'
-
 
 def import_pygtk():
     try:
