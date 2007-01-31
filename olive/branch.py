@@ -25,6 +25,8 @@ except:
 import gtk
 import gtk.glade
 
+from errors import show_bzr_error
+
 from bzrlib.branch import Branch
 from bzrlib.config import GlobalConfig
 import bzrlib.errors as errors
@@ -150,6 +152,7 @@ class BranchDialog(gtk.Dialog):
             
                 revb.destroy()
     
+    @show_bzr_error
     def _on_branch_clicked(self, button):
         """ Branch button clicked handler. """
         location = self._combo.get_child().get_text()
@@ -159,48 +162,25 @@ class BranchDialog(gtk.Dialog):
             return
         
         destination = self._filechooser.get_filename()
-        if self._button_revision.get_label() != 'N/A':
+        try:
             revno = int(self._entry_revision.get_text())
-        else:
+        except:
             revno = None
         
-        try:
-            br_from = Branch.open(location)
-        except errors.NotBranchError:
-            error_dialog(_('Location is not a branch'),
-                         _('The specified location has to be a branch.'))
-            return
-        except OSError, e:
-            if e.errno == errno.ENOENT:
-                error_dialog(_('Non existing source'),
-                             _("The location (%s)\ndoesn't exist.") % location)
+        br_from = Branch.open(location)
         
         br_from.lock_read()
         try:
             from bzrlib.transport import get_transport
 
-            try:
-                revision_id = br_from.get_rev_id(revno)
-            except errors.NoSuchRevision:
-                error_dialog(_('No such revision'),
-                             _("The revision you specified doesn't exist."))
-                return
+            revision_id = br_from.get_rev_id(revno)
 
             basis_dir = None
             
             to_location = destination + '/' + os.path.basename(location.rstrip("/\\"))
             to_transport = get_transport(to_location)
             
-            try:
-                to_transport.mkdir('.')
-            except errors.FileExists:
-                error_dialog(_('Target already exists'),
-                             _("Target directory (%s)\nalready exists. Please select another target.") % location)
-                return
-            except errors.NoSuchFile:
-                error_dialog(_('Non existing parent directory'),
-                             _("The parent directory of %s\ndoesn't exist.") % location)
-                return
+            to_transport.mkdir('.')
             
             try:
                 # preserve whatever source format we have.
@@ -211,9 +191,7 @@ class BranchDialog(gtk.Dialog):
                 revs = branch.revno()
             except errors.NoSuchRevision:
                 to_transport.delete_tree('.')
-                error_dialog(_('Non existing revision'),
-                             _("The branch has no revision %s.") % revision[0])
-                return
+                raise
         finally:
             br_from.unlock()
                 
