@@ -24,6 +24,7 @@ except:
 
 import gtk
 
+from olive import delimiter
 from errors import show_bzr_error
 
 from bzrlib.branch import Branch
@@ -110,7 +111,7 @@ class CheckoutDialog(gtk.Dialog):
         history = config.get_user_option('gcheckout_history')
         if history is not None:
             self._combo_model = gtk.ListStore(str)
-            for item in history.split('|'):
+            for item in history.split(delimiter):
                 self._combo_model.append([ item ])
             self._combo.set_model(self._combo_model)
             self._combo.set_text_column(0)
@@ -122,10 +123,10 @@ class CheckoutDialog(gtk.Dialog):
         if history is None:
             config.set_user_option('gcheckout_history', location)
         else:
-            h = history.split('|')
+            h = history.split(delimiter)
             if location not in h:
                 h.append(location)
-            config.set_user_option('gcheckout_history', '|'.join(h))                
+            config.set_user_option('gcheckout_history', delimiter.join(h))                
     
     def _get_last_revno(self):
         """ Get the revno of the last revision (if any). """
