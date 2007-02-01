@@ -253,10 +253,10 @@ class OliveMenu:
 
     def edit_bookmark(self, action):
         """ Left context menu -> Edit """
-        from bookmark import OliveBookmarkDialog
+        from bookmark import BookmarkDialog
         
         if self.selected != None:
-            bookmark = OliveBookmarkDialog(self.selected, self.app.window)
+            bookmark = BookmarkDialog(self.selected, self.app.window)
             response = bookmark.run()
             
             if response != gtk.RESPONSE_NONE:
