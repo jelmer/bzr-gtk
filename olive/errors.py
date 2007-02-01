@@ -50,6 +50,12 @@ def show_bzr_error(unbound):
         except errors.NoSuchFile:
             error_dialog(_("No diff output"),
                          _("The selected file hasn't changed."))
+        except errors.NoSuchRevision:
+                error_dialog(_('No such revision'),
+                             _("The revision you specified doesn't exist."))
+        except errors.FileExists:
+                error_dialog(_('Target already exists'),
+                             _("Target directory already exists. Please select another target."))
         except errors.AlreadyBranchError, errmsg:
             error_dialog(_('Directory is already a branch'),
                          _('The current directory (%s) is already a branch.\nYou can start using it, or initialize another directory.') % errmsg)

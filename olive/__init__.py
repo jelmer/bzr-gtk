@@ -55,6 +55,8 @@ except ImportError:
     from annotate.gannotate import GAnnotateWindow
     from annotate.config import GAnnotateConfig
 
+# History delimiter used in config files
+delimiter = ' '
 
 class OliveGtk:
     """ The main Olive GTK frontend class. This is called when launching the
@@ -221,14 +223,28 @@ class OliveGtk:
     def on_menuitem_branch_get_activate(self, widget):
         """ Branch/Get... menu handler. """
         from branch import BranchDialog
-        branch = BranchDialog(self.get_path())
-        branch.display()
+        branch = BranchDialog(self.get_path(), self.window)
+        response = branch.run()
+        if response != gtk.RESPONSE_NONE:
+            branch.hide()
+        
+            if response == gtk.RESPONSE_OK:
+                self.refresh_right()
+            
+            branch.destroy()
     
     def on_menuitem_branch_checkout_activate(self, widget):
         """ Branch/Checkout... menu handler. """
-        from checkout import OliveCheckout
-        checkout = OliveCheckout(self.get_path())
-        checkout.display()
+        from checkout import CheckoutDialog
+        checkout = CheckoutDialog(self.get_path(), self.window)
+        response = checkout.run()
+        if response != gtk.RESPONSE_NONE:
+            checkout.hide()
+        
+            if response == gtk.RESPONSE_OK:
+                self.refresh_right()
+            
+            checkout.destroy()
     
     def on_menuitem_branch_commit_activate(self, widget):
         """ Branch/Commit... menu handler. """
@@ -305,9 +321,11 @@ class OliveGtk:
     
     def on_menuitem_branch_push_activate(self, widget):
         """ Branch/Push... menu handler. """
-        from push import OlivePush
-        push = OlivePush(self.wt.branch)
-        push.display()
+        from push import PushDialog
+        push = PushDialog(self.wt.branch, self.window)
+        response = push.run()
+        if response != gtk.RESPONSE_NONE:
+            push.destroy()
     
     @show_bzr_error
     def on_menuitem_branch_revert_activate(self, widget):

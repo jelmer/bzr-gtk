@@ -96,12 +96,54 @@ class cmd_gbranch(Command):
 
         set_ui_factory()
         dialog = BranchDialog(os.path.abspath('.'))
-        dialog.window.connect("destroy", lambda w: gtk.main_quit())
-        dialog.display()
-        
-        gtk.main()
+        dialog.run()
 
 register_command(cmd_gbranch)
+
+class cmd_gcheckout(Command):
+    """ GTK+ checkout.
+    
+    """
+    
+    def run(self):
+        pygtk = import_pygtk()
+        try:
+            import gtk
+        except RuntimeError, e:
+            if str(e) == "could not open display":
+                raise NoDisplayError
+
+        from bzrlib.plugins.gtk.olive.checkout import CheckoutDialog
+
+        set_ui_factory()
+        dialog = CheckoutDialog(os.path.abspath('.'))
+        dialog.run()
+
+register_command(cmd_gcheckout)
+
+class cmd_gpush(Command):
+    """ GTK+ push.
+    
+    """
+    takes_args = [ "location?" ]
+    
+    def run(self, location="."):
+        (branch, path) = Branch.open_containing(location)
+        
+        pygtk = import_pygtk()
+        try:
+            import gtk
+        except RuntimeError, e:
+            if str(e) == "could not open display":
+                raise NoDisplayError
+
+        from bzrlib.plugins.gtk.olive.push import PushDialog
+
+        set_ui_factory()
+        dialog = PushDialog(branch)
+        dialog.run()
+
+register_command(cmd_gpush)
 
 class cmd_gdiff(Command):
     """Show differences in working tree in a GTK+ Window.

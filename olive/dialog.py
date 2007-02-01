@@ -26,7 +26,13 @@ import gtk.glade
 
 def about():
     """ Display the AboutDialog. """
-    import olive
+    version = None
+    try:
+        import bzrlib.plugins.gtk
+    except ImportError:
+        version = 'N/A'
+    else:
+        version = bzrlib.plugins.gtk.__version__
     from guifiles import GLADEFILENAME
 
     # Load AboutDialog description
@@ -34,7 +40,7 @@ def about():
     dialog = dglade.get_widget('aboutdialog')
 
     # Set version
-    dialog.set_version(olive.__version__)
+    dialog.set_version(version)
 
     dialog.run()
     # Destroy the dialog
