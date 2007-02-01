@@ -55,6 +55,8 @@ except ImportError:
     from annotate.gannotate import GAnnotateWindow
     from annotate.config import GAnnotateConfig
 
+# History delimiter used in config files
+delimiter = ' '
 
 class OliveGtk:
     """ The main Olive GTK frontend class. This is called when launching the
@@ -319,9 +321,11 @@ class OliveGtk:
     
     def on_menuitem_branch_push_activate(self, widget):
         """ Branch/Push... menu handler. """
-        from push import OlivePush
-        push = OlivePush(self.wt.branch)
-        push.display()
+        from push import PushDialog
+        push = PushDialog(self.wt.branch, self.window)
+        response = push.run()
+        if response != gtk.RESPONSE_NONE:
+            push.destroy()
     
     @show_bzr_error
     def on_menuitem_branch_revert_activate(self, widget):

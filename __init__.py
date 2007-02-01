@@ -121,6 +121,30 @@ class cmd_gcheckout(Command):
 
 register_command(cmd_gcheckout)
 
+class cmd_gpush(Command):
+    """ GTK+ push.
+    
+    """
+    takes_args = [ "location?" ]
+    
+    def run(self, location="."):
+        (branch, path) = Branch.open_containing(location)
+        
+        pygtk = import_pygtk()
+        try:
+            import gtk
+        except RuntimeError, e:
+            if str(e) == "could not open display":
+                raise NoDisplayError
+
+        from bzrlib.plugins.gtk.olive.push import PushDialog
+
+        set_ui_factory()
+        dialog = PushDialog(branch)
+        dialog.run()
+
+register_command(cmd_gpush)
+
 class cmd_gdiff(Command):
     """Show differences in working tree in a GTK+ Window.
     
