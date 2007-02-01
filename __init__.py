@@ -358,4 +358,10 @@ class NoDisplayError(BzrCommandError):
     def __str__(self):
         return "No DISPLAY. Unable to run GTK+ application."
 
+def test_suite():
+    from unittest import TestSuite
+    import tests
+    result = TestSuite()
+    result.addTest(tests.test_suite())
+    return result
 
