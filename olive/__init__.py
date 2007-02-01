@@ -233,9 +233,16 @@ class OliveGtk:
     
     def on_menuitem_branch_checkout_activate(self, widget):
         """ Branch/Checkout... menu handler. """
-        from checkout import OliveCheckout
-        checkout = OliveCheckout(self.get_path())
-        checkout.display()
+        from checkout import CheckoutDialog
+        checkout = CheckoutDialog(self.get_path(), self.window)
+        response = checkout.run()
+        if response != gtk.RESPONSE_NONE:
+            checkout.hide()
+        
+            if response == gtk.RESPONSE_OK:
+                self.refresh_right()
+            
+            checkout.destroy()
     
     def on_menuitem_branch_commit_activate(self, widget):
         """ Branch/Commit... menu handler. """

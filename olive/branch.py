@@ -23,7 +23,6 @@ except:
     pass
 
 import gtk
-import gtk.glade
 
 from errors import show_bzr_error
 
@@ -54,9 +53,11 @@ class BranchDialog(gtk.Dialog):
         self._combo = gtk.ComboBoxEntry()
         self._label_location = gtk.Label(_("Branch location:"))
         self._label_destination = gtk.Label(_("Destination:"))
+        self._label_nick = gtk.Label(_("Branck nick:"))
         self._label_revision = gtk.Label(_("Revision:"))
         self._hbox_revision = gtk.HBox()
         self._entry_revision = gtk.Entry()
+        self._entry_nick = gtk.Entry()
         
         # Set callbacks
         self._button_branch.connect('clicked', self._on_branch_clicked)
@@ -67,10 +68,12 @@ class BranchDialog(gtk.Dialog):
         self._table = gtk.Table(rows=3, columns=2)
         self._table.attach(self._label_location, 0, 1, 0, 1)
         self._table.attach(self._label_destination, 0, 1, 1, 2)
-        self._table.attach(self._label_revision, 0, 1, 2, 3)
+        self._table.attach(self._label_nick, 0, 1, 2, 3)
+        self._table.attach(self._label_revision, 0, 1, 3, 4)
         self._table.attach(self._combo, 1, 2, 0, 1)
         self._table.attach(self._filechooser, 1, 2, 1, 2)
-        self._table.attach(self._hbox_revision, 1, 2, 2, 3)
+        self._table.attach(self._entry_nick, 1, 2, 2, 3)
+        self._table.attach(self._hbox_revision, 1, 2, 3, 4)
         
         # Set properties
         self._image_browse.set_from_stock(gtk.STOCK_OPEN, gtk.ICON_SIZE_BUTTON)
@@ -79,6 +82,7 @@ class BranchDialog(gtk.Dialog):
         self._filechooser.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
         self._label_location.set_alignment(0, 0.5)
         self._label_destination.set_alignment(0, 0.5)
+        self._label_nick.set_alignment(0, 0.5)
         self._label_revision.set_alignment(0, 0.5)
         self._table.set_row_spacings(3)
         self._table.set_col_spacings(3)
@@ -136,6 +140,7 @@ class BranchDialog(gtk.Dialog):
         from revbrowser import RevisionBrowser
         
         location = self._combo.get_child().get_text()
+        
         try:
             br = Branch.open(location)
         except:
@@ -167,6 +172,10 @@ class BranchDialog(gtk.Dialog):
         except:
             revno = None
         
+        nick = self._entry_nick.get_text()
+        if nick is '':
+            nick = os.path.basename(location.rstrip("/\\"))
+        
         br_from = Branch.open(location)
         
         br_from.lock_read()
@@ -177,7 +186,7 @@ class BranchDialog(gtk.Dialog):
 
             basis_dir = None
             
-            to_location = destination + '/' + os.path.basename(location.rstrip("/\\"))
+            to_location = destination + os.sep + nick
             to_transport = get_transport(to_location)
             
             to_transport.mkdir('.')
@@ -210,3 +219,5 @@ class BranchDialog(gtk.Dialog):
         else:
             self._entry_revision.set_text(str(rev))
             self._button_revision.set_sensitive(True)
+            if self._entry_nick.get_text() == '':
+                self._entry_nick.set_text(os.path.basename(self._combo.get_child().get_text().rstrip("/\\")))

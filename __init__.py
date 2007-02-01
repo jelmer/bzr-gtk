@@ -100,6 +100,27 @@ class cmd_gbranch(Command):
 
 register_command(cmd_gbranch)
 
+class cmd_gcheckout(Command):
+    """ GTK+ checkout.
+    
+    """
+    
+    def run(self):
+        pygtk = import_pygtk()
+        try:
+            import gtk
+        except RuntimeError, e:
+            if str(e) == "could not open display":
+                raise NoDisplayError
+
+        from bzrlib.plugins.gtk.olive.checkout import CheckoutDialog
+
+        set_ui_factory()
+        dialog = CheckoutDialog(os.path.abspath('.'))
+        dialog.run()
+
+register_command(cmd_gcheckout)
+
 class cmd_gdiff(Command):
     """Show differences in working tree in a GTK+ Window.
     
