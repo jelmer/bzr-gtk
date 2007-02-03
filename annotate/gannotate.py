@@ -28,8 +28,7 @@ from bzrlib.errors import NoSuchRevision
 from bzrlib.revision import NULL_REVISION, CURRENT_REVISION
 
 from colormap import AnnotateColorMap, AnnotateColorSaturation
-from logview import LogView
-from spanselector import SpanSelector
+from bzrlib.plugins.gtk.logview import LogView
 
 
 (
@@ -244,7 +243,7 @@ class GAnnotateWindow(gtk.Window):
                 tree2 = repository.revision_tree(revision.parent_ids[0])
             else:
                 tree2 = repository.revision_tree(NULL_REVISION)
-        from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
+        from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow()
         window.set_diff("Diff for row %d" % (row+1), tree1, tree2)
         window.set_file(tree1.id2path(self.file_id))
@@ -312,7 +311,6 @@ class GAnnotateWindow(gtk.Window):
     def _create_log_view(self):
         lv = LogView()
         lv.show()
-
         return lv
 
     def _create_button_box(self):
@@ -378,6 +376,7 @@ class FakeRevision:
         self.message = "?"
         self.timestamp = 0.0
         self.timezone = 0
+        self.properties = []
 
 
 class RevisionCache(object):

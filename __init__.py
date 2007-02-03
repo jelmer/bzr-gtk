@@ -52,6 +52,10 @@ def check_bzrlib_version(desired):
 
 check_bzrlib_version(version_info[:2])
 
+from bzrlib.trace import warning
+if __name__ != 'bzrlib.plugins.gtk':
+    warning("Not running as bzrlib.plugins.gtk, things may break.")
+
 from bzrlib import errors
 from bzrlib.commands import Command, register_command, display_command
 from bzrlib.errors import NotVersionedError, BzrCommandError, NoSuchFile
@@ -74,7 +78,7 @@ def import_pygtk():
 
 def set_ui_factory():
     pygtk = import_pygtk()
-    from olive.ui import GtkUIFactory
+    from ui import GtkUIFactory
     import bzrlib.ui
     bzrlib.ui.ui_factory = GtkUIFactory()
 
@@ -92,7 +96,7 @@ class cmd_gbranch(Command):
             if str(e) == "could not open display":
                 raise NoDisplayError
 
-        from bzrlib.plugins.gtk.olive.branch import BranchDialog
+        from bzrlib.plugins.gtk.branch import BranchDialog
 
         set_ui_factory()
         dialog = BranchDialog(os.path.abspath('.'))
@@ -113,7 +117,7 @@ class cmd_gcheckout(Command):
             if str(e) == "could not open display":
                 raise NoDisplayError
 
-        from bzrlib.plugins.gtk.olive.checkout import CheckoutDialog
+        from bzrlib.plugins.gtk.checkout import CheckoutDialog
 
         set_ui_factory()
         dialog = CheckoutDialog(os.path.abspath('.'))
@@ -137,7 +141,7 @@ class cmd_gpush(Command):
             if str(e) == "could not open display":
                 raise NoDisplayError
 
-        from bzrlib.plugins.gtk.olive.push import PushDialog
+        from push import PushDialog
 
         set_ui_factory()
         dialog = PushDialog(branch)
@@ -172,10 +176,10 @@ class cmd_gdiff(Command):
             tree1 = wt
             tree2 = tree1.basis_tree()
 
-        from viz.diffwin import DiffWindow
+        from diff import DiffWindow
         import gtk
         window = DiffWindow()
-        window.connect("destroy", lambda w: gtk.main_quit())
+        window.connect("destroy", gtk.main_quit)
         window.set_diff("Working Tree", tree1, tree2)
         if filename is not None:
             tree_filename = wt.relpath(filename)
@@ -222,14 +226,17 @@ class cmd_visualise(Command):
             else:
                 (revno, revid) = revision[0].in_history(branch)
 
-            from viz.bzrkapp import BzrkApp
+            from viz.branchwin import BranchWindow
+            import gtk
                 
-            app = BzrkApp()
-            app.show(branch, revid, limit)
+            pp = BranchWindow()
+            pp.set_branch(branch, revid, limit)
+            pp.connect("destroy", lambda w: gtk.main_quit())
+            pp.show()
+            gtk.main()
         finally:
             branch.repository.unlock()
             branch.unlock()
-        app.main()
 
 
 register_command(cmd_visualise)
@@ -309,6 +316,7 @@ class cmd_gcommit(Command):
 
     Graphical user interface for committing revisions"""
     
+    aliases = [ "gci" ]
     takes_args = []
     takes_options = []
 
@@ -323,7 +331,7 @@ class cmd_gcommit(Command):
                 raise NoDisplayError
 
         set_ui_factory()
-        from olive.commit import CommitDialog
+        from commit import CommitDialog
         from bzrlib.commit import Commit
         from bzrlib.errors import (BzrCommandError,
                                    NotBranchError,
@@ -352,6 +360,39 @@ class cmd_gcommit(Command):
 
 register_command(cmd_gcommit)
 
+class cmd_gstatus(Command):
+    """GTK+ status dialog
+
+    Graphical user interface for showing status 
+    information."""
+    
+    aliases = [ "gst" ]
+    takes_args = ['PATH?']
+    takes_options = []
+
+    def run(self, path='.'):
+        import os
+        pygtk = import_pygtk()
+
+        try:
+            import gtk
+        except RuntimeError, e:
+            if str(e) == "could not open display":
+                raise NoDisplayError
+
+        set_ui_factory()
+        from status import StatusDialog
+        (wt, wt_path) = WorkingTree.open_containing(path)
+        status = StatusDialog(wt, wt_path)
+        status.connect("destroy", gtk.main_quit)
+        status.run()
+
+register_command(cmd_gstatus)
+
+
+import gettext
+gettext.install('olive-gtk')
+
 class NoDisplayError(BzrCommandError):
     """gtk could not find a proper display"""
 
@@ -364,4 +405,3 @@ def test_suite():
     result = TestSuite()
     result.addTest(tests.test_suite())
     return result
-

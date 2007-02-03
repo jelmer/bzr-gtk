@@ -35,28 +35,16 @@ from bzrlib.branch import Branch
 import bzrlib.errors as bzrerrors
 from bzrlib.workingtree import WorkingTree
 
-from dialog import error_dialog, info_dialog, warning_dialog
-from errors import show_bzr_error
+from bzrlib.plugins.gtk.dialog import error_dialog, info_dialog, warning_dialog
+from bzrlib.plugins.gtk.errors import show_bzr_error
 from guifiles import GLADEFILENAME
 
-# import this classes only once
-try:
-    from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
-    from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
-    from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
-    from bzrlib.plugins.gtk.annotate.config import GAnnotateConfig
-except ImportError:
-    # olive+bzr-gtk not installed. try to import from sources
-    path = os.path.dirname(os.path.dirname(__file__))
-    if path not in sys.path:
-        sys.path.append(path)
-    from viz.diffwin import DiffWindow
-    from viz.branchwin import BranchWindow
-    from annotate.gannotate import GAnnotateWindow
-    from annotate.config import GAnnotateConfig
-
-# History delimiter used in config files
-delimiter = ' '
+from bzrlib.plugins.gtk.diff import DiffWindow
+from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
+from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
+from bzrlib.plugins.gtk.annotate.config import GAnnotateConfig
+from bzrlib.plugins.gtk.commit import CommitDialog
+from bzrlib.plugins.gtk.push import PushDialog
 
 class OliveGtk:
     """ The main Olive GTK frontend class. This is called when launching the
@@ -64,11 +52,8 @@ class OliveGtk:
     
     def __init__(self):
         self.toplevel = gtk.glade.XML(GLADEFILENAME, 'window_main', 'olive-gtk')
-        
         self.window = self.toplevel.get_widget('window_main')
-        
-        self.pref = OlivePreferences()
-        
+        self.pref = Preferences()
         self.path = None
 
         # Initialize the statusbar
@@ -211,7 +196,7 @@ class OliveGtk:
         return self.path
    
     def on_about_activate(self, widget):
-        from dialog import about
+        from bzrlib.plugins.gtk.dialog import about
         about()
         
     def on_menuitem_add_files_activate(self, widget):
@@ -222,7 +207,7 @@ class OliveGtk:
     
     def on_menuitem_branch_get_activate(self, widget):
         """ Branch/Get... menu handler. """
-        from branch import BranchDialog
+        from bzrlib.plugins.gtk.branch import BranchDialog
         branch = BranchDialog(self.get_path(), self.window)
         response = branch.run()
         if response != gtk.RESPONSE_NONE:
@@ -235,7 +220,7 @@ class OliveGtk:
     
     def on_menuitem_branch_checkout_activate(self, widget):
         """ Branch/Checkout... menu handler. """
-        from checkout import CheckoutDialog
+        from bzrlib.plugins.gtk.checkout import CheckoutDialog
         checkout = CheckoutDialog(self.get_path(), self.window)
         response = checkout.run()
         if response != gtk.RESPONSE_NONE:
@@ -246,9 +231,9 @@ class OliveGtk:
             
             checkout.destroy()
     
+    @show_bzr_error
     def on_menuitem_branch_commit_activate(self, widget):
         """ Branch/Commit... menu handler. """
-        from commit import CommitDialog
         commit = CommitDialog(self.wt, self.wtpath, self.notbranch, self.get_selected_right(), self.window)
         response = commit.run()
         if response != gtk.RESPONSE_NONE:
@@ -261,7 +246,7 @@ class OliveGtk:
     
     def on_menuitem_branch_merge_activate(self, widget):
         """ Branch/Merge... menu handler. """
-        from merge import MergeDialog
+        from bzrlib.plugins.gtk.merge import MergeDialog
         
         if self.check_for_changes():
             error_dialog(_('There are local changes in the branch'),
@@ -270,6 +255,7 @@ class OliveGtk:
             merge = MergeDialog(self.wt, self.wtpath)
             merge.display()
 
+    @show_bzr_error
     def on_menuitem_branch_missing_revisions_activate(self, widget):
         """ Branch/Missing revisions menu handler. """
         local_branch = self.wt.branch
@@ -321,7 +307,6 @@ class OliveGtk:
     
     def on_menuitem_branch_push_activate(self, widget):
         """ Branch/Push... menu handler. """
-        from push import PushDialog
         push = PushDialog(self.wt.branch, self.window)
         response = push.run()
         if response != gtk.RESPONSE_NONE:
@@ -341,8 +326,8 @@ class OliveGtk:
     
     def on_menuitem_branch_status_activate(self, widget):
         """ Branch/Status... menu handler. """
-        from status import OliveStatus
-        status = OliveStatus(self.wt, self.wtpath)
+        from bzrlib.plugins.gtk.status import StatusDialog
+        status = StatusDialog(self.wt, self.wtpath)
         status.display()
     
     @show_bzr_error
@@ -930,7 +915,7 @@ class OliveGtk:
 
 import ConfigParser
 
-class OlivePreferences:
+class Preferences:
     """ A class which handles Olive's preferences. """
     def __init__(self):
         """ Initialize the Preferences class. """
@@ -1014,6 +999,8 @@ class OlivePreferences:
     
     def set_bookmark_title(self, path, title):
         """ Set bookmark title. """
+        # FIXME: What if path isn't listed yet?
+        # FIXME: Canonicalize paths first?
         self.config.set(path, 'title', title)
     
     def remove_bookmark(self, path):

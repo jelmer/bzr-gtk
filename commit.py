@@ -21,7 +21,6 @@ except:
     pass
 
 import gtk
-import gtk.glade
 import gobject
 import pango
 
@@ -32,7 +31,6 @@ from bzrlib import osutils
 
 from dialog import error_dialog, question_dialog
 from errors import show_bzr_error
-from guifiles import GLADEFILENAME
 
 class CommitDialog(gtk.Dialog):
     """ New implementation of the Commit dialog. """
@@ -82,17 +80,17 @@ class CommitDialog(gtk.Dialog):
         # Create the widgets
         self._button_commit = gtk.Button(_("Comm_it"), use_underline=True)
         if self._is_checkout:
-            self._check_local = gtk.CheckButton(_("_Local only commit (works in checkouts)"),
+            self._check_local = gtk.CheckButton(_("_Only commit locally"),
                                                 use_underline=True)
-        self._check_strict = gtk.CheckButton(_("_Strict commit (fails if unknown files are present)"),
+        self._check_strict = gtk.CheckButton(_("_Allow unknown files"),
                                              use_underline=True)
-        self._expander_files = gtk.Expander(_("Please select the file(s) to commit"))
+        self._expander_files = gtk.Expander(_("File(s) to commit"))
         self._vpaned_main = gtk.VPaned()
         self._scrolledwindow_files = gtk.ScrolledWindow()
         self._scrolledwindow_message = gtk.ScrolledWindow()
         self._treeview_files = gtk.TreeView()
         self._vbox_message = gtk.VBox()
-        self._label_message = gtk.Label(_("Please specify a commit message:"))
+        self._label_message = gtk.Label(_("Commit message:"))
         self._textview_message = gtk.TextView()
         
         if self._is_pending:
@@ -166,7 +164,7 @@ class CommitDialog(gtk.Dialog):
         (model, iter) = treeselection.get_selected()
         
         if iter is not None:
-            from olive import DiffWindow
+            from diff import DiffWindow
             
             _selected = model.get_value(iter, 1)
             

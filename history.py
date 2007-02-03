@@ -1,4 +1,4 @@
-# Copyright (C) 2007 Jelmer Venrooij <jelmer@samba.org>
+# Copyright (C) 2007 Jelmer Vernooij <jelmer@samba.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,16 +14,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from unittest import TestLoader, TestSuite
-from bzrlib.tests import TestUtil
+delimiter = " "
 
+class UrlHistory:
+    def __init__(self, config, name):
+        self._config = config
+        self._name = name
 
-def test_suite():
-    result = TestSuite()
+    def add_entry(self, url):
+        self._config.set_user_option(self._name, delimiter.join(self.get_entries() + [url]))
 
-    loader = TestUtil.TestLoader()
-
-    testmod_names = ['test_preferences', 'test_history']
-    result.addTest(loader.loadTestsFromModuleNames(["%s.%s" % (__name__, i) for i in testmod_names]))
-    return result
-
+    def get_entries(self):
+        history = self._config.get_user_option(self._name)
+        if history is None:
+            return []
+        else:
+            return history.split(delimiter)

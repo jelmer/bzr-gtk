@@ -15,7 +15,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import bzrlib.errors as errors
-
 from dialog import error_dialog
 
 def show_bzr_error(unbound):

@@ -46,55 +46,33 @@ def about():
     # Destroy the dialog
     dialog.destroy()
 
-def _message_dialog(type, primary, secondary):
+def _message_dialog(type, primary, secondary, buttons=gtk.BUTTONS_OK):
     """ Display a given type of MessageDialog with the given message.
     
-    :param type: error | warning | info
+    :param type: message dialog type
     
     :param message: the message you want to display.
     """
-    if type == 'error':
-        dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL,
-                                   type=gtk.MESSAGE_ERROR,
-                                   buttons=gtk.BUTTONS_OK)
-        dialog.set_markup('<big><b>' + primary + '</b></big>')
-    elif type == 'warning':
-        dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL,
-                                   type=gtk.MESSAGE_WARNING,
-                                   buttons=gtk.BUTTONS_OK)
-        dialog.set_markup('<big><b>' + primary + '</b></big>')
-    elif type == 'info':
-        dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL,
-                                   type=gtk.MESSAGE_INFO,
-                                   buttons=gtk.BUTTONS_OK)
-        dialog.set_markup('<big><b>' + primary + '</b></big>')
-    elif type == 'question':
-        dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL,
-                                   type=gtk.MESSAGE_QUESTION,
-                                   buttons=gtk.BUTTONS_YES_NO)
-        dialog.set_markup('<big><b>' + primary + '</b></big>')
-    else:
-        return
-
+    dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL, type=type,
+                               buttons=buttons)
+    dialog.set_markup('<big><b>' + primary + '</b></big>')
     dialog.format_secondary_markup(secondary)
-
     response = dialog.run()
     dialog.destroy()
-
     return response
 
 def error_dialog(primary, secondary):
     """ Display an error dialog with the given message. """
-    return _message_dialog('error', primary, secondary)
+    return _message_dialog(gtk.MESSAGE_ERROR, primary, secondary)
 
 def info_dialog(primary, secondary):
     """ Display an info dialog with the given message. """
-    return _message_dialog('info', primary, secondary)
+    return _message_dialog(gtk.MESSAGE_INFO, primary, secondary)
 
 def warning_dialog(primary, secondary):
     """ Display a warning dialog with the given message. """
-    return _message_dialog('warning', primary, secondary)
+    return _message_dialog(gtk.MESSAGE_WARNING, primary, secondary)
 
 def question_dialog(primary, secondary):
     """ Display a dialog with the given question. """
-    return _message_dialog('question', primary, secondary)
+    return _message_dialog(gtk.MESSAGE_QUESTION, primary, secondary, gtk.BUTTONS_YES_NO)

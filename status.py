@@ -21,43 +21,47 @@ except:
     pass
 
 import gtk
-import gtk.glade
 
-from guifiles import GLADEFILENAME
-
-
-class OliveStatus:
+class StatusDialog(gtk.MessageDialog):
     """ Display Status window and perform the needed actions. """
     def __init__(self, wt, wtpath):
         """ Initialize the Status window. """
-        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_status')
-        
-        # Get the Status window widget
-        self.window = self.glade.get_widget('window_status')
-        
+        super(StatusDialog, self).__init__(flags=gtk.DIALOG_MODAL, buttons=gtk.BUTTONS_OK)
+        self.set_title("Working tree changes")
+        self.set_image(gtk.Label("Working tree status"))
+        self._create()
         self.wt = wt
         self.wtpath = wtpath
-        
-        # Check if current location is a branch
-        file_id = self.wt.path2id(wtpath)
-
         # Set the old working tree
         self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
-        
-        # Dictionary for signal_autoconnect
-        dic = { "on_button_status_close_clicked": self.close }
-        
-        # Connect the signals to the handlers
-        self.glade.signal_autoconnect(dic)
-        
         # Generate status output
         self._generate_status()
+
+    def _create(self):
+        self.set_default_size(400, 300)
+        scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self.treeview = gtk.TreeView()
+        scrolledwindow.add(self.treeview)
+        self.vbox.pack_start(scrolledwindow, True, True)
+        self.vbox.show_all()
+
+    def row_diff(self, tv, path, tvc):
+        file = self.model[path][1]
+        if file is None:
+            return
+        from bzrlib.plugins.gtk.diff import DiffWindow
+        window = DiffWindow()
+        window.set_diff("Working tree changes", self.old_tree, self.wt)
+        window.set_file(file)
+        window.show()
 
     def _generate_status(self):
         """ Generate 'bzr status' output. """
         self.model = gtk.TreeStore(str, str)
-        self.treeview = self.glade.get_widget('treeview_status')
+        self.treeview.set_headers_visible(False)
         self.treeview.set_model(self.model)
+        self.treeview.connect("row-activated", self.row_diff)
         
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 20)
