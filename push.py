@@ -29,7 +29,7 @@ import bzrlib.errors as errors
 
 from dialog import error_dialog, info_dialog, question_dialog
 
-from olive import delimiter
+from history import UrlHistory
 
 class PushDialog(gtk.Dialog):
     """ New implementation of the Push dialog. """
@@ -88,34 +88,20 @@ class PushDialog(gtk.Dialog):
         self.vbox.show_all()
         
         # Build location history
+        self._history = UrlHistory(self.branch.get_config(), 'push_history')
         self._build_history()
         
     def _build_history(self):
         """ Build up the location history. """
-        config = LocationConfig(self.branch.base)
-        history = config.get_user_option('gpush_history')
-        if history is not None:
-            self._combo_model = gtk.ListStore(str)
-            for item in history.split(delimiter):
-                self._combo_model.append([ item ])
-            self._combo.set_model(self._combo_model)
-            self._combo.set_text_column(0)
+        self._combo_model = gtk.ListStore(str)
+        for item in self._history.get_entries():
+            self._combo_model.append([ item ])
+        self._combo.set_model(self._combo_model)
+        self._combo.set_text_column(0)
         
         location = self.branch.get_push_location()
         if location:
             self._combo.get_child().set_text(location)
-    
-    def _add_to_history(self, location):
-        """ Add specified location to the history (if not yet added). """
-        config = LocationConfig(self.branch.base)
-        history = config.get_user_option('gpush_history')
-        if history is None:
-            config.set_user_option('gpush_history', location)
-        else:
-            h = history.split(delimiter)
-            if location not in h:
-                h.append(location)
-            config.set_user_option('gpush_history', delimiter.join(h))
     
     def _on_test_clicked(self, widget):
         """ Test button clicked handler. """
@@ -158,7 +144,7 @@ class PushDialog(gtk.Dialog):
                 revs = do_push(self.branch, overwrite=True)
             return
         
-        self._add_to_history(location)
+        self._history.add_entry(location)
         info_dialog(_('Push successful'),
                     _("%d revision(s) pushed.") % revs)
         

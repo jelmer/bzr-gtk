@@ -24,7 +24,6 @@ except:
 
 import gtk
 
-from olive import delimiter
 from errors import show_bzr_error
 
 from bzrlib.branch import Branch
@@ -33,6 +32,7 @@ import bzrlib.errors as errors
 
 from dialog import error_dialog, info_dialog
 
+from history import UrlHistory
 
 class BranchDialog(gtk.Dialog):
     """ New implementation of the Branch dialog. """
@@ -101,30 +101,16 @@ class BranchDialog(gtk.Dialog):
         self.vbox.show_all()
         
         # Build branch history
+        self._history = UrlHistory(GlobalConfig(), 'branch_history')
         self._build_history()
     
     def _build_history(self):
         """ Build up the branch history. """
-        config = GlobalConfig()
-        history = config.get_user_option('gbranch_history')
-        if history is not None:
-            self._combo_model = gtk.ListStore(str)
-            for item in history.split(delimiter):
-                self._combo_model.append([ item ])
-            self._combo.set_model(self._combo_model)
-            self._combo.set_text_column(0)
-    
-    def _add_to_history(self, location):
-        """ Add specified location to the history (if not yet added). """
-        config = GlobalConfig()
-        history = config.get_user_option('gbranch_history')
-        if history is None:
-            config.set_user_option('gbranch_history', location)
-        else:
-            h = history.split(delimiter)
-            if location not in h:
-                h.append(location)
-            config.set_user_option('gbranch_history', delimiter.join(h))                
+        self._combo_model = gtk.ListStore(str)
+        for item in self._history.get_entries():
+            self._combo_model.append([ item ])
+        self._combo.set_model(self._combo_model)
+        self._combo.set_text_column(0)
     
     def _get_last_revno(self):
         """ Get the revno of the last revision (if any). """
@@ -205,7 +191,7 @@ class BranchDialog(gtk.Dialog):
         finally:
             br_from.unlock()
                 
-        self._add_to_history(location)
+        self._history.add_entry(location)
         info_dialog(_('Branching successful'),
                     _('%d revision(s) branched.') % revs)
         

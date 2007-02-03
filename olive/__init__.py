@@ -46,8 +46,6 @@ from bzrlib.plugins.gtk.annotate.config import GAnnotateConfig
 from bzrlib.plugins.gtk.commit import CommitDialog
 from bzrlib.plugins.gtk.push import PushDialog
 
-delimiter = ' '
-
 class OliveGtk:
     """ The main Olive GTK frontend class. This is called when launching the
     program. """
@@ -212,7 +210,7 @@ class OliveGtk:
     
     def on_menuitem_branch_get_activate(self, widget):
         """ Branch/Get... menu handler. """
-        from branch import BranchDialog
+        from bzrlib.plugins.gtk.branch import BranchDialog
         branch = BranchDialog(self.get_path(), self.window)
         response = branch.run()
         if response != gtk.RESPONSE_NONE:
@@ -225,7 +223,7 @@ class OliveGtk:
     
     def on_menuitem_branch_checkout_activate(self, widget):
         """ Branch/Checkout... menu handler. """
-        from checkout import CheckoutDialog
+        from bzrlib.plugins.gtk.checkout import CheckoutDialog
         checkout = CheckoutDialog(self.get_path(), self.window)
         response = checkout.run()
         if response != gtk.RESPONSE_NONE:
@@ -251,7 +249,7 @@ class OliveGtk:
     
     def on_menuitem_branch_merge_activate(self, widget):
         """ Branch/Merge... menu handler. """
-        from merge import MergeDialog
+        from bzrlib.plugins.gtk.merge import MergeDialog
         
         if self.check_for_changes():
             error_dialog(_('There are local changes in the branch'),
