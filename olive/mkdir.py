@@ -30,6 +30,8 @@ import bzrlib.errors as errors
 from bzrlib.plugins.gtk.dialog import error_dialog, warning_dialog
 from guifiles import GLADEFILENAME
 
+from bzrlib.plugins.gtk.errors import show_bzr_error
+
 
 class OliveMkdir:
     """ Display the Make directory dialog and perform the needed actions. """

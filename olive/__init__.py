@@ -52,11 +52,8 @@ class OliveGtk:
     
     def __init__(self):
         self.toplevel = gtk.glade.XML(GLADEFILENAME, 'window_main', 'olive-gtk')
-        
         self.window = self.toplevel.get_widget('window_main')
-        
         self.pref = Preferences()
-        
         self.path = None
 
         # Initialize the statusbar
@@ -258,6 +255,7 @@ class OliveGtk:
             merge = MergeDialog(self.wt, self.wtpath)
             merge.display()
 
+    @show_bzr_error
     def on_menuitem_branch_missing_revisions_activate(self, widget):
         """ Branch/Missing revisions menu handler. """
         local_branch = self.wt.branch

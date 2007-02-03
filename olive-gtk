@@ -78,8 +78,6 @@ except ImportError:
             print >>sys.stderr, "Can't find bzrlib location"
             sys.exit(1)
 
-
-from olive import OliveGtk
 from bzrlib.plugin import load_plugins
 load_plugins()
 
@@ -87,5 +85,6 @@ import bzrlib.ui
 import ui
 bzrlib.ui.ui_factory = ui.GtkUIFactory()
 
+from olive import OliveGtk
 app = OliveGtk()
 gtk.main()
