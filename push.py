@@ -22,14 +22,14 @@ except:
     
 import gtk
 
-from olive import delimiter
 from errors import show_bzr_error
 
 from bzrlib.config import LocationConfig
 import bzrlib.errors as errors
 
-from olive.dialog import error_dialog, info_dialog, question_dialog
+from dialog import error_dialog, info_dialog, question_dialog
 
+from olive import delimiter
 
 class PushDialog(gtk.Dialog):
     """ New implementation of the Push dialog. """

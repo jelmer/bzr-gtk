@@ -29,7 +29,7 @@ import os.path
 import bzrlib.errors as errors
 from bzrlib import osutils
 
-from olive.dialog import error_dialog, question_dialog
+from dialog import error_dialog, question_dialog
 from errors import show_bzr_error
 
 class CommitDialog(gtk.Dialog):
@@ -164,7 +164,7 @@ class CommitDialog(gtk.Dialog):
         (model, iter) = treeselection.get_selected()
         
         if iter is not None:
-            from olive import DiffWindow
+            from diff import DiffWindow
             
             _selected = model.get_value(iter, 1)
             
