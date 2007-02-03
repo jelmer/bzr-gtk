@@ -1014,6 +1014,8 @@ class Preferences:
     
     def set_bookmark_title(self, path, title):
         """ Set bookmark title. """
+        # FIXME: What if path isn't listed yet?
+        # FIXME: Canonicalize paths first?
         self.config.set(path, 'title', title)
     
     def remove_bookmark(self, path):
