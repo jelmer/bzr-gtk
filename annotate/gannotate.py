@@ -311,7 +311,6 @@ class GAnnotateWindow(gtk.Window):
     def _create_log_view(self):
         lv = LogView()
         lv.show()
-
         return lv
 
     def _create_button_box(self):

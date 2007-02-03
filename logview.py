@@ -35,6 +35,7 @@ class LogView(gtk.ScrolledWindow):
         self.set_shadow_type(gtk.SHADOW_NONE)
         self._create()
         self._show_callback = None
+        self._go_callback = None
         self._clicked_callback = None
 
         if revision is not None:
@@ -91,17 +92,20 @@ class LogView(gtk.ScrolledWindow):
                 gtk.STOCK_FIND, gtk.ICON_SIZE_SMALL_TOOLBAR)
             image.show()
 
-            button = gtk.Button()
-            button.add(image)
-            button.set_sensitive(self._show_callback is not None)
-            button.connect("clicked", self._show_clicked_cb,
-                           self._revision.revision_id, parent_id)
-            hbox.pack_start(button, expand=False, fill=True)
-            button.show()
+            if self._show_callback is not None:
+                button = gtk.Button()
+                button.add(image)
+                button.connect("clicked", self._show_clicked_cb,
+                               self._revision.revision_id, parent_id)
+                hbox.pack_start(button, expand=False, fill=True)
+                button.show()
 
-            button = gtk.Button(parent_id)
+            if self._go_callback is not None:
+                button = gtk.Button(parent_id)
+                button.connect("clicked", self._go_clicked_cb, parent_id)
+            else:
+                button = gtk.Label(parent_id)
             button.set_use_underline(False)
-            button.connect("clicked", self._go_clicked_cb, parent_id)
             hbox.pack_start(button, expand=False, fill=True)
             button.show()
 
