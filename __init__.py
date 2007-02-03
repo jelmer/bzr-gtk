@@ -360,6 +360,36 @@ class cmd_gcommit(Command):
 
 register_command(cmd_gcommit)
 
+class cmd_gstatus(Command):
+    """GTK+ status dialog
+
+    Graphical user interface for showing status 
+    information."""
+    
+    aliases = [ "gst" ]
+    takes_args = ['PATH?']
+    takes_options = []
+
+    def run(self, path='.'):
+        import os
+        pygtk = import_pygtk()
+
+        try:
+            import gtk
+        except RuntimeError, e:
+            if str(e) == "could not open display":
+                raise NoDisplayError
+
+        set_ui_factory()
+        from status import StatusDialog
+        (wt, wt_path) = WorkingTree.open_containing(path)
+        status = StatusDialog(wt, wt_path)
+        status.connect("destroy", gtk.main_quit)
+        status.run()
+
+register_command(cmd_gstatus)
+
+
 import gettext
 gettext.install('olive-gtk')
 
