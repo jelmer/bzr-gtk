@@ -148,10 +148,13 @@ class CommitDialog(gtk.Dialog):
         self._vpaned_main.add2(self._vbox_message)
         
         self.vbox.pack_start(self._vpaned_main, True, True)
-        if self._is_checkout and not have_nm:
+        if self._is_checkout: 
             self._check_local = gtk.CheckButton(_("_Only commit locally"),
                                                 use_underline=True)
             self.vbox.pack_start(self._check_local, False, False)
+            if have_nm:
+                # 3 is the enum value for STATE_CONNECTED
+                self._check_local.set_active(dbus_iface.state() != 3)
         self.vbox.pack_start(self._check_strict, False, False)
         
         # Create the file list
@@ -208,10 +211,7 @@ class CommitDialog(gtk.Dialog):
                 return
 
         if self._is_checkout:
-            if have_nm:
-                local = (dbus_iface.state() != 3)
-            else:
-                local = self._check_local.get_active()
+            local = self._check_local.get_active()
         else:
             local = False
         
