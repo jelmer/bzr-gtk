@@ -326,8 +326,8 @@ class OliveGtk:
     
     def on_menuitem_branch_status_activate(self, widget):
         """ Branch/Status... menu handler. """
-        from status import OliveStatus
-        status = OliveStatus(self.wt, self.wtpath)
+        from bzrlib.plugins.gtk.status import StatusDialog
+        status = StatusDialog(self.wt, self.wtpath)
         status.display()
     
     @show_bzr_error
