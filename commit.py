@@ -32,6 +32,17 @@ from bzrlib import osutils
 from dialog import error_dialog, question_dialog
 from errors import show_bzr_error
 
+try:
+    import dbus
+    import dbus.glib
+    bus = dbus.SystemBus()
+    proxy_obj = bus.get_object('org.freedesktop.NetworkManager', 
+                              '/org/freedesktop/NetworkManager')
+    dbus_iface = dbus.Interface(proxy_obj, 'org.freedesktop.NetworkManager')
+    have_nm = True
+except ImportError:
+    have_nm = False
+
 class CommitDialog(gtk.Dialog):
     """ New implementation of the Commit dialog. """
     def __init__(self, wt, wtpath, notbranch, selected=None, parent=None):
@@ -79,9 +90,6 @@ class CommitDialog(gtk.Dialog):
         
         # Create the widgets
         self._button_commit = gtk.Button(_("Comm_it"), use_underline=True)
-        if self._is_checkout:
-            self._check_local = gtk.CheckButton(_("_Only commit locally"),
-                                                use_underline=True)
         self._check_strict = gtk.CheckButton(_("_Allow unknown files"),
                                              use_underline=True)
         self._expander_files = gtk.Expander(_("File(s) to commit"))
@@ -140,7 +148,9 @@ class CommitDialog(gtk.Dialog):
         self._vpaned_main.add2(self._vbox_message)
         
         self.vbox.pack_start(self._vpaned_main, True, True)
-        if self._is_checkout:
+        if self._is_checkout and not have_nm:
+            self._check_local = gtk.CheckButton(_("_Only commit locally"),
+                                                use_underline=True)
             self.vbox.pack_start(self._check_local, False, False)
         self.vbox.pack_start(self._check_strict, False, False)
         
@@ -198,7 +208,10 @@ class CommitDialog(gtk.Dialog):
                 return
 
         if self._is_checkout:
-            local = self._check_local.get_active()
+            if have_nm:
+                local = (dbus_iface.state() != 3)
+            else:
+                local = self._check_local.get_active()
         else:
             local = False
         
