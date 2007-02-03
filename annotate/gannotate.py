@@ -28,7 +28,7 @@ from bzrlib.errors import NoSuchRevision
 from bzrlib.revision import NULL_REVISION, CURRENT_REVISION
 
 from colormap import AnnotateColorMap, AnnotateColorSaturation
-from logview import LogView
+from bzrlib.plugins.gtk.logview import LogView
 
 
 (

@@ -52,6 +52,10 @@ def check_bzrlib_version(desired):
 
 check_bzrlib_version(version_info[:2])
 
+from bzrlib.trace import warning
+if __name__ != 'bzrlib.plugins.gtk':
+    warning("Not running as bzrlib.plugins.gtk, things may break.")
+
 from bzrlib import errors
 from bzrlib.commands import Command, register_command, display_command
 from bzrlib.errors import NotVersionedError, BzrCommandError, NoSuchFile

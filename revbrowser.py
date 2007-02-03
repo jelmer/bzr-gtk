@@ -22,7 +22,6 @@ except:
 
 import gobject
 import gtk
-import gtk.glade
 
 from bzrlib.osutils import format_date
 
