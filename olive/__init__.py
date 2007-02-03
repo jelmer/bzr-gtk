@@ -45,6 +45,8 @@ try:
     from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
     from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
     from bzrlib.plugins.gtk.annotate.config import GAnnotateConfig
+    from bzrlib.plugins.gtk.commit import CommitDialog
+    from bzrlib.plugins.gtk.push import PushDialog
 except ImportError:
     # olive+bzr-gtk not installed. try to import from sources
     path = os.path.dirname(os.path.dirname(__file__))
@@ -67,7 +69,7 @@ class OliveGtk:
         
         self.window = self.toplevel.get_widget('window_main')
         
-        self.pref = OlivePreferences()
+        self.pref = Preferences()
         
         self.path = None
 
@@ -248,7 +250,6 @@ class OliveGtk:
     
     def on_menuitem_branch_commit_activate(self, widget):
         """ Branch/Commit... menu handler. """
-        from commit import CommitDialog
         commit = CommitDialog(self.wt, self.wtpath, self.notbranch, self.get_selected_right(), self.window)
         response = commit.run()
         if response != gtk.RESPONSE_NONE:
@@ -321,7 +322,6 @@ class OliveGtk:
     
     def on_menuitem_branch_push_activate(self, widget):
         """ Branch/Push... menu handler. """
-        from push import PushDialog
         push = PushDialog(self.wt.branch, self.window)
         response = push.run()
         if response != gtk.RESPONSE_NONE:
@@ -930,7 +930,7 @@ class OliveGtk:
 
 import ConfigParser
 
-class OlivePreferences:
+class Preferences:
     """ A class which handles Olive's preferences. """
     def __init__(self):
         """ Initialize the Preferences class. """

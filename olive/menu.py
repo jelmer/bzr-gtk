@@ -31,7 +31,7 @@ from bzrlib.workingtree import WorkingTree
 from dialog import error_dialog, info_dialog, warning_dialog
 from errors import show_bzr_error
 from launch import launch
-from olive import OlivePreferences, DiffWindow
+from olive import Preferences, DiffWindow
 
 class OliveMenu:
     """ This class is responsible for building the context menus. """
@@ -42,7 +42,7 @@ class OliveMenu:
         self.uifile = UIFILENAME
 
         # Preferences handler
-        self.pref = OlivePreferences()
+        self.pref = Preferences()
         
         # Set default values
         self.path = path

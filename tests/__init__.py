@@ -15,10 +15,15 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 from unittest import TestLoader, TestSuite
+from bzrlib.tests import TestUtil
+
 
 def test_suite():
     result = TestSuite()
 
-    loader = TestLoader()
+    loader = TestUtil.TestLoader()
+
+    testmod_names = ['test_preferences']
+    result.addTest(loader.loadTestsFromModuleNames(["%s.%s" % (__name__, i) for i in testmod_names]))
     return result
 

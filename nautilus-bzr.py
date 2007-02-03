@@ -118,7 +118,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         if vfs_file.get_uri_scheme() != 'file':
             return
 
-        from bzrlib.plugins.gtk.olive.branch import BranchDialog
+        from bzrlib.plugins.gtk.branch import BranchDialog
         
         dialog = BranchDialog(vfs_file.get_name())
         dialog.display()
@@ -134,7 +134,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         except NotBranchError:
             return
 
-        from bzrlib.plugins.gtk.olive.commit import CommitDialog
+        from bzrlib.plugins.gtk.commit import CommitDialog
         dialog = CommitDialog(tree, path)
         dialog.display()
         gtk.main()
@@ -170,7 +170,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         except NotBranchError:
             return
 
-        from bzrlib.plugins.gtk.olive.pull import PullDialog
+        from bzrlib.plugins.gtk.pull import PullDialog
         dialog = PullDialog(tree, path)
         dialog.display()
         gtk.main()
@@ -188,7 +188,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         except NotBranchError:
             return
 
-        from bzrlib.plugins.gtk.olive.merge import MergeDialog
+        from bzrlib.plugins.gtk.merge import MergeDialog
         dialog = MergeDialog(tree, path)
         dialog.display()
         gtk.main()

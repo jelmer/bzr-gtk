@@ -22,7 +22,7 @@ except:
 
 import gtk
 
-from olive import OlivePreferences
+from olive import Preferences
 from dialog import error_dialog
 
 
@@ -36,7 +36,7 @@ class BookmarkDialog(gtk.Dialog):
                                   flags=0,
                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         
-        self.pref = OlivePreferences()
+        self.pref = Preferences()
         
         # Get arguments
         self.selected = selected

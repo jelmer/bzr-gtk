@@ -21,7 +21,6 @@ except:
     pass
 
 import gtk
-import gtk.glade
 import gobject
 import pango
 

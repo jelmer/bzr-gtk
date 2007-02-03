@@ -74,7 +74,7 @@ def import_pygtk():
 
 def set_ui_factory():
     pygtk = import_pygtk()
-    from olive.ui import GtkUIFactory
+    from ui import GtkUIFactory
     import bzrlib.ui
     bzrlib.ui.ui_factory = GtkUIFactory()
 
@@ -92,7 +92,7 @@ class cmd_gbranch(Command):
             if str(e) == "could not open display":
                 raise NoDisplayError
 
-        from bzrlib.plugins.gtk.olive.branch import BranchDialog
+        from bzrlib.plugins.gtk.branch import BranchDialog
 
         set_ui_factory()
         dialog = BranchDialog(os.path.abspath('.'))
@@ -113,7 +113,7 @@ class cmd_gcheckout(Command):
             if str(e) == "could not open display":
                 raise NoDisplayError
 
-        from bzrlib.plugins.gtk.olive.checkout import CheckoutDialog
+        from bzrlib.plugins.gtk.checkout import CheckoutDialog
 
         set_ui_factory()
         dialog = CheckoutDialog(os.path.abspath('.'))
@@ -137,7 +137,7 @@ class cmd_gpush(Command):
             if str(e) == "could not open display":
                 raise NoDisplayError
 
-        from bzrlib.plugins.gtk.olive.push import PushDialog
+        from push import PushDialog
 
         set_ui_factory()
         dialog = PushDialog(branch)
@@ -323,7 +323,7 @@ class cmd_gcommit(Command):
                 raise NoDisplayError
 
         set_ui_factory()
-        from olive.commit import CommitDialog
+        from commit import CommitDialog
         from bzrlib.commit import Commit
         from bzrlib.errors import (BzrCommandError,
                                    NotBranchError,
@@ -364,4 +364,3 @@ def test_suite():
     result = TestSuite()
     result.addTest(tests.test_suite())
     return result
-
