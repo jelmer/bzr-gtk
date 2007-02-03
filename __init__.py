@@ -176,10 +176,10 @@ class cmd_gdiff(Command):
             tree1 = wt
             tree2 = tree1.basis_tree()
 
-        from viz.diff import DiffWindow
+        from diff import DiffWindow
         import gtk
         window = DiffWindow()
-        window.connect("destroy", lambda w: gtk.main_quit())
+        window.connect("destroy", gtk.main_quit)
         window.set_diff("Working Tree", tree1, tree2)
         if filename is not None:
             tree_filename = wt.relpath(filename)
@@ -226,14 +226,17 @@ class cmd_visualise(Command):
             else:
                 (revno, revid) = revision[0].in_history(branch)
 
-            from viz.bzrkapp import BzrkApp
+            from viz.branchwin import BranchWindow
+            import gtk
                 
-            app = BzrkApp()
-            app.show(branch, revid, limit)
+            pp = BranchWindow()
+            pp.set_branch(branch, revid, limit)
+            pp.connect("destroy", lambda w: gtk.main_quit())
+            pp.show()
+            gtk.main()
         finally:
             branch.repository.unlock()
             branch.unlock()
-        app.main()
 
 
 register_command(cmd_visualise)
@@ -356,6 +359,9 @@ class cmd_gcommit(Command):
         commit.run()
 
 register_command(cmd_gcommit)
+
+import gettext
+gettext.install('olive-gtk')
 
 class NoDisplayError(BzrCommandError):
     """gtk could not find a proper display"""

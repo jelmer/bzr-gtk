@@ -26,12 +26,10 @@ class BranchWindow(gtk.Window):
     for a particular branch.
     """
 
-    def __init__(self, app=None):
+    def __init__(self):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.set_border_width(0)
         self.set_title("bzrk")
-
-        self.app = app
 
         # Use three-quarters of the screen by default
         screen = self.get_screen()
@@ -246,10 +244,19 @@ class BranchWindow(gtk.Window):
         self.treeview.set_cursor(self.index[self.revisions[revid]])
         self.treeview.grab_focus()
 
+    def show_diff(self, branch, revid, parentid):
+        """Open a new window to show a diff between the given revisions."""
+        from bzrlib.plugins.gtk.diff import DiffWindow
+        window = DiffWindow()
+        rev_tree = branch.repository.revision_tree(revid)
+        parent_tree = branch.repository.revision_tree(parentid)
+        description = revid + " - " + branch.nick
+        window.set_diff(description, rev_tree, parent_tree)
+        window.show()
+
     def _show_clicked_cb(self, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
-        if self.app is not None:
-            self.app.show_diff(self.branch, revid, parentid)
+        self.show_diff(self.branch, revid, parentid)
         self.treeview.grab_focus()
 
     def _treeview_row_activated_cb(self, widget, path, col):
@@ -260,6 +267,5 @@ class BranchWindow(gtk.Window):
             # Ignore revisions without parent
             return
         parent_id = self.parent_ids[revision][0]
-        if self.app is not None:
-            self.app.show_diff(self.branch, revision.revision_id, parent_id)
+        self.show_diff(self.branch, revision.revision_id, parent_id)
         self.treeview.grab_focus()
