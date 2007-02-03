@@ -31,7 +31,6 @@ from bzrlib import osutils
 
 from dialog import error_dialog, question_dialog
 from errors import show_bzr_error
-from guifiles import GLADEFILENAME
 
 class CommitDialog(gtk.Dialog):
     """ New implementation of the Commit dialog. """

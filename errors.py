@@ -16,7 +16,7 @@
 
 import bzrlib.errors as errors
 
-from dialog import error_dialog
+from olive.dialog import error_dialog
 
 def show_bzr_error(unbound):
     """Decorator that shows bazaar exceptions. """

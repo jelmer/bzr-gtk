@@ -28,9 +28,9 @@ import gtk.glade
 from bzrlib.branch import Branch
 import bzrlib.errors as errors
 
-from dialog import error_dialog, info_dialog, warning_dialog
+from olive.dialog import error_dialog, info_dialog, warning_dialog
 from errors import show_bzr_error
-from guifiles import GLADEFILENAME
+from olive.guifiles import GLADEFILENAME
 
 
 class MergeDialog:

@@ -30,7 +30,7 @@ from errors import show_bzr_error
 from bzrlib.branch import Branch
 from bzrlib.config import GlobalConfig
 
-from dialog import error_dialog
+from olive.dialog import error_dialog
 
 
 class CheckoutDialog(gtk.Dialog):

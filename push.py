@@ -28,7 +28,7 @@ from errors import show_bzr_error
 from bzrlib.config import LocationConfig
 import bzrlib.errors as errors
 
-from dialog import error_dialog, info_dialog, question_dialog
+from olive.dialog import error_dialog, info_dialog, question_dialog
 
 
 class PushDialog(gtk.Dialog):

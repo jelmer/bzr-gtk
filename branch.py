@@ -31,7 +31,7 @@ from bzrlib.branch import Branch
 from bzrlib.config import GlobalConfig
 import bzrlib.errors as errors
 
-from dialog import error_dialog, info_dialog
+from olive.dialog import error_dialog, info_dialog
 
 
 class BranchDialog(gtk.Dialog):
