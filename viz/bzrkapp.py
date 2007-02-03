@@ -15,7 +15,7 @@ pygtk.require("2.0")
 import gtk
 
 from branchwin import BranchWindow
-from diffwin import DiffWindow
+from bzrlib.plugins.gtk.diff import DiffWindow
 
 
 class BzrkApp(object):

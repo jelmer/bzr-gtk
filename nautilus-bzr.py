@@ -70,7 +70,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         except NotBranchError:
             return
 
-        from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
+        from bzrlib.plugins.gtk.viz.diff import DiffWindow
         window = DiffWindow()
         window.set_diff(tree.branch.nick, tree, tree.branch.basis_tree())
         window.show()

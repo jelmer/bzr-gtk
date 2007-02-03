@@ -39,23 +39,12 @@ from dialog import error_dialog, info_dialog, warning_dialog
 from errors import show_bzr_error
 from guifiles import GLADEFILENAME
 
-# import this classes only once
-try:
-    from bzrlib.plugins.gtk.viz.diffwin import DiffWindow
-    from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
-    from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
-    from bzrlib.plugins.gtk.annotate.config import GAnnotateConfig
-    from bzrlib.plugins.gtk.commit import CommitDialog
-    from bzrlib.plugins.gtk.push import PushDialog
-except ImportError:
-    # olive+bzr-gtk not installed. try to import from sources
-    path = os.path.dirname(os.path.dirname(__file__))
-    if path not in sys.path:
-        sys.path.append(path)
-    from viz.diffwin import DiffWindow
-    from viz.branchwin import BranchWindow
-    from annotate.gannotate import GAnnotateWindow
-    from annotate.config import GAnnotateConfig
+from bzrlib.plugins.gtk.viz.diff import DiffWindow
+from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
+from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
+from bzrlib.plugins.gtk.annotate.config import GAnnotateConfig
+from bzrlib.plugins.gtk.commit import CommitDialog
+from bzrlib.plugins.gtk.push import PushDialog
 
 # History delimiter used in config files
 delimiter = ' '
