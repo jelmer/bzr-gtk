@@ -248,6 +248,7 @@ class OliveGtk:
             
             checkout.destroy()
     
+    @show_bzr_error
     def on_menuitem_branch_commit_activate(self, widget):
         """ Branch/Commit... menu handler. """
         commit = CommitDialog(self.wt, self.wtpath, self.notbranch, self.get_selected_right(), self.window)

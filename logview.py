@@ -31,59 +31,85 @@ class LogView(gtk.ScrolledWindow):
 
     def __init__(self, revision=None):
         gtk.ScrolledWindow.__init__(self)
-        self.parent_id_widgets = []
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.set_shadow_type(gtk.SHADOW_NONE)
         self._create()
+        self._show_callback = None
+        self._clicked_callback = None
 
         if revision is not None:
             self.set_revision(revision)
 
+    def set_show_callback(self, callback):
+        self._show_callback = callback
+
+    def set_go_callback(self, callback):
+        self._go_callback = callback
+
     def set_revision(self, revision):
+        self._revision = revision
         self.revision_id.set_text(revision.revision_id)
         self.committer.set_text(revision.committer)
         self.timestamp.set_text(format_date(revision.timestamp,
                                             revision.timezone))
         self.message_buffer.set_text(revision.message)
+        try:
+            self.branchnick_label.set_text(revision.properties['branch-nick'])
+        except KeyError:
+            self.branchnick_label.set_text("")
+
         self._add_parents(revision.parent_ids)
 
+    def _show_clicked_cb(self, widget, revid, parentid):
+        """Callback for when the show button for a parent is clicked."""
+        self._show_callback(revid, parentid)
+
+    def _go_clicked_cb(self, widget, revid):
+        """Callback for when the go button for a parent is clicked."""
+        self._go_callback(revid)
+
     def _add_parents(self, parent_ids):
-        for widget in self.parent_id_widgets:
-            self.table.remove(widget)
+        for widget in self.parents_widgets:
+            self.parents_table.remove(widget)
             
-        self.parent_id_widgets = []
+        self.parents_widgets = []
+        self.parents_table.resize(max(len(parent_ids), 1), 2)
 
-        if len(parent_ids):
-            self.table.resize(4 + len(parent_ids), 2)
-
-            align = gtk.Alignment(1.0, 0.5)
+        for idx, parent_id in enumerate(parent_ids):
+            align = gtk.Alignment(0.0, 0.0)
+            self.parents_widgets.append(align)
+            self.parents_table.attach(align, 1, 2, idx, idx + 1,
+                                      gtk.EXPAND | gtk.FILL, gtk.FILL)
             align.show()
-            self.table.attach(align, 0, 1, 3, 4, gtk.FILL, gtk.FILL)
-            self.parent_id_widgets.append(align)
 
-            label = gtk.Label()
-            if len(parent_ids) > 1:
-                label.set_markup("<b>Parent Ids:</b>")
-            else:
-                label.set_markup("<b>Parent Id:</b>")
-            label.show()
-            align.add(label)
+            hbox = gtk.HBox(False, spacing=6)
+            align.add(hbox)
+            hbox.show()
 
-            for i, parent_id in enumerate(parent_ids):
-                align = gtk.Alignment(0.0, 0.5)
-                self.parent_id_widgets.append(align)
-                self.table.attach(align, 1, 2, i + 3, i + 4,
-                                  gtk.EXPAND | gtk.FILL, gtk.FILL)
-                align.show()
-                label = gtk.Label(parent_id)
-                label.set_selectable(True)
-                label.show()
-                align.add(label)
+            image = gtk.Image()
+            image.set_from_stock(
+                gtk.STOCK_FIND, gtk.ICON_SIZE_SMALL_TOOLBAR)
+            image.show()
+
+            button = gtk.Button()
+            button.add(image)
+            button.set_sensitive(self._show_callback is not None)
+            button.connect("clicked", self._show_clicked_cb,
+                           self._revision.revision_id, parent_id)
+            hbox.pack_start(button, expand=False, fill=True)
+            button.show()
+
+            button = gtk.Button(parent_id)
+            button.set_use_underline(False)
+            button.connect("clicked", self._go_clicked_cb, parent_id)
+            hbox.pack_start(button, expand=False, fill=True)
+            button.show()
 
     def _create(self):
         vbox = gtk.VBox(False, 6)
         vbox.set_border_width(6)
         vbox.pack_start(self._create_headers(), expand=False, fill=True)
+        vbox.pack_start(self._create_parents_table(), expand=False, fill=True)
         vbox.pack_start(self._create_message_view())
         self.add_with_viewport(vbox)
         vbox.show()
@@ -93,44 +119,12 @@ class LogView(gtk.ScrolledWindow):
         self.table.set_row_spacings(6)
         self.table.set_col_spacings(6)
         self.table.show()
-        
-        align = gtk.Alignment(1.0, 0.5)
-        label = gtk.Label()
-        label.set_markup("<b>Committer:</b>")
-        align.add(label)
-        self.table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
-        align.show()
-        label.show()
-
-        align = gtk.Alignment(0.0, 0.5)
-        self.committer = gtk.Label()
-        self.committer.set_selectable(True)
-        align.add(self.committer)
-        self.table.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
-        align.show()
-        self.committer.show()
-
-        align = gtk.Alignment(1.0, 0.5)
-        label = gtk.Label()
-        label.set_markup("<b>Timestamp:</b>")
-        align.add(label)
-        self.table.attach(align, 0, 1, 1, 2, gtk.FILL, gtk.FILL)
-        align.show()
-        label.show()
-
-        align = gtk.Alignment(0.0, 0.5)
-        self.timestamp = gtk.Label()
-        self.timestamp.set_selectable(True)
-        align.add(self.timestamp)
-        self.table.attach(align, 1, 2, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
-        align.show()
-        self.timestamp.show()
 
         align = gtk.Alignment(1.0, 0.5)
         label = gtk.Label()
         label.set_markup("<b>Revision Id:</b>")
         align.add(label)
-        self.table.attach(align, 0, 1, 2, 3, gtk.FILL, gtk.FILL)
+        self.table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
         align.show()
         label.show()
 
@@ -138,11 +132,76 @@ class LogView(gtk.ScrolledWindow):
         self.revision_id = gtk.Label()
         self.revision_id.set_selectable(True)
         align.add(self.revision_id)
-        self.table.attach(align, 1, 2, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.table.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
         align.show()
         self.revision_id.show()
 
+        align = gtk.Alignment(1.0, 0.5)
+        label = gtk.Label()
+        label.set_markup("<b>Committer:</b>")
+        align.add(label)
+        self.table.attach(align, 0, 1, 1, 2, gtk.FILL, gtk.FILL)
+        align.show()
+        label.show()
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.committer = gtk.Label()
+        self.committer.set_selectable(True)
+        align.add(self.committer)
+        self.table.attach(align, 1, 2, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        align.show()
+        self.committer.show()
+
+        align = gtk.Alignment(0.0, 0.5)
+        label = gtk.Label()
+        label.set_markup("<b>Branch nick:</b>")
+        align.add(label)
+        self.table.attach(align, 0, 1, 2, 3, gtk.FILL, gtk.FILL)
+        label.show()
+        align.show()
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.branchnick_label = gtk.Label()
+        self.branchnick_label.set_selectable(True)
+        align.add(self.branchnick_label)
+        self.table.attach(align, 1, 2, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.branchnick_label.show()
+        align.show()
+
+        align = gtk.Alignment(1.0, 0.5)
+        label = gtk.Label()
+        label.set_markup("<b>Timestamp:</b>")
+        align.add(label)
+        self.table.attach(align, 0, 1, 3, 4, gtk.FILL, gtk.FILL)
+        align.show()
+        label.show()
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.timestamp = gtk.Label()
+        self.timestamp.set_selectable(True)
+        align.add(self.timestamp)
+        self.table.attach(align, 1, 2, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        align.show()
+        self.timestamp.show()
+
         return self.table
+
+    def _create_parents_table(self):
+        self.parents_table = gtk.Table(rows=1, columns=2)
+        self.parents_table.set_row_spacings(3)
+        self.parents_table.set_col_spacings(6)
+        self.parents_table.show()
+        self.parents_widgets = []
+
+        label = gtk.Label()
+        label.set_markup("<b>Parents:</b>")
+        align = gtk.Alignment(0.0, 0.5)
+        align.add(label)
+        self.parents_table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
+        label.show()
+        align.show()
+
+        return self.parents_table
 
     def _create_message_view(self):
         self.message_buffer = gtk.TextBuffer()
