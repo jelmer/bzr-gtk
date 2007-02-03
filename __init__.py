@@ -389,6 +389,27 @@ class cmd_gstatus(Command):
 
 register_command(cmd_gstatus)
 
+class cmd_gconflicts(Command):
+    """ GTK+ push.
+    
+    """
+    def run(self):
+        (wt, path) = WorkingTree.open_containing('.')
+        
+        pygtk = import_pygtk()
+        try:
+            import gtk
+        except RuntimeError, e:
+            if str(e) == "could not open display":
+                raise NoDisplayError
+
+        from bzrlib.plugins.gtk.conflicts import ConflictsDialog
+
+        set_ui_factory()
+        dialog = ConflictsDialog(wt)
+        dialog.run()
+
+register_command(cmd_gconflicts)
 
 import gettext
 gettext.install('olive-gtk')
