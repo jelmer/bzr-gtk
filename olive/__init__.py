@@ -35,18 +35,17 @@ from bzrlib.branch import Branch
 import bzrlib.errors as bzrerrors
 from bzrlib.workingtree import WorkingTree
 
-from dialog import error_dialog, info_dialog, warning_dialog
-from errors import show_bzr_error
+from bzrlib.plugins.gtk.dialog import error_dialog, info_dialog, warning_dialog
+from bzrlib.plugins.gtk.errors import show_bzr_error
 from guifiles import GLADEFILENAME
 
-from bzrlib.plugins.gtk.viz.diff import DiffWindow
+from bzrlib.plugins.gtk.diff import DiffWindow
 from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
 from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
 from bzrlib.plugins.gtk.annotate.config import GAnnotateConfig
 from bzrlib.plugins.gtk.commit import CommitDialog
 from bzrlib.plugins.gtk.push import PushDialog
 
-# History delimiter used in config files
 delimiter = ' '
 
 class OliveGtk:
@@ -202,7 +201,7 @@ class OliveGtk:
         return self.path
    
     def on_about_activate(self, widget):
-        from dialog import about
+        from bzrlib.plugins.gtk.dialog import about
         about()
         
     def on_menuitem_add_files_activate(self, widget):

@@ -23,7 +23,7 @@ except:
 import gtk
 
 from olive import Preferences
-from dialog import error_dialog
+from bzrlib.plugins.gtk.dialog import error_dialog
 
 
 class BookmarkDialog(gtk.Dialog):

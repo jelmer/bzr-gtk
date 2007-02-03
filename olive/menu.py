@@ -28,7 +28,7 @@ import gtk
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
-from dialog import error_dialog, info_dialog, warning_dialog
+from bzrlib.plugins.gtk.dialog import error_dialog, info_dialog, warning_dialog
 from errors import show_bzr_error
 from launch import launch
 from olive import Preferences, DiffWindow
