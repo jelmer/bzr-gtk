@@ -309,6 +309,7 @@ class cmd_gcommit(Command):
 
     Graphical user interface for committing revisions"""
     
+    aliases = [ "gci" ]
     takes_args = []
     takes_options = []
 
