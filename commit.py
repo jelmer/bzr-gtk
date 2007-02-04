@@ -169,6 +169,8 @@ class CommitDialog(gtk.Dialog):
             _selected = model.get_value(iter, 1)
             
             diff = DiffWindow()
+            diff.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
+            diff.set_modal(True)
             parent_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
             diff.set_diff(self.wt.branch.nick, self.wt, parent_tree)
             try:
