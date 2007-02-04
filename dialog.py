@@ -26,21 +26,15 @@ import gtk.glade
 
 def about():
     """ Display the AboutDialog. """
-    version = None
-    try:
-        import bzrlib.plugins.gtk
-    except ImportError:
-        version = 'N/A'
-    else:
-        version = bzrlib.plugins.gtk.__version__
-    from guifiles import GLADEFILENAME
+    from bzrlib.plugins.gtk import __version__
+    from bzrlib.plugins.gtk.olive.guifiles import GLADEFILENAME
 
     # Load AboutDialog description
     dglade = gtk.glade.XML(GLADEFILENAME, 'aboutdialog')
     dialog = dglade.get_widget('aboutdialog')
 
     # Set version
-    dialog.set_version(version)
+    dialog.set_version(__version__)
 
     dialog.run()
     # Destroy the dialog
