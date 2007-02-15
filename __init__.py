@@ -56,13 +56,19 @@ from bzrlib.trace import warning
 if __name__ != 'bzrlib.plugins.gtk':
     warning("Not running as bzrlib.plugins.gtk, things may break.")
 
-from bzrlib import errors
+from bzrlib.lazy_import import lazy_import
+lazy_import(globals(), """
+from bzrlib import (
+    branch,
+    errors,
+    workingtree,
+    )
+""")
+
 from bzrlib.commands import Command, register_command, display_command
 from bzrlib.errors import NotVersionedError, BzrCommandError, NoSuchFile
 from bzrlib.commands import Command, register_command
 from bzrlib.option import Option
-from bzrlib.branch import Branch
-from bzrlib.workingtree import WorkingTree
 from bzrlib.bzrdir import BzrDir
 
 import os.path
@@ -132,7 +138,7 @@ class cmd_gpush(Command):
     takes_args = [ "location?" ]
     
     def run(self, location="."):
-        (branch, path) = Branch.open_containing(location)
+        (branch, path) = branch.Branch.open_containing(location)
         
         pygtk = import_pygtk()
         try:
@@ -160,7 +166,7 @@ class cmd_gdiff(Command):
     @display_command
     def run(self, revision=None, filename=None):
         set_ui_factory()
-        wt = WorkingTree.open_containing(".")[0]
+        wt = workingtree.WorkingTree.open_containing(".")[0]
         branch = wt.branch
         if revision is not None:
             if len(revision) == 1:
@@ -215,7 +221,7 @@ class cmd_visualise(Command):
 
     def run(self, location=".", revision=None, limit=None):
         set_ui_factory()
-        (branch, path) = Branch.open_containing(location)
+        (branch, path) = branch.Branch.open_containing(location)
         branch.lock_read()
         branch.repository.lock_read()
         try:
@@ -277,10 +283,10 @@ class cmd_gannotate(Command):
         from annotate.config import GAnnotateConfig
 
         try:
-            (tree, path) = WorkingTree.open_containing(filename)
+            (tree, path) = workingtree.WorkingTree.open_containing(filename)
             branch = tree.branch
         except errors.NoWorkingTree:
-            (branch, path) = Branch.open_containing(filename)
+            (branch, path) = branch.Branch.open_containing(filename)
             tree = branch.basis_tree()
 
         file_id = tree.path2id(path)
@@ -343,14 +349,14 @@ class cmd_gcommit(Command):
         wt = None
         branch = None
         try:
-            (wt, path) = WorkingTree.open_containing(filename)
+            (wt, path) = workingtree.WorkingTree.open_containing(filename)
             branch = wt.branch
         except NotBranchError, e:
             path = e.path
         except NoWorkingTree, e:
             path = e.base
             try:
-                (branch, path) = Branch.open_containing(path)
+                (branch, path) = branch.Branch.open_containing(path)
             except NotBranchError, e:
                 path = e.path
 
@@ -382,7 +388,7 @@ class cmd_gstatus(Command):
 
         set_ui_factory()
         from status import StatusDialog
-        (wt, wt_path) = WorkingTree.open_containing(path)
+        (wt, wt_path) = workingtree.WorkingTree.open_containing(path)
         status = StatusDialog(wt, wt_path)
         status.connect("destroy", gtk.main_quit)
         status.run()
@@ -394,7 +400,7 @@ class cmd_gconflicts(Command):
     
     """
     def run(self):
-        (wt, path) = WorkingTree.open_containing('.')
+        (wt, path) = workingtree.WorkingTree.open_containing('.')
         
         pygtk = import_pygtk()
         try:
