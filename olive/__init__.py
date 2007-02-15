@@ -33,6 +33,7 @@ import gtk.glade
 
 from bzrlib.branch import Branch
 import bzrlib.errors as bzrerrors
+from bzrlib.lazy_import import lazy_import
 from bzrlib.workingtree import WorkingTree
 
 from bzrlib.plugins.gtk.dialog import error_dialog, info_dialog, warning_dialog
@@ -40,7 +41,9 @@ from bzrlib.plugins.gtk.errors import show_bzr_error
 from guifiles import GLADEFILENAME
 
 from bzrlib.plugins.gtk.diff import DiffWindow
-from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
+lazy_import(globals(), """
+from bzrlib.plugins.gtk.viz import branchwin
+""")
 from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
 from bzrlib.plugins.gtk.annotate.config import GAnnotateConfig
 from bzrlib.plugins.gtk.commit import CommitDialog
@@ -435,7 +438,7 @@ class OliveGtk:
     
     def on_menuitem_stats_log_activate(self, widget):
         """ Statistics/Log... menu handler. """
-        window = BranchWindow()
+        window = branchwin.BranchWindow()
         window.set_branch(self.wt.branch, self.wt.branch.last_revision(), None)
         window.show()
     
