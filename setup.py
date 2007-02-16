@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.4
+#!/usr/bin/python
 """GTK+ Frontends for various Bazaar commands."""
 
 from distutils.core import setup
