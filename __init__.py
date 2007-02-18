@@ -56,13 +56,19 @@ from bzrlib.trace import warning
 if __name__ != 'bzrlib.plugins.gtk':
     warning("Not running as bzrlib.plugins.gtk, things may break.")
 
-from bzrlib import errors
+from bzrlib.lazy_import import lazy_import
+lazy_import(globals(), """
+from bzrlib import (
+    branch,
+    errors,
+    workingtree,
+    )
+""")
+
 from bzrlib.commands import Command, register_command, display_command
 from bzrlib.errors import NotVersionedError, BzrCommandError, NoSuchFile
 from bzrlib.commands import Command, register_command
 from bzrlib.option import Option
-from bzrlib.branch import Branch
-from bzrlib.workingtree import WorkingTree
 from bzrlib.bzrdir import BzrDir
 
 import os.path
@@ -130,10 +136,10 @@ class cmd_gpush(Command):
     
     """
     takes_args = [ "location?" ]
-    
+
     def run(self, location="."):
-        (branch, path) = Branch.open_containing(location)
-        
+        (br, path) = branch.Branch.open_containing(location)
+
         pygtk = import_pygtk()
         try:
             import gtk
@@ -144,7 +150,7 @@ class cmd_gpush(Command):
         from push import PushDialog
 
         set_ui_factory()
-        dialog = PushDialog(branch)
+        dialog = PushDialog(br)
         dialog.run()
 
 register_command(cmd_gpush)
@@ -160,7 +166,7 @@ class cmd_gdiff(Command):
     @display_command
     def run(self, revision=None, filename=None):
         set_ui_factory()
-        wt = WorkingTree.open_containing(".")[0]
+        wt = workingtree.WorkingTree.open_containing(".")[0]
         branch = wt.branch
         if revision is not None:
             if len(revision) == 1:
@@ -215,28 +221,28 @@ class cmd_visualise(Command):
 
     def run(self, location=".", revision=None, limit=None):
         set_ui_factory()
-        (branch, path) = Branch.open_containing(location)
-        branch.lock_read()
-        branch.repository.lock_read()
+        (br, path) = branch.Branch.open_containing(location)
+        br.lock_read()
+        br.repository.lock_read()
         try:
             if revision is None:
-                revid = branch.last_revision()
+                revid = br.last_revision()
                 if revid is None:
                     return
             else:
-                (revno, revid) = revision[0].in_history(branch)
+                (revno, revid) = revision[0].in_history(br)
 
             from viz.branchwin import BranchWindow
             import gtk
                 
             pp = BranchWindow()
-            pp.set_branch(branch, revid, limit)
+            pp.set_branch(br, revid, limit)
             pp.connect("destroy", lambda w: gtk.main_quit())
             pp.show()
             gtk.main()
         finally:
-            branch.repository.unlock()
-            branch.unlock()
+            br.repository.unlock()
+            br.unlock()
 
 
 register_command(cmd_visualise)
@@ -277,11 +283,11 @@ class cmd_gannotate(Command):
         from annotate.config import GAnnotateConfig
 
         try:
-            (tree, path) = WorkingTree.open_containing(filename)
-            branch = tree.branch
+            (tree, path) = workingtree.WorkingTree.open_containing(filename)
+            br = tree.branch
         except errors.NoWorkingTree:
-            (branch, path) = Branch.open_containing(filename)
-            tree = branch.basis_tree()
+            (br, path) = branch.Branch.open_containing(filename)
+            tree = br.basis_tree()
 
         file_id = tree.path2id(path)
 
@@ -290,8 +296,8 @@ class cmd_gannotate(Command):
         if revision is not None:
             if len(revision) != 1:
                 raise BzrCommandError("Only 1 revion may be specified.")
-            revision_id = revision[0].in_history(branch).rev_id
-            tree = branch.repository.revision_tree(revision_id)
+            revision_id = revision[0].in_history(br).rev_id
+            tree = br.repository.revision_tree(revision_id)
         else:
             revision_id = getattr(tree, 'get_revision_id', lambda: None)()
 
@@ -300,11 +306,11 @@ class cmd_gannotate(Command):
         window.set_title(path + " - gannotate")
         config = GAnnotateConfig(window)
         window.show()
-        branch.lock_read()
+        br.lock_read()
         try:
-            window.annotate(tree, branch, file_id)
+            window.annotate(tree, br, file_id)
         finally:
-            branch.unlock()
+            br.unlock()
         window.jump_to_line(line)
         
         gtk.main()
@@ -341,21 +347,21 @@ class cmd_gcommit(Command):
                                    StrictCommitFailed)
 
         wt = None
-        branch = None
+        br = None
         try:
-            (wt, path) = WorkingTree.open_containing(filename)
-            branch = wt.branch
+            (wt, path) = workingtree.WorkingTree.open_containing(filename)
+            br = wt.branch
         except NotBranchError, e:
             path = e.path
         except NoWorkingTree, e:
             path = e.base
             try:
-                (branch, path) = Branch.open_containing(path)
+                (br, path) = branch.Branch.open_containing(path)
             except NotBranchError, e:
                 path = e.path
 
 
-        commit = CommitDialog(wt, path, not branch)
+        commit = CommitDialog(wt, path, not br)
         commit.run()
 
 register_command(cmd_gcommit)
@@ -382,7 +388,7 @@ class cmd_gstatus(Command):
 
         set_ui_factory()
         from status import StatusDialog
-        (wt, wt_path) = WorkingTree.open_containing(path)
+        (wt, wt_path) = workingtree.WorkingTree.open_containing(path)
         status = StatusDialog(wt, wt_path)
         status.connect("destroy", gtk.main_quit)
         status.run()
@@ -394,7 +400,7 @@ class cmd_gconflicts(Command):
     
     """
     def run(self):
-        (wt, path) = WorkingTree.open_containing('.')
+        (wt, path) = workingtree.WorkingTree.open_containing('.')
         
         pygtk = import_pygtk()
         try:
