@@ -73,14 +73,16 @@ setup(
         "bzrlib.plugins.gtk": ".",
         "bzrlib.plugins.gtk.viz": "viz", 
         "bzrlib.plugins.gtk.annotate": "annotate",
-        "bzrlib.plugins.gtk.olive": "olive"
+        "bzrlib.plugins.gtk.olive": "olive",
+        "bzrlib.plugins.gtk.tests": "tests"
         },
     packages = [
 		"olive",
         "bzrlib.plugins.gtk",
         "bzrlib.plugins.gtk.viz",
         "bzrlib.plugins.gtk.annotate",
-        "bzrlib.plugins.gtk.olive"
+        "bzrlib.plugins.gtk.olive",
+        "bzrlib.plugins.gtk.tests"
         ],
       data_files=[('share/olive', ['olive.glade',
                                    'oliveicon2.png',
