@@ -23,6 +23,7 @@ if [ -x po/olive-gtk.pot ]; then
 fi
 xgettext -L python -o po/olive-gtk.pot olive-gtk
 xgettext -j -o po/olive-gtk.pot olive.glade
+xgettext -o po/olive-gtk.pot *.py
 cd olive/
 xgettext -j -o ../po/olive-gtk.pot *.py
 #cd viz

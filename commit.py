@@ -119,6 +119,7 @@ class CommitDialog(gtk.Dialog):
         self._textview_message.modify_font(pango.FontDescription("Monospace"))
         self.set_default_size(500, 500)
         self._vpaned_main.set_position(200)
+        self._button_commit.set_flags(gtk.CAN_DEFAULT)
 
         if self._is_pending:
             self._scrolledwindow_merges.set_policy(gtk.POLICY_AUTOMATIC,
@@ -170,6 +171,9 @@ class CommitDialog(gtk.Dialog):
         
         # Display dialog
         self.vbox.show_all()
+        
+        # Default to Commit button
+        self._button_commit.grab_default()
     
     def _on_treeview_files_row_activated(self, treeview, path, view_column):
         # FIXME: the diff window freezes for some reason
@@ -182,6 +186,8 @@ class CommitDialog(gtk.Dialog):
             _selected = model.get_value(iter, 1)
             
             diff = DiffWindow()
+            diff.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
+            diff.set_modal(True)
             parent_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
             diff.set_diff(self.wt.branch.nick, self.wt, parent_tree)
             try:

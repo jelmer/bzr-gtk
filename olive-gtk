@@ -82,7 +82,7 @@ from bzrlib.plugin import load_plugins
 load_plugins()
 
 import bzrlib.ui
-import ui
+import bzrlib.plugins.gtk.ui as ui
 bzrlib.ui.ui_factory = ui.GtkUIFactory()
 
 from olive import OliveGtk

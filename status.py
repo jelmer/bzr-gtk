@@ -39,8 +39,11 @@ class StatusDialog(gtk.MessageDialog):
 
     def _create(self):
         self.set_default_size(400, 300)
+        scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self.treeview = gtk.TreeView()
-        self.vbox.pack_start(self.treeview, True, True)
+        scrolledwindow.add(self.treeview)
+        self.vbox.pack_start(scrolledwindow, True, True)
         self.vbox.show_all()
 
     def row_diff(self, tv, path, tvc):

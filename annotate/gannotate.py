@@ -139,6 +139,7 @@ class GAnnotateWindow(gtk.Window):
         current_revision.timestamp = time.time()
         current_revision.message = '[Not yet committed]'
         current_revision.parent_ids = tree.get_parent_ids()
+        current_revision.properties['branch-nick'] = self.branch.nick
         current_revno = '%d?' % (self.branch.revno() + 1)
         repository = self.branch.repository
         if self.revision_id == CURRENT_REVISION:
@@ -369,14 +370,14 @@ class FakeRevision:
     For when a revision is referenced but not present.
     """
 
-    def __init__(self, revision_id, committer='?'):
+    def __init__(self, revision_id, committer='?', nick=None):
         self.revision_id = revision_id
         self.parent_ids = []
         self.committer = committer
         self.message = "?"
         self.timestamp = 0.0
         self.timezone = 0
-        self.properties = []
+        self.properties = {}
 
 
 class RevisionCache(object):

@@ -33,6 +33,7 @@ import gtk.glade
 
 from bzrlib.branch import Branch
 import bzrlib.errors as bzrerrors
+from bzrlib.lazy_import import lazy_import
 from bzrlib.workingtree import WorkingTree
 
 from bzrlib.plugins.gtk.dialog import error_dialog, info_dialog, warning_dialog
@@ -40,10 +41,13 @@ from bzrlib.plugins.gtk.errors import show_bzr_error
 from guifiles import GLADEFILENAME
 
 from bzrlib.plugins.gtk.diff import DiffWindow
-from bzrlib.plugins.gtk.viz.branchwin import BranchWindow
+lazy_import(globals(), """
+from bzrlib.plugins.gtk.viz import branchwin
+""")
 from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
 from bzrlib.plugins.gtk.annotate.config import GAnnotateConfig
 from bzrlib.plugins.gtk.commit import CommitDialog
+from bzrlib.plugins.gtk.conflicts import ConflictsDialog
 from bzrlib.plugins.gtk.push import PushDialog
 
 class OliveGtk:
@@ -86,6 +90,7 @@ class OliveGtk:
         self.menuitem_branch_commit = self.toplevel.get_widget('menuitem_branch_commit')
         self.menuitem_branch_status = self.toplevel.get_widget('menuitem_branch_status')
         self.menuitem_branch_missing = self.toplevel.get_widget('menuitem_branch_missing_revisions')
+        self.menuitem_branch_conflicts = self.toplevel.get_widget('menuitem_branch_conflicts')
         self.menuitem_stats = self.toplevel.get_widget('menuitem_stats')
         self.menuitem_stats_diff = self.toplevel.get_widget('menuitem_stats_diff')
         self.menuitem_stats_log = self.toplevel.get_widget('menuitem_stats_log')
@@ -126,6 +131,7 @@ class OliveGtk:
                 "on_menuitem_branch_pull_activate": self.on_menuitem_branch_pull_activate,
                 "on_menuitem_branch_status_activate": self.on_menuitem_branch_status_activate,
                 "on_menuitem_branch_missing_revisions_activate": self.on_menuitem_branch_missing_revisions_activate,
+                "on_menuitem_branch_conflicts_activate": self.on_menuitem_branch_conflicts_activate,
                 "on_menuitem_stats_diff_activate": self.on_menuitem_stats_diff_activate,
                 "on_menuitem_stats_log_activate": self.on_menuitem_stats_log_activate,
                 "on_menuitem_stats_infos_activate": self.on_menuitem_stats_infos_activate,
@@ -243,6 +249,13 @@ class OliveGtk:
                 self.refresh_right()
             
             commit.destroy()
+    
+    def on_menuitem_branch_conflicts_activate(self, widget):
+        """ Branch/Conflicts... menu handler. """
+        conflicts = ConflictsDialog(self.wt, self.window)
+        response = conflicts.run()
+        if response != gtk.RESPONSE_NONE:
+            conflicts.destroy()
     
     def on_menuitem_branch_merge_activate(self, widget):
         """ Branch/Merge... menu handler. """
@@ -425,7 +438,7 @@ class OliveGtk:
     
     def on_menuitem_stats_log_activate(self, widget):
         """ Statistics/Log... menu handler. """
-        window = BranchWindow()
+        window = branchwin.BranchWindow()
         window.set_branch(self.wt.branch, self.wt.branch.last_revision(), None)
         window.show()
     
@@ -725,6 +738,7 @@ class OliveGtk:
         self.menuitem_branch_commit.set_sensitive(not self.notbranch)
         self.menuitem_branch_status.set_sensitive(not self.notbranch)
         self.menuitem_branch_missing.set_sensitive(not self.notbranch)
+        self.menuitem_branch_conflicts.set_sensitive(not self.notbranch)
         self.menuitem_stats.set_sensitive(not self.notbranch)
         self.menuitem_add_files.set_sensitive(not self.notbranch)
         self.menuitem_remove_files.set_sensitive(not self.notbranch)
