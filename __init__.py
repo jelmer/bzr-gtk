@@ -435,6 +435,12 @@ class NoDisplayError(BzrCommandError):
 def test_suite():
     from unittest import TestSuite
     import tests
-    result = TestSuite()
-    result.addTest(tests.test_suite())
+    import sys
+    default_encoding = sys.getdefaultencoding()
+    try:
+        result = TestSuite()
+        result.addTest(tests.test_suite())
+    finally:
+        reload(sys)
+        sys.setdefaultencoding(default_encoding)
     return result
