@@ -167,39 +167,43 @@ class cmd_gdiff(Command):
     def run(self, revision=None, filename=None):
         set_ui_factory()
         wt = workingtree.WorkingTree.open_containing(".")[0]
-        branch = wt.branch
-        if revision is not None:
-            if len(revision) == 1:
+        wt.lock_read()
+        try:
+            branch = wt.branch
+            if revision is not None:
+                if len(revision) == 1:
+                    tree1 = wt
+                    revision_id = revision[0].in_history(branch).rev_id
+                    tree2 = branch.repository.revision_tree(revision_id)
+                elif len(revision) == 2:
+                    revision_id_0 = revision[0].in_history(branch).rev_id
+                    tree2 = branch.repository.revision_tree(revision_id_0)
+                    revision_id_1 = revision[1].in_history(branch).rev_id
+                    tree1 = branch.repository.revision_tree(revision_id_1)
+            else:
                 tree1 = wt
-                revision_id = revision[0].in_history(branch).rev_id
-                tree2 = branch.repository.revision_tree(revision_id)
-            elif len(revision) == 2:
-                revision_id_0 = revision[0].in_history(branch).rev_id
-                tree2 = branch.repository.revision_tree(revision_id_0)
-                revision_id_1 = revision[1].in_history(branch).rev_id
-                tree1 = branch.repository.revision_tree(revision_id_1)
-        else:
-            tree1 = wt
-            tree2 = tree1.basis_tree()
+                tree2 = tree1.basis_tree()
 
-        from diff import DiffWindow
-        import gtk
-        window = DiffWindow()
-        window.connect("destroy", gtk.main_quit)
-        window.set_diff("Working Tree", tree1, tree2)
-        if filename is not None:
-            tree_filename = wt.relpath(filename)
-            try:
-                window.set_file(tree_filename)
-            except NoSuchFile:
-                if (tree1.inventory.path2id(tree_filename) is None and 
-                    tree2.inventory.path2id(tree_filename) is None):
-                    raise NotVersionedError(filename)
-                raise BzrCommandError('No changes found for file "%s"' % 
-                                      filename)
-        window.show()
+            from diff import DiffWindow
+            import gtk
+            window = DiffWindow()
+            window.connect("destroy", gtk.main_quit)
+            window.set_diff("Working Tree", tree1, tree2)
+            if filename is not None:
+                tree_filename = wt.relpath(filename)
+                try:
+                    window.set_file(tree_filename)
+                except NoSuchFile:
+                    if (tree1.inventory.path2id(tree_filename) is None and 
+                        tree2.inventory.path2id(tree_filename) is None):
+                        raise NotVersionedError(filename)
+                    raise BzrCommandError('No changes found for file "%s"' % 
+                                          filename)
+            window.show()
 
-        gtk.main()
+            gtk.main()
+        finally:
+            wt.unlock()
 
 register_command(cmd_gdiff)
 
@@ -282,11 +286,10 @@ class cmd_gannotate(Command):
         from annotate.gannotate import GAnnotateWindow
         from annotate.config import GAnnotateConfig
 
-        try:
-            (tree, path) = workingtree.WorkingTree.open_containing(filename)
-            br = tree.branch
-        except errors.NoWorkingTree:
-            (br, path) = branch.Branch.open_containing(filename)
+        wt, br, path = BzrDir.open_containing_tree_or_branch(filename)
+        if wt is not None:
+            tree = wt
+        else:
             tree = br.basis_tree()
 
         file_id = tree.path2id(path)
@@ -307,13 +310,16 @@ class cmd_gannotate(Command):
         config = GAnnotateConfig(window)
         window.show()
         br.lock_read()
+        if wt is not None:
+            wt.lock_read()
         try:
             window.annotate(tree, br, file_id)
+            window.jump_to_line(line)
+            gtk.main()
         finally:
             br.unlock()
-        window.jump_to_line(line)
-        
-        gtk.main()
+            if wt is not None:
+                wt.unlock()
 
 register_command(cmd_gannotate)
 
