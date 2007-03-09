@@ -17,6 +17,7 @@
 from unittest import TestLoader, TestSuite
 from bzrlib.tests import TestUtil
 
+import os
 
 def test_suite():
     result = TestSuite()
@@ -24,6 +25,10 @@ def test_suite():
     loader = TestUtil.TestLoader()
 
     testmod_names = ['test_preferences', 'test_history']
+
+    if os.name == 'nt':
+        testmod_names.append("test_tortoise_bzr")
+
     result.addTest(loader.loadTestsFromModuleNames(["%s.%s" % (__name__, i) for i in testmod_names]))
     return result
 
