@@ -91,7 +91,7 @@ You can download the dependencies from the following locations:
 
  - Python: http://www.python.org/download/releases/2.4.3/
  - GTK: http://gladewin32.sourceforge.net/
- - PyGTK: http://www.mapr.ucl.ac.be/~gustin/win32_ports/pygtk.html (pycairo too)
+ - PyGTK: http://www.mapr.ucl.ac.be/~gustin/win32_ports (pygtk, pygobject and pycairo)
  - Bazaar: http://bazaar-vcs.org/WindowsDownloads (Python-based should be okay)
  - pyWin32: http://sourceforge.net/project/showfiles.php?group_id=78018
 
