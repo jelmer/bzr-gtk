@@ -1,4 +1,4 @@
-# Copyright (C) 2007 Jelmer Venrooij <jelmer@samba.org>
+# Copyright (C) 2007 Jelmer Vernooij <jelmer@samba.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 from unittest import TestLoader, TestSuite
 from bzrlib.tests import TestUtil
 
+import os
 
 def test_suite():
     result = TestSuite()
@@ -24,6 +25,10 @@ def test_suite():
     loader = TestUtil.TestLoader()
 
     testmod_names = ['test_preferences', 'test_history']
+
+    if os.name == 'nt':
+        testmod_names.append("test_tortoise_bzr")
+
     result.addTest(loader.loadTestsFromModuleNames(["%s.%s" % (__name__, i) for i in testmod_names]))
     return result
 

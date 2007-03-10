@@ -1,3 +1,11 @@
+# Trivial Bazaar plugin for Nautilus
+#
+# Copyright (C) 2006 Jeff Bailey
+# Copyright (C) 2006 Wouter van Heyst
+# Copyright (C) 2006 Jelmer Vernooij
+#
+# Published under the GNU GPL
+
 import nautilus
 import bzrlib
 from bzrlib.bzrdir import BzrDir
