@@ -931,7 +931,7 @@ import ConfigParser
 
 class Preferences:
     """ A class which handles Olive's preferences. """
-    def __init__(self):
+    def __init__(self, path=None):
         """ Initialize the Preferences class. """
         # Some default options
         self.defaults = { 'strict_commit' : False,
@@ -944,6 +944,16 @@ class Preferences:
 
         # Create a config parser object
         self.config = ConfigParser.RawConfigParser()
+
+        # Set filename
+        if path is None:
+            if sys.platform == 'win32':
+                # Windows - no dotted files
+                self._filename = os.path.expanduser('~/olive.conf')
+            else:
+                self._filename = os.path.expanduser('~/.olive.conf')
+        else:
+            self._filename = path
         
         # Load the configuration
         self.read()
@@ -968,23 +978,13 @@ class Preferences:
         """ Just read the configuration. """
         # Re-initialize the config parser object to avoid some bugs
         self.config = ConfigParser.RawConfigParser()
-        if sys.platform == 'win32':
-            # Windows - no dotted files
-            self.config.read([os.path.expanduser('~/olive.conf')])
-        else:
-            self.config.read([os.path.expanduser('~/.olive.conf')])
+        self.config.read([self._filename])
     
     def write(self):
         """ Write the configuration to the appropriate files. """
-        if sys.platform == 'win32':
-            # Windows - no dotted files
-            fp = open(os.path.expanduser('~/olive.conf'), 'w')
-            self.config.write(fp)
-            fp.close()
-        else:
-            fp = open(os.path.expanduser('~/.olive.conf'), 'w')
-            self.config.write(fp)
-            fp.close()
+        fp = open(self._filename, 'w')
+        self.config.write(fp)
+        fp.close()
 
     def get_bookmarks(self):
         """ Return the list of bookmarks. """
