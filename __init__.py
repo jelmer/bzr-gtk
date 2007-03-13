@@ -423,6 +423,26 @@ class cmd_gconflicts(Command):
 
 register_command(cmd_gconflicts)
 
+class cmd_gpreferences(Command):
+    """ GTK+ preferences dialog.
+
+    """
+    def run(self):
+        pygtk = import_pygtk()
+        try:
+            import gtk
+        except RuntimeError, e:
+            if str(e) == "could not open display":
+                raise NoDisplayError
+
+        from bzrlib.plugins.gtk.preferences import PreferencesWindow
+
+        set_ui_factory()
+        dialog = PreferencesWindow()
+        dialog.run()
+
+register_command(cmd_gpreferences)
+
 import gettext
 gettext.install('olive-gtk')
 
