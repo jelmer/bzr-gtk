@@ -931,7 +931,7 @@ import ConfigParser
 
 class Preferences:
     """ A class which handles Olive's preferences. """
-    def __init__(self, filename=None):
+    def __init__(self, path=None):
         """ Initialize the Preferences class. """
         # Some default options
         self.defaults = { 'strict_commit' : False,
@@ -944,16 +944,16 @@ class Preferences:
 
         # Create a config parser object
         self.config = ConfigParser.RawConfigParser()
-        
+
         # Set filename
-        if filename is None:
+        if path is None:
             if sys.platform == 'win32':
                 # Windows - no dotted files
                 self._filename = os.path.expanduser('~/olive.conf')
             else:
                 self._filename = os.path.expanduser('~/.olive.conf')
         else:
-            self._filename = filename
+            self._filename = path
         
         # Load the configuration
         self.read()
