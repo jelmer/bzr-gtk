@@ -22,7 +22,7 @@ import win32com.client as client
 class TestsShellExtension(TestCaseInTempDir):
     def setUp(self):
         super(TestsUrlHistory, self).setUp()
-		self.ext = client.Dispatch("Bazaar.ShellExtension.ContextMenu")
+        self.ext = client.Dispatch("Bazaar.ShellExtension.ContextMenu")
 
-	def test_get_command_string(self):
-		self.assertEqual(u"Hello from Python!!", self.ext.GetCommandString(1,1))
+    def test_get_command_string(self):
+        self.assertEqual(u"Hello from Python!!", self.ext.GetCommandString(1,1))
