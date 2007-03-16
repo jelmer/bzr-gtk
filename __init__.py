@@ -441,6 +441,7 @@ def test_suite():
         result = TestSuite()
         result.addTest(tests.test_suite())
     finally:
-        reload(sys)
-        sys.setdefaultencoding(default_encoding)
+        if sys.getdefaultencoding() != default_encoding:
+            reload(sys)
+            sys.setdefaultencoding(default_encoding)
     return result
