@@ -197,15 +197,19 @@ class GAnnotateWindow(gtk.Window):
         sw.add(self.annoview)
         self.annoview.gwindow = self
         sw.show()
+
+        swbox = gtk.VBox()
+        swbox.pack_start(sw)
+        swbox.show()
         
         self.pane = pane = gtk.VPaned()
-        pane.add1(sw)
+        pane.add1(swbox)
         pane.add2(self.logview)
         pane.show()
         vbox.pack_start(pane, expand=True, fill=True)
 
         self._search = SearchBox()
-        vbox.pack_start(self._search, expand=False, fill=True)
+        swbox.pack_start(self._search, expand=False, fill=True)
         accels = gtk.AccelGroup()
         accels.connect_group(gtk.keysyms.f, gtk.gdk.CONTROL_MASK,
                              gtk.ACCEL_LOCKED,
