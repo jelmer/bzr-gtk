@@ -55,6 +55,7 @@ class GAnnotateWindow(gtk.Window):
 
         self._create()
         self.revisions = {}
+        self.history = []
 
     def annotate(self, tree, branch, file_id):
         self.annotations = []
@@ -177,11 +178,13 @@ class GAnnotateWindow(gtk.Window):
             return None
         return self.annomodel[path][REVISION_ID_COL]
 
-    def _show_log(self, w):
+    def _activate_selected_revision(self, w):
         rev_id = self._selected_revision()
         if rev_id is None:
             return
-        self.logview.set_revision(self.revisions[rev_id])
+        selected = self.revisions[rev_id]
+        self.logview.set_revision(selected)
+        self.back_button.set_sensitive(len(selected.parent_ids) != 0)
 
     def _create(self):
         self.logview = self._create_log_view()
@@ -219,8 +222,11 @@ class GAnnotateWindow(gtk.Window):
                              self._search_by_line)
         self.add_accel_group(accels)
 
-        hbox = gtk.HBox(True, 6)
-        hbox.pack_start(self._create_prev_button(), expand=False, fill=True)
+        hbox = gtk.HBox(False, 6)
+        self.back_button = self._create_back_button()
+        hbox.pack_start(self.back_button, expand=False, fill=True)
+        self.forward_button = self._create_forward_button()
+        hbox.pack_start(self.forward_button, expand=False, fill=True)
         hbox.pack_end(self._create_button_box(), expand=False, fill=True)
         hbox.show()
         vbox.pack_start(hbox, expand=False, fill=True)
@@ -258,7 +264,7 @@ class GAnnotateWindow(gtk.Window):
     def _create_annotate_view(self):
         tv = gtk.TreeView()
         tv.set_rules_hint(False)
-        tv.connect("cursor-changed", self._show_log)
+        tv.connect("cursor-changed", self._activate_selected_revision)
         tv.show()
         tv.connect("row-activated", self.row_diff)
 
@@ -319,42 +325,56 @@ class GAnnotateWindow(gtk.Window):
         return lv
 
     def _create_button_box(self):
-        box = gtk.HButtonBox()
-        box.set_layout(gtk.BUTTONBOX_END)
-        box.show()
-
         button = gtk.Button()
         button.set_use_stock(True)
         button.set_label("gtk-close")
         button.connect("clicked", lambda w: self.destroy())
         button.show()
+        return button
 
-        box.pack_start(button, expand=False, fill=False)
-
-        return box
-
-    def _create_prev_button(self):
-        box = gtk.HButtonBox()
-        box.set_layout(gtk.BUTTONBOX_START)
-        box.show()
-        
+    def _create_back_button(self):
         button = gtk.Button()
         button.set_use_stock(True)
         button.set_label("gtk-go-back")
         button.connect("clicked", lambda w: self.go_back())
         button.show()
-        box.pack_start(button, expand=False, fill=False)
-        return box
+        return button
+
+    def _create_forward_button(self):
+        button = gtk.Button()
+        button.set_use_stock(True)
+        button.set_label("gtk-go-forward")
+        button.connect("clicked", lambda w: self.go_forward())
+        button.show()
+        button.set_sensitive(False)
+        return button
 
     def go_back(self):
+        self.history.append(self.tree)
+        self.forward_button.set_sensitive(True)
         rev_id = self._selected_revision()
         parent_id = self.revisions[rev_id].parent_ids[0]
-        tree = self.branch.repository.revision_tree(parent_id)
-        if self.file_id in tree:
-            offset = self.get_scroll_offset(tree)
+        target_tree = self.branch.repository.revision_tree(parent_id)
+        self._go(target_tree)
+
+    def go_forward(self):
+        if len(self.history) == 0:
+            return
+        target_tree = self.history.pop()
+        if len(self.history) == 0:
+            self.forward_button.set_sensitive(False)
+        self._go(target_tree)
+
+    def _go(self, target_tree):
+        rev_id = self._selected_revision()
+        if self.file_id in target_tree:
+            offset = self.get_scroll_offset(target_tree)
             (row,), col = self.annoview.get_cursor()
-            self.annotate(tree, self.branch, self.file_id)
-            self.annoview.set_cursor(row+offset)
+            self.annotate(target_tree, self.branch, self.file_id)
+            new_row = row+offset
+            if new_row < 0:
+                new_row = 0
+            self.annoview.set_cursor(new_row)
 
     def get_scroll_offset(self, tree):
         old = self.tree.get_file(self.file_id)
