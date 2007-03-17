@@ -638,24 +638,29 @@ class OliveGtk:
             if not self.notbranch:
                 filename = self.wt.relpath(self.path + os.sep + item)
                 
-                for rpath, rpathnew, id, kind, text_modified, meta_modified in delta.renamed:
-                    if rpathnew == filename:
-                        status = 'renamed'
-                for rpath, id, kind in delta.added:
-                    if rpath == filename:
-                        status = 'added'
-                for rpath, id, kind in delta.removed:
-                    if rpath == filename:
-                        status = 'removed'
-                for rpath, id, kind, text_modified, meta_modified in delta.modified:
-                    if rpath == filename:
-                        status = 'modified'
-                for rpath, id, kind in delta.unchanged:
-                    if rpath == filename:
-                        status = 'unchanged'
-                for rpath, file_class, kind, id, entry in self.wt.list_files():
-                    if rpath == filename and file_class == 'I':
-                        status = 'ignored'
+                try:
+                    self.wt.lock_read()
+                    
+                    for rpath, rpathnew, id, kind, text_modified, meta_modified in delta.renamed:
+                        if rpathnew == filename:
+                            status = 'renamed'
+                    for rpath, id, kind in delta.added:
+                        if rpath == filename:
+                            status = 'added'
+                    for rpath, id, kind in delta.removed:
+                        if rpath == filename:
+                            status = 'removed'
+                    for rpath, id, kind, text_modified, meta_modified in delta.modified:
+                        if rpath == filename:
+                            status = 'modified'
+                    for rpath, id, kind in delta.unchanged:
+                        if rpath == filename:
+                            status = 'unchanged'
+                    for rpath, file_class, kind, id, entry in self.wt.list_files():
+                        if rpath == filename and file_class == 'I':
+                            status = 'ignored'
+                finally:
+                    self.wt.unlock()
             
             #try:
             #    status = fileops.status(path + os.sep + item)
@@ -834,24 +839,29 @@ class OliveGtk:
             if not notbranch:
                 filename = tree1.relpath(path + os.sep + item)
                 
-                for rpath, rpathnew, id, kind, text_modified, meta_modified in delta.renamed:
-                    if rpathnew == filename:
-                        status = 'renamed'
-                for rpath, id, kind in delta.added:
-                    if rpath == filename:
-                        status = 'added'                
-                for rpath, id, kind in delta.removed:
-                    if rpath == filename:
-                        status = 'removed'
-                for rpath, id, kind, text_modified, meta_modified in delta.modified:
-                    if rpath == filename:
-                        status = 'modified'
-                for rpath, id, kind in delta.unchanged:
-                    if rpath == filename:
-                        status = 'unchanged'
-                for rpath, file_class, kind, id, entry in self.wt.list_files():
-                    if rpath == filename and file_class == 'I':
-                        status = 'ignored'
+                try:
+                    self.wt.lock_read()
+                    
+                    for rpath, rpathnew, id, kind, text_modified, meta_modified in delta.renamed:
+                        if rpathnew == filename:
+                            status = 'renamed'
+                    for rpath, id, kind in delta.added:
+                        if rpath == filename:
+                            status = 'added'                
+                    for rpath, id, kind in delta.removed:
+                        if rpath == filename:
+                            status = 'removed'
+                    for rpath, id, kind, text_modified, meta_modified in delta.modified:
+                        if rpath == filename:
+                            status = 'modified'
+                    for rpath, id, kind in delta.unchanged:
+                        if rpath == filename:
+                            status = 'unchanged'
+                    for rpath, file_class, kind, id, entry in self.wt.list_files():
+                        if rpath == filename and file_class == 'I':
+                            status = 'ignored'
+                finally:
+                    self.wt.unlock()
             
             #try:
             #    status = fileops.status(path + os.sep + item)
