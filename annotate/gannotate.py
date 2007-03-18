@@ -190,8 +190,7 @@ class GAnnotateWindow(gtk.Window):
         self.logview = self._create_log_view()
         self.annoview = self._create_annotate_view()
 
-        vbox = gtk.VBox(False, 12)
-        vbox.set_border_width(12)
+        vbox = gtk.VBox(False)
         vbox.show()
 
         sw = gtk.ScrolledWindow()
@@ -204,6 +203,14 @@ class GAnnotateWindow(gtk.Window):
         swbox = gtk.VBox()
         swbox.pack_start(sw)
         swbox.show()
+
+        hbox = gtk.HBox(False, 6)
+        self.back_button = self._create_back_button()
+        hbox.pack_start(self.back_button, expand=False, fill=True)
+        self.forward_button = self._create_forward_button()
+        hbox.pack_start(self.forward_button, expand=False, fill=True)
+        hbox.show()
+        vbox.pack_start(hbox, expand=False, fill=True)
         
         self.pane = pane = gtk.VPaned()
         pane.add1(swbox)
@@ -221,15 +228,6 @@ class GAnnotateWindow(gtk.Window):
                              gtk.ACCEL_LOCKED,
                              self._search_by_line)
         self.add_accel_group(accels)
-
-        hbox = gtk.HBox(False, 6)
-        self.back_button = self._create_back_button()
-        hbox.pack_start(self.back_button, expand=False, fill=True)
-        self.forward_button = self._create_forward_button()
-        hbox.pack_start(self.forward_button, expand=False, fill=True)
-        hbox.pack_end(self._create_button_box(), expand=False, fill=True)
-        hbox.show()
-        vbox.pack_start(hbox, expand=False, fill=True)
 
         self.add(vbox)
 
@@ -324,19 +322,12 @@ class GAnnotateWindow(gtk.Window):
         lv.show()
         return lv
 
-    def _create_button_box(self):
-        button = gtk.Button()
-        button.set_use_stock(True)
-        button.set_label("gtk-close")
-        button.connect("clicked", lambda w: self.destroy())
-        button.show()
-        return button
-
     def _create_back_button(self):
         button = gtk.Button()
         button.set_use_stock(True)
         button.set_label("gtk-go-back")
         button.connect("clicked", lambda w: self.go_back())
+        button.set_relief(gtk.RELIEF_NONE)
         button.show()
         return button
 
@@ -345,6 +336,7 @@ class GAnnotateWindow(gtk.Window):
         button.set_use_stock(True)
         button.set_label("gtk-go-forward")
         button.connect("clicked", lambda w: self.go_forward())
+        button.set_relief(gtk.RELIEF_NONE)
         button.show()
         button.set_sensitive(False)
         return button
