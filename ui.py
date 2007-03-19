@@ -22,8 +22,6 @@ import gtk
 import sys
 
 import bzrlib.progress
-from bzrlib.symbol_versioning import (deprecated_method, 
-        zero_eight)
 from bzrlib.ui import UIFactory
 
 
@@ -38,6 +36,53 @@ class PromptDialog(gtk.Dialog):
         self.vbox.show_all()
 
         self.add_buttons(gtk.STOCK_YES, gtk.RESPONSE_YES, gtk.STOCK_NO, gtk.RESPONSE_NO)
+
+
+class GtkProgressBar(gtk.ProgressBar):
+    def __init__(self, stack):
+        super(GtkProgressBar, self).__init__()
+        self.set_fraction(0.0)
+        self._stack = stack
+
+    def finished(self):
+        self._stack.remove(self)
+
+    def clear(self):
+        pass
+
+    def tick(self):
+        self.pulse()
+
+    def update(self, msg=None, current=None, total=None):
+        if msg is not None:
+            self.set_text(msg)
+        self.set_fraction(1.0 * current / total)
+        while gtk.events_pending():
+            gtk.main_iteration()
+
+
+class GtkProgressBarStack(gtk.Window):
+    def __init__(self):
+        super(GtkProgressBarStack, self).__init__(type=gtk.WINDOW_TOPLEVEL)
+        self.set_border_width(0)
+        self.set_title("Progress")
+        self.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+        self.vbox = gtk.VBox()
+        self.add(self.vbox)
+        self.set_resizable(False)
+
+    def _adapt_size(self):
+        self.resize(250, 15 * len(self.vbox.get_children()))
+
+    def get_nested(self):
+        nested = GtkProgressBar(self)
+        self.vbox.pack_start(nested)
+        self._adapt_size()
+        self.show_all()
+        return nested
+
+    def remove(self, pb):
+        self.vbox.remove(pb)
 
 
 class PasswordDialog(gtk.Dialog):
@@ -66,17 +111,12 @@ class GtkUIFactory(UIFactory):
     """A UI factory for GTK user interfaces."""
 
     def __init__(self,
-                 bar_type=None,
                  stdout=None,
                  stderr=None):
         """Create a GtkUIFactory.
 
-        :param bar_type: The type of progress bar to create. It defaults to 
-                         letting the bzrlib.progress.ProgressBar factory auto
-                         select.
         """
         super(GtkUIFactory, self).__init__()
-        self._bar_type = bar_type
         if stdout is None:
             self.stdout = sys.stdout
         else:
@@ -85,6 +125,7 @@ class GtkUIFactory(UIFactory):
             self.stderr = sys.stderr
         else:
             self.stderr = stderr
+        self._progress_bar_stack = None
 
     def get_boolean(self, prompt):
         """GtkDialog with yes/no answers"""
@@ -93,13 +134,6 @@ class GtkUIFactory(UIFactory):
         dialog.destroy()
         return (response == gtk.RESPONSE_YES)
         
-    @deprecated_method(zero_eight)
-    def progress_bar(self):
-        """See UIFactory.nested_progress_bar()."""
-        # this in turn is abstract, and creates either a tty or dots
-        # bar depending on what we think of the terminal
-        return bzrlib.progress.ProgressBar()
-
     def get_password(self, prompt='', **kwargs):
         """Prompt the user for a password.
 
@@ -121,16 +155,15 @@ class GtkUIFactory(UIFactory):
 
     def nested_progress_bar(self):
         """Return a nested progress bar.
-        
-        The actual bar type returned depends on the progress module which
-        may return a tty or dots bar depending on the terminal.
-        
-        FIXME: It should return a GtkProgressBar actually.
         """
         if self._progress_bar_stack is None:
-            self._progress_bar_stack = bzrlib.progress.ProgressBarStack(
-                klass=self._bar_type)
+            self._progress_bar_stack = GtkProgressBarStack()
         return self._progress_bar_stack.get_nested()
+
+    def set_progress_bar_vbox(self, vbox):
+        """Change the vbox to put progress bars in.
+        """
+        self._progress_bar_stack = vbox
 
     def clear_term(self):
         """Prepare the terminal for output.
