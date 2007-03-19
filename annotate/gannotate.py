@@ -56,6 +56,7 @@ class GAnnotateWindow(gtk.Window):
         self._create()
         self.revisions = {}
         self.history = []
+        self._no_back = set()
 
     def annotate(self, tree, branch, file_id):
         self.annotations = []
@@ -184,7 +185,12 @@ class GAnnotateWindow(gtk.Window):
             return
         selected = self.revisions[rev_id]
         self.logview.set_revision(selected)
-        self.back_button.set_sensitive(len(selected.parent_ids) != 0)
+        if (len(selected.parent_ids) != 0 and selected.parent_ids[0] not in
+            self._no_back):
+            enable_back = True
+        else:
+            enable_back = False
+        self.back_button.set_sensitive(enable_back)
 
     def _create(self):
         self.logview = self._create_log_view()
@@ -342,12 +348,16 @@ class GAnnotateWindow(gtk.Window):
         return button
 
     def go_back(self):
-        self.history.append(self.tree)
-        self.forward_button.set_sensitive(True)
+        last_tree = self.tree
         rev_id = self._selected_revision()
         parent_id = self.revisions[rev_id].parent_ids[0]
         target_tree = self.branch.repository.revision_tree(parent_id)
-        self._go(target_tree)
+        if self._go(target_tree):
+            self.history.append(last_tree)
+            self.forward_button.set_sensitive(True)
+        else:
+            self._no_back.add(parent_id)
+            self.back_button.set_sensitive(False)
 
     def go_forward(self):
         if len(self.history) == 0:
@@ -367,6 +377,9 @@ class GAnnotateWindow(gtk.Window):
             if new_row < 0:
                 new_row = 0
             self.annoview.set_cursor(new_row)
+            return True
+        else:
+            return False
 
     def get_scroll_offset(self, tree):
         old = self.tree.get_file(self.file_id)
