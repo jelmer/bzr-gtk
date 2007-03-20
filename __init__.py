@@ -443,6 +443,44 @@ class cmd_gpreferences(Command):
 
 register_command(cmd_gpreferences)
 
+
+class cmd_gmissing(Command):
+    """ GTK+ missing revisions dialog.
+
+    """
+    takes_args = ["other_branch?"]
+    def run(self, other_branch=None):
+        pygtk = import_pygtk()
+        try:
+            import gtk
+        except RuntimeError, e:
+            if str(e) == "could not open display":
+                raise NoDisplayError
+
+        from bzrlib.plugins.gtk.missing import MissingWindow
+        from bzrlib.branch import Branch
+
+        local_branch = Branch.open_containing(".")[0]
+        if other_branch is None:
+            other_branch = local_branch.get_parent()
+            
+            if other_branch is None:
+                raise errors.BzrCommandError("No peer location known or specified.")
+        remote_branch = Branch.open_containing(other_branch)[0]
+        set_ui_factory()
+        local_branch.lock_read()
+        try:
+            remote_branch.lock_read()
+            try:
+                dialog = MissingWindow(local_branch, remote_branch)
+                dialog.run()
+            finally:
+                remote_branch.unlock()
+        finally:
+            local_branch.unlock()
+
+register_command(cmd_gmissing)
+
 import gettext
 gettext.install('olive-gtk')
 
