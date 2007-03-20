@@ -90,8 +90,6 @@ class CommitDialog(gtk.Dialog):
         
         # Create the widgets
         self._button_commit = gtk.Button(_("Comm_it"), use_underline=True)
-        self._check_strict = gtk.CheckButton(_("_Allow unknown files"),
-                                             use_underline=True)
         self._expander_files = gtk.Expander(_("File(s) to commit"))
         self._vpaned_main = gtk.VPaned()
         self._scrolledwindow_files = gtk.ScrolledWindow()
@@ -156,7 +154,6 @@ class CommitDialog(gtk.Dialog):
             if have_nm:
                 # 3 is the enum value for STATE_CONNECTED
                 self._check_local.set_active(dbus_iface.state() != 3)
-        self.vbox.pack_start(self._check_strict, False, False)
         
         # Create the file list
         self._create_file_view()
@@ -220,11 +217,17 @@ class CommitDialog(gtk.Dialog):
             local = self._check_local.get_active()
         else:
             local = False
+
+        if list(self.wt.unknowns()) != []:
+            response = question_dialog(_("Commit with unknowns?"),
+               _("Unknown files exist in the working tree. Commit anyway?"))
+            if response == gtk.RESPONSE_NO:
+                return
         
         try:
             self.wt.commit(message,
                        allow_pointless=False,
-                       strict=self._check_strict.get_active(),
+                       strict=False,
                        local=local,
                        specific_files=specific_files)
         except errors.PointlessCommit:
@@ -233,7 +236,7 @@ class CommitDialog(gtk.Dialog):
             if response == gtk.RESPONSE_YES:
                 self.wt.commit(message,
                                allow_pointless=True,
-                               strict=self._check_strict.get_active(),
+                               strict=False,
                                local=local,
                                specific_files=specific_files)
         self.response(gtk.RESPONSE_OK)
