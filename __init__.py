@@ -335,13 +335,9 @@ class cmd_gcommit(Command):
 
         set_ui_factory()
         from commit import CommitDialog
-        from bzrlib.commit import Commit
         from bzrlib.errors import (BzrCommandError,
                                    NotBranchError,
-                                   NoWorkingTree,
-                                   PointlessCommit,
-                                   ConflictsInTree,
-                                   StrictCommitFailed)
+                                   NoWorkingTree)
 
         wt = None
         br = None
@@ -356,7 +352,6 @@ class cmd_gcommit(Command):
                 (br, path) = branch.Branch.open_containing(path)
             except NotBranchError, e:
                 path = e.path
-
 
         commit = CommitDialog(wt, path, not br)
         commit.run()
