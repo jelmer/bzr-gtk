@@ -44,13 +44,14 @@ class MissingWindow(gtk.Dialog):
         extra_revs = gtk.ScrolledWindow()
         vbox = gtk.VBox()
         for rev in revisions:
-            vbox.pack_start(LogView(rev), True, True)
+            vbox.pack_start(LogView(rev, scroll=False), True, True)
         extra_revs.add_with_viewport(vbox)
         extra_revs.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         return extra_revs
 
     def _create(self):
         self.set_default_size(600, 600)
+        paned = gtk.VPaned()
 
         frame = gtk.Frame("You have the following extra revisions:")
 
@@ -58,7 +59,7 @@ class MissingWindow(gtk.Dialog):
                 self.local_branch.repository.get_revisions(
                     map(lambda (x,y):y, self.local_extra)))
         frame.add(extra_revs)
-        self.vbox.pack_start(frame, True, True)
+        paned.pack1(frame, resize=True, shrink=False)
 
         missing_revs = self._create_revisions_frame(
                 self.remote_branch.repository.get_revisions(
@@ -66,7 +67,10 @@ class MissingWindow(gtk.Dialog):
 
         frame = gtk.Frame("You are missing following revisions:")
         frame.add(missing_revs)
-        self.vbox.pack_start(frame, True, True)
+
+        paned.pack2(frame, resize=False, shrink=True)
+
+        self.vbox.pack_start(paned, True, True)
         self.vbox.show_all()
 
     def display(self):

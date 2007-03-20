@@ -147,8 +147,6 @@ class BranchWindow(gtk.Window):
         """Construct the bottom half of the window."""
         from bzrlib.plugins.gtk.logview import LogView
         self.logview = LogView()
-        self.logview.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-        self.logview.set_shadow_type(gtk.SHADOW_NONE)
         (width, height) = self.get_size()
         self.logview.set_size_request(width, int(height / 2.5))
         self.logview.show()

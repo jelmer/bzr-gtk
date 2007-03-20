@@ -30,9 +30,12 @@ class LogView(gtk.ScrolledWindow):
     start.
     """
 
-    def __init__(self, revision=None):
-        gtk.ScrolledWindow.__init__(self)
-        self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+    def __init__(self, revision=None, scroll=True):
+        super(LogView, self).__init__()
+        if scroll:
+            self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        else:
+            self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
         self.set_shadow_type(gtk.SHADOW_NONE)
         self._create()
         self._show_callback = None
