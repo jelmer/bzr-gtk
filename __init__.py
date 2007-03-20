@@ -67,9 +67,7 @@ from bzrlib import (
 
 from bzrlib.commands import Command, register_command, display_command
 from bzrlib.errors import NotVersionedError, BzrCommandError, NoSuchFile
-from bzrlib.commands import Command, register_command
 from bzrlib.option import Option
-from bzrlib.bzrdir import BzrDir
 
 import os.path
 
@@ -83,7 +81,7 @@ def import_pygtk():
 
 
 def set_ui_factory():
-    pygtk = import_pygtk()
+    import_pygtk()
     from ui import GtkUIFactory
     import bzrlib.ui
     bzrlib.ui.ui_factory = GtkUIFactory()
@@ -108,8 +106,6 @@ class cmd_gbranch(Command):
         dialog = BranchDialog(os.path.abspath('.'))
         dialog.run()
 
-register_command(cmd_gbranch)
-
 class cmd_gcheckout(Command):
     """ GTK+ checkout.
     
@@ -129,7 +125,6 @@ class cmd_gcheckout(Command):
         dialog = CheckoutDialog(os.path.abspath('.'))
         dialog.run()
 
-register_command(cmd_gcheckout)
 
 class cmd_gpush(Command):
     """ GTK+ push.
@@ -153,7 +148,6 @@ class cmd_gpush(Command):
         dialog = PushDialog(br)
         dialog.run()
 
-register_command(cmd_gpush)
 
 class cmd_gdiff(Command):
     """Show differences in working tree in a GTK+ Window.
@@ -205,7 +199,6 @@ class cmd_gdiff(Command):
         finally:
             wt.unlock()
 
-register_command(cmd_gdiff)
 
 class cmd_visualise(Command):
     """Graphically visualise this branch.
@@ -249,8 +242,6 @@ class cmd_visualise(Command):
             br.unlock()
 
 
-register_command(cmd_visualise)
-
 class cmd_gannotate(Command):
     """GTK+ annotate.
     
@@ -285,6 +276,7 @@ class cmd_gannotate(Command):
 
         from annotate.gannotate import GAnnotateWindow
         from annotate.config import GAnnotateConfig
+        from bzrlib.bzrdir import BzrDir
 
         wt, br, path = BzrDir.open_containing_tree_or_branch(filename)
         if wt is not None:
@@ -321,7 +313,6 @@ class cmd_gannotate(Command):
             if wt is not None:
                 wt.unlock()
 
-register_command(cmd_gannotate)
 
 class cmd_gcommit(Command):
     """GTK+ commit dialog
@@ -370,7 +361,6 @@ class cmd_gcommit(Command):
         commit = CommitDialog(wt, path, not br)
         commit.run()
 
-register_command(cmd_gcommit)
 
 class cmd_gstatus(Command):
     """GTK+ status dialog
@@ -399,7 +389,6 @@ class cmd_gstatus(Command):
         status.connect("destroy", gtk.main_quit)
         status.run()
 
-register_command(cmd_gstatus)
 
 class cmd_gconflicts(Command):
     """ GTK+ push.
@@ -421,7 +410,6 @@ class cmd_gconflicts(Command):
         dialog = ConflictsDialog(wt)
         dialog.run()
 
-register_command(cmd_gconflicts)
 
 class cmd_gpreferences(Command):
     """ GTK+ preferences dialog.
@@ -441,7 +429,6 @@ class cmd_gpreferences(Command):
         dialog = PreferencesWindow()
         dialog.run()
 
-register_command(cmd_gpreferences)
 
 
 class cmd_gmissing(Command):
@@ -479,7 +466,23 @@ class cmd_gmissing(Command):
         finally:
             local_branch.unlock()
 
-register_command(cmd_gmissing)
+
+commands = [
+    cmd_gmissing, 
+    cmd_gpreferences, 
+    cmd_gconflicts, 
+    cmd_gstatus,
+    cmd_gcommit, 
+    cmd_gannotate, 
+    cmd_visualise, 
+    cmd_gdiff,
+    cmd_gpush, 
+    cmd_gcheckout, 
+    cmd_gbranch 
+    ]
+
+for cmd in commands:
+    register_command(cmd)
 
 import gettext
 gettext.install('olive-gtk')
