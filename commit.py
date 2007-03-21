@@ -35,13 +35,9 @@ from errors import show_bzr_error
 try:
     import dbus
     import dbus.glib
-    bus = dbus.SystemBus()
-    proxy_obj = bus.get_object('org.freedesktop.NetworkManager', 
-                              '/org/freedesktop/NetworkManager')
-    dbus_iface = dbus.Interface(proxy_obj, 'org.freedesktop.NetworkManager')
-    have_nm = True
+    have_dbus = True
 except ImportError:
-    have_nm = False
+    have_dbus = False
 
 class CommitDialog(gtk.Dialog):
     """ New implementation of the Commit dialog. """
@@ -151,7 +147,12 @@ class CommitDialog(gtk.Dialog):
             self._check_local = gtk.CheckButton(_("_Only commit locally"),
                                                 use_underline=True)
             self.vbox.pack_start(self._check_local, False, False)
-            if have_nm:
+            if have_dbus:
+                bus = dbus.SystemBus()
+                proxy_obj = bus.get_object('org.freedesktop.NetworkManager', 
+                              '/org/freedesktop/NetworkManager')
+                dbus_iface = dbus.Interface(
+                        proxy_obj, 'org.freedesktop.NetworkManager')
                 # 3 is the enum value for STATE_CONNECTED
                 self._check_local.set_active(dbus_iface.state() != 3)
         
