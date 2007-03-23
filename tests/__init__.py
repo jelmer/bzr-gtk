@@ -24,7 +24,10 @@ def test_suite():
 
     loader = TestUtil.TestLoader()
 
-    testmod_names = ['test_preferences', 'test_history']
+    testmod_names = [
+        'test_preferences',
+        'test_history',
+        ]
 
     if os.name == 'nt':
         testmod_names.append("test_tortoise_bzr")

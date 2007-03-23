@@ -100,6 +100,7 @@ class GTKCommand(Command):
             if str(e) == "could not open display":
                 raise NoDisplayError
         set_ui_factory()
+        return gtk
 
     def run(self):
         self.open_display()
@@ -399,6 +400,68 @@ class cmd_gpreferences(GTKCommand):
         dialog.run()
 
 register_command(cmd_gpreferences)
+
+
+class cmd_commit_notify(GTKCommand):
+    """Run the bzr commit notifier.
+
+    This is a background program which will pop up a notification on the users
+    screen when a commit occurs.
+    """
+
+    def run(self):
+        gtk = self.open_display()
+        import cgi
+        import dbus
+        import dbus.service
+        import pynotify
+        from bzrlib.bzrdir import BzrDir
+        from bzrlib import errors
+        from bzrlib.osutils import format_date
+        from bzrlib.transport import get_transport
+        if getattr(dbus, 'version', (0,0,0)) >= (0,41,0):
+            import dbus.glib
+        from bzrlib.plugins.dbus import activity
+        bus = dbus.SessionBus()
+        # get the object so we can subscribe to callbacks from it.
+        broadcast_service = bus.get_object(
+            activity.Broadcast.DBUS_NAME,
+            activity.Broadcast.DBUS_PATH)
+        def catch_branch(revision_id, url):
+            try:
+                if isinstance(revision_id, unicode):
+                    revision_id = revision_id.encode('utf8')
+                transport = get_transport(url)
+                try:
+                    transport.local_abspath('.')
+                except errors.TransportNotPossible:
+                    # dont show remote urls for now.
+                    return
+                # here we should:
+                a_dir = BzrDir.open_from_transport(transport)
+                branch = a_dir.open_branch()
+                revno = branch.revision_id_to_revno(revision_id)
+                revision = branch.repository.get_revision(revision_id)
+                summary = 'New revision %d in %s' % (revno, url)
+                body  = 'Committer: %s\n' % revision.committer
+                body += 'Date: %s\n' % format_date(revision.timestamp,
+                    revision.timezone)
+                body += '\n'
+                body += revision.message
+                body = cgi.escape(body)
+                #print repr(body)
+                nw = pynotify.Notification(summary, body)
+                nw.set_timeout(5000)
+                nw.show()
+            except Exception, e:
+                print e
+                raise
+        broadcast_service.connect_to_signal("Revision", catch_branch,
+            dbus_interface=activity.Broadcast.DBUS_INTERFACE)
+        pynotify.init("bzr commit-notify")
+        gtk.main()
+
+register_command(cmd_commit_notify)
 
 
 import gettext
