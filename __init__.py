@@ -87,46 +87,47 @@ def set_ui_factory():
     bzrlib.ui.ui_factory = GtkUIFactory()
 
 
-class cmd_gbranch(Command):
+class GTKCommand(Command):
+    """Abstract class providing GTK specific run commands."""
+
+    def open_display(self):
+        pygtk = import_pygtk()
+        try:
+            import gtk
+        except RuntimeError, e:
+            if str(e) == "could not open display":
+                raise NoDisplayError
+        set_ui_factory()
+        return gtk
+
+    def run(self):
+        self.open_display()
+        dialog = self.get_gtk_dialog(os.path.abspath('.'))
+        dialog.run()
+
+
+class cmd_gbranch(GTKCommand):
     """GTK+ branching.
     
     """
 
-    def run(self):
-        pygtk = import_pygtk()
-        try:
-            import gtk
-        except RuntimeError, e:
-            if str(e) == "could not open display":
-                raise NoDisplayError
-
+    def get_gtk_dialog(self, path):
         from bzrlib.plugins.gtk.branch import BranchDialog
+        return BranchDialog(path)
 
-        set_ui_factory()
-        dialog = BranchDialog(os.path.abspath('.'))
-        dialog.run()
 
-class cmd_gcheckout(Command):
+class cmd_gcheckout(GTKCommand):
     """ GTK+ checkout.
     
     """
     
-    def run(self):
-        pygtk = import_pygtk()
-        try:
-            import gtk
-        except RuntimeError, e:
-            if str(e) == "could not open display":
-                raise NoDisplayError
-
+    def get_gtk_dialog(self, path):
         from bzrlib.plugins.gtk.checkout import CheckoutDialog
-
-        set_ui_factory()
-        dialog = CheckoutDialog(os.path.abspath('.'))
-        dialog.run()
+        return CheckoutDialog(path)
 
 
-class cmd_gpush(Command):
+
+class cmd_gpush(GTKCommand):
     """ GTK+ push.
     
     """
@@ -134,22 +135,14 @@ class cmd_gpush(Command):
 
     def run(self, location="."):
         (br, path) = branch.Branch.open_containing(location)
-
-        pygtk = import_pygtk()
-        try:
-            import gtk
-        except RuntimeError, e:
-            if str(e) == "could not open display":
-                raise NoDisplayError
-
+        self.open_display()
         from push import PushDialog
-
-        set_ui_factory()
         dialog = PushDialog(br)
         dialog.run()
 
 
-class cmd_gdiff(Command):
+
+class cmd_gdiff(GTKCommand):
     """Show differences in working tree in a GTK+ Window.
     
     Otherwise, all changes for the tree are listed.
@@ -242,7 +235,7 @@ class cmd_visualise(Command):
             br.unlock()
 
 
-class cmd_gannotate(Command):
+class cmd_gannotate(GTKCommand):
     """GTK+ annotate.
     
     Browse changes to FILENAME line by line in a GTK+ window.
@@ -259,14 +252,7 @@ class cmd_gannotate(Command):
     aliases = ["gblame", "gpraise"]
     
     def run(self, filename, all=False, plain=False, line='1', revision=None):
-        pygtk = import_pygtk()
-
-        try:
-            import gtk
-        except RuntimeError, e:
-            if str(e) == "could not open display":
-                raise NoDisplayError
-        set_ui_factory()
+        self.open_display()
 
         try:
             line = int(line)
@@ -314,7 +300,8 @@ class cmd_gannotate(Command):
                 wt.unlock()
 
 
-class cmd_gcommit(Command):
+
+class cmd_gcommit(GTKCommand):
     """GTK+ commit dialog
 
     Graphical user interface for committing revisions"""
@@ -325,15 +312,7 @@ class cmd_gcommit(Command):
 
     def run(self, filename=None):
         import os
-        pygtk = import_pygtk()
-
-        try:
-            import gtk
-        except RuntimeError, e:
-            if str(e) == "could not open display":
-                raise NoDisplayError
-
-        set_ui_factory()
+        self.open_display()
         from commit import CommitDialog
         from bzrlib.errors import (BzrCommandError,
                                    NotBranchError,
@@ -357,7 +336,8 @@ class cmd_gcommit(Command):
         commit.run()
 
 
-class cmd_gstatus(Command):
+
+class cmd_gstatus(GTKCommand):
     """GTK+ status dialog
 
     Graphical user interface for showing status 
@@ -369,15 +349,7 @@ class cmd_gstatus(Command):
 
     def run(self, path='.'):
         import os
-        pygtk = import_pygtk()
-
-        try:
-            import gtk
-        except RuntimeError, e:
-            if str(e) == "could not open display":
-                raise NoDisplayError
-
-        set_ui_factory()
+        self.open_display()
         from status import StatusDialog
         (wt, wt_path) = workingtree.WorkingTree.open_containing(path)
         status = StatusDialog(wt, wt_path)
@@ -385,42 +357,27 @@ class cmd_gstatus(Command):
         status.run()
 
 
-class cmd_gconflicts(Command):
+
+class cmd_gconflicts(GTKCommand):
     """ GTK+ push.
     
     """
     def run(self):
         (wt, path) = workingtree.WorkingTree.open_containing('.')
-        
-        pygtk = import_pygtk()
-        try:
-            import gtk
-        except RuntimeError, e:
-            if str(e) == "could not open display":
-                raise NoDisplayError
-
+        self.open_display()
         from bzrlib.plugins.gtk.conflicts import ConflictsDialog
-
-        set_ui_factory()
         dialog = ConflictsDialog(wt)
         dialog.run()
 
 
-class cmd_gpreferences(Command):
+
+class cmd_gpreferences(GTKCommand):
     """ GTK+ preferences dialog.
 
     """
     def run(self):
-        pygtk = import_pygtk()
-        try:
-            import gtk
-        except RuntimeError, e:
-            if str(e) == "could not open display":
-                raise NoDisplayError
-
+        self.open_display()
         from bzrlib.plugins.gtk.preferences import PreferencesWindow
-
-        set_ui_factory()
         dialog = PreferencesWindow()
         dialog.run()
 
@@ -479,14 +436,79 @@ commands = [
 for cmd in commands:
     register_command(cmd)
 
+
+class cmd_commit_notify(GTKCommand):
+    """Run the bzr commit notifier.
+
+    This is a background program which will pop up a notification on the users
+    screen when a commit occurs.
+    """
+
+    def run(self):
+        gtk = self.open_display()
+        import cgi
+        import dbus
+        import dbus.service
+        import pynotify
+        from bzrlib.bzrdir import BzrDir
+        from bzrlib import errors
+        from bzrlib.osutils import format_date
+        from bzrlib.transport import get_transport
+        if getattr(dbus, 'version', (0,0,0)) >= (0,41,0):
+            import dbus.glib
+        from bzrlib.plugins.dbus import activity
+        bus = dbus.SessionBus()
+        # get the object so we can subscribe to callbacks from it.
+        broadcast_service = bus.get_object(
+            activity.Broadcast.DBUS_NAME,
+            activity.Broadcast.DBUS_PATH)
+        def catch_branch(revision_id, url):
+            try:
+                if isinstance(revision_id, unicode):
+                    revision_id = revision_id.encode('utf8')
+                transport = get_transport(url)
+                try:
+                    transport.local_abspath('.')
+                except errors.TransportNotPossible:
+                    # dont show remote urls for now.
+                    return
+                # here we should:
+                a_dir = BzrDir.open_from_transport(transport)
+                branch = a_dir.open_branch()
+                revno = branch.revision_id_to_revno(revision_id)
+                revision = branch.repository.get_revision(revision_id)
+                summary = 'New revision %d in %s' % (revno, url)
+                body  = 'Committer: %s\n' % revision.committer
+                body += 'Date: %s\n' % format_date(revision.timestamp,
+                    revision.timezone)
+                body += '\n'
+                body += revision.message
+                body = cgi.escape(body)
+                #print repr(body)
+                nw = pynotify.Notification(summary, body)
+                nw.set_timeout(5000)
+                nw.show()
+            except Exception, e:
+                print e
+                raise
+        broadcast_service.connect_to_signal("Revision", catch_branch,
+            dbus_interface=activity.Broadcast.DBUS_INTERFACE)
+        pynotify.init("bzr commit-notify")
+        gtk.main()
+
+register_command(cmd_commit_notify)
+
+
 import gettext
 gettext.install('olive-gtk')
+
 
 class NoDisplayError(BzrCommandError):
     """gtk could not find a proper display"""
 
     def __str__(self):
         return "No DISPLAY. Unable to run GTK+ application."
+
 
 def test_suite():
     from unittest import TestSuite
