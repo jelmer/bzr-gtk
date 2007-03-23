@@ -1,6 +1,8 @@
 TODO list for Bzr-Gtk
 ---------------------
 
+- List unknown files in commit dialog
+- Allow merging revisions from missing dialog
 - It should be possible to add unknown files from the commit dialog.
 - Eliminate radiobuttons in push but rather show the default location and 
   allow the user to change it
