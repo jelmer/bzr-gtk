@@ -1,0 +1,174 @@
+0.16.0	UNRELEASED
+
+ BUG FIXES
+
+ FEATURES
+
+0.15.1	2007-03-25
+
+ BUG FIXES
+ 
+  * Prevent test suite from causing default-encoding changes (Aaron)
+ 
+  * Fix testsuite when Olive was run before (Szilveszter)
+ 
+  * Fix locking issue in Olive (Szilvester, #91522)
+
+  * Don't obtain handle to networkmanager until necessary (Jelmer)
+
+  * Better behavior in annotate when unable to go back (Aaron)
+
+ FEATURES
+ 
+  * Add very simple TortoiseBzr implementation (Wouter, Jelmer)
+
+  * Add 'forward' button in gannotate (Aaron)
+
+  * Add simple GTK+ progress bars (Jelmer)
+
+  * Add gmissing command (Jelmer)
+
+  * Add simple preferences window with plugin list and global settings
+  (Jelmer)
+
+  * Add new command 'commit-notify' to listen for commits on dbus and
+  show them via pynotify. (Robert)
+
+ UI IMPROVEMENTS
+
+  * Move search fields in gannotate directly below source window (Aaron)
+
+  * Move buttons to top, tweak layout (Aaron)
+
+  * Strict commits are now a dialog, not a check box (Jelmer)
+
+0.15.0	2007-03-09
+
+BUG FIXES
+
+  * Fix gannotate interaction with dirstate (Aaron)
+
+  * Default button set on Commit dialog (#83030, Szilveszter)
+
+  * Fix branch-nick handling (Aaron)
+
+  * Defer cairo import to prevent import errors (Aaron)
+
+  * More use of lazy_imports to speed up timing (Aaron)
+
+  * Fix diff window freeze when shown from commit (Szilveszter)
+
+  * Allow to commit single files from the context menu (#54983, Szilveszter)
+
+FEATURES
+
+  * Add ability to install nautilus plugin (#75603, Szilveszter)
+
+  * Add conflicts window (Szilveszter)
+
+  * Use network manager to determine default value of "Local Commit"
+setting (Jelmer)
+
+  * Add status window (Jelmer, Szilveszter)
+
+  * Add revision browser for push and pull dialogs (Szilveszter)
+
+  * Add revert functionality to context menu (Szilveszter)
+
+INTERNAL
+
+  * Some more code converted to not use glade (Szilveszter, Jelmer)
+
+  * Move url history and preferences code to a separate class (Jelmer)
+
+  * Merge revision info code for gannotate and viz into single new widget
+(Jelmer)
+
+  * Add initial testsuite (Jelmer)
+
+0.14.0	2007-01-30
+
+  * Add revert functionality (Szilvester)
+
+  * Rewritten CommitDialog without glade (Szilvester)
+
+  * Allow to commit single files from the context menu (Fixes #54983,
+													   Szilvester)
+
+  * Warn about incompatible Bazaar versions (Jelmer)
+
+  * Fixed gbranch (#77751, Szilvester)
+
+  * Use the UI factory (Jelmer)
+
+  * Generic handling of errors (Jelmer)
+
+  * Set default drive letter (#67924, Szilvester)
+
+  * Show error if no diff available for the selected file (#76536,
+														  Szilvester)
+
+  * Handle current revision in annotate better (Aaron)
+
+  * Support scrolling based on an offset in annotate (Aaron)
+
+  * Add "Back" button in annotate (Aaron)
+
+  * Removed some unused functions (Aaron)
+
+  * Added Ctrl+G and Ctrl+F shortcuts to annotate (#73965, Vincent)
+
+  * Nicer error when pygtk not installed (Aaron)
+
+  * Show uncommitted changes in annotate (Aaron)
+
+  * Support annotate in olive (#73786, Szilvester)
+
+  * Ignored files no longer shown as unknown (#67926, Szilvester)
+
+  * Don't allow merge if there are local changes (#73770, Szilvester)
+
+  * Fix bookmark dialog (#67922, Szilvester)
+
+  * Fix remove dialog (#73766 and #73767, Szilvester)
+
+  * Several other small regression fixes (Szilvester)
+
+0.13.0	2006-12-13
+
+  * Don't show pending merge list when there are no pending merges
+    (Alexander Belchenko)
+
+  * Better error handling in gcommit (Alexander Belchenko)
+
+  * Fix desktop file compliancy to standard (Toshio Kuratomi) #75278
+
+  * Rename put into context menu (Szilvester Farkas) #73774
+
+  * Improved commit dialog (Szilvester Farkas) #73778
+
+  * Rename dialog contains original name (Szilvester Farkas) #73775
+
+  * Bookmarks can be removed (Szilvester Farkas)
+
+  * Run Olive after maximizing window (Szilvester Farkas) #70134
+
+  * Check empty commit message at commit time (vila) #73737
+
+  * Use dotted revnos in gannotate (Aaron Bentley)
+
+0.12.0	2006-11-04
+
+  * #68127: gcommit is broken
+
+  * #67934: various win32 fixes
+
+  * #67933: fix product name in setup.py
+
+  * #67930: gdiff relies on plugin name being 'gtk'
+
+  * #66937: process doesn't stop after closing commit dialog
+  
+  * #66091: commit after merge fails
+  
+  * #67927: fix non-ascii commit message
