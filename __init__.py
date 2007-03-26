@@ -462,17 +462,13 @@ class cmd_commit_notify(GTKCommand):
         broadcast_service = bus.get_object(
             activity.Broadcast.DBUS_NAME,
             activity.Broadcast.DBUS_PATH)
-        def catch_branch(revision_id, url):
+        def catch_branch(revision_id, urls):
+            # TODO: show all the urls, or perhaps choose the 'best'.
+            url = urls[0]
             try:
                 if isinstance(revision_id, unicode):
                     revision_id = revision_id.encode('utf8')
                 transport = get_transport(url)
-                try:
-                    transport.local_abspath('.')
-                except errors.TransportNotPossible:
-                    # dont show remote urls for now.
-                    return
-                # here we should:
                 a_dir = BzrDir.open_from_transport(transport)
                 branch = a_dir.open_branch()
                 revno = branch.revision_id_to_revno(revision_id)
@@ -484,7 +480,6 @@ class cmd_commit_notify(GTKCommand):
                 body += '\n'
                 body += revision.message
                 body = cgi.escape(body)
-                #print repr(body)
                 nw = pynotify.Notification(summary, body)
                 nw.set_timeout(5000)
                 nw.show()
