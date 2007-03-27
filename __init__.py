@@ -349,7 +349,7 @@ class cmd_gstatus(GTKCommand):
 
     def run(self, path='.'):
         import os
-        self.open_display()
+        gtk = self.open_display()
         from status import StatusDialog
         (wt, wt_path) = workingtree.WorkingTree.open_containing(path)
         status = StatusDialog(wt, wt_path)
