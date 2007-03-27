@@ -22,13 +22,12 @@ except:
 
 import gtk
 
-class StatusDialog(gtk.MessageDialog):
+class StatusDialog(gtk.Dialog):
     """ Display Status window and perform the needed actions. """
     def __init__(self, wt, wtpath):
         """ Initialize the Status window. """
-        super(StatusDialog, self).__init__(flags=gtk.DIALOG_MODAL, buttons=gtk.BUTTONS_OK)
+        super(StatusDialog, self).__init__(flags=gtk.DIALOG_MODAL, buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         self.set_title("Working tree changes")
-        self.set_image(gtk.Label("Working tree status"))
         self._create()
         self.wt = wt
         self.wtpath = wtpath
