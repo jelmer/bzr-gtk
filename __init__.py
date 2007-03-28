@@ -252,7 +252,7 @@ class cmd_gannotate(GTKCommand):
     aliases = ["gblame", "gpraise"]
     
     def run(self, filename, all=False, plain=False, line='1', revision=None):
-        self.open_display()
+        gtk = self.open_display()
 
         try:
             line = int(line)
