@@ -1,8 +1,22 @@
 0.16.0	UNRELEASED
 
+
+0.15.2	2007-04-03
+
  BUG FIXES
 
+  * Fix regression that prevented gannotate from being used (#97473, 
+															Vincent, Jelmer)
+
+  * Fix regression that prevented gstatus from being used (Jelmer)
+
+  * Fix status dialog size (Jelmer)
+
  FEATURES
+
+  * Update commit-notify to use new dbus API (Robert)
+
+  * Display remote locations in commit-notify (Robert)
 
 0.15.1	2007-03-25
 
