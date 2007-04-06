@@ -22,7 +22,14 @@ except:
 
 import gtk
 
+import os
+
+from dialog import error_dialog
 from errors import show_bzr_error
+
+from bzrlib import bzrdir
+from bzrlib import transport
+import bzrlib.errors as errors
 
 class InitDialog(gtk.Dialog):
     """ Initialize dialog. """
@@ -66,11 +73,46 @@ class InitDialog(gtk.Dialog):
     
     def _on_custom_toggled(self, widget):
         """ Occurs if the Custom radiobutton is toggled. """
-        if self._radio_custom.get_active() == True:
+        if self._radio_custom.get_active():
             self._entry_custom.set_sensitive(True)
             self._entry_custom.grab_focus()
         else:
             self._entry_custom.set_sensitive(False)
     
+    @show_bzr_error
     def _on_init_clicked(self, widget):
+        if self._radio_custom.get_active() and len(self._entry_custom.get_text()) == 0:
+            error_dialog(_("Directory name not specified"),
+                         _("You should specify a new directory name."))
+            return
+        
+        if self._radio_current.get_active():
+            location = self.path
+        else:
+            location = self.path + os.sep + self._entry_custom.get_text()
+        
+        format = bzrdir.format_registry.make_bzrdir('default')        
+        to_transport = transport.get_transport(location)
+        
+        try:
+            to_transport.mkdir('.')
+        except errors.FileExists:
+            pass
+                    
+        try:
+            existing_bzrdir = bzrdir.BzrDir.open(location)
+        except errors.NotBranchError:
+            branch = bzrdir.BzrDir.create_branch_convenience(to_transport.base,
+                                                             format=format)
+        else:
+            from bzrlib.transport.local import LocalTransport
+            if existing_bzrdir.has_branch():
+                if (isinstance(to_transport, LocalTransport)
+                    and not existing_bzrdir.has_workingtree()):
+                        raise errors.BranchExistsWithoutWorkingTree(location)
+                raise errors.AlreadyBranchError(location)
+            else:
+                branch = existing_bzrdir.create_branch()
+                existing_bzrdir.create_workingtree()
+        
         self.response(gtk.RESPONSE_OK)
