@@ -1,0 +1,7 @@
+The Bazaar hacking guide (HACKING in the source tarball) should be applicable to bzr-gtk as well, with a few exceptions listed in this file.
+
+bzr-gtk is a set of GTK+ frontends to Bazaar. Integration between components and with the system is highly welcome. 
+
+The GNOME Human Interface Guidelines (http://developer.gnome.org/projects/gup/hig/) should be followed where possible.
+
+Please update the NEWS file when closing bugs or adding new features.
