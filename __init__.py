@@ -419,6 +419,14 @@ class cmd_gmissing(Command):
             local_branch.unlock()
 
 
+class cmd_ginit(GTKCommand):
+    def run(self):
+        self.open_display()
+        from initialize import InitDialog
+        dialog = InitDialog(os.path.abspath(os.path.curdir))
+        dialog.run()
+
+
 commands = [
     cmd_gmissing, 
     cmd_gpreferences, 
@@ -430,7 +438,8 @@ commands = [
     cmd_gdiff,
     cmd_gpush, 
     cmd_gcheckout, 
-    cmd_gbranch 
+    cmd_gbranch,
+    cmd_ginit
     ]
 
 for cmd in commands:
