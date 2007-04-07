@@ -1,12 +1,16 @@
 0.16.0	UNRELEASED
 
+ FEATURES
+ 
+  * An Initialize dialog added to Olive along with a 'ginit' command
+  (#90839, Szilveszter)
 
 0.15.2	2007-04-03
 
  BUG FIXES
 
   * Fix regression that prevented gannotate from being used (#97473, 
-															Vincent, Jelmer)
+                                                             Vincent, Jelmer)
 
   * Fix regression that prevented gstatus from being used (Jelmer)
 
