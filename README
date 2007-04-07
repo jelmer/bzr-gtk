@@ -43,6 +43,8 @@ Other ways include doing the same in the bzrlib/plugins directory of
 your bzr working tree, or adding the location of bzr-gtk to your
 BZR_PLUGIN_PATH environment variable.
 
+Note: the plugin directory of bzr-gtk must be called 'gtk'.
+
 To use the nautilus integration, either place the nautilus-bzr.py file in
 ~/.nautilus/python-extensions or in /usr/lib/nautilus/extensions-1.0/python
 
