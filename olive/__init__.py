@@ -48,6 +48,7 @@ from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
 from bzrlib.plugins.gtk.annotate.config import GAnnotateConfig
 from bzrlib.plugins.gtk.commit import CommitDialog
 from bzrlib.plugins.gtk.conflicts import ConflictsDialog
+from bzrlib.plugins.gtk.initialize import InitDialog
 from bzrlib.plugins.gtk.push import PushDialog
 
 class OliveGtk:
@@ -343,30 +344,17 @@ class OliveGtk:
         status = StatusDialog(self.wt, self.wtpath)
         status.display()
     
-    @show_bzr_error
     def on_menuitem_branch_initialize_activate(self, widget):
         """ Initialize current directory. """
-        import bzrlib.bzrdir as bzrdir
+        init = InitDialog(self.path, self.window)
+        response = init.run()
+        if response != gtk.RESPONSE_NONE:
+            init.hide()
         
-        if not os.path.exists(self.path):
-            os.mkdir(self.path)
- 
-        try:
-            existing_bzrdir = bzrdir.BzrDir.open(self.path)
-        except bzrerrors.NotBranchError:
-            bzrdir.BzrDir.create_branch_convenience(self.path)
-        else:
-            if existing_bzrdir.has_branch():
-                if existing_bzrdir.has_workingtree():
-                    raise bzrerrors.AlreadyBranchError(self.path)
-                else:
-                    raise bzrerrors.BranchExistsWithoutWorkingTree(self.path)
-            else:
-                existing_bzrdir.create_branch()
-                existing_bzrdir.create_workingtree()
-        info_dialog(_('Initialize successful'),
-                    _('Directory successfully initialized.'))
-        self.refresh_right()
+            if response == gtk.RESPONSE_OK:
+                self.refresh_right()
+            
+            init.destroy()
         
     def on_menuitem_file_annotate_activate(self, widget):
         """ File/Annotate... menu handler. """

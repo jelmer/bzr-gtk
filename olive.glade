@@ -204,7 +204,7 @@
 		  <child>
 		    <widget class="GtkMenuItem" id="menuitem_branch_initialize">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">_Initialize</property>
+		      <property name="label" translatable="yes">_Initialize...</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="on_menuitem_branch_initialize_activate" last_modification_time="Mon, 17 Jul 2006 08:52:48 GMT"/>
 		    </widget>
