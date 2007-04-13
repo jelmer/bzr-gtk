@@ -24,6 +24,7 @@ import gtk
 
 from bzrlib.plugins.gtk.logview import LogView
 
+
 class TagsWindow(gtk.Window):
     """ Tags window. Allows the user to view/add/remove tags. """
     def __init__(self, branch, parent=None):
@@ -44,6 +45,8 @@ class TagsWindow(gtk.Window):
         self._logview = LogView()
         self._hbox = gtk.HBox()
         self._vbox_buttons = gtk.VBox()
+        self._vbox_buttons_top = gtk.VBox()
+        self._vbox_buttons_bottom = gtk.VBox()
         self._vpaned = gtk.VPaned()
         
         # Set callbacks
@@ -56,24 +59,39 @@ class TagsWindow(gtk.Window):
         
         # Set properties
         self.set_title(_("Tags - Olive"))
+        self.set_default_size(600, 400)
         
         self._scrolledwindow_tags.set_policy(gtk.POLICY_AUTOMATIC,
                                              gtk.POLICY_AUTOMATIC)
         
+        self._hbox.set_border_width(5)
+        self._hbox.set_spacing(5)
+        self._vbox_buttons.set_size_request(100, -1)
+        
+        self._vbox_buttons_top.set_spacing(3)
+        
+        self._vpaned.set_position(200)
+        
         # Construct the dialog
         self._scrolledwindow_tags.add(self._treeview_tags)
         
-        self._vbox_buttons.pack_start(self._button_add)
-        self._vbox_buttons.pack_start(self._button_remove)
-        self._vbox_buttons.pack_start(self._button_close)
+        self._vbox_buttons_top.pack_start(self._button_add, False, False)
+        self._vbox_buttons_top.pack_start(self._button_remove, False, False)
+        self._vbox_buttons_bottom.pack_start(self._button_close, False, False)
+        
+        self._vbox_buttons.pack_start(self._vbox_buttons_top, True, True)
+        self._vbox_buttons.pack_start(self._vbox_buttons_bottom, False, False)
         
         self._vpaned.add1(self._scrolledwindow_tags)
         self._vpaned.add2(self._logview)
         
-        self._hbox.pack_start(self._vpaned)
-        self._hbox.pack_start(self._vbox_buttons)
+        self._hbox.pack_start(self._vpaned, True, True)
+        self._hbox.pack_start(self._vbox_buttons, False, True)
         
         self.add(self._hbox)
+        
+        # Default to no tags
+        self._no_tags = True
         
         # Load the tags
         self._load_tags()
@@ -83,12 +101,20 @@ class TagsWindow(gtk.Window):
     
     def _load_tags(self):
         """ Load the tags into the TreeView. """
-        self._treeview_tags.append_column(gtk.TreeViewColumn(_("Tag Name"),
-                                                             gtk.CellRendererText(),
-                                                             text=0))
-        self._treeview_tags.append_column(gtk.TreeViewColumn(_("Revision ID"),
-                                                             gtk.CellRendererText(),
-                                                             text=1))
+        tvcol_name = gtk.TreeViewColumn(_("Tag Name"),
+                                        gtk.CellRendererText(),
+                                        text=0)
+        tvcol_name.set_resizable(True)
+        
+        tvcol_revid = gtk.TreeViewColumn(_("Revision ID"),
+                                         gtk.CellRendererText(),
+                                         text=1)
+        tvcol_revid.set_resizable(True)
+        
+        self._treeview_tags.append_column(tvcol_name)
+        self._treeview_tags.append_column(tvcol_revid)
+        
+        self._treeview_tags.set_search_column(0)
         
         self._refresh_tags()
     
@@ -98,11 +124,14 @@ class TagsWindow(gtk.Window):
         if self.branch.supports_tags():
             tags = self.branch.tags.get_tag_dict()
             if len(tags) > 0:
+                self._no_tags = False
                 for name, target in tags.items():
                     self._model.append([name, target])
             else:
-                self._no_tags()
+                self._no_tags = True
+                self._no_tags_available()
         else:
+            self._no_tags = True
             self._tags_not_supported()
         
         self._treeview_tags.set_model(self._model)
@@ -113,7 +142,7 @@ class TagsWindow(gtk.Window):
         self._button_add.set_sensitive(False)
         self._button_remove.set_sensitive(False)
     
-    def _no_tags(self):
+    def _no_tags_available(self):
         """ No tags in the branch. """
         self._model.append([_("No tagged revisions in the branch."), ""])
         self._button_remove.set_sensitive(False)
@@ -133,12 +162,80 @@ class TagsWindow(gtk.Window):
         (path, col) = self._treeview_tags.get_cursor()
         tag = self._model[path][0]
         
-        self.branch.tags.delete_tag(tag)
-        self._refresh_tags()
+        dialog = RemoveTagDialog(tag, self)
+        response = dialog.run()
+        if response != gtk.RESPONSE_NONE:
+            dialog.hide()
+        
+            if response == gtk.RESPONSE_OK:
+                self.branch.tags.delete_tag(tag)
+                self._refresh_tags()
+            
+            dialog.destroy()
     
     def _on_treeview_changed(self, *args):
         """ When a user clicks on a tag. """
-        (path, col) = self._treeview_tags.get_cursor()
-        revision = self._model[path][1]
+        # Refresh LogView only if there are tags available
+        if not self._no_tags:
+            (path, col) = self._treeview_tags.get_cursor()
+            revision = self._model[path][1]
+            
+            self._logview.set_revision(self.branch.repository.get_revision(revision))
+
+
+class RemoveTagDialog(gtk.Dialog):
+    """ Confirm removal of tag. """
+    def __init__(self, tagname, parent):
+        gtk.Dialog.__init__(self, title="Remove tag - Olive",
+                                  parent=parent,
+                                  flags=0,
+                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         
-        self._logview.set_revision(self.branch.repository.get_revision(revision))
+        # Get the arguments
+        self.tag = tagname
+        
+        # Create the widgets
+        self._hbox = gtk.HBox()
+        self._vbox_question = gtk.VBox()
+        self._image_question = gtk.image_new_from_stock(gtk.STOCK_DIALOG_QUESTION,
+                                                        gtk.ICON_SIZE_DIALOG)
+        self._label_title = gtk.Label()
+        self._label_question = gtk.Label(_("Are you sure you want to remove the tag?"))
+        self._button_remove = gtk.Button(_("_Remove tag"), use_underline=True)
+        
+        # Set callbacks
+        self._button_remove.connect('clicked', self._on_remove_clicked)
+        
+        # Set properties
+        self._hbox.set_border_width(5)
+        self._hbox.set_spacing(5)
+        self._vbox_question.set_spacing(3)
+        
+        self._label_title.set_markup(_("<b><big>Remove tag?</big></b>"))
+        self._label_title.set_alignment(0.0, 0.5)
+        self._label_question.set_alignment(0.0, 0.5)
+        
+        self._button_remove.set_image(gtk.image_new_from_stock(gtk.STOCK_REMOVE,
+                                                               gtk.ICON_SIZE_BUTTON))
+        self._button_remove.set_flags(gtk.CAN_DEFAULT)
+        
+        # Construct the dialog
+        self._vbox_question.pack_start(self._label_title)
+        self._vbox_question.pack_start(self._label_question)
+        
+        self._hbox.pack_start(self._image_question)
+        self._hbox.pack_start(self._vbox_question)
+        
+        self.vbox.add(self._hbox)
+        
+        self.action_area.pack_end(self._button_remove)
+        
+        # Display dialog
+        self.vbox.show_all()
+        
+        # Default to Commit button
+        self._button_remove.grab_default()
+    
+    def _on_remove_clicked(self, widget):
+        """ Remove button event handler. """
+        self.response(gtk.RESPONSE_OK)
