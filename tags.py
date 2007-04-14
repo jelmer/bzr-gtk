@@ -38,6 +38,7 @@ class TagsWindow(gtk.Window):
         # Create the widgets
         self._button_add = gtk.Button(stock=gtk.STOCK_ADD)
         self._button_remove = gtk.Button(stock=gtk.STOCK_REMOVE)
+        self._button_refresh = gtk.Button(stock=gtk.STOCK_REFRESH)
         self._button_close = gtk.Button(stock=gtk.STOCK_CLOSE)
         self._model = gtk.ListStore(str, str)
         self._treeview_tags = gtk.TreeView(self._model)
@@ -52,6 +53,7 @@ class TagsWindow(gtk.Window):
         # Set callbacks
         self._button_add.connect('clicked', self._on_add_clicked)
         self._button_close.connect('clicked', self._on_close_clicked)
+        self._button_refresh.connect('clicked', self._on_refresh_clicked)
         self._button_remove.connect('clicked', self._on_remove_clicked)
         self._treeview_tags.connect('cursor-changed', self._on_treeview_changed)
         if parent is None:
@@ -77,6 +79,7 @@ class TagsWindow(gtk.Window):
         
         self._vbox_buttons_top.pack_start(self._button_add, False, False)
         self._vbox_buttons_top.pack_start(self._button_remove, False, False)
+        self._vbox_buttons_top.pack_start(self._button_refresh, False, False)
         self._vbox_buttons_bottom.pack_start(self._button_close, False, False)
         
         self._vbox_buttons.pack_start(self._vbox_buttons_top, True, True)
@@ -156,6 +159,10 @@ class TagsWindow(gtk.Window):
         self.destroy()
         if self._parent is None:
             gtk.main_quit()
+    
+    def _on_refresh_clicked(self, widget):
+        """ Refresh button event handler. """
+        self._refresh_tags()
     
     def _on_remove_clicked(self, widget):
         """ Remove button event handler. """
