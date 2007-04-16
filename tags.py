@@ -225,7 +225,7 @@ class RemoveTagDialog(gtk.Dialog):
         self._image_question = gtk.image_new_from_stock(gtk.STOCK_DIALOG_QUESTION,
                                                         gtk.ICON_SIZE_DIALOG)
         self._label_title = gtk.Label()
-        self._label_question = gtk.Label(_("Are you sure you want to remove the tag?"))
+        self._label_question = gtk.Label()
         self._button_remove = gtk.Button(_("_Remove tag"), use_underline=True)
         
         # Set callbacks
@@ -238,6 +238,7 @@ class RemoveTagDialog(gtk.Dialog):
         
         self._label_title.set_markup(_("<b><big>Remove tag?</big></b>"))
         self._label_title.set_alignment(0.0, 0.5)
+        self._label_question.set_markup(_("Are you sure you want to remove the tag: <b>%s</b>?") % self.tag)
         self._label_question.set_alignment(0.0, 0.5)
         
         self._button_remove.set_image(gtk.image_new_from_stock(gtk.STOCK_REMOVE,
