@@ -24,6 +24,8 @@ import gtk
 
 from bzrlib.plugins.gtk.logview import LogView
 
+from dialog import error_dialog
+
 
 class TagsWindow(gtk.Window):
     """ Tags window. Allows the user to view/add/remove tags. """
@@ -130,6 +132,9 @@ class TagsWindow(gtk.Window):
                 self._no_tags = False
                 for name, target in tags.items():
                     self._model.append([name, target])
+                
+                self._button_add.set_sensitive(True)
+                self._button_remove.set_sensitive(True)
             else:
                 self._no_tags = True
                 self._no_tags_available()
@@ -148,11 +153,21 @@ class TagsWindow(gtk.Window):
     def _no_tags_available(self):
         """ No tags in the branch. """
         self._model.append([_("No tagged revisions in the branch."), ""])
+        self._button_add.set_sensitive(True)
         self._button_remove.set_sensitive(False)
     
     def _on_add_clicked(self, widget):
         """ Add button event handler. """
-        return
+        dialog = AddTagDialog(self.branch, self)
+        response = dialog.run()
+        if response != gtk.RESPONSE_NONE:
+            dialog.hide()
+        
+            if response == gtk.RESPONSE_OK:
+                self.branch.tags.set_tag(dialog.tagname, dialog.revid)
+                self._refresh_tags()
+            
+            dialog.destroy()
     
     def _on_close_clicked(self, widget):
         """ Close button event handler. """
@@ -167,6 +182,9 @@ class TagsWindow(gtk.Window):
     def _on_remove_clicked(self, widget):
         """ Remove button event handler. """
         (path, col) = self._treeview_tags.get_cursor()
+        if path is None:
+            return
+        
         tag = self._model[path][0]
         
         dialog = RemoveTagDialog(tag, self)
@@ -245,4 +263,84 @@ class RemoveTagDialog(gtk.Dialog):
     
     def _on_remove_clicked(self, widget):
         """ Remove button event handler. """
+        self.response(gtk.RESPONSE_OK)
+
+
+class AddTagDialog(gtk.Dialog):
+    """ Add tag dialog. """
+    def __init__(self, branch, parent):
+        """ Initialize Add tag dialog. """
+        gtk.Dialog.__init__(self, title="Add tag - Olive",
+                                  parent=parent,
+                                  flags=0,
+                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+        
+        # Get arguments
+        self._branch = branch
+        
+        # Create the widgets
+        self._button_add = gtk.Button(_("_Add tag"), use_underline=True)
+        self._button_revid = gtk.Button('')
+        self._table = gtk.Table(2, 2)
+        self._label_name = gtk.Label(_("Tag Name:"))
+        self._label_revid = gtk.Label(_("Revision ID:"))
+        self._entry_name = gtk.Entry()
+        self._entry_revid = gtk.Entry()
+        self._hbox_revid = gtk.HBox()
+        
+        # Set callbacks
+        self._button_add.connect('clicked', self._on_add_clicked)
+        self._button_revid.connect('clicked', self._on_revid_clicked)
+        
+        # Set properties
+        self._label_name.set_alignment(0, 0.5)
+        self._label_revid.set_alignment(0, 0.5)
+        self._button_add.set_image(gtk.image_new_from_stock(gtk.STOCK_ADD,
+                                                            gtk.ICON_SIZE_BUTTON))
+        self._button_revid.set_image(gtk.image_new_from_stock(gtk.STOCK_OPEN,
+                                                               gtk.ICON_SIZE_BUTTON))
+        self._button_add.set_flags(gtk.CAN_DEFAULT)
+        
+        # Construct the dialog
+        self._hbox_revid.pack_start(self._entry_revid, True, True)
+        self._hbox_revid.pack_start(self._button_revid, False, False) 
+        self._table.attach(self._label_name, 0, 1, 0, 1)
+        self._table.attach(self._label_revid, 0, 1, 1, 2)
+        self._table.attach(self._entry_name, 1, 2, 0, 1)
+        self._table.attach(self._hbox_revid, 1, 2, 1, 2)
+        self.vbox.add(self._table)
+        self.action_area.pack_end(self._button_add)
+        
+        # Show the dialog
+        self.vbox.show_all()
+    
+    def _on_revid_clicked(self, widget):
+        """ Browse for revision button clicked handler. """
+        from revbrowser import RevisionBrowser
+        
+        revb = RevisionBrowser(self._branch, self)
+        response = revb.run()
+        if response != gtk.RESPONSE_NONE:
+            revb.hide()
+        
+            if response == gtk.RESPONSE_OK:
+                if revb.selected_revno is not None:
+                    self._entry_revid.set_text(revb.selected_revid)
+            
+            revb.destroy()
+    
+    def _on_add_clicked(self, widget):
+        """ Add button clicked handler. """
+        if len(self._entry_name.get_text()) == 0:
+            error_dialog(_("No tag name specified"),
+                         _("You have to specify the tag's desired name."))
+            return
+        
+        if len(self._entry_revid.get_text()) == 0:
+            self.revid = self._branch.last_revision()
+        else:
+            self.revid = self._entry_revid.get_text()
+        
+        self.tagname = self._entry_name.get_text()
+        
         self.response(gtk.RESPONSE_OK)
