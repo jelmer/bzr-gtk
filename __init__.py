@@ -181,8 +181,8 @@ class cmd_gdiff(GTKCommand):
                 try:
                     window.set_file(tree_filename)
                 except NoSuchFile:
-                    if (tree1.inventory.path2id(tree_filename) is None and 
-                        tree2.inventory.path2id(tree_filename) is None):
+                    if (tree1.path2id(tree_filename) is None and 
+                        tree2.path2id(tree_filename) is None):
                         raise NotVersionedError(filename)
                     raise BzrCommandError('No changes found for file "%s"' % 
                                           filename)
