@@ -54,7 +54,10 @@ class LogView(gtk.ScrolledWindow):
     def set_revision(self, revision):
         self._revision = revision
         self.revision_id.set_text(revision.revision_id)
-        self.committer.set_text(revision.committer)
+        if revision.committer is not None:
+            self.committer.set_text(revision.committer)
+        else:
+            self.committer.set_text("")
         self.timestamp.set_text(format_date(revision.timestamp,
                                             revision.timezone))
         self.message_buffer.set_text(revision.message)
