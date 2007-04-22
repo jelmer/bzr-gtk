@@ -4,6 +4,9 @@
  
   * An Initialize dialog added to Olive along with a 'ginit' command
   (#90839, Szilveszter)
+  
+  * Tags support added: 'gtags' command and Branch->Tags menu entry in Olive
+  (#103725, Szilveszter)
 
 0.15.2	2007-04-03
 

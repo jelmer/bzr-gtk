@@ -427,6 +427,17 @@ class cmd_ginit(GTKCommand):
         dialog.run()
 
 
+class cmd_gtags(GTKCommand):
+    def run(self):
+        br = branch.Branch.open_containing('.')[0]
+        
+        gtk = self.open_display()
+        from tags import TagsWindow
+        window = TagsWindow(br)
+        window.show()
+        gtk.main()
+
+
 commands = [
     cmd_gmissing, 
     cmd_gpreferences, 
@@ -439,7 +450,8 @@ commands = [
     cmd_gpush, 
     cmd_gcheckout, 
     cmd_gbranch,
-    cmd_ginit
+    cmd_ginit,
+    cmd_gtags
     ]
 
 for cmd in commands:

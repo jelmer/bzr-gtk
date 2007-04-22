@@ -89,6 +89,7 @@ class OliveGtk:
         self.menuitem_branch_revert = self.toplevel.get_widget('menuitem_branch_revert')
         self.menuitem_branch_merge = self.toplevel.get_widget('menuitem_branch_merge')
         self.menuitem_branch_commit = self.toplevel.get_widget('menuitem_branch_commit')
+        self.menuitem_branch_tags = self.toplevel.get_widget('menuitem_branch_tags')
         self.menuitem_branch_status = self.toplevel.get_widget('menuitem_branch_status')
         self.menuitem_branch_missing = self.toplevel.get_widget('menuitem_branch_missing_revisions')
         self.menuitem_branch_conflicts = self.toplevel.get_widget('menuitem_branch_conflicts')
@@ -130,6 +131,7 @@ class OliveGtk:
                 "on_menuitem_branch_commit_activate": self.on_menuitem_branch_commit_activate,
                 "on_menuitem_branch_push_activate": self.on_menuitem_branch_push_activate,
                 "on_menuitem_branch_pull_activate": self.on_menuitem_branch_pull_activate,
+                "on_menuitem_branch_tags_activate": self.on_menuitem_branch_tags_activate,
                 "on_menuitem_branch_status_activate": self.on_menuitem_branch_status_activate,
                 "on_menuitem_branch_missing_revisions_activate": self.on_menuitem_branch_missing_revisions_activate,
                 "on_menuitem_branch_conflicts_activate": self.on_menuitem_branch_conflicts_activate,
@@ -356,6 +358,12 @@ class OliveGtk:
             
             init.destroy()
         
+    def on_menuitem_branch_tags_activate(self, widget):
+        """ Branch/Tags... menu handler. """
+        from bzrlib.plugins.gtk.tags import TagsWindow
+        window = TagsWindow(self.wt.branch, self.window)
+        window.show()
+    
     def on_menuitem_file_annotate_activate(self, widget):
         """ File/Annotate... menu handler. """
         if self.get_selected_right() is None:
@@ -729,6 +737,7 @@ class OliveGtk:
         self.menuitem_branch_revert.set_sensitive(not self.notbranch)
         self.menuitem_branch_merge.set_sensitive(not self.notbranch)
         self.menuitem_branch_commit.set_sensitive(not self.notbranch)
+        self.menuitem_branch_tags.set_sensitive(not self.notbranch)
         self.menuitem_branch_status.set_sensitive(not self.notbranch)
         self.menuitem_branch_missing.set_sensitive(not self.notbranch)
         self.menuitem_branch_conflicts.set_sensitive(not self.notbranch)

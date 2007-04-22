@@ -82,8 +82,9 @@ class RevisionBrowser(gtk.Dialog):
 
     def _fill_revisions(self):
         """ Fill up the treeview with the revisions. """
-        # [ revno, message, committer, timestamp ]
+        # [ revno, message, committer, timestamp, revid ]
         self.model = gtk.ListStore(gobject.TYPE_STRING,
+                                   gobject.TYPE_STRING,
                                    gobject.TYPE_STRING,
                                    gobject.TYPE_STRING,
                                    gobject.TYPE_STRING)
@@ -100,7 +101,8 @@ class RevisionBrowser(gtk.Dialog):
             self.model.append([ self.branch.revision_id_to_revno(rev.revision_id),
                                 rev.get_summary(),
                                 rev.committer,
-                                timestamp ])
+                                timestamp,
+                                rev.revision_id ])
     
     def _get_selected_revno(self):
         """ Return the selected revision's revno. """
@@ -112,6 +114,16 @@ class RevisionBrowser(gtk.Dialog):
         else:
             return model.get_value(iter, 0)
     
+    def _get_selected_revid(self):
+        """ Return the selected revision's revid. """
+        treeselection = self._treeview.get_selection()
+        (model, iter) = treeselection.get_selected()
+        
+        if iter is None:
+            return None
+        else:
+            return model.get_value(iter, 4)
+    
     def _on_treeview_row_activated(self, treeview, path, column):
         """ Double-click on a row should also select a revision. """
         self._on_select_clicked(treeview)
@@ -119,4 +131,5 @@ class RevisionBrowser(gtk.Dialog):
     def _on_select_clicked(self, widget):
         """ Select button clicked handler. """
         self.selected_revno = self._get_selected_revno()
+        self.selected_revid = self._get_selected_revid()
         self.response(gtk.RESPONSE_OK)
