@@ -8,6 +8,8 @@
   * Tags support added: 'gtags' command and Branch->Tags menu entry in Olive
   (#103725, Szilveszter)
 
+  * Sort plugins in gpreferences (Jelmer)
+
 0.15.2	2007-04-03
 
  BUG FIXES

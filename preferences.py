@@ -173,8 +173,11 @@ class PreferencesWindow(gtk.Dialog):
         treeview.append_column(column)
         
         import bzrlib.plugin
-        for name, plugin in bzrlib.plugin.all_plugins().items():
-            model.append([name, getattr(plugin, '__file__', None)])
+        plugins = bzrlib.plugin.all_plugins()
+        plugin_names = plugins.keys()
+        plugin_names.sort()
+        for name in plugin_names:
+            model.append([name, getattr(plugins[name], '__file__', None)])
                  
         vbox.pack_start(scrolledwindow, expand=True, fill=True)
 
