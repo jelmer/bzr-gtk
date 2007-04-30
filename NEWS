@@ -8,7 +8,19 @@
   * Tags support added: 'gtags' command and Branch->Tags menu entry in Olive
   (#103725, Szilveszter)
 
+ BUG FIXES
+
   * Sort plugins in gpreferences (Jelmer)
+
+  * Give nicer errors when startup fails (John)
+
+  * Fix 'bzr gdiff notafile' (John)
+
+  * Find olive.glade on a couple more systems (John)
+
+ INTERNALS
+  
+  * Some minor style fixes (John)
 
 0.15.2	2007-04-03
 

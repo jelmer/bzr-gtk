@@ -37,19 +37,25 @@ if version_info < NEED_VERS:
                 os.execvp(python, [python] + sys.argv)
             except OSError:
                 pass
-    print >>sys.stderr, _('bzr: error: cannot find a suitable python interpreter (need %d.%d or later)') % NEED_VERS
+    print >>sys.stderr, ('bzr: error: cannot find a suitable python interpreter'
+                         ' (need %d.%d or later)'
+                        ) % NEED_VERS
     sys.exit(1)
 
 try:
- 	import pygtk
-  	pygtk.require("2.0")
+    import pygtk
+    pygtk.require("2.0")
 except:
-  	pass
+    pass
+
 try:
-	import gtk
-	import gtk.glade
+    import gtk
+    import gtk.glade
 except:
-    print >>sys.stderr, _('You need to install python-glade2 and/or pygtk2 (gtk2) or set your PYTHONPATH correctly.\ntry: export PYTHONPATH=/usr/local/lib/python2.4/site-packages/')
+    print >>sys.stderr, ('You need to install python-glade2 and/or pygtk2 (gtk2)'
+                         ' or set your PYTHONPATH correctly.\n'
+                         'try: export PYTHONPATH=/usr/local/lib/python2.4/site-packages/'
+                        )
     sys.exit(1)
 
 # gettext support

@@ -163,8 +163,7 @@ def get_missing_revisions_working(working):
     ret = {}
     branch = working.branch
     basis = working.basis_tree()
-    work_inv = working.inventory
-    
+
     if (bzrlib.version_info[0] == 0) and (bzrlib.version_info[1] < 9):
         delta = compare_trees(basis, working, want_unchanged=True)
     else:
@@ -192,8 +191,7 @@ def get_working_stats(working):
     
     ret = {}
     basis = working.basis_tree()
-    work_inv = working.inventory
-    
+
     if (bzrlib.version_info[0] == 0) and (bzrlib.version_info[1] < 9):
         delta = compare_trees(basis, working, want_unchanged=True)
     else:
@@ -215,8 +213,8 @@ def get_working_stats(working):
     ret['ignored'] = ignore_cnt
 
     dir_cnt = 0
-    for file_id in work_inv:
-        if work_inv.get_file_kind(file_id) == 'directory':
+    for path, ie in working.iter_entries_by_dir():
+        if ie.kind == 'directory':
             dir_cnt += 1
     ret['subdirs'] = dir_cnt
 
