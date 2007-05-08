@@ -323,14 +323,9 @@ class cmd_gcommit(GTKCommand):
         try:
             (wt, path) = workingtree.WorkingTree.open_containing(filename)
             br = wt.branch
-        except NotBranchError, e:
-            path = e.path
         except NoWorkingTree, e:
             path = e.base
-            try:
-                (br, path) = branch.Branch.open_containing(path)
-            except NotBranchError, e:
-                path = e.path
+            (br, path) = branch.Branch.open_containing(path)
 
         commit = CommitDialog(wt, path, not br)
         commit.run()
