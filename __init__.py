@@ -16,7 +16,7 @@
 
 import bzrlib
 
-__version__ = '0.16.0'
+__version__ = '0.17.0'
 version_info = tuple(int(n) for n in __version__.split('.'))
 
 
