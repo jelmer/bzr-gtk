@@ -111,9 +111,5 @@ class StatusDialog(gtk.Dialog):
 
         self.treeview.expand_all()
     
-    def display(self):
-        """ Display the Diff window. """
-        self.window.show_all()
-
     def close(self, widget=None):
         self.window.destroy()
