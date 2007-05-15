@@ -2,6 +2,9 @@
 
  BUG FIXES
  
+  * Get and Checkout dialogs: scan the branch only if the entry has lost focus
+  (#93653, Szilveszter)
+
   * Fixed 'bzr gcommit' if command not issued in a branch (#113394, Szilveszter)
 
 0.16.0	2007-05-05
