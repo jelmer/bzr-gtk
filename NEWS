@@ -1,10 +1,12 @@
 0.17.0  UNRELEASED
 
  FEATURES
- 
+
+  * Bookmarked locations are now added to branch/checkout history (Szilveszter)
+
   * There are now more columns in the file list, and you can sort by them
   (Szilveszter)
-  
+
   * A location bar was added to the top of the file list. On Windows, the
   drive selector combo was moved here (Szilveszter)
 
