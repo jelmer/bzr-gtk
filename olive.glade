@@ -488,9 +488,6 @@
               <widget class="GtkVBox" id="vbox_main_right">
                 <property name="visible">True</property>
                 <child>
-                  <placeholder/>
-                </child>
-                <child>
                   <widget class="GtkHBox" id="hbox_location">
                     <property name="visible">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
@@ -518,6 +515,9 @@
                       </packing>
                     </child>
                     <child>
+                      <placeholder/>
+                    </child>
+                    <child>
                       <widget class="GtkEntry" id="entry_location">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
@@ -525,7 +525,7 @@
                         <signal name="key_press_event" handler="on_entry_location_key_press_event"/>
                       </widget>
                       <packing>
-                        <property name="position">1</property>
+                        <property name="position">2</property>
                       </packing>
                     </child>
                     <child>
@@ -536,7 +536,7 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
-                        <property name="position">2</property>
+                        <property name="position">3</property>
                       </packing>
                     </child>
                     <child>
@@ -553,14 +553,13 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
-                        <property name="position">3</property>
+                        <property name="position">4</property>
                       </packing>
                     </child>
                   </widget>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">False</property>
-                    <property name="position">1</property>
                   </packing>
                 </child>
                 <child>
@@ -580,7 +579,7 @@
                     </child>
                   </widget>
                   <packing>
-                    <property name="position">2</property>
+                    <property name="position">1</property>
                   </packing>
                 </child>
               </widget>
@@ -1211,147 +1210,15 @@
                     <property name="n_columns">2</property>
                     <property name="column_spacing">12</property>
                     <child>
-                      <widget class="GtkLabel" id="label_info_location_lightcoroot_label">
+                      <widget class="GtkLabel" id="label_info_location_repobranch">
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Light checkout root: </property>
+                        <property name="label" translatable="yes">(none)</property>
                       </widget>
                       <packing>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_location_sharedrepo_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Shared repository: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_location_repobranch_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Repository branch: </property>
-                      </widget>
-                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
                         <property name="top_attach">2</property>
                         <property name="bottom_attach">3</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_location_cobranch_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Checkout of branch: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">3</property>
-                        <property name="bottom_attach">4</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_location_repoco_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Repository checkout: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_location_branchroot_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Branch root: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">6</property>
-                        <property name="bottom_attach">7</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_location_coroot_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Checkout root: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">5</property>
-                        <property name="bottom_attach">6</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_location_lightcoroot">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">(none)</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_location_sharedrepo">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">(none)</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_location_branchroot">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">(none)</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">6</property>
-                        <property name="bottom_attach">7</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_location_coroot">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">(none)</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">5</property>
-                        <property name="bottom_attach">6</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_location_repoco">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">(none)</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
                         <property name="y_options"></property>
                       </packing>
                     </child>
@@ -1369,15 +1236,147 @@
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="label_info_location_repobranch">
+                      <widget class="GtkLabel" id="label_info_location_repoco">
                         <property name="xalign">0</property>
                         <property name="label" translatable="yes">(none)</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="right_attach">2</property>
+                        <property name="top_attach">4</property>
+                        <property name="bottom_attach">5</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_location_coroot">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">(none)</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">5</property>
+                        <property name="bottom_attach">6</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_location_branchroot">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">(none)</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">6</property>
+                        <property name="bottom_attach">7</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_location_sharedrepo">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">(none)</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_location_lightcoroot">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">(none)</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_location_coroot_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Checkout root: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">5</property>
+                        <property name="bottom_attach">6</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_location_branchroot_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Branch root: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">6</property>
+                        <property name="bottom_attach">7</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_location_repoco_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Repository checkout: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">4</property>
+                        <property name="bottom_attach">5</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_location_cobranch_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Checkout of branch: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_location_repobranch_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Repository branch: </property>
+                      </widget>
+                      <packing>
                         <property name="top_attach">2</property>
                         <property name="bottom_attach">3</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_location_sharedrepo_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Shared repository: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_location_lightcoroot_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Light checkout root: </property>
+                      </widget>
+                      <packing>
+                        <property name="x_options">GTK_FILL</property>
                         <property name="y_options"></property>
                       </packing>
                     </child>
@@ -1416,24 +1415,13 @@
                     <property name="n_columns">2</property>
                     <property name="column_spacing">12</property>
                     <child>
-                      <widget class="GtkLabel" id="label_info_related_parentbranch_label">
+                      <widget class="GtkLabel" id="label_info_related_parentbranch">
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Parent branch: </property>
+                        <property name="label" translatable="yes">(none)</property>
                       </widget>
                       <packing>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_related_publishbranch_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Publish to branch: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                        <property name="x_options">GTK_FILL</property>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
                         <property name="y_options"></property>
                       </packing>
                     </child>
@@ -1451,13 +1439,24 @@
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="label_info_related_parentbranch">
+                      <widget class="GtkLabel" id="label_info_related_publishbranch_label">
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes">(none)</property>
+                        <property name="label" translatable="yes">Publish to branch: </property>
                       </widget>
                       <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_related_parentbranch_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Parent branch: </property>
+                      </widget>
+                      <packing>
+                        <property name="x_options">GTK_FILL</property>
                         <property name="y_options"></property>
                       </packing>
                     </child>
@@ -1496,74 +1495,13 @@
                     <property name="n_columns">2</property>
                     <property name="column_spacing">12</property>
                     <child>
-                      <widget class="GtkLabel" id="label_info_format_control_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Control format: </property>
-                      </widget>
-                      <packing>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_format_workingtree_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Working tree format: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_format_branch_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Branch format: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_format_repository_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Repository format: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">3</property>
-                        <property name="bottom_attach">4</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_format_repository">
+                      <widget class="GtkLabel" id="label_info_format_control">
                         <property name="xalign">0</property>
                         <property name="label" translatable="yes">(none)</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="right_attach">2</property>
-                        <property name="top_attach">3</property>
-                        <property name="bottom_attach">4</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_format_branch">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">(none)</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
                         <property name="y_options"></property>
                       </packing>
                     </child>
@@ -1581,13 +1519,74 @@
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="label_info_format_control">
+                      <widget class="GtkLabel" id="label_info_format_branch">
                         <property name="xalign">0</property>
                         <property name="label" translatable="yes">(none)</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="right_attach">2</property>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_format_repository">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">(none)</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_format_repository_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Repository format: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_format_branch_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Branch format: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_format_workingtree_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Working tree format: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_format_control_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Control format: </property>
+                      </widget>
+                      <packing>
+                        <property name="x_options">GTK_FILL</property>
                         <property name="y_options"></property>
                       </packing>
                     </child>
@@ -1626,49 +1625,13 @@
                     <property name="n_columns">2</property>
                     <property name="column_spacing">12</property>
                     <child>
-                      <widget class="GtkLabel" id="label_info_locking_workingtree_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Working tree lock status: </property>
-                      </widget>
-                      <packing>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_locking_branch_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Branch lock status: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_locking_repository_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Repository lock status: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_locking_repository">
+                      <widget class="GtkLabel" id="label_info_locking_workingtree">
                         <property name="xalign">0</property>
                         <property name="label" translatable="yes">(none)</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="right_attach">2</property>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
                         <property name="y_options"></property>
                       </packing>
                     </child>
@@ -1686,13 +1649,49 @@
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="label_info_locking_workingtree">
+                      <widget class="GtkLabel" id="label_info_locking_repository">
                         <property name="xalign">0</property>
                         <property name="label" translatable="yes">(none)</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="right_attach">2</property>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_locking_repository_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Repository lock status: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_locking_branch_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Branch lock status: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_locking_workingtree_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Working tree lock status: </property>
+                      </widget>
+                      <packing>
+                        <property name="x_options">GTK_FILL</property>
                         <property name="y_options"></property>
                       </packing>
                     </child>
@@ -1731,24 +1730,13 @@
                     <property name="n_columns">2</property>
                     <property name="column_spacing">12</property>
                     <child>
-                      <widget class="GtkLabel" id="label_info_missing_workingtree_label">
+                      <widget class="GtkLabel" id="label_info_missing_workingtree">
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Missing revisions in working tree: </property>
+                        <property name="label" translatable="yes">(none)</property>
                       </widget>
                       <packing>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_missing_branch_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Missing revisions in branch: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                        <property name="x_options">GTK_FILL</property>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
                         <property name="y_options"></property>
                       </packing>
                     </child>
@@ -1766,13 +1754,24 @@
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="label_info_missing_workingtree">
+                      <widget class="GtkLabel" id="label_info_missing_branch_label">
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes">(none)</property>
+                        <property name="label" translatable="yes">Missing revisions in branch: </property>
                       </widget>
                       <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_missing_workingtree_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Missing revisions in working tree: </property>
+                      </widget>
+                      <packing>
+                        <property name="x_options">GTK_FILL</property>
                         <property name="y_options"></property>
                       </packing>
                     </child>
@@ -1811,174 +1810,13 @@
                     <property name="n_columns">2</property>
                     <property name="column_spacing">12</property>
                     <child>
-                      <widget class="GtkLabel" id="label_info_wtstats_unchanged_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Unchanged files: </property>
-                      </widget>
-                      <packing>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_wtstats_modified_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Modified files: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_wtstats_added_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Added files: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_wtstats_removed_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Removed files: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">3</property>
-                        <property name="bottom_attach">4</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_wtstats_renamed_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Renamed files: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_wtstats_unknown_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Unknown files: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">5</property>
-                        <property name="bottom_attach">6</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_wtstats_ignored_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Ignored files: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">6</property>
-                        <property name="bottom_attach">7</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_wtstats_subdirs_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Versioned subdirectories: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">7</property>
-                        <property name="bottom_attach">8</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_wtstats_subdirs">
+                      <widget class="GtkLabel" id="label_info_wtstats_unchanged">
                         <property name="xalign">0</property>
                         <property name="label" translatable="yes">(none)</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="right_attach">2</property>
-                        <property name="top_attach">7</property>
-                        <property name="bottom_attach">8</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_wtstats_ignored">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">(none)</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">6</property>
-                        <property name="bottom_attach">7</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_wtstats_unknown">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">(none)</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">5</property>
-                        <property name="bottom_attach">6</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_wtstats_renamed">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">(none)</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_wtstats_removed">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">(none)</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">3</property>
-                        <property name="bottom_attach">4</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_wtstats_added">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">(none)</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
                         <property name="y_options"></property>
                       </packing>
                     </child>
@@ -1996,13 +1834,174 @@
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="label_info_wtstats_unchanged">
+                      <widget class="GtkLabel" id="label_info_wtstats_added">
                         <property name="xalign">0</property>
                         <property name="label" translatable="yes">(none)</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="right_attach">2</property>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_wtstats_removed">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">(none)</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_wtstats_renamed">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">(none)</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">4</property>
+                        <property name="bottom_attach">5</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_wtstats_unknown">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">(none)</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">5</property>
+                        <property name="bottom_attach">6</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_wtstats_ignored">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">(none)</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">6</property>
+                        <property name="bottom_attach">7</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_wtstats_subdirs">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">(none)</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">7</property>
+                        <property name="bottom_attach">8</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_wtstats_subdirs_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Versioned subdirectories: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">7</property>
+                        <property name="bottom_attach">8</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_wtstats_ignored_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Ignored files: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">6</property>
+                        <property name="bottom_attach">7</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_wtstats_unknown_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Unknown files: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">5</property>
+                        <property name="bottom_attach">6</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_wtstats_renamed_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Renamed files: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">4</property>
+                        <property name="bottom_attach">5</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_wtstats_removed_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Removed files: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_wtstats_added_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Added files: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_wtstats_modified_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Modified files: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_wtstats_unchanged_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Unchanged files: </property>
+                      </widget>
+                      <packing>
+                        <property name="x_options">GTK_FILL</property>
                         <property name="y_options"></property>
                       </packing>
                     </child>
@@ -2041,99 +2040,13 @@
                     <property name="n_columns">2</property>
                     <property name="column_spacing">12</property>
                     <child>
-                      <widget class="GtkLabel" id="label_info_brstats_revno_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Revisions in branch: </property>
-                      </widget>
-                      <packing>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_brstats_commiters_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Number of commiters: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_brstats_age_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Age of branch in days: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_brstats_firstrev_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Time of first revision: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">3</property>
-                        <property name="bottom_attach">4</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_brstats_lastrev_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Time of last revision: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_brstats_lastrev">
+                      <widget class="GtkLabel" id="label_info_brstats_revno">
                         <property name="xalign">0</property>
                         <property name="label" translatable="yes">(none)</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="right_attach">2</property>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_brstats_firstrev">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">(none)</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">3</property>
-                        <property name="bottom_attach">4</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_brstats_age">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">(none)</property>
-                      </widget>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
                         <property name="y_options"></property>
                       </packing>
                     </child>
@@ -2151,13 +2064,99 @@
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="label_info_brstats_revno">
+                      <widget class="GtkLabel" id="label_info_brstats_age">
                         <property name="xalign">0</property>
                         <property name="label" translatable="yes">(none)</property>
                       </widget>
                       <packing>
                         <property name="left_attach">1</property>
                         <property name="right_attach">2</property>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_brstats_firstrev">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">(none)</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_brstats_lastrev">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">(none)</property>
+                      </widget>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">4</property>
+                        <property name="bottom_attach">5</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_brstats_lastrev_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Time of last revision: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">4</property>
+                        <property name="bottom_attach">5</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_brstats_firstrev_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Time of first revision: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_brstats_age_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Age of branch in days: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_brstats_commiters_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Number of commiters: </property>
+                      </widget>
+                      <packing>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_brstats_revno_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Revisions in branch: </property>
+                      </widget>
+                      <packing>
+                        <property name="x_options">GTK_FILL</property>
                         <property name="y_options"></property>
                       </packing>
                     </child>
@@ -2196,24 +2195,13 @@
                     <property name="n_columns">2</property>
                     <property name="column_spacing">12</property>
                     <child>
-                      <widget class="GtkLabel" id="label_info_repstats_revisions_label">
+                      <widget class="GtkLabel" id="label_info_repstats_revisions">
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Revisions in repository: </property>
+                        <property name="label" translatable="yes">(none)</property>
                       </widget>
                       <packing>
-                        <property name="x_options">GTK_FILL</property>
-                        <property name="y_options"></property>
-                      </packing>
-                    </child>
-                    <child>
-                      <widget class="GtkLabel" id="label_info_repstats_size_label">
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Size of repository: </property>
-                      </widget>
-                      <packing>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                        <property name="x_options">GTK_FILL</property>
+                        <property name="left_attach">1</property>
+                        <property name="right_attach">2</property>
                         <property name="y_options"></property>
                       </packing>
                     </child>
@@ -2231,13 +2219,24 @@
                       </packing>
                     </child>
                     <child>
-                      <widget class="GtkLabel" id="label_info_repstats_revisions">
+                      <widget class="GtkLabel" id="label_info_repstats_size_label">
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes">(none)</property>
+                        <property name="label" translatable="yes">Size of repository: </property>
                       </widget>
                       <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
+                        <property name="x_options">GTK_FILL</property>
+                        <property name="y_options"></property>
+                      </packing>
+                    </child>
+                    <child>
+                      <widget class="GtkLabel" id="label_info_repstats_revisions_label">
+                        <property name="xalign">0</property>
+                        <property name="label" translatable="yes">Revisions in repository: </property>
+                      </widget>
+                      <packing>
+                        <property name="x_options">GTK_FILL</property>
                         <property name="y_options"></property>
                       </packing>
                     </child>

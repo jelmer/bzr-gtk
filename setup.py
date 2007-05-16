@@ -77,31 +77,30 @@ setup(
         "bzrlib.plugins.gtk.tests": "tests"
         },
     packages = [
-		"olive",
+        "olive",
         "bzrlib.plugins.gtk",
         "bzrlib.plugins.gtk.viz",
         "bzrlib.plugins.gtk.annotate",
         "bzrlib.plugins.gtk.olive",
         "bzrlib.plugins.gtk.tests"
         ],
-      data_files=[('share/olive', ['olive.glade',
-                                   'oliveicon2.png',
-                                   'cmenu.ui',
-                                  ]),
-                  ('share/olive/icons', [\
-                                   'icons/commit.png',
-                                   'icons/commit16.png',
-                                   'icons/diff.png',
-                                   'icons/diff16.png',
-                                   'icons/log.png',
-                                   'icons/log16.png',
-                                   'icons/pull.png',
-                                   'icons/pull16.png',
-                                   'icons/push.png',
-                                   'icons/push16.png',
-                                   'icons/refresh.png']),
-                  ('share/applications', ['olive-gtk.desktop']),
-                  ('share/pixmaps', ['icons/olive-gtk.png'])
-                 ],
-	cmdclass={'install_data': InstallData}
+    data_files=[('share/olive', ['olive.glade',
+                                 'oliveicon2.png',
+                                 'cmenu.ui',
+                                ]),
+                ('share/olive', ['icons/commit.png',
+                                 'icons/commit16.png',
+                                 'icons/diff.png',
+                                 'icons/diff16.png',
+                                 'icons/log.png',
+                                 'icons/log16.png',
+                                 'icons/pull.png',
+                                 'icons/pull16.png',
+                                 'icons/push.png',
+                                 'icons/push16.png',
+                                 'icons/refresh.png']),
+                ('share/applications', ['olive-gtk.desktop']),
+                ('share/pixmaps', ['icons/olive-gtk.png'])
+               ],
+    cmdclass={'install_data': InstallData}
 )

@@ -110,6 +110,7 @@ class OliveGtk:
         self.combobox_drive.connect("changed", self._refresh_drives)
         
         # Get the navigation widgets
+        self.hbox_location = self.toplevel.get_widget('hbox_location')
         self.button_location_up = self.toplevel.get_widget('button_location_up')
         self.button_location_jump = self.toplevel.get_widget('button_location_jump')
         self.entry_location = self.toplevel.get_widget('entry_location')
@@ -186,8 +187,8 @@ class OliveGtk:
         
         # Show drive selector if under Win32
         if sys.platform == 'win32':
-            self.vbox_main_right.pack_start(self.combobox_drive, False, True, 0)
-            self.vbox_main_right.reorder_child(self.combobox_drive, 0)
+            self.hbox_location.pack_start(self.combobox_drive, False, False, 0)
+            self.hbox_location.reorder_child(self.combobox_drive, 1)
             self.combobox_drive.show()
             self.gen_hard_selector()
         
