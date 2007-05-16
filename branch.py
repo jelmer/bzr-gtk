@@ -63,7 +63,7 @@ class BranchDialog(gtk.Dialog):
         # Set callbacks
         self._button_branch.connect('clicked', self._on_branch_clicked)
         self._button_revision.connect('clicked', self._on_revision_clicked)
-        self._combo.connect('changed', self._on_combo_changed)
+        self._combo.child.connect('focus-out-event', self._on_combo_changed)
         
         # Create the table and pack the widgets into it
         self._table = gtk.Table(rows=3, columns=2)
@@ -197,8 +197,9 @@ class BranchDialog(gtk.Dialog):
         
         self.response(gtk.RESPONSE_OK)
     
-    def _on_combo_changed(self, widget):
+    def _on_combo_changed(self, widget, event):
         """ We try to get the last revision if focus lost. """
+        print "DEBUG: combo changed."
         rev = self._get_last_revno()
         if rev is None:
             self._entry_revision.set_text(_('N/A'))
