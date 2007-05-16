@@ -1,5 +1,12 @@
 0.17.0  UNRELEASED
 
+ FEATURES
+ 
+  * There are now more columns in the file list, and you can sort by them
+  (Szilveszter)
+  
+  * A location bar was added to the top of the file list (Szilveszter)
+
  BUG FIXES
  
   * Get and Checkout dialogs: scan the branch only if the entry has lost focus
