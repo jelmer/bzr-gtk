@@ -33,6 +33,7 @@ import bzrlib.errors as errors
 from dialog import error_dialog, info_dialog
 
 from history import UrlHistory
+from olive import Preferences
 
 class BranchDialog(gtk.Dialog):
     """ New implementation of the Branch dialog. """
@@ -107,8 +108,14 @@ class BranchDialog(gtk.Dialog):
     def _build_history(self):
         """ Build up the branch history. """
         self._combo_model = gtk.ListStore(str)
+        
         for item in self._history.get_entries():
             self._combo_model.append([ item ])
+        
+        pref = Preferences()
+        for item in pref.get_bookmarks():
+            self._combo_model.append([ item ])
+        
         self._combo.set_model(self._combo_model)
         self._combo.set_text_column(0)
     
@@ -199,7 +206,6 @@ class BranchDialog(gtk.Dialog):
     
     def _on_combo_changed(self, widget, event):
         """ We try to get the last revision if focus lost. """
-        print "DEBUG: combo changed."
         rev = self._get_last_revno()
         if rev is None:
             self._entry_revision.set_text(_('N/A'))
