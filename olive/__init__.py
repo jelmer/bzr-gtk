@@ -209,18 +209,17 @@ class OliveGtk:
         self._just_started = False
 
     def set_path(self, path):
-        self.path = path
         self.notbranch = False
         
-        if not self.remote:
+        if os.path.isdir(path):
+            self.image_location_error.destroy()
+            self.remote = False
+            
             # We're local
             try:
-                self.wt, self.wtpath = WorkingTree.open_containing(self.path)
+                self.wt, self.wtpath = WorkingTree.open_containing(path)
             except (bzrerrors.NotBranchError, bzrerrors.NoWorkingTree):
                 self.notbranch = True
-            
-            self.statusbar.push(self.context_id, path)
-            self.entry_location.set_text(path)
             
             # If we're in the root, we cannot go up anymore
             if sys.platform == 'win32':
@@ -234,7 +233,23 @@ class OliveGtk:
                     self.button_location_up.set_sensitive(False)
                 else:
                     self.button_location_up.set_sensitive(True)
-        else:
+        elif not os.path.isfile(path):
+            # Doesn't seem to be a file nor a directory, trying to open a
+            # remote location
+            self._show_stock_image(gtk.STOCK_DISCONNECT)
+            try:
+                br = Branch.open_containing(path)[0]
+            except bzrerrors.NotBranchError:
+                self._show_stock_image(gtk.STOCK_DIALOG_ERROR)
+                return False
+            except bzrerrors.UnsupportedProtocol:
+                self._show_stock_image(gtk.STOCK_DIALOG_ERROR)
+                return False
+            
+            self._show_stock_image(gtk.STOCK_CONNECT)
+            
+            self.remote = True
+           
             # We're remote
             tstart = time.time()
             self.remote_branch, self.remote_path = Branch.open_containing(path)
@@ -257,9 +272,6 @@ class OliveGtk:
             tend = time.time()
             print "DEBUG: find parent id =", tend - tstart
             
-            self.statusbar.push(self.context_id, path)
-            self.entry_location.set_text(path)
-            
             if not path.endswith('/'):
                 path += '/'
             
@@ -267,6 +279,11 @@ class OliveGtk:
                 self.button_location_up.set_sensitive(False)
             else:
                 self.button_location_up.set_sensitive(True)
+        
+        self.statusbar.push(self.context_id, path)
+        self.entry_location.set_text(path)
+        self.path = path
+        return True
 
     def get_path(self):
         if not self.remote:
@@ -299,29 +316,9 @@ class OliveGtk:
     def on_button_location_jump_clicked(self, widget):
         """ Location Jump button handler. """
         location = self.entry_location.get_text()
-        if os.path.isdir(location):
-            self.set_path(location)
+        
+        if self.set_path(location):
             self.refresh_right()
-            self.image_location_error.hide()
-        elif not os.path.isfile(location):
-            # Doesn't seem to be a file nor a directory, trying to open a
-            # remote location
-            self._show_stock_image(gtk.STOCK_DISCONNECT)
-            try:
-                br = Branch.open_containing(location)[0]
-            except bzrerrors.NotBranchError:
-                self._show_stock_image(gtk.STOCK_DIALOG_ERROR)
-                return
-            except bzrerrors.UnsupportedProtocol:
-                self._show_stock_image(gtk.STOCK_DIALOG_ERROR)
-                return
-            
-            self._show_stock_image(gtk.STOCK_CONNECT)
-            
-            self.remote = True
-            self.set_path(location)
-            self.refresh_right()
-            self.image_location_error.hide()
     
     def on_entry_location_key_press_event(self, widget, event):
         """ Key pressed handler for the location entry. """
@@ -595,11 +592,12 @@ class OliveGtk:
         bookmark list. """
 
         newdir = self.get_selected_left()
+        print "DEBUG: newdir =", newdir
         if newdir == None:
             return
 
-        self.set_path(newdir)
-        self.refresh_right()
+        if self.set_path(newdir):
+            self.refresh_right()
 
     def on_treeview_right_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the file list. """
