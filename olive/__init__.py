@@ -248,7 +248,7 @@ class OliveGtk:
             
             tstart = time.time()
             if len(self.remote_path) == 0:
-                self.remote_parent = 'TREE_ROOT'
+                self.remote_parent = self.remote_branch.repository.get_inventory(self.remote_branch.last_revision()).iter_entries_by_dir().next()[1].file_id
             else:
                 for (name, type) in self.remote_entries:
                     if name == self.remote_path:
