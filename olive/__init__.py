@@ -300,15 +300,22 @@ class OliveGtk:
         """ Location Jump button handler. """
         location = self.entry_location.get_text()
         if os.path.isdir(location):
+            print "DEBUG: location not a directory."
             self.set_path(location)
             self.refresh_right()
             self.image_location_error.hide()
-        else:
+        elif not os.path.isfile(location):
+            # Doesn't seem to be a file nor a directory, trying to open a
+            # remote location
+            print "DEBUG: location not a file, trying remote."
+            self._show_stock_image(gtk.STOCK_DISCONNECT)
             try:
                 br = Branch.open_containing(location)[0]
             except bzrerrors.NotBranchError:
-                self.image_location_error.show()
+                self._show_stock_image(gtk.STOCK_DIALOG_ERROR)
                 return
+            
+            self._show_stock_image(gtk.STOCK_CONNECT)
             
             self.remote = True
             self.set_path(location)
@@ -1018,15 +1025,6 @@ class OliveGtk:
             
             repo = self.remote_branch.repository
             
-            """revcache = {}
-            def _lookup_revision(revid):
-                if revcache.has_key(revid):
-                    return revcache[revid]
-                else:
-                    rev = repo.get_revision(revid)
-                    revcache[revid] = rev
-                    return rev"""
-            
             tstart = time.time()
             revs = repo.get_revisions(self.remote_branch.revision_history())
             tend = time.time()
@@ -1043,14 +1041,9 @@ class OliveGtk:
                 revs.append(rev)
                 return rev
             
-            pbdir = ui_factory.nested_progress_bar()
-            total = len(dirs)
-            num = 1
-            
             tstart = time.time()
             for item in dirs:
                 ts = time.time()
-                pbdir.update(("Processing directory: %s (%d/%d)" % (item.name, num, total)), num, total)
                 if item.parent_id == self.remote_parent:
                     rev = _lookup_revision(item.revision)
                     print "DEBUG: revision result =", rev
@@ -1064,21 +1057,16 @@ class OliveGtk:
                                        rev.timestamp,
                                        self._format_date(rev.timestamp)
                                    ])
+                while gtk.events_pending():
+                    gtk.main_iteration()
                 te = time.time()
                 print "DEBUG: processed", item.name, "in", te - ts
-                num += 1
             tend = time.time()
             print "DEBUG: filling up dirs =", tend - tstart
-            pbdir.finished()
-            
-            pbfile = ui_factory.nested_progress_bar()
-            total = len(files)
-            num = 1
             
             tstart = time.time()
             for item in files:
                 ts = time.time()
-                pbdir.update(("Processing file: %s (%d/%d)" % (item.name, num, total)), num, total)
                 if item.parent_id == self.remote_parent:
                     rev = _lookup_revision(item.revision)
                     liststore.append([ gtk.STOCK_FILE,
@@ -1091,16 +1079,14 @@ class OliveGtk:
                                        rev.timestamp,
                                        self._format_date(rev.timestamp)
                                    ])
+                while gtk.events_pending():
+                    gtk.main_iteration()
                 te = time.time()
                 print "DEBUG: processed", item.name, "in", te - ts
-                num += 1
             tend = time.time()
             print "DEBUG: filling up files =", tend - tstart
-            
-            pbfile.finished()
 
-        # Add the ListStore to the TreeView
-        self.treeview_right.set_model(liststore)
+        # Columns should auto-size
         self.treeview_right.columns_autosize()
         
         # Set sensitivity
@@ -1210,6 +1196,17 @@ class OliveGtk:
                     return True
             # Either it's not a directory or not in the inventory
             return False
+    
+    def _show_stock_image(self, stock_id):
+        """ Show a stock image next to the location entry. """
+        self.image_location_error.destroy()
+        self.image_location_error = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_BUTTON)
+        print "DEBUG: image_location_error =", self.image_location_error
+        self.hbox_location.pack_start(self.image_location_error, False, False, 0)
+        self.hbox_location.reorder_child(self.image_location_error, 2)
+        self.image_location_error.show()
+        while gtk.events_pending():
+            gtk.main_iteration()
 
 import ConfigParser
 
