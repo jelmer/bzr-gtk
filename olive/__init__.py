@@ -1015,6 +1015,8 @@ class OliveGtk:
             dirs = []
             files = []
             
+            self._show_stock_image(gtk.STOCK_REFRESH)
+            
             tstart = time.time()
             for (name, type) in self.remote_entries:
                 if type.kind == 'directory':
@@ -1024,29 +1026,41 @@ class OliveGtk:
             tend = time.time()
             print "DEBUG: separating files and dirs =", tend - tstart
             
+            class HistoryCache:
+                """ Cache based on revision history. """
+                def __init__(self, history):
+                    self._history = history
+                
+                def _lookup_revision(self, revid):
+                    print "DEBUG: looking up revision =", revid
+                    for r in self._history:
+                        if r.revision_id == revid:
+                            print "DEBUG: revision found =", r
+                            return r
+                    print "DEBUG: revision not found, adding it to the cache."
+                    rev = repo.get_revision(revid)
+                    self._history.append(rev)
+                    return rev
+            
             repo = self.remote_branch.repository
             
             tstart = time.time()
-            revs = repo.get_revisions(self.remote_branch.revision_history())
+            revhistory = self.remote_branch.revision_history()
+            try:
+                revs = repo.get_revisions(revhistory)
+                cache = HistoryCache(revs)
+            except bzrerrors.InvalidHttpResponse:
+                # Fallback to dummy algorithm, because of LP: #115209
+                cache = HistoryCache([])
+            
             tend = time.time()
             print "DEBUG: fetching all revisions =", tend - tstart
-            
-            def _lookup_revision(revid):
-                print "DEBUG: looking up revision =", revid
-                for r in revs:
-                    if r.revision_id == revid:
-                        print "DEBUG: revision found =", r
-                        return r
-                print "DEBUG: revision not found, adding it to the cache."
-                rev = repo.get_revision(revid)
-                revs.append(rev)
-                return rev
             
             tstart = time.time()
             for item in dirs:
                 ts = time.time()
                 if item.parent_id == self.remote_parent:
-                    rev = _lookup_revision(item.revision)
+                    rev = cache._lookup_revision(item.revision)
                     print "DEBUG: revision result =", rev
                     liststore.append([ gtk.STOCK_DIRECTORY,
                                        True,
@@ -1069,7 +1083,7 @@ class OliveGtk:
             for item in files:
                 ts = time.time()
                 if item.parent_id == self.remote_parent:
-                    rev = _lookup_revision(item.revision)
+                    rev = cache._lookup_revision(item.revision)
                     liststore.append([ gtk.STOCK_FILE,
                                        False,
                                        item.name,
@@ -1086,6 +1100,8 @@ class OliveGtk:
                 print "DEBUG: processed", item.name, "in", te - ts
             tend = time.time()
             print "DEBUG: filling up files =", tend - tstart
+            
+            self.image_location_error.destroy()
 
         # Columns should auto-size
         self.treeview_right.columns_autosize()
