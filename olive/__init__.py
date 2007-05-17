@@ -784,41 +784,44 @@ class OliveGtk:
         
         # Create the columns and add them to the TreeView
         self.treeview_right.set_model(liststore)
-        tvcolumn_filename = gtk.TreeViewColumn(_('Filename'))
-        tvcolumn_status = gtk.TreeViewColumn(_('Status'))
-        tvcolumn_size = gtk.TreeViewColumn(_('Size'))
-        tvcolumn_mtime = gtk.TreeViewColumn(_('Last modified'))
-        self.treeview_right.append_column(tvcolumn_filename)
-        self.treeview_right.append_column(tvcolumn_status)
-        self.treeview_right.append_column(tvcolumn_size)
-        self.treeview_right.append_column(tvcolumn_mtime)
+        self._tvcolumn_filename = gtk.TreeViewColumn(_('Filename'))
+        self._tvcolumn_status = gtk.TreeViewColumn(_('Status'))
+        self._tvcolumn_size = gtk.TreeViewColumn(_('Size'))
+        self._tvcolumn_mtime = gtk.TreeViewColumn(_('Last modified'))
+        self.treeview_right.append_column(self._tvcolumn_filename)
+        self.treeview_right.append_column(self._tvcolumn_status)
+        self.treeview_right.append_column(self._tvcolumn_size)
+        self.treeview_right.append_column(self._tvcolumn_mtime)
         
         # Set up the cells
         cellpb = gtk.CellRendererPixbuf()
         cell = gtk.CellRendererText()
-        tvcolumn_filename.pack_start(cellpb, False)
-        tvcolumn_filename.pack_start(cell, True)
-        tvcolumn_filename.set_attributes(cellpb, stock_id=0)
-        tvcolumn_filename.add_attribute(cell, 'text', 2)
-        tvcolumn_status.pack_start(cell, True)
-        tvcolumn_status.add_attribute(cell, 'text', 3)
-        tvcolumn_size.pack_start(cell, True)
-        tvcolumn_size.add_attribute(cell, 'text', 6)
-        tvcolumn_mtime.pack_start(cell, True)
-        tvcolumn_mtime.add_attribute(cell, 'text', 8)
+        self._tvcolumn_filename.pack_start(cellpb, False)
+        self._tvcolumn_filename.pack_start(cell, True)
+        self._tvcolumn_filename.set_attributes(cellpb, stock_id=0)
+        self._tvcolumn_filename.add_attribute(cell, 'text', 2)
+        self._tvcolumn_status.pack_start(cell, True)
+        self._tvcolumn_status.add_attribute(cell, 'text', 3)
+        self._tvcolumn_size.pack_start(cell, True)
+        self._tvcolumn_size.add_attribute(cell, 'text', 6)
+        self._tvcolumn_mtime.pack_start(cell, True)
+        self._tvcolumn_mtime.add_attribute(cell, 'text', 8)
         
         # Set up the properties of the TreeView
         self.treeview_right.set_headers_visible(True)
         self.treeview_right.set_headers_clickable(True)
         self.treeview_right.set_search_column(1)
-        tvcolumn_filename.set_resizable(True)
+        self._tvcolumn_filename.set_resizable(True)
+        self._tvcolumn_status.set_resizable(True)
+        self._tvcolumn_size.set_resizable(True)
+        self._tvcolumn_mtime.set_resizable(True)
         # Set up sorting
         liststore.set_sort_func(13, self._sort_filelist_callback, None)
         liststore.set_sort_column_id(13, gtk.SORT_ASCENDING)
-        tvcolumn_filename.set_sort_column_id(13)
-        tvcolumn_status.set_sort_column_id(3)
-        tvcolumn_size.set_sort_column_id(5)
-        tvcolumn_mtime.set_sort_column_id(7)
+        self._tvcolumn_filename.set_sort_column_id(13)
+        self._tvcolumn_status.set_sort_column_id(3)
+        self._tvcolumn_size.set_sort_column_id(5)
+        self._tvcolumn_mtime.set_sort_column_id(7)
         
         # Set sensitivity
         self.set_sensitivity()
@@ -920,6 +923,9 @@ class OliveGtk:
             # Get ListStore and clear it
             liststore = self.treeview_right.get_model()
             liststore.clear()
+            
+            # Show Status column
+            self._tvcolumn_status.set_visible(True)
     
             dirs = []
             files = []
@@ -1009,6 +1015,9 @@ class OliveGtk:
             # Get ListStore and clear it
             liststore = self.treeview_right.get_model()
             liststore.clear()
+            
+            # Hide Status column
+            self._tvcolumn_status.set_visible(False)
             
             dirs = []
             files = []
