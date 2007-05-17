@@ -197,6 +197,11 @@ class OliveGtk:
         # Apply menu state
         self.menuitem_view_show_hidden_files.set_active(self.pref.get_preference('dotted_files', 'bool'))
 
+        # We're starting local
+        self.remote = False
+        self.remote_branch = None
+        self.remote_path = None
+        
         self.set_path(os.getcwd())
         self._load_right()
         
@@ -206,29 +211,71 @@ class OliveGtk:
         self.path = path
         self.notbranch = False
         
-        try:
-            self.wt, self.wtpath = WorkingTree.open_containing(self.path)
-        except (bzrerrors.NotBranchError, bzrerrors.NoWorkingTree):
-            self.notbranch = True
-        
-        self.statusbar.push(self.context_id, path)
-        self.entry_location.set_text(path)
-        
-        # If we're in the root, we cannot go up anymore
-        if sys.platform == 'win32':
-            drive, tail = os.path.splitdrive(self.path)
-            if tail in ('', '/', '\\'):
-                self.button_location_up.set_sensitive(False)
+        if not self.remote:
+            # We're local
+            try:
+                self.wt, self.wtpath = WorkingTree.open_containing(self.path)
+            except (bzrerrors.NotBranchError, bzrerrors.NoWorkingTree):
+                self.notbranch = True
+            
+            self.statusbar.push(self.context_id, path)
+            self.entry_location.set_text(path)
+            
+            # If we're in the root, we cannot go up anymore
+            if sys.platform == 'win32':
+                drive, tail = os.path.splitdrive(self.path)
+                if tail in ('', '/', '\\'):
+                    self.button_location_up.set_sensitive(False)
+                else:
+                    self.button_location_up.set_sensitive(True)
             else:
-                self.button_location_up.set_sensitive(True)
+                if self.path == '/':
+                    self.button_location_up.set_sensitive(False)
+                else:
+                    self.button_location_up.set_sensitive(True)
         else:
-            if self.path == '/':
+            # We're remote
+            tstart = time.time()
+            self.remote_branch, self.remote_path = Branch.open_containing(path)
+            tend = time.time()
+            print "DEBUG: opening branch =", tend - tstart
+            
+            tstart = time.time()
+            self.remote_entries = self.remote_branch.repository.get_inventory(self.remote_branch.last_revision()).entries()
+            tend = time.time()
+            print "DEBUG: retrieving entries =", tend - tstart
+            
+            tstart = time.time()
+            if len(self.remote_path) == 0:
+                self.remote_parent = 'TREE_ROOT'
+            else:
+                for (name, type) in self.remote_entries:
+                    if name == self.remote_path:
+                        self.remote_parent = type.file_id
+                        break
+            tend = time.time()
+            print "DEBUG: find parent id =", tend - tstart
+            
+            self.statusbar.push(self.context_id, path)
+            self.entry_location.set_text(path)
+            
+            if not path.endswith('/'):
+                path += '/'
+            
+            if self.remote_branch.base == path:
                 self.button_location_up.set_sensitive(False)
             else:
                 self.button_location_up.set_sensitive(True)
 
     def get_path(self):
-        return self.path
+        if not self.remote:
+            return self.path
+        else:
+            # Remote mode
+            if len(self.remote_path) > 0:
+                return self.remote_branch.base + self.remote_path + '/'
+            else:
+                return self.remote_branch.base
    
     def on_about_activate(self, widget):
         from bzrlib.plugins.gtk.dialog import about
@@ -236,7 +283,16 @@ class OliveGtk:
         
     def on_button_location_up_clicked(self, widget):
         """ Location Up button handler. """
-        self.set_path(os.path.split(self.get_path())[0])
+        if not self.remote:
+            # Local mode
+            self.set_path(os.path.split(self.get_path())[0])
+        else:
+            # Remote mode
+            delim = '/'
+            newpath = delim.join(self.get_path().split(delim)[:-2])
+            newpath += '/'
+            self.set_path(newpath)
+
         self.refresh_right()
     
     def on_button_location_jump_clicked(self, widget):
@@ -247,7 +303,16 @@ class OliveGtk:
             self.refresh_right()
             self.image_location_error.hide()
         else:
-            self.image_location_error.show()
+            try:
+                br = Branch.open_containing(location)[0]
+            except bzrerrors.NotBranchError:
+                self.image_location_error.show()
+                return
+            
+            self.remote = True
+            self.set_path(location)
+            self.refresh_right()
+            self.image_location_error.hide()
     
     def on_entry_location_key_press_event(self, widget, event):
         """ Key pressed handler for the location entry. """
@@ -570,15 +635,21 @@ class OliveGtk:
         
         newdir = self.get_selected_right()
         
-        if newdir == '..':
-            self.set_path(os.path.split(self.get_path())[0])
-        else:
-            fullpath = os.path.join(self.get_path(), newdir)
-            if os.path.isdir(fullpath):
-                # selected item is an existant directory
-                self.set_path(fullpath)
+        if not self.remote:
+            # We're local
+            if newdir == '..':
+                self.set_path(os.path.split(self.get_path())[0])
             else:
-                launch(fullpath) 
+                fullpath = os.path.join(self.get_path(), newdir)
+                if os.path.isdir(fullpath):
+                    # selected item is an existant directory
+                    self.set_path(fullpath)
+                else:
+                    launch(fullpath)
+        else:
+            # We're remote
+            if self._is_remote_dir(self.get_path() + newdir):
+                self.set_path(self.get_path() + newdir)
         
         self.refresh_right()
     
@@ -828,100 +899,189 @@ class OliveGtk:
 
     def refresh_right(self, path=None):
         """ Refresh the file list. """
-        from bzrlib.workingtree import WorkingTree
-
-        if path is None:
-            path = self.get_path()
-
-        # A workaround for double-clicking Bookmarks
-        if not os.path.exists(path):
-            return
-
-        # Get ListStore and clear it
-        liststore = self.treeview_right.get_model()
-        liststore.clear()
-
-        dirs = []
-        files = []
-
-        # Fill the appropriate lists
-        dotted_files = self.pref.get_preference('dotted_files', 'bool')
-        for item in os.listdir(path):
-            if not dotted_files and item[0] == '.':
-                continue
-            if os.path.isdir(path + os.sep + item):
-                dirs.append(item)
-            else:
-                files.append(item)
-        
-        # Try to open the working tree
-        notbranch = False
-        try:
-            tree1 = WorkingTree.open_containing(path)[0]
-        except (bzrerrors.NotBranchError, bzrerrors.NoWorkingTree):
-            notbranch = True
-        
-        if not notbranch:
-            branch = tree1.branch
-            tree2 = tree1.branch.repository.revision_tree(branch.last_revision())
-        
-            delta = tree1.changes_from(tree2, want_unchanged=True)
+        if not self.remote:
+            # We're local
+            from bzrlib.workingtree import WorkingTree
+    
+            if path is None:
+                path = self.get_path()
+    
+            # A workaround for double-clicking Bookmarks
+            if not os.path.exists(path):
+                return
+    
+            # Get ListStore and clear it
+            liststore = self.treeview_right.get_model()
+            liststore.clear()
+    
+            dirs = []
+            files = []
+    
+            # Fill the appropriate lists
+            dotted_files = self.pref.get_preference('dotted_files', 'bool')
+            for item in os.listdir(path):
+                if not dotted_files and item[0] == '.':
+                    continue
+                if os.path.isdir(path + os.sep + item):
+                    dirs.append(item)
+                else:
+                    files.append(item)
             
-        # Add'em to the ListStore
-        for item in dirs:
-            statinfo = os.stat(self.path + os.sep + item)
-            liststore.append([gtk.STOCK_DIRECTORY, True, item, '', '', statinfo.st_size, self._format_size(statinfo.st_size), statinfo.st_mtime, self._format_date(statinfo.st_mtime)])
-        for item in files:
-            status = 'unknown'
+            # Try to open the working tree
+            notbranch = False
+            try:
+                tree1 = WorkingTree.open_containing(path)[0]
+            except (bzrerrors.NotBranchError, bzrerrors.NoWorkingTree):
+                notbranch = True
+            
             if not notbranch:
-                filename = tree1.relpath(path + os.sep + item)
+                branch = tree1.branch
+                tree2 = tree1.branch.repository.revision_tree(branch.last_revision())
+            
+                delta = tree1.changes_from(tree2, want_unchanged=True)
                 
-                try:
-                    self.wt.lock_read()
+            # Add'em to the ListStore
+            for item in dirs:
+                statinfo = os.stat(self.path + os.sep + item)
+                liststore.append([gtk.STOCK_DIRECTORY, True, item, '', '', statinfo.st_size, self._format_size(statinfo.st_size), statinfo.st_mtime, self._format_date(statinfo.st_mtime)])
+            for item in files:
+                status = 'unknown'
+                if not notbranch:
+                    filename = tree1.relpath(path + os.sep + item)
                     
-                    for rpath, rpathnew, id, kind, text_modified, meta_modified in delta.renamed:
-                        if rpathnew == filename:
-                            status = 'renamed'
-                    for rpath, id, kind in delta.added:
-                        if rpath == filename:
-                            status = 'added'                
-                    for rpath, id, kind in delta.removed:
-                        if rpath == filename:
-                            status = 'removed'
-                    for rpath, id, kind, text_modified, meta_modified in delta.modified:
-                        if rpath == filename:
-                            status = 'modified'
-                    for rpath, id, kind in delta.unchanged:
-                        if rpath == filename:
-                            status = 'unchanged'
-                    for rpath, file_class, kind, id, entry in self.wt.list_files():
-                        if rpath == filename and file_class == 'I':
-                            status = 'ignored'
-                finally:
-                    self.wt.unlock()
+                    try:
+                        self.wt.lock_read()
+                        
+                        for rpath, rpathnew, id, kind, text_modified, meta_modified in delta.renamed:
+                            if rpathnew == filename:
+                                status = 'renamed'
+                        for rpath, id, kind in delta.added:
+                            if rpath == filename:
+                                status = 'added'                
+                        for rpath, id, kind in delta.removed:
+                            if rpath == filename:
+                                status = 'removed'
+                        for rpath, id, kind, text_modified, meta_modified in delta.modified:
+                            if rpath == filename:
+                                status = 'modified'
+                        for rpath, id, kind in delta.unchanged:
+                            if rpath == filename:
+                                status = 'unchanged'
+                        for rpath, file_class, kind, id, entry in self.wt.list_files():
+                            if rpath == filename and file_class == 'I':
+                                status = 'ignored'
+                    finally:
+                        self.wt.unlock()
+                
+                #try:
+                #    status = fileops.status(path + os.sep + item)
+                #except errors.PermissionDenied:
+                #    continue
+    
+                if status == 'renamed':
+                    st = _('renamed')
+                elif status == 'removed':
+                    st = _('removed')
+                elif status == 'added':
+                    st = _('added')
+                elif status == 'modified':
+                    st = _('modified')
+                elif status == 'unchanged':
+                    st = _('unchanged')
+                elif status == 'ignored':
+                    st = _('ignored')
+                else:
+                    st = _('unknown')
+                
+                statinfo = os.stat(self.path + os.sep + item)
+                liststore.append([gtk.STOCK_FILE, False, item, st, status, statinfo.st_size, self._format_size(statinfo.st_size), statinfo.st_mtime, self._format_date(statinfo.st_mtime)])
+        else:
+            # We're remote
+            # NOTE: First approach, without any caching or optimization
             
-            #try:
-            #    status = fileops.status(path + os.sep + item)
-            #except errors.PermissionDenied:
-            #    continue
-
-            if status == 'renamed':
-                st = _('renamed')
-            elif status == 'removed':
-                st = _('removed')
-            elif status == 'added':
-                st = _('added')
-            elif status == 'modified':
-                st = _('modified')
-            elif status == 'unchanged':
-                st = _('unchanged')
-            elif status == 'ignored':
-                st = _('ignored')
-            else:
-                st = _('unknown')
+            # Get ListStore and clear it
+            liststore = self.treeview_right.get_model()
+            liststore.clear()
             
-            statinfo = os.stat(self.path + os.sep + item)
-            liststore.append([gtk.STOCK_FILE, False, item, st, status, statinfo.st_size, self._format_size(statinfo.st_size), statinfo.st_mtime, self._format_date(statinfo.st_mtime)])
+            dirs = []
+            files = []
+            
+            tstart = time.time()
+            for (name, type) in self.remote_entries:
+                if type.kind == 'directory':
+                    dirs.append(type)
+                elif type.kind == 'file':
+                    files.append(type)
+            tend = time.time()
+            print "DEBUG: separating files and dirs =", tend - tstart
+            
+            repo = self.remote_branch.repository
+            
+            """revcache = {}
+            def _lookup_revision(revid):
+                if revcache.has_key(revid):
+                    return revcache[revid]
+                else:
+                    rev = repo.get_revision(revid)
+                    revcache[revid] = rev
+                    return rev"""
+            
+            tstart = time.time()
+            revs = repo.get_revisions(self.remote_branch.revision_history())
+            tend = time.time()
+            print "DEBUG: fetching all revisions =", tend - tstart
+            
+            def _lookup_revision(revid):
+                print "DEBUG: looking up revision =", revid
+                for r in revs:
+                    if r.revision_id == revid:
+                        print "DEBUG: revision found =", r
+                        return r
+                print "DEBUG: revision not found, adding it to the cache."
+                rev = repo.get_revision(revid)
+                revs.append(rev)
+                return rev
+            
+            tstart = time.time()
+            for item in dirs:
+                ts = time.time()
+                if item.parent_id == self.remote_parent:
+                    rev = _lookup_revision(item.revision)
+                    print "DEBUG: revision result =", rev
+                    liststore.append([ gtk.STOCK_DIRECTORY,
+                                       True,
+                                       item.name,
+                                       '',
+                                       '',
+                                       0,
+                                       self._format_size(0),
+                                       rev.timestamp,
+                                       self._format_date(rev.timestamp)
+                                   ])
+                te = time.time()
+                print "DEBUG: processed", item.name, "in", te - ts
+            tend = time.time()
+            print "DEBUG: filling up dirs =", tend - tstart
+            
+            tstart = time.time()
+            for item in files:
+                ts = time.time()
+                if item.parent_id == self.remote_parent:
+                    rev = _lookup_revision(item.revision)
+                    liststore.append([ gtk.STOCK_FILE,
+                                       False,
+                                       item.name,
+                                       '',
+                                       '',
+                                       item.text_size,
+                                       self._format_size(item.text_size),
+                                       rev.timestamp,
+                                       self._format_date(rev.timestamp)
+                                   ])
+                te = time.time()
+                print "DEBUG: processed", item.name, "in", te - ts
+            tend = time.time()
+            print "DEBUG: filling up files =", tend - tstart
 
         # Add the ListStore to the TreeView
         self.treeview_right.set_model(liststore)
@@ -1020,6 +1180,20 @@ class OliveGtk:
     def _format_date(self, timestamp):
         """ Format the time (given in secs) to a human readable format. """
         return time.ctime(timestamp)
+    
+    def _is_remote_dir(self, location):
+        """ Determine whether the given location is a directory or not. """
+        if not self.remote:
+            # We're in local mode
+            return False
+        else:
+            branch, path = Branch.open_containing(location)
+            for (name, type) in self.remote_entries:
+                if name == path and type.kind == 'directory':
+                    # We got it
+                    return True
+            # Either it's not a directory or not in the inventory
+            return False
 
 import ConfigParser
 
