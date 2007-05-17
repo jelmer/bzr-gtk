@@ -312,6 +312,9 @@ class OliveGtk:
             except bzrerrors.NotBranchError:
                 self._show_stock_image(gtk.STOCK_DIALOG_ERROR)
                 return
+            except bzrerrors.UnsupportedProtocol:
+                self._show_stock_image(gtk.STOCK_DIALOG_ERROR)
+                return
             
             self._show_stock_image(gtk.STOCK_CONNECT)
             
