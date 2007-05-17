@@ -251,17 +251,10 @@ class OliveGtk:
             self.remote = True
            
             # We're remote
-            tstart = time.time()
             self.remote_branch, self.remote_path = Branch.open_containing(path)
-            tend = time.time()
-            print "DEBUG: opening branch =", tend - tstart
             
-            tstart = time.time()
             self.remote_entries = self.remote_branch.repository.get_inventory(self.remote_branch.last_revision()).entries()
-            tend = time.time()
-            print "DEBUG: retrieving entries =", tend - tstart
             
-            tstart = time.time()
             if len(self.remote_path) == 0:
                 self.remote_parent = self.remote_branch.repository.get_inventory(self.remote_branch.last_revision()).iter_entries_by_dir().next()[1].file_id
             else:
@@ -269,8 +262,6 @@ class OliveGtk:
                     if name == self.remote_path:
                         self.remote_parent = type.file_id
                         break
-            tend = time.time()
-            print "DEBUG: find parent id =", tend - tstart
             
             if not path.endswith('/'):
                 path += '/'
@@ -592,7 +583,6 @@ class OliveGtk:
         bookmark list. """
 
         newdir = self.get_selected_left()
-        print "DEBUG: newdir =", newdir
         if newdir == None:
             return
 
@@ -986,11 +976,6 @@ class OliveGtk:
                     finally:
                         self.wt.unlock()
                 
-                #try:
-                #    status = fileops.status(path + os.sep + item)
-                #except errors.PermissionDenied:
-                #    continue
-    
                 if status == 'renamed':
                     st = _('renamed')
                 elif status == 'removed':
@@ -1010,7 +995,6 @@ class OliveGtk:
                 liststore.append([gtk.STOCK_FILE, False, item, st, status, statinfo.st_size, self._format_size(statinfo.st_size), statinfo.st_mtime, self._format_date(statinfo.st_mtime)])
         else:
             # We're remote
-            # NOTE: First approach, without any caching or optimization
             
             # Get ListStore and clear it
             liststore = self.treeview_right.get_model()
@@ -1024,14 +1008,11 @@ class OliveGtk:
             
             self._show_stock_image(gtk.STOCK_REFRESH)
             
-            tstart = time.time()
             for (name, type) in self.remote_entries:
                 if type.kind == 'directory':
                     dirs.append(type)
                 elif type.kind == 'file':
                     files.append(type)
-            tend = time.time()
-            print "DEBUG: separating files and dirs =", tend - tstart
             
             class HistoryCache:
                 """ Cache based on revision history. """
@@ -1039,19 +1020,15 @@ class OliveGtk:
                     self._history = history
                 
                 def _lookup_revision(self, revid):
-                    print "DEBUG: looking up revision =", revid
                     for r in self._history:
                         if r.revision_id == revid:
-                            print "DEBUG: revision found =", r
                             return r
-                    print "DEBUG: revision not found, adding it to the cache."
                     rev = repo.get_revision(revid)
                     self._history.append(rev)
                     return rev
             
             repo = self.remote_branch.repository
             
-            tstart = time.time()
             revhistory = self.remote_branch.revision_history()
             try:
                 revs = repo.get_revisions(revhistory)
@@ -1060,15 +1037,9 @@ class OliveGtk:
                 # Fallback to dummy algorithm, because of LP: #115209
                 cache = HistoryCache([])
             
-            tend = time.time()
-            print "DEBUG: fetching all revisions =", tend - tstart
-            
-            tstart = time.time()
             for item in dirs:
-                ts = time.time()
                 if item.parent_id == self.remote_parent:
                     rev = cache._lookup_revision(item.revision)
-                    print "DEBUG: revision result =", rev
                     liststore.append([ gtk.STOCK_DIRECTORY,
                                        True,
                                        item.name,
@@ -1081,14 +1052,8 @@ class OliveGtk:
                                    ])
                 while gtk.events_pending():
                     gtk.main_iteration()
-                te = time.time()
-                print "DEBUG: processed", item.name, "in", te - ts
-            tend = time.time()
-            print "DEBUG: filling up dirs =", tend - tstart
             
-            tstart = time.time()
             for item in files:
-                ts = time.time()
                 if item.parent_id == self.remote_parent:
                     rev = cache._lookup_revision(item.revision)
                     liststore.append([ gtk.STOCK_FILE,
@@ -1103,10 +1068,6 @@ class OliveGtk:
                                    ])
                 while gtk.events_pending():
                     gtk.main_iteration()
-                te = time.time()
-                print "DEBUG: processed", item.name, "in", te - ts
-            tend = time.time()
-            print "DEBUG: filling up files =", tend - tstart
             
             self.image_location_error.destroy()
 
