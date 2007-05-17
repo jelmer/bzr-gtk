@@ -223,7 +223,7 @@ class OliveGtk:
             
             # If we're in the root, we cannot go up anymore
             if sys.platform == 'win32':
-                drive, tail = os.path.splitdrive(self.path)
+                drive, tail = os.path.splitdrive(path)
                 if tail in ('', '/', '\\'):
                     self.button_location_up.set_sensitive(False)
                 else:
