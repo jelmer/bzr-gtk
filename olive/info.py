@@ -108,6 +108,8 @@ def info(location):
 
     try:
         branch = a_bzrdir.open_branch()
+        repository = branch.repository
+        control = a_bzrdir
         branch.lock_read()
         try:
             ret['location'] = info_helper.get_location_info(repository, branch)
@@ -142,7 +144,7 @@ def info(location):
 
 class OliveInfo:
     """ Display Informations window and perform the needed actions. """
-    def __init__(self, wt):
+    def __init__(self, branch):
         """ Initialize the Informations window. """
         self.glade = gtk.glade.XML(GLADEFILENAME, 'window_info', 'olive-gtk')
         
@@ -152,7 +154,7 @@ class OliveInfo:
         # Check if current location is a branch
         self.notbranch = False
         try:
-            self.ret = info(wt.basedir)
+            self.ret = info(branch.base)
         except errors.NotBranchError:
             self.notbranch = True
             return

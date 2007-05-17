@@ -37,7 +37,7 @@ from olive import Preferences
 
 class BranchDialog(gtk.Dialog):
     """ New implementation of the Branch dialog. """
-    def __init__(self, path=None, parent=None):
+    def __init__(self, path=None, parent=None, remote_path=None):
         """ Initialize the Branch dialog. """
         gtk.Dialog.__init__(self, title="Branch - Olive",
                                   parent=parent,
@@ -91,6 +91,8 @@ class BranchDialog(gtk.Dialog):
         self.vbox.set_spacing(3)
         if self.path is not None:
             self._filechooser.set_filename(self.path)
+        if remote_path is not None:
+            self._combo.child.set_text(remote_path)
         
         # Pack some widgets
         self._hbox_revision.pack_start(self._entry_revision, True, True)

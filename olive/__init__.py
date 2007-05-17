@@ -326,11 +326,15 @@ class OliveGtk:
     def on_menuitem_branch_get_activate(self, widget):
         """ Branch/Get... menu handler. """
         from bzrlib.plugins.gtk.branch import BranchDialog
-        branch = BranchDialog(self.get_path(), self.window)
+        
+        if self.remote:
+            branch = BranchDialog(os.getcwd(), self.window, self.remote_branch.base)
+        else:
+            branch = BranchDialog(self.get_path(), self.window)
         response = branch.run()
         if response != gtk.RESPONSE_NONE:
             branch.hide()
-        
+            
             if response == gtk.RESPONSE_OK:
                 self.refresh_right()
             
@@ -339,7 +343,11 @@ class OliveGtk:
     def on_menuitem_branch_checkout_activate(self, widget):
         """ Branch/Checkout... menu handler. """
         from bzrlib.plugins.gtk.checkout import CheckoutDialog
-        checkout = CheckoutDialog(self.get_path(), self.window)
+        
+        if self.remote:
+            checkout = CheckoutDialog(os.getcwd(), self.window, self.remote_branch.base)
+        else:
+            checkout = CheckoutDialog(self.get_path(), self.window)
         response = checkout.run()
         if response != gtk.RESPONSE_NONE:
             checkout.hide()
@@ -421,11 +429,6 @@ class OliveGtk:
         if branch_to.get_parent() is None:
             branch_to.set_parent(branch_from.base)
 
-        #old_rh = branch_to.revision_history()
-        #if tree_to is not None:
-        #    tree_to.pull(branch_from)
-        #else:
-        #    branch_to.pull(branch_from)
         ret = branch_to.pull(branch_from)
         
         info_dialog(_('Pull successful'), _('%d revision(s) pulled.') % ret)
@@ -472,7 +475,10 @@ class OliveGtk:
     def on_menuitem_branch_tags_activate(self, widget):
         """ Branch/Tags... menu handler. """
         from bzrlib.plugins.gtk.tags import TagsWindow
-        window = TagsWindow(self.wt.branch, self.window)
+        if not self.remote:
+            window = TagsWindow(self.wt.branch, self.window)
+        else:
+            window = TagsWindow(self.remote_branch, self.window)
         window.show()
     
     def on_menuitem_file_annotate_activate(self, widget):
@@ -540,7 +546,10 @@ class OliveGtk:
     def on_menuitem_stats_infos_activate(self, widget):
         """ Statistics/Informations... menu handler. """
         from info import OliveInfo
-        info = OliveInfo(self.wt)
+        if self.remote:
+            info = OliveInfo(self.remote_branch)
+        else:
+            info = OliveInfo(self.wt.branch)
         info.display()
     
     def on_menuitem_stats_log_activate(self, widget):
@@ -601,28 +610,44 @@ class OliveGtk:
                              selected=self.get_selected_right(),
                              app=self)
             # get the menu items
+            m_open = menu.ui.get_widget('/context_right/open')
             m_add = menu.ui.get_widget('/context_right/add')
             m_remove = menu.ui.get_widget('/context_right/remove')
             m_rename = menu.ui.get_widget('/context_right/rename')
             m_revert = menu.ui.get_widget('/context_right/revert')
             m_commit = menu.ui.get_widget('/context_right/commit')
+            m_annotate = menu.ui.get_widget('/context_right/annotate')
             m_diff = menu.ui.get_widget('/context_right/diff')
             # check if we're in a branch
             try:
                 from bzrlib.branch import Branch
                 Branch.open_containing(self.get_path())
-                m_add.set_sensitive(True)
-                m_remove.set_sensitive(True)
-                m_rename.set_sensitive(True)
-                m_revert.set_sensitive(True)
-                m_commit.set_sensitive(True)
-                m_diff.set_sensitive(True)
+                if self.remote:
+                    m_open.set_sensitive(False)
+                    m_add.set_sensitive(False)
+                    m_remove.set_sensitive(False)
+                    m_rename.set_sensitive(False)
+                    m_revert.set_sensitive(False)
+                    m_commit.set_sensitive(False)
+                    m_annotate.set_sensitive(False)
+                    m_diff.set_sensitive(False)
+                else:
+                    m_open.set_sensitive(True)
+                    m_add.set_sensitive(True)
+                    m_remove.set_sensitive(True)
+                    m_rename.set_sensitive(True)
+                    m_revert.set_sensitive(True)
+                    m_commit.set_sensitive(True)
+                    m_annotate.set_sensitive(True)
+                    m_diff.set_sensitive(True)
             except bzrerrors.NotBranchError:
+                m_open.set_sensitive(True)
                 m_add.set_sensitive(False)
                 m_remove.set_sensitive(False)
                 m_rename.set_sensitive(False)
                 m_revert.set_sensitive(False)
                 m_commit.set_sensitive(False)
+                m_annotate.set_sensitive(False)
                 m_diff.set_sensitive(False)
 
             menu.right_context_menu().popup(None, None, None, 0,
@@ -849,31 +874,62 @@ class OliveGtk:
     
     def set_sensitivity(self):
         """ Set menu and toolbar sensitivity. """
-        self.menuitem_branch_init.set_sensitive(self.notbranch)
-        self.menuitem_branch_get.set_sensitive(self.notbranch)
-        self.menuitem_branch_checkout.set_sensitive(self.notbranch)
-        self.menuitem_branch_pull.set_sensitive(not self.notbranch)
-        self.menuitem_branch_push.set_sensitive(not self.notbranch)
-        self.menuitem_branch_revert.set_sensitive(not self.notbranch)
-        self.menuitem_branch_merge.set_sensitive(not self.notbranch)
-        self.menuitem_branch_commit.set_sensitive(not self.notbranch)
-        self.menuitem_branch_tags.set_sensitive(not self.notbranch)
-        self.menuitem_branch_status.set_sensitive(not self.notbranch)
-        self.menuitem_branch_missing.set_sensitive(not self.notbranch)
-        self.menuitem_branch_conflicts.set_sensitive(not self.notbranch)
-        self.menuitem_stats.set_sensitive(not self.notbranch)
-        self.menuitem_add_files.set_sensitive(not self.notbranch)
-        self.menuitem_remove_files.set_sensitive(not self.notbranch)
-        self.menuitem_file_make_directory.set_sensitive(not self.notbranch)
-        self.menuitem_file_rename.set_sensitive(not self.notbranch)
-        self.menuitem_file_move.set_sensitive(not self.notbranch)
-        self.menuitem_file_annotate.set_sensitive(not self.notbranch)
-        #self.menutoolbutton_diff.set_sensitive(True)
-        self.toolbutton_diff.set_sensitive(not self.notbranch)
-        self.toolbutton_log.set_sensitive(not self.notbranch)
-        self.toolbutton_commit.set_sensitive(not self.notbranch)
-        self.toolbutton_pull.set_sensitive(not self.notbranch)
-        self.toolbutton_push.set_sensitive(not self.notbranch)
+        if not self.remote:
+            # We're local
+            self.menuitem_branch_init.set_sensitive(self.notbranch)
+            self.menuitem_branch_get.set_sensitive(self.notbranch)
+            self.menuitem_branch_checkout.set_sensitive(self.notbranch)
+            self.menuitem_branch_pull.set_sensitive(not self.notbranch)
+            self.menuitem_branch_push.set_sensitive(not self.notbranch)
+            self.menuitem_branch_revert.set_sensitive(not self.notbranch)
+            self.menuitem_branch_merge.set_sensitive(not self.notbranch)
+            self.menuitem_branch_commit.set_sensitive(not self.notbranch)
+            self.menuitem_branch_tags.set_sensitive(not self.notbranch)
+            self.menuitem_branch_status.set_sensitive(not self.notbranch)
+            self.menuitem_branch_missing.set_sensitive(not self.notbranch)
+            self.menuitem_branch_conflicts.set_sensitive(not self.notbranch)
+            self.menuitem_stats.set_sensitive(not self.notbranch)
+            self.menuitem_stats_diff.set_sensitive(not self.notbranch)
+            self.menuitem_add_files.set_sensitive(not self.notbranch)
+            self.menuitem_remove_files.set_sensitive(not self.notbranch)
+            self.menuitem_file_make_directory.set_sensitive(not self.notbranch)
+            self.menuitem_file_rename.set_sensitive(not self.notbranch)
+            self.menuitem_file_move.set_sensitive(not self.notbranch)
+            self.menuitem_file_annotate.set_sensitive(not self.notbranch)
+            #self.menutoolbutton_diff.set_sensitive(True)
+            self.toolbutton_diff.set_sensitive(not self.notbranch)
+            self.toolbutton_log.set_sensitive(not self.notbranch)
+            self.toolbutton_commit.set_sensitive(not self.notbranch)
+            self.toolbutton_pull.set_sensitive(not self.notbranch)
+            self.toolbutton_push.set_sensitive(not self.notbranch)
+        else:
+            # We're remote
+            self.menuitem_branch_init.set_sensitive(False)
+            self.menuitem_branch_get.set_sensitive(True)
+            self.menuitem_branch_checkout.set_sensitive(True)
+            self.menuitem_branch_pull.set_sensitive(False)
+            self.menuitem_branch_push.set_sensitive(False)
+            self.menuitem_branch_revert.set_sensitive(False)
+            self.menuitem_branch_merge.set_sensitive(False)
+            self.menuitem_branch_commit.set_sensitive(False)
+            self.menuitem_branch_tags.set_sensitive(True)
+            self.menuitem_branch_status.set_sensitive(False)
+            self.menuitem_branch_missing.set_sensitive(False)
+            self.menuitem_branch_conflicts.set_sensitive(False)
+            self.menuitem_stats.set_sensitive(True)
+            self.menuitem_stats_diff.set_sensitive(False)
+            self.menuitem_add_files.set_sensitive(False)
+            self.menuitem_remove_files.set_sensitive(False)
+            self.menuitem_file_make_directory.set_sensitive(False)
+            self.menuitem_file_rename.set_sensitive(False)
+            self.menuitem_file_move.set_sensitive(False)
+            self.menuitem_file_annotate.set_sensitive(False)
+            #self.menutoolbutton_diff.set_sensitive(True)
+            self.toolbutton_diff.set_sensitive(False)
+            self.toolbutton_log.set_sensitive(True)
+            self.toolbutton_commit.set_sensitive(False)
+            self.toolbutton_pull.set_sensitive(False)
+            self.toolbutton_push.set_sensitive(False)
     
     def refresh_left(self):
         """ Refresh the bookmark list. """
