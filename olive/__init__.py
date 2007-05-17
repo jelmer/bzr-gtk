@@ -546,7 +546,10 @@ class OliveGtk:
     def on_menuitem_stats_log_activate(self, widget):
         """ Statistics/Log... menu handler. """
         window = branchwin.BranchWindow()
-        window.set_branch(self.wt.branch, self.wt.branch.last_revision(), None)
+        if not self.remote:
+            window.set_branch(self.wt.branch, self.wt.branch.last_revision(), None)
+        else:
+            window.set_branch(self.remote_branch, self.remote_branch.last_revision(), None)
         window.show()
     
     def on_menuitem_view_refresh_activate(self, widget):
