@@ -300,14 +300,12 @@ class OliveGtk:
         """ Location Jump button handler. """
         location = self.entry_location.get_text()
         if os.path.isdir(location):
-            print "DEBUG: location not a directory."
             self.set_path(location)
             self.refresh_right()
             self.image_location_error.hide()
         elif not os.path.isfile(location):
             # Doesn't seem to be a file nor a directory, trying to open a
             # remote location
-            print "DEBUG: location not a file, trying remote."
             self._show_stock_image(gtk.STOCK_DISCONNECT)
             try:
                 br = Branch.open_containing(location)[0]
@@ -1201,9 +1199,11 @@ class OliveGtk:
         """ Show a stock image next to the location entry. """
         self.image_location_error.destroy()
         self.image_location_error = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_BUTTON)
-        print "DEBUG: image_location_error =", self.image_location_error
         self.hbox_location.pack_start(self.image_location_error, False, False, 0)
-        self.hbox_location.reorder_child(self.image_location_error, 2)
+        if sys.platform == 'win32':
+            self.hbox_location.reorder_child(self.image_location_error, 2)
+        else:
+            self.hbox_location.reorder_child(self.image_location_error, 1)
         self.image_location_error.show()
         while gtk.events_pending():
             gtk.main_iteration()
