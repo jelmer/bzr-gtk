@@ -36,6 +36,7 @@ import gtk.glade
 from bzrlib.branch import Branch
 import bzrlib.errors as bzrerrors
 from bzrlib.lazy_import import lazy_import
+from bzrlib.ui import ui_factory
 from bzrlib.workingtree import WorkingTree
 
 from bzrlib.plugins.gtk.dialog import error_dialog, info_dialog, warning_dialog
@@ -1042,9 +1043,14 @@ class OliveGtk:
                 revs.append(rev)
                 return rev
             
+            pbdir = ui_factory.nested_progress_bar()
+            total = len(dirs)
+            num = 1
+            
             tstart = time.time()
             for item in dirs:
                 ts = time.time()
+                pbdir.update(("Processing directory: %s (%d/%d)" % (item.name, num, total)), num, total)
                 if item.parent_id == self.remote_parent:
                     rev = _lookup_revision(item.revision)
                     print "DEBUG: revision result =", rev
@@ -1060,12 +1066,19 @@ class OliveGtk:
                                    ])
                 te = time.time()
                 print "DEBUG: processed", item.name, "in", te - ts
+                num += 1
             tend = time.time()
             print "DEBUG: filling up dirs =", tend - tstart
+            pbdir.finished()
+            
+            pbfile = ui_factory.nested_progress_bar()
+            total = len(files)
+            num = 1
             
             tstart = time.time()
             for item in files:
                 ts = time.time()
+                pbdir.update(("Processing file: %s (%d/%d)" % (item.name, num, total)), num, total)
                 if item.parent_id == self.remote_parent:
                     rev = _lookup_revision(item.revision)
                     liststore.append([ gtk.STOCK_FILE,
@@ -1080,8 +1093,11 @@ class OliveGtk:
                                    ])
                 te = time.time()
                 print "DEBUG: processed", item.name, "in", te - ts
+                num += 1
             tend = time.time()
             print "DEBUG: filling up files =", tend - tstart
+            
+            pbfile.finished()
 
         # Add the ListStore to the TreeView
         self.treeview_right.set_model(liststore)
