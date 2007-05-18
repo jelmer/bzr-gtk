@@ -111,7 +111,19 @@ class OliveMenu:
                                       ('diff_all', None,
                                        _('All...'), None,
                                        _('Show the differences of all files'),
-                                       self.diff_all)
+                                       self.diff_all),
+                                      ('view_remote', None,
+                                       _('View contents'), None,
+                                       _('View the contents of the file in a builtin viewer'),
+                                       self.view_remote),
+                                      ('diff_remote', None,
+                                       _('Show differences'), None,
+                                       _('Show the differences between two revisions of the file'),
+                                       self.diff_remote),
+                                      ('revert_remote', None,
+                                       _('Revert to this revision'), None,
+                                       _('Revert the selected file to the selected revision'),
+                                       self.revert_remote)
                                      ])
         
         self.ui.insert_action_group(self.actiongroup, 0)
@@ -120,6 +132,7 @@ class OliveMenu:
         self.cmenu_right = self.ui.get_widget('/context_right')
         self.cmenu_left = self.ui.get_widget('/context_left')
         self.toolbar_diff = self.ui.get_widget('/toolbar_diff')
+        self.cmenu_remote = self.ui.get_widget('/context_remote')
         
         # Set icons
         # TODO: do it without using deprecated comm
@@ -141,6 +154,9 @@ class OliveMenu:
     
     def left_context_menu(self):
         return self.cmenu_left
+    
+    def remote_context_menu(self):
+        return self.cmenu_remote
     
     @show_bzr_error
     def add_file(self, action):
@@ -325,3 +341,15 @@ class OliveMenu:
         from diff import OliveDiff
         diff = OliveDiff(self.comm)
         diff.display()
+    
+    def view_remote(self, action):
+        """ Remote context menu -> View contents """
+        print "DEBUG: view contents."
+    
+    def diff_remote(self, action):
+        """ Remote context menu -> Show differences """
+        print "DEBUG: show differences."
+    
+    def revert_remote(self, action):
+        """ Remote context menu -> Revert to this revision """
+        print "DEBUG: revert to this revision."

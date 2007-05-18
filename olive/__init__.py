@@ -53,6 +53,7 @@ from bzrlib.plugins.gtk.commit import CommitDialog
 from bzrlib.plugins.gtk.conflicts import ConflictsDialog
 from bzrlib.plugins.gtk.initialize import InitDialog
 from bzrlib.plugins.gtk.push import PushDialog
+from bzrlib.plugins.gtk.revbrowser import RevisionBrowser
 
 class OliveGtk:
     """ The main Olive GTK frontend class. This is called when launching the
@@ -117,6 +118,11 @@ class OliveGtk:
         self.entry_location = self.toplevel.get_widget('entry_location')
         self.image_location_error = self.toplevel.get_widget('image_location_error')
         
+        # Get the History widgets
+        self.check_history = self.toplevel.get_widget('checkbutton_history')
+        self.entry_history = self.toplevel.get_widget('entry_history_revno')
+        self.button_history = self.toplevel.get_widget('button_history_browse')
+        
         self.vbox_main_right = self.toplevel.get_widget('vbox_main_right')
         
         # Dictionary for signal_autoconnect
@@ -160,7 +166,10 @@ class OliveGtk:
                 "on_treeview_left_row_activated": self.on_treeview_left_row_activated,
                 "on_button_location_up_clicked": self.on_button_location_up_clicked,
                 "on_button_location_jump_clicked": self.on_button_location_jump_clicked,
-                "on_entry_location_key_press_event": self.on_entry_location_key_press_event
+                "on_entry_location_key_press_event": self.on_entry_location_key_press_event,
+                "on_checkbutton_history_toggled": self.on_checkbutton_history_toggled,
+                "on_entry_history_revno_key_press_event": self.on_entry_history_revno_key_press_event,
+                "on_button_history_browse_clicked": self.on_button_history_browse_clicked
             }
         
         # Connect the signals to the handlers
@@ -202,48 +211,30 @@ class OliveGtk:
         self.remote = False
         self.remote_branch = None
         self.remote_path = None
+        self.remote_revision = None
         
         self.set_path(os.getcwd())
         self._load_right()
         
         self._just_started = False
 
-    def set_path(self, path):
+    def set_path(self, path, force_remote=False):
         self.notbranch = False
         
-        if os.path.isdir(path):
-            self.image_location_error.destroy()
-            self.remote = False
-            
-            # We're local
-            try:
-                self.wt, self.wtpath = WorkingTree.open_containing(path)
-            except (bzrerrors.NotBranchError, bzrerrors.NoWorkingTree):
-                self.notbranch = True
-            
-            # If we're in the root, we cannot go up anymore
-            if sys.platform == 'win32':
-                drive, tail = os.path.splitdrive(path)
-                if tail in ('', '/', '\\'):
-                    self.button_location_up.set_sensitive(False)
-                else:
-                    self.button_location_up.set_sensitive(True)
-            else:
-                if self.path == '/':
-                    self.button_location_up.set_sensitive(False)
-                else:
-                    self.button_location_up.set_sensitive(True)
-        elif not os.path.isfile(path):
-            # Doesn't seem to be a file nor a directory, trying to open a
-            # remote location
+        if force_remote:
+            # Forcing remote mode (reading data from inventory)
             self._show_stock_image(gtk.STOCK_DISCONNECT)
             try:
                 br = Branch.open_containing(path)[0]
             except bzrerrors.NotBranchError:
                 self._show_stock_image(gtk.STOCK_DIALOG_ERROR)
+                self.check_history.set_active(False)
+                self.check_history.set_sensitive(False)
                 return False
             except bzrerrors.UnsupportedProtocol:
                 self._show_stock_image(gtk.STOCK_DIALOG_ERROR)
+                self.check_history.set_active(False)
+                self.check_history.set_sensitive(False)
                 return False
             
             self._show_stock_image(gtk.STOCK_CONNECT)
@@ -253,7 +244,10 @@ class OliveGtk:
             # We're remote
             self.remote_branch, self.remote_path = Branch.open_containing(path)
             
-            self.remote_entries = self.remote_branch.repository.get_inventory(self.remote_branch.last_revision()).entries()
+            if self.remote_revision is None:
+                self.remote_entries = self.remote_branch.repository.get_inventory(self.remote_branch.last_revision()).entries()
+            else:
+                self.remote_entries = self.remote_branch.repository.get_inventory(self.remote_revision).entries()
             
             if len(self.remote_path) == 0:
                 self.remote_parent = self.remote_branch.repository.get_inventory(self.remote_branch.last_revision()).iter_entries_by_dir().next()[1].file_id
@@ -270,6 +264,79 @@ class OliveGtk:
                 self.button_location_up.set_sensitive(False)
             else:
                 self.button_location_up.set_sensitive(True)
+        else:
+            if os.path.isdir(path):
+                self.image_location_error.destroy()
+                self.remote = False
+                
+                # We're local
+                try:
+                    self.wt, self.wtpath = WorkingTree.open_containing(path)
+                except (bzrerrors.NotBranchError, bzrerrors.NoWorkingTree):
+                    self.notbranch = True
+                
+                # If we're in the root, we cannot go up anymore
+                if sys.platform == 'win32':
+                    drive, tail = os.path.splitdrive(path)
+                    if tail in ('', '/', '\\'):
+                        self.button_location_up.set_sensitive(False)
+                    else:
+                        self.button_location_up.set_sensitive(True)
+                else:
+                    if self.path == '/':
+                        self.button_location_up.set_sensitive(False)
+                    else:
+                        self.button_location_up.set_sensitive(True)
+            elif not os.path.isfile(path):
+                # Doesn't seem to be a file nor a directory, trying to open a
+                # remote location
+                self._show_stock_image(gtk.STOCK_DISCONNECT)
+                try:
+                    br = Branch.open_containing(path)[0]
+                except bzrerrors.NotBranchError:
+                    self._show_stock_image(gtk.STOCK_DIALOG_ERROR)
+                    self.check_history.set_active(False)
+                    self.check_history.set_sensitive(False)
+                    return False
+                except bzrerrors.UnsupportedProtocol:
+                    self._show_stock_image(gtk.STOCK_DIALOG_ERROR)
+                    self.check_history.set_active(False)
+                    self.check_history.set_sensitive(False)
+                    return False
+                
+                self._show_stock_image(gtk.STOCK_CONNECT)
+                
+                self.remote = True
+               
+                # We're remote
+                self.remote_branch, self.remote_path = Branch.open_containing(path)
+                
+                if self.remote_revision is None:
+                    self.remote_entries = self.remote_branch.repository.get_inventory(self.remote_branch.last_revision()).entries()
+                else:
+                    self.remote_entries = self.remote_branch.repository.get_inventory(self.remote_revision).entries()
+                
+                if len(self.remote_path) == 0:
+                    self.remote_parent = self.remote_branch.repository.get_inventory(self.remote_branch.last_revision()).iter_entries_by_dir().next()[1].file_id
+                else:
+                    for (name, type) in self.remote_entries:
+                        if name == self.remote_path:
+                            self.remote_parent = type.file_id
+                            break
+                
+                if not path.endswith('/'):
+                    path += '/'
+                
+                if self.remote_branch.base == path:
+                    self.button_location_up.set_sensitive(False)
+                else:
+                    self.button_location_up.set_sensitive(True)
+        
+        if self.notbranch:
+            self.check_history.set_active(False)
+            self.check_history.set_sensitive(False)
+        else:
+            self.check_history.set_sensitive(True)
         
         self.statusbar.push(self.context_id, path)
         self.entry_location.set_text(path)
@@ -290,6 +357,32 @@ class OliveGtk:
         from bzrlib.plugins.gtk.dialog import about
         about()
         
+    
+    def on_button_history_browse_clicked(self, widget):
+        """ Browse for revision button handler. """
+        if self.remote:
+            br = self.remote_branch
+        else:
+            br = self.wt.branch
+            
+        revb = RevisionBrowser(br, self.window)
+        response = revb.run()
+        if response != gtk.RESPONSE_NONE:
+            revb.hide()
+        
+            if response == gtk.RESPONSE_OK:
+                if revb.selected_revno is not None:
+                    self.entry_history.set_text(revb.selected_revno)
+            
+            revb.destroy()
+    
+    def on_button_location_jump_clicked(self, widget):
+        """ Location Jump button handler. """
+        location = self.entry_location.get_text()
+        
+        if self.set_path(location):
+            self.refresh_right()
+    
     def on_button_location_up_clicked(self, widget):
         """ Location Up button handler. """
         if not self.remote:
@@ -304,12 +397,31 @@ class OliveGtk:
 
         self.refresh_right()
     
-    def on_button_location_jump_clicked(self, widget):
-        """ Location Jump button handler. """
-        location = self.entry_location.get_text()
-        
-        if self.set_path(location):
-            self.refresh_right()
+    def on_checkbutton_history_toggled(self, widget):
+        """ History Mode toggle handler. """
+        if self.check_history.get_active():
+            # History Mode activated
+            self.entry_history.set_sensitive(True)
+            self.button_history.set_sensitive(True)
+        else:
+            # History Mode deactivated
+            self.entry_history.set_sensitive(False)
+            self.button_history.set_sensitive(False)
+    
+    def on_entry_history_revno_key_press_event(self, widget, event):
+        """ Key pressed handler for the history entry. """
+        if event.keyval == 65293:
+            # Return was hit, so we have to load that specific revision
+            # Emulate being remote, so inventory should be used
+            path = self.get_path()
+            if not self.remote:
+                self.remote = True
+                self.remote_branch = self.wt.branch
+            
+            revno = int(self.entry_history.get_text())
+            self.remote_revision = self.remote_branch.get_rev_id(revno)
+            if self.set_path(path, True):
+                self.refresh_right()
     
     def on_entry_location_key_press_event(self, widget, event):
         """ Key pressed handler for the location entry. """
@@ -650,8 +762,12 @@ class OliveGtk:
                 m_annotate.set_sensitive(False)
                 m_diff.set_sensitive(False)
 
-            menu.right_context_menu().popup(None, None, None, 0,
-                                            event.time)
+            if not self.remote:
+                menu.right_context_menu().popup(None, None, None, 0,
+                                                event.time)
+            else:
+                menu.remote_context_menu().popup(None, None, None, 0,
+                                                 event.time)
         
     def on_treeview_right_row_activated(self, treeview, path, view_column):
         """ Occurs when somebody double-clicks or enters an item in the
