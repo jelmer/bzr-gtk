@@ -14,6 +14,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import time
+
 try:
     import pygtk
     pygtk.require("2.0")
@@ -38,7 +40,9 @@ class RevisionBrowser(gtk.Dialog):
         self.branch = branch
         
         # Create the widgets
-        self._label_select = gtk.Label(_("Please select a revision"))
+        self._hbox = gtk.HBox()
+        self._image_loading = gtk.image_new_from_stock(gtk.STOCK_REFRESH, gtk.ICON_SIZE_BUTTON)
+        self._label_loading = gtk.Label(_("Please wait, revisions are being loaded..."))
         self._scrolledwindow = gtk.ScrolledWindow()
         self._treeview = gtk.TreeView()
         self._button_select = gtk.Button(_("_Select"), use_underline=True)
@@ -52,6 +56,9 @@ class RevisionBrowser(gtk.Dialog):
                                         gtk.POLICY_AUTOMATIC)
         self.vbox.set_spacing(3)
         self.set_default_size(600, 400)
+        self._label_loading.set_alignment(0.0, 0.5)
+        self._hbox.set_spacing(5)
+        self._hbox.set_border_width(5)
         
         # Construct the TreeView columns
         self._treeview.append_column(gtk.TreeViewColumn(_('Revno'),
@@ -71,14 +78,17 @@ class RevisionBrowser(gtk.Dialog):
         
         self._scrolledwindow.add(self._treeview)
         
-        self.vbox.pack_start(self._label_select, False, False)
+        self._hbox.pack_start(self._image_loading, False, False)
+        self._hbox.pack_start(self._label_loading, True, True)
+        
+        self.vbox.pack_start(self._hbox, False, False)
         self.vbox.pack_start(self._scrolledwindow, True, True)
+
+        # Show the dialog
+        self.show_all()
         
         # Fill up with revisions
         self._fill_revisions()
-        
-        # Show the dialog
-        self.vbox.show_all()
 
     def _fill_revisions(self):
         """ Fill up the treeview with the revisions. """
@@ -89,10 +99,12 @@ class RevisionBrowser(gtk.Dialog):
                                    gobject.TYPE_STRING,
                                    gobject.TYPE_STRING)
         self._treeview.set_model(self.model)
+
         repo = self.branch.repository
         revs = self.branch.revision_history()
         r = repo.get_revisions(revs)
         r.reverse()
+
         for rev in r:
             if rev.committer is not None:
                 timestamp = format_date(rev.timestamp, rev.timezone)
@@ -103,6 +115,12 @@ class RevisionBrowser(gtk.Dialog):
                                 rev.committer,
                                 timestamp,
                                 rev.revision_id ])
+            while gtk.events_pending():
+                gtk.main_iteration()
+        tend = time.time()
+        
+        # Finished loading
+        self._hbox.hide()
     
     def _get_selected_revno(self):
         """ Return the selected revision's revno. """
