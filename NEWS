@@ -14,13 +14,17 @@
 
   * Give nicer errors when startup fails (John)
 
-  * Fix 'bzr gdiff notafile' (John)
+  * Fix 'bzr gdiff notafile' (#107812, John)
 
   * Find olive.glade on a couple more systems (John)
 
  INTERNALS
   
   * Some minor style fixes (John)
+
+ DOCS
+  
+  * Recommend installation as 'gtk' not 'bzr-gtk'. (#104110, Szilveszter)
 
 0.15.2	2007-04-03
 
