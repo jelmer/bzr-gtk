@@ -10,10 +10,11 @@ __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 
+from bzrlib.revision import Revision
 from bzrlib.tsort import merge_sort
 
 
-class DummyRevision(object):
+class DummyRevision(Revision):
     """Dummy bzr revision.
 
     Sometimes, especially in older bzr branches, a revision is referenced
@@ -21,15 +22,10 @@ class DummyRevision(object):
     When this happens we use an instance of this class instead of the real
     Revision object (which we can't get).
     """
-
     def __init__(self, revid):
-        self.revision_id = revid
-        self.parent_ids = []
+        super(DummyRevision, self).__init__(revid)
         self.committer = None
-        self.timestamp = None
-        self.timezone = None
-        self.message = self.revision_id
-        self.properties = {}
+        self.message = revid
 
 
 class RevisionProxy(object):

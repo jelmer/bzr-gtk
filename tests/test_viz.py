@@ -14,25 +14,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from unittest import TestLoader, TestSuite
-from bzrlib.tests import TestUtil
+from bzrlib.plugins.gtk.viz.graph import DummyRevision
+from bzrlib.tests import TestCase
 
-import os
-
-def test_suite():
-    result = TestSuite()
-
-    loader = TestUtil.TestLoader()
-
-    testmod_names = [
-        'test_preferences',
-        'test_history',
-        'test_viz'
-        ]
-
-    if os.name == 'nt':
-        testmod_names.append("test_tortoise_bzr")
-
-    result.addTest(loader.loadTestsFromModuleNames(["%s.%s" % (__name__, i) for i in testmod_names]))
-    return result
-
+class TestDummyRevision(TestCase):
+    def test_dummy_revision(self):
+        d = DummyRevision("blarev")
+        self.assertEquals("blarev", d.revision_id)
+        self.assertEquals({}, d.properties)
+        self.assertIs(None, d.committer)
+        self.assertIs(None, d.timestamp)
+        self.assertIs(None, d.timezone)
