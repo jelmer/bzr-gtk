@@ -26,7 +26,10 @@ class DummyRevision(object):
         self.revision_id = revid
         self.parent_ids = []
         self.committer = None
+        self.timestamp = None
+        self.timezone = None
         self.message = self.revision_id
+        self.properties = {}
 
 
 class RevisionProxy(object):

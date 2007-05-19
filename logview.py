@@ -58,8 +58,9 @@ class LogView(gtk.ScrolledWindow):
             self.committer.set_text(revision.committer)
         else:
             self.committer.set_text("")
-        self.timestamp.set_text(format_date(revision.timestamp,
-                                            revision.timezone))
+        if revision.timestamp is not None:
+            self.timestamp.set_text(format_date(revision.timestamp,
+                                                revision.timezone))
         self.message_buffer.set_text(revision.message)
         try:
             self.branchnick_label.set_text(revision.properties['branch-nick'])
