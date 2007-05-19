@@ -16,6 +16,7 @@
 
 import os
 import sys
+import time
 
 # gettext support
 import gettext
@@ -27,6 +28,7 @@ try:
 except:
     pass
 
+import gobject
 import gtk
 import gtk.gdk
 import gtk.glade
@@ -107,8 +109,14 @@ class OliveGtk:
         self.combobox_drive = gtk.combo_box_new_text()
         self.combobox_drive.connect("changed", self._refresh_drives)
         
+        # Get the navigation widgets
+        self.hbox_location = self.toplevel.get_widget('hbox_location')
+        self.button_location_up = self.toplevel.get_widget('button_location_up')
+        self.button_location_jump = self.toplevel.get_widget('button_location_jump')
+        self.entry_location = self.toplevel.get_widget('entry_location')
+        self.image_location_error = self.toplevel.get_widget('image_location_error')
+        
         self.vbox_main_right = self.toplevel.get_widget('vbox_main_right')
- 
         
         # Dictionary for signal_autoconnect
         dic = { "on_window_main_destroy": gtk.main_quit,
@@ -148,7 +156,11 @@ class OliveGtk:
                 "on_treeview_right_button_press_event": self.on_treeview_right_button_press_event,
                 "on_treeview_right_row_activated": self.on_treeview_right_row_activated,
                 "on_treeview_left_button_press_event": self.on_treeview_left_button_press_event,
-                "on_treeview_left_row_activated": self.on_treeview_left_row_activated }
+                "on_treeview_left_row_activated": self.on_treeview_left_row_activated,
+                "on_button_location_up_clicked": self.on_button_location_up_clicked,
+                "on_button_location_jump_clicked": self.on_button_location_jump_clicked,
+                "on_entry_location_key_press_event": self.on_entry_location_key_press_event
+            }
         
         # Connect the signals to the handlers
         self.toplevel.signal_autoconnect(dic)
@@ -175,8 +187,8 @@ class OliveGtk:
         
         # Show drive selector if under Win32
         if sys.platform == 'win32':
-            self.vbox_main_right.pack_start(self.combobox_drive, False, True, 0)
-            self.vbox_main_right.reorder_child(self.combobox_drive, 0)
+            self.hbox_location.pack_start(self.combobox_drive, False, False, 0)
+            self.hbox_location.reorder_child(self.combobox_drive, 1)
             self.combobox_drive.show()
             self.gen_hard_selector()
         
@@ -200,6 +212,20 @@ class OliveGtk:
             self.notbranch = True
         
         self.statusbar.push(self.context_id, path)
+        self.entry_location.set_text(path)
+        
+        # If we're in the root, we cannot go up anymore
+        if sys.platform == 'win32':
+            drive, tail = os.path.splitdrive(self.path)
+            if tail in ('', '/', '\\'):
+                self.button_location_up.set_sensitive(False)
+            else:
+                self.button_location_up.set_sensitive(True)
+        else:
+            if self.path == '/':
+                self.button_location_up.set_sensitive(False)
+            else:
+                self.button_location_up.set_sensitive(True)
 
     def get_path(self):
         return self.path
@@ -208,6 +234,27 @@ class OliveGtk:
         from bzrlib.plugins.gtk.dialog import about
         about()
         
+    def on_button_location_up_clicked(self, widget):
+        """ Location Up button handler. """
+        self.set_path(os.path.split(self.get_path())[0])
+        self.refresh_right()
+    
+    def on_button_location_jump_clicked(self, widget):
+        """ Location Jump button handler. """
+        location = self.entry_location.get_text()
+        if os.path.isdir(location):
+            self.set_path(location)
+            self.refresh_right()
+            self.image_location_error.hide()
+        else:
+            self.image_location_error.show()
+    
+    def on_entry_location_key_press_event(self, widget, event):
+        """ Key pressed handler for the location entry. """
+        if event.keyval == 65293:
+            # Return was hit, so we have to jump
+            self.on_button_location_jump_clicked(widget)
+    
     def on_menuitem_add_files_activate(self, widget):
         """ Add file(s)... menu handler. """
         from add import OliveAdd
@@ -344,7 +391,9 @@ class OliveGtk:
         """ Branch/Status... menu handler. """
         from bzrlib.plugins.gtk.status import StatusDialog
         status = StatusDialog(self.wt, self.wtpath)
-        status.display()
+        response = status.run()
+        if response != gtk.RESPONSE_NONE:
+            status.destroy()
     
     def on_menuitem_branch_initialize_activate(self, widget):
         """ Initialize current directory. """
@@ -574,31 +623,11 @@ class OliveGtk:
         # Expand the tree
         self.treeview_left.expand_all()
 
-    def _add_updir_to_dirlist(self, dirlist, curdir):
-        """Add .. to the top of directories list if we not in root directory
-
-        :param dirlist:     list of directories (modified in place)
-        :param curdir:      current directory
-        :return:            nothing
-        """
-        if curdir is None:
-            curdir = self.path
-
-        if sys.platform == 'win32':
-            drive, tail = os.path.splitdrive(curdir)
-            if tail in ('', '/', '\\'):
-                return
-        else:
-            if curdir == '/':
-                return
-
-        # insert always as first element
-        dirlist.insert(0, '..')
-
     def _load_right(self):
         """ Load data into the right panel. (Filelist) """
         # Create ListStore
-        liststore = gtk.ListStore(str, str, str)
+        # Model: [icon, dir, name, status text, status, size (int), size (human), mtime (int), mtime (local)]
+        liststore = gtk.ListStore(str, gobject.TYPE_BOOLEAN, str, str, str, gobject.TYPE_INT, gobject.TYPE_STRING, gobject.TYPE_INT, gobject.TYPE_STRING)
         
         dirs = []
         files = []
@@ -612,13 +641,6 @@ class OliveGtk:
                 dirs.append(item)
             else:
                 files.append(item)
-            
-        # Sort'em
-        dirs.sort()
-        files.sort()
-
-        # add updir link to dirs
-        self._add_updir_to_dirlist(dirs, self.path)
         
         if not self.notbranch:
             branch = self.wt.branch
@@ -627,8 +649,9 @@ class OliveGtk:
             delta = self.wt.changes_from(tree2, want_unchanged=True)
         
         # Add'em to the ListStore
-        for item in dirs:    
-            liststore.append([gtk.STOCK_DIRECTORY, item, ''])
+        for item in dirs:
+            statinfo = os.stat(self.path + os.sep + item)
+            liststore.append([gtk.STOCK_DIRECTORY, True, item, '', '', statinfo.st_size, self._format_size(statinfo.st_size), statinfo.st_mtime, self._format_date(statinfo.st_mtime)])
         for item in files:
             status = 'unknown'
             if not self.notbranch:
@@ -677,14 +700,20 @@ class OliveGtk:
                 st = _('ignored')
             else:
                 st = _('unknown')
-            liststore.append([gtk.STOCK_FILE, item, st])
+            
+            statinfo = os.stat(self.path + os.sep + item)
+            liststore.append([gtk.STOCK_FILE, False, item, st, status, statinfo.st_size, self._format_size(statinfo.st_size), statinfo.st_mtime, self._format_date(statinfo.st_mtime)])
         
         # Create the columns and add them to the TreeView
         self.treeview_right.set_model(liststore)
         tvcolumn_filename = gtk.TreeViewColumn(_('Filename'))
         tvcolumn_status = gtk.TreeViewColumn(_('Status'))
+        tvcolumn_size = gtk.TreeViewColumn(_('Size'))
+        tvcolumn_mtime = gtk.TreeViewColumn(_('Last modified'))
         self.treeview_right.append_column(tvcolumn_filename)
         self.treeview_right.append_column(tvcolumn_status)
+        self.treeview_right.append_column(tvcolumn_size)
+        self.treeview_right.append_column(tvcolumn_mtime)
         
         # Set up the cells
         cellpb = gtk.CellRendererPixbuf()
@@ -692,9 +721,26 @@ class OliveGtk:
         tvcolumn_filename.pack_start(cellpb, False)
         tvcolumn_filename.pack_start(cell, True)
         tvcolumn_filename.set_attributes(cellpb, stock_id=0)
-        tvcolumn_filename.add_attribute(cell, 'text', 1)
+        tvcolumn_filename.add_attribute(cell, 'text', 2)
         tvcolumn_status.pack_start(cell, True)
-        tvcolumn_status.add_attribute(cell, 'text', 2)
+        tvcolumn_status.add_attribute(cell, 'text', 3)
+        tvcolumn_size.pack_start(cell, True)
+        tvcolumn_size.add_attribute(cell, 'text', 6)
+        tvcolumn_mtime.pack_start(cell, True)
+        tvcolumn_mtime.add_attribute(cell, 'text', 8)
+        
+        # Set up the properties of the TreeView
+        self.treeview_right.set_headers_visible(True)
+        self.treeview_right.set_headers_clickable(True)
+        self.treeview_right.set_search_column(1)
+        tvcolumn_filename.set_resizable(True)
+        # Set up sorting
+        liststore.set_sort_func(13, self._sort_filelist_callback, None)
+        liststore.set_sort_column_id(13, gtk.SORT_ASCENDING)
+        tvcolumn_filename.set_sort_column_id(13)
+        tvcolumn_status.set_sort_column_id(3)
+        tvcolumn_size.set_sort_column_id(5)
+        tvcolumn_mtime.set_sort_column_id(7)
         
         # Set sensitivity
         self.set_sensitivity()
@@ -707,7 +753,7 @@ class OliveGtk:
         if iter is None:
             return None
         else:
-            return model.get_value(iter, 1)
+            return model.get_value(iter, 2)
     
     def get_selected_left(self):
         """ Get the selected bookmark. """
@@ -807,14 +853,7 @@ class OliveGtk:
                 dirs.append(item)
             else:
                 files.append(item)
-
-        # Sort'em
-        dirs.sort()
-        files.sort()
-
-        # add updir link to dirs
-        self._add_updir_to_dirlist(dirs, path)
-
+        
         # Try to open the working tree
         notbranch = False
         try:
@@ -830,7 +869,8 @@ class OliveGtk:
             
         # Add'em to the ListStore
         for item in dirs:
-            liststore.append([gtk.STOCK_DIRECTORY, item, ''])
+            statinfo = os.stat(self.path + os.sep + item)
+            liststore.append([gtk.STOCK_DIRECTORY, True, item, '', '', statinfo.st_size, self._format_size(statinfo.st_size), statinfo.st_mtime, self._format_date(statinfo.st_mtime)])
         for item in files:
             status = 'unknown'
             if not notbranch:
@@ -879,10 +919,13 @@ class OliveGtk:
                 st = _('ignored')
             else:
                 st = _('unknown')
-            liststore.append([gtk.STOCK_FILE, item, st])
+            
+            statinfo = os.stat(self.path + os.sep + item)
+            liststore.append([gtk.STOCK_FILE, False, item, st, status, statinfo.st_size, self._format_size(statinfo.st_size), statinfo.st_mtime, self._format_date(statinfo.st_mtime)])
 
         # Add the ListStore to the TreeView
         self.treeview_right.set_model(liststore)
+        self.treeview_right.columns_autosize()
         
         # Set sensitivity
         self.set_sensitivity()
@@ -933,6 +976,50 @@ class OliveGtk:
             changes = True
         
         return changes
+    
+    def _sort_filelist_callback(self, model, iter1, iter2, data):
+        """ The sort callback for the file list, return values:
+        -1: iter1 < iter2
+        0: iter1 = iter2
+        1: iter1 > iter2
+        """
+        name1 = model.get_value(iter1, 2)
+        name2 = model.get_value(iter2, 2)
+        
+        if model.get_value(iter1, 1):
+            # item1 is a directory
+            if not model.get_value(iter2, 1):
+                # item2 isn't
+                return -1
+            else:
+                # both of them are directories, we compare their names
+                if name1 < name2:
+                    return -1
+                elif name1 == name2:
+                    return 0
+                else:
+                    return 1
+        else:
+            # item1 is not a directory
+            if model.get_value(iter2, 1):
+                # item2 is
+                return 1
+            else:
+                # both of them are files, compare them
+                if name1 < name2:
+                    return -1
+                elif name1 == name2:
+                    return 0
+                else:
+                    return 1
+    
+    def _format_size(self, size):
+        """ Format size to a human readable format. """
+        return size
+    
+    def _format_date(self, timestamp):
+        """ Format the time (given in secs) to a human readable format. """
+        return time.ctime(timestamp)
 
 import ConfigParser
 

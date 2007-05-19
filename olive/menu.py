@@ -30,8 +30,11 @@ from bzrlib.workingtree import WorkingTree
 
 from bzrlib.plugins.gtk.dialog import error_dialog, info_dialog, warning_dialog
 from bzrlib.plugins.gtk.errors import show_bzr_error
+from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
+from bzrlib.plugins.gtk.annotate.config import GAnnotateConfig
+from bzrlib.plugins.gtk.diff import DiffWindow
 from launch import launch
-from olive import Preferences, DiffWindow
+from olive import Preferences
 
 class OliveMenu:
     """ This class is responsible for building the context menus. """
@@ -77,6 +80,10 @@ class OliveMenu:
                                        _('Commit'), None,
                                        _('Commit the changes'),
                                        self.commit),
+                                      ('annotate', None,
+                                       _('Annotate'), None,
+                                       _('Annotate the selected file'),
+                                       self.annotate),
                                       ('diff', None,
                                        _('Diff'), None,
                                        _('Show the diff of the file'),
@@ -150,6 +157,32 @@ class OliveMenu:
             return
         
         bzrlib.add.smart_add([os.path.join(directory, filename)])
+    
+    @show_bzr_error
+    def annotate(self, action):
+        """ Right context menu -> Annotate """
+        directory = self.path
+        filename = self.selected
+        
+        if filename is None:
+            error_dialog(_('No file was selected'),
+                         _('Please select a file from the list.'))
+            return
+        
+        wt, path = WorkingTree.open_containing(os.path.join(directory, filename))
+        
+        branch = wt.branch
+        file_id = wt.path2id(wt.relpath(os.path.join(directory, filename)))
+        
+        window = GAnnotateWindow(all=False, plain=False)
+        window.set_title(os.path.join(directory, filename) + " - Annotate")
+        config = GAnnotateConfig(window)
+        window.show()
+        branch.lock_read()
+        try:
+            window.annotate(wt, branch, file_id)
+        finally:
+            branch.unlock()
     
     @show_bzr_error
     def remove_file(self, action):

@@ -8,6 +8,7 @@
         <menuitem name="revert" action="revert" />
         <menuitem name="commit" action="commit" />
         <separator />
+        <menuitem name="annotate" action="annotate" />
         <menuitem name="diff" action="diff" />
         <separator />
         <menuitem name="bookmark" action="bookmark" />

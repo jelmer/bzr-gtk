@@ -16,7 +16,7 @@
 
 import bzrlib
 
-__version__ = '0.16.0'
+__version__ = '0.17.0'
 version_info = tuple(int(n) for n in __version__.split('.'))
 
 
@@ -40,8 +40,7 @@ def check_bzrlib_version(desired):
     if bzrlib_version < desired:
         warning('Installed bzr version %s is too old to be used with bzr-gtk'
                 ' %s.' % (bzrlib.__version__, __version__))
-        # Not using BzrNewError, because it may not exist.
-        raise Exception, ('Version mismatch', version_info)
+        raise BzrError('Version mismatch: %r' % version_info)
     else:
         warning('bzr-gtk is not up to date with installed bzr version %s.'
                 ' \nThere should be a newer version available, e.g. %i.%i.' 
@@ -323,14 +322,9 @@ class cmd_gcommit(GTKCommand):
         try:
             (wt, path) = workingtree.WorkingTree.open_containing(filename)
             br = wt.branch
-        except NotBranchError, e:
-            path = e.path
         except NoWorkingTree, e:
             path = e.base
-            try:
-                (br, path) = branch.Branch.open_containing(path)
-            except NotBranchError, e:
-                path = e.path
+            (br, path) = branch.Branch.open_containing(path)
 
         commit = CommitDialog(wt, path, not br)
         commit.run()
