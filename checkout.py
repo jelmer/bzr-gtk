@@ -32,6 +32,7 @@ from bzrlib.config import GlobalConfig
 from dialog import error_dialog
 
 from history import UrlHistory
+from olive import Preferences
 
 class CheckoutDialog(gtk.Dialog):
     """ New implementation of the Checkout dialog. """
@@ -109,8 +110,14 @@ class CheckoutDialog(gtk.Dialog):
     def _build_history(self):
         """ Build up the checkout history. """
         self._combo_model = gtk.ListStore(str)
+        
         for item in self._history.get_entries():
             self._combo_model.append([ item ])
+        
+        pref = Preferences()
+        for item in pref.get_bookmarks():
+            self._combo_model.append([ item ])
+        
         self._combo.set_model(self._combo_model)
         self._combo.set_text_column(0)
     
