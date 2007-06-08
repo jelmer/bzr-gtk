@@ -25,6 +25,8 @@ class DummyRevision(Revision):
     def __init__(self, revid):
         super(DummyRevision, self).__init__(revid)
         self.committer = None
+        self.timestamp = None
+        self.timezone = None
         self.message = revid
 
 
