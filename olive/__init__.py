@@ -245,9 +245,9 @@ class OliveGtk:
             self.remote_branch, self.remote_path = Branch.open_containing(path)
             
             if self.remote_revision is None:
-                self.remote_entries = self.remote_branch.repository.get_inventory(self.remote_branch.last_revision()).entries()
-            else:
-                self.remote_entries = self.remote_branch.repository.get_inventory(self.remote_revision).entries()
+                self.remote_revision = self.remote_branch.last_revision()
+            
+            self.remote_entries = self.remote_branch.repository.get_inventory(self.remote_revision).entries()
             
             if len(self.remote_path) == 0:
                 self.remote_parent = self.remote_branch.repository.get_inventory(self.remote_branch.last_revision()).iter_entries_by_dir().next()[1].file_id
@@ -312,9 +312,9 @@ class OliveGtk:
                 self.remote_branch, self.remote_path = Branch.open_containing(path)
                 
                 if self.remote_revision is None:
-                    self.remote_entries = self.remote_branch.repository.get_inventory(self.remote_branch.last_revision()).entries()
-                else:
-                    self.remote_entries = self.remote_branch.repository.get_inventory(self.remote_revision).entries()
+                    self.remote_revision = self.remote_branch.last_revision()
+                
+                self.remote_entries = self.remote_branch.repository.get_inventory(self.remote_revision).entries()
                 
                 if len(self.remote_path) == 0:
                     self.remote_parent = self.remote_branch.repository.get_inventory(self.remote_branch.last_revision()).iter_entries_by_dir().next()[1].file_id
@@ -408,6 +408,7 @@ class OliveGtk:
             self.entry_history.set_sensitive(False)
             self.button_history.set_sensitive(False)
     
+    @show_bzr_error
     def on_entry_history_revno_key_press_event(self, widget, event):
         """ Key pressed handler for the history entry. """
         if event.keyval == 65293:
@@ -838,8 +839,17 @@ class OliveGtk:
     def _load_right(self):
         """ Load data into the right panel. (Filelist) """
         # Create ListStore
-        # Model: [icon, dir, name, status text, status, size (int), size (human), mtime (int), mtime (local)]
-        liststore = gtk.ListStore(str, gobject.TYPE_BOOLEAN, str, str, str, gobject.TYPE_INT, gobject.TYPE_STRING, gobject.TYPE_INT, gobject.TYPE_STRING)
+        # Model: [ icon, dir, name, status text, status, size (int), size (human), mtime (int), mtime (local), fileid]
+        liststore = gtk.ListStore(gobject.TYPE_STRING,
+                                  gobject.TYPE_BOOLEAN,
+                                  gobject.TYPE_STRING,
+                                  gobject.TYPE_STRING,
+                                  gobject.TYPE_STRING,
+                                  gobject.TYPE_INT,
+                                  gobject.TYPE_STRING,
+                                  gobject.TYPE_INT,
+                                  gobject.TYPE_STRING,
+                                  gobject.TYPE_STRING)
         
         dirs = []
         files = []
@@ -863,9 +873,19 @@ class OliveGtk:
         # Add'em to the ListStore
         for item in dirs:
             statinfo = os.stat(self.path + os.sep + item)
-            liststore.append([gtk.STOCK_DIRECTORY, True, item, '', '', statinfo.st_size, self._format_size(statinfo.st_size), statinfo.st_mtime, self._format_date(statinfo.st_mtime)])
+            liststore.append([ gtk.STOCK_DIRECTORY,
+                               True,
+                               item,
+                               '',
+                               '',
+                               statinfo.st_size,
+                               self._format_size(statinfo.st_size),
+                               statinfo.st_mtime,
+                               self._format_date(statinfo.st_mtime),
+                               ''])
         for item in files:
             status = 'unknown'
+            fileid = ''
             if not self.notbranch:
                 filename = self.wt.relpath(self.path + os.sep + item)
                 
@@ -875,28 +895,28 @@ class OliveGtk:
                     for rpath, rpathnew, id, kind, text_modified, meta_modified in delta.renamed:
                         if rpathnew == filename:
                             status = 'renamed'
+                            fileid = id
                     for rpath, id, kind in delta.added:
                         if rpath == filename:
                             status = 'added'
+                            fileid = id
                     for rpath, id, kind in delta.removed:
                         if rpath == filename:
                             status = 'removed'
+                            fileid = id
                     for rpath, id, kind, text_modified, meta_modified in delta.modified:
                         if rpath == filename:
                             status = 'modified'
+                            fileid = id
                     for rpath, id, kind in delta.unchanged:
                         if rpath == filename:
                             status = 'unchanged'
+                            fileid = id
                     for rpath, file_class, kind, id, entry in self.wt.list_files():
                         if rpath == filename and file_class == 'I':
                             status = 'ignored'
                 finally:
                     self.wt.unlock()
-            
-            #try:
-            #    status = fileops.status(path + os.sep + item)
-            #except errors.PermissionDenied:
-            #    continue
             
             if status == 'renamed':
                 st = _('renamed')
@@ -914,7 +934,16 @@ class OliveGtk:
                 st = _('unknown')
             
             statinfo = os.stat(self.path + os.sep + item)
-            liststore.append([gtk.STOCK_FILE, False, item, st, status, statinfo.st_size, self._format_size(statinfo.st_size), statinfo.st_mtime, self._format_date(statinfo.st_mtime)])
+            liststore.append([gtk.STOCK_FILE,
+                              False,
+                              item,
+                              st,
+                              status,
+                              statinfo.st_size,
+                              self._format_size(statinfo.st_size),
+                              statinfo.st_mtime,
+                              self._format_date(statinfo.st_mtime),
+                              fileid])
         
         # Create the columns and add them to the TreeView
         self.treeview_right.set_model(liststore)
@@ -960,6 +989,16 @@ class OliveGtk:
         # Set sensitivity
         self.set_sensitivity()
         
+    def get_selected_fileid(self):
+        """ Get the file_id of the selected file. """
+        treeselection = self.treeview_right.get_selection()
+        (model, iter) = treeselection.get_selected()
+        
+        if iter is None:
+            return None
+        else:
+            return model.get_value(iter, 9)
+    
     def get_selected_right(self):
         """ Get the selected filename. """
         treeselection = self.treeview_right.get_selection()
@@ -1121,9 +1160,19 @@ class OliveGtk:
             # Add'em to the ListStore
             for item in dirs:
                 statinfo = os.stat(self.path + os.sep + item)
-                liststore.append([gtk.STOCK_DIRECTORY, True, item, '', '', statinfo.st_size, self._format_size(statinfo.st_size), statinfo.st_mtime, self._format_date(statinfo.st_mtime)])
+                liststore.append([gtk.STOCK_DIRECTORY,
+                                  True,
+                                  item,
+                                  '',
+                                  '',
+                                  statinfo.st_size,
+                                  self._format_size(statinfo.st_size),
+                                  statinfo.st_mtime,
+                                  self._format_date(statinfo.st_mtime),
+                                  ''])
             for item in files:
                 status = 'unknown'
+                fileid = ''
                 if not notbranch:
                     filename = tree1.relpath(path + os.sep + item)
                     
@@ -1133,18 +1182,23 @@ class OliveGtk:
                         for rpath, rpathnew, id, kind, text_modified, meta_modified in delta.renamed:
                             if rpathnew == filename:
                                 status = 'renamed'
+                                fileid = id
                         for rpath, id, kind in delta.added:
                             if rpath == filename:
-                                status = 'added'                
+                                status = 'added'
+                                fileid = id
                         for rpath, id, kind in delta.removed:
                             if rpath == filename:
                                 status = 'removed'
+                                fileid = id
                         for rpath, id, kind, text_modified, meta_modified in delta.modified:
                             if rpath == filename:
                                 status = 'modified'
+                                fileid = id
                         for rpath, id, kind in delta.unchanged:
                             if rpath == filename:
                                 status = 'unchanged'
+                                fileid = id
                         for rpath, file_class, kind, id, entry in self.wt.list_files():
                             if rpath == filename and file_class == 'I':
                                 status = 'ignored'
@@ -1167,7 +1221,16 @@ class OliveGtk:
                     st = _('unknown')
                 
                 statinfo = os.stat(self.path + os.sep + item)
-                liststore.append([gtk.STOCK_FILE, False, item, st, status, statinfo.st_size, self._format_size(statinfo.st_size), statinfo.st_mtime, self._format_date(statinfo.st_mtime)])
+                liststore.append([gtk.STOCK_FILE,
+                                  False,
+                                  item,
+                                  st,
+                                  status,
+                                  statinfo.st_size,
+                                  self._format_size(statinfo.st_size),
+                                  statinfo.st_mtime,
+                                  self._format_date(statinfo.st_mtime),
+                                  fileid])
         else:
             # We're remote
             
@@ -1223,7 +1286,8 @@ class OliveGtk:
                                        0,
                                        self._format_size(0),
                                        rev.timestamp,
-                                       self._format_date(rev.timestamp)
+                                       self._format_date(rev.timestamp),
+                                       ''
                                    ])
                 while gtk.events_pending():
                     gtk.main_iteration()
@@ -1239,7 +1303,8 @@ class OliveGtk:
                                        item.text_size,
                                        self._format_size(item.text_size),
                                        rev.timestamp,
-                                       self._format_date(rev.timestamp)
+                                       self._format_date(rev.timestamp),
+                                       item.file_id
                                    ])
                 while gtk.events_pending():
                     gtk.main_iteration()
