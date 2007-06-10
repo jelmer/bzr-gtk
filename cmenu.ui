@@ -23,4 +23,9 @@
         <menuitem name="diff_selected" action="diff_selected" />
         <menuitem name="diff_all" action="diff_all" />
     </popup>
+    <popup name="context_remote">
+        <menuitem name="view_remote" action="view_remote" />
+        <menuitem name="diff_remote" action="diff_remote" />
+        <menuitem name="revert_remote" action="revert_remote" />
+    </popup>
 </ui>
