@@ -2,6 +2,8 @@
 
  FEATURES
 
+  * Added an EXPERIMENTAL feature for browsing remote branches (Szilveszter)
+
   * Bookmarked locations are now added to branch/checkout history (Szilveszter)
 
   * There are now more columns in the file list, and you can sort by them
