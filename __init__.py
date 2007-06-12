@@ -30,7 +30,8 @@ def check_bzrlib_version(desired):
     """
     desired_plus = (desired[0], desired[1]+1)
     bzrlib_version = bzrlib.version_info[:2]
-    if bzrlib_version == desired:
+    if bzrlib_version == desired or (bzrlib_version == desired_plus and
+                                     bzrlib.version_info[3] == 'dev'):
         return
     try:
         from bzrlib.trace import warning
