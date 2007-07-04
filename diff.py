@@ -14,6 +14,8 @@ from cStringIO import StringIO
 
 import gtk
 import pango
+import os
+import re
 import sys
 
 try:
@@ -26,6 +28,7 @@ import bzrlib
 
 from bzrlib.diff import show_diff_trees
 from bzrlib.errors import NoSuchFile
+from bzrlib.trace import warning
 
 
 class DiffWindow(gtk.Window):
@@ -92,6 +95,7 @@ class DiffWindow(gtk.Window):
             self.buffer = gtksourceview.SourceBuffer()
             slm = gtksourceview.SourceLanguagesManager()
             gsl = slm.get_language_from_mime_type("text/x-patch")
+            self.apply_colordiffrc(gsl)
             self.buffer.set_language(gsl)
             self.buffer.set_highlight(True)
 
@@ -167,3 +171,73 @@ class DiffWindow(gtk.Window):
         s = StringIO()
         show_diff_trees(self.parent_tree, self.rev_tree, s, specific_files)
         self.buffer.set_text(s.getvalue().decode(sys.getdefaultencoding(), 'replace'))
+
+    @staticmethod
+    def apply_colordiffrc(lang):
+        """Set style colors in lang to that specified in colordiff config file.
+
+        Both ~/.colordiffrc and ~/.colordiffrc.bzr-gtk are read.
+
+        :param lang: a gtksourceview.SourceLanguage object.
+        """
+        def parse_colordiffrc(fileobj):
+            """Parse fileobj as a colordiff configuration file.
+            
+            :return: A dict with the key -> value pairs.
+            """
+            colors = {}
+            for line in fileobj:
+                if re.match(r'^\s*#', line):
+                    continue
+                key, val = line.split('=')
+                colors[key.strip()] = val.strip()
+            return colors
+
+        colors = {}
+
+        for f in ('~/.colordiffrc', '~/.colordiffrc.bzr-gtk'):
+            f = os.path.expanduser(f)
+            if os.path.exists(f):
+                try:
+                    f = file(f)
+                except IOError, e:
+                    warning('could not open file %s: %s' % (f, str(e)))
+                else:
+                    colors.update(parse_colordiffrc(f))
+                    f.close()
+
+        if not colors:
+            # ~/.colordiffrc does not exist
+            return
+
+        mapping = {
+                # map GtkSourceView tags to colordiff names
+                # since GSV is richer, accept new names for extra bits,
+                # defaulting to old names if they're not present
+                'Added@32@line': ['newtext'],
+                'Removed@32@line': ['oldtext'],
+                'Location': ['location', 'diffstuff'],
+                'Diff@32@file': ['file', 'diffstuff'],
+                'Special@32@case': ['specialcase', 'diffstuff'],
+        }
+
+        for tag in lang.get_tags():
+            tag_id = tag.get_id()
+            keys = mapping.get(tag_id, [])
+            color = None
+
+            for key in keys:
+                color = colors.get(key, None)
+                if color is not None:
+                    break
+
+            if color is None:
+                continue
+
+            style = gtksourceview.SourceTagStyle()
+            try:
+                style.foreground = gtk.gdk.color_parse(color)
+            except ValueError:
+                warning('not a valid color: %s' % color)
+            else:
+                lang.set_tag_style(tag_id, style)
