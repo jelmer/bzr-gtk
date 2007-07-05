@@ -2,8 +2,9 @@
 
  FEATURES
 
-  * Add support for customizing colors in the diff window via ~/.colordiffrc.
-    See README file for details. (Adeodato Simó)
+  * Add support for customizing colors in the diff window via ~/.colordiffrc
+    or gedit's syntax highlighting configuration. See README file for details.
+    (Adeodato Simó)
 
 
 0.18.0  2007-07-14

@@ -91,9 +91,14 @@ Usage - diff window
 -------------------
 
 If you have the gtksourceview python bindings installed, the diff window
-will have syntax highlighting. The colors will come from the ~/.colordiffrc
-file; since that file may be written for a dark background environment,
-the file ~/.colordiffrc.bzr-gtk can be used to override some values.
+will have syntax highlighting. If the python GConf bindings are installed, 
+the colors will be read from gedit's syntax highlighting configuration
+for the "Diff" language.
+
+Afterwards, colors from the ~/.colordiffrc file will be read, and will
+override gedit's. Since that file may be written for a dark background
+environment, the file ~/.colordiffrc.bzr-gtk can be used to override
+some values.
 
 Because gtksourceview is more configurable that colordiff, in addition
 to the 'oldtext', 'newtext', and 'diffstuff' keys, the following keys
