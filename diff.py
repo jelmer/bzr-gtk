@@ -95,7 +95,7 @@ class DiffWindow(gtk.Window):
             self.buffer = gtksourceview.SourceBuffer()
             slm = gtksourceview.SourceLanguagesManager()
             gsl = slm.get_language_from_mime_type("text/x-patch")
-            self.apply_colordiffrc(gsl)
+            self.apply_colordiff_colors(gsl)
             self.buffer.set_language(gsl)
             self.buffer.set_highlight(True)
 
@@ -173,12 +173,12 @@ class DiffWindow(gtk.Window):
         self.buffer.set_text(s.getvalue().decode(sys.getdefaultencoding(), 'replace'))
 
     @staticmethod
-    def apply_colordiffrc(lang):
-        """Set style colors in lang to that specified in colordiff config file.
+    def apply_colordiff_colors(lang):
+        """Set style colors for lang using the colordiff configuration file.
 
         Both ~/.colordiffrc and ~/.colordiffrc.bzr-gtk are read.
 
-        :param lang: a gtksourceview.SourceLanguage object.
+        :param lang: a "Diff" gtksourceview.SourceLanguage object.
         """
         def parse_colordiffrc(fileobj):
             """Parse fileobj as a colordiff configuration file.
