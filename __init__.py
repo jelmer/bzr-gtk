@@ -12,7 +12,24 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-"""GTK+ frontends to Bazaar commands """
+"""Graphical support for Bazaar using GTK.
+
+This plugin includes:
+commit-notify     Start the graphical notifier of commits.
+gannotate         GTK+ annotate. 
+gbranch           GTK+ branching. 
+gcheckout         GTK+ checkout. 
+gcommit           GTK+ commit dialog 
+gconflicts        GTK+ push. 
+gdiff             Show differences in working tree in a GTK+ Window. 
+ginit             Initialise a new branch.
+gmissing          GTK+ missing revisions dialog. 
+gpreferences      GTK+ preferences dialog. 
+gpush             GTK+ push. 
+gstatus           GTK+ status dialog 
+gtags             Manage branch tags.
+visualise         Graphically visualise this branch. 
+"""
 
 import bzrlib
 
