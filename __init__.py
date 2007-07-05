@@ -211,6 +211,20 @@ class cmd_gdiff(GTKCommand):
             wt.unlock()
 
 
+def start_viz_window(branch, revision, limit=None):
+    """Start viz on branch with revision revision.
+    
+    :return: The viz window object.
+    """
+    from viz.branchwin import BranchWindow
+    branch.lock_read()
+    pp = BranchWindow()
+    pp.set_branch(branch, revision, limit)
+    # cleanup locks when the window is closed
+    pp.connect("destroy", lambda w: branch.unlock())
+    return pp
+
+
 class cmd_visualise(Command):
     """Graphically visualise this branch.
 
@@ -231,7 +245,6 @@ class cmd_visualise(Command):
         set_ui_factory()
         (br, path) = branch.Branch.open_containing(location)
         br.lock_read()
-        br.repository.lock_read()
         try:
             if revision is None:
                 revid = br.last_revision()
@@ -240,16 +253,12 @@ class cmd_visualise(Command):
             else:
                 (revno, revid) = revision[0].in_history(br)
 
-            from viz.branchwin import BranchWindow
             import gtk
-                
-            pp = BranchWindow()
-            pp.set_branch(br, revid, limit)
+            pp = start_viz_window(br, revid, limit)
             pp.connect("destroy", lambda w: gtk.main_quit())
             pp.show()
             gtk.main()
         finally:
-            br.repository.unlock()
             br.unlock()
 
 
@@ -515,6 +524,11 @@ class cmd_commit_notify(GTKCommand):
                 body += revision.message
                 body = cgi.escape(body)
                 nw = pynotify.Notification(summary, body)
+                def start_viz(notification=None, action=None, data=None):
+                    """Start the viz program."""
+                    pp = start_viz_window(branch, revision_id)
+                    pp.show()
+                nw.add_action("clicked", "Inspect", start_viz, None)
                 nw.set_timeout(5000)
                 nw.show()
             except Exception, e:
