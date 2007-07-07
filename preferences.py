@@ -72,7 +72,7 @@ class PreferencesWindow(gtk.Dialog):
 
         align = gtk.Alignment(0.0, 0.5)
         self.check_sigs = gtk.Entry()
-        #self.check_sigs.set_text(self.config.signature_checking())
+        self.check_sigs.set_text(self.config.signature_checking())
         align.add(self.check_sigs)
         table.attach(align, 1, 2, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
@@ -84,13 +84,11 @@ class PreferencesWindow(gtk.Dialog):
 
         align = gtk.Alignment(0.0, 0.5)
         self.create_sigs = gtk.Entry()
-        #self.create_sigs.set_text(self.config.signing_policy())
+        self.create_sigs.set_text(self.config.signing_policy())
         align.add(self.create_sigs)
         table.attach(align, 1, 2, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
         return table
-
-
 
     def _create_pluginpage(self):
         vbox = gtk.VBox(False, 2)
