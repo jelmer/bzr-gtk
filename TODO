@@ -15,3 +15,7 @@ TODO list for Bzr-Gtk
 - Ability to bind/unbind the branch
 - List Bzr options in context menu in a way that makes sense (alphabetically?)
 - Allow specifying two revisions in the diff window rather then always diffing between base and working tree
+- For performance BranchDialog should only open each url once. Once opened it
+  should keep a read lock open and only release this when the url is changed.
+  It should also allow the creator of the window to supply an already opened
+  branch, and a revision id.

@@ -528,7 +528,13 @@ class cmd_commit_notify(GTKCommand):
                     """Start the viz program."""
                     pp = start_viz_window(branch, revision_id)
                     pp.show()
+                def start_branch(notification=None, action=None, data=None):
+                    """Start a Branch dialog"""
+                    from bzrlib.plugins.gtk.branch import BranchDialog
+                    bd = BranchDialog(remote_path=url)
+                    bd.run()
                 nw.add_action("clicked", "Inspect", start_viz, None)
+                nw.add_action("clicked", "Branch", start_branch, None)
                 nw.set_timeout(5000)
                 nw.show()
             except Exception, e:
