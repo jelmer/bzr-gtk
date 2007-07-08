@@ -533,8 +533,8 @@ class cmd_commit_notify(GTKCommand):
                     from bzrlib.plugins.gtk.branch import BranchDialog
                     bd = BranchDialog(remote_path=url)
                     bd.run()
-                nw.add_action("clicked", "Inspect", start_viz, None)
-                nw.add_action("clicked", "Branch", start_branch, None)
+                nw.add_action("inspect", "Inspect", start_viz, None)
+                nw.add_action("branch", "Branch", start_branch, None)
                 nw.set_timeout(5000)
                 nw.show()
             except Exception, e:
