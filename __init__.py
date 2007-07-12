@@ -236,7 +236,7 @@ class cmd_visualise(Command):
     """
     takes_options = [
         "revision",
-        Option('limit', "maximum number of revisions to display",
+        Option('limit', "Maximum number of revisions to display.",
                int, 'count')]
     takes_args = [ "location?" ]
     aliases = [ "visualize", "vis", "viz" ]
@@ -270,10 +270,10 @@ class cmd_gannotate(GTKCommand):
 
     takes_args = ["filename", "line?"]
     takes_options = [
-        Option("all", help="show annotations on all lines"),
-        Option("plain", help="don't highlight annotation lines"),
+        Option("all", help="Show annotations on all lines."),
+        Option("plain", help="Don't highlight annotation lines."),
         Option("line", type=int, argname="lineno",
-               help="jump to specified line number"),
+               help="Jump to specified line number."),
         "revision",
     ]
     aliases = ["gblame", "gpraise"]
