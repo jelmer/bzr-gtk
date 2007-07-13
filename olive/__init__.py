@@ -55,6 +55,22 @@ from bzrlib.plugins.gtk.initialize import InitDialog
 from bzrlib.plugins.gtk.push import PushDialog
 from bzrlib.plugins.gtk.revbrowser import RevisionBrowser
 
+def about():
+    """ Display the AboutDialog. """
+    from bzrlib.plugins.gtk import __version__
+    from bzrlib.plugins.gtk.olive.guifiles import GLADEFILENAME
+
+    # Load AboutDialog description
+    dglade = gtk.glade.XML(GLADEFILENAME, 'aboutdialog')
+    dialog = dglade.get_widget('aboutdialog')
+
+    # Set version
+    dialog.set_version(__version__)
+
+    dialog.run()
+    # Destroy the dialog
+    dialog.destroy()
+
 class OliveGtk:
     """ The main Olive GTK frontend class. This is called when launching the
     program. """
@@ -354,9 +370,7 @@ class OliveGtk:
                 return self.remote_branch.base
    
     def on_about_activate(self, widget):
-        from bzrlib.plugins.gtk.dialog import about
         about()
-        
     
     def on_button_history_browse_clicked(self, widget):
         """ Browse for revision button handler. """
