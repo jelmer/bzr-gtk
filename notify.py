@@ -71,6 +71,7 @@ class NotifyPopupMenu(gtk.Menu):
             self.zeroconfserver.close()
 
     def show_preferences(self, item):
-        # FIXME
-        pass
+        from preferences import PreferencesWindow
+        prefs = PreferencesWindow()
+        prefs.run()
 

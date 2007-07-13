@@ -71,9 +71,18 @@ class PreferencesWindow(gtk.Dialog):
         table.attach(align, 0, 1, 2, 3, gtk.FILL, gtk.FILL)
 
         align = gtk.Alignment(0.0, 0.5)
-        self.check_sigs = gtk.Entry()
-        self.check_sigs.set_text(self.config.signature_checking())
-        align.add(self.check_sigs)
+        sigvals = gtk.VBox()
+        self.check_sigs_if_possible = gtk.RadioButton(None, 
+                                                      "_Check if possible")
+        sigvals.pack_start(self.check_sigs_if_possible)
+        self.check_sigs_always = gtk.RadioButton(self.check_sigs_if_possible, 
+                                                 "Check _always")
+        sigvals.pack_start(self.check_sigs_always)
+        self.check_sigs_never = gtk.RadioButton(self.check_sigs_if_possible,
+                                                "Check _never")
+        sigvals.pack_start(self.check_sigs_if_possible)
+        # FIXME: Set default
+        align.add(sigvals)
         table.attach(align, 1, 2, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
         align = gtk.Alignment(1.0, 0.5)
@@ -83,9 +92,18 @@ class PreferencesWindow(gtk.Dialog):
         table.attach(align, 0, 1, 3, 4, gtk.FILL, gtk.FILL)
 
         align = gtk.Alignment(0.0, 0.5)
-        self.create_sigs = gtk.Entry()
-        self.create_sigs.set_text(self.config.signing_policy())
-        align.add(self.create_sigs)
+        create_sigs = gtk.VBox()
+        self.create_sigs_when_required = gtk.RadioButton(None, 
+                                                         "Sign When _Required")
+        create_sigs.pack_start(self.create_sigs_when_required)
+        self.create_sigs_always = gtk.RadioButton(
+            self.create_sigs_when_required, "Sign _Always")
+        create_sigs.pack_start(self.create_sigs_always)
+        self.create_sigs_never = gtk.RadioButton(
+            self.create_sigs_when_required, "Sign _Never")
+        create_sigs.pack_start(self.create_sigs_never)
+        # FIXME: Set default
+        align.add(create_sigs)
         table.attach(align, 1, 2, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
         return table
@@ -196,3 +214,9 @@ class PreferencesWindow(gtk.Dialog):
 
     def close(self, widget=None):
         self.window.destroy()
+
+class BranchPreferencesWindow(gtk.Dialog):
+    """Displays global preferences windows."""
+    def __init__(self, config=None):
+        super(BranchPreferencesWindow, self).__init__(config)
+
