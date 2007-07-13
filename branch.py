@@ -37,6 +37,7 @@ from olive import Preferences
 
 class BranchDialog(gtk.Dialog):
     """ New implementation of the Branch dialog. """
+
     def __init__(self, path=None, parent=None, remote_path=None):
         """ Initialize the Branch dialog. """
         gtk.Dialog.__init__(self, title="Branch - Olive",

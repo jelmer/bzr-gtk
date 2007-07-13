@@ -14,7 +14,24 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-"""GTK+ frontends to Bazaar commands """
+"""Graphical support for Bazaar using GTK.
+
+This plugin includes:
+commit-notify     Start the graphical notifier of commits.
+gannotate         GTK+ annotate. 
+gbranch           GTK+ branching. 
+gcheckout         GTK+ checkout. 
+gcommit           GTK+ commit dialog 
+gconflicts        GTK+ push. 
+gdiff             Show differences in working tree in a GTK+ Window. 
+ginit             Initialise a new branch.
+gmissing          GTK+ missing revisions dialog. 
+gpreferences      GTK+ preferences dialog. 
+gpush             GTK+ push. 
+gstatus           GTK+ status dialog 
+gtags             Manage branch tags.
+visualise         Graphically visualise this branch. 
+"""
 
 import bzrlib
 
@@ -196,6 +213,20 @@ class cmd_gdiff(GTKCommand):
             wt.unlock()
 
 
+def start_viz_window(branch, revision, limit=None):
+    """Start viz on branch with revision revision.
+    
+    :return: The viz window object.
+    """
+    from viz.branchwin import BranchWindow
+    branch.lock_read()
+    pp = BranchWindow()
+    pp.set_branch(branch, revision, limit)
+    # cleanup locks when the window is closed
+    pp.connect("destroy", lambda w: branch.unlock())
+    return pp
+
+
 class cmd_visualise(Command):
     """Graphically visualise this branch.
 
@@ -207,7 +238,7 @@ class cmd_visualise(Command):
     """
     takes_options = [
         "revision",
-        Option('limit', "maximum number of revisions to display",
+        Option('limit', "Maximum number of revisions to display.",
                int, 'count')]
     takes_args = [ "location?" ]
     aliases = [ "visualize", "vis", "viz" ]
@@ -216,7 +247,6 @@ class cmd_visualise(Command):
         set_ui_factory()
         (br, path) = branch.Branch.open_containing(location)
         br.lock_read()
-        br.repository.lock_read()
         try:
             if revision is None:
                 revid = br.last_revision()
@@ -225,16 +255,12 @@ class cmd_visualise(Command):
             else:
                 (revno, revid) = revision[0].in_history(br)
 
-            from viz.branchwin import BranchWindow
             import gtk
-                
-            pp = BranchWindow()
-            pp.set_branch(br, revid, limit)
+            pp = start_viz_window(br, revid, limit)
             pp.connect("destroy", lambda w: gtk.main_quit())
             pp.show()
             gtk.main()
         finally:
-            br.repository.unlock()
             br.unlock()
 
 
@@ -246,10 +272,10 @@ class cmd_gannotate(GTKCommand):
 
     takes_args = ["filename", "line?"]
     takes_options = [
-        Option("all", help="show annotations on all lines"),
-        Option("plain", help="don't highlight annotation lines"),
+        Option("all", help="Show annotations on all lines."),
+        Option("plain", help="Don't highlight annotation lines."),
         Option("line", type=int, argname="lineno",
-               help="jump to specified line number"),
+               help="Jump to specified line number."),
         "revision",
     ]
     aliases = ["gblame", "gpraise"]
@@ -506,6 +532,17 @@ class cmd_commit_notify(GTKCommand):
                 body += revision.message
                 body = cgi.escape(body)
                 nw = pynotify.Notification(summary, body)
+                def start_viz(notification=None, action=None, data=None):
+                    """Start the viz program."""
+                    pp = start_viz_window(branch, revision_id)
+                    pp.show()
+                def start_branch(notification=None, action=None, data=None):
+                    """Start a Branch dialog"""
+                    from bzrlib.plugins.gtk.branch import BranchDialog
+                    bd = BranchDialog(remote_path=url)
+                    bd.run()
+                nw.add_action("inspect", "Inspect", start_viz, None)
+                nw.add_action("branch", "Branch", start_branch, None)
                 nw.set_timeout(5000)
                 nw.show()
             except Exception, e:
