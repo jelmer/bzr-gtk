@@ -80,7 +80,7 @@ class PreferencesWindow(gtk.Dialog):
         sigvals.pack_start(self.check_sigs_always)
         self.check_sigs_never = gtk.RadioButton(self.check_sigs_if_possible,
                                                 "Check _never")
-        sigvals.pack_start(self.check_sigs_if_possible)
+        sigvals.pack_start(self.check_sigs_never)
         # FIXME: Set default
         align.add(sigvals)
         table.attach(align, 1, 2, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
