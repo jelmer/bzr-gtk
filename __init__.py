@@ -1,3 +1,5 @@
+#
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -16,7 +18,7 @@
 
 import bzrlib
 
-__version__ = '0.17.0'
+__version__ = '0.18.0'
 version_info = tuple(int(n) for n in __version__.split('.'))
 
 
@@ -462,7 +464,61 @@ class cmd_commit_notify(GTKCommand):
     """
 
     def run(self):
+        def toggle_lan_gateway(item):
+            if item.get_active():
+                langateway.start()
+            else:
+                langateway.stop()
+
+        def toggle_announce_branches(item):
+            if item.get_active():
+                zeroconfserver.start()
+            else:
+                zeroconfserver.close()
+
+        def show_preferences(item):
+            # FIXME
+            pass 
+
+        def make_menu(icon, event_button, event_time):
+            menu.popup(None, None, gtk.status_icon_position_menu, 
+                       event_button, event_time, icon)
+
         gtk = self.open_display()
+        t = gtk.status_icon_new_from_file("bzr-icon-64.png")
+        t.connect('popup-menu', make_menu)
+        menu = gtk.Menu()
+        try:
+            from bzrlib.plugins.dbus.activity import LanGateway
+            langateway = LanGateway()
+            item = gtk.CheckMenuItem('_Gateway to LAN')
+            item.connect('toggled', toggle_lan_gateway)
+            menu.append(item)
+            menu.append(gtk.SeparatorMenuItem())
+        except ImportError:
+            langateway = None
+
+        try:
+            from bzrlib.plugins.avahi.share import ZeroConfServer
+            from bzrlib import urlutils
+            zeroconfserver = ZeroConfServer(urlutils.normalize_url('.'))
+            item = gtk.CheckMenuItem('Announce _branches on LAN')
+            item.connect('toggled', toggle_announce_branches)
+            menu.append(item)
+            menu.append(gtk.SeparatorMenuItem())
+        except ImportError:
+            zeroconfserver = None
+
+        item = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES, None)
+        menu.append(item)
+        menu.append(gtk.SeparatorMenuItem())
+        item = gtk.MenuItem('_Close')
+        item.connect('activate', gtk.main_quit)
+        menu.append(item)
+        menu.show_all()
+
+        gtk.main()
+
         import cgi
         import dbus
         import dbus.service
