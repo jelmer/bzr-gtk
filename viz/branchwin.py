@@ -262,10 +262,9 @@ class BranchWindow(gtk.Window):
     def _treeview_row_mouseclick(self, widget, event):
         from bzrlib.plugins.gtk.revisionmenu import RevisionPopupMenu
         if event.button == 3:
-            # FIXME: Support multiple revisions
             menu = RevisionPopupMenu(self.branch.repository, 
-                                     self.selected_revisions()[0].revision_id, 
-                                     self.branch)
+                [x.revision_id for x in self.selected_revisions()],
+                self.branch)
             menu.popup(None, None, None, event.button, event.get_time())
 
     def selected_revision(self, path):

@@ -25,33 +25,35 @@ import bzrlib
 import gtk
 
 class RevisionPopupMenu(gtk.Menu):
-    def __init__(self, repository, revid, branch=None):
+    def __init__(self, repository, revids, branch=None):
         super(RevisionPopupMenu, self).__init__()
         self.branch = branch
         self.repository = repository
-        self.revid = revid
+        self.revids = revids
         self.create_items()
 
     def create_items(self):
-        item = gtk.MenuItem("View _Diff")
-        item.connect('activate', self.show_diff)
-        self.append(item)
-        self.show_all()
-        item = gtk.MenuItem("_Push")
-        item.connect('activate', self.show_push)
-        self.append(item)
-        self.show_all()
+        if len(self.revids) == 1:
+            item = gtk.MenuItem("View _Diff")
+            item.connect('activate', self.show_diff)
+            self.append(item)
+            self.show_all()
+
+            item = gtk.MenuItem("_Push")
+            item.connect('activate', self.show_push)
+            self.append(item)
+            self.show_all()
 
     def show_diff(self, item):
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow()
-        parentid = self.repository.revision_parents(self.revid)[0]
-        (parent_tree, rev_tree) = self.repository.revision_trees([parentid, 
-                                                                   self.revid])
-        window.set_diff(self.revid, rev_tree, parent_tree)
+        parentid = self.repository.revision_parents(self.revids[0])[0]
+        (parent_tree, rev_tree) = self.repository.revision_trees(
+            [parentid, self.revids[0]])
+        window.set_diff(self.revids[0], rev_tree, parent_tree)
         window.show()
 
     def show_push(self, item):
         from bzrlib.plugins.gtk.push import PushDialog
-        dialog = PushDialog(self.repository, self.revid, self.branch)
+        dialog = PushDialog(self.repository, self.revids[0], self.branch)
         dialog.run()
