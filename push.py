@@ -25,6 +25,8 @@ import gtk
 
 from errors import show_bzr_error
 
+# FIXME: This needs to be public JRV 20070714
+from bzrlib.builtins import _create_prefix
 from bzrlib.config import LocationConfig
 import bzrlib.errors as errors
 
@@ -49,8 +51,6 @@ class PushDialog(gtk.Dialog):
         # Create the widgets
         self._label_location = gtk.Label(_("Location:"))
         self._label_test = gtk.Label(_("(click the Test button to check write access)"))
-        self._check_prefix = gtk.CheckButton(_("Create the path _leading up to the location"),
-                                             use_underline=True)
         self._combo = gtk.ComboBoxEntry()
         self._button_test = gtk.Button(_("_Test"), use_underline=True)
         self._button_push = gtk.Button(_("_Push"), use_underline=True)
@@ -76,7 +76,6 @@ class PushDialog(gtk.Dialog):
         self._hbox_test.pack_start(self._image_test, False, False)
         self._hbox_test.pack_start(self._label_test, True, True)
         self.vbox.pack_start(self._hbox_location)
-        self.vbox.pack_start(self._check_prefix)
         self.vbox.pack_start(self._hbox_test)
         self.action_area.pack_start(self._button_test)
         self.action_area.pack_end(self._button_push)
@@ -138,18 +137,12 @@ class PushDialog(gtk.Dialog):
                 self.branch.set_push_location(location)
 
         try:
-            revs = do_push(self.branch,
-                           location=location,
-                           overwrite=False,
-                           create_prefix=self._check_prefix.get_active())
+            revs = do_push(self.branch, location=location, overwrite=False)
         except errors.DivergedBranches:
             response = question_dialog(_('Branches have been diverged'),
                                        _('You cannot push if branches have diverged.\nOverwrite?'))
             if response == gtk.RESPONSE_OK:
-                revs = do_push(self.branch, location=location,
-                               overwrite=True,
-                               create_prefix=self._check_prefix.get_active()
-                               )
+                revs = do_push(self.branch, location=location, overwrite=True)
             return
         
         self._history.add_entry(location)
@@ -158,16 +151,14 @@ class PushDialog(gtk.Dialog):
         
         self.response(gtk.RESPONSE_OK)
 
-def do_push(branch, location, overwrite, create_prefix):
+def do_push(br_from, location, overwrite):
     """ Update a mirror of a branch.
     
-    :param branch: the source branch
+    :param br_from: the source branch
     
     :param location: the location of the branch that you'd like to update
     
     :param overwrite: overwrite target location if it diverged
-    
-    :param create_prefix: create the path leading up to the branch if it doesn't exist
     
     :return: number of revisions pushed
     """
@@ -185,30 +176,16 @@ def do_push(branch, location, overwrite, create_prefix):
     except errors.NotBranchError:
         # create a branch.
         transport = transport.clone('..')
-        if not create_prefix:
-            try:
-                relurl = transport.relpath(location_url)
-                transport.mkdir(relurl)
-            except errors.NoSuchFile:
-                error_dialog(_('Non existing parent directory'),
-                             _("The parent directory (%s)\ndoesn't exist.") % location)
+        try:
+            relurl = transport.relpath(location_url)
+            transport.mkdir(relurl)
+        except errors.NoSuchFile:
+            response = question_dialog(_('Non existing parent directory'),
+                         _("The parent directory (%s)\ndoesn't exist. Create?") % location)
+            if response == gtk.RESPONSE_OK:
+                _create_prefix(transport)
+            else:
                 return
-        else:
-            current = transport.base
-            needed = [(transport, transport.relpath(location_url))]
-            while needed:
-                try:
-                    transport, relpath = needed[-1]
-                    transport.mkdir(relpath)
-                    needed.pop()
-                except errors.NoSuchFile:
-                    new_transport = transport.clone('..')
-                    needed.append((new_transport,
-                                   new_transport.relpath(transport.base)))
-                    if new_transport.base == transport.base:
-                        error_dialog(_('Path prefix not created'),
-                                     _("The path leading up to the specified location couldn't\nbe created."))
-                        return
         dir_to = br_from.bzrdir.clone(location_url,
             revision_id=br_from.last_revision())
         br_to = dir_to.open_branch()
