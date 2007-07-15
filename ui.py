@@ -1,4 +1,5 @@
 # Copyright (C) 2006 Szilveszter Farkas <szilveszter.farkas@gmail.com>
+# Copyright (C) 2007 Jelmer Vernooij <jelmer@samba.org>
 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,7 +36,8 @@ class PromptDialog(gtk.Dialog):
         
         self.vbox.show_all()
 
-        self.add_buttons(gtk.STOCK_YES, gtk.RESPONSE_YES, gtk.STOCK_NO, gtk.RESPONSE_NO)
+        self.add_buttons(gtk.STOCK_YES, gtk.RESPONSE_YES, gtk.STOCK_NO, 
+                         gtk.RESPONSE_NO)
 
 
 class GtkProgressBar(gtk.ProgressBar):
@@ -117,14 +119,6 @@ class GtkUIFactory(UIFactory):
 
         """
         super(GtkUIFactory, self).__init__()
-        if stdout is None:
-            self.stdout = sys.stdout
-        else:
-            self.stdout = stdout
-        if stderr is None:
-            self.stderr = sys.stderr
-        else:
-            self.stderr = stderr
         self._progress_bar_stack = None
 
     def get_boolean(self, prompt):
