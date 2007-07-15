@@ -113,8 +113,10 @@ class PushDialog(gtk.Dialog):
         m = _urlRE.match(url)
         if m:
             proto = m.groupdict()['proto']
-            if (proto == 'sftp') or (proto == 'file') or (proto == 'ftp'):
-                # have write acces (most probably)
+            # FIXME: This should ask the transport or branch rather than 
+            # guessing using regular expressions. JRV 20070714
+            if proto in ('sftp', 'file', 'ftp'):
+                # have write access (most probably)
                 self._image_test.set_from_stock(gtk.STOCK_YES, 4)
                 self._label_test.set_markup(_('<b>Write access is probably available</b>'))
             else:
