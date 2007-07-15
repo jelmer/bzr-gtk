@@ -155,7 +155,7 @@ class cmd_gpush(GTKCommand):
         (br, path) = branch.Branch.open_containing(location)
         self.open_display()
         from push import PushDialog
-        dialog = PushDialog(br)
+        dialog = PushDialog(br.repository, br.last_revision(), br)
         dialog.run()
 
 

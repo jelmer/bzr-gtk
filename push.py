@@ -50,34 +50,22 @@ class PushDialog(gtk.Dialog):
         
         # Create the widgets
         self._label_location = gtk.Label(_("Location:"))
-        self._label_test = gtk.Label(_("(click the Test button to check write access)"))
         self._combo = gtk.ComboBoxEntry()
-        self._button_test = gtk.Button(_("_Test"), use_underline=True)
         self._button_push = gtk.Button(_("_Push"), use_underline=True)
         self._hbox_location = gtk.HBox()
-        self._hbox_test = gtk.HBox()
-        self._image_test = gtk.Image()
         
         # Set callbacks
-        self._button_test.connect('clicked', self._on_test_clicked)
         self._button_push.connect('clicked', self._on_push_clicked)
         
         # Set properties
-        self._image_test.set_from_stock(gtk.STOCK_DIALOG_INFO, gtk.ICON_SIZE_BUTTON)
         self._label_location.set_alignment(0, 0.5)
-        self._label_test.set_alignment(0, 0.5)
         self._hbox_location.set_spacing(3)
-        self._hbox_test.set_spacing(3)
         self.vbox.set_spacing(3)
         
         # Pack widgets
         self._hbox_location.pack_start(self._label_location, False, False)
         self._hbox_location.pack_start(self._combo, True, True)
-        self._hbox_test.pack_start(self._image_test, False, False)
-        self._hbox_test.pack_start(self._label_test, True, True)
         self.vbox.pack_start(self._hbox_location)
-        self.vbox.pack_start(self._hbox_test)
-        self.action_area.pack_start(self._button_test)
         self.action_area.pack_end(self._button_push)
         
         # Show the dialog
@@ -99,31 +87,6 @@ class PushDialog(gtk.Dialog):
             location = self.branch.get_push_location()
             if location is not None:
                 self._combo.get_child().set_text(location)
-    
-    def _on_test_clicked(self, widget):
-        """ Test button clicked handler. """
-        import re
-        _urlRE = re.compile(r'^(?P<proto>[^:/\\]+)://(?P<path>.*)$')
-        
-        url = self._combo.get_child().get_text()
-        
-        m = _urlRE.match(url)
-        if m:
-            proto = m.groupdict()['proto']
-            # FIXME: This should ask the transport or branch rather than 
-            # guessing using regular expressions. JRV 20070714
-            if proto in ('sftp', 'file', 'ftp'):
-                # have write access (most probably)
-                self._image_test.set_from_stock(gtk.STOCK_YES, 4)
-                self._label_test.set_markup(_('<b>Write access is probably available</b>'))
-            else:
-                # no write access
-                self._image_test.set_from_stock(gtk.STOCK_NO, 4)
-                self._label_test.set_markup(_('<b>No write access</b>'))
-        else:
-            # couldn't determine
-            self._image_test.set_from_stock(gtk.STOCK_DIALOG_QUESTION, 4)
-            self._label_test.set_markup(_('<b>Could not determine</b>'))
     
     @show_bzr_error
     def _on_push_clicked(self, widget):
