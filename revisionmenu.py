@@ -25,15 +25,20 @@ import bzrlib
 import gtk
 
 class RevisionPopupMenu(gtk.Menu):
-    def __init__(self, repository, revid):
+    def __init__(self, repository, revid, branch=None):
         super(RevisionPopupMenu, self).__init__()
-        self.create_items()
+        self.branch = branch
         self.repository = repository
         self.revid = revid
+        self.create_items()
 
     def create_items(self):
         item = gtk.MenuItem("View _Diff")
         item.connect('activate', self.show_diff)
+        self.append(item)
+        self.show_all()
+        item = gtk.MenuItem("_Push")
+        item.connect('activate', self.show_push)
         self.append(item)
         self.show_all()
 
@@ -45,3 +50,8 @@ class RevisionPopupMenu(gtk.Menu):
                                                                    self.revid])
         window.set_diff(self.revid, rev_tree, parent_tree)
         window.show()
+
+    def show_push(self, item):
+        from bzrlib.plugins.gtk.push import PushDialog
+        dialog = PushDialog(self.repository, self.revid, self.branch)
+        dialog.run()
