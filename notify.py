@@ -52,7 +52,7 @@ class NotifyPopupMenu(gtk.Menu):
         item.connect('activate', self.show_about)
         self.append(item)
         self.append(gtk.SeparatorMenuItem())
-        item = gtk.MenuItem('_Close')
+        item = gtk.ImageMenuItem(gtk.STOCK_QUIT, None)
         item.connect('activate', gtk.main_quit)
         self.append(item)
         self.show_all()

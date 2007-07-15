@@ -6,5 +6,5 @@ Name=Olive
 GenericName=Version Control GUI
 Comment=Graphical User Interface for the Bazaar Version Control System
 Icon=olive-gtk.png
-Exec=/usr/bin/olive-gtk
+Exec=olive-gtk
 Categories=Application;Development;

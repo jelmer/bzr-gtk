@@ -6,5 +6,6 @@ Name=Bazaar Notification
 GenericName=
 Comment=Notification Area Icon for Bazaar
 Icon=bzr-icon-64.png
-Exec=/usr/bin/bzr commit-notify
+Exec=bzr commit-notify
 Categories=Application;Development;
+Terminal=false
