@@ -48,6 +48,9 @@ class NotifyPopupMenu(gtk.Menu):
         item = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES, None)
         item.connect('activate', self.show_preferences)
         self.append(item)
+        item = gtk.ImageMenuItem(gtk.STOCK_ABOUT, None)
+        item.connect('activate', self.show_about)
+        self.append(item)
         self.append(gtk.SeparatorMenuItem())
         item = gtk.MenuItem('_Close')
         item.connect('activate', gtk.main_quit)
@@ -69,6 +72,11 @@ class NotifyPopupMenu(gtk.Menu):
             self.zeroconfserver.start()
         else:
             self.zeroconfserver.close()
+
+    def show_about(self, item):
+        from about import AboutDialog
+        dialog = AboutDialog()
+        dialog.run()
 
     def show_preferences(self, item):
         from preferences import PreferencesWindow

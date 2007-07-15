@@ -8,6 +8,8 @@
 
   * New tango icons. (Pascal Klein)
 
+  * Add simple About dialog. (Jelmer)
+
  BUG FIXES
 
   * Fix option help strings to comply with the style guide. (Vincent)
