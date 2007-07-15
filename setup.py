@@ -99,7 +99,9 @@ setup(
                                  'icons/push.png',
                                  'icons/push16.png',
                                  'icons/refresh.png']),
-                ('share/applications', ['olive-gtk.desktop']),
+                ('share/applications', ['olive-gtk.desktop',
+                                        'bazaar-properties.desktop',
+                                        'bzr-notify.desktop']),
                 ('share/pixmaps', ['icons/olive-gtk.png'])
                ],
     cmdclass={'install_data': InstallData}
