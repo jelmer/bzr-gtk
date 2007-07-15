@@ -1,4 +1,5 @@
 # Copyright (C) 2007 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
+# Copyright (C) 2007 by Jelmer Vernooij <jelmer@samba.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,6 +26,7 @@ import gtk
 from bzrlib.plugins.gtk.logview import LogView
 
 from dialog import error_dialog
+from revidbox import RevisionSelectionBox
 
 
 class TagsWindow(gtk.Window):
@@ -158,7 +160,8 @@ class TagsWindow(gtk.Window):
     
     def _on_add_clicked(self, widget):
         """ Add button event handler. """
-        dialog = AddTagDialog(self.branch, self)
+        dialog = AddTagDialog(self.branch.repository, None,
+                              self.branch, self)
         response = dialog.run()
         if response != gtk.RESPONSE_NONE:
             dialog.hide()
@@ -269,42 +272,38 @@ class RemoveTagDialog(gtk.Dialog):
 
 class AddTagDialog(gtk.Dialog):
     """ Add tag dialog. """
-    def __init__(self, branch, parent):
+    def __init__(self, repository, revid=None, branch=None, parent=None):
         """ Initialize Add tag dialog. """
         gtk.Dialog.__init__(self, title="Add tag - Olive",
                                   parent=parent,
                                   flags=0,
-                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+                                  buttons=(gtk.STOCK_CANCEL, 
+                                           gtk.RESPONSE_CANCEL))
         
         # Get arguments
+        self._repository = repository
+        self._revid = revid
         self._branch = branch
         
         # Create the widgets
         self._button_add = gtk.Button(_("_Add tag"), use_underline=True)
-        self._button_revid = gtk.Button('')
         self._table = gtk.Table(2, 2)
         self._label_name = gtk.Label(_("Tag Name:"))
         self._label_revid = gtk.Label(_("Revision ID:"))
         self._entry_name = gtk.Entry()
-        self._entry_revid = gtk.Entry()
-        self._hbox_revid = gtk.HBox()
+        self._hbox_revid = RevisionSelectionBox(self._branch)
         
         # Set callbacks
         self._button_add.connect('clicked', self._on_add_clicked)
-        self._button_revid.connect('clicked', self._on_revid_clicked)
         
         # Set properties
         self._label_name.set_alignment(0, 0.5)
         self._label_revid.set_alignment(0, 0.5)
         self._button_add.set_image(gtk.image_new_from_stock(gtk.STOCK_ADD,
                                                             gtk.ICON_SIZE_BUTTON))
-        self._button_revid.set_image(gtk.image_new_from_stock(gtk.STOCK_OPEN,
-                                                               gtk.ICON_SIZE_BUTTON))
         self._button_add.set_flags(gtk.CAN_DEFAULT)
         
         # Construct the dialog
-        self._hbox_revid.pack_start(self._entry_revid, True, True)
-        self._hbox_revid.pack_start(self._button_revid, False, False) 
         self._table.attach(self._label_name, 0, 1, 0, 1)
         self._table.attach(self._label_revid, 0, 1, 1, 2)
         self._table.attach(self._entry_name, 1, 2, 0, 1)
@@ -315,21 +314,6 @@ class AddTagDialog(gtk.Dialog):
         # Show the dialog
         self.vbox.show_all()
     
-    def _on_revid_clicked(self, widget):
-        """ Browse for revision button clicked handler. """
-        from revbrowser import RevisionBrowser
-        
-        revb = RevisionBrowser(self._branch, self)
-        response = revb.run()
-        if response != gtk.RESPONSE_NONE:
-            revb.hide()
-        
-            if response == gtk.RESPONSE_OK:
-                if revb.selected_revno is not None:
-                    self._entry_revid.set_text(revb.selected_revid)
-            
-            revb.destroy()
-    
     def _on_add_clicked(self, widget):
         """ Add button clicked handler. """
         if len(self._entry_name.get_text()) == 0:
@@ -337,10 +321,10 @@ class AddTagDialog(gtk.Dialog):
                          _("You have to specify the tag's desired name."))
             return
         
-        if len(self._entry_revid.get_text()) == 0:
+        if self._hbox_revid.get_revision_id() is None:
             self.revid = self._branch.last_revision()
         else:
-            self.revid = self._entry_revid.get_text()
+            self.revid = self.hbox_revid.get_revision_id()
         
         self.tagname = self._entry_name.get_text()
         
