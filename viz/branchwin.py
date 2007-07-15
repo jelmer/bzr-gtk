@@ -278,7 +278,7 @@ class BranchWindow(gtk.Window):
     def _treeview_row_activated_cb(self, widget, path, col):
         # TODO: more than one parent
         """Callback for when a treeview row gets activated."""
-        revision = self.selected_revision()
+        revision = self.selected_revision(path)
         if len(self.parent_ids[revision]) == 0:
             # Ignore revisions without parent
             return
