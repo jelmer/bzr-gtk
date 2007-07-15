@@ -44,6 +44,11 @@ class RevisionPopupMenu(gtk.Menu):
             self.append(item)
             self.show_all()
 
+            item = gtk.MenuItem("_Tag Revision")
+            item.connect('activate', self.show_tag)
+            self.append(item)
+            self.show_all()
+
     def show_diff(self, item):
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow()
@@ -57,3 +62,17 @@ class RevisionPopupMenu(gtk.Menu):
         from bzrlib.plugins.gtk.push import PushDialog
         dialog = PushDialog(self.repository, self.revids[0], self.branch)
         dialog.run()
+
+    def show_tag(self, item):
+        from bzrlib.plugins.gtk.tags import AddTagDialog
+        dialog = AddTagDialog(self.repository, self.revids[0], self.branch)
+        response = dialog.run()
+        if response != gtk.RESPONSE_NONE:
+            dialog.hide()
+        
+            if response == gtk.RESPONSE_OK:
+                self.branch.lock_write()
+                self.branch.tags.set_tag(dialog.tagname, dialog._revid)
+                self.branch.unlock()
+            
+            dialog.destroy()

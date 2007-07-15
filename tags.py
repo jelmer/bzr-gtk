@@ -64,7 +64,7 @@ class TagsWindow(gtk.Window):
             self.connect('delete-event', gtk.main_quit)
         
         # Set properties
-        self.set_title(_("Tags - Olive"))
+        self.set_title(_("Tags"))
         self.set_default_size(600, 400)
         
         self._scrolledwindow_tags.set_policy(gtk.POLICY_AUTOMATIC,
@@ -167,7 +167,7 @@ class TagsWindow(gtk.Window):
             dialog.hide()
         
             if response == gtk.RESPONSE_OK:
-                self.branch.tags.set_tag(dialog.tagname, dialog.revid)
+                self.branch.tags.set_tag(dialog.tagname, dialog._revid)
                 self._refresh_tags()
             
             dialog.destroy()
@@ -214,7 +214,7 @@ class TagsWindow(gtk.Window):
 class RemoveTagDialog(gtk.Dialog):
     """ Confirm removal of tag. """
     def __init__(self, tagname, parent):
-        gtk.Dialog.__init__(self, title="Remove tag - Olive",
+        gtk.Dialog.__init__(self, title="Remove tag",
                                   parent=parent,
                                   flags=0,
                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
@@ -274,7 +274,7 @@ class AddTagDialog(gtk.Dialog):
     """ Add tag dialog. """
     def __init__(self, repository, revid=None, branch=None, parent=None):
         """ Initialize Add tag dialog. """
-        gtk.Dialog.__init__(self, title="Add tag - Olive",
+        gtk.Dialog.__init__(self, title="Add tag",
                                   parent=parent,
                                   flags=0,
                                   buttons=(gtk.STOCK_CANCEL, 
@@ -291,7 +291,10 @@ class AddTagDialog(gtk.Dialog):
         self._label_name = gtk.Label(_("Tag Name:"))
         self._label_revid = gtk.Label(_("Revision ID:"))
         self._entry_name = gtk.Entry()
-        self._hbox_revid = RevisionSelectionBox(self._branch)
+        if self._revid is not None:
+            self._hbox_revid = gtk.Label(self._revid)
+        else:
+            self._hbox_revid = RevisionSelectionBox(self._branch)
         
         # Set callbacks
         self._button_add.connect('clicked', self._on_add_clicked)
@@ -321,11 +324,12 @@ class AddTagDialog(gtk.Dialog):
                          _("You have to specify the tag's desired name."))
             return
         
-        if self._hbox_revid.get_revision_id() is None:
-            self.revid = self._branch.last_revision()
-        else:
-            self.revid = self.hbox_revid.get_revision_id()
-        
+        if self._revid is None:
+            if self._hbox_revid.get_revision_id() is None:
+                self._revid = self._branch.last_revision()
+            else:
+                self._revid = self.hbox_revid.get_revision_id()
+            
         self.tagname = self._entry_name.get_text()
         
         self.response(gtk.RESPONSE_OK)
