@@ -66,8 +66,6 @@ def check_bzrlib_version(desired):
         warning('bzr-gtk is not up to date with installed bzr version %s.'
                 ' \nThere should be a newer version available, e.g. %i.%i.' 
                 % (bzrlib.__version__, bzrlib_version[0], bzrlib_version[1]))
-        if bzrlib_version != desired_plus:
-            raise Exception, 'Version mismatch'
 
 
 check_bzrlib_version(version_info[:2])

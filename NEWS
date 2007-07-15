@@ -16,6 +16,8 @@
 
   * Fix missing attributes for DummyRevision. (Vincent)
 
+  * Never refuse to run with newer versions of bzr, just warn. (Jelmer)
+
 
 0.17.0  2007-06-15
 
