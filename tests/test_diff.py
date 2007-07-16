@@ -1,4 +1,5 @@
-# Copyright (C) 2007 Jelmer Vernooij <jelmer@samba.org>
+# -*- coding: utf-8 -*-
+# Copyright (C) 2007 Adeodato Simó <dato@net.com.org.es>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,26 +15,25 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from unittest import TestLoader, TestSuite
-from bzrlib.tests import TestUtil
+from cStringIO import StringIO
 
-import os
+from bzrlib.plugins.gtk.diff import DiffWindow
+from bzrlib.tests import TestCase
 
-def test_suite():
-    result = TestSuite()
+class TestDiffWindow(TestCase):
+    def test_parse_colordiffrc(self):
+        colordiffrc = '''\
+newtext=blue
+oldtext = Red
+# now a comment and a blank line
 
-    loader = TestUtil.TestLoader()
-
-    testmod_names = [
-        'test_diff',
-        'test_preferences',
-        'test_history',
-        'test_viz'
-        ]
-
-    if os.name == 'nt':
-        testmod_names.append("test_tortoise_bzr")
-
-    result.addTest(loader.loadTestsFromModuleNames(["%s.%s" % (__name__, i) for i in testmod_names]))
-    return result
-
+diffstuff = #ffff00  
+  # another comment preceded by whitespace
+'''
+        colors = {
+                'newtext': 'blue',
+                'oldtext': 'Red',
+                'diffstuff': '#ffff00',
+        }
+        parsed_colors = DiffWindow.parse_colordiffrc(StringIO(colordiffrc))
+        self.assertEqual(colors, parsed_colors)
