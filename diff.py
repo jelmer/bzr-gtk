@@ -250,19 +250,6 @@ class DiffWindow(gtk.Window):
 
         :param lang: a "Diff" gtksourceview.SourceLanguage object.
         """
-        def parse_colordiffrc(fileobj):
-            """Parse fileobj as a colordiff configuration file.
-            
-            :return: A dict with the key -> value pairs.
-            """
-            colors = {}
-            for line in fileobj:
-                if re.match(r'^\s*#', line):
-                    continue
-                key, val = line.split('=')
-                colors[key.strip()] = val.strip()
-            return colors
-
         colors = {}
 
         for f in ('~/.colordiffrc', '~/.colordiffrc.bzr-gtk'):
@@ -273,7 +260,7 @@ class DiffWindow(gtk.Window):
                 except IOError, e:
                     warning('could not open file %s: %s' % (f, str(e)))
                 else:
-                    colors.update(parse_colordiffrc(f))
+                    colors.update(DiffWindow.parse_colordiffrc(f))
                     f.close()
 
         if not colors:
@@ -311,3 +298,20 @@ class DiffWindow(gtk.Window):
                 warning('not a valid color: %s' % color)
             else:
                 lang.set_tag_style(tag_id, style)
+
+    @staticmethod
+    def parse_colordiffrc(fileobj):
+        """Parse fileobj as a colordiff configuration file.
+        
+        :return: A dict with the key -> value pairs.
+        """
+        colors = {}
+        for line in fileobj:
+            if re.match(r'^\s*#', line):
+                continue
+            if '=' not in line:
+                continue
+            key, val = line.split('=', 1)
+            colors[key.strip()] = val.strip()
+        return colors
+
