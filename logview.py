@@ -51,7 +51,7 @@ class LogView(gtk.ScrolledWindow):
     def set_go_callback(self, callback):
         self._go_callback = callback
 
-    def set_revision(self, revision, tags=None):
+    def set_revision(self, revision, tags=[]):
         self._revision = revision
         self.revision_id.set_text(revision.revision_id)
         if revision.committer is not None:
