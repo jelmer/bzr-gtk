@@ -153,9 +153,14 @@ class CommitDialog(gtk.Dialog):
                               '/org/freedesktop/NetworkManager')
                 dbus_iface = dbus.Interface(
                         proxy_obj, 'org.freedesktop.NetworkManager')
-                # 3 is the enum value for STATE_CONNECTED
-                self._check_local.set_active(dbus_iface.state() != 3)
-        
+                try:
+                    # 3 is the enum value for STATE_CONNECTED
+                    self._check_local.set_active(dbus_iface.state() != 3)
+                except dbus.DBusException, e:
+                    # Silently drop errors. While DBus may be 
+                    # available, NetworkManager doesn't necessarily have to be
+                    mutter("unable to get networkmanager state: %r" % e)
+                
         # Create the file list
         self._create_file_view()
         # Create the pending merges
