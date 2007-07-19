@@ -26,6 +26,11 @@ from bzrlib.config import GlobalConfig
 
 class PreferencesWindow(gtk.Dialog):
     """Displays global preferences windows."""
+    # Note that we don't allow configuration of aliases or 
+    # default log formats. This is because doing so wouldn't make 
+    # a lot of sense to pure GUI users. Users that need these settings 
+    # will already be familiar with the configuration file.
+
     def __init__(self, config=None):
         """ Initialize the Status window. """
         super(PreferencesWindow, self).__init__(flags=gtk.DIALOG_MODAL)
