@@ -87,6 +87,8 @@ class LogView(gtk.ScrolledWindow):
         for widget in self.tags_widgets:
             self.tags_list.remove(widget)
 
+        self.tags_widgets = []
+
         for tag in tags:
             widget = gtk.Label(tag)
             widget.set_selectable(True)
