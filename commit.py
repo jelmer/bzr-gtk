@@ -153,9 +153,14 @@ class CommitDialog(gtk.Dialog):
                               '/org/freedesktop/NetworkManager')
                 dbus_iface = dbus.Interface(
                         proxy_obj, 'org.freedesktop.NetworkManager')
-                # 3 is the enum value for STATE_CONNECTED
-                self._check_local.set_active(dbus_iface.state() != 3)
-        
+                try:
+                    # 3 is the enum value for STATE_CONNECTED
+                    self._check_local.set_active(dbus_iface.state() != 3) # FIXME: We need better way of finding if net is available, as above fails for me running KDE (MateuszKorniak).  
+                                                                          # <dbus_bindings.DBusException instance at 0xb66e38cc> : The name org.freedesktop.NetworkManager was not provided by any .service files
+                except Exception,e:
+                    self._check_local.set_active(False) # Assuming commits non local seems sane to me  (MateuszKorniak).
+                    print "ERROR: dbus_iface.state() failed with: %r : %s" % (e,e)
+                
         # Create the file list
         self._create_file_view()
         # Create the pending merges
