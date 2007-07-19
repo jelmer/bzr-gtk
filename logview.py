@@ -30,7 +30,7 @@ class LogView(gtk.ScrolledWindow):
     start.
     """
 
-    def __init__(self, revision=None, scroll=True):
+    def __init__(self, revision=None, scroll=True, tags=None):
         super(LogView, self).__init__()
         if scroll:
             self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
@@ -43,7 +43,7 @@ class LogView(gtk.ScrolledWindow):
         self._clicked_callback = None
 
         if revision is not None:
-            self.set_revision(revision)
+            self.set_revision(revision, tags=tags)
 
     def set_show_callback(self, callback):
         self._show_callback = callback
@@ -51,7 +51,7 @@ class LogView(gtk.ScrolledWindow):
     def set_go_callback(self, callback):
         self._go_callback = callback
 
-    def set_revision(self, revision):
+    def set_revision(self, revision, tags=None):
         self._revision = revision
         self.revision_id.set_text(revision.revision_id)
         if revision.committer is not None:
@@ -68,6 +68,7 @@ class LogView(gtk.ScrolledWindow):
             self.branchnick_label.set_text("")
 
         self._add_parents(revision.parent_ids)
+        self._add_tags(tags)
 
     def _show_clicked_cb(self, widget, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
@@ -76,6 +77,24 @@ class LogView(gtk.ScrolledWindow):
     def _go_clicked_cb(self, widget, revid):
         """Callback for when the go button for a parent is clicked."""
         self._go_callback(revid)
+
+    def _add_tags(self, tags):
+        if tags == []:
+            self.tags_list.hide()
+            self.tags_label.hide()
+            return
+
+        for widget in self.tags_widgets:
+            self.tags_list.remove(widget)
+
+        for tag in tags:
+            widget = gtk.Label(tag)
+            widget.set_selectable(True)
+            self.tags_widgets.append(widget)
+            self.tags_list.add(widget)
+        self.tags_list.show_all()
+        self.tags_label.show_all()
+        
 
     def _add_parents(self, parent_ids):
         for widget in self.parents_widgets:
@@ -127,7 +146,7 @@ class LogView(gtk.ScrolledWindow):
         vbox.show()
 
     def _create_headers(self):
-        self.table = gtk.Table(rows=4, columns=2)
+        self.table = gtk.Table(rows=5, columns=2)
         self.table.set_row_spacings(6)
         self.table.set_col_spacings(6)
         self.table.show()
@@ -195,6 +214,22 @@ class LogView(gtk.ScrolledWindow):
         self.table.attach(align, 1, 2, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
         align.show()
         self.timestamp.show()
+
+        align = gtk.Alignment(1.0, 0.5)
+        self.tags_label = gtk.Label()
+        self.tags_label.set_markup("<b>Tags:</b>")
+        align.add(self.tags_label)
+        align.show()
+        self.table.attach(align, 0, 1, 4, 5, gtk.FILL, gtk.FILL)
+        self.tags_label.show()
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.tags_list = gtk.VBox()
+        align.add(self.tags_list)
+        self.table.attach(align, 1, 2, 4, 5, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        align.show()
+        self.tags_list.show()
+        self.tags_widgets = []
 
         return self.table
 
