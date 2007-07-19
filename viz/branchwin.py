@@ -204,7 +204,12 @@ class BranchWindow(gtk.Window):
 
         self.back_button.set_sensitive(len(self.parent_ids[revision]) > 0)
         self.fwd_button.set_sensitive(len(self.children[revision]) > 0)
-        self.logview.set_revision(revision)
+        tags = []
+        if self.branch.supports_tags():
+            tagdict = self.branch.tags.get_reverse_tag_dict()
+            if tagdict.has_key(revision.revision_id):
+                tags = tagdict[revision.revision_id]
+        self.logview.set_revision(revision, tags)
 
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
