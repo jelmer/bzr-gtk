@@ -2,6 +2,7 @@
     <popup name="context_right">
         <menuitem name="add" action="add" />
         <menuitem name="remove" action="remove" />
+        <menuitem name="remove_and_delete" action="remove_and_delete" />
         <menuitem name="rename" action="rename" />
         <menuitem name="open" action="open" />
         <separator />

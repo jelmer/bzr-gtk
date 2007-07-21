@@ -66,7 +66,7 @@ def check_bzrlib_version(desired):
                 % (bzrlib.__version__, bzrlib_version[0], bzrlib_version[1]))
 
 
-check_bzrlib_version(version_info[:2])
+## check_bzrlib_version(version_info[:2]) REMOVE
 
 from bzrlib.trace import warning
 if __name__ != 'bzrlib.plugins.gtk':
