@@ -30,7 +30,7 @@ class LogView(gtk.ScrolledWindow):
     start.
     """
 
-    def __init__(self, revision=None, scroll=True, tags=None):
+    def __init__(self, revision=None, scroll=True, tags=[]):
         super(LogView, self).__init__()
         if scroll:
             self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
