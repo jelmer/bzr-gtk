@@ -176,7 +176,7 @@ class BranchWindow(gtk.Window):
 
         last_lines = []
         (self.revisions, colours, self.children, self.parent_ids,
-            merge_sorted) = distances(branch, start)
+            merge_sorted) = distances(branch.repository, start)
         for (index, (revision, node, lines)) in enumerate(graph(
                 self.revisions, colours, merge_sorted)):
             # FIXME: at this point we should be able to show the graph order

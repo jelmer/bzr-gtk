@@ -64,24 +64,24 @@ class RevisionProxy(object):
 
 class DistanceMethod(object):
 
-    def __init__(self, branch, start):
-        self.branch = branch
-        self.start = start
+    def __init__(self, repository, start_revid):
+        self.repository = repository
+        self.start_revid = start_revid
         self.revisions = {}
         self.children = {}
-        self.children_of_id = {start: set()}
+        self.children_of_id = {start_revid: set()}
         self.parent_ids_of = {}
-        self.colours = { start: 0 }
+        self.colours = { start_revid: 0 }
         self.last_colour = 0
         self.direct_parent_of = {}
         self.graph = {}
 
     def fill_caches(self):
-        graph = self.branch.repository.get_revision_graph_with_ghosts([self.start])
+        graph = self.repository.get_revision_graph_with_ghosts([self.start_revid])
         for revid in graph.ghosts:
             self.cache_revision(DummyRevision(revid))
         for revid, parents in graph.get_ancestors().items():
-            self.cache_revision(RevisionProxy(revid, parents, self.branch.repository))
+            self.cache_revision(RevisionProxy(revid, parents, self.repository))
 
     def cache_revision(self, revision):
         "Set the caches for a newly retrieved revision."""
@@ -236,7 +236,7 @@ class DistanceMethod(object):
                 self.colours[revid] = self.last_colour = self.last_colour + 1
 
 
-def distances(branch, start):
+def distances(repository, start_revid):
     """Sort the revisions.
 
     Traverses the branch revision tree starting at start and produces an
@@ -245,9 +245,9 @@ def distances(branch, start):
 
     Returns a tuple of (revids, revisions, colours, children)
     """
-    distance = DistanceMethod(branch, start)
+    distance = DistanceMethod(repository, start_revid)
     distance.fill_caches()
-    distance.merge_sorted = merge_sort(distance.graph, distance.start)
+    distance.merge_sorted = merge_sort(distance.graph, distance.start_revid)
     children = distance.make_children_map()
     
     for seq, revid, merge_depth, end_of_merge in distance.merge_sorted:
