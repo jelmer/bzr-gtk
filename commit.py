@@ -27,7 +27,9 @@ import pango
 import os.path
 
 import bzrlib.errors as errors
+
 from bzrlib import osutils
+from bzrlib.trace import mutter
 
 from dialog import error_dialog, question_dialog
 from errors import show_bzr_error
