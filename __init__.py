@@ -569,7 +569,6 @@ class cmd_gselftest(GTKCommand):
         # prevent gtk from blowing up later
         gtk = import_pygtk()
         import pynotify
-        import pkg_resources
         result = builtins.cmd_selftest().run(*args, **kwargs)
         if result == 0:
             summary = 'Success'
