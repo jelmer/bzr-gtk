@@ -566,9 +566,15 @@ class cmd_gselftest(GTKCommand):
 
     def run(self, *args, **kwargs):
         import cgi
+        import sys
+        default_encoding = sys.getdefaultencoding()
         # prevent gtk from blowing up later
         gtk = import_pygtk()
+        # prevent gtk from messing with default encoding
         import pynotify
+        if sys.getdefaultencoding() != default_encoding:
+            reload(sys)
+            sys.setdefaultencoding(default_encoding)
         result = builtins.cmd_selftest().run(*args, **kwargs)
         if result == 0:
             summary = 'Success'
