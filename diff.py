@@ -11,6 +11,8 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 from cStringIO import StringIO
 
+import pygtk
+pygtk.require("2.0")
 import gtk
 import pango
 import os
