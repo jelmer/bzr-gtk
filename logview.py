@@ -30,7 +30,7 @@ class LogView(gtk.ScrolledWindow):
     start.
     """
 
-    def __init__(self, revision=None, scroll=True, tags=None):
+    def __init__(self, revision=None, scroll=True, tags=[]):
         super(LogView, self).__init__()
         if scroll:
             self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
@@ -51,7 +51,7 @@ class LogView(gtk.ScrolledWindow):
     def set_go_callback(self, callback):
         self._go_callback = callback
 
-    def set_revision(self, revision, tags=None):
+    def set_revision(self, revision, tags=[]):
         self._revision = revision
         self.revision_id.set_text(revision.revision_id)
         if revision.committer is not None:
