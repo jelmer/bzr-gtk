@@ -20,8 +20,10 @@ try:
 except:
     pass
 
-import gtk
 import bzrlib
+import gtk
+import os
+from bzrlib.plugins.gtk import data_path
 
 class AboutDialog(gtk.AboutDialog):
     def __init__(self):
@@ -30,6 +32,6 @@ class AboutDialog(gtk.AboutDialog):
         self.set_version(bzrlib.version_string)
         self.set_website("http://bazaar-vcs.org/")
         self.set_license("GNU GPLv2")
-        self.set_icon(gtk.gdk.pixbuf_new_from_file("bzr-icon-64.png"))
+        self.set_icon(gtk.gdk.pixbuf_new_from_file(os.path.join(data_path(), "bzr-icon-64.png")))
         self.connect ("response", lambda d, r: d.destroy())
 
