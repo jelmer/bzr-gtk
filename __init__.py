@@ -362,7 +362,7 @@ class cmd_gcommit(GTKCommand):
 
 
 
-class cmd_gstatus(Command):
+class cmd_gstatus(GTKCommand):
     """GTK+ status dialog
 
     Graphical user interface for showing status 
