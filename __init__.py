@@ -76,6 +76,7 @@ from bzrlib.lazy_import import lazy_import
 lazy_import(globals(), """
 from bzrlib import (
     branch,
+    builtins,
     errors,
     workingtree,
     )
@@ -361,7 +362,7 @@ class cmd_gcommit(GTKCommand):
 
 
 
-class cmd_gstatus(GTKCommand):
+class cmd_gstatus(Command):
     """GTK+ status dialog
 
     Graphical user interface for showing status 
@@ -554,6 +555,35 @@ class cmd_commit_notify(GTKCommand):
         gtk.main()
 
 register_command(cmd_commit_notify)
+
+
+class cmd_gselftest(GTKCommand):
+    """Version of selftest that displays a notification at the end"""
+
+    takes_args = builtins.cmd_selftest.takes_args
+    takes_options = builtins.cmd_selftest.takes_options
+    _see_also = ['selftest']
+
+    def run(self, *args, **kwargs):
+        import cgi
+        # prevent gtk from blowing up later
+        gtk = import_pygtk()
+        import pynotify
+        import pkg_resources
+        result = builtins.cmd_selftest().run(*args, **kwargs)
+        if result == 0:
+            summary = 'Success'
+            body = 'Selftest succeeded in "%s"' % os.getcwd()
+        if result == 1:
+            summary = 'Failure'
+            body = 'Selftest failed in "%s"' % os.getcwd()
+        pynotify.init("bzr gselftest")
+        note = pynotify.Notification(cgi.escape(summary), cgi.escape(body))
+        note.set_timeout(pynotify.EXPIRES_NEVER)
+        note.show()
+
+
+register_command(cmd_gselftest)
 
 
 import gettext
