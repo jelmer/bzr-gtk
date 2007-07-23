@@ -14,7 +14,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import os
 import os.path
+import shutil
 import sys
 
 try:
@@ -24,6 +26,7 @@ except:
     pass
 
 import gtk
+from dialog import question_dialog
 
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
@@ -64,6 +67,10 @@ class OliveMenu:
                                        _('Remove'), None,
                                        _('Remove the selected file'),
                                        self.remove_file),
+                                      ('remove_and_delete', gtk.STOCK_REMOVE,
+                                       _('Remove and delete'), None,
+                                       _('Remove the selected file/dir and delete from disk'),
+                                       self.remove_and_delete_file),
                                       ('rename', None,
                                        _('Rename'), None,
                                        _('Rename the selected file'),
@@ -201,7 +208,7 @@ class OliveMenu:
             branch.unlock()
     
     @show_bzr_error
-    def remove_file(self, action):
+    def remove_file(self, action,delete_on_disk=0):
         """ Right context menu -> Remove """
         # Remove only the selected file
         directory = self.path
@@ -214,8 +221,22 @@ class OliveMenu:
         
         wt, path = WorkingTree.open_containing(os.path.join(directory, filename))
         wt.remove(path)
+        
+        if delete_on_disk:
+            abs_filename = os.path.join(directory,filename)
+            if os.path.isdir(abs_filename):
+                response = question_dialog(_('Delete directory with all directories below ?'), abs_filename )
+                if response == gtk.RESPONSE_YES:
+                    shutil.rmtree(abs_filename)
+            else:
+                os.remove(abs_filename)
+                
         self.app.set_path(self.path)
         self.app.refresh_right()
+        
+    def remove_and_delete_file(self, action):
+        """ Right context menu -> Remove and delete"""
+        self.remove_file(action,delete_on_disk=1)
 
     def rename_file(self, action):
         """ Right context menu -> Rename """
