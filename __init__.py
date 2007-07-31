@@ -20,7 +20,7 @@ gannotate         GTK+ annotate.
 gbranch           GTK+ branching. 
 gcheckout         GTK+ checkout. 
 gcommit           GTK+ commit dialog 
-gconflicts        GTK+ push. 
+gconflicts        GTK+ conflicts. 
 gdiff             Show differences in working tree in a GTK+ Window. 
 ginit             Initialise a new branch.
 gmissing          GTK+ missing revisions dialog. 
@@ -379,8 +379,10 @@ class cmd_gstatus(GTKCommand):
 
 
 class cmd_gconflicts(GTKCommand):
-    """ GTK+ push.
+    """ GTK+ conflicts.
     
+    Select files from the list of conflicts and run an external utility to
+    resolve them.
     """
     def run(self):
         (wt, path) = workingtree.WorkingTree.open_containing('.')
