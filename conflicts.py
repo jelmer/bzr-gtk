@@ -20,7 +20,7 @@ try:
 except:
     pass
 
-import os
+import subprocess
 
 import gtk
 import gobject
@@ -166,7 +166,11 @@ class ConflictsDialog(gtk.Dialog):
             base = self.wt.abspath(selected) + '.BASE'
             this = self.wt.abspath(selected) + '.THIS'
             other = self.wt.abspath(selected) + '.OTHER'
-            os.system(self._entry_diff3.get_text() + ' ' + base + ' ' + this + ' ' + other)
+            try:
+                p = subprocess.Popen([ self._entry_diff3.get_text(), base, this, other ])
+                p.wait()
+            except OSError, e:
+                warning_dialog(_('Call to external utility failed'), str(e))
         else:
             warning_dialog(_('Cannot resolve conflict'),
                            _('Only conflicts on the text of files can be resolved with Olive at the moment. Content conflicts, on the structure of the tree, need to be resolved using the command line.'))
