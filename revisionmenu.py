@@ -49,6 +49,16 @@ class RevisionPopupMenu(gtk.Menu):
             self.append(item)
             self.show_all()
 
+            item = gtk.MenuItem("_Merge Directive")
+            item.connect('activate', self.store_merge_directive)
+            self.append(item)
+            self.show_all()
+
+    def store_merge_directive(self, item):
+        from bzrlib.plugins.gtk.mergedirective import CreateMergeDirectiveDialog
+        window = CreateMergeDirectiveDialog(self.branch, self.revids[0])
+        window.show()
+
     def show_diff(self, item):
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow()
