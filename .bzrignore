@@ -3,6 +3,6 @@ dist
 MANIFEST
 *.pyc
 *.bak
-*.gladep
+*.kpf
 dist
 tags
