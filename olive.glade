@@ -6,7 +6,7 @@
     <property name="width_request">700</property>
     <property name="height_request">400</property>
     <property name="title" translatable="yes">Olive - Bazaar GUI</property>
-    <property name="icon">oliveicon2.png</property>
+    <property name="icon">icons/oliveicon2.png</property>
     <signal name="destroy" handler="on_window_main_destroy"/>
     <signal name="delete_event" handler="on_window_main_delete_event"/>
     <child>
@@ -367,7 +367,7 @@
                 <property name="visible">True</property>
                 <property name="label">Refresh</property>
                 <property name="use_underline">True</property>
-                <property name="icon">refresh.png</property>
+                <property name="icon">icons/refresh.png</property>
                 <signal name="clicked" handler="on_toolbutton_refresh_clicked"/>
               </widget>
               <packing>
@@ -379,7 +379,7 @@
                 <property name="visible">True</property>
                 <property name="label">Diff</property>
                 <property name="use_underline">True</property>
-                <property name="icon">diff.png</property>
+                <property name="icon">icons/diff.png</property>
                 <signal name="clicked" handler="on_toolbutton_diff_clicked"/>
               </widget>
               <packing>
@@ -391,7 +391,7 @@
                 <property name="visible">True</property>
                 <property name="label">Log</property>
                 <property name="use_underline">True</property>
-                <property name="icon">log.png</property>
+                <property name="icon">icons/log.png</property>
                 <signal name="clicked" handler="on_toolbutton_log_clicked"/>
               </widget>
               <packing>
@@ -412,7 +412,7 @@
                 <property name="visible">True</property>
                 <property name="label">Commit</property>
                 <property name="use_underline">True</property>
-                <property name="icon">commit.png</property>
+                <property name="icon">icons/commit.png</property>
                 <signal name="clicked" handler="on_toolbutton_commit_clicked"/>
               </widget>
               <packing>
@@ -433,7 +433,7 @@
                 <property name="visible">True</property>
                 <property name="label">Pull</property>
                 <property name="use_underline">True</property>
-                <property name="icon">pull.png</property>
+                <property name="icon">icons/pull.png</property>
                 <signal name="clicked" handler="on_toolbutton_pull_clicked"/>
               </widget>
               <packing>
@@ -445,7 +445,7 @@
                 <property name="visible">True</property>
                 <property name="label">Push</property>
                 <property name="use_underline">True</property>
-                <property name="icon">push.png</property>
+                <property name="icon">icons/push.png</property>
                 <signal name="clicked" handler="on_toolbutton_push_clicked"/>
               </widget>
               <packing>
@@ -675,7 +675,7 @@
     <property name="website_label" translatable="yes">https://launchpad.net/products/olive</property>
     <property name="authors">Szilveszter Farkas (Phanatic) &lt;szilveszter.farkas@gmail.com&gt;</property>
     <property name="translator_credits" translatable="yes" comments="TRANSLATORS: Replace this string with your names, one name per line.">translator-credits</property>
-    <property name="logo">oliveicon2.png</property>
+    <property name="logo">icons/oliveicon2.png</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="dialog-vbox1">
         <child internal-child="action_area">
@@ -693,7 +693,7 @@
     <property name="visible">True</property>
     <property name="title" translatable="yes">Olive - Add file(s)</property>
     <property name="resizable">False</property>
-    <property name="icon">oliveicon2.png</property>
+    <property name="icon">icons/oliveicon2.png</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="vbox_add">
@@ -813,7 +813,7 @@
     <property name="visible">True</property>
     <property name="title" translatable="yes">Olive - Remove file(s)</property>
     <property name="resizable">False</property>
-    <property name="icon">oliveicon2.png</property>
+    <property name="icon">icons/oliveicon2.png</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="vbox_remove">
@@ -932,7 +932,7 @@
   <widget class="GtkDialog" id="window_mkdir">
     <property name="visible">True</property>
     <property name="title" translatable="yes">Olive - Make directory</property>
-    <property name="icon">oliveicon2.png</property>
+    <property name="icon">icons/oliveicon2.png</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="vbox_mkdir">
@@ -1039,7 +1039,7 @@
   <widget class="GtkDialog" id="window_move">
     <property name="width_request">250</property>
     <property name="title" translatable="yes">Olive - Move</property>
-    <property name="icon">oliveicon2.png</property>
+    <property name="icon">icons/oliveicon2.png</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="vbox_move">
@@ -1146,7 +1146,7 @@
   </widget>
   <widget class="GtkDialog" id="window_rename">
     <property name="title" translatable="yes">Olive - Rename</property>
-    <property name="icon">oliveicon2.png</property>
+    <property name="icon">icons/oliveicon2.png</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="vbox_rename">
@@ -1253,7 +1253,7 @@
   </widget>
   <widget class="GtkDialog" id="window_info">
     <property name="title" translatable="yes">Olive - Information</property>
-    <property name="icon">oliveicon2.png</property>
+    <property name="icon">icons/oliveicon2.png</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="vbox_info">
@@ -2354,7 +2354,7 @@
   <widget class="GtkDialog" id="window_merge">
     <property name="visible">True</property>
     <property name="title" translatable="yes">Merge - Olive</property>
-    <property name="icon">oliveicon2.png</property>
+    <property name="icon">icons/oliveicon2.png</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
     <child internal-child="vbox">
       <widget class="GtkVBox" id="vbox_merge">
