@@ -33,7 +33,7 @@ visualise         Graphically visualise this branch.
 
 import bzrlib
 
-__version__ = '0.19.0'
+__version__ = '0.90.0'
 version_info = tuple(int(n) for n in __version__.split('.'))
 
 

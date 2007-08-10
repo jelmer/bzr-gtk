@@ -63,7 +63,7 @@ class InstallData(install_data):
 
 setup(
     name = "bzr-gtk",
-    version = "0.19.0",
+    version = "0.90.0",
     maintainer = "Jelmer Vernooij",
     maintainer_email = "jelmer@samba.org",
     description = "GTK+ Frontends for various Bazaar commands",
