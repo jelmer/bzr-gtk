@@ -15,7 +15,7 @@ import pango
 
 from bzrlib.osutils import format_date
 
-from graph import linegraph, same_branch
+from linegraph import linegraph, same_branch
 from graphcell import CellRendererGraph
 
 
