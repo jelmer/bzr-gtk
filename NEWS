@@ -1,23 +1,76 @@
+0.90.0	UNRELEASED
+
+ FEATURES
+
+  * Show tags in bzr viz. (Jelmer)
+
+  * Handle large files correctly in Olive. (#127392, Mateusz Korniak)
+
+  * Support DBus being present but NetworkManager missing. (#126767, Mateusz 
+															Korniak, Jelmer)
+
+  * Add remove and delete menu item in Olive. (#127392, Mateusz Korniak)
+
+ UI
+  
+  * Improve Preferences dialog layout. (Jelmer)
+ 
+ INTERNALS:
+ 
+  * Updated pot generator script and regenerated the translation template.
+    (Szilveszter)
+
+0.18.0  2007-07-17
+
+ FEATURES
+
+  * Add support for customizing colors in the diff window via ~/.colordiffrc
+    or gedit's syntax highlighting configuration. See README file for details.
+    (Adeodato Simó)
+
+  * Add Inspect and Branch buttons to notification window. (Robert)
+
+  * Add notification area icon with context menu. (Jelmer)
+
+  * New tango icons. (Pascal Klein)
+
+  * Add simple About dialog. (Jelmer)
+
+  * Add context menu in bzrk. (Jelmer)
+
+ BUG FIXES
+
+  * Fix option help strings to comply with the style guide. (Vincent)
+
+  * Fix import of BzrError. (Aaron)
+
+  * Fix missing attributes for DummyRevision. (Vincent)
+
+  * Never refuse to run with newer versions of bzr, just warn. (Jelmer)
+
+
 0.17.0  2007-06-15
 
  FEATURES
 
-  * Added an EXPERIMENTAL feature for browsing remote branches in Olive (Szilveszter)
+  * Added an EXPERIMENTAL feature for browsing remote branches in Olive 
+    (Szilveszter)
 
   * Bookmarked locations are now added to branch/checkout history (Szilveszter)
 
   * There are now more columns in the file list, and you can sort by them
-  (Szilveszter)
+    (Szilveszter)
 
   * A location bar was added to the top of the file list. On Windows, the
-  drive selector combo was moved here (Szilveszter)
+    drive selector combo was moved here (Szilveszter)
 
-  * Don't warn about incompatible versions when .dev version of Bazaar is used (Aaron)
+  * Don't warn about incompatible versions when .dev version of Bazaar is used 
+    (Aaron)
 
  BUG FIXES
  
   * Get and Checkout dialogs: scan the branch only if the entry has lost focus
-  (#93653, Szilveszter)
+    (#93653, Szilveszter)
 
   * Fixed 'bzr gcommit' if command not issued in a branch (#113394, Szilveszter)
 

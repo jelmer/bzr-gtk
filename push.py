@@ -1,4 +1,5 @@
 # Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
+# Copyright (C) 2007 by Jelmer Vernooij <jelmer@samba.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,6 +25,8 @@ import gtk
 
 from errors import show_bzr_error
 
+# FIXME: This needs to be public JRV 20070714
+from bzrlib.builtins import _create_prefix
 from bzrlib.config import LocationConfig
 import bzrlib.errors as errors
 
@@ -33,7 +36,7 @@ from history import UrlHistory
 
 class PushDialog(gtk.Dialog):
     """ New implementation of the Push dialog. """
-    def __init__(self, branch, parent=None):
+    def __init__(self, repository, revid, branch=None, parent=None):
         """ Initialize the Push dialog. """
         gtk.Dialog.__init__(self, title="Push - Olive",
                                   parent=parent,
@@ -41,47 +44,28 @@ class PushDialog(gtk.Dialog):
                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         
         # Get arguments
+        self.repository = repository
+        self.revid = revid
         self.branch = branch
         
         # Create the widgets
         self._label_location = gtk.Label(_("Location:"))
-        self._label_test = gtk.Label(_("(click the Test button to check write access)"))
-        self._check_remember = gtk.CheckButton(_("_Remember as default location"),
-                                               use_underline=True)
-        self._check_prefix = gtk.CheckButton(_("Create the path _leading up to the location"),
-                                             use_underline=True)
-        self._check_overwrite = gtk.CheckButton(_("_Overwrite target if diverged"),
-                                                use_underline=True)
         self._combo = gtk.ComboBoxEntry()
-        self._button_test = gtk.Button(_("_Test"), use_underline=True)
         self._button_push = gtk.Button(_("_Push"), use_underline=True)
         self._hbox_location = gtk.HBox()
-        self._hbox_test = gtk.HBox()
-        self._image_test = gtk.Image()
         
         # Set callbacks
-        self._button_test.connect('clicked', self._on_test_clicked)
         self._button_push.connect('clicked', self._on_push_clicked)
         
         # Set properties
-        self._image_test.set_from_stock(gtk.STOCK_DIALOG_INFO, gtk.ICON_SIZE_BUTTON)
         self._label_location.set_alignment(0, 0.5)
-        self._label_test.set_alignment(0, 0.5)
         self._hbox_location.set_spacing(3)
-        self._hbox_test.set_spacing(3)
         self.vbox.set_spacing(3)
         
         # Pack widgets
         self._hbox_location.pack_start(self._label_location, False, False)
         self._hbox_location.pack_start(self._combo, True, True)
-        self._hbox_test.pack_start(self._image_test, False, False)
-        self._hbox_test.pack_start(self._label_test, True, True)
         self.vbox.pack_start(self._hbox_location)
-        self.vbox.pack_start(self._check_remember)
-        self.vbox.pack_start(self._check_prefix)
-        self.vbox.pack_start(self._check_overwrite)
-        self.vbox.pack_start(self._hbox_test)
-        self.action_area.pack_start(self._button_test)
         self.action_area.pack_end(self._button_push)
         
         # Show the dialog
@@ -99,49 +83,29 @@ class PushDialog(gtk.Dialog):
         self._combo.set_model(self._combo_model)
         self._combo.set_text_column(0)
         
-        location = self.branch.get_push_location()
-        if location:
-            self._combo.get_child().set_text(location)
-    
-    def _on_test_clicked(self, widget):
-        """ Test button clicked handler. """
-        import re
-        _urlRE = re.compile(r'^(?P<proto>[^:/\\]+)://(?P<path>.*)$')
-        
-        url = self._combo.get_child().get_text()
-        
-        m = _urlRE.match(url)
-        if m:
-            proto = m.groupdict()['proto']
-            if (proto == 'sftp') or (proto == 'file') or (proto == 'ftp'):
-                # have write acces (most probably)
-                self._image_test.set_from_stock(gtk.STOCK_YES, 4)
-                self._label_test.set_markup(_('<b>Write access is probably available</b>'))
-            else:
-                # no write access
-                self._image_test.set_from_stock(gtk.STOCK_NO, 4)
-                self._label_test.set_markup(_('<b>No write access</b>'))
-        else:
-            # couldn't determine
-            self._image_test.set_from_stock(gtk.STOCK_DIALOG_QUESTION, 4)
-            self._label_test.set_markup(_('<b>Could not determine</b>'))
+        if self.branch is not None:
+            location = self.branch.get_push_location()
+            if location is not None:
+                self._combo.get_child().set_text(location)
     
     @show_bzr_error
     def _on_push_clicked(self, widget):
         """ Push button clicked handler. """
         location = self._combo.get_child().get_text()
         revs = 0
+        if self.branch is not None and self.branch.get_push_location() is None:
+            response = question_dialog(_('Set default push location'),
+                                       _('There is no default push location set.\nSet %r as default now?') % location)
+            if response == gtk.REPONSE_OK:
+                self.branch.set_push_location(location)
+
         try:
-            revs = do_push(self.branch,
-                           location=location,
-                           overwrite=self._check_overwrite.get_active(),
-                           remember=self._check_remember.get_active(),
-                           create_prefix=self._check_prefix.get_active())
+            revs = do_push(self.branch, location=location, overwrite=False)
         except errors.DivergedBranches:
             response = question_dialog(_('Branches have been diverged'),
                                        _('You cannot push if branches have diverged.\nOverwrite?'))
             if response == gtk.RESPONSE_OK:
-                revs = do_push(self.branch, overwrite=True)
+                revs = do_push(self.branch, location=location, overwrite=True)
             return
         
         self._history.add_entry(location)
@@ -150,41 +114,22 @@ class PushDialog(gtk.Dialog):
         
         self.response(gtk.RESPONSE_OK)
 
-def do_push(branch, location=None, remember=False, overwrite=False,
-         create_prefix=False):
+def do_push(br_from, location, overwrite):
     """ Update a mirror of a branch.
     
-    :param branch: the source branch
+    :param br_from: the source branch
     
     :param location: the location of the branch that you'd like to update
     
-    :param remember: if set, the location will be stored
-    
     :param overwrite: overwrite target location if it diverged
-    
-    :param create_prefix: create the path leading up to the branch if it doesn't exist
     
     :return: number of revisions pushed
     """
     from bzrlib.bzrdir import BzrDir
     from bzrlib.transport import get_transport
         
-    br_from = branch
-    
-    stored_loc = br_from.get_push_location()
-    if location is None:
-        if stored_loc is None:
-            error_dialog(_('Push location is unknown'),
-                         _('Please specify a location manually.'))
-            return
-        else:
-            location = stored_loc
-
     transport = get_transport(location)
     location_url = transport.base
-
-    if br_from.get_push_location() is None or remember:
-        br_from.set_push_location(location_url)
 
     old_rh = []
 
@@ -194,30 +139,16 @@ def do_push(branch, location=None, remember=False, overwrite=False,
     except errors.NotBranchError:
         # create a branch.
         transport = transport.clone('..')
-        if not create_prefix:
-            try:
-                relurl = transport.relpath(location_url)
-                transport.mkdir(relurl)
-            except errors.NoSuchFile:
-                error_dialog(_('Non existing parent directory'),
-                             _("The parent directory (%s)\ndoesn't exist.") % location)
+        try:
+            relurl = transport.relpath(location_url)
+            transport.mkdir(relurl)
+        except errors.NoSuchFile:
+            response = question_dialog(_('Non existing parent directory'),
+                         _("The parent directory (%s)\ndoesn't exist. Create?") % location)
+            if response == gtk.RESPONSE_OK:
+                _create_prefix(transport)
+            else:
                 return
-        else:
-            current = transport.base
-            needed = [(transport, transport.relpath(location_url))]
-            while needed:
-                try:
-                    transport, relpath = needed[-1]
-                    transport.mkdir(relpath)
-                    needed.pop()
-                except errors.NoSuchFile:
-                    new_transport = transport.clone('..')
-                    needed.append((new_transport,
-                                   new_transport.relpath(transport.base)))
-                    if new_transport.base == transport.base:
-                        error_dialog(_('Path prefix not created'),
-                                     _("The path leading up to the specified location couldn't\nbe created."))
-                        return
         dir_to = br_from.bzrdir.clone(location_url,
             revision_id=br_from.last_revision())
         br_to = dir_to.open_branch()
@@ -228,8 +159,6 @@ def do_push(branch, location=None, remember=False, overwrite=False,
             tree_to = dir_to.open_workingtree()
         except errors.NotLocalUrl:
             # FIXME - what to do here? how should we warn the user?
-            #warning('This transport does not update the working '
-            #        'tree of: %s' % (br_to.base,))
             count = br_to.pull(br_from, overwrite)
         except errors.NoWorkingTree:
             count = br_to.pull(br_from, overwrite)

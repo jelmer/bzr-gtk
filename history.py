@@ -17,14 +17,30 @@
 delimiter = " "
 
 class UrlHistory:
+    """Simple helper class for storing URL history."""
+
     def __init__(self, config, name):
+        """Access URL History in a Config object.
+
+        :param config: Config object to use
+        :param name: Name of the history variable.
+        """
         self._config = config
         self._name = name
 
     def add_entry(self, url):
-        self._config.set_user_option(self._name, delimiter.join(self.get_entries() + [url]))
+        """Add a new entry to the list.
+
+        :param url: Url to add
+        """
+        self._config.set_user_option(self._name, delimiter.join(
+            self.get_entries() + [url]))
 
     def get_entries(self):
+        """Obtain all URLs currently listed.
+
+        :return list of URLs or empty list if no URLs set yet.
+        """
         history = self._config.get_user_option(self._name)
         if history is None:
             return []

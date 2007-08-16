@@ -63,7 +63,7 @@ class InstallData(install_data):
 
 setup(
     name = "bzr-gtk",
-    version = "0.17.0",
+    version = "0.90.0",
     maintainer = "Jelmer Vernooij",
     maintainer_email = "jelmer@samba.org",
     description = "GTK+ Frontends for various Bazaar commands",
@@ -85,10 +85,9 @@ setup(
         "bzrlib.plugins.gtk.tests"
         ],
     data_files=[('share/olive', ['olive.glade',
-                                 'oliveicon2.png',
                                  'cmenu.ui',
                                 ]),
-                ('share/olive', ['icons/commit.png',
+                ('share/olive/icons', ['icons/commit.png',
                                  'icons/commit16.png',
                                  'icons/diff.png',
                                  'icons/diff16.png',
@@ -98,8 +97,11 @@ setup(
                                  'icons/pull16.png',
                                  'icons/push.png',
                                  'icons/push16.png',
-                                 'icons/refresh.png']),
-                ('share/applications', ['olive-gtk.desktop']),
+                                 'icons/refresh.png',
+                                 'icons/oliveicon2.png']),
+                ('share/applications', ['olive-gtk.desktop',
+                                        'bazaar-properties.desktop',
+                                        'bzr-notify.desktop']),
                 ('share/pixmaps', ['icons/olive-gtk.png'])
                ],
     cmdclass={'install_data': InstallData}

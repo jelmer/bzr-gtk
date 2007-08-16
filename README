@@ -23,7 +23,8 @@ In order to see graphs in the visualisation tool, you will also need:
 
 In order to see syntax highlighted diffs:
 
-  * gtksourceview python bindings
+  * gtksourceview python bindings (on Debian and Ubuntu systems, these
+    are in the python-gnome2-desktop package)
 
 In order to use the nautilus integration, you will need:
 
@@ -85,6 +86,26 @@ Time spans are scaled; for instance by selecting "1 Day", lines older than a
 day will be highlighted blue, but changes in the past hour will be red and
 lines 2 hours old may be orange. Highlighting can be turned off with --plain
 if overwhelming.
+
+Usage - diff window
+-------------------
+
+If you have the gtksourceview python bindings installed, the diff window
+will have syntax highlighting. If the python GConf bindings are installed, 
+the colors will be read from gedit's syntax highlighting configuration
+for the "Diff" language.
+
+Afterwards, colors from the ~/.colordiffrc file will be read, and will
+override gedit's. Since that file may be written for a dark background
+environment, the file ~/.colordiffrc.bzr-gtk can be used to override
+some values.
+
+Because gtksourceview is more configurable that colordiff, in addition
+to the 'oldtext', 'newtext', and 'diffstuff' keys, the following keys
+are also accepted: 'location', 'file', 'specialcase'.
+
+Colors can be specified with names (valid names are those in the
+/usr/share/X11/rgb.txt file), or with a #RRGGBB notation.
 
 Install on Windows
 ------------------

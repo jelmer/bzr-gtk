@@ -12,11 +12,28 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-"""GTK+ frontends to Bazaar commands """
+"""Graphical support for Bazaar using GTK.
+
+This plugin includes:
+commit-notify     Start the graphical notifier of commits.
+gannotate         GTK+ annotate. 
+gbranch           GTK+ branching. 
+gcheckout         GTK+ checkout. 
+gcommit           GTK+ commit dialog 
+gconflicts        GTK+ conflicts. 
+gdiff             Show differences in working tree in a GTK+ Window. 
+ginit             Initialise a new branch.
+gmissing          GTK+ missing revisions dialog. 
+gpreferences      GTK+ preferences dialog. 
+gpush             GTK+ push. 
+gstatus           GTK+ status dialog 
+gtags             Manage branch tags.
+visualise         Graphically visualise this branch. 
+"""
 
 import bzrlib
 
-__version__ = '0.17.0'
+__version__ = '0.90.0'
 version_info = tuple(int(n) for n in __version__.split('.'))
 
 
@@ -39,6 +56,7 @@ def check_bzrlib_version(desired):
         # get the message out any way we can
         from warnings import warn as warning
     if bzrlib_version < desired:
+        from bzrlib.errors import BzrError
         warning('Installed bzr version %s is too old to be used with bzr-gtk'
                 ' %s.' % (bzrlib.__version__, __version__))
         raise BzrError('Version mismatch: %r' % version_info)
@@ -46,8 +64,6 @@ def check_bzrlib_version(desired):
         warning('bzr-gtk is not up to date with installed bzr version %s.'
                 ' \nThere should be a newer version available, e.g. %i.%i.' 
                 % (bzrlib.__version__, bzrlib_version[0], bzrlib_version[1]))
-        if bzrlib_version != desired_plus:
-            raise Exception, 'Version mismatch'
 
 
 check_bzrlib_version(version_info[:2])
@@ -60,6 +76,7 @@ from bzrlib.lazy_import import lazy_import
 lazy_import(globals(), """
 from bzrlib import (
     branch,
+    builtins,
     errors,
     workingtree,
     )
@@ -85,6 +102,10 @@ def set_ui_factory():
     from ui import GtkUIFactory
     import bzrlib.ui
     bzrlib.ui.ui_factory = GtkUIFactory()
+
+
+def data_path():
+    return os.path.dirname(__file__)
 
 
 class GTKCommand(Command):
@@ -137,7 +158,7 @@ class cmd_gpush(GTKCommand):
         (br, path) = branch.Branch.open_containing(location)
         self.open_display()
         from push import PushDialog
-        dialog = PushDialog(br)
+        dialog = PushDialog(br.repository, br.last_revision(), br)
         dialog.run()
 
 
@@ -193,6 +214,20 @@ class cmd_gdiff(GTKCommand):
             wt.unlock()
 
 
+def start_viz_window(branch, revision, limit=None):
+    """Start viz on branch with revision revision.
+    
+    :return: The viz window object.
+    """
+    from viz.branchwin import BranchWindow
+    branch.lock_read()
+    pp = BranchWindow()
+    pp.set_branch(branch, revision, limit)
+    # cleanup locks when the window is closed
+    pp.connect("destroy", lambda w: branch.unlock())
+    return pp
+
+
 class cmd_visualise(Command):
     """Graphically visualise this branch.
 
@@ -204,7 +239,7 @@ class cmd_visualise(Command):
     """
     takes_options = [
         "revision",
-        Option('limit', "maximum number of revisions to display",
+        Option('limit', "Maximum number of revisions to display.",
                int, 'count')]
     takes_args = [ "location?" ]
     aliases = [ "visualize", "vis", "viz" ]
@@ -213,7 +248,6 @@ class cmd_visualise(Command):
         set_ui_factory()
         (br, path) = branch.Branch.open_containing(location)
         br.lock_read()
-        br.repository.lock_read()
         try:
             if revision is None:
                 revid = br.last_revision()
@@ -222,16 +256,12 @@ class cmd_visualise(Command):
             else:
                 (revno, revid) = revision[0].in_history(br)
 
-            from viz.branchwin import BranchWindow
             import gtk
-                
-            pp = BranchWindow()
-            pp.set_branch(br, revid, limit)
+            pp = start_viz_window(br, revid, limit)
             pp.connect("destroy", lambda w: gtk.main_quit())
             pp.show()
             gtk.main()
         finally:
-            br.repository.unlock()
             br.unlock()
 
 
@@ -243,10 +273,10 @@ class cmd_gannotate(GTKCommand):
 
     takes_args = ["filename", "line?"]
     takes_options = [
-        Option("all", help="show annotations on all lines"),
-        Option("plain", help="don't highlight annotation lines"),
+        Option("all", help="Show annotations on all lines."),
+        Option("plain", help="Don't highlight annotation lines."),
         Option("line", type=int, argname="lineno",
-               help="jump to specified line number"),
+               help="Jump to specified line number."),
         "revision",
     ]
     aliases = ["gblame", "gpraise"]
@@ -354,8 +384,10 @@ class cmd_gstatus(GTKCommand):
 
 
 class cmd_gconflicts(GTKCommand):
-    """ GTK+ push.
+    """ GTK+ conflicts.
     
+    Select files from the list of conflicts and run an external utility to
+    resolve them.
     """
     def run(self):
         (wt, path) = workingtree.WorkingTree.open_containing('.')
@@ -461,7 +493,12 @@ class cmd_commit_notify(GTKCommand):
     """
 
     def run(self):
+        from notify import NotifyPopupMenu
         gtk = self.open_display()
+        menu = NotifyPopupMenu()
+        icon = gtk.status_icon_new_from_file(os.path.join(data_path(), "bzr-icon-64.png"))
+        icon.connect('popup-menu', menu.display)
+
         import cgi
         import dbus
         import dbus.service
@@ -478,6 +515,7 @@ class cmd_commit_notify(GTKCommand):
         broadcast_service = bus.get_object(
             activity.Broadcast.DBUS_NAME,
             activity.Broadcast.DBUS_PATH)
+
         def catch_branch(revision_id, urls):
             # TODO: show all the urls, or perhaps choose the 'best'.
             url = urls[0]
@@ -497,6 +535,17 @@ class cmd_commit_notify(GTKCommand):
                 body += revision.message
                 body = cgi.escape(body)
                 nw = pynotify.Notification(summary, body)
+                def start_viz(notification=None, action=None, data=None):
+                    """Start the viz program."""
+                    pp = start_viz_window(branch, revision_id)
+                    pp.show()
+                def start_branch(notification=None, action=None, data=None):
+                    """Start a Branch dialog"""
+                    from bzrlib.plugins.gtk.branch import BranchDialog
+                    bd = BranchDialog(remote_path=url)
+                    bd.run()
+                nw.add_action("inspect", "Inspect", start_viz, None)
+                nw.add_action("branch", "Branch", start_branch, None)
                 nw.set_timeout(5000)
                 nw.show()
             except Exception, e:
@@ -508,6 +557,40 @@ class cmd_commit_notify(GTKCommand):
         gtk.main()
 
 register_command(cmd_commit_notify)
+
+
+class cmd_gselftest(GTKCommand):
+    """Version of selftest that displays a notification at the end"""
+
+    takes_args = builtins.cmd_selftest.takes_args
+    takes_options = builtins.cmd_selftest.takes_options
+    _see_also = ['selftest']
+
+    def run(self, *args, **kwargs):
+        import cgi
+        import sys
+        default_encoding = sys.getdefaultencoding()
+        # prevent gtk from blowing up later
+        gtk = import_pygtk()
+        # prevent gtk from messing with default encoding
+        import pynotify
+        if sys.getdefaultencoding() != default_encoding:
+            reload(sys)
+            sys.setdefaultencoding(default_encoding)
+        result = builtins.cmd_selftest().run(*args, **kwargs)
+        if result == 0:
+            summary = 'Success'
+            body = 'Selftest succeeded in "%s"' % os.getcwd()
+        if result == 1:
+            summary = 'Failure'
+            body = 'Selftest failed in "%s"' % os.getcwd()
+        pynotify.init("bzr gselftest")
+        note = pynotify.Notification(cgi.escape(summary), cgi.escape(body))
+        note.set_timeout(pynotify.EXPIRES_NEVER)
+        note.show()
+
+
+register_command(cmd_gselftest)
 
 
 import gettext

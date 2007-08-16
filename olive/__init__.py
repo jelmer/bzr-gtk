@@ -55,6 +55,22 @@ from bzrlib.plugins.gtk.initialize import InitDialog
 from bzrlib.plugins.gtk.push import PushDialog
 from bzrlib.plugins.gtk.revbrowser import RevisionBrowser
 
+def about():
+    """ Display the AboutDialog. """
+    from bzrlib.plugins.gtk import __version__
+    from bzrlib.plugins.gtk.olive.guifiles import GLADEFILENAME
+
+    # Load AboutDialog description
+    dglade = gtk.glade.XML(GLADEFILENAME, 'aboutdialog')
+    dialog = dglade.get_widget('aboutdialog')
+
+    # Set version
+    dialog.set_version(__version__)
+
+    dialog.run()
+    # Destroy the dialog
+    dialog.destroy()
+
 class OliveGtk:
     """ The main Olive GTK frontend class. This is called when launching the
     program. """
@@ -354,9 +370,7 @@ class OliveGtk:
                 return self.remote_branch.base
    
     def on_about_activate(self, widget):
-        from bzrlib.plugins.gtk.dialog import about
         about()
-        
     
     def on_button_history_browse_clicked(self, widget):
         """ Browse for revision button handler. """
@@ -839,13 +853,13 @@ class OliveGtk:
     def _load_right(self):
         """ Load data into the right panel. (Filelist) """
         # Create ListStore
-        # Model: [ icon, dir, name, status text, status, size (int), size (human), mtime (int), mtime (local), fileid]
+        # Model: [ icon, dir, name, status text, status, size (int), size (human), mtime (int), mtime (local), fileid ]
         liststore = gtk.ListStore(gobject.TYPE_STRING,
                                   gobject.TYPE_BOOLEAN,
                                   gobject.TYPE_STRING,
                                   gobject.TYPE_STRING,
                                   gobject.TYPE_STRING,
-                                  gobject.TYPE_INT,
+                                  gobject.TYPE_STRING,
                                   gobject.TYPE_STRING,
                                   gobject.TYPE_INT,
                                   gobject.TYPE_STRING,
@@ -878,8 +892,8 @@ class OliveGtk:
                                item,
                                '',
                                '',
-                               statinfo.st_size,
-                               self._format_size(statinfo.st_size),
+                               "<DIR>",
+                               "<DIR>",
                                statinfo.st_mtime,
                                self._format_date(statinfo.st_mtime),
                                ''])
@@ -939,7 +953,7 @@ class OliveGtk:
                               item,
                               st,
                               status,
-                              statinfo.st_size,
+                              str(statinfo.st_size), # NOTE: if int used there it will fail for large files (size expressed as long int)
                               self._format_size(statinfo.st_size),
                               statinfo.st_mtime,
                               self._format_date(statinfo.st_mtime),
@@ -1165,8 +1179,8 @@ class OliveGtk:
                                   item,
                                   '',
                                   '',
-                                  statinfo.st_size,
-                                  self._format_size(statinfo.st_size),
+                                  "<DIR>",
+                                  "<DIR>",
                                   statinfo.st_mtime,
                                   self._format_date(statinfo.st_mtime),
                                   ''])
@@ -1226,7 +1240,7 @@ class OliveGtk:
                                   item,
                                   st,
                                   status,
-                                  statinfo.st_size,
+                                  str(statinfo.st_size),
                                   self._format_size(statinfo.st_size),
                                   statinfo.st_mtime,
                                   self._format_date(statinfo.st_mtime),
@@ -1283,8 +1297,8 @@ class OliveGtk:
                                        item.name,
                                        '',
                                        '',
-                                       0,
-                                       self._format_size(0),
+                                       "<DIR>",
+                                       "<DIR>",
                                        rev.timestamp,
                                        self._format_date(rev.timestamp),
                                        ''
@@ -1300,7 +1314,7 @@ class OliveGtk:
                                        item.name,
                                        '',
                                        '',
-                                       item.text_size,
+                                       str(item.text_size),
                                        self._format_size(item.text_size),
                                        rev.timestamp,
                                        self._format_date(rev.timestamp),
@@ -1402,7 +1416,15 @@ class OliveGtk:
     
     def _format_size(self, size):
         """ Format size to a human readable format. """
-        return size
+        if size < 1000:
+            return "%d[B]" % (size,)
+        size = size / 1000.0
+        
+        for metric in ["kB","MB","GB","TB"]:
+            if size < 1000:
+                break
+            size = size / 1000.0
+        return "%.1f[%s]" % (size,metric) 
     
     def _format_date(self, timestamp):
         """ Format the time (given in secs) to a human readable format. """

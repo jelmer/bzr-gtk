@@ -75,6 +75,8 @@ class BranchWindow(gtk.Window):
         self.treeview.set_search_column(4)
         self.treeview.connect("cursor-changed", self._treeview_cursor_cb)
         self.treeview.connect("row-activated", self._treeview_row_activated_cb)
+        self.treeview.connect("button-release-event", 
+                self._treeview_row_mouseclick)
         scrollwin.add(self.treeview)
         self.treeview.show()
 
@@ -174,7 +176,7 @@ class BranchWindow(gtk.Window):
 
         last_lines = []
         (self.revisions, colours, self.children, self.parent_ids,
-         merge_sorted) = distances(branch, start)
+            merge_sorted) = distances(branch.repository, start)
         for (index, (revision, node, lines)) in enumerate(graph(
                 self.revisions, colours, merge_sorted)):
             # FIXME: at this point we should be able to show the graph order
@@ -202,7 +204,12 @@ class BranchWindow(gtk.Window):
 
         self.back_button.set_sensitive(len(self.parent_ids[revision]) > 0)
         self.fwd_button.set_sensitive(len(self.children[revision]) > 0)
-        self.logview.set_revision(revision)
+        tags = []
+        if self.branch.supports_tags():
+            tagdict = self.branch.tags.get_reverse_tag_dict()
+            if tagdict.has_key(revision.revision_id):
+                tags = tagdict[revision.revision_id]
+        self.logview.set_revision(revision, tags)
 
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
@@ -246,8 +253,8 @@ class BranchWindow(gtk.Window):
         """Open a new window to show a diff between the given revisions."""
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow()
-        rev_tree = branch.repository.revision_tree(revid)
-        parent_tree = branch.repository.revision_tree(parentid)
+        (parent_tree, rev_tree) = branch.repository.revision_trees([parentid, 
+                                                                   revid])
         description = revid + " - " + branch.nick
         window.set_diff(description, rev_tree, parent_tree)
         window.show()
@@ -257,10 +264,25 @@ class BranchWindow(gtk.Window):
         self.show_diff(self.branch, revid, parentid)
         self.treeview.grab_focus()
 
+    def _treeview_row_mouseclick(self, widget, event):
+        from bzrlib.plugins.gtk.revisionmenu import RevisionPopupMenu
+        if event.button == 3:
+            menu = RevisionPopupMenu(self.branch.repository, 
+                [x.revision_id for x in self.selected_revisions()],
+                self.branch)
+            menu.popup(None, None, None, event.button, event.get_time())
+
+    def selected_revision(self, path):
+        return self.model[path][0]
+
+    def selected_revisions(self):
+        return [self.selected_revision(path) for path in \
+                self.treeview.get_selection().get_selected_rows()[1]]
+
     def _treeview_row_activated_cb(self, widget, path, col):
         # TODO: more than one parent
         """Callback for when a treeview row gets activated."""
-        revision = self.model[path][0]
+        revision = self.selected_revision(path)
         if len(self.parent_ids[revision]) == 0:
             # Ignore revisions without parent
             return

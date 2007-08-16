@@ -26,6 +26,11 @@ from bzrlib.config import GlobalConfig
 
 class PreferencesWindow(gtk.Dialog):
     """Displays global preferences windows."""
+    # Note that we don't allow configuration of aliases or 
+    # default log formats. This is because doing so wouldn't make 
+    # a lot of sense to pure GUI users. Users that need these settings 
+    # will already be familiar with the configuration file.
+
     def __init__(self, config=None):
         """ Initialize the Status window. """
         super(PreferencesWindow, self).__init__(flags=gtk.DIALOG_MODAL)
@@ -46,11 +51,9 @@ class PreferencesWindow(gtk.Dialog):
         align.add(label)
         table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
 
-        align = gtk.Alignment(0.0, 0.5)
         self.username = gtk.Entry()
-        align.add(self.username)
         self.username.set_text(self.config.username())
-        table.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        table.attach(self.username, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
         align = gtk.Alignment(1.0, 0.5)
         label = gtk.Label()
@@ -58,11 +61,9 @@ class PreferencesWindow(gtk.Dialog):
         align.add(label)
         table.attach(align, 0, 1, 1, 2, gtk.FILL, gtk.FILL)
 
-        align = gtk.Alignment(0.0, 0.5)
         self.email = gtk.Entry()
         self.email.set_text(self.config.gpg_signing_command())
-        align.add(self.email)
-        table.attach(align, 1, 2, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        table.attach(self.email, 1, 2, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
         align = gtk.Alignment(1.0, 0.5)
         label = gtk.Label()
@@ -70,11 +71,18 @@ class PreferencesWindow(gtk.Dialog):
         align.add(label)
         table.attach(align, 0, 1, 2, 3, gtk.FILL, gtk.FILL)
 
-        align = gtk.Alignment(0.0, 0.5)
-        self.check_sigs = gtk.Entry()
-        #self.check_sigs.set_text(self.config.signature_checking())
-        align.add(self.check_sigs)
-        table.attach(align, 1, 2, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        sigvals = gtk.VBox()
+        self.check_sigs_if_possible = gtk.RadioButton(None, 
+                                                      "_Check if possible")
+        sigvals.pack_start(self.check_sigs_if_possible)
+        self.check_sigs_always = gtk.RadioButton(self.check_sigs_if_possible, 
+                                                 "Check _always")
+        sigvals.pack_start(self.check_sigs_always)
+        self.check_sigs_never = gtk.RadioButton(self.check_sigs_if_possible,
+                                                "Check _never")
+        sigvals.pack_start(self.check_sigs_never)
+        # FIXME: Set default
+        table.attach(sigvals, 1, 2, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
         align = gtk.Alignment(1.0, 0.5)
         label = gtk.Label()
@@ -82,30 +90,33 @@ class PreferencesWindow(gtk.Dialog):
         align.add(label)
         table.attach(align, 0, 1, 3, 4, gtk.FILL, gtk.FILL)
 
-        align = gtk.Alignment(0.0, 0.5)
-        self.create_sigs = gtk.Entry()
-        #self.create_sigs.set_text(self.config.signing_policy())
-        align.add(self.create_sigs)
-        table.attach(align, 1, 2, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        create_sigs = gtk.VBox()
+        self.create_sigs_when_required = gtk.RadioButton(None, 
+                                                         "Sign When _Required")
+        create_sigs.pack_start(self.create_sigs_when_required)
+        self.create_sigs_always = gtk.RadioButton(
+            self.create_sigs_when_required, "Sign _Always")
+        create_sigs.pack_start(self.create_sigs_always)
+        self.create_sigs_never = gtk.RadioButton(
+            self.create_sigs_when_required, "Sign _Never")
+        create_sigs.pack_start(self.create_sigs_never)
+        # FIXME: Set default
+        table.attach(create_sigs, 1, 2, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
         return table
 
-
-
     def _create_pluginpage(self):
-        vbox = gtk.VBox(False, 2)
-        vbox.set_border_width(6)
-
+        paned = gtk.VPaned()
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         model = gtk.ListStore(str, str)
         treeview = gtk.TreeView()
         scrolledwindow.add(treeview)
+        paned.pack1(scrolledwindow, resize=True, shrink=False)
 
         table = gtk.Table(columns=2)
         table.set_row_spacings(6)
         table.set_col_spacings(6)
-
 
         def row_selected(tv, path, tvc):
             p = bzrlib.plugin.all_plugins()[model[path][0]]
@@ -179,11 +190,13 @@ class PreferencesWindow(gtk.Dialog):
         for name in plugin_names:
             model.append([name, getattr(plugins[name], '__file__', None)])
                  
-        vbox.pack_start(scrolledwindow, expand=True, fill=True)
+        scrolledwindow = gtk.ScrolledWindow()
+        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scrolledwindow.add_with_viewport(table)
+        paned.pack2(scrolledwindow, resize=False, shrink=True)
+        paned.show()
 
-        vbox.pack_start(table)
-
-        return vbox
+        return paned
 
     def _create(self):
         self.set_default_size(600, 600)
@@ -198,3 +211,9 @@ class PreferencesWindow(gtk.Dialog):
 
     def close(self, widget=None):
         self.window.destroy()
+
+class BranchPreferencesWindow(gtk.Dialog):
+    """Displays global preferences windows."""
+    def __init__(self, config=None):
+        super(BranchPreferencesWindow, self).__init__(config)
+

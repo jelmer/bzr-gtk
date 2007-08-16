@@ -1,4 +1,4 @@
-# Copyright (C) 2007 Jelmer Vernooij <jelmer@samba.org>
+# Copyright (C) 2007 by Jelmer Vernooij <jelmer@samba.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,26 +14,24 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from unittest import TestLoader, TestSuite
-from bzrlib.tests import TestUtil
+try:
+    import pygtk
+    pygtk.require("2.0")
+except:
+    pass
 
+import bzrlib
+import gtk
 import os
+from bzrlib.plugins.gtk import data_path
 
-def test_suite():
-    result = TestSuite()
-
-    loader = TestUtil.TestLoader()
-
-    testmod_names = [
-        'test_diff',
-        'test_preferences',
-        'test_history',
-        'test_viz'
-        ]
-
-    if os.name == 'nt':
-        testmod_names.append("test_tortoise_bzr")
-
-    result.addTest(loader.loadTestsFromModuleNames(["%s.%s" % (__name__, i) for i in testmod_names]))
-    return result
+class AboutDialog(gtk.AboutDialog):
+    def __init__(self):
+        super(AboutDialog, self).__init__()
+        self.set_name("Bazaar")
+        self.set_version(bzrlib.version_string)
+        self.set_website("http://bazaar-vcs.org/")
+        self.set_license("GNU GPLv2")
+        self.set_icon(gtk.gdk.pixbuf_new_from_file(os.path.join(data_path(), "bzr-icon-64.png")))
+        self.connect ("response", lambda d, r: d.destroy())
 

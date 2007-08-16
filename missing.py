@@ -72,9 +72,3 @@ class MissingWindow(gtk.Dialog):
 
         self.vbox.pack_start(paned, True, True)
         self.vbox.show_all()
-
-    def display(self):
-        self.window.show_all()
-
-    def close(self, widget=None):
-        self.window.destroy()
