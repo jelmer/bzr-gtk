@@ -174,19 +174,23 @@ class BranchWindow(gtk.Window):
                                    gobject.TYPE_PYOBJECT,
                                    str, str, str)
         self.index = {}
-        revids = [revision for revision in \
-                  reversed( \
-                    branch.repository.get_ancestry(branch.last_revision()) \
-                  ) \
-                  if revision is not None]
+        revids = []
+        for (index, revid) in enumerate(reversed( \
+                branch.repository.get_ancestry(branch.last_revision()))):
+            if revid is not None:
+                revids.append(revid)
+                self.index[revid] = index
+            if maxnum is not None and index > maxnum:
+                break
+        
+        
         self.revisions = branch.repository.get_revisions(revids)
         revisionparents = branch.repository.get_graph().get_parents(revids)
         
-            
         
         last_lines = []
-        for (index,(revision, node, lines, parents, children)) in \
-                enumerate(linegraph(self.revisions, revisionparents, maxnum)):
+        for (index,(revision, node, lines, parents, children)) in enumerate( \
+                linegraph(self.revisions, revisionparents, self.index)):
             # FIXME: at this point we should be able to show the graph order
             # and lines with no message or commit data - and then incrementally
             # fill the timestamp, committer etc data as desired.
@@ -200,7 +204,6 @@ class BranchWindow(gtk.Window):
             self.model.append([revision, node, last_lines, lines,
                                parents, children, 
                                message, revision.committer, timestamp])
-            self.index[revision.revision_id] = index
             last_lines = lines
         
         self.set_title(branch.nick + " - bzrk")

@@ -13,7 +13,7 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 from bzrlib.revision import Revision
 from bzrlib.tsort import merge_sort
 
-def linegraph(revisions, revisionparents, maxnum):
+def linegraph(revisions, revisionparents, revindex):
     """Produce a directed graph of a bzr branch.
 
     Returns a list of tuples of (revision, node, lines, parents, children).
@@ -33,6 +33,27 @@ def linegraph(revisions, revisionparents, maxnum):
     curved, kinked, etc.) and to pick the actual colours for each index.
     """
     
+    directparentcache = [None for revision in revisions]
+    def getdirectparent(childindex, childsparents):
+        """Return the revision id of the direct parent
+        
+        The direct parent is the first parent with the same committer"""
+        childrevision = revisions[childindex]
+        directparent = directparentcache[childindex]
+        if directparent is None:
+            for parentrevid in childsparents:
+                parentrevision = revisions[revindex[parentrevid]]
+                if childrevision.committer == parentrevision.committer:
+                    directparent = parentrevid
+                    break
+            #no parents have the same commiter
+            if directparent is None:
+                directparent = ""
+            directparentcache[childindex] = directparent
+        return directparent
+        
+
+    
     #This will hold the lines we have not yet added to lines
     #The position of the item in this list indicates the column, and it
     #it may change if we need to make space for other branches.
@@ -41,6 +62,8 @@ def linegraph(revisions, revisionparents, maxnum):
     activelines = []
     
     linegraph = []
+    
+    lastcolor = 0
     
     for (index, revision) in enumerate(revisions):
         parents = [parent for parent in revisionparents[index]\
@@ -76,7 +99,27 @@ def linegraph(revisions, revisionparents, maxnum):
         if revnodecolumn is None:
             revnodecolumn = 0
         
-        color = 0
+        color = None
+        
+        #Try and see if we are the same "branch" as one of our children
+        #If we are, use the childs color
+        for childrevid in children:
+            childindex = revindex[childrevid]
+            childsparents = revisionparents[childindex]
+            if len(children) == 1 and len(childsparents) == 1: 
+                # one-one relationship between parent and child, same colour
+                #1st [1] selects the node
+                #2nd [1] selects the color
+                color = linegraph[childindex][1][1]
+                break
+            
+            #Is the current revision the direct parent of the child?
+            if revision.revision_id == getdirectparent(childindex, childsparents):
+                color = linegraph[childindex][1][1]
+                break
+        
+        if color is None:
+            color = lastcolor = lastcolor + 1
         
         #We now have every thing (except for the lines) so we can add
         #our tuple to our list.
@@ -135,8 +178,6 @@ def linegraph(revisions, revisionparents, maxnum):
                     #no more columns, so add one to the end
                     activelines.append(line)
                     break
-        if maxnum is not None and index > maxnum:
-            break
 
     return linegraph
 
