@@ -144,44 +144,15 @@ class CellRendererGraph(gtk.GenericCellRenderer):
 
         # Draw lines into the cell
         for start, end, colour in self.in_lines:
-            ctx.move_to(cell_area.x + box_size * start + box_size / 2,
-                        bg_area.y - bg_area.height / 2)
-
-            if start - end > 1:
-                ctx.line_to(cell_area.x + box_size * start, bg_area.y)
-                ctx.line_to(cell_area.x + box_size * end + box_size, bg_area.y)
-            elif start - end < -1:
-                ctx.line_to(cell_area.x + box_size * start + box_size,
-                            bg_area.y)
-                ctx.line_to(cell_area.x + box_size * end, bg_area.y)
-
-            ctx.line_to(cell_area.x + box_size * end + box_size / 2,
-                        bg_area.y + bg_area.height / 2)
-
-            self.set_colour(ctx, colour, 0.0, 0.65)
-            ctx.stroke()
+            self.render_line (ctx, cell_area, box_size,
+                         bg_area.y, bg_area.height,
+                         start, end, colour)
 
         # Draw lines out of the cell
         for start, end, colour in self.out_lines:
-            ctx.move_to(cell_area.x + box_size * start + box_size / 2,
-                        bg_area.y + bg_area.height / 2)
-
-            if start - end > 1:
-                ctx.line_to(cell_area.x + box_size * start,
-                            bg_area.y + bg_area.height)
-                ctx.line_to(cell_area.x + box_size * end + box_size,
-                            bg_area.y + bg_area.height)
-            elif start - end < -1:
-                ctx.line_to(cell_area.x + box_size * start + box_size,
-                            bg_area.y + bg_area.height)
-                ctx.line_to(cell_area.x + box_size * end,
-                            bg_area.y + bg_area.height)
-
-            ctx.line_to(cell_area.x + box_size * end + box_size / 2,
-                        bg_area.y + bg_area.height / 2 + bg_area.height)
-
-            self.set_colour(ctx, colour, 0.0, 0.65)
-            ctx.stroke()
+            self.render_line (ctx, cell_area, box_size,
+                         bg_area.y + bg_area.height, bg_area.height,
+                         start, end, colour)
 
         # Draw the revision node in the right column
         (column, colour) = self.node
@@ -194,3 +165,24 @@ class CellRendererGraph(gtk.GenericCellRenderer):
 
         self.set_colour(ctx, colour, 0.5, 1.0)
         ctx.fill()
+    
+    def render_line (self, ctx, cell_area, box_size, mid, height, start, end, colour):
+        startx = cell_area.x + box_size * start + box_size / 2
+        endx = cell_area.x + box_size * end + box_size / 2
+        
+        ctx.move_to(startx, mid - height / 2)
+        
+        if start - end == 0 :
+            ctx.line_to(endx, mid + height / 2)
+        else:
+            ctx.curve_to(startx, mid - height / 5,
+                         startx, mid - height / 5,
+                         startx + (endx - startx) / 2, mid)
+            
+            ctx.curve_to(endx, mid + height / 5,
+                         endx, mid + height / 5 ,
+                         endx, mid + height / 2)
+            
+        self.set_colour(ctx, colour, 0.0, 0.65)
+        ctx.stroke()
+        
