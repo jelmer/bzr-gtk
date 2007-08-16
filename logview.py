@@ -248,13 +248,13 @@ class LogView(gtk.ScrolledWindow):
         self.tags_label.set_markup("<b>Tags:</b>")
         align.add(self.tags_label)
         align.show()
-        self.table.attach(align, 0, 1, 4, 5, gtk.FILL, gtk.FILL)
+        self.table.attach(align, 0, 1, 5, 6, gtk.FILL, gtk.FILL)
         self.tags_label.show()
 
         align = gtk.Alignment(0.0, 0.5)
         self.tags_list = gtk.VBox()
         align.add(self.tags_list)
-        self.table.attach(align, 1, 2, 4, 5, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.table.attach(align, 1, 2, 5, 6, gtk.EXPAND | gtk.FILL, gtk.FILL)
         align.show()
         self.tags_list.show()
         self.tags_widgets = []
