@@ -58,6 +58,15 @@ class LogView(gtk.ScrolledWindow):
             self.committer.set_text(revision.committer)
         else:
             self.committer.set_text("")
+        author = revision.properties.get('author', '')
+        if author != '':
+            self.author.set_text(author)
+            self.author.show()
+            self.author_label.show()
+        else:
+            self.author.hide()
+            self.author_label.hide()
+
         if revision.timestamp is not None:
             self.timestamp.set_text(format_date(revision.timestamp,
                                                 revision.timezone))
@@ -170,10 +179,27 @@ class LogView(gtk.ScrolledWindow):
         self.revision_id.show()
 
         align = gtk.Alignment(1.0, 0.5)
+        self.author_label = gtk.Label()
+        self.author_label.set_markup("<b>Author:</b>")
+        align.add(self.author_label)
+        self.table.attach(align, 0, 1, 1, 2, gtk.FILL, gtk.FILL)
+        align.show()
+        self.author_label.show()
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.author = gtk.Label()
+        self.author.set_selectable(True)
+        align.add(self.author)
+        self.table.attach(align, 1, 2, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        align.show()
+        self.author.show()
+        self.author.hide()
+
+        align = gtk.Alignment(1.0, 0.5)
         label = gtk.Label()
         label.set_markup("<b>Committer:</b>")
         align.add(label)
-        self.table.attach(align, 0, 1, 1, 2, gtk.FILL, gtk.FILL)
+        self.table.attach(align, 0, 1, 2, 3, gtk.FILL, gtk.FILL)
         align.show()
         label.show()
 
@@ -181,7 +207,7 @@ class LogView(gtk.ScrolledWindow):
         self.committer = gtk.Label()
         self.committer.set_selectable(True)
         align.add(self.committer)
-        self.table.attach(align, 1, 2, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.table.attach(align, 1, 2, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
         align.show()
         self.committer.show()
 
@@ -189,7 +215,7 @@ class LogView(gtk.ScrolledWindow):
         label = gtk.Label()
         label.set_markup("<b>Branch nick:</b>")
         align.add(label)
-        self.table.attach(align, 0, 1, 2, 3, gtk.FILL, gtk.FILL)
+        self.table.attach(align, 0, 1, 3, 4, gtk.FILL, gtk.FILL)
         label.show()
         align.show()
 
@@ -197,7 +223,7 @@ class LogView(gtk.ScrolledWindow):
         self.branchnick_label = gtk.Label()
         self.branchnick_label.set_selectable(True)
         align.add(self.branchnick_label)
-        self.table.attach(align, 1, 2, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.table.attach(align, 1, 2, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
         self.branchnick_label.show()
         align.show()
 
@@ -205,7 +231,7 @@ class LogView(gtk.ScrolledWindow):
         label = gtk.Label()
         label.set_markup("<b>Timestamp:</b>")
         align.add(label)
-        self.table.attach(align, 0, 1, 3, 4, gtk.FILL, gtk.FILL)
+        self.table.attach(align, 0, 1, 4, 5, gtk.FILL, gtk.FILL)
         align.show()
         label.show()
 
@@ -213,7 +239,7 @@ class LogView(gtk.ScrolledWindow):
         self.timestamp = gtk.Label()
         self.timestamp.set_selectable(True)
         align.add(self.timestamp)
-        self.table.attach(align, 1, 2, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.table.attach(align, 1, 2, 4, 5, gtk.EXPAND | gtk.FILL, gtk.FILL)
         align.show()
         self.timestamp.show()
 

@@ -66,7 +66,7 @@ class GAnnotateWindow(gtk.Window):
         self.revision_id = getattr(tree, 'get_revision_id', 
                                    lambda: CURRENT_REVISION)()
         
-        # [revision id, line number, committer, revno, highlight color, line]
+        # [revision id, line number, author, revno, highlight color, line]
         self.annomodel = gtk.ListStore(gobject.TYPE_STRING,
                                        gobject.TYPE_STRING,
                                        gobject.TYPE_STRING,
@@ -84,7 +84,8 @@ class GAnnotateWindow(gtk.Window):
                     revno = committer = ""
                 else:
                     last_seen = revision.revision_id
-                    committer = revision.committer
+                    committer = revision.properties.get('author',
+                        revision.committer)
 
                 if revision.revision_id not in self.revisions:
                     self.revisions[revision.revision_id] = revision
