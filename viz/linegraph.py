@@ -169,10 +169,30 @@ def linegraph(revisions, revisionparents, revindex):
                             #this rev, Move along.
                             column += 1
                         else:
-                            #This column is allready used for a line for
-                            #another rev. Insert this line at this column,
-                            #and in the process, move all the other lines out.
-                            activelines.insert(column, line)
+                            #This column is allready used for a line for another
+                            #rev. Insert her.
+                            
+                            #See if there is a None after us that we could
+                            #move the lines after us into
+                            movetocolumn = None
+                            for i in \
+                                    range(column+1,len(activelines)):
+                                if activelines[i] is None:
+                                    movetocolumn = i
+                                    break
+                            
+                            if movetocolumn is None:
+                                #No None was found. Insert line here
+                                activelines.insert(column, line)
+                            else:
+                                #Move the lines after us out to the None
+                                for movecolumn in \
+                                        reversed(range(column,movetocolumn)):
+                                    activelines[movecolumn+1] = \
+                                        activelines[movecolumn]
+                                #And put line here
+                                activelines[column] = line
+                            
                             break
                 else:
                     #no more columns, so add one to the end
