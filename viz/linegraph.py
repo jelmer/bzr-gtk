@@ -54,12 +54,12 @@ def linegraph(revisions, revisionparents, revindex):
         
 
     
-    #This will hold the lines we have not yet added to lines
-    #The position of the item in this list indicates the column, and it
-    #it may change if we need to make space for other branches.
+    #This will hold the branchlines that we are current tracking.
+    #The position of the branchline in this list indicates the column, and it
+    #it may change if we need to make space for other branchlines.
     #Each typle in the list is in the form (child index, parent revision)
     #A item may be None to indicate that there is no line for a column
-    activelines = []
+    branchlines = []
     
     linegraph = []
     
@@ -71,22 +71,22 @@ def linegraph(revisions, revisionparents, revindex):
         
         revnodecolumn = None
         
-        #This will hold a list of lines whose parent is this rev
-        linesforcurrentrev = []
+        #This will hold a list of branchlines whose parent is this rev
+        branchlinesforrev = []
         
         children = []
         
-        #We should maybe should pop None's at the end of activelines.
+        #We should maybe should pop None's at the end of branchlines.
         #I'm not sure what will cost more: resizing the list, or
         #have this loop ittrate more.
         
         #Find lines that end at this rev
-        for (column, activeline) in enumerate(activelines):
-            if (activeline is not None):
-                (childindex, parentrevid) = activeline
+        for (column, branchline) in enumerate(branchlines):
+            if (branchline is not None):
+                (childindex, parentrevid) = branchline
                 if parentrevid == revision.revision_id:
-                    linesforcurrentrev.append((childindex, parentrevid, column))
-                    activelines[column] = None
+                    branchlinesforrev.append((childindex, parentrevid, column))
+                    branchlines[column] = None
                     children.append(linegraph[childindex][0].revision_id)
                     
                     #The node column for this rev will be the smallest
@@ -126,8 +126,8 @@ def linegraph(revisions, revisionparents, revindex):
         linegraph.append((revision, (revnodecolumn, color),
                           [], parents, children))
         
-        #add all the line bits to the rev that the line passes
-        for (childindex, parentrevid, column) in linesforcurrentrev:
+        #add all the line bits to the rev that the branchline passes
+        for (childindex, parentrevid, column) in branchlinesforrev:
             if index>childindex+1:
                 #out from the child to line
                 linegraph[childindex][2].append(
@@ -156,15 +156,15 @@ def linegraph(revisions, revisionparents, revindex):
                 
         for parentrevid in parents:
             column = revnodecolumn
-            line = (index,parentrevid)
+            branchline = (index,parentrevid)
             while True:
-                if column<len(activelines):
-                    if activelines[column] is None:
+                if column<len(branchlines):
+                    if branchlines[column] is None:
                         #An empty column. Put line here
-                        activelines[column] = line
+                        branchlines[column] = branchline
                         break
                     else:
-                        if activelines[column][0] == index:
+                        if branchlines[column][0] == index:
                             #This column is allready used for a line for
                             #this rev, Move along.
                             column += 1
@@ -176,27 +176,27 @@ def linegraph(revisions, revisionparents, revindex):
                             #move the lines after us into
                             movetocolumn = None
                             for i in \
-                                    range(column+1,len(activelines)):
-                                if activelines[i] is None:
+                                    range(column+1,len(branchlines)):
+                                if branchlines[i] is None:
                                     movetocolumn = i
                                     break
                             
                             if movetocolumn is None:
                                 #No None was found. Insert line here
-                                activelines.insert(column, line)
+                                branchlines.insert(column, branchline)
                             else:
                                 #Move the lines after us out to the None
                                 for movecolumn in \
                                         reversed(range(column,movetocolumn)):
-                                    activelines[movecolumn+1] = \
-                                        activelines[movecolumn]
+                                    branchlines[movecolumn+1] = \
+                                        branchlines[movecolumn]
                                 #And put line here
-                                activelines[column] = line
+                                branchlines[column] = branchline
                             
                             break
                 else:
                     #no more columns, so add one to the end
-                    activelines.append(line)
+                    branchlines.append(branchline)
                     break
 
     return linegraph
