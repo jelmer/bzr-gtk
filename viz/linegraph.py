@@ -196,25 +196,15 @@ def linegraph(revisions, revisionparents, revindex):
                                 "lines": [(childindex,index)],
                                 "maxindex": index})
         
-        finished_cols = []
         for (columnindex, column) in enumerate(columns):
-            if column is not None and \
-                    (column["maxindex"] <= index or columnindex==0):
-                finished_cols.append((columnindex, column))
-        
-        for (columnindex, column) in finished_cols:
-            if column is not None:
+            if column is not None and column["maxindex"] <= index:
                 for nodeindex in column["nodeindexes"]:
                     linegraph[nodeindex][1] = (columnindex,
                                                branchlineids[nodeindex])
             
-            for (childindex, parentindex) in column["lines"]:
-                notdrawnlines.append((columnindex, childindex, parentindex))
-            
-            if columnindex == 0:
-                columns[columnindex]["nodeindexes"] = []
-                columns[columnindex]["lines"] = []
-            else:
+                for (childindex, parentindex) in column["lines"]:
+                    notdrawnlines.append((columnindex, childindex, parentindex))
+                
                 columns[columnindex] = None
         
         for (lineindex,(columnindex, childindex, parentindex))\
