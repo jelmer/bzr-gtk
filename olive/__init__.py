@@ -66,6 +66,7 @@ def about():
 
     # Set version
     dialog.set_version(__version__)
+    dialog.set_artists(["Simon Pascal Klein"])
 
     dialog.run()
     # Destroy the dialog
