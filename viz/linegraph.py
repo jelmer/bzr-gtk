@@ -51,166 +51,187 @@ def linegraph(revisions, revisionparents, revindex):
                 directparent = ""
             directparentcache[childindex] = directparent
         return directparent
-        
+    
+    def find_column_from_branchlineid(branchlineid):
+        for index, column in enumerate(columns):
+            if column is not None and column["branchlineid"] == branchlineid:
+                return (index, column)
+        return (None, None)
+    
+    def find_finished_child_column(index, children):
+        for childrevid in children:
+            childbranchlineid = branchlineids[revindex[childrevid]]
+            (columnindex, column) = \
+                find_column_from_branchlineid(childbranchlineid)
+            if column is not None and column["maxindex"] <= index:
+                return (columnindex, column)
+        return (None, None)
+    
+    def has_no_nodes_between (column, startindex, endindex):
+        for nodeindex in column["nodeindexes"]:
+            if nodeindex > startindex and nodeindex < endindex:
+                return False
+        return True
+    
+    def append_line (column , startindex, endindex):
+        column["lines"].append((startindex,endindex))
+        if endindex > column["maxindex"] :
+            column["maxindex"] = endindex
 
     
-    #This will hold the branchlines that we are current tracking.
-    #The position of the branchline in this list indicates the column, and it
-    #it may change if we need to make space for other branchlines.
-    #Each typle in the list is in the form (child index, parent revision)
-    #A item may be None to indicate that there is no line for a column
-    branchlines = []
+    # This will hold what we plan to put in each column.
+    # The position of the item in this list indicates the column, and it
+    # it may change if we need to make space for other things.
+    # Each typle in the list is in the form:
+    # (branchlineid, nodeindexes, lines, maxindex)
+    # A item may be None to indicate that there is nothing in the column
+    columns = []
     
     linegraph = []
     
-    lastcolour = 0
+    lastbranchlineid = 0
+    branchlineids = []
+    revisionchildren = [[] for revision in revisions]
     
     for (index, revision) in enumerate(revisions):
-        parents = [parent for parent in revisionparents[index]\
+        parents = [parent for parent in revisionparents[index] \
                    if parent!="null:"]
+        for parentrevid in parents:
+            if parentrevid in revindex:
+                revisionchildren[revindex[parentrevid]]\
+                    .append(revision.revision_id)
         
-        revnodecolumn = None
+        children = revisionchildren[index]
+        linegraph.append([revision, None,
+                          [], parents, children])
         
-        #This will hold a list of branchlines whose parent is this rev
-        branchlinesforrev = []
-        
-        children = []
-        
-        #We should maybe should pop None's at the end of branchlines.
-        #I'm not sure what will cost more: resizing the list, or
-        #have this loop ittrate more.
-        
-        #Find lines that end at this rev
-        for (column, branchline) in enumerate(branchlines):
-            if (branchline is not None):
-                (childindex, parentrevid) = branchline
-                if parentrevid == revision.revision_id:
-                    branchlinesforrev.append((childindex, parentrevid, column))
-                    branchlines[column] = None
-                    children.append(linegraph[childindex][0].revision_id)
-                    
-                    #The node column for this rev will be the smallest
-                    #column for the lines that end at this rev
-                    #The smallest column is the first one we get to.
-                    if revnodecolumn is None:
-                        revnodecolumn = column
-        
-        #This will happen for the latest revision
-        if revnodecolumn is None:
-            revnodecolumn = 0
-        
-        colour = None
-        childcolours = []
-        
-        #Try and see if we are the same "branch" as one of our children
-        #If we are, use the childs colour
-        for childrevid in children:
+        branchlineid = None
+        #Try and see if we are the same branchline as one of our children
+        #If we are, use the same branchlineid
+        for childrevid in children: 
             childindex = revindex[childrevid]
             childsparents = revisionparents[childindex]
-            childcolour = linegraph[childindex][1][1]
-            childcolours.append(childcolour)
+            childbranchlineid = branchlineids[childindex]
             
             if len(children) == 1 and len(childsparents) == 1: 
-                # one-one relationship between parent and child, same colour
-                #1st [1] selects the node
-                #2nd [1] selects the colour
-                colour = childcolour
+                # one-one relationship between parent and child
+                branchlineid = childbranchlineid
                 break
             
             #Is the current revision the direct parent of the child?
             if revision.revision_id == \
                     getdirectparent(childindex, childsparents):
-                colour = childcolour
+                branchlineid = childbranchlineid
                 break
         
-        if colour is None:
-            # 6 is the len of the colourwheel in graphcell
-            if len(children)<6:
-                while (colour is None or colour in childcolours):
-                    colour = lastcolour = (lastcolour + 1) % 6
+        if branchlineid is None:
+            branchlineid = lastbranchlineid = lastbranchlineid + 1
+        
+        branchlineids.append(branchlineid)
+        
+        (columnindex, column) = find_column_from_branchlineid(branchlineid)
+        
+        if columnindex is None:
+            (columnindex, column) = find_finished_child_column(index, children)
+
+        
+        if columnindex is None:
+            columnindex = len(columns)
+            column = {"branchlineid": branchlineid,
+                      "nodeindexes": [index],
+                      "lines": [],
+                      "maxindex": index}
+            columns.append(column)
+        else:
+            column["branchlineid"] = branchlineid
+            column["nodeindexes"].append(index)
+        
+        opentillparent = getdirectparent(index, parents)
+        if opentillparent == "":
+            if len(parents)>0:
+                opentillparent = parents[0]
             else:
-                #If this is getting hit, we should increase the size of the
-                #colourwheel
-                colour = lastcolour = (lastcolour + 1) % 6
+                opentillparent = None
+        
+        if opentillparent is not None and opentillparent in revindex:
+            parentindex = revindex[opentillparent]
+            if parentindex > column["maxindex"]:
+                column["maxindex"] = parentindex
+        
+        for childrevid in children:
+            childindex = revindex[childrevid]
+            childbranchlineid = branchlineids[childindex]
+            (childcolumnindex, childcolumn) = \
+                find_column_from_branchlineid(childbranchlineid)
             
-        
-        #We now have every thing (except for the lines) so we can add
-        #our tuple to our list.
-        linegraph.append((revision, (revnodecolumn, colour),
-                          [], parents, children))
-        
-        #add all the line bits to the rev that the branchline passes
-        for (childindex, parentrevid, column) in branchlinesforrev:
-            if index>childindex+1:
-                #out from the child to line
-                linegraph[childindex][2].append(
-                    (linegraph[childindex][1][0], #the column of the child
-                     column,                      #the column of the line
-                     colour))
-                
-                #down the line
-                for linepartindex in range(childindex+1, index-1):
-                    linegraph[linepartindex][2].append(
-                        (column,                  #the column of the line
-                         column,                  #the column of the line
-                         colour))
-                
-                #in to the parent
-                linegraph[index-1][2].append(
-                    (column,                      #the column of the line
-                     revnodecolumn,               #the column of the parent
-                     colour))
+            if index-childindex == 1 or childcolumnindex is None:
+                append_line(column,childindex,index)
+            elif childcolumnindex >= columnindex and \
+                    has_no_nodes_between(childcolumn, childindex, index):
+                append_line(childcolumn,childindex,index)
+            elif childcolumnindex > columnindex and \
+                    has_no_nodes_between(column, childindex, index):
+                append_line(column,childindex,index)
+            elif childcolumnindex < columnindex and \
+                    has_no_nodes_between(column, childindex, index):
+                append_line(column,childindex,index)
+            elif childcolumnindex < columnindex and \
+                    has_no_nodes_between(childcolumn, childindex, index):
+                append_line(childcolumn,childindex,index)
             else:
-                #child to parent
-                linegraph[childindex][2].append(
-                    (linegraph[childindex][1][0], #the column of the child
-                     revnodecolumn,               #the column of the parent
-                     colour))
-                
-        for parentrevid in parents:
-            column = revnodecolumn
-            branchline = (index,parentrevid)
-            while True:
-                if column<len(branchlines):
-                    if branchlines[column] is None:
-                        #An empty column. Put line here
-                        branchlines[column] = branchline
-                        break
+                columns.append({"branchlineid": None,
+                                "nodeindexes": [],
+                                "lines": [(childindex,index)],
+                                "maxindex": index})
+        
+        num_of_unfinished_cols = 0
+        for (columnindex, column) in enumerate(columns):
+            if column is not None and column["maxindex"] > index:
+                num_of_unfinished_cols += 1
+        
+        if num_of_unfinished_cols == 1:
+            for (columnindex, column) in enumerate(columns):
+                if column is not None:
+                    for nodeindex in column["nodeindexes"]:
+                        linegraph[nodeindex][1] = (columnindex,
+                                                   branchlineids[nodeindex])
+
+            for (columnindex, column) in enumerate(columns):
+                for (childindex, parentindex) in column["lines"]:
+                    childnode = linegraph[childindex][1]
+                    parentnode = linegraph[parentindex][1]
+                    if parentindex>childindex+1:
+                        #out from the child to line
+                        linegraph[childindex][2].append(
+                            (childnode[0],    #the column of the child
+                             columnindex,     #the column of the line
+                             parentnode[1]))
+                        
+                        #down the line
+                        for linepartindex in range(childindex+1, parentindex-1):
+                            linegraph[linepartindex][2].append(
+                                (columnindex, #the column of the line
+                                 columnindex, #the column of the line
+                                 parentnode[1]))
+                        
+                        #in to the parent
+                        linegraph[parentindex-1][2].append(
+                            (columnindex,     #the column of the line
+                             parentnode[0],   #the column of the parent
+                             parentnode[1]))
                     else:
-                        if branchlines[column][0] == index:
-                            #This column is allready used for a line for
-                            #this rev, Move along.
-                            column += 1
-                        else:
-                            #This column is allready used for a line for another
-                            #rev. Insert her.
-                            
-                            #See if there is a None after us that we could
-                            #move the lines after us into
-                            movetocolumn = None
-                            for i in \
-                                    range(column+1,len(branchlines)):
-                                if branchlines[i] is None:
-                                    movetocolumn = i
-                                    break
-                            
-                            if movetocolumn is None:
-                                #No None was found. Insert line here
-                                branchlines.insert(column, branchline)
-                            else:
-                                #Move the lines after us out to the None
-                                for movecolumn in \
-                                        reversed(range(column,movetocolumn)):
-                                    branchlines[movecolumn+1] = \
-                                        branchlines[movecolumn]
-                                #And put line here
-                                branchlines[column] = branchline
-                            
-                            break
+                        #child to parent
+                        linegraph[childindex][2].append(
+                            (childnode[0],    #the column of the child
+                             parentnode[0],   #the column of the parent
+                             parentnode[1]))
+                
+                if column["maxindex"] <= index:
+                    columns[columnindex] = None
                 else:
-                    #no more columns, so add one to the end
-                    branchlines.append(branchline)
-                    break
+                    columns[columnindex]["nodeindexes"] = []
+                    columns[columnindex]["lines"] = []
+            columns = [column for column in columns if column is not None]            
 
     return linegraph
 
