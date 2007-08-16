@@ -63,7 +63,7 @@ def linegraph(revisions, revisionparents, revindex):
     
     linegraph = []
     
-    lastcolor = 0
+    lastcolour = 0
     
     for (index, revision) in enumerate(revisions):
         parents = [parent for parent in revisionparents[index]\
@@ -99,31 +99,44 @@ def linegraph(revisions, revisionparents, revindex):
         if revnodecolumn is None:
             revnodecolumn = 0
         
-        color = None
+        colour = None
+        childcolours = []
         
         #Try and see if we are the same "branch" as one of our children
-        #If we are, use the childs color
+        #If we are, use the childs colour
         for childrevid in children:
             childindex = revindex[childrevid]
             childsparents = revisionparents[childindex]
+            childcolour = linegraph[childindex][1][1]
+            childcolours.append(childcolour)
+            
             if len(children) == 1 and len(childsparents) == 1: 
                 # one-one relationship between parent and child, same colour
                 #1st [1] selects the node
-                #2nd [1] selects the color
-                color = linegraph[childindex][1][1]
+                #2nd [1] selects the colour
+                colour = childcolour
                 break
             
             #Is the current revision the direct parent of the child?
-            if revision.revision_id == getdirectparent(childindex, childsparents):
-                color = linegraph[childindex][1][1]
+            if revision.revision_id == \
+                    getdirectparent(childindex, childsparents):
+                colour = childcolour
                 break
         
-        if color is None:
-            color = lastcolor = lastcolor + 1
+        if colour is None:
+            # 6 is the len of the colourwheel in graphcell
+            if len(children)<6:
+                while (colour is None or colour in childcolours):
+                    colour = lastcolour = (lastcolour + 1) % 6
+            else:
+                #If this is getting hit, we should increase the size of the
+                #colourwheel
+                colour = lastcolour = (lastcolour + 1) % 6
+            
         
         #We now have every thing (except for the lines) so we can add
         #our tuple to our list.
-        linegraph.append((revision, (revnodecolumn, color),
+        linegraph.append((revision, (revnodecolumn, colour),
                           [], parents, children))
         
         #add all the line bits to the rev that the branchline passes
@@ -133,26 +146,26 @@ def linegraph(revisions, revisionparents, revindex):
                 linegraph[childindex][2].append(
                     (linegraph[childindex][1][0], #the column of the child
                      column,                      #the column of the line
-                     color))
+                     colour))
                 
                 #down the line
                 for linepartindex in range(childindex+1, index-1):
                     linegraph[linepartindex][2].append(
                         (column,                  #the column of the line
                          column,                  #the column of the line
-                         color))
+                         colour))
                 
                 #in to the parent
                 linegraph[index-1][2].append(
                     (column,                      #the column of the line
                      revnodecolumn,               #the column of the parent
-                     color))
+                     colour))
             else:
                 #child to parent
                 linegraph[childindex][2].append(
                     (linegraph[childindex][1][0], #the column of the child
                      revnodecolumn,               #the column of the parent
-                     color))
+                     colour))
                 
         for parentrevid in parents:
             column = revnodecolumn
