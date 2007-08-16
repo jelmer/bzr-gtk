@@ -42,10 +42,11 @@ def linegraph(revisions, revisionparents, revindex):
         directparent = directparentcache[childindex]
         if directparent is None:
             for parentrevid in childsparents:
-                parentrevision = revisions[revindex[parentrevid]]
-                if childrevision.committer == parentrevision.committer:
-                    directparent = parentrevid
-                    break
+                if parentrevid in revindex:
+                    parentrevision = revisions[revindex[parentrevid]]
+                    if childrevision.committer == parentrevision.committer:
+                        directparent = parentrevid
+                        break
             #no parents have the same commiter
             if directparent is None:
                 directparent = ""
@@ -77,7 +78,18 @@ def linegraph(revisions, revisionparents, revindex):
         column["lines"].append((startindex,endindex))
         if endindex > column["maxindex"] :
             column["maxindex"] = endindex
-
+    
+    def append_column (column):
+        columnindex = None
+        for (i, c) in enumerate(columns):
+            if c is None:
+                columnindex = i
+                columns[columnindex] = column
+                break
+        if columnindex is None:
+            columnindex = len(columns)
+            columns.append(column)
+        return columnindex
     
     # This will hold what we plan to put in each column.
     # The position of the item in this list indicates the column, and it
@@ -92,6 +104,7 @@ def linegraph(revisions, revisionparents, revindex):
     lastbranchlineid = 0
     branchlineids = []
     revisionchildren = [[] for revision in revisions]
+    notdrawnlines = []
     
     for (index, revision) in enumerate(revisions):
         parents = [parent for parent in revisionparents[index] \
@@ -136,12 +149,11 @@ def linegraph(revisions, revisionparents, revindex):
 
         
         if columnindex is None:
-            columnindex = len(columns)
             column = {"branchlineid": branchlineid,
                       "nodeindexes": [index],
                       "lines": [],
                       "maxindex": index}
-            columns.append(column)
+            columnindex = append_column(column)
         else:
             column["branchlineid"] = branchlineid
             column["nodeindexes"].append(index)
@@ -179,59 +191,67 @@ def linegraph(revisions, revisionparents, revindex):
                     has_no_nodes_between(childcolumn, childindex, index):
                 append_line(childcolumn,childindex,index)
             else:
-                columns.append({"branchlineid": None,
+                append_column({"branchlineid": None,
                                 "nodeindexes": [],
                                 "lines": [(childindex,index)],
                                 "maxindex": index})
         
-        num_of_unfinished_cols = 0
+        finished_cols = []
         for (columnindex, column) in enumerate(columns):
-            if column is not None and column["maxindex"] > index:
-                num_of_unfinished_cols += 1
+            if column is not None and \
+                    (column["maxindex"] <= index or columnindex==0):
+                finished_cols.append((columnindex, column))
         
-        if num_of_unfinished_cols == 1:
-            for (columnindex, column) in enumerate(columns):
-                if column is not None:
-                    for nodeindex in column["nodeindexes"]:
-                        linegraph[nodeindex][1] = (columnindex,
-                                                   branchlineids[nodeindex])
-
-            for (columnindex, column) in enumerate(columns):
-                for (childindex, parentindex) in column["lines"]:
-                    childnode = linegraph[childindex][1]
-                    parentnode = linegraph[parentindex][1]
-                    if parentindex>childindex+1:
-                        #out from the child to line
-                        linegraph[childindex][2].append(
-                            (childnode[0],    #the column of the child
-                             columnindex,     #the column of the line
+        for (columnindex, column) in finished_cols:
+            if column is not None:
+                for nodeindex in column["nodeindexes"]:
+                    linegraph[nodeindex][1] = (columnindex,
+                                               branchlineids[nodeindex])
+            
+            for (childindex, parentindex) in column["lines"]:
+                notdrawnlines.append((columnindex, childindex, parentindex))
+            
+            if columnindex == 0:
+                columns[columnindex]["nodeindexes"] = []
+                columns[columnindex]["lines"] = []
+            else:
+                columns[columnindex] = None
+        
+        for (lineindex,(columnindex, childindex, parentindex))\
+                in enumerate(notdrawnlines):
+            
+            childnode = linegraph[childindex][1]
+            parentnode = linegraph[parentindex][1]
+            if childnode is not None and parentnode is not None:
+                notdrawnlines[lineindex] = None
+                if parentindex>childindex+1:
+                    #out from the child to line
+                    linegraph[childindex][2].append(
+                        (childnode[0],    #the column of the child
+                         columnindex,     #the column of the line
+                         parentnode[1]))
+                    
+                    #down the line
+                    for linepartindex in range(childindex+1, parentindex-1):
+                        linegraph[linepartindex][2].append(
+                            (columnindex, #the column of the line
+                             columnindex, #the column of the line
                              parentnode[1]))
-                        
-                        #down the line
-                        for linepartindex in range(childindex+1, parentindex-1):
-                            linegraph[linepartindex][2].append(
-                                (columnindex, #the column of the line
-                                 columnindex, #the column of the line
-                                 parentnode[1]))
-                        
-                        #in to the parent
-                        linegraph[parentindex-1][2].append(
-                            (columnindex,     #the column of the line
-                             parentnode[0],   #the column of the parent
-                             parentnode[1]))
-                    else:
-                        #child to parent
-                        linegraph[childindex][2].append(
-                            (childnode[0],    #the column of the child
-                             parentnode[0],   #the column of the parent
-                             parentnode[1]))
-                
-                if column["maxindex"] <= index:
-                    columns[columnindex] = None
+                    
+                    #in to the parent
+                    linegraph[parentindex-1][2].append(
+                        (columnindex,     #the column of the line
+                         parentnode[0],   #the column of the parent
+                         parentnode[1]))
                 else:
-                    columns[columnindex]["nodeindexes"] = []
-                    columns[columnindex]["lines"] = []
-            columns = [column for column in columns if column is not None]            
+                    #child to parent
+                    linegraph[childindex][2].append(
+                        (childnode[0],    #the column of the child
+                         parentnode[0],   #the column of the parent
+                         parentnode[1]))
+        
+        notdrawnlines = [line for line in notdrawnlines if line is not None]
+        
 
     return linegraph
 
