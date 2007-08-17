@@ -78,15 +78,6 @@ def linegraph(revisions, revisionparents, revindex):
                 return (index, column)
         return (None, None)
     
-    def find_finished_child_column(index, children):
-        for childrevid in children:
-            childbranchlineid = branchlineids[revindex[childrevid]]
-            (columnindex, column) = \
-                find_column_from_branchlineid(childbranchlineid)
-            if column is not None and column["maxindex"] <= index:
-                return (columnindex, column)
-        return (None, None)
-    
     def has_no_nodes_between (column, startindex, endindex):
         for nodeindex in column["nodeindexes"]:
             if nodeindex > startindex and nodeindex < endindex:
@@ -135,16 +126,23 @@ def linegraph(revisions, revisionparents, revindex):
                     .append(revision.revision_id)
         
         children = revisionchildren[index]
+        
+        #We use childrevid, childindex, childbranchlineid often, so cache it
+        children_ext = []
+        for childrevid in children:
+            childindex = revindex[childrevid]
+            children_ext.append((childrevid,
+                                 childindex,
+                                 branchlineids[childindex]))
+        
         linegraph.append([revision, None,
                           [], parents, children])
         
         branchlineid = None
         #Try and see if we are the same branchline as one of our children
         #If we are, use the same branchlineid
-        for childrevid in children: 
-            childindex = revindex[childrevid]
+        for (childrevid, childindex, childbranchlineid) in children_ext: 
             childsparents = revisionparents[childindex]
-            childbranchlineid = branchlineids[childindex]
             
             if len(children) == 1 and len(childsparents) == 1: 
                 # one-one relationship between parent and child
@@ -165,7 +163,12 @@ def linegraph(revisions, revisionparents, revindex):
         (columnindex, column) = find_column_from_branchlineid(branchlineid)
         
         if columnindex is None:
-            (columnindex, column) = find_finished_child_column(index, children)
+            for (childrevid, childindex, childbranchlineid) in children_ext:
+                (i, c) = find_column_from_branchlineid(childbranchlineid)
+                if c is not None and c["maxindex"] <= index:
+                    (columnindex, column) = (i, c)
+                    break
+    
 
         
         if columnindex is None:
@@ -196,9 +199,7 @@ def linegraph(revisions, revisionparents, revindex):
             if parentindex > column["maxindex"]:
                 column["maxindex"] = parentindex
         
-        for childrevid in children:
-            childindex = revindex[childrevid]
-            childbranchlineid = branchlineids[childindex]
+        for (childrevid, childindex, childbranchlineid) in children_ext: 
             (childcolumnindex, childcolumn) = \
                 find_column_from_branchlineid(childbranchlineid)
             
