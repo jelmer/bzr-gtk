@@ -79,10 +79,11 @@ def linegraph(revisions, revisionparents, revindex):
         if endindex > column["maxindex"] :
             column["maxindex"] = endindex
     
-    def append_column (column):
+    def append_column (column, minindex):
         columnindex = None
         for (i, c) in enumerate(columns):
-            if c is None:
+            if c is None or (c["branchlineid"] == "finished" \
+                             and c["maxindex"] <= minindex):
                 columnindex = i
                 columns[columnindex] = column
                 break
@@ -149,11 +150,17 @@ def linegraph(revisions, revisionparents, revindex):
 
         
         if columnindex is None:
+            minindex = index
+            for childrevid in children:
+                childindex = revindex[childrevid]
+                if childindex<minindex:
+                    minindex = childindex
+            
             column = {"branchlineid": branchlineid,
                       "nodeindexes": [index],
                       "lines": [],
                       "maxindex": index}
-            columnindex = append_column(column)
+            columnindex = append_column(column, minindex)
         else:
             column["branchlineid"] = branchlineid
             column["nodeindexes"].append(index)
@@ -191,13 +198,14 @@ def linegraph(revisions, revisionparents, revindex):
                     has_no_nodes_between(childcolumn, childindex, index):
                 append_line(childcolumn,childindex,index)
             else:
-                append_column({"branchlineid": None,
+                append_column({"branchlineid": "line",
                                 "nodeindexes": [],
                                 "lines": [(childindex,index)],
-                                "maxindex": index})
+                                "maxindex": index}, childindex)
         
         for (columnindex, column) in enumerate(columns):
-            if column is not None and column["maxindex"] <= index:
+            if column is not None and column["maxindex"] <= index \
+                    and column["branchlineid"] != "finished":
                 for nodeindex in column["nodeindexes"]:
                     linegraph[nodeindex][1] = (columnindex,
                                                branchlineids[nodeindex])
@@ -205,7 +213,9 @@ def linegraph(revisions, revisionparents, revindex):
                 for (childindex, parentindex) in column["lines"]:
                     notdrawnlines.append((columnindex, childindex, parentindex))
                 
-                columns[columnindex] = None
+                column["branchlineid"] = "finished"
+                column["nodeindexes"] = []
+                column["lines"] = []
         
         for (lineindex,(columnindex, childindex, parentindex))\
                 in enumerate(notdrawnlines):
