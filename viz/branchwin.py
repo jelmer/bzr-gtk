@@ -176,7 +176,7 @@ class BranchWindow(gtk.Window):
         self.index = {}
         revids = []
         for (index, revid) in enumerate(reversed( \
-                branch.repository.get_ancestry(branch.last_revision()))):
+                branch.repository.get_ancestry(start))):
             if revid is not None:
                 revids.append(revid)
                 self.index[revid] = index
