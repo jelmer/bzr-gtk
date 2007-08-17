@@ -34,7 +34,7 @@ def linegraph(revisions, revisionparents, revindex):
     """
     
     directparentcache = [None for revision in revisions]
-    def getdirectparent(childindex, childsparents):
+    def getdirectparent(childrevid, childindex, childsparents):
         """Return the revision id of the direct parent
         
         The direct parent is the first parent with the same committer"""
@@ -43,10 +43,29 @@ def linegraph(revisions, revisionparents, revindex):
         if directparent is None:
             for parentrevid in childsparents:
                 if parentrevid in revindex:
-                    parentrevision = revisions[revindex[parentrevid]]
+                    parentindex = revindex[parentrevid]
+                    parentrevision = revisions[parentindex]
                     if childrevision.committer == parentrevision.committer:
-                        directparent = parentrevid
-                        break
+                        # This may be a direct parent, but first check that
+                        # for this parent, there are no other children, who are
+                        # before us in the children list, for which this parent
+                        # is also the direct parent.
+                        # pc in all the below var name stands for parents child
+                        first = True
+                        for pcrevid in revisionchildren[parentindex]:
+                            if pcrevid == childrevid:
+                                break
+                            pcindex = revindex[pcrevid]
+                            pcdirectparent = getdirectparent(pcrevid,
+                                                    pcindex,
+                                                    revisionchildren[pcindex])
+                            if pcdirectparent==parentrevid:
+                                first = False
+                                break
+                        
+                        if first:
+                            directparent = parentrevid
+                            break
             #no parents have the same commiter
             if directparent is None:
                 directparent = ""
@@ -134,7 +153,7 @@ def linegraph(revisions, revisionparents, revindex):
             
             #Is the current revision the direct parent of the child?
             if revision.revision_id == \
-                    getdirectparent(childindex, childsparents):
+                    getdirectparent(childrevid, childindex, childsparents):
                 branchlineid = childbranchlineid
                 break
         
@@ -165,7 +184,7 @@ def linegraph(revisions, revisionparents, revindex):
             column["branchlineid"] = branchlineid
             column["nodeindexes"].append(index)
         
-        opentillparent = getdirectparent(index, parents)
+        opentillparent = getdirectparent(revision.revision_id, index, parents)
         if opentillparent == "":
             if len(parents)>0:
                 opentillparent = parents[0]
