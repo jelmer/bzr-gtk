@@ -10,10 +10,17 @@
 															Korniak, Jelmer)
 
   * Add remove and delete menu item in Olive. (#127392, Mateusz Korniak)
+  
+  * New Olive application icon. (Simon Pascal Klein)
 
  UI
   
   * Improve Preferences dialog layout. (Jelmer)
+ 
+ INTERNALS:
+ 
+  * Updated pot generator script and regenerated the translation template.
+    (Szilveszter)
 
 0.18.0  2007-07-17
 
