@@ -10,9 +10,6 @@ __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 
-from bzrlib.revision import Revision
-from bzrlib.tsort import merge_sort
-
 def linegraph(revisions, revisionparents, revindex):
     """Produce a directed graph of a bzr branch.
 
