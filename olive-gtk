@@ -18,6 +18,7 @@
 
 import os
 import sys
+import re
 
 try:
     version_info = sys.version_info
@@ -75,11 +76,9 @@ except ImportError:
         print >>sys.stderr, "bzr not found"
         sys.exit(1)
     else:
-        for i in s.splitlines():
-            if i.startswith("Using bzrlib: "):
-                path = os.path.split(i[14:])[0]
-                sys.path.append(path)
-                break
+        bzrlib_match = re.compile(r"bzrlib: (.*)[/\\]bzrlib").search(s)
+        if bzrlib_match:
+            sys.path.append(bzrlib_match.group(1))
         else:
             print >>sys.stderr, "Can't find bzrlib location"
             sys.exit(1)

@@ -190,7 +190,7 @@
                         <child internal-child="image">
                           <widget class="GtkImage" id="image243">
                             <property name="visible">True</property>
-                            <property name="pixbuf">pull16.png</property>
+                            <property name="pixbuf">icons/pull16.png</property>
                           </widget>
                         </child>
                       </widget>
@@ -204,7 +204,7 @@
                         <child internal-child="image">
                           <widget class="GtkImage" id="image244">
                             <property name="visible">True</property>
-                            <property name="pixbuf">push16.png</property>
+                            <property name="pixbuf">icons/push16.png</property>
                           </widget>
                         </child>
                       </widget>
@@ -239,7 +239,7 @@
                         <child internal-child="image">
                           <widget class="GtkImage" id="image245">
                             <property name="visible">True</property>
-                            <property name="pixbuf">commit16.png</property>
+                            <property name="pixbuf">icons/commit16.png</property>
                           </widget>
                         </child>
                       </widget>
@@ -301,7 +301,7 @@
                         <child internal-child="image">
                           <widget class="GtkImage" id="image246">
                             <property name="visible">True</property>
-                            <property name="pixbuf">diff16.png</property>
+                            <property name="pixbuf">icons/diff16.png</property>
                           </widget>
                         </child>
                       </widget>
@@ -315,7 +315,7 @@
                         <child internal-child="image">
                           <widget class="GtkImage" id="image247">
                             <property name="visible">True</property>
-                            <property name="pixbuf">log16.png</property>
+                            <property name="pixbuf">icons/log16.png</property>
                           </widget>
                         </child>
                       </widget>
