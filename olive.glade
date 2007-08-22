@@ -129,6 +129,14 @@
                       </widget>
                     </child>
                     <child>
+                      <widget class="GtkCheckMenuItem" id="menuitem_view_show_ignored_files">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Show _ignored files</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_menuitem_view_show_ignored_files_activate"/>
+                      </widget>
+                    </child>
+                    <child>
                       <widget class="GtkSeparatorMenuItem" id="separator_view1">
                         <property name="visible">True</property>
                       </widget>

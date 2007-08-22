@@ -2,6 +2,8 @@
 
  FEATURES
 
+  * Add ability to hide ignored files (#134121, Tom Badran)
+
   * Show tags in bzr viz. (Jelmer)
 
   * Handle large files correctly in Olive. (#127392, Mateusz Korniak)
