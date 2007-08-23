@@ -59,7 +59,7 @@ def check_bzrlib_version(desired):
         from bzrlib.errors import BzrError
         warning('Installed bzr version %s is too old to be used with bzr-gtk'
                 ' %s.' % (bzrlib.__version__, __version__))
-        raise BzrError('Version mismatch: %r' % version_info)
+        raise BzrError('Version mismatch: %r' % (version_info,) )
     else:
         warning('bzr-gtk is not up to date with installed bzr version %s.'
                 ' \nThere should be a newer version available, e.g. %i.%i.' 
