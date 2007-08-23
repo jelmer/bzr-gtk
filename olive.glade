@@ -212,7 +212,7 @@
                         <child internal-child="image">
                           <widget class="GtkImage" id="image244">
                             <property name="visible">True</property>
-                            <property name="pixbuf">push16.png</property>
+                            <property name="pixbuf">icons/push16.png</property>
                           </widget>
                         </child>
                       </widget>
