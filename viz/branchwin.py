@@ -164,7 +164,7 @@ class BranchWindow(gtk.Window):
         treeview itself.
         """
         self.branch = branch
-        
+
         # [ revision, node, last_lines, lines, message, committer, timestamp ]
         self.model = gtk.ListStore(gobject.TYPE_PYOBJECT,
                                    gobject.TYPE_PYOBJECT,
@@ -174,9 +174,13 @@ class BranchWindow(gtk.Window):
                                    gobject.TYPE_PYOBJECT,
                                    str, str, str)
         self.index = {}
+        self.set_title(branch.nick + " - bzrk")
+        gobject.idle_add(self.populate_model, start, maxnum)
+
+    def populate_model(self, start, maxnum):
         revids = []
         for (index, revid) in enumerate(reversed( \
-                branch.repository.get_ancestry(start))):
+                self.branch.repository.get_ancestry(start))):
             if revid is not None:
                 revids.append(revid)
                 self.index[revid] = index
@@ -184,8 +188,8 @@ class BranchWindow(gtk.Window):
                 break
         
         
-        self.revisions = branch.repository.get_revisions(revids)
-        revisionparents = branch.repository.get_graph().get_parents(revids)
+        self.revisions = self.branch.repository.get_revisions(revids)
+        revisionparents = self.branch.repository.get_graph().get_parents(revids)
         
         
         last_lines = []
@@ -205,9 +209,8 @@ class BranchWindow(gtk.Window):
                                parents, children, 
                                message, revision.committer, timestamp])
             last_lines = lines
-        
-        self.set_title(branch.nick + " - bzrk")
         self.treeview.set_model(self.model)
+
     def _treeview_cursor_cb(self, *args):
         """Callback for when the treeview cursor changes."""
         (path, col) = self.treeview.get_cursor()
@@ -303,6 +306,3 @@ class BranchWindow(gtk.Window):
         parent_id = self.parent_ids[revision][0]
         self.show_diff(self.branch, revision.revision_id, parent_id)
         self.treeview.grab_focus()
-
-
-
