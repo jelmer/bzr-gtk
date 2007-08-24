@@ -581,7 +581,7 @@ class OliveGtk:
     
     def on_menuitem_branch_push_activate(self, widget):
         """ Branch/Push... menu handler. """
-        push = PushDialog(self.wt.branch, self.window)
+        push = PushDialog(repository=None,revid=None,branch=self.wt.branch, parent=self.window)
         response = push.run()
         if response != gtk.RESPONSE_NONE:
             push.destroy()
