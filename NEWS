@@ -29,6 +29,8 @@
     (Szilveszter)
     
  BUG FIXES
+ 
+  * Fixed interface to push.PushDialog (Mateusz Korniak)
 
   * Fix so the when Olive is run from the source code, the toolbar and menu
     icons show. (Gary van der Merwe)
