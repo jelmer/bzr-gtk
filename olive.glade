@@ -218,6 +218,15 @@
                       </widget>
                     </child>
                     <child>
+                      <widget class="GtkMenuItem" id="menuitem_branch_update">
+                        <property name="visible">True</property>
+                        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                        <property name="label" translatable="yes">Update</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_menuitem_branch_update_activate"/>
+                      </widget>
+                    </child>
+                    <child>
                       <widget class="GtkSeparatorMenuItem" id="separator_branch2">
                         <property name="visible">True</property>
                       </widget>
@@ -460,6 +469,18 @@
                 <property name="expand">False</property>
               </packing>
             </child>
+            <child>
+              <widget class="GtkToolButton" id="toolbutton_update">
+                <property name="visible">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="label" translatable="yes">Update</property>
+                <property name="icon">icons/pull.png</property>
+                <signal name="clicked" handler="on_toolbutton_update_clicked"/>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+              </packing>
+            </child>
           </widget>
           <packing>
             <property name="expand">False</property>
@@ -490,6 +511,7 @@
               </widget>
               <packing>
                 <property name="resize">False</property>
+                <property name="shrink">True</property>
               </packing>
             </child>
             <child>
@@ -508,6 +530,7 @@
                         <property name="receives_default">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="relief">GTK_RELIEF_NONE</property>
+                        <property name="response_id">0</property>
                         <signal name="clicked" handler="on_button_location_up_clicked"/>
                         <child>
                           <widget class="GtkImage" id="image_location_up">
@@ -556,6 +579,7 @@
                         <property name="label" translatable="yes">gtk-jump-to</property>
                         <property name="relief">GTK_RELIEF_NONE</property>
                         <property name="use_stock">True</property>
+                        <property name="response_id">0</property>
                         <signal name="clicked" handler="on_button_location_jump_clicked"/>
                       </widget>
                       <packing>
@@ -582,6 +606,7 @@
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="label" translatable="yes">H_istory Mode</property>
                         <property name="use_underline">True</property>
+                        <property name="response_id">0</property>
                         <property name="draw_indicator">True</property>
                         <signal name="toggled" handler="on_checkbutton_history_toggled"/>
                       </widget>
@@ -613,6 +638,7 @@
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                        <property name="response_id">0</property>
                         <signal name="clicked" handler="on_button_history_browse_clicked"/>
                         <child>
                           <widget class="GtkImage" id="image_history_browse">
@@ -655,6 +681,10 @@
                   </packing>
                 </child>
               </widget>
+              <packing>
+                <property name="resize">True</property>
+                <property name="shrink">True</property>
+              </packing>
             </child>
           </widget>
           <packing>
@@ -724,6 +754,7 @@
             <property name="can_focus">True</property>
             <property name="label" translatable="yes">Selected only</property>
             <property name="use_underline">True</property>
+            <property name="response_id">0</property>
             <property name="draw_indicator">True</property>
           </widget>
           <packing>
@@ -738,6 +769,7 @@
             <property name="can_focus">True</property>
             <property name="label" translatable="yes">All unknowns recursively</property>
             <property name="use_underline">True</property>
+            <property name="response_id">0</property>
             <property name="draw_indicator">True</property>
             <property name="group">radiobutton_add_selected</property>
           </widget>
@@ -758,6 +790,7 @@
                 <property name="can_default">True</property>
                 <property name="label">gtk-cancel</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_button_add_cancel_clicked"/>
               </widget>
             </child>
@@ -767,6 +800,7 @@
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_button_add_add_clicked"/>
                 <child>
                   <widget class="GtkAlignment" id="alignment3">
@@ -844,6 +878,7 @@
             <property name="can_focus">True</property>
             <property name="label" translatable="yes">Selected only</property>
             <property name="use_underline">True</property>
+            <property name="response_id">0</property>
             <property name="draw_indicator">True</property>
           </widget>
           <packing>
@@ -858,6 +893,7 @@
             <property name="can_focus">True</property>
             <property name="label" translatable="yes">All files with status 'added'</property>
             <property name="use_underline">True</property>
+            <property name="response_id">0</property>
             <property name="draw_indicator">True</property>
             <property name="group">radiobutton_remove_selected</property>
           </widget>
@@ -878,6 +914,7 @@
                 <property name="can_default">True</property>
                 <property name="label">gtk-cancel</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_button_remove_cancel_clicked"/>
               </widget>
             </child>
@@ -887,6 +924,7 @@
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_button_remove_remove_clicked"/>
                 <child>
                   <widget class="GtkAlignment" id="alignment4">
@@ -964,6 +1002,7 @@
             <property name="can_focus">True</property>
             <property name="label" translatable="yes">_Versioned directory</property>
             <property name="use_underline">True</property>
+            <property name="response_id">0</property>
             <property name="active">True</property>
             <property name="draw_indicator">True</property>
           </widget>
@@ -984,6 +1023,7 @@
                 <property name="can_default">True</property>
                 <property name="label">gtk-cancel</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_button_mkdir_cancel_clicked"/>
               </widget>
             </child>
@@ -993,6 +1033,7 @@
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_button_mkdir_mkdir_clicked"/>
                 <child>
                   <widget class="GtkAlignment" id="alignment8">
@@ -1093,6 +1134,7 @@
                 <property name="can_default">True</property>
                 <property name="label">gtk-cancel</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_button_move_cancel_clicked"/>
               </widget>
             </child>
@@ -1102,6 +1144,7 @@
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_button_move_move_clicked"/>
                 <child>
                   <widget class="GtkAlignment" id="alignment9">
@@ -1200,6 +1243,7 @@
                 <property name="can_default">True</property>
                 <property name="label">gtk-cancel</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_button_rename_cancel_clicked"/>
               </widget>
             </child>
@@ -1209,6 +1253,7 @@
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_button_rename_rename_clicked"/>
                 <child>
                   <widget class="GtkAlignment" id="alignment10">
@@ -2346,6 +2391,7 @@
                 <property name="has_default">True</property>
                 <property name="label">gtk-close</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_button_info_close_clicked"/>
               </widget>
             </child>
@@ -2395,6 +2441,7 @@
               <widget class="GtkButton" id="button_merge_open">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_button_merge_open_clicked"/>
                 <child>
                   <widget class="GtkImage" id="image240">
@@ -2427,6 +2474,7 @@
                 <property name="can_default">True</property>
                 <property name="label">gtk-cancel</property>
                 <property name="use_stock">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_button_merge_cancel_clicked"/>
               </widget>
             </child>
@@ -2436,6 +2484,7 @@
                 <property name="can_focus">True</property>
                 <property name="can_default">True</property>
                 <property name="has_default">True</property>
+                <property name="response_id">0</property>
                 <signal name="clicked" handler="on_button_merge_merge_clicked"/>
                 <child>
                   <widget class="GtkAlignment" id="alignment19">

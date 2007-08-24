@@ -8,9 +8,12 @@
 
   * Handle large files correctly in Olive. (#127392, Mateusz Korniak)
 
-  * Support DBus being present but NetworkManager missing. (#126767, Mateusz 
+  * Support DBus being present but NetworkManager missing. (#126767, Mateusz
+  Korniak, Jelmer)
 
   * Add remove and delete menu item in Olive. (#127392, Mateusz Korniak)
+  
+  * Added "update" menu item in Olive. (Mateusz Korniak)
   
   * New Olive application icon. (Simon Pascal Klein)
 

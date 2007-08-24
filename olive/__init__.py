@@ -108,6 +108,7 @@ class OliveGtk:
         self.menuitem_branch_checkout = self.toplevel.get_widget('menuitem_branch_checkout')
         self.menuitem_branch_pull = self.toplevel.get_widget('menuitem_branch_pull')
         self.menuitem_branch_push = self.toplevel.get_widget('menuitem_branch_push')
+        self.menuitem_branch_update = self.toplevel.get_widget('menuitem_branch_update')
         self.menuitem_branch_revert = self.toplevel.get_widget('menuitem_branch_revert')
         self.menuitem_branch_merge = self.toplevel.get_widget('menuitem_branch_merge')
         self.menuitem_branch_commit = self.toplevel.get_widget('menuitem_branch_commit')
@@ -125,6 +126,7 @@ class OliveGtk:
         self.toolbutton_commit = self.toplevel.get_widget('toolbutton_commit')
         self.toolbutton_pull = self.toplevel.get_widget('toolbutton_pull')
         self.toolbutton_push = self.toplevel.get_widget('toolbutton_push')
+        self.toolbutton_update = self.toplevel.get_widget('toolbutton_update')
         # Get the drive selector
         self.combobox_drive = gtk.combo_box_new_text()
         self.combobox_drive.connect("changed", self._refresh_drives)
@@ -165,6 +167,7 @@ class OliveGtk:
                 "on_menuitem_branch_commit_activate": self.on_menuitem_branch_commit_activate,
                 "on_menuitem_branch_push_activate": self.on_menuitem_branch_push_activate,
                 "on_menuitem_branch_pull_activate": self.on_menuitem_branch_pull_activate,
+                "on_menuitem_branch_update_activate": self.on_menuitem_branch_update_activate,                
                 "on_menuitem_branch_tags_activate": self.on_menuitem_branch_tags_activate,
                 "on_menuitem_branch_status_activate": self.on_menuitem_branch_status_activate,
                 "on_menuitem_branch_missing_revisions_activate": self.on_menuitem_branch_missing_revisions_activate,
@@ -179,6 +182,7 @@ class OliveGtk:
                 "on_toolbutton_commit_clicked": self.on_menuitem_branch_commit_activate,
                 "on_toolbutton_pull_clicked": self.on_menuitem_branch_pull_activate,
                 "on_toolbutton_push_clicked": self.on_menuitem_branch_push_activate,
+                "on_toolbutton_update_clicked": self.on_menuitem_branch_update_activate,
                 "on_treeview_right_button_press_event": self.on_treeview_right_button_press_event,
                 "on_treeview_right_row_activated": self.on_treeview_right_row_activated,
                 "on_treeview_left_button_press_event": self.on_treeview_left_button_press_event,
@@ -563,6 +567,17 @@ class OliveGtk:
         ret = branch_to.pull(branch_from)
         
         info_dialog(_('Pull successful'), _('%d revision(s) pulled.') % ret)
+        
+    @show_bzr_error
+    def on_menuitem_branch_update_activate(self, widget):
+        """ Brranch/checkout update menu handler. """
+        
+        ret = self.wt.update()
+        conflicts = self.wt.conflicts()
+        if conflicts:
+            info_dialog(_('Update successful but conflicts generated'), _('Number of conflicts generated: %d.') % (len(conflicts),) )
+        else:
+            info_dialog(_('Update successful'), _('No conflicts generated.') )
     
     def on_menuitem_branch_push_activate(self, widget):
         """ Branch/Push... menu handler. """
@@ -1060,6 +1075,7 @@ class OliveGtk:
             self.menuitem_branch_checkout.set_sensitive(self.notbranch)
             self.menuitem_branch_pull.set_sensitive(not self.notbranch)
             self.menuitem_branch_push.set_sensitive(not self.notbranch)
+            self.menuitem_branch_update.set_sensitive(not self.notbranch)
             self.menuitem_branch_revert.set_sensitive(not self.notbranch)
             self.menuitem_branch_merge.set_sensitive(not self.notbranch)
             self.menuitem_branch_commit.set_sensitive(not self.notbranch)
@@ -1081,6 +1097,7 @@ class OliveGtk:
             self.toolbutton_commit.set_sensitive(not self.notbranch)
             self.toolbutton_pull.set_sensitive(not self.notbranch)
             self.toolbutton_push.set_sensitive(not self.notbranch)
+            self.toolbutton_update.set_sensitive(not self.notbranch)
         else:
             # We're remote
             self.menuitem_branch_init.set_sensitive(False)
@@ -1088,6 +1105,7 @@ class OliveGtk:
             self.menuitem_branch_checkout.set_sensitive(True)
             self.menuitem_branch_pull.set_sensitive(False)
             self.menuitem_branch_push.set_sensitive(False)
+            self.menuitem_branch_update.set_sensitive(False)
             self.menuitem_branch_revert.set_sensitive(False)
             self.menuitem_branch_merge.set_sensitive(False)
             self.menuitem_branch_commit.set_sensitive(False)
@@ -1109,6 +1127,7 @@ class OliveGtk:
             self.toolbutton_commit.set_sensitive(False)
             self.toolbutton_pull.set_sensitive(False)
             self.toolbutton_push.set_sensitive(False)
+            self.toolbutton_update.set_sensitive(False)
     
     def refresh_left(self):
         """ Refresh the bookmark list. """
