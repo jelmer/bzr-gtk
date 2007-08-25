@@ -101,12 +101,14 @@ class OliveGtk:
         self.menuitem_file_move = self.toplevel.get_widget('menuitem_file_move')
         self.menuitem_file_annotate = self.toplevel.get_widget('menuitem_file_annotate')
         self.menuitem_view_show_hidden_files = self.toplevel.get_widget('menuitem_view_show_hidden_files')
+        self.menuitem_view_show_ignored_files = self.toplevel.get_widget('menuitem_view_show_ignored_files')
         self.menuitem_branch = self.toplevel.get_widget('menuitem_branch')
         self.menuitem_branch_init = self.toplevel.get_widget('menuitem_branch_initialize')
         self.menuitem_branch_get = self.toplevel.get_widget('menuitem_branch_get')
         self.menuitem_branch_checkout = self.toplevel.get_widget('menuitem_branch_checkout')
         self.menuitem_branch_pull = self.toplevel.get_widget('menuitem_branch_pull')
         self.menuitem_branch_push = self.toplevel.get_widget('menuitem_branch_push')
+        self.menuitem_branch_update = self.toplevel.get_widget('menuitem_branch_update')
         self.menuitem_branch_revert = self.toplevel.get_widget('menuitem_branch_revert')
         self.menuitem_branch_merge = self.toplevel.get_widget('menuitem_branch_merge')
         self.menuitem_branch_commit = self.toplevel.get_widget('menuitem_branch_commit')
@@ -124,6 +126,7 @@ class OliveGtk:
         self.toolbutton_commit = self.toplevel.get_widget('toolbutton_commit')
         self.toolbutton_pull = self.toplevel.get_widget('toolbutton_pull')
         self.toolbutton_push = self.toplevel.get_widget('toolbutton_push')
+        self.toolbutton_update = self.toplevel.get_widget('toolbutton_update')
         # Get the drive selector
         self.combobox_drive = gtk.combo_box_new_text()
         self.combobox_drive.connect("changed", self._refresh_drives)
@@ -154,6 +157,7 @@ class OliveGtk:
                 "on_menuitem_file_rename_activate": self.on_menuitem_file_rename_activate,
                 "on_menuitem_file_annotate_activate": self.on_menuitem_file_annotate_activate,
                 "on_menuitem_view_show_hidden_files_activate": self.on_menuitem_view_show_hidden_files_activate,
+                "on_menuitem_view_show_ignored_files_activate": self.on_menuitem_view_show_ignored_files_activate,
                 "on_menuitem_view_refresh_activate": self.on_menuitem_view_refresh_activate,
                 "on_menuitem_branch_initialize_activate": self.on_menuitem_branch_initialize_activate,
                 "on_menuitem_branch_get_activate": self.on_menuitem_branch_get_activate,
@@ -163,6 +167,7 @@ class OliveGtk:
                 "on_menuitem_branch_commit_activate": self.on_menuitem_branch_commit_activate,
                 "on_menuitem_branch_push_activate": self.on_menuitem_branch_push_activate,
                 "on_menuitem_branch_pull_activate": self.on_menuitem_branch_pull_activate,
+                "on_menuitem_branch_update_activate": self.on_menuitem_branch_update_activate,                
                 "on_menuitem_branch_tags_activate": self.on_menuitem_branch_tags_activate,
                 "on_menuitem_branch_status_activate": self.on_menuitem_branch_status_activate,
                 "on_menuitem_branch_missing_revisions_activate": self.on_menuitem_branch_missing_revisions_activate,
@@ -177,6 +182,7 @@ class OliveGtk:
                 "on_toolbutton_commit_clicked": self.on_menuitem_branch_commit_activate,
                 "on_toolbutton_pull_clicked": self.on_menuitem_branch_pull_activate,
                 "on_toolbutton_push_clicked": self.on_menuitem_branch_push_activate,
+                "on_toolbutton_update_clicked": self.on_menuitem_branch_update_activate,
                 "on_treeview_right_button_press_event": self.on_treeview_right_button_press_event,
                 "on_treeview_right_row_activated": self.on_treeview_right_row_activated,
                 "on_treeview_left_button_press_event": self.on_treeview_left_button_press_event,
@@ -223,6 +229,7 @@ class OliveGtk:
 
         # Apply menu state
         self.menuitem_view_show_hidden_files.set_active(self.pref.get_preference('dotted_files', 'bool'))
+        self.menuitem_view_show_ignored_files.set_active(self.pref.get_preference('ignored_files', 'bool'))
 
         # We're starting local
         self.remote = False
@@ -560,10 +567,21 @@ class OliveGtk:
         ret = branch_to.pull(branch_from)
         
         info_dialog(_('Pull successful'), _('%d revision(s) pulled.') % ret)
+        
+    @show_bzr_error
+    def on_menuitem_branch_update_activate(self, widget):
+        """ Brranch/checkout update menu handler. """
+        
+        ret = self.wt.update()
+        conflicts = self.wt.conflicts()
+        if conflicts:
+            info_dialog(_('Update successful but conflicts generated'), _('Number of conflicts generated: %d.') % (len(conflicts),) )
+        else:
+            info_dialog(_('Update successful'), _('No conflicts generated.') )
     
     def on_menuitem_branch_push_activate(self, widget):
         """ Branch/Push... menu handler. """
-        push = PushDialog(self.wt.branch, self.window)
+        push = PushDialog(repository=None,revid=None,branch=self.wt.branch, parent=self.window)
         response = push.run()
         if response != gtk.RESPONSE_NONE:
             push.destroy()
@@ -702,6 +720,12 @@ class OliveGtk:
         if self.path is not None:
             self.refresh_right()
 
+    def on_menuitem_view_show_ignored_files_activate(self, widget):
+        """ Hide/Show ignored files menu handler. """
+        self.pref.set_preference('ignored_files', widget.get_active())
+        if self.path is not None:
+            self.refresh_right()
+            
     def on_treeview_left_button_press_event(self, widget, event):
         """ Occurs when somebody right-clicks in the bookmark list. """
         if event.button == 3:
@@ -1051,6 +1075,7 @@ class OliveGtk:
             self.menuitem_branch_checkout.set_sensitive(self.notbranch)
             self.menuitem_branch_pull.set_sensitive(not self.notbranch)
             self.menuitem_branch_push.set_sensitive(not self.notbranch)
+            self.menuitem_branch_update.set_sensitive(not self.notbranch)
             self.menuitem_branch_revert.set_sensitive(not self.notbranch)
             self.menuitem_branch_merge.set_sensitive(not self.notbranch)
             self.menuitem_branch_commit.set_sensitive(not self.notbranch)
@@ -1072,6 +1097,7 @@ class OliveGtk:
             self.toolbutton_commit.set_sensitive(not self.notbranch)
             self.toolbutton_pull.set_sensitive(not self.notbranch)
             self.toolbutton_push.set_sensitive(not self.notbranch)
+            self.toolbutton_update.set_sensitive(not self.notbranch)
         else:
             # We're remote
             self.menuitem_branch_init.set_sensitive(False)
@@ -1079,6 +1105,7 @@ class OliveGtk:
             self.menuitem_branch_checkout.set_sensitive(True)
             self.menuitem_branch_pull.set_sensitive(False)
             self.menuitem_branch_push.set_sensitive(False)
+            self.menuitem_branch_update.set_sensitive(False)
             self.menuitem_branch_revert.set_sensitive(False)
             self.menuitem_branch_merge.set_sensitive(False)
             self.menuitem_branch_commit.set_sensitive(False)
@@ -1100,6 +1127,7 @@ class OliveGtk:
             self.toolbutton_commit.set_sensitive(False)
             self.toolbutton_pull.set_sensitive(False)
             self.toolbutton_push.set_sensitive(False)
+            self.toolbutton_update.set_sensitive(False)
     
     def refresh_left(self):
         """ Refresh the bookmark list. """
@@ -1151,6 +1179,8 @@ class OliveGtk:
     
             # Fill the appropriate lists
             dotted_files = self.pref.get_preference('dotted_files', 'bool')
+            ignored_files = self.pref.get_preference('ignored_files', 'bool')
+
             for item in os.listdir(path):
                 if not dotted_files and item[0] == '.':
                     continue
@@ -1232,6 +1262,8 @@ class OliveGtk:
                     st = _('unchanged')
                 elif status == 'ignored':
                     st = _('ignored')
+                    if not ignored_files:
+                        continue
                 else:
                     st = _('unknown')
                 
@@ -1467,6 +1499,7 @@ class Preferences:
         # Some default options
         self.defaults = { 'strict_commit' : False,
                           'dotted_files'  : False,
+                          'ignored_files' : True,
                           'window_width'  : 700,
                           'window_height' : 400,
                           'window_x'      : 40,

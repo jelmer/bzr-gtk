@@ -20,10 +20,32 @@ import time
 
 import bzrlib
 
-import bzrlib.osutils as osutils
+from bzrlib import (
+    bzrdir,
+    diff,
+    errors,
+    osutils,
+    urlutils,
+    )
 
-from bzrlib.info import _repo_rel_url
 from bzrlib.missing import find_unmerged
+
+def _repo_rel_url(repo_url, inner_url):
+    """Return path with common prefix of repository path removed.
+
+    If path is not part of the repository, the original path is returned.
+    If path is equal to the repository, the current directory marker '.' is
+    returned.
+    Otherwise, a relative path is returned, with trailing '/' stripped.
+    """
+    inner_url = urlutils.normalize_url(inner_url)
+    repo_url = urlutils.normalize_url(repo_url)
+    if inner_url == repo_url:
+        return '.'
+    result = urlutils.relative_url(repo_url, inner_url)
+    if result != inner_url:
+        result = result.rstrip('/')
+    return result
 
 def get_location_info(repository, branch=None, working=None):
     """ Get known locations for working, branch and repository.

@@ -172,11 +172,15 @@ class BranchWindow(gtk.Window):
                                    gobject.TYPE_PYOBJECT,
                                    str, str, str)
         self.index = {}
-        index = 0
+        self.set_title(branch.nick + " - bzrk")
+        gobject.idle_add(self.populate_model, start, maxnum)
 
+    def populate_model(self, start, maxnum):
+        index = 0
+        
         last_lines = []
         (self.revisions, colours, self.children, self.parent_ids,
-            merge_sorted) = distances(branch.repository, start)
+            merge_sorted) = distances(self.branch.repository, start)
         for (index, (revision, node, lines)) in enumerate(graph(
                 self.revisions, colours, merge_sorted)):
             # FIXME: at this point we should be able to show the graph order
@@ -193,10 +197,10 @@ class BranchWindow(gtk.Window):
             last_lines = lines
             if maxnum is not None and index > maxnum:
                 break
-
-        self.set_title(branch.nick + " - bzrk")
         self.treeview.set_model(self.model)
-
+        return False
+    
+    
     def _treeview_cursor_cb(self, *args):
         """Callback for when the treeview cursor changes."""
         (path, col) = self.treeview.get_cursor()
