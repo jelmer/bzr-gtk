@@ -66,7 +66,14 @@ def about():
 
     # Set version
     dialog.set_version(__version__)
-    dialog.set_artists(["Simon Pascal Klein"])
+    dialog.set_authors([ _("Lead Developer:"),
+			 "Szilveszter Farkas <szilveszter.farkas@gmail.com>",
+			 _("Contributors:"),
+			 "Jelmer Vernooij <jelmer@samba.org>",
+			 "Mateusz Korniak <mateusz.korniak@ant.gliwice.pl>",
+			 "Gary van der Merwe <garyvdm@gmail.com>" ])
+    dialog.set_artists([ "Simon Pascal Klein <klepas@klepas.org>",
+			 "Jakub Steiner <jimmac@novell.com>" ])
 
     dialog.run()
     # Destroy the dialog
