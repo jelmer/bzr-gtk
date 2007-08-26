@@ -10,7 +10,7 @@ __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 
-def linegraph(revisions, revisionparents, revindex):
+def linegraph(branch, start, maxnum):
     """Produce a directed graph of a bzr branch.
 
     Returns a list of tuples of (revision, node, lines, parents, children).
@@ -30,7 +30,6 @@ def linegraph(revisions, revisionparents, revindex):
     curved, kinked, etc.) and to pick the actual colours for each index.
     """
     
-    directparentcache = [None for revision in revisions]
     def getdirectparent(childrevid, childindex, childsparents):
         """Return the revision id of the direct parent
         
@@ -98,6 +97,21 @@ def linegraph(revisions, revisionparents, revindex):
             columnindex = len(columns)
             columns.append(column)
         return columnindex
+    
+    revids = []
+    revindex = {}
+    for (index, revid) in enumerate(reversed( \
+            branch.repository.get_ancestry(start))):
+        if revid is not None:
+            revids.append(revid)
+            revindex[revid] = index
+        if maxnum is not None and index > maxnum:
+            break
+    
+    
+    revisions = branch.repository.get_revisions(revids)
+    revisionparents = branch.repository.get_graph().get_parents(revids)    
+    directparentcache = [None for revision in revisions]
     
     # This will hold what we plan to put in each column.
     # The position of the item in this list indicates the column, and it
@@ -270,7 +284,7 @@ def linegraph(revisions, revisionparents, revindex):
         notdrawnlines = [line for line in notdrawnlines if line is not None]
         
 
-    return linegraph
+    return (linegraph, revindex, revisions)
 
 
 def same_branch(a, b):
