@@ -108,7 +108,7 @@ def linegraph(branch, start, maxnum):
         if maxnum is not None and index > maxnum:
             break
     
-    
+    mainline = branch.revision_history()
     revisions = branch.repository.get_revisions(revids)
     revisionparents = branch.repository.get_graph().get_parents(revids)    
     directparentcache = [None for revision in revisions]
@@ -150,21 +150,25 @@ def linegraph(branch, start, maxnum):
                           [], parents, children])
         
         branchlineid = None
-        #Try and see if we are the same branchline as one of our children
-        #If we are, use the same branchlineid
-        for (childrevid, childindex, childbranchlineid) in children_ext: 
-            childsparents = revisionparents[childindex]
-            
-            if len(children) == 1 and len(childsparents) == 1: 
-                # one-one relationship between parent and child
-                branchlineid = childbranchlineid
-                break
-            
-            #Is the current revision the direct parent of the child?
-            if revision.revision_id == \
-                    getdirectparent(childrevid, childindex, childsparents):
-                branchlineid = childbranchlineid
-                break
+        
+        if revision.revision_id in mainline:
+            branchlineid = 0
+        else:
+            #Try and see if we are the same branchline as one of our children
+            #If we are, use the same branchlineid
+            for (childrevid, childindex, childbranchlineid) in children_ext: 
+                childsparents = revisionparents[childindex]
+                
+                if len(children) == 1 and len(childsparents) == 1: 
+                    # one-one relationship between parent and child
+                    branchlineid = childbranchlineid
+                    break
+                
+                #Is the current revision the direct parent of the child?
+                if childbranchlineid != 0 and revision.revision_id == \
+                        getdirectparent(childrevid, childindex, childsparents):
+                    branchlineid = childbranchlineid
+                    break
         
         if branchlineid is None:
             branchlineid = lastbranchlineid = lastbranchlineid + 1
