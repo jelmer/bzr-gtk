@@ -1,17 +1,14 @@
-0.90.0	UNRELEASED
+0.90.0	2007-08-27
 
  FEATURES
 
-  * Add ability to hide ignored files (#134121, Tom Badran)
+  * Add ability to hide ignored files in Olive (#134121, Tom Badran)
 
   * Show tags in bzr viz. (Jelmer)
 
   * Handle large files correctly in Olive. (#127392, Mateusz Korniak)
 
-  * Support DBus being present but NetworkManager missing. (#126767, Mateusz
-  Korniak, Jelmer)
-
-  * Add remove and delete menu item in Olive. (#127392, Mateusz Korniak)
+  * Add remove and delete menu item in Olive. (#127381, Mateusz Korniak)
   
   * Added "update" menu item in Olive. (Mateusz Korniak)
   
@@ -30,10 +27,13 @@
     
  BUG FIXES
  
+  * Support DBus being present but NetworkManager missing. (#126767, Mateusz
+  Korniak, Jelmer)
+
   * Fixed interface to push.PushDialog (Mateusz Korniak)
 
   * Fix so the when Olive is run from the source code, the toolbar and menu
-    icons show. (Gary van der Merwe)
+    icons show. (Gary van der Merwe, #131520)
 
   * Fix a regression that Olive was no longer able to find bzrlib location
     due to a change in the output of "bzr version". (Gary van der Merwe)
@@ -41,6 +41,7 @@
   * Fix a regression that Olive branch info window was not working. (Gary van
     der Merwe)
     
+  * Fixed tags formatting. (Aaron)
 
 0.18.0  2007-07-17
 
