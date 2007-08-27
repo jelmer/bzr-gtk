@@ -57,7 +57,7 @@ def check_bzrlib_version(desired):
         from warnings import warn as warning
     if bzrlib_version < desired:
         from bzrlib.errors import BzrError
-        warning('Installed bzr version %s is too old to be used with bzr-gtk'
+        warning('Installed Bazaar version %s is too old to be used with bzr-gtk'
                 ' %s.' % (bzrlib.__version__, __version__))
         raise BzrError('Version mismatch: %r' % (version_info,) )
     else:

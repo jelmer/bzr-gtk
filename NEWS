@@ -24,6 +24,8 @@
  
   * Updated pot generator script and regenerated the translation template.
     (Szilveszter)
+
+  * Add helper widget for selecting branches (Jelmer)
     
  BUG FIXES
  
