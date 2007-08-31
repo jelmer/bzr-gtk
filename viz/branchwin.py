@@ -148,7 +148,7 @@ class BranchWindow(gtk.Window):
     def construct_bottom(self):
         """Construct the bottom half of the window."""
         from bzrlib.plugins.gtk.logview import LogView
-        self.logview = LogView()
+        self.logview = LogView(None, True, [], True)
         (width, height) = self.get_size()
         self.logview.set_size_request(width, int(height / 2.5))
         self.logview.show()
@@ -216,7 +216,7 @@ class BranchWindow(gtk.Window):
             tagdict = self.branch.tags.get_reverse_tag_dict()
             if tagdict.has_key(revision.revision_id):
                 tags = tagdict[revision.revision_id]
-        self.logview.set_revision(revision, tags)
+        self.logview.set_revision(revision, tags, children)
 
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
