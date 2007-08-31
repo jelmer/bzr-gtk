@@ -183,13 +183,11 @@ def linegraph(branch, start, maxnum):
                 if c is not None and c["maxindex"] <= index:
                     (columnindex, column) = (i, c)
                     break
-    
-
         
         if columnindex is None:
             minindex = index
             for childrevid in children:
-                childindex = revindex[childrevid]
+                childindex = revindex[childrevid] + 1
                 if childindex<minindex:
                     minindex = childindex
             
