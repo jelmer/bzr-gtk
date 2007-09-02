@@ -26,12 +26,11 @@ except:
     pass
 
 import gtk
-from dialog import question_dialog
 
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
-from bzrlib.plugins.gtk.dialog import error_dialog, info_dialog, warning_dialog
+from bzrlib.plugins.gtk.dialog import error_dialog, info_dialog, question_dialog, warning_dialog
 from bzrlib.plugins.gtk.errors import show_bzr_error
 from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
 from bzrlib.plugins.gtk.annotate.config import GAnnotateConfig
