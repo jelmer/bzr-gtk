@@ -81,18 +81,17 @@ class GAnnotateWindow(gtk.Window):
             for line_no, (revision, revno, line)\
                     in enumerate(self._annotate(tree, file_id)):
                 if revision.revision_id == last_seen and not self.all:
-                    revno = committer = ""
+                    revno = author = ""
                 else:
                     last_seen = revision.revision_id
-                    committer = revision.properties.get('author',
-                        revision.committer)
+                    author = revision.get_apparent_author()
 
                 if revision.revision_id not in self.revisions:
                     self.revisions[revision.revision_id] = revision
 
                 self.annomodel.append([revision.revision_id,
                                        line_no + 1,
-                                       committer,
+                                       author,
                                        revno,
                                        None,
                                        line.rstrip("\r\n")
@@ -408,6 +407,9 @@ class FakeRevision:
         self.timestamp = 0.0
         self.timezone = 0
         self.properties = {}
+
+    def get_apparent_author(self):
+        return self.committer
 
 
 class RevisionCache(object):
