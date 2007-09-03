@@ -9,6 +9,7 @@ window.
 __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
+from bzrlib.tsort import merge_sort
 
 def linegraph(branch, start, maxnum):
     """Produce a directed graph of a bzr branch.
@@ -98,17 +99,26 @@ def linegraph(branch, start, maxnum):
             columns.append(column)
         return columnindex
     
+    mainline = branch.revision_history()
+    merge_sorted_revisions = merge_sort(
+        branch.repository.get_revision_graph(start),
+        start,
+        mainline,
+        generate_revno=True)
+
+    
     revids = []
     revindex = {}
-    for (index, revid) in enumerate(reversed( \
-            branch.repository.get_ancestry(start))):
+    for (index, (sequence_number,
+                 revid, merge_depth,
+                 revno_sequence,
+                 end_of_merge)) in enumerate(merge_sorted_revisions):
         if revid is not None:
             revids.append(revid)
             revindex[revid] = index
         if maxnum is not None and index > maxnum:
             break
     
-    mainline = branch.revision_history()
     revisions = branch.repository.get_revisions(revids)
     revisionparents = branch.repository.get_graph().get_parents(revids)    
     directparentcache = [None for revision in revisions]
