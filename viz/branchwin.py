@@ -80,6 +80,15 @@ class BranchWindow(gtk.Window):
         scrollwin.add(self.treeview)
         self.treeview.show()
 
+        cell = gtk.CellRendererText()
+        #cell.set_property("width-chars", 40)
+        #cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        column = gtk.TreeViewColumn("Revision No")
+        column.set_resizable(True)
+        column.pack_start(cell, expand=True)
+        column.add_attribute(cell, "text", 9)
+        self.treeview.append_column(column)
+
         cell = CellRendererGraph()
         column = gtk.TreeViewColumn()
         column.set_resizable(True)
@@ -172,7 +181,7 @@ class BranchWindow(gtk.Window):
                                    gobject.TYPE_PYOBJECT,
                                    gobject.TYPE_PYOBJECT,
                                    gobject.TYPE_PYOBJECT,
-                                   str, str, str)
+                                   str, str, str, str)
         self.set_title(branch.nick + " - bzrk")
         gobject.idle_add(self.populate_model, start, maxnum)
 
@@ -184,8 +193,12 @@ class BranchWindow(gtk.Window):
         self.revisions = revisions
         
         last_lines = []
-        for (index,(revision, node, lines, parents, children)) in enumerate( \
-                linegraphdata):
+        for (index,(revision,
+                    node,
+                    lines,
+                    parents,
+                    children,
+                    revno_sequence)) in enumerate(linegraphdata):
             # FIXME: at this point we should be able to show the graph order
             # and lines with no message or commit data - and then incrementally
             # fill the timestamp, committer etc data as desired.
@@ -196,9 +209,18 @@ class BranchWindow(gtk.Window):
                 timestamp = format_date(revision.timestamp, revision.timezone)
             else:
                 timestamp = None
-            self.model.append([revision, node, last_lines, lines,
-                               parents, children, 
-                               message, revision.committer, timestamp])
+            revno_string = ".".join(["%d" % (revno) for revno in revno_sequence])
+            
+            self.model.append([revision,
+                               node,
+                               last_lines,
+                               lines,
+                               parents,
+                               children, 
+                               message,
+                               revision.committer,
+                               timestamp,
+                               revno_string])
             last_lines = lines
         self.treeview.set_model(self.model)
 

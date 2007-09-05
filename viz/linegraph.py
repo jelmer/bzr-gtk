@@ -14,7 +14,12 @@ from bzrlib.tsort import merge_sort
 def linegraph(branch, start, maxnum):
     """Produce a directed graph of a bzr branch.
 
-    Returns a list of tuples of (revision, node, lines, parents, children).
+    Returns a list of tuples of (revision,
+                                 node,
+                                 lines,
+                                 parents,
+                                 children,
+                                 revno_sequence).
 
     Node is a tuple of (column, colour) with column being a zero-indexed
     column number of the graph that this revision represents and colour
@@ -89,8 +94,12 @@ def linegraph(branch, start, maxnum):
                      merge_depth,     #the column of the line
                      color))
         
-        linegraph.append((revision, (merge_depth, color),
-                          [], parents, children))
+        linegraph.append((revision,
+                          (merge_depth, color),
+                          [],
+                          parents,
+                          children,
+                          revno_sequence))
 
     return (linegraph, rev_index, revisions)
 
