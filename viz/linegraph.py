@@ -30,273 +30,69 @@ def linegraph(branch, start, maxnum):
     It's up to you how to actually draw the nodes and lines (straight,
     curved, kinked, etc.) and to pick the actual colours for each index.
     """
-    
-    def getdirectparent(childrevid, childindex, childsparents):
-        """Return the revision id of the direct parent
-        
-        The direct parent is the first parent with the same committer"""
-        childrevision = revisions[childindex]
-        directparent = directparentcache[childindex]
-        if directparent is None:
-            for parentrevid in childsparents:
-                if parentrevid in revindex:
-                    parentindex = revindex[parentrevid]
-                    parentrevision = revisions[parentindex]
-                    if childrevision.committer == parentrevision.committer:
-                        # This may be a direct parent, but first check that
-                        # for this parent, there are no other children, who are
-                        # before us in the children list, for which this parent
-                        # is also the direct parent.
-                        # pc in all the below var name stands for parents child
-                        first = True
-                        for pcrevid in revisionchildren[parentindex]:
-                            if pcrevid == childrevid:
-                                break
-                            pcindex = revindex[pcrevid]
-                            pcdirectparent = getdirectparent(pcrevid,
-                                                    pcindex,
-                                                    revisionchildren[pcindex])
-                            if pcdirectparent==parentrevid:
-                                first = False
-                                break
-                        
-                        if first:
-                            directparent = parentrevid
-                            break
-            #no parents have the same commiter
-            if directparent is None:
-                directparent = ""
-            directparentcache[childindex] = directparent
-        return directparent
-    
-    def find_column_from_branchlineid(branchlineid):
-        for index, column in enumerate(columns):
-            if column is not None and column["branchlineid"] == branchlineid:
-                return (index, column)
-        return (None, None)
-    
-    def has_no_nodes_between (column, startindex, endindex):
-        for nodeindex in column["nodeindexes"]:
-            if nodeindex > startindex and nodeindex < endindex:
-                return False
-        return True
-    
-    def append_line (column , startindex, endindex):
-        column["lines"].append((startindex,endindex))
-        if endindex > column["maxindex"] :
-            column["maxindex"] = endindex
-    
-    def append_column (column, minindex):
-        columnindex = None
-        for (i, c) in enumerate(columns):
-            if c is None or (c["branchlineid"] == "finished" \
-                             and c["maxindex"] <= minindex):
-                columnindex = i
-                columns[columnindex] = column
-                break
-        if columnindex is None:
-            columnindex = len(columns)
-            columns.append(column)
-        return columnindex
-    
+       
     mainline = branch.revision_history()
+    graph_parents = branch.repository.get_revision_graph(start)
+    graph_children = {}
+    for revid in graph_parents.keys():
+        graph_children[revid] = []
+    
+    rev_index = {}
+    
+    
     merge_sorted_revisions = merge_sort(
-        branch.repository.get_revision_graph(start),
+        graph_parents,
         start,
         mainline,
         generate_revno=True)
-
     
-    revids = []
-    revindex = {}
-    for (index, (sequence_number,
-                 revid, merge_depth,
+    revids = [revid for (sequence_number,
+                 revid,
+                 merge_depth,
                  revno_sequence,
-                 end_of_merge)) in enumerate(merge_sorted_revisions):
-        if revid is not None:
-            revids.append(revid)
-            revindex[revid] = index
-        if maxnum is not None and index > maxnum:
-            break
+                 end_of_merge) in merge_sorted_revisions]
     
     revisions = branch.repository.get_revisions(revids)
-    revisionparents = branch.repository.get_graph().get_parents(revids)    
-    directparentcache = [None for revision in revisions]
-    
-    # This will hold what we plan to put in each column.
-    # The position of the item in this list indicates the column, and it
-    # it may change if we need to make space for other things.
-    # Each typle in the list is in the form:
-    # (branchlineid, nodeindexes, lines, maxindex)
-    # A item may be None to indicate that there is nothing in the column
-    columns = []
-    
     linegraph = []
     
-    lastbranchlineid = 0
-    branchlineids = []
-    revisionchildren = [[] for revision in revisions]
-    notdrawnlines = []
-    
-    for (index, revision) in enumerate(revisions):
-        parents = [parent for parent in revisionparents[index] \
+    for (index, (sequence_number,
+                 revid,
+                 merge_depth,
+                 revno_sequence,
+                 end_of_merge)) in enumerate(merge_sorted_revisions):
+        
+        revision = revisions[index]
+        rev_index[revid] = index
+        
+        color = reduce(lambda x, y: x+y, revno_sequence[0:-2], 0)
+        
+        parents = [parent for parent in graph_parents[revid] \
                    if parent!="null:"]
-        for parentrevid in parents:
-            if parentrevid in revindex:
-                revisionchildren[revindex[parentrevid]]\
-                    .append(revision.revision_id)
         
-        children = revisionchildren[index]
+        for parent_revid in parents:
+            graph_children[parent_revid].append(revid)
         
-        #We use childrevid, childindex, childbranchlineid often, so cache it
-        children_ext = []
-        for childrevid in children:
-            childindex = revindex[childrevid]
-            children_ext.append((childrevid,
-                                 childindex,
-                                 branchlineids[childindex]))
+        children = graph_children[revid]
         
-        linegraph.append([revision, None,
-                          [], parents, children])
-        
-        branchlineid = None
-        
-        if revision.revision_id in mainline:
-            branchlineid = 0
-        else:
-            #Try and see if we are the same branchline as one of our children
-            #If we are, use the same branchlineid
-            for (childrevid, childindex, childbranchlineid) in children_ext: 
-                childsparents = revisionparents[childindex]
-                
-                if len(children) == 1 and len(childsparents) == 1: 
-                    # one-one relationship between parent and child
-                    branchlineid = childbranchlineid
-                    break
-                
-                #Is the current revision the direct parent of the child?
-                if childbranchlineid != 0 and revision.revision_id == \
-                        getdirectparent(childrevid, childindex, childsparents):
-                    branchlineid = childbranchlineid
-                    break
-        
-        if branchlineid is None:
-            branchlineid = lastbranchlineid = lastbranchlineid + 1
-        
-        branchlineids.append(branchlineid)
-        
-        (columnindex, column) = find_column_from_branchlineid(branchlineid)
-        
-        if columnindex is None:
-            for (childrevid, childindex, childbranchlineid) in children_ext:
-                (i, c) = find_column_from_branchlineid(childbranchlineid)
-                if c is not None and c["maxindex"] <= index:
-                    (columnindex, column) = (i, c)
-                    break
-        
-        if columnindex is None:
-            minindex = index
-            for childrevid in children:
-                childindex = revindex[childrevid] + 1
-                if childindex<minindex:
-                    minindex = childindex
+        for child_revid in children:
+            child_index = rev_index[child_revid]
+            child_merge_depth = merge_sorted_revisions[child_index][2]
+            #out from the child to line
+            linegraph[child_index][2].append(
+                (child_merge_depth,    #the column of the child
+                 merge_depth,     #the column of the line
+                 color))
             
-            column = {"branchlineid": branchlineid,
-                      "nodeindexes": [index],
-                      "lines": [],
-                      "maxindex": index}
-            columnindex = append_column(column, minindex)
-        else:
-            column["branchlineid"] = branchlineid
-            column["nodeindexes"].append(index)
+            for line_part_index in range(child_index+1, index):
+                linegraph[line_part_index][2].append(
+                    (merge_depth,    #the column of the child
+                     merge_depth,     #the column of the line
+                     color))
         
-        opentillparent = getdirectparent(revision.revision_id, index, parents)
-        if opentillparent == "":
-            if len(parents)>0:
-                opentillparent = parents[0]
-            else:
-                opentillparent = None
-        
-        if opentillparent is not None and opentillparent in revindex:
-            parentindex = revindex[opentillparent]
-            if parentindex > column["maxindex"]:
-                column["maxindex"] = parentindex
-        
-        for (childrevid, childindex, childbranchlineid) in children_ext: 
-            (childcolumnindex, childcolumn) = \
-                find_column_from_branchlineid(childbranchlineid)
-            
-            if index-childindex == 1 or childcolumnindex is None:
-                append_line(column,childindex,index)
-            elif childcolumnindex >= columnindex and \
-                    has_no_nodes_between(childcolumn, childindex, index):
-                append_line(childcolumn,childindex,index)
-            elif childcolumnindex > columnindex and \
-                    has_no_nodes_between(column, childindex, index):
-                append_line(column,childindex,index)
-            elif childcolumnindex < columnindex and \
-                    has_no_nodes_between(column, childindex, index):
-                append_line(column,childindex,index)
-            elif childcolumnindex < columnindex and \
-                    has_no_nodes_between(childcolumn, childindex, index):
-                append_line(childcolumn,childindex,index)
-            else:
-                append_column({"branchlineid": "line",
-                                "nodeindexes": [],
-                                "lines": [(childindex,index)],
-                                "maxindex": index}, childindex)
-        
-        for (columnindex, column) in enumerate(columns):
-            if column is not None and column["maxindex"] <= index \
-                    and column["branchlineid"] != "finished":
-                for nodeindex in column["nodeindexes"]:
-                    linegraph[nodeindex][1] = (columnindex,
-                                               branchlineids[nodeindex])
-            
-                for (childindex, parentindex) in column["lines"]:
-                    notdrawnlines.append((columnindex, childindex, parentindex))
-                
-                column["branchlineid"] = "finished"
-                column["nodeindexes"] = []
-                column["lines"] = []
-        
-        for (lineindex,(columnindex, childindex, parentindex))\
-                in enumerate(notdrawnlines):
-            
-            childnode = linegraph[childindex][1]
-            parentnode = linegraph[parentindex][1]
-            if childnode is not None and parentnode is not None:
-                notdrawnlines[lineindex] = None
-                if parentindex>childindex+1:
-                    #out from the child to line
-                    linegraph[childindex][2].append(
-                        (childnode[0],    #the column of the child
-                         columnindex,     #the column of the line
-                         parentnode[1]))
-                    
-                    #down the line
-                    for linepartindex in range(childindex+1, parentindex-1):
-                        linegraph[linepartindex][2].append(
-                            (columnindex, #the column of the line
-                             columnindex, #the column of the line
-                             parentnode[1]))
-                    
-                    #in to the parent
-                    linegraph[parentindex-1][2].append(
-                        (columnindex,     #the column of the line
-                         parentnode[0],   #the column of the parent
-                         parentnode[1]))
-                else:
-                    #child to parent
-                    linegraph[childindex][2].append(
-                        (childnode[0],    #the column of the child
-                         parentnode[0],   #the column of the parent
-                         parentnode[1]))
-        
-        notdrawnlines = [line for line in notdrawnlines if line is not None]
-        
+        linegraph.append((revision, (merge_depth, color),
+                          [], parents, children))
 
-    return (linegraph, revindex, revisions)
+    return (linegraph, rev_index, revisions)
 
 
 def same_branch(a, b):
