@@ -186,14 +186,15 @@ class BranchWindow(gtk.Window):
         gobject.idle_add(self.populate_model, start, maxnum)
 
     def populate_model(self, start, maxnum):
-        (linegraphdata, index, revisions) = linegraph(self.branch,
-                                                      start,
-                                                      maxnum)
+        (linegraphdata, index) = linegraph(self.branch,
+                                           start,
+                                           maxnum)
+        print "linegraph compleate"
         self.index = index
-        self.revisions = revisions
+        self.revisions = []
         
         last_lines = []
-        for (index,(revision,
+        for (index,(revid,
                     node,
                     lines,
                     parents,
@@ -202,6 +203,9 @@ class BranchWindow(gtk.Window):
             # FIXME: at this point we should be able to show the graph order
             # and lines with no message or commit data - and then incrementally
             # fill the timestamp, committer etc data as desired.
+            
+            revision = self.branch.repository.get_revisions([revid])[0]
+            self.revisions.append(revision)
             
             message = revision.message.split("\n")[0]
             
