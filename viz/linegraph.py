@@ -74,6 +74,8 @@ def linegraph(branch, start, maxnum):
         else:
             branch_line = branch_lines[branch_id]
         branch_line["rev_indexes"].append(index)
+        if index > branch_line["max_index"]:
+            branch_line["max_index"] = index
         
         parents = graph_parents[revid]
         for parent_revid in parents:
@@ -92,28 +94,10 @@ def linegraph(branch, start, maxnum):
     
     for branch_id in branch_ids:
         branch_line = branch_lines[branch_id]
-        branch_line["inward_line_ends"] = []
-        for rev_index in branch_line["rev_indexes"]:
-            (sequence_number,
-                 revid,
-                 merge_depth,
-                 revno_sequence,
-                 end_of_merge) = merge_sorted_revisions[rev_index]
-            for parent_revid in graph_parents[revid]:
-                if parent_revid in revid_index:
-                    parent_index = revid_index[parent_revid]
-                    parent_merge_depth = merge_sorted_revisions[parent_index][2]
-                    if parent_merge_depth < merge_depth:
-                        branch_line["inward_line_ends"].append(parent_index)
-                        if branch_line["max_index"] < parent_index:
-                            branch_line["max_index"] =parent_index
-            
-            for child_revid in graph_children[revid]:
-                if child_revid in revid_index:
-                    child_index = revid_index[child_revid]
-                    child_merge_depth = merge_sorted_revisions[child_index][2]
-                    if child_merge_depth < merge_depth:
-                        branch_line["inward_line_ends"].append(child_index)
+        if len(branch_id) >= 2:
+            branch_parent_revno = branch_id[0:-1]
+            if branch_parent_revno in revno_index:
+                branch_line["max_index"] = revno_index[branch_parent_revno]
         
         col_index = None
         start_col_index = 0
