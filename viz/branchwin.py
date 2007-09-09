@@ -12,11 +12,13 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 import gtk
 import gobject
 import pango
+import treemodel
 
 from bzrlib.osutils import format_date
 
 from linegraph import linegraph, same_branch
 from graphcell import CellRendererGraph
+from treemodel import TreeModel
 
 
 class BranchWindow(gtk.Window):
@@ -86,16 +88,16 @@ class BranchWindow(gtk.Window):
         column = gtk.TreeViewColumn("Revision No")
         column.set_resizable(True)
         column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", 9)
+        column.add_attribute(cell, "text", treemodel.REVNO)
         self.treeview.append_column(column)
 
         cell = CellRendererGraph()
         column = gtk.TreeViewColumn()
         column.set_resizable(True)
         column.pack_start(cell, expand=False)
-        column.add_attribute(cell, "node", 1)
-        column.add_attribute(cell, "in-lines", 2)
-        column.add_attribute(cell, "out-lines", 3)
+        column.add_attribute(cell, "node", treemodel.NODE)
+        column.add_attribute(cell, "in-lines", treemodel.LAST_LINES)
+        column.add_attribute(cell, "out-lines", treemodel.LINES)
         self.treeview.append_column(column)
 
         cell = gtk.CellRendererText()
@@ -104,7 +106,7 @@ class BranchWindow(gtk.Window):
         column = gtk.TreeViewColumn("Message")
         column.set_resizable(True)
         column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", 6)
+        column.add_attribute(cell, "text", treemodel.MESSAGE)
         self.treeview.append_column(column)
 
         cell = gtk.CellRendererText()
@@ -113,7 +115,7 @@ class BranchWindow(gtk.Window):
         column = gtk.TreeViewColumn("Committer")
         column.set_resizable(True)
         column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", 7)
+        column.add_attribute(cell, "text", treemodel.COMMITER)
         self.treeview.append_column(column)
 
         cell = gtk.CellRendererText()
@@ -121,7 +123,7 @@ class BranchWindow(gtk.Window):
         column = gtk.TreeViewColumn("Date")
         column.set_resizable(True)
         column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", 8)
+        column.add_attribute(cell, "text", treemodel.TIMESTAMP)
         self.treeview.append_column(column)
 
         return scrollwin
@@ -173,15 +175,6 @@ class BranchWindow(gtk.Window):
         treeview itself.
         """
         self.branch = branch
-
-        # [ revision, node, last_lines, lines, message, committer, timestamp ]
-        self.model = gtk.ListStore(gobject.TYPE_PYOBJECT,
-                                   gobject.TYPE_PYOBJECT,
-                                   gobject.TYPE_PYOBJECT,
-                                   gobject.TYPE_PYOBJECT,
-                                   gobject.TYPE_PYOBJECT,
-                                   gobject.TYPE_PYOBJECT,
-                                   str, str, str, str)
         self.set_title(branch.nick + " - bzrk")
         gobject.idle_add(self.populate_model, start, maxnum)
 
@@ -189,51 +182,17 @@ class BranchWindow(gtk.Window):
         (linegraphdata, index) = linegraph(self.branch,
                                            start,
                                            maxnum)
-        print "linegraph compleate"
+        self.model = TreeModel(self.branch, linegraphdata)
         self.index = index
-        self.revisions = []
-        
-        last_lines = []
-        for (index,(revid,
-                    node,
-                    lines,
-                    parents,
-                    children,
-                    revno_sequence)) in enumerate(linegraphdata):
-            # FIXME: at this point we should be able to show the graph order
-            # and lines with no message or commit data - and then incrementally
-            # fill the timestamp, committer etc data as desired.
-            
-            revision = self.branch.repository.get_revisions([revid])[0]
-            self.revisions.append(revision)
-            
-            message = revision.message.split("\n")[0]
-            
-            if revision.committer is not None:
-                timestamp = format_date(revision.timestamp, revision.timezone)
-            else:
-                timestamp = None
-            revno_string = ".".join(["%d" % (revno) for revno in revno_sequence])
-            
-            self.model.append([revision,
-                               node,
-                               last_lines,
-                               lines,
-                               parents,
-                               children, 
-                               message,
-                               revision.committer,
-                               timestamp,
-                               revno_string])
-            last_lines = lines
         self.treeview.set_model(self.model)
 
     def _treeview_cursor_cb(self, *args):
         """Callback for when the treeview cursor changes."""
         (path, col) = self.treeview.get_cursor()
-        revision = self.model[path][0]
-        parents = self.model[path][4]
-        children = self.model[path][5]
+        iter = self.model.get_iter(path)
+        revision = self.model.get_value(iter, treemodel.REVISION)
+        parents = self.model.get_value(iter, treemodel.PARENTS)
+        children = self.model.get_value(iter, treemodel.CHILDREN)
 
         self.back_button.set_sensitive(len(parents) > 0)
         self.fwd_button.set_sensitive(len(children) > 0)
