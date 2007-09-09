@@ -27,13 +27,11 @@ import gtk
 from errors import show_bzr_error
 
 from bzrlib.branch import Branch
-from bzrlib.config import GlobalConfig
 import bzrlib.errors as errors
 
 from dialog import error_dialog, info_dialog
 
-from history import UrlHistory
-from olive import Preferences
+from branchbox import BranchSelectionBox
 
 class BranchDialog(gtk.Dialog):
     """ New implementation of the Branch dialog. """
@@ -50,14 +48,15 @@ class BranchDialog(gtk.Dialog):
         
         # Create the widgets
         self._button_branch = gtk.Button(_("_Branch"), use_underline=True)
+        self._remote_branch = BranchSelectionBox()
         self._button_revision = gtk.Button('')
-        self._image_browse = gtk.Image()
-        self._filechooser = gtk.FileChooserButton(_("Please select a folder"))
-        self._combo = gtk.ComboBoxEntry()
         self._label_location = gtk.Label(_("Branch location:"))
+        self._label_location.set_alignment(0, 0.5)
         self._label_destination = gtk.Label(_("Destination:"))
         self._label_nick = gtk.Label(_("Branck nick:"))
         self._label_revision = gtk.Label(_("Revision:"))
+        self._filechooser = gtk.FileChooserButton(_("Please select a folder"))
+        self._filechooser.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
         self._hbox_revision = gtk.HBox()
         self._entry_revision = gtk.Entry()
         self._entry_nick = gtk.Entry()
@@ -65,35 +64,34 @@ class BranchDialog(gtk.Dialog):
         # Set callbacks
         self._button_branch.connect('clicked', self._on_branch_clicked)
         self._button_revision.connect('clicked', self._on_revision_clicked)
-        self._combo.child.connect('focus-out-event', self._on_combo_changed)
-        
+        self._remote_branch.connect('branch-changed', self._on_branch_changed)
+
         # Create the table and pack the widgets into it
         self._table = gtk.Table(rows=3, columns=2)
         self._table.attach(self._label_location, 0, 1, 0, 1)
+        self._table.attach(self._remote_branch, 1, 2, 0, 1)
         self._table.attach(self._label_destination, 0, 1, 1, 2)
         self._table.attach(self._label_nick, 0, 1, 2, 3)
         self._table.attach(self._label_revision, 0, 1, 3, 4)
-        self._table.attach(self._combo, 1, 2, 0, 1)
         self._table.attach(self._filechooser, 1, 2, 1, 2)
         self._table.attach(self._entry_nick, 1, 2, 2, 3)
         self._table.attach(self._hbox_revision, 1, 2, 3, 4)
         
         # Set properties
+        self._image_browse = gtk.Image()
         self._image_browse.set_from_stock(gtk.STOCK_OPEN, gtk.ICON_SIZE_BUTTON)
         self._button_revision.set_image(self._image_browse)
         self._button_revision.set_sensitive(False)
-        self._filechooser.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
-        self._label_location.set_alignment(0, 0.5)
         self._label_destination.set_alignment(0, 0.5)
         self._label_nick.set_alignment(0, 0.5)
         self._label_revision.set_alignment(0, 0.5)
         self._table.set_row_spacings(3)
         self._table.set_col_spacings(3)
         self.vbox.set_spacing(3)
+        if remote_path is not None:
+            self._remote_branch.set_url(remote_path)
         if self.path is not None:
             self._filechooser.set_filename(self.path)
-        if remote_path is not None:
-            self._combo.child.set_text(remote_path)
         
         # Pack some widgets
         self._hbox_revision.pack_start(self._entry_revision, True, True)
@@ -103,61 +101,39 @@ class BranchDialog(gtk.Dialog):
         
         # Show the dialog
         self.vbox.show_all()
-        
-        # Build branch history
-        self._history = UrlHistory(GlobalConfig(), 'branch_history')
-        self._build_history()
-    
-    def _build_history(self):
-        """ Build up the branch history. """
-        self._combo_model = gtk.ListStore(str)
-        
-        for item in self._history.get_entries():
-            self._combo_model.append([ item ])
-        
-        pref = Preferences()
-        for item in pref.get_bookmarks():
-            self._combo_model.append([ item ])
-        
-        self._combo.set_model(self._combo_model)
-        self._combo.set_text_column(0)
     
     def _get_last_revno(self):
         """ Get the revno of the last revision (if any). """
-        location = self._combo.get_child().get_text()
         try:
-            br = Branch.open(location)
-        except:
-            return None
-        else:
+            br = self._remote_branch.get_branch()
             return br.revno()
+        except:
+            pass
     
     def _on_revision_clicked(self, button):
         """ Browse for revision button clicked handler. """
         from revbrowser import RevisionBrowser
         
-        location = self._combo.get_child().get_text()
         
         try:
-            br = Branch.open(location)
+            br = self._remote_branch.get_branch()
         except:
             return
-        else:
-            revb = RevisionBrowser(br, self)
-            response = revb.run()
-            if response != gtk.RESPONSE_NONE:
-                revb.hide()
+        revb = RevisionBrowser(br, self)
+        response = revb.run()
+        if response != gtk.RESPONSE_NONE:
+            revb.hide()
+    
+            if response == gtk.RESPONSE_OK:
+                if revb.selected_revno is not None:
+                    self._entry_revision.set_text(revb.selected_revno)
         
-                if response == gtk.RESPONSE_OK:
-                    if revb.selected_revno is not None:
-                        self._entry_revision.set_text(revb.selected_revno)
-            
-                revb.destroy()
+            revb.destroy()
     
     @show_bzr_error
     def _on_branch_clicked(self, button):
         """ Branch button clicked handler. """
-        location = self._combo.get_child().get_text()
+        location = self._remote_branch.get_url()
         if location is '':
             error_dialog(_('Missing branch location'),
                          _('You must specify a branch location.'))
@@ -207,7 +183,7 @@ class BranchDialog(gtk.Dialog):
         
         self.response(gtk.RESPONSE_OK)
     
-    def _on_combo_changed(self, widget, event):
+    def _on_branch_changed(self, widget, event):
         """ We try to get the last revision if focus lost. """
         rev = self._get_last_revno()
         if rev is None:
@@ -217,4 +193,4 @@ class BranchDialog(gtk.Dialog):
             self._entry_revision.set_text(str(rev))
             self._button_revision.set_sensitive(True)
             if self._entry_nick.get_text() == '':
-                self._entry_nick.set_text(os.path.basename(self._combo.get_child().get_text().rstrip("/\\")))
+                self._entry_nick.set_text(os.path.basename(self._remote_branch.get_url().rstrip("/\\")))

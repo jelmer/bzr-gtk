@@ -51,7 +51,7 @@ class RevisionPopupMenu(gtk.Menu):
 
             item = gtk.MenuItem("_Merge Directive")
             item.connect('activate', self.store_merge_directive)
-            self.append(item)
+            # FIXME: self.append(item)
             self.show_all()
 
     def store_merge_directive(self, item):
