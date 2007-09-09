@@ -87,7 +87,7 @@ class TreeModel(gtk.GenericTreeModel):
                                                    revision.timezone)
     
     def on_iter_next(self, rowref):
-        if rowref < len(self.line_graph_data):
+        if rowref < len(self.line_graph_data) - 1:
             return rowref+1
         return None
     
