@@ -574,7 +574,7 @@ class OliveGtk:
             if remote_extra:
                 dlg_txt += _('%d local missing revision(s):\n') % (len(remote_extra),) 
                 max_revisions = 10
-                for log_revision in iter_log_revisions(local_extra, local_branch.repository, verbose=1):
+                for log_revision in iter_log_revisions(remote_extra, parent_branch.repository, verbose=1):
                     dlg_txt += log_revision_one_line_text(log_revision)
                     if max_revisions <= 0:
                         dlg_txt += _("more ... \n")
