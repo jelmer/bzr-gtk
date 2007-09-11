@@ -35,7 +35,7 @@ from olive.guifiles import GLADEFILENAME
 
 class MergeDialog:
     """ Display the Merge dialog and perform the needed actions. """
-    def __init__(self, wt, wtpath):
+    def __init__(self, wt, wtpath,default_branch_path=None):
         """ Initialize the Merge dialog. """
         self.glade = gtk.glade.XML(GLADEFILENAME, 'window_merge', 'olive-gtk')
         
@@ -54,6 +54,8 @@ class MergeDialog:
         
         # Get some widgets
         self.entry = self.glade.get_widget('entry_merge')
+        if default_branch_path:
+            self.entry.set_text(default_branch_path)
 
     def display(self):
         """ Display the Add file(s) dialog. """

@@ -527,7 +527,8 @@ class OliveGtk:
             error_dialog(_('There are local changes in the branch'),
                          _('Please commit or revert the changes before merging.'))
         else:
-            merge = MergeDialog(self.wt, self.wtpath)
+            parent_branch_path = self.wt.branch.get_parent()
+            merge = MergeDialog(self.wt, self.wtpath,default_branch_path=parent_branch_path )
             merge.display()
 
     @show_bzr_error
