@@ -31,6 +31,8 @@ class BranchWindow(gtk.Window):
         self.set_border_width(0)
         self.set_title("bzrk")
 
+        self.connect("destroy", gtk.mainquit)
+
         # Use three-quarters of the screen by default
         screen = self.get_screen()
         monitor = screen.get_monitor_geometry(0)
