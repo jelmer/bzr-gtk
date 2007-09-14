@@ -35,7 +35,7 @@ class TagsWindow(gtk.Window):
         """ Initialize the Tags window. """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
-        self.connect("destroy", gtk.mainquit)
+        self.connect("destroy", gtk.main_quit)
         
         # Get arguments
         self.branch = branch

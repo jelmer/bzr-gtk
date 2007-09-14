@@ -50,7 +50,7 @@ class GAnnotateWindow(gtk.Window):
         
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
-        self.connect("destroy", gtk.mainquit)
+        self.connect("destroy", gtk.main_quit)
         
         self.set_icon(self.render_icon(gtk.STOCK_FIND, gtk.ICON_SIZE_BUTTON))
         self.annotate_colormap = AnnotateColorSaturation()
