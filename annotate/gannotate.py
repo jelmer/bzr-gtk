@@ -50,7 +50,8 @@ class GAnnotateWindow(gtk.Window):
         
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
-        self.connect("destroy", gtk.main_quit)
+        self.connect("delete-event", gtk.main_quit)
+        self.connect("key-press-event", self._on_key_pressed)
         
         self.set_icon(self.render_icon(gtk.STOCK_FIND, gtk.ICON_SIZE_BUTTON))
         self.annotate_colormap = AnnotateColorSaturation()
@@ -392,6 +393,22 @@ class GAnnotateWindow(gtk.Window):
         for i, j, n in matcher.get_matching_blocks():
             if i + n >= row:
                 return j - i
+
+    def _on_key_pressed(self, widget, event):
+        """ Key press event handler. """
+        keyname = gtk.gdk.keyval_name(event.keyval)
+        func = getattr(self, '_on_key_press_' + keyname, None)
+        if func:
+            return func(event)
+
+    def _on_key_press_w(self, event):
+        if event.state & gtk.gdk.CONTROL_MASK:
+            self.destroy()
+
+    def _on_key_press_q(self, event):
+        if event.state & gtk.gdk.CONTROL_MASK:
+            gtk.main_quit()
+    
 
 
 

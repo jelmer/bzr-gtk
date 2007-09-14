@@ -31,7 +31,7 @@ class BranchWindow(gtk.Window):
         self.set_border_width(0)
         self.set_title("bzrk")
 
-        self.connect("destroy", gtk.main_quit)
+        self.connect("delete-event", gtk.main_quit)
 
         # Use three-quarters of the screen by default
         screen = self.get_screen()
@@ -46,6 +46,8 @@ class BranchWindow(gtk.Window):
 
         self.accel_group = gtk.AccelGroup()
         self.add_accel_group(self.accel_group)
+
+        self.connect('key-press-event', self._on_key_pressed)
 
         self.construct()
 
@@ -202,6 +204,20 @@ class BranchWindow(gtk.Window):
         self.treeview.set_model(self.model)
         return False
     
+    def _on_key_pressed(self, widget, event):
+        """ Key press event handler. """
+        keyname = gtk.gdk.keyval_name(event.keyval)
+        func = getattr(self, '_on_key_press_' + keyname, None)
+        if func:
+            return func(event)
+
+    def _on_key_press_w(self, event):
+        if event.state & gtk.gdk.CONTROL_MASK:
+            self.destroy()
+
+    def _on_key_press_q(self, event):
+        if event.state & gtk.gdk.CONTROL_MASK:
+            gtk.main_quit()
     
     def _treeview_cursor_cb(self, *args):
         """Callback for when the treeview cursor changes."""
