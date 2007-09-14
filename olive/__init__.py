@@ -552,34 +552,37 @@ class OliveGtk:
         local_extra, remote_extra = find_unmerged(local_branch,parent_branch)
 
         if local_extra or remote_extra:
-            def log_revision_one_line_text(log_revision):
-                """ Generates one line description of log_revison ended with end of line."""
-                revision = log_revision.rev
-                txt =  "- %s (%s)\n" % (revision.get_summary(), revision.committer, )
-                txt = txt.replace("<"," ") # Seems < > chars are expected to be xml tags ...
-                txt = txt.replace(">"," ")
-                return txt
+            
+            ## def log_revision_one_line_text(log_revision):
+            ##    """ Generates one line description of log_revison ended with end of line."""
+            ##    revision = log_revision.rev
+            ##    txt =  "- %s (%s)\n" % (revision.get_summary(), revision.committer, )
+            ##    txt = txt.replace("<"," ") # Seems < > chars are expected to be xml tags ...
+            ##    txt = txt.replace(">"," ")
+            ##    return txt
             
             dlg_txt = ""
             if local_extra:
-                dlg_txt += _('%d local extra revision(s):\n') % (len(local_extra),) 
-                max_revisions = 10
-                for log_revision in iter_log_revisions(local_extra, local_branch.repository, verbose=1):
-                    dlg_txt += log_revision_one_line_text(log_revision)
-                    if max_revisions <= 0:
-                        dlg_txt += _("more ... \n")
-                        break
-                max_revisions -= 1
-            dlg_txt += "\n"
+                dlg_txt += _('%d local extra revision(s). \n') % (len(local_extra),) 
+                ## NOTE: We do not want such ugly info about missing revisions
+                ##       Revision Browser should be used there
+                ## max_revisions = 10
+                ## for log_revision in iter_log_revisions(local_extra, local_branch.repository, verbose=1):
+                ##    dlg_txt += log_revision_one_line_text(log_revision)
+                ##    if max_revisions <= 0:
+                ##        dlg_txt += _("more ... \n")
+                ##        break
+                ## max_revisions -= 1
+            ## dlg_txt += "\n"
             if remote_extra:
-                dlg_txt += _('%d local missing revision(s):\n') % (len(remote_extra),) 
-                max_revisions = 10
-                for log_revision in iter_log_revisions(remote_extra, parent_branch.repository, verbose=1):
-                    dlg_txt += log_revision_one_line_text(log_revision)
-                    if max_revisions <= 0:
-                        dlg_txt += _("more ... \n")
-                        break
-                    max_revisions -= 1
+                dlg_txt += _('%d local missing revision(s).\n') % (len(remote_extra),) 
+                ## max_revisions = 10
+                ## for log_revision in iter_log_revisions(remote_extra, parent_branch.repository, verbose=1):
+                ##    dlg_txt += log_revision_one_line_text(log_revision)
+                ##    if max_revisions <= 0:
+                ##        dlg_txt += _("more ... \n")
+                ##        break
+                ##    max_revisions -= 1
                 
             info_dialog(_('There are missing revisions'),
                         dlg_txt)
