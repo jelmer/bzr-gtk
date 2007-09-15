@@ -679,7 +679,7 @@ class OliveGtk:
         branch = self.wt.branch
         file_id = self.wt.path2id(self.wt.relpath(os.path.join(self.path, self.get_selected_right())))
         
-        window = GAnnotateWindow(all=False, plain=False)
+        window = GAnnotateWindow(all=False, plain=False, parent=self.window)
         window.set_title(os.path.join(self.path, self.get_selected_right()) + " - Annotate")
         config = GAnnotateConfig(window)
         window.show()
@@ -742,7 +742,7 @@ class OliveGtk:
     
     def on_menuitem_stats_log_activate(self, widget):
         """ Statistics/Log... menu handler. """
-        window = branchwin.BranchWindow()
+        window = branchwin.BranchWindow(parent=self.window)
         if not self.remote:
             window.set_branch(self.wt.branch, self.wt.branch.last_revision(), None)
         else:
