@@ -1,5 +1,10 @@
-0.91.0  IN DEVELOPMENT
+0.91.0	UNRELEASED
 
+ UI
+
+  * Added keyboard shortcuts for closing windows and exiting Olive.
+    (#139559, Daniel Schierbeck)
+ 
  BUG FIXES
 
   * Fix the "Complete Diff" entry in DiffWindow to show the whole diff.
@@ -26,7 +31,7 @@
  UI
   
   * Improve Preferences dialog layout. (Jelmer)
- 
+
  INTERNALS:
  
   * Updated pot generator script and regenerated the translation template.
