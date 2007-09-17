@@ -527,30 +527,65 @@ class OliveGtk:
             error_dialog(_('There are local changes in the branch'),
                          _('Please commit or revert the changes before merging.'))
         else:
-            merge = MergeDialog(self.wt, self.wtpath)
+            parent_branch_path = self.wt.branch.get_parent()
+            merge = MergeDialog(self.wt, self.wtpath,default_branch_path=parent_branch_path )
             merge.display()
 
     @show_bzr_error
     def on_menuitem_branch_missing_revisions_activate(self, widget):
         """ Branch/Missing revisions menu handler. """
-        local_branch = self.wt.branch
         
-        other_branch = local_branch.get_parent()
-        if other_branch is None:
+        from bzrlib.missing import find_unmerged, iter_log_revisions
+        
+        local_branch = self.wt.branch
+        parent_branch_path = local_branch.get_parent()
+        if parent_branch_path is None:
             error_dialog(_('Parent location is unknown'),
                          _('Cannot determine missing revisions if no parent location is known.'))
             return
         
-        remote_branch = Branch.open(other_branch)
+        parent_branch = Branch.open(parent_branch_path)
         
-        if remote_branch.base == local_branch.base:
-            remote_branch = local_branch
+        if parent_branch.base == local_branch.base:
+            parent_branch = local_branch
+        
+        local_extra, remote_extra = find_unmerged(local_branch,parent_branch)
 
-        ret = len(local_branch.missing_revisions(remote_branch))
-
-        if ret > 0:
+        if local_extra or remote_extra:
+            
+            ## def log_revision_one_line_text(log_revision):
+            ##    """ Generates one line description of log_revison ended with end of line."""
+            ##    revision = log_revision.rev
+            ##    txt =  "- %s (%s)\n" % (revision.get_summary(), revision.committer, )
+            ##    txt = txt.replace("<"," ") # Seems < > chars are expected to be xml tags ...
+            ##    txt = txt.replace(">"," ")
+            ##    return txt
+            
+            dlg_txt = ""
+            if local_extra:
+                dlg_txt += _('%d local extra revision(s). \n') % (len(local_extra),) 
+                ## NOTE: We do not want such ugly info about missing revisions
+                ##       Revision Browser should be used there
+                ## max_revisions = 10
+                ## for log_revision in iter_log_revisions(local_extra, local_branch.repository, verbose=1):
+                ##    dlg_txt += log_revision_one_line_text(log_revision)
+                ##    if max_revisions <= 0:
+                ##        dlg_txt += _("more ... \n")
+                ##        break
+                ## max_revisions -= 1
+            ## dlg_txt += "\n"
+            if remote_extra:
+                dlg_txt += _('%d local missing revision(s).\n') % (len(remote_extra),) 
+                ## max_revisions = 10
+                ## for log_revision in iter_log_revisions(remote_extra, parent_branch.repository, verbose=1):
+                ##    dlg_txt += log_revision_one_line_text(log_revision)
+                ##    if max_revisions <= 0:
+                ##        dlg_txt += _("more ... \n")
+                ##        break
+                ##    max_revisions -= 1
+                
             info_dialog(_('There are missing revisions'),
-                        _('%d revision(s) missing.') % ret)
+                        dlg_txt)
         else:
             info_dialog(_('Local branch up to date'),
                         _('There are no missing revisions.'))
