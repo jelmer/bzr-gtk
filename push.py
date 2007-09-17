@@ -104,9 +104,8 @@ class PushDialog(gtk.Dialog):
         except errors.DivergedBranches:
             response = question_dialog(_('Branches have been diverged'),
                                        _('You cannot push if branches have diverged.\nOverwrite?'))
-            if response == gtk.RESPONSE_OK:
+            if response == gtk.RESPONSE_YES:
                 revs = do_push(self.branch, location=location, overwrite=True)
-            return
         
         self._history.add_entry(location)
         info_dialog(_('Push successful'),
