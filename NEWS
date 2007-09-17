@@ -1,3 +1,10 @@
+0.91.0  IN DEVELOPMENT
+
+ BUG FIXES
+
+  * Fix the "Complete Diff" entry in DiffWindow to show the whole diff.
+    (#140512, James Westby) 
+
 0.90.0	2007-08-27
 
  FEATURES

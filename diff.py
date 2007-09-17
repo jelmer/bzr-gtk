@@ -174,7 +174,7 @@ class DiffWindow(gtk.Window):
         if specific_files == [ None ]:
             return
         elif specific_files == [ "" ]:
-            specific_files = []
+            specific_files = None
 
         s = StringIO()
         show_diff_trees(self.parent_tree, self.rev_tree, s, specific_files)
