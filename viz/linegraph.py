@@ -39,7 +39,7 @@ def linegraph(branch, start, maxnum):
     mainline = branch.revision_history()
     graph_parents = branch.repository.get_revision_graph(start)
     graph_children = {}
-    for revid in graph_parents.keys():
+    for revid in graph_parents.iterkeys():
         graph_children[revid] = []
 
     merge_sorted_revisions = merge_sort(
@@ -49,7 +49,6 @@ def linegraph(branch, start, maxnum):
         generate_revno=True)
     
     revid_index = {}
-    revno_index = {}
     branch_lines = {}
     linegraph = []    
     
@@ -60,14 +59,12 @@ def linegraph(branch, start, maxnum):
                      end_of_merge)) in enumerate(merge_sorted_revisions):
         
         revid_index[revid] = rev_index
-        revno_index[revno_sequence] = rev_index
         
         branch_id = revno_sequence[0:-1]
         
         branch_line = None
         if branch_id not in branch_lines:
-            branch_line = {"line_type": "branch_line",
-                           "branch_id": branch_id,
+            branch_line = {"branch_id": branch_id,
                            "rev_indexes": [],
                            "min_index": rev_index,
                            "max_index": 0}
@@ -100,12 +97,17 @@ def linegraph(branch, start, maxnum):
     branch_ids.sort(branch_id_cmp)
     lines = []
     columns = []
+    empty_column = [False for i in range(len(graph_parents))]
+    
+    
     
     for branch_id in branch_ids:
         branch_line = branch_lines[branch_id]
         
-        append_line(columns, branch_line)
-        branch_id = branch_line["branch_id"]
+        branch_line["col_index"] = append_line(columns,
+                                               (branch_line["min_index"],
+                                                branch_line["max_index"]),
+                                               empty_column)
         color = reduce(lambda x, y: x+y, branch_id, 0)
         col_index = branch_line["col_index"]
         node = (col_index, color)        
@@ -125,25 +127,22 @@ def linegraph(branch, start, maxnum):
                     parent_index = revid_index[parent_revid]
                     parent_revno = merge_sorted_revisions[parent_index][3]
                     parent_branch_id = parent_revno[0:-1]
-                    line = {"line_type": "inter_branch_line",
-                            "min_index": rev_index,
-                            "max_index": parent_index}
-                    lines.append(line)
+                    col_index = None
                     if branch_id != parent_branch_id and \
                                     parent_index - rev_index > 1:
-                        append_line(columns, line)
+                        col_index = append_line(columns,
+                                                (rev_index+1, parent_index),
+                                                empty_column)
+                    lines.append((rev_index, parent_index, col_index))
     
-    for line in lines:
-        parent_index = line["max_index"]
+    for (child_index, parent_index, line_col_index) in lines:
+        child_col_index = linegraph[child_index][1][0]
+        
         parent_node = linegraph[parent_index][1]
         parent_col_index = parent_node[0]
         color = parent_node[1]
         
-        child_index = line["min_index"]
-        child_col_index = linegraph[child_index][1][0]
-        
-        if "col_index" in line:
-            line_col_index = line["col_index"]
+        if line_col_index:
             linegraph[child_index][2].append(
                 (child_col_index,
                  line_col_index,
@@ -171,23 +170,24 @@ def linegraph(branch, start, maxnum):
     
     return (linegraph, revid_index)
 
-def append_line(columns, line):
+def append_line(columns, line, empty_column):
+    line_range = range(line[0], line[1]+1)
     for col_index, column in enumerate(columns):
         has_overlaping_line = False
-        for col_line in column:
-            if not (col_line["min_index"] >= line["max_index"] or \
-                    col_line["max_index"] <=  line["min_index"]):
+        for row_index in line_range:
+            if column[row_index]:
                 has_overlaping_line = True
                 break
         if not has_overlaping_line:
             break
     else:
         col_index = len(columns)
-        columns.append([])
-    line["col_index"] = col_index
-    columns[col_index].append(line)
+        column = list(empty_column)
+        columns.append(column)
     
-
+    for row_index in line_range:
+        column[row_index] = True
+    return col_index
 
 def same_branch(a, b):
     """Return whether we think revisions a and b are on the same branch."""
