@@ -53,14 +53,14 @@ def linegraph(branch, start, maxnum):
     branch_lines = {}
     linegraph = []    
     
-    for (index, (sequence_number,
-                 revid,
-                 merge_depth,
-                 revno_sequence,
-                 end_of_merge)) in enumerate(merge_sorted_revisions):
+    for (rev_index, (sequence_number,
+                     revid,
+                     merge_depth,
+                     revno_sequence,
+                     end_of_merge)) in enumerate(merge_sorted_revisions):
         
-        revid_index[revid] = index
-        revno_index[revno_sequence] = index
+        revid_index[revid] = rev_index
+        revno_index[revno_sequence] = rev_index
         
         branch_id = revno_sequence[0:-1]
         
@@ -69,14 +69,14 @@ def linegraph(branch, start, maxnum):
             branch_line = {"line_type": "branch_line",
                            "branch_id": branch_id,
                            "rev_indexes": [],
-                           "min_index": index,
+                           "min_index": rev_index,
                            "max_index": 0}
             branch_lines[branch_id] = branch_line
         else:
             branch_line = branch_lines[branch_id]
-        branch_line["rev_indexes"].append(index)
-        if index > branch_line["max_index"]:
-            branch_line["max_index"] = index
+        branch_line["rev_indexes"].append(rev_index)
+        if rev_index > branch_line["max_index"]:
+            branch_line["max_index"] = rev_index
         
         parents = graph_parents[revid]
         for parent_revid in parents:
@@ -98,58 +98,17 @@ def linegraph(branch, start, maxnum):
         return cmp(len_x, len_y)
         
     branch_ids.sort(branch_id_cmp)
-    inter_branch_lines = {}
-    all_lines = []
+    lines = []
+    columns = []
     
     for branch_id in branch_ids:
         branch_line = branch_lines[branch_id]
-        branch_parent_revno = None
-        all_lines.append(branch_line)
         
-        for rev_index in branch_line["rev_indexes"]:
-            (sequence_number,
-                 revid,
-                 merge_depth,
-                 revno_sequence,
-                 end_of_merge) = merge_sorted_revisions[rev_index]
-            for parent_revid in graph_parents[revid]:
-                if parent_revid in revid_index:
-                    parent_index = revid_index[parent_revid]
-                    if parent_index - rev_index > 1:
-                        parent_revno = merge_sorted_revisions[parent_index][3]
-                        parent_branch_id = parent_revno[0:-1]
-                        if branch_id != parent_branch_id:
-                            inter_branch_line = {"line_type": "inter_branch_line",
-                                                 "min_index": rev_index,
-                                                 "max_index": parent_index,
-                                                 "child_branch_id": branch_id,
-                                                 "parent_branch_id": parent_branch_id}
-                            inter_branch_lines[(rev_index, parent_index)] = \
-                                                                inter_branch_line
-                            all_lines.append (inter_branch_line)
-    
-    columns = []
-    for line in all_lines:
-        for col_index, column in enumerate(columns):
-            has_overlaping_line = False
-            for col_line in column:
-                if not (col_line["min_index"] >= line["max_index"] or \
-                        col_line["max_index"] <=  line["min_index"]):
-                    has_overlaping_line = True
-                    break
-            if not has_overlaping_line:
-                break
-        else:
-            col_index = len(columns)
-            columns.append([])
-        line["col_index"] = col_index
-        columns[col_index].append(line)
-
-    for branch_line in branch_lines.itervalues():
+        append_line(columns, branch_line)
         branch_id = branch_line["branch_id"]
         color = reduce(lambda x, y: x+y, branch_id, 0)
         col_index = branch_line["col_index"]
-        node = (col_index, color)
+        node = (col_index, color)        
         
         for rev_index in branch_line["rev_indexes"]:
             (sequence_number,
@@ -157,57 +116,77 @@ def linegraph(branch, start, maxnum):
                  merge_depth,
                  revno_sequence,
                  end_of_merge) = merge_sorted_revisions[rev_index]
-            children = graph_children[revid]
             
             linegraph[rev_index][1] = node
-            linegraph[rev_index][4] = children
-            for child_revid in children:
-                if child_revid in revid_index:
-                    child_index = revid_index[child_revid]
-                    inter_branch_line_id = (child_index, rev_index)
-                    if inter_branch_line_id in inter_branch_lines:
-                        inter_branch_line = \
-                                    inter_branch_lines[inter_branch_line_id]
-                        child_branch_id = inter_branch_line["child_branch_id"]
-                        child_col_index = \
-                                    branch_lines[child_branch_id]["col_index"]
-                        inter_branch_line_col_index = \
-                                                inter_branch_line["col_index"]
-                        linegraph[child_index][2].append(
-                            (child_col_index,
-                             inter_branch_line_col_index,
-                             color))
-                        for line_part_index in range(child_index+1,
-                                                     rev_index-1):
-                            linegraph[line_part_index][2].append(
-                                (inter_branch_line_col_index,   
-                                 inter_branch_line_col_index,
-                                 color))
-
-                        linegraph[rev_index-1][2].append(
-                            (inter_branch_line_col_index,
-                             col_index,
-                             color))
-
-                    else:
-                        child_revno_sequence = \
-                                        merge_sorted_revisions[child_index][3]
-                        child_branch_id = child_revno_sequence[0:-1]                    
-                        child_col_index = \
-                                    branch_lines[child_branch_id]["col_index"]
-                        
-                        linegraph[child_index][2].append(
-                            (child_col_index,
-                             col_index,
-                             color))
-                        for line_part_index in range(child_index+1, rev_index):
-                            linegraph[line_part_index][2].append(
-                                (col_index,   
-                                 col_index,
-                                 color))
-                        
+            linegraph[rev_index][4] = graph_children[revid]
+            
+            for parent_revid in graph_parents[revid]:
+                if parent_revid in revid_index:
+                    parent_index = revid_index[parent_revid]
+                    parent_revno = merge_sorted_revisions[parent_index][3]
+                    parent_branch_id = parent_revno[0:-1]
+                    line = {"line_type": "inter_branch_line",
+                            "min_index": rev_index,
+                            "max_index": parent_index}
+                    lines.append(line)
+                    if branch_id != parent_branch_id and \
+                                    parent_index - rev_index > 1:
+                        append_line(columns, line)
+    
+    for line in lines:
+        parent_index = line["max_index"]
+        parent_node = linegraph[parent_index][1]
+        parent_col_index = parent_node[0]
+        color = parent_node[1]
+        
+        child_index = line["min_index"]
+        child_col_index = linegraph[child_index][1][0]
+        
+        if "col_index" in line:
+            line_col_index = line["col_index"]
+            linegraph[child_index][2].append(
+                (child_col_index,
+                 line_col_index,
+                 color))
+            for line_part_index in range(child_index+1, parent_index-1):
+                linegraph[line_part_index][2].append(
+                    (line_col_index,   
+                     line_col_index,
+                     color))
+            linegraph[parent_index-1][2].append(
+                (line_col_index,
+                 parent_col_index,
+                 color))
+        else:
+            linegraph[child_index][2].append(
+                (child_col_index,
+                 parent_col_index,
+                 color))
+            for line_part_index in range(child_index+1, parent_index):
+                linegraph[line_part_index][2].append(
+                    (parent_col_index,   
+                     parent_col_index,
+                     color))
+                    
     
     return (linegraph, revid_index)
+
+def append_line(columns, line):
+    for col_index, column in enumerate(columns):
+        has_overlaping_line = False
+        for col_line in column:
+            if not (col_line["min_index"] >= line["max_index"] or \
+                    col_line["max_index"] <=  line["min_index"]):
+                has_overlaping_line = True
+                break
+        if not has_overlaping_line:
+            break
+    else:
+        col_index = len(columns)
+        columns.append([])
+    line["col_index"] = col_index
+    columns[col_index].append(line)
+    
 
 
 def same_branch(a, b):
