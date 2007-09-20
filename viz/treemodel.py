@@ -74,16 +74,17 @@ class TreeModel(gtk.GenericTreeModel):
         if column == REVNO: return ".".join(["%d" % (revno)
                                       for revno in revno_sequence])
         
-        if revid in self.revisions:
-            revision = self.revisions[revid]
-            
-            if column == REVISION: return revision
-            if column == MESSAGE: return revision.message.split("\n")[0]
-            if column == COMMITER: return revision.committer
-            if column == TIMESTAMP: return format_date(revision.timestamp,
-                                                       revision.timezone)
+        if revid not in self.revisions:
+            revision = self.branch.repository.get_revisions([revid])[0]
+            self.revisions[revid] = revision
         else:
-            return None
+            revision = self.revisions[revid]
+        
+        if column == REVISION: return revision
+        if column == MESSAGE: return revision.message.split("\n")[0]
+        if column == COMMITER: return revision.committer
+        if column == TIMESTAMP: return format_date(revision.timestamp,
+                                                   revision.timezone)
     
     def on_iter_next(self, rowref):
         if rowref < len(self.line_graph_data) - 1:
@@ -107,10 +108,3 @@ class TreeModel(gtk.GenericTreeModel):
     
     def on_iter_parent(self, child):
         return None
-    
-    def on_ref_node(self, iter):
-        revid = self.line_graph_data[iter][0]
-        if revid not in self.revisions:
-            revision = self.branch.repository.get_revisions([revid])[0]
-            self.revisions[revid] = revision        
-
