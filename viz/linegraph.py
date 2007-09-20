@@ -90,8 +90,14 @@ def linegraph(branch, start, maxnum):
                           revno_sequence])
 
     branch_ids = branch_lines.keys()
-    branch_ids.sort()
-    #branch_ids.reverse()
+    def branch_id_cmp(x, y):
+        len_x = len(x)
+        len_y = len(y)
+        if len_x == len_y:
+            return -cmp(x, y)
+        return cmp(len_x, len_y)
+        
+    branch_ids.sort(branch_id_cmp)
     inter_branch_lines = {}
     all_lines = []
     
