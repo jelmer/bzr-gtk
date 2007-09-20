@@ -96,18 +96,23 @@ def linegraph(branch, start, maxnum):
         
     branch_ids.sort(branch_id_cmp)
     lines = []
-    columns = []
     empty_column = [False for i in range(len(graph_parents))]
-    
+    columns = [list(empty_column)]
     
     
     for branch_id in branch_ids:
         branch_line = branch_lines[branch_id]
         
+        parent_col_index = 0
+        if len(branch_id) > 1:
+            parent_branch_id = branch_id[0:-2]
+            parent_col_index = branch_lines[parent_branch_id]["col_index"]
+        
         branch_line["col_index"] = append_line(columns,
                                                (branch_line["min_index"],
                                                 branch_line["max_index"]),
-                                               empty_column)
+                                               empty_column,
+                                               parent_col_index)
         color = reduce(lambda x, y: x+y, branch_id, 0)
         col_index = branch_line["col_index"]
         node = (col_index, color)        
@@ -131,8 +136,9 @@ def linegraph(branch, start, maxnum):
                     if branch_id != parent_branch_id and \
                                     parent_index - rev_index > 1:
                         col_index = append_line(columns,
-                                                (rev_index+1, parent_index),
-                                                empty_column)
+                                                (rev_index+1, parent_index-1),
+                                                empty_column,
+                                                branch_line["col_index"])
                     lines.append((rev_index, parent_index, col_index))
     
     for (child_index, parent_index, line_col_index) in lines:
@@ -170,9 +176,12 @@ def linegraph(branch, start, maxnum):
     
     return (linegraph, revid_index)
 
-def append_line(columns, line, empty_column):
+def append_line(columns, line, empty_column, starting_col_index):
     line_range = range(line[0], line[1]+1)
-    for col_index, column in enumerate(columns):
+    col_order = range(starting_col_index, -1, -1) + \
+                range(starting_col_index+1, len(columns))
+    for col_index in col_order:
+        column = columns[col_index]
         has_overlaping_line = False
         for row_index in line_range:
             if column[row_index]:
