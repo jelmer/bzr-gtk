@@ -34,11 +34,11 @@ class TagsWindow(gtk.Window):
     def __init__(self, branch, parent=None):
         """ Initialize the Tags window. """
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-        
+
         # Get arguments
         self.branch = branch
         self._parent = parent
-        
+
         # Create the widgets
         self._button_add = gtk.Button(stock=gtk.STOCK_ADD)
         self._button_remove = gtk.Button(stock=gtk.STOCK_REMOVE)
@@ -60,6 +60,7 @@ class TagsWindow(gtk.Window):
         self._button_refresh.connect('clicked', self._on_refresh_clicked)
         self._button_remove.connect('clicked', self._on_remove_clicked)
         self._treeview_tags.connect('cursor-changed', self._on_treeview_changed)
+        self.connect('key-press-event', self._on_key_pressed)
         if parent is None:
             self.connect('delete-event', gtk.main_quit)
         
@@ -176,6 +177,23 @@ class TagsWindow(gtk.Window):
         """ Close button event handler. """
         self.destroy()
         if self._parent is None:
+            gtk.main_quit()
+
+    def _on_key_pressed(self, widget, event):
+        """ Key press event handler. """
+        keyname = gtk.gdk.keyval_name(event.keyval)
+        func = getattr(self, '_on_key_press_' + keyname, None)
+        if func:
+            return func(event)
+
+    def _on_key_press_w(self, event):
+        if event.state & gtk.gdk.CONTROL_MASK:
+            self.destroy()
+            if self._parent is None:
+                gtk.main_quit()
+
+    def _on_key_press_q(self, event):
+        if event.state & gtk.gdk.CONTROL_MASK:
             gtk.main_quit()
     
     def _on_refresh_clicked(self, widget):

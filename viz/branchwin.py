@@ -28,10 +28,14 @@ class BranchWindow(gtk.Window):
     for a particular branch.
     """
 
-    def __init__(self):
+    def __init__(self, parent=None):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.set_border_width(0)
         self.set_title("bzrk")
+
+        self._parent = parent
+
+        self.connect('key-press-event', self._on_key_pressed)
 
         # Use three-quarters of the screen by default
         screen = self.get_screen()
@@ -169,7 +173,7 @@ class BranchWindow(gtk.Window):
 
     def set_branch(self, branch, start, maxnum):
         """Set the branch and start position for this window.
-        
+
         Creates a new TreeModel and populates it with information about
         the new branch before updating the window title and model of the
         treeview itself.
@@ -185,7 +189,23 @@ class BranchWindow(gtk.Window):
         self.model = TreeModel(self.branch, linegraphdata)
         self.index = index
         self.treeview.set_model(self.model)
+    def _on_key_pressed(self, widget, event):
+        """ Key press event handler. """
+        keyname = gtk.gdk.keyval_name(event.keyval)
+        func = getattr(self, '_on_key_press_' + keyname, None)
+        if func:
+            return func(event)
 
+    def _on_key_press_w(self, event):
+        if event.state & gtk.gdk.CONTROL_MASK:
+            self.destroy()
+            if self._parent is None:
+                gtk.main_quit()
+
+    def _on_key_press_q(self, event):
+        if event.state & gtk.gdk.CONTROL_MASK:
+            gtk.main_quit()
+    
     def _treeview_cursor_cb(self, *args):
         """Callback for when the treeview cursor changes."""
         (path, col) = self.treeview.get_cursor()
