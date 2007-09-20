@@ -84,6 +84,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         colours and the fg parameter provides the multiplier that should be
         applied to the foreground colours.
         """
+        mainline_color = ( 0.0, 0.0, 0.0 )
         colours = [
             ( 1.0, 0.0, 0.0 ),
             ( 1.0, 1.0, 0.0 ),
@@ -93,10 +94,14 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             ( 1.0, 0.0, 1.0 ),
             ]
 
-        colour %= len(colours)
-        red   = (colours[colour][0] * fg) or bg
-        green = (colours[colour][1] * fg) or bg
-        blue  = (colours[colour][2] * fg) or bg
+        if colour == 0:
+            colour_rgb = mainline_color
+        else:
+            colour_rgb = colours[colour % len(colours)]
+
+        red   = (colour_rgb[0] * fg) or bg
+        green = (colour_rgb[1] * fg) or bg
+        blue  = (colour_rgb[2] * fg) or bg
 
         ctx.set_source_rgb(red, green, blue)
 
