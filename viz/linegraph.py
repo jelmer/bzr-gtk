@@ -35,7 +35,9 @@ def linegraph(branch, start, maxnum):
     It's up to you how to actually draw the nodes and lines (straight,
     curved, kinked, etc.) and to pick the actual colours for each index.
     """
-       
+    
+    # We get the mainline so we can pass it to merge_sort to make merge_sort
+    # run faster.
     mainline = branch.revision_history()
     graph_parents = branch.repository.get_revision_graph(start)
     graph_children = {}
@@ -49,7 +51,20 @@ def linegraph(branch, start, maxnum):
         generate_revno=True)
     
     revid_index = {}
+    
+    # This will hold an item for each "branch". For a revisions, the revsion
+    # number less the least significant digit is the branch_id, and used as the
+    # key for the dict. Hence revision with the same revsion number less the
+    # least significant digit are considered to be in the same branch line.
+    # e.g.: for revisions 290.12.1 and 290.12.2, the branch_id would be 290.12,
+    # and these two revisions will be in the same branch line. Each value is
+    # a list of [rev_indexes, min_index, max_index, col_index].
     branch_lines = {}
+    BL_REV_INDEXES = 0
+    BL_MIN_INDEX = 1
+    BL_MAX_INDEX = 2
+    BL_COL_INDEX = 3
+    
     linegraph = []    
     
     for (rev_index, (sequence_number,
@@ -64,16 +79,17 @@ def linegraph(branch, start, maxnum):
         
         branch_line = None
         if branch_id not in branch_lines:
-            branch_line = {"branch_id": branch_id,
-                           "rev_indexes": [],
-                           "min_index": rev_index,
-                           "max_index": 0}
+            branch_line = [[],        # BL_REV_INDEXES
+                           rev_index, # BL_MIN_INDEX
+                           0,         # BL_MAX_INDEX
+                           None]      # BL_COL_INDEX
             branch_lines[branch_id] = branch_line
         else:
             branch_line = branch_lines[branch_id]
-        branch_line["rev_indexes"].append(rev_index)
-        if rev_index > branch_line["max_index"]:
-            branch_line["max_index"] = rev_index
+        
+        branch_line[BL_REV_INDEXES].append(rev_index)
+        if rev_index > branch_line[BL_MAX_INDEX]:
+            branch_line[BL_MAX_INDEX] = rev_index
         
         parents = graph_parents[revid]
         for parent_revid in parents:
@@ -87,37 +103,50 @@ def linegraph(branch, start, maxnum):
                           revno_sequence])
 
     branch_ids = branch_lines.keys()
+    
     def branch_id_cmp(x, y):
+        """Compaire branch_id's first by the number of digits, then reversed
+        by their value"""
         len_x = len(x)
         len_y = len(y)
         if len_x == len_y:
             return -cmp(x, y)
         return cmp(len_x, len_y)
-        
+    
     branch_ids.sort(branch_id_cmp)
+    # This will hold a tuple of (child_index, parent_index, col_index) for each
+    # line that needs to be drawn. If col_index is not none, then the line is
+    # drawn along that column, else the the line can be drawn directly between
+    # the child and parent because either the child and parent are in the same
+    # branch line, or the child and parent are 1 row apart.
     lines = []
     empty_column = [False for i in range(len(graph_parents))]
+    # This will hold a bit map for each cell. If the cell is true, then the
+    # cell allready contains a node or line. This use when deciding what column
+    # to place a branch line or line in, without it overlaping something else.
     columns = [list(empty_column)]
     
     
     for branch_id in branch_ids:
         branch_line = branch_lines[branch_id]
         
+        
         parent_col_index = 0
         if len(branch_id) > 1:
             parent_branch_id = branch_id[0:-2]
-            parent_col_index = branch_lines[parent_branch_id]["col_index"]
+            parent_col_index = branch_lines[parent_branch_id][BL_COL_INDEX]
         
-        branch_line["col_index"] = append_line(columns,
-                                               (branch_line["min_index"],
-                                                branch_line["max_index"]),
+        branch_line[BL_COL_INDEX] = append_line(columns,
+                                               (branch_line[BL_MIN_INDEX],
+                                                branch_line[BL_MAX_INDEX]),
                                                empty_column,
-                                               parent_col_index)
+                                               parent_col_index,
+                                               False)
         color = reduce(lambda x, y: x+y, branch_id, 0)
-        col_index = branch_line["col_index"]
+        col_index = branch_line[BL_COL_INDEX]
         node = (col_index, color)        
         
-        for rev_index in branch_line["rev_indexes"]:
+        for rev_index in branch_line[BL_REV_INDEXES]:
             (sequence_number,
                  revid,
                  merge_depth,
@@ -138,7 +167,8 @@ def linegraph(branch, start, maxnum):
                         col_index = append_line(columns,
                                                 (rev_index+1, parent_index-1),
                                                 empty_column,
-                                                branch_line["col_index"])
+                                                branch_line[BL_COL_INDEX],
+                                                True)
                     lines.append((rev_index, parent_index, col_index))
     
     for (child_index, parent_index, line_col_index) in lines:
@@ -176,10 +206,15 @@ def linegraph(branch, start, maxnum):
     
     return (linegraph, revid_index)
 
-def append_line(columns, line, empty_column, starting_col_index):
+def append_line(columns, line, empty_column, starting_col_index, search_inwards):
     line_range = range(line[0], line[1]+1)
-    col_order = range(starting_col_index, -1, -1) + \
-                range(starting_col_index+1, len(columns))
+    if search_inwards:
+        col_order = range(starting_col_index, -1, -1) + \
+                    range(starting_col_index+1, len(columns))
+    else:
+        col_order = range(starting_col_index, len(columns)) + \
+                    range(starting_col_index-1, -1, -1)
+    
     for col_index in col_order:
         column = columns[col_index]
         has_overlaping_line = False
