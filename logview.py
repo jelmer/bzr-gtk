@@ -21,6 +21,7 @@ import gtk
 import pango
 
 from bzrlib.osutils import format_date
+from bzrlib.util import bencode
 
 
 class LogView(gtk.ScrolledWindow):
@@ -78,6 +79,19 @@ class LogView(gtk.ScrolledWindow):
 
         self._add_parents(revision.parent_ids)
         self._add_tags(tags)
+
+        file_info = revision.properties.get('sp1-exp-file-info', None)
+        if file_info is not None:
+            file_info = bencode.bdecode(file_info)
+
+        if file_info:
+            text = []
+            for fi in file_info:
+                text.append('%(file_id)s\n%(comments)s' % fi)
+            self.file_info_buffer.set_text('\n'.join(text))
+            self.file_info_box.show()
+        else:
+            self.file_info_box.hide()
 
     def _show_clicked_cb(self, widget, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
@@ -152,7 +166,8 @@ class LogView(gtk.ScrolledWindow):
         vbox.set_border_width(6)
         vbox.pack_start(self._create_headers(), expand=False, fill=True)
         vbox.pack_start(self._create_parents_table(), expand=False, fill=True)
-        vbox.pack_start(self._create_message_view())
+        vbox.pack_start(self._create_message_view(), expand=True, fill=True)
+        vbox.pack_start(self._create_file_info_view(), expand=True, fill=True)
         self.add_with_viewport(vbox)
         vbox.show()
 
@@ -286,4 +301,20 @@ class LogView(gtk.ScrolledWindow):
         tv.modify_font(pango.FontDescription("Monospace"))
         tv.show()
         return tv
+
+    def _create_file_info_view(self):
+        self.file_info_box = gtk.VBox()
+        label = gtk.Label()
+        label.set_markup("<b>Per File Messages:</b>")
+        label.show()
+        self.file_info_buffer = gtk.TextBuffer()
+        tv = gtk.TextView(self.file_info_buffer)
+        tv.set_editable(False)
+        tv.set_wrap_mode(gtk.WRAP_WORD)
+        tv.modify_font(pango.FontDescription("Monospace"))
+        tv.show()
+        self.file_info_box.pack_start(label)
+        self.file_info_box.pack_start(tv)
+        self.file_info_box.hide() # Only shown when there are per-file messages
+        return self.file_info_box
 
