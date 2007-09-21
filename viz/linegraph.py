@@ -51,6 +51,7 @@ def linegraph(branch, start, maxnum):
         generate_revno=True)
     
     revid_index = {}
+    revno_index = {}
     
     # This will hold an item for each "branch". For a revisions, the revsion
     # number less the least significant digit is the branch_id, and used as the
@@ -74,6 +75,7 @@ def linegraph(branch, start, maxnum):
                      end_of_merge)) in enumerate(merge_sorted_revisions):
         
         revid_index[revid] = rev_index
+        revno_index[revno_sequence] = rev_index
         
         branch_id = revno_sequence[0:-1]
         
@@ -130,18 +132,24 @@ def linegraph(branch, start, maxnum):
     for branch_id in branch_ids:
         branch_line = branch_lines[branch_id]
         
-        
+        # Find the col_index for the direct parent branch. This will be the
+        # starting point when looking for a free column.
         parent_col_index = 0
         if len(branch_id) > 1:
             parent_branch_id = branch_id[0:-2]
             parent_col_index = branch_lines[parent_branch_id][BL_COL_INDEX]
-        col_search_order = branch_line_col_search_order(columns,
-                                                        parent_col_index)
-        branch_line[BL_COL_INDEX] = append_line(columns,
-                                               (branch_line[BL_MIN_INDEX],
-                                                branch_line[BL_MAX_INDEX]),
-                                               empty_column,
-                                               col_search_order)
+            parent_revno = branch_id[0:-1]
+            if parent_revno in revno_index:
+                parent_index = revno_index[parent_revno]
+                branch_line[BL_MAX_INDEX] = parent_index - 1
+        
+        col_search_order = _branch_line_col_search_order(columns,
+                                                         parent_col_index)
+        branch_line[BL_COL_INDEX] = _append_line(columns,
+                                                (branch_line[BL_MIN_INDEX],
+                                                 branch_line[BL_MAX_INDEX]),
+                                                empty_column,
+                                                col_search_order)
         color = reduce(lambda x, y: x+y, branch_id, 0)
         col_index = branch_line[BL_COL_INDEX]
         node = (col_index, color)        
@@ -162,21 +170,30 @@ def linegraph(branch, start, maxnum):
                     parent_revno = merge_sorted_revisions[parent_index][3]
                     parent_branch_id = parent_revno[0:-1]
                     col_index = None
+                    is_direct_parent_line = False
+                    if len(branch_id) > 1:
+                        if parent_revno == branch_id[0:-1]:
+                            is_direct_parent_line = True
+                    
+                    # A line only needs it's own column if it is going from
+                    # one branch line to another, it's not the line to the
+                    # direct parent, and if it is longer than one row.
                     if branch_id != parent_branch_id and \
-                                    parent_index - rev_index > 1:
+                       parent_index - rev_index > 1 and \
+                       not is_direct_parent_line:
                         parent_node = linegraph[parent_index][1]
                         if parent_node:
                             parent_col_index = parent_node[0]
                         else:
                             parent_col_index = None
                         col_search_order = \
-                                line_col_search_order(columns,
-                                                      parent_col_index,
-                                                      branch_line[BL_COL_INDEX])
-                        col_index = append_line(columns,
-                                                (rev_index+1, parent_index-1),
-                                                empty_column,
-                                                col_search_order)
+                                _line_col_search_order(columns,
+                                                       parent_col_index,
+                                                       branch_line[BL_COL_INDEX])
+                        col_index = _append_line(columns,
+                                                 (rev_index+1, parent_index-1),
+                                                 empty_column,
+                                                 col_search_order)
                     lines.append((rev_index, parent_index, col_index))
     
     for (child_index, parent_index, line_col_index) in lines:
@@ -187,43 +204,48 @@ def linegraph(branch, start, maxnum):
         color = parent_node[1]
         
         if line_col_index:
+            # line from the child's column to the lines column
             linegraph[child_index][2].append(
                 (child_col_index,
                  line_col_index,
                  color))
+            # lines down the line's column
             for line_part_index in range(child_index+1, parent_index-1):
                 linegraph[line_part_index][2].append(
                     (line_col_index,   
                      line_col_index,
                      color))
+            # line from the line's column to the parent's column
             linegraph[parent_index-1][2].append(
                 (line_col_index,
                  parent_col_index,
                  color))
         else:
-            linegraph[child_index][2].append(
+            # lines down the child's column
+            for line_part_index in range(child_index, parent_index-1):
+                linegraph[line_part_index][2].append(
+                    (child_col_index,   
+                     child_col_index,
+                     color))
+            # line from the child's column to the parent's column
+            linegraph[parent_index-1][2].append(
                 (child_col_index,
                  parent_col_index,
                  color))
-            for line_part_index in range(child_index+1, parent_index):
-                linegraph[line_part_index][2].append(
-                    (parent_col_index,   
-                     parent_col_index,
-                     color))
-                    
     
     return (linegraph, revid_index)
 
-def branch_line_col_search_order(columns, parent_col_index):
+def _branch_line_col_search_order(columns, parent_col_index):
     return range(parent_col_index, len(columns)) + \
            range(parent_col_index-1, -1, -1)
 
-def line_col_search_order(columns, parent_col_index, child_col_index):
+def _line_col_search_order(columns, parent_col_index, child_col_index):
     dest_col_indexes = []
-    if parent_col_index is not None: dest_col_indexes.append(parent_col_index)
-    if child_col_index is not None: dest_col_indexes.append(child_col_index)
-    if len(dest_col_indexes) == 1:
-        dest_col_indexes.append(dest_col_indexes[0])
+    if parent_col_index is not None:
+        dest_col_indexes.append(parent_col_index)
+    else:
+        dest_col_indexes.append(child_col_index)
+    dest_col_indexes.append(child_col_index)
     dest_col_indexes.sort()
     col_search_order = range(dest_col_indexes[1], dest_col_indexes[0] -1, -1) 
     i = 1
@@ -236,7 +258,7 @@ def line_col_search_order(columns, parent_col_index, child_col_index):
         i += 1
     return col_search_order
 
-def append_line(columns, line, empty_column, col_search_order):
+def _append_line(columns, line, empty_column, col_search_order):
     line_range = range(line[0], line[1]+1)
     
     for col_index in col_search_order:
