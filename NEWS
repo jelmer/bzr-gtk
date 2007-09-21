@@ -4,6 +4,19 @@
 
   * Added keyboard shortcuts for closing windows and exiting Olive.
     (#139559, Daniel Schierbeck)
+
+  * Rewrite of a large ammount of the viz code:
+        * Make use of the bzrlib.tsort.merge_sort for sorting the revisions.
+        * A new algorithm to work out how to draw the lines using the
+          revsion numbers returned from merge_sort.
+        * Choose the color for a branch from the revsion number, which results
+          in stable colors. Revisions on the mainline are allways black.
+        * Implement a TreeModel that loads the revision data incrementaly,
+          improving the time it takes to display the first screen of data
+          by 82%.
+        * Add a column to display the revision number.
+        * Add buttons to navigate to child revisions.
+    (Gary van der Merwe)
  
  BUG FIXES
 
