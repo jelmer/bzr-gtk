@@ -203,18 +203,18 @@ def linegraph(branch, start, maxnum):
                             _find_free_column(columns,
                                               empty_column,
                                               col_search_order,
-                                              (rev_index + 1, rev_index + 1))
+                                              (rev_index + 1,))
                         _mark_column_as_used(columns,
                                              child_line_col_index,
-                                             (rev_index + 1, rev_index + 1))
+                                             (rev_index + 1,))
                         parent_col_line_index = \
                             _find_free_column(columns,
                                               empty_column,
                                               col_search_order,
-                                              (parent_index - 1, parent_index - 1))
+                                              (parent_index - 1,))
                         _mark_column_as_used(columns,
                                              parent_col_line_index,
-                                             (parent_index - 1, parent_index - 1))
+                                             (parent_index - 1,))
                         lines.append((rev_index,
                                       parent_index,
                                       (child_line_col_index,
@@ -279,12 +279,12 @@ def linegraph(branch, start, maxnum):
             linegraph[parent_index-2][2].append(
                 (None,
                  line_col_indexes[1],
-                 child_color))
+                 parent_color))
             # line from the line's column to the parent's column
             linegraph[parent_index-1][2].append(
                 (line_col_indexes[1],
                  parent_col_index,
-                 child_color))
+                 parent_color))
             
     
     return (linegraph, revid_index)
