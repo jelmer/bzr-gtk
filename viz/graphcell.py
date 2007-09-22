@@ -145,7 +145,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         box_size = self.box_size(widget)
 
         ctx.set_line_width(box_size / 8)
-        ctx.set_line_cap(cairo.LINE_CAP_SQUARE)
+        ctx.set_line_cap(cairo.LINE_CAP_ROUND)
 
         # Draw lines into the cell
         for start, end, colour in self.in_lines:
@@ -172,22 +172,36 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         ctx.fill()
     
     def render_line (self, ctx, cell_area, box_size, mid, height, start, end, colour):
-        startx = cell_area.x + box_size * start + box_size / 2
-        endx = cell_area.x + box_size * end + box_size / 2
-        
-        ctx.move_to(startx, mid - height / 2)
-        
-        if start - end == 0 :
-            ctx.line_to(endx, mid + height / 2)
+        if start is None:
+            x = cell_area.x + box_size * end + box_size / 2
+            ctx.move_to(x, mid + height / 3)
+            ctx.line_to(x, mid + height / 3)
+            ctx.move_to(x, mid + height / 6)
+            ctx.line_to(x, mid + height / 6)
+            
+        elif end is None:
+            x = cell_area.x + box_size * start + box_size / 2
+            ctx.move_to(x, mid - height / 3)
+            ctx.line_to(x, mid - height / 3)
+            ctx.move_to(x, mid - height / 6)
+            ctx.line_to(x, mid - height / 6)
         else:
-            ctx.curve_to(startx, mid - height / 5,
-                         startx, mid - height / 5,
-                         startx + (endx - startx) / 2, mid)
+            startx = cell_area.x + box_size * start + box_size / 2
+            endx = cell_area.x + box_size * end + box_size / 2
             
-            ctx.curve_to(endx, mid + height / 5,
-                         endx, mid + height / 5 ,
-                         endx, mid + height / 2)
+            ctx.move_to(startx, mid - height / 2)
             
+            if start - end == 0 :
+                ctx.line_to(endx, mid + height / 2)
+            else:
+                ctx.curve_to(startx, mid - height / 5,
+                             startx, mid - height / 5,
+                             startx + (endx - startx) / 2, mid)
+                
+                ctx.curve_to(endx, mid + height / 5,
+                             endx, mid + height / 5 ,
+                             endx, mid + height / 2)
+                
         self.set_colour(ctx, colour, 0.0, 0.65)
         ctx.stroke()
         
