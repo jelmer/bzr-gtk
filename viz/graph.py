@@ -68,7 +68,6 @@ class DistanceMethod(object):
         self.repository = repository
         self.start_revid = start_revid
         self.revisions = {}
-        self.children = {}
         self.children_of_id = {start_revid: set()}
         self.parent_ids_of = {}
         self.colours = { start_revid: 0 }
@@ -162,6 +161,10 @@ class DistanceMethod(object):
         self.distances = distances
         return sorted(distances, key=distances.get)
 
+    def choose_null_colour(self, revid):
+        """We know we don't need this color, so just set it to NULL"""
+        self.colours[revid] = 0
+
     def choose_colour(self, revid):
         revision = self.revisions[revid]
         children_of_id = self.children_of_id
@@ -236,7 +239,7 @@ class DistanceMethod(object):
                 self.colours[revid] = self.last_colour = self.last_colour + 1
 
 
-def distances(repository, start_revid):
+def distances(repository, start_revid, maxnum=None):
     """Sort the revisions.
 
     Traverses the branch revision tree starting at start and produces an
@@ -250,8 +253,13 @@ def distances(repository, start_revid):
     distance.merge_sorted = merge_sort(distance.graph, distance.start_revid)
     children = distance.make_children_map()
     
+    count = 0
     for seq, revid, merge_depth, end_of_merge in distance.merge_sorted:
-        distance.choose_colour(revid)
+        count += 1
+        if maxnum is not None and count > maxnum:
+            distance.choose_null_colour(revid)
+        else:
+            distance.choose_colour(revid)
 
     revisions = distance.revisions
     colours = distance.colours
