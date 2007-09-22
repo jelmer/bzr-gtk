@@ -9,6 +9,10 @@
 
   * Fix the "Complete Diff" entry in DiffWindow to show the whole diff.
     (#140512, James Westby) 
+ 
+ INTERNALS
+ 
+  * `bzr viz --limit` much more faster than before. (John Arbash Meinel)
 
 0.90.0	2007-08-27
 
