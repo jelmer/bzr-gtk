@@ -78,7 +78,8 @@ def linegraph(branch, start, maxnum):
                      merge_depth,
                      revno_sequence,
                      end_of_merge)) in enumerate(merge_sorted_revisions):
-        
+        if maxnum and rev_index >= maxnum:
+            break
         revid_index[revid] = rev_index
         revno_index[revno_sequence] = rev_index
         
