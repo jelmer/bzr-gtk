@@ -143,32 +143,34 @@ def linegraph(branch, start, maxnum):
                                                          parent_col_index)
         color = reduce(lambda x, y: x+y, branch_id, 0)
         cur_cont_line = []
-        def end_cont_line(line_range):
-            col_index = _find_free_column(columns,
-                                          empty_column,
-                                          col_search_order,
-                                          line_range)
-            node = (col_index, color)
-            for rev_index in cur_cont_line:
-                linegraph[rev_index][1] = node
-                columns[col_index][rev_index] = True
         
+        line_range = []
         last_rev_index = None
         for rev_index in branch_line:
             if last_rev_index:
                 if rev_index - last_rev_index > BROKEN_LINE_LENGTH:
-                    line_range = range(cur_cont_line[0], cur_cont_line[-1]+1)
-                    end_cont_line(line_range)
-                    cur_cont_line = []
+                    line_range.append(last_rev_index+1)
+                    line_range.append(rev_index-1)
+                else:
+                    line_range.extend(range(last_rev_index+1, rev_index))
+            
+            line_range.append(rev_index)
             last_rev_index = rev_index
-            cur_cont_line.append(rev_index)
         
-        if parent_index and \
-           parent_index - cur_cont_line[-1] <= BROKEN_LINE_LENGTH:
-            line_range = range(cur_cont_line[0], parent_index)
-        else:
-            line_range = range(cur_cont_line[0], cur_cont_line[-1]+1)
-        end_cont_line(line_range)
+        if parent_index:
+            if parent_index - last_rev_index > BROKEN_LINE_LENGTH:
+                line_range.append(last_rev_index+1)
+            else:
+                line_range.extend(range(last_rev_index+1, parent_index))
+        
+        col_index = _find_free_column(columns,
+                                      empty_column,
+                                      col_search_order,
+                                      line_range)
+        node = (col_index, color)
+        for rev_index in branch_line:
+            linegraph[rev_index][1] = node
+            columns[col_index][rev_index] = True
         
         for rev_index in branch_line:
             (sequence_number,
