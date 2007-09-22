@@ -87,21 +87,21 @@ class BranchWindow(gtk.Window):
         self.treeview.show()
 
         cell = gtk.CellRendererText()
-        #cell.set_property("width-chars", 40)
-        #cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        cell.set_property("width-chars", 10)
+        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         column = gtk.TreeViewColumn("Revision No")
         column.set_resizable(True)
         column.pack_start(cell, expand=True)
         column.add_attribute(cell, "text", treemodel.REVNO)
         self.treeview.append_column(column)
 
-        cell = CellRendererGraph()
+        self.graph_cell = CellRendererGraph()
         column = gtk.TreeViewColumn()
         column.set_resizable(True)
-        column.pack_start(cell, expand=False)
-        column.add_attribute(cell, "node", treemodel.NODE)
-        column.add_attribute(cell, "in-lines", treemodel.LAST_LINES)
-        column.add_attribute(cell, "out-lines", treemodel.LINES)
+        column.pack_start(self.graph_cell, expand=False)
+        column.add_attribute(self.graph_cell, "node", treemodel.NODE)
+        column.add_attribute(self.graph_cell, "in-lines", treemodel.LAST_LINES)
+        column.add_attribute(self.graph_cell, "out-lines", treemodel.LINES)
         self.treeview.append_column(column)
 
         cell = gtk.CellRendererText()
@@ -183,10 +183,11 @@ class BranchWindow(gtk.Window):
         gobject.idle_add(self.populate_model, start, maxnum)
 
     def populate_model(self, start, maxnum):
-        (linegraphdata, index) = linegraph(self.branch,
-                                           start,
-                                           maxnum)
+        (linegraphdata, index, columns_len) = linegraph(self.branch,
+                                                        start,
+                                                        maxnum)
         self.model = TreeModel(self.branch, linegraphdata)
+        self.graph_cell.columns_len = columns_len
         self.index = index
         self.treeview.set_model(self.model)
     def _on_key_pressed(self, widget, event):

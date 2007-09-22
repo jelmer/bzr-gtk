@@ -30,6 +30,8 @@ class CellRendererGraph(gtk.GenericCellRenderer):
       in_lines          (start, end, colour) tuple list to draw inward lines,
       out_lines         (start, end, colour) tuple list to draw outward lines.
     """
+    
+    columns_len = 0
 
     __gproperties__ = {
         "node":         ( gobject.TYPE_PYOBJECT, "node",
@@ -45,7 +47,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                           gobject.PARAM_WRITABLE
                         ),
         }
-
+    
     def do_set_property(self, property, value):
         """Set properties from GObject properties."""
         if property.name == "node":
@@ -114,11 +116,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         """
         box_size = self.box_size(widget) + 1
 
-        cols = self.node[0]
-        for start, end, colour in self.in_lines + self.out_lines:
-            cols = max(cols, start, end)
-
-        width = box_size * (cols + 1)
+        width = box_size * (self.columns_len + 1)
         height = box_size
 
         # FIXME I have no idea how to use cell_area properly
