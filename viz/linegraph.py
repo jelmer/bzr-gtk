@@ -234,58 +234,55 @@ def linegraph(branch, start, maxnum):
                                       (line_col_index,)))
     
     for (child_index, parent_index, line_col_indexes) in lines:
-        child_col_index = linegraph[child_index][1][0]
-        
-        parent_node = linegraph[parent_index][1]
-        parent_col_index = parent_node[0]
-        color = parent_node[1]
+        (child_col_index, child_color) = linegraph[child_index][1]
+        (parent_col_index, parent_color) = linegraph[parent_index][1]
         
         if len(line_col_indexes) == 1:
             if parent_index - child_index == 1:
                 linegraph[child_index][2].append(
                     (child_col_index,
                      parent_col_index,
-                     color))
+                     parent_color))
             else:
                 # line from the child's column to the lines column
                 linegraph[child_index][2].append(
                     (child_col_index,
                      line_col_indexes[0],
-                     color))
+                     parent_color))
                 # lines down the line's column
                 for line_part_index in range(child_index+1, parent_index-1):
                     linegraph[line_part_index][2].append(
                         (line_col_indexes[0],   
                          line_col_indexes[0],
-                         color))
+                         parent_color))
                 # line from the line's column to the parent's column
                 linegraph[parent_index-1][2].append(
                     (line_col_indexes[0],
                      parent_col_index,
-                     color))
+                     parent_color))
         else:
             # Broken line
             # line from the child's column to the lines column
             linegraph[child_index][2].append(
                 (child_col_index,
                  line_col_indexes[0],
-                 color))
+                 parent_color))
             # Broken line end
             linegraph[child_index+1][2].append(
                 (line_col_indexes[0],
                  None,
-                 color))
+                 parent_color))
             
             # Broken line end 
             linegraph[parent_index-2][2].append(
                 (None,
                  line_col_indexes[1],
-                 color))
+                 child_color))
             # line from the line's column to the parent's column
             linegraph[parent_index-1][2].append(
                 (line_col_indexes[1],
                  parent_col_index,
-                 color))
+                 child_color))
             
     
     return (linegraph, revid_index)
