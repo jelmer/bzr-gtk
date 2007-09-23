@@ -203,6 +203,8 @@ class BranchWindow(gtk.Window):
             if maxnum is not None and index > maxnum:
                 break
         self.treeview.set_model(self.model)
+        self.treeview.get_selection().select_path(0)
+        self.logview.set_revision(self.model[0][0], []) # TODO: Send tags as well
         return False
     
     def _on_key_pressed(self, widget, event):
