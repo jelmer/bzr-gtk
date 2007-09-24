@@ -299,27 +299,29 @@ def linegraph(branch, start, maxnum):
     return (linegraph, revid_index, len(columns))
 
 def _branch_line_col_search_order(columns, parent_col_index):
-    return range(parent_col_index, len(columns)) + \
-           range(parent_col_index-1, -1, -1)
+    for col_index in range(parent_col_index, len(columns)):
+        yield col_index
+    for col_index in range(parent_col_index-1, -1, -1):
+        yield col_index
 
 def _line_col_search_order(columns, parent_col_index, child_col_index):
-    dest_col_indexes = []
     if parent_col_index is not None:
-        dest_col_indexes.append(parent_col_index)
+        max_index = max(parent_col_index, child_col_index)
+        min_index = min(parent_col_index, child_col_index)
+        for col_index in range(max_index, min_index -1, -1):
+            yield col_index
     else:
-        dest_col_indexes.append(child_col_index)
-    dest_col_indexes.append(child_col_index)
-    dest_col_indexes.sort()
-    col_search_order = range(dest_col_indexes[1], dest_col_indexes[0] -1, -1) 
+        max_index = child_col_index
+        min_index = child_col_index
+        yield child_col_index
     i = 1
-    while dest_col_indexes[1] + i < len(columns) or \
-          dest_col_indexes[0] - i > -1:
-        if dest_col_indexes[1] + i < len(columns):
-            col_search_order.append(dest_col_indexes[1] + i)
-        if dest_col_indexes[0] - i > -1:
-            col_search_order.append(dest_col_indexes[0] - i)
+    while max_index + i < len(columns) or \
+          min_index - i > -1:
+        if max_index + i < len(columns):
+            yield max_index + i
+        if min_index - i > -1:
+            yield min_index - i
         i += 1
-    return col_search_order
 
 def _find_free_column(columns, empty_column, col_search_order, line_range):
     for col_index in col_search_order:
