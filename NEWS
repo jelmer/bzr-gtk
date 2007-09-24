@@ -11,7 +11,9 @@
  BUG FIXES
 
   * Fix the "Complete Diff" entry in DiffWindow to show the whole diff.
-    (#140512, James Westby) 
+    (#140512, James Westby)
+  
+  * Right-clicking in Olive's file list works again. (#136310, Mark Lee) 
  
  INTERNALS
  
