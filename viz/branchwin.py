@@ -77,7 +77,7 @@ class BranchWindow(gtk.Window):
         self.treeview = gtk.TreeView()
         self.treeview.set_rules_hint(True)
         self.treeview.set_search_column(4)
-        self.treeview.connect("cursor-changed", self._treeview_cursor_cb)
+        self.treeview.get_selection().connect("changed", self._treeselection_changed_cb)
         self.treeview.connect("row-activated", self._treeview_row_activated_cb)
         self.treeview.connect("button-release-event", 
                 self._treeview_row_mouseclick)
@@ -203,6 +203,7 @@ class BranchWindow(gtk.Window):
             if maxnum is not None and index > maxnum:
                 break
         self.treeview.set_model(self.model)
+        self.treeview.get_selection().select_path(0)
         return False
     
     def _on_key_pressed(self, widget, event):
@@ -221,20 +222,21 @@ class BranchWindow(gtk.Window):
     def _on_key_press_q(self, event):
         if event.state & gtk.gdk.CONTROL_MASK:
             gtk.main_quit()
-    
-    def _treeview_cursor_cb(self, *args):
-        """Callback for when the treeview cursor changes."""
-        (path, col) = self.treeview.get_cursor()
-        revision = self.model[path][0]
 
-        self.back_button.set_sensitive(len(self.parent_ids[revision]) > 0)
-        self.fwd_button.set_sensitive(len(self.children[revision]) > 0)
-        tags = []
-        if self.branch.supports_tags():
-            tagdict = self.branch.tags.get_reverse_tag_dict()
-            if tagdict.has_key(revision.revision_id):
-                tags = tagdict[revision.revision_id]
-        self.logview.set_revision(revision, tags)
+    def _treeselection_changed_cb(self, selection, *args):
+        """Callback for when the treeview changes."""
+        (model, selected_rows) = selection.get_selected_rows()
+        if len(selected_rows) > 0:
+            revision = self.model[selected_rows[0]][0]
+
+            self.back_button.set_sensitive(len(self.parent_ids[revision]) > 0)
+            self.fwd_button.set_sensitive(len(self.children[revision]) > 0)
+            tags = []
+            if self.branch.supports_tags():
+                tagdict = self.branch.tags.get_reverse_tag_dict()
+                if tagdict.has_key(revision.revision_id):
+                    tags = tagdict[revision.revision_id]
+            self.logview.set_revision(revision, tags)
 
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
