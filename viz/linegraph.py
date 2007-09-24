@@ -154,7 +154,8 @@ def linegraph(branch, start, maxnum):
         last_rev_index = None
         for rev_index in branch_line:
             if last_rev_index:
-                if rev_index - last_rev_index > BROKEN_LINE_LENGTH:
+                if BROKEN_LINE_LENGTH and \
+                   rev_index - last_rev_index > BROKEN_LINE_LENGTH:
                     line_range.append(last_rev_index+1)
                     line_range.append(rev_index-1)
                 else:
@@ -164,7 +165,8 @@ def linegraph(branch, start, maxnum):
             last_rev_index = rev_index
         
         if parent_index:
-            if parent_index - last_rev_index > BROKEN_LINE_LENGTH:
+            if BROKEN_LINE_LENGTH and \
+               parent_index - last_rev_index > BROKEN_LINE_LENGTH:
                 line_range.append(last_rev_index+1)
             else:
                 line_range.extend(range(last_rev_index+1, parent_index))
@@ -204,6 +206,7 @@ def linegraph(branch, start, maxnum):
                         
                     # If this line is really long, break it.
                     if len(branch_id) > 0 and \
+                       BROKEN_LINE_LENGTH and \
                        parent_index - rev_index > BROKEN_LINE_LENGTH:
                         child_line_col_index = \
                             _find_free_column(columns,
