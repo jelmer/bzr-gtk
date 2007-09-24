@@ -4,6 +4,9 @@
 
   * Added keyboard shortcuts for closing windows and exiting Olive.
     (#139559, Daniel Schierbeck)
+  
+  * The tip revision will be automatically selected in the branch visualization
+    window. (#144244, Daniel Schierbeck)
  
  BUG FIXES
 
