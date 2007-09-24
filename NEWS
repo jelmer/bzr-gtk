@@ -7,17 +7,33 @@
   
   * The tip revision will be automatically selected in the branch visualization
     window. (#144244, Daniel Schierbeck)
+  
+  * Updated olive-gtk.desktop: Polish translation and additional categories.
+    (Mateusz Korniak)
  
  BUG FIXES
 
   * Fix the "Complete Diff" entry in DiffWindow to show the whole diff.
     (#140512, James Westby)
   
-  * Right-clicking in Olive's file list works again. (#136310, Mark Lee) 
+  * Right-clicking in Olive's file list works again. (#136310, Mark Lee)
+  
+  * Annotate context menu works again. (Daniel Schierbeck)
+  
+  * Fixed push (with overwite) behavior when branches are diverged.
+    (Mateusz Korniak)
+  
+  * Local missing revisions are remote extra revisions (Missing revisions menu
+    item in Olive). (Mateusz Korniak)
  
  INTERNALS
  
   * `bzr viz --limit` much more faster than before. (John Arbash Meinel)
+  
+  * Use get_apparent_author, rename variables to 'author'. (Aaron Bentley)
+  
+  * Added default_branch_path to MergeDialog and use it from olive-gtk.
+    (Mateusz Korniak)
 
 0.90.0	2007-08-27
 
