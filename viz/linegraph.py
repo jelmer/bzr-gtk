@@ -216,6 +216,13 @@ def linegraph(branch, start, maxnum):
                         _mark_column_as_used(columns,
                                              child_line_col_index,
                                              (rev_index + 1,))
+                        
+                        # Recall _line_col_search_order to reset it back to
+                        # the beging.
+                        col_search_order = \
+                                _line_col_search_order(columns,
+                                                       parent_col_index,
+                                                       col_index)
                         parent_col_line_index = \
                             _find_free_column(columns,
                                               empty_column,
