@@ -4,6 +4,8 @@
 
   * Added keyboard shortcuts for closing windows and exiting Olive.
     (#139559, Daniel Schierbeck)
+  * Add a message to the viz window to indicate that the graph is still loading.
+    (Gary van der Merwe)
  
  BUG FIXES
 
