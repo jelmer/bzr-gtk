@@ -1,3 +1,9 @@
+0.92.0	UNRELEASED
+
+ INTERNALS
+
+  * Use standard version tuple. (Jelmer)
+
 0.91.0	2007-09-24
 
  UI
