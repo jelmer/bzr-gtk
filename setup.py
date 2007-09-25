@@ -1,13 +1,37 @@
 #!/usr/bin/python
 """GTK+ Frontends for various Bazaar commands."""
 
-from distutils.core import setup
+from distutils.core import setup, Command
 from distutils.command.install_data import install_data
 from distutils.dep_util import newer
 from distutils.log import info
 import glob
 import os
 import sys
+
+class Check(Command):
+    description = "Run unit tests"
+
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def get_command_name(self):
+        return 'test'
+
+    def run(self):
+        from bzrlib.tests import TestLoader, TestSuite, TextTestRunner
+        import __init__ as bzrgtk
+        runner = TextTestRunner()
+        loader = TestLoader()
+        suite = TestSuite()
+        suite.addTest(bzrgtk.test_suite())
+        result = runner.run(suite)
+        return result.wasSuccessful()
 
 class InstallData(install_data):
     def run(self):
@@ -104,5 +128,6 @@ setup(
                                         'bzr-notify.desktop']),
                 ('share/pixmaps', ['icons/olive-gtk.png'])
                ],
-    cmdclass={'install_data': InstallData}
+    cmdclass={'install_data': InstallData,
+              'check': Check}
 )

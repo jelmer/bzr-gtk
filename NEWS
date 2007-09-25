@@ -4,6 +4,8 @@
 
   * Use standard version tuple. (Jelmer)
 
+  * Add check command to setup.py. (Jelmer)
+
 0.91.0	2007-09-24
 
  UI
