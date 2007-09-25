@@ -79,7 +79,7 @@ class BranchWindow(gtk.Window):
         self.treeview = gtk.TreeView()
         self.treeview.set_rules_hint(True)
         self.treeview.set_search_column(4)
-        self.treeview.connect("cursor-changed", self._treeview_cursor_cb)
+        self.treeview.get_selection().connect("changed", self._treeselection_changed_cb)
         self.treeview.connect("row-activated", self._treeview_row_activated_cb)
         self.treeview.connect("button-release-event", 
                 self._treeview_row_mouseclick)
@@ -204,6 +204,9 @@ class BranchWindow(gtk.Window):
         self.graph_column.set_max_width(width)
         self.index = index
         self.treeview.set_model(self.model)
+        self.treeview.get_selection().select_path(0)
+        return False
+    
     def _on_key_pressed(self, widget, event):
         """ Key press event handler. """
         keyname = gtk.gdk.keyval_name(event.keyval)
@@ -221,22 +224,23 @@ class BranchWindow(gtk.Window):
         if event.state & gtk.gdk.CONTROL_MASK:
             gtk.main_quit()
     
-    def _treeview_cursor_cb(self, *args):
-        """Callback for when the treeview cursor changes."""
-        (path, col) = self.treeview.get_cursor()
-        iter = self.model.get_iter(path)
-        revision = self.model.get_value(iter, treemodel.REVISION)
-        parents = self.model.get_value(iter, treemodel.PARENTS)
-        children = self.model.get_value(iter, treemodel.CHILDREN)
-
-        self.back_button.set_sensitive(len(parents) > 0)
-        self.fwd_button.set_sensitive(len(children) > 0)
-        tags = []
-        if self.branch.supports_tags():
-            tagdict = self.branch.tags.get_reverse_tag_dict()
-            if tagdict.has_key(revision.revision_id):
-                tags = tagdict[revision.revision_id]
-        self.logview.set_revision(revision, tags, children)
+    def _treeselection_changed_cb(self, selection, *args):
+        """Callback for when the treeview changes."""
+        (model, selected_rows) = selection.get_selected_rows()
+        if len(selected_rows) > 0:
+            iter = self.model.get_iter(selected_rows[0])
+            revision = self.model.get_value(iter, treemodel.REVISION)
+            parents = self.model.get_value(iter, treemodel.PARENTS)
+            children = self.model.get_value(iter, treemodel.CHILDREN)
+            
+            self.back_button.set_sensitive(len(parents) > 0)
+            self.fwd_button.set_sensitive(len(children) > 0)
+            tags = []
+            if self.branch.supports_tags():
+                tagdict = self.branch.tags.get_reverse_tag_dict()
+                if tagdict.has_key(revision.revision_id):
+                    tags = tagdict[revision.revision_id]
+            self.logview.set_revision(revision, tags, children)
 
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
