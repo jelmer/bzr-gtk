@@ -305,7 +305,7 @@ class BranchWindow(gtk.Window):
             menu.popup(None, None, None, event.button, event.get_time())
 
     def selected_revision(self, path):
-        return self.model[path][0]
+        return self.model[path][treemodel.REVISION]
 
     def selected_revisions(self):
         return [self.selected_revision(path) for path in \
