@@ -39,6 +39,7 @@ try:
 except ImportError:
     have_dbus = False
 
+
 class CommitDialog(gtk.Dialog):
     """ New implementation of the Commit dialog. """
     def __init__(self, wt, wtpath, notbranch, selected=None, parent=None):
@@ -85,6 +86,9 @@ class CommitDialog(gtk.Dialog):
                 self._is_pending = True
         
         # Create the widgets
+        # This is the main horizontal box, which is used to separate the commit
+        # info from the diff window.
+        self._hpane = gtk.HPaned()
         self._button_commit = gtk.Button(_("Comm_it"), use_underline=True)
         self._expander_files = gtk.Expander(_("File(s) to commit"))
         self._vpaned_main = gtk.VPaned()
@@ -103,7 +107,8 @@ class CommitDialog(gtk.Dialog):
 
         # Set callbacks
         self._button_commit.connect('clicked', self._on_commit_clicked)
-        self._treeview_files.connect('row_activated', self._on_treeview_files_row_activated)
+        self._treeview_files.connect('cursor-changed', self._on_treeview_files_cursor_changed)
+        self._treeview_files.connect('row-activated', self._on_treeview_files_row_activated)
         
         # Set properties
         self._scrolledwindow_files.set_policy(gtk.POLICY_AUTOMATIC,
@@ -142,7 +147,8 @@ class CommitDialog(gtk.Dialog):
 
         self._vpaned_main.add2(self._vbox_message)
         
-        self.vbox.pack_start(self._vpaned_main, True, True)
+        self._hpane.pack1(self._vpaned_main)
+        self.vbox.pack_start(self._hpane, expand=True, fill=True)
         if self._is_checkout: 
             self._check_local = gtk.CheckButton(_("_Only commit locally"),
                                                 use_underline=True)
@@ -165,6 +171,7 @@ class CommitDialog(gtk.Dialog):
         self._create_file_view()
         # Create the pending merges
         self._create_pending_merges()
+        self._create_diff_view()
         
         # Expand the corresponding expander
         if self._is_pending:
@@ -178,26 +185,20 @@ class CommitDialog(gtk.Dialog):
         # Default to Commit button
         self._button_commit.grab_default()
     
-    def _on_treeview_files_row_activated(self, treeview, path, view_column):
+    def _show_diff_view(self, treeview):
         # FIXME: the diff window freezes for some reason
         treeselection = treeview.get_selection()
         (model, iter) = treeselection.get_selected()
-        
+
         if iter is not None:
-            from diff import DiffWindow
-            
-            _selected = model.get_value(iter, 1)
-            
-            diff = DiffWindow()
-            diff.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
-            diff.set_modal(True)
-            parent_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
-            diff.set_diff(self.wt.branch.nick, self.wt, parent_tree)
-            try:
-                diff.set_file(_selected)
-            except errors.NoSuchFile:
-                pass
-            diff.show()
+            selected = model.get_value(iter, 3) # Get the real_path attribute
+            self._diff_display.show_diff([selected])
+
+    def _on_treeview_files_cursor_changed(self, treeview):
+        self._show_diff_view(treeview)
+        
+    def _on_treeview_files_row_activated(self, treeview, path, view_column):
+        self._show_diff_view(treeview)
     
     @show_bzr_error
     def _on_commit_clicked(self, button):
@@ -404,6 +405,16 @@ class CommitDialog(gtk.Dialog):
                                item['committer'],
                                item['summary'] ])
     
+
+    def _create_diff_view(self):
+        from diff import DiffDisplay
+
+        self._diff_display = DiffDisplay()
+        self._diff_display.set_trees(self.wt, self.wt.basis_tree())
+        self._diff_display.show_diff(None)
+        self._diff_display.show()
+        self._hpane.pack2(self._diff_display)
+
     def _get_specific_files(self):
         ret = []
         it = self._file_store.get_iter_first()
