@@ -335,7 +335,7 @@ class cmd_gcommit(GTKCommand):
     """GTK+ commit dialog
 
     Graphical user interface for committing revisions"""
-    
+
     aliases = [ "gci" ]
     takes_args = []
     takes_options = []
@@ -354,12 +354,21 @@ class cmd_gcommit(GTKCommand):
             (wt, path) = workingtree.WorkingTree.open_containing(filename)
             br = wt.branch
         except NoWorkingTree, e:
-            path = e.base
-            (br, path) = branch.Branch.open_containing(path)
+            from dialog import error_dialog
+            error_dialog(_('Directory does not have a working tree'),
+                         _('Operation aborted.'))
+            return 1 # should this be retval=3?
 
-        commit = CommitDialog(wt, path, not br)
-        commit.run()
-
+        # It is a good habit to keep things locked for the duration, but it
+        # could cause difficulties if someone wants to do things in another
+        # window... We could lock_read() until we actually go to commit
+        # changes... Just a thought.
+        wt.lock_write()
+        try:
+            dlg = CommitDialog(wt)
+            return dlg.run()
+        finally:
+            wt.unlock()
 
 
 class cmd_gstatus(GTKCommand):
