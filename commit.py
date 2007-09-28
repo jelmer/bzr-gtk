@@ -232,7 +232,9 @@ class CommitDialog(gtk.Dialog):
         self._file_message_expander = gtk.Expander(_('Message for XXX'))
         self._file_message_expander.add(file_message_box)
         file_message_box.show()
-        # TODO: When expanded, we want to change expand=True
+        # When expanded, we want to change expand=True, so that the message box
+        # gets more space. But when it is shrunk, it has nothing to do with
+        # that space, so we start it at expand=False
         self._right_pane_box.pack_start(self._file_message_expander,
                                         expand=False, fill=True)
         self._file_message_expander.connect('notify::expanded',
