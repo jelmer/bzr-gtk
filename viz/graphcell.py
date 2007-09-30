@@ -30,6 +30,8 @@ class CellRendererGraph(gtk.GenericCellRenderer):
       in_lines          (start, end, colour) tuple list to draw inward lines,
       out_lines         (start, end, colour) tuple list to draw outward lines.
     """
+    
+    columns_len = 0
 
     __gproperties__ = {
         "node":         ( gobject.TYPE_PYOBJECT, "node",
@@ -45,7 +47,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                           gobject.PARAM_WRITABLE
                         ),
         }
-
+    
     def do_set_property(self, property, value):
         """Set properties from GObject properties."""
         if property.name == "node":
@@ -84,6 +86,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         colours and the fg parameter provides the multiplier that should be
         applied to the foreground colours.
         """
+        mainline_color = ( 0.0, 0.0, 0.0 )
         colours = [
             ( 1.0, 0.0, 0.0 ),
             ( 1.0, 1.0, 0.0 ),
@@ -93,10 +96,14 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             ( 1.0, 0.0, 1.0 ),
             ]
 
-        colour %= len(colours)
-        red   = (colours[colour][0] * fg) or bg
-        green = (colours[colour][1] * fg) or bg
-        blue  = (colours[colour][2] * fg) or bg
+        if colour == 0:
+            colour_rgb = mainline_color
+        else:
+            colour_rgb = colours[colour % len(colours)]
+
+        red   = (colour_rgb[0] * fg) or bg
+        green = (colour_rgb[1] * fg) or bg
+        blue  = (colour_rgb[2] * fg) or bg
 
         ctx.set_source_rgb(red, green, blue)
 
@@ -109,11 +116,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         """
         box_size = self.box_size(widget) + 1
 
-        cols = self.node[0]
-        for start, end, colour in self.in_lines + self.out_lines:
-            cols = max(cols, start, end)
-
-        width = box_size * (cols + 1)
+        width = box_size * (self.columns_len + 1)
         height = box_size
 
         # FIXME I have no idea how to use cell_area properly
@@ -140,48 +143,19 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         box_size = self.box_size(widget)
 
         ctx.set_line_width(box_size / 8)
-        ctx.set_line_cap(cairo.LINE_CAP_SQUARE)
+        ctx.set_line_cap(cairo.LINE_CAP_ROUND)
 
         # Draw lines into the cell
         for start, end, colour in self.in_lines:
-            ctx.move_to(cell_area.x + box_size * start + box_size / 2,
-                        bg_area.y - bg_area.height / 2)
-
-            if start - end > 1:
-                ctx.line_to(cell_area.x + box_size * start, bg_area.y)
-                ctx.line_to(cell_area.x + box_size * end + box_size, bg_area.y)
-            elif start - end < -1:
-                ctx.line_to(cell_area.x + box_size * start + box_size,
-                            bg_area.y)
-                ctx.line_to(cell_area.x + box_size * end, bg_area.y)
-
-            ctx.line_to(cell_area.x + box_size * end + box_size / 2,
-                        bg_area.y + bg_area.height / 2)
-
-            self.set_colour(ctx, colour, 0.0, 0.65)
-            ctx.stroke()
+            self.render_line (ctx, cell_area, box_size,
+                         bg_area.y, bg_area.height,
+                         start, end, colour)
 
         # Draw lines out of the cell
         for start, end, colour in self.out_lines:
-            ctx.move_to(cell_area.x + box_size * start + box_size / 2,
-                        bg_area.y + bg_area.height / 2)
-
-            if start - end > 1:
-                ctx.line_to(cell_area.x + box_size * start,
-                            bg_area.y + bg_area.height)
-                ctx.line_to(cell_area.x + box_size * end + box_size,
-                            bg_area.y + bg_area.height)
-            elif start - end < -1:
-                ctx.line_to(cell_area.x + box_size * start + box_size,
-                            bg_area.y + bg_area.height)
-                ctx.line_to(cell_area.x + box_size * end,
-                            bg_area.y + bg_area.height)
-
-            ctx.line_to(cell_area.x + box_size * end + box_size / 2,
-                        bg_area.y + bg_area.height / 2 + bg_area.height)
-
-            self.set_colour(ctx, colour, 0.0, 0.65)
-            ctx.stroke()
+            self.render_line (ctx, cell_area, box_size,
+                         bg_area.y + bg_area.height, bg_area.height,
+                         start, end, colour)
 
         # Draw the revision node in the right column
         (column, colour) = self.node
@@ -194,3 +168,38 @@ class CellRendererGraph(gtk.GenericCellRenderer):
 
         self.set_colour(ctx, colour, 0.5, 1.0)
         ctx.fill()
+    
+    def render_line (self, ctx, cell_area, box_size, mid, height, start, end, colour):
+        if start is None:
+            x = cell_area.x + box_size * end + box_size / 2
+            ctx.move_to(x, mid + height / 3)
+            ctx.line_to(x, mid + height / 3)
+            ctx.move_to(x, mid + height / 6)
+            ctx.line_to(x, mid + height / 6)
+            
+        elif end is None:
+            x = cell_area.x + box_size * start + box_size / 2
+            ctx.move_to(x, mid - height / 3)
+            ctx.line_to(x, mid - height / 3)
+            ctx.move_to(x, mid - height / 6)
+            ctx.line_to(x, mid - height / 6)
+        else:
+            startx = cell_area.x + box_size * start + box_size / 2
+            endx = cell_area.x + box_size * end + box_size / 2
+            
+            ctx.move_to(startx, mid - height / 2)
+            
+            if start - end == 0 :
+                ctx.line_to(endx, mid + height / 2)
+            else:
+                ctx.curve_to(startx, mid - height / 5,
+                             startx, mid - height / 5,
+                             startx + (endx - startx) / 2, mid)
+                
+                ctx.curve_to(endx, mid + height / 5,
+                             endx, mid + height / 5 ,
+                             endx, mid + height / 2)
+                
+        self.set_colour(ctx, colour, 0.0, 0.65)
+        ctx.stroke()
+        

@@ -30,13 +30,15 @@ class LogView(gtk.ScrolledWindow):
     start.
     """
 
-    def __init__(self, revision=None, scroll=True, tags=[]):
+    def __init__(self, revision=None, scroll=True, tags=[],
+                 show_children=False):
         super(LogView, self).__init__()
         if scroll:
             self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         else:
             self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
         self.set_shadow_type(gtk.SHADOW_NONE)
+        self.show_children = show_children
         self._create()
         self._show_callback = None
         self._go_callback = None
@@ -51,7 +53,7 @@ class LogView(gtk.ScrolledWindow):
     def set_go_callback(self, callback):
         self._go_callback = callback
 
-    def set_revision(self, revision, tags=[]):
+    def set_revision(self, revision, tags=[], children=[]):
         self._revision = revision
         self.revision_id.set_text(revision.revision_id)
         if revision.committer is not None:
@@ -76,7 +78,15 @@ class LogView(gtk.ScrolledWindow):
         except KeyError:
             self.branchnick_label.set_text("")
 
-        self._add_parents(revision.parent_ids)
+        self._add_parents_or_children(revision.parent_ids,
+                                      self.parents_widgets,
+                                      self.parents_table)
+        
+        if self.show_children:
+            self._add_parents_or_children(children,
+                                          self.children_widgets,
+                                          self.children_table)
+        
         self._add_tags(tags)
 
     def _show_clicked_cb(self, widget, revid, parentid):
@@ -107,17 +117,17 @@ class LogView(gtk.ScrolledWindow):
         self.tags_label.show_all()
         
 
-    def _add_parents(self, parent_ids):
-        for widget in self.parents_widgets:
-            self.parents_table.remove(widget)
-            
-        self.parents_widgets = []
-        self.parents_table.resize(max(len(parent_ids), 1), 2)
+    def _add_parents_or_children(self, revids, widgets, table):
+        while len(widgets) > 0:
+            widget = widgets.pop()
+            table.remove(widget)
+        
+        table.resize(max(len(revids), 1), 2)
 
-        for idx, parent_id in enumerate(parent_ids):
+        for idx, revid in enumerate(revids):
             align = gtk.Alignment(0.0, 0.0)
-            self.parents_widgets.append(align)
-            self.parents_table.attach(align, 1, 2, idx, idx + 1,
+            widgets.append(align)
+            table.attach(align, 1, 2, idx, idx + 1,
                                       gtk.EXPAND | gtk.FILL, gtk.FILL)
             align.show()
 
@@ -134,15 +144,15 @@ class LogView(gtk.ScrolledWindow):
                 button = gtk.Button()
                 button.add(image)
                 button.connect("clicked", self._show_clicked_cb,
-                               self._revision.revision_id, parent_id)
+                               self._revision.revision_id, revid)
                 hbox.pack_start(button, expand=False, fill=True)
                 button.show()
 
             if self._go_callback is not None:
-                button = gtk.Button(parent_id)
-                button.connect("clicked", self._go_clicked_cb, parent_id)
+                button = gtk.Button(revid)
+                button.connect("clicked", self._go_clicked_cb, revid)
             else:
-                button = gtk.Label(parent_id)
+                button = gtk.Label(revid)
             button.set_use_underline(False)
             hbox.pack_start(button, expand=False, fill=True)
             button.show()
@@ -151,7 +161,7 @@ class LogView(gtk.ScrolledWindow):
         vbox = gtk.VBox(False, 6)
         vbox.set_border_width(6)
         vbox.pack_start(self._create_headers(), expand=False, fill=True)
-        vbox.pack_start(self._create_parents_table(), expand=False, fill=True)
+        vbox.pack_start(self._create_parents_and_children(), expand=False, fill=True)
         vbox.pack_start(self._create_message_view())
         self.add_with_viewport(vbox)
         vbox.show()
@@ -261,22 +271,41 @@ class LogView(gtk.ScrolledWindow):
 
         return self.table
 
-    def _create_parents_table(self):
-        self.parents_table = gtk.Table(rows=1, columns=2)
-        self.parents_table.set_row_spacings(3)
-        self.parents_table.set_col_spacings(6)
-        self.parents_table.show()
+    
+    def _create_parents_and_children(self):
+        hbox = gtk.HBox(True, 6)
+        
+        self.parents_table = self._create_parents_or_children_table(
+            "<b>Parents:</b>")
         self.parents_widgets = []
+        hbox.pack_start(self.parents_table)
+        
+        if self.show_children:
+            self.children_table = self._create_parents_or_children_table(
+                "<b>Children:</b>")
+            self.children_widgets = []
+            hbox.pack_start(self.children_table)
+        
+        hbox.show()
+        return hbox
+        
+    def _create_parents_or_children_table(self, text):
+        table = gtk.Table(rows=1, columns=2)
+        table.set_row_spacings(3)
+        table.set_col_spacings(6)
+        table.show()
 
         label = gtk.Label()
-        label.set_markup("<b>Parents:</b>")
+        label.set_markup(text)
         align = gtk.Alignment(0.0, 0.5)
         align.add(label)
-        self.parents_table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
+        table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
         label.show()
         align.show()
 
-        return self.parents_table
+        return table
+    
+
 
     def _create_message_view(self):
         self.message_buffer = gtk.TextBuffer()
