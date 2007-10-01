@@ -213,7 +213,13 @@ class DiffView(gtk.ScrolledWindow):
 
     def show_diff(self, specific_files):
         s = StringIO()
-        show_diff_trees(self.parent_tree, self.rev_tree, s, specific_files)
+        show_diff_trees(self.parent_tree, self.rev_tree, s, specific_files,
+                        old_label='', new_label='',
+                        # path_encoding=sys.getdefaultencoding()
+                        # The default is utf-8, but we interpret the file
+                        # contents as getdefaultencoding(), so we should
+                        # probably try to make the paths in the same encoding.
+                        )
         self.buffer.set_text(s.getvalue().decode(sys.getdefaultencoding(), 'replace'))
 
 

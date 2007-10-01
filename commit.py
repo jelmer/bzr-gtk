@@ -231,7 +231,7 @@ class CommitDialog(gtk.Dialog):
         self._treeview_files.set_model(store)
 
     def _fill_in_diff(self):
-        self._diff_label = gtk.Label(_('Diff for whole tree'))
+        self._diff_label.set_text(_('Diff for whole tree'))
         self._diff_view.set_trees(self._wt, self._basis_tree)
         self._diff_view.show_diff(None)
 
@@ -454,12 +454,13 @@ class CommitDialog(gtk.Dialog):
         self._global_message_text_view.show()
 
     def _on_treeview_files_cursor_changed(self, treeview):
-         treeselection = treeview.get_selection()
-         (model, iter) = treeselection.get_selected()
+        treeselection = treeview.get_selection()
+        (model, iterable) = treeselection.get_selected()
 
-         if iter is not None:
-             selected = model.get_value(iter, 1) # Get the real_path attribute
-             self._diff_view.show_diff([selected])
+        if iterable is not None:
+            path, display_path = model.get(iterable, 1, 3) # Get the real_path attribute
+            self._diff_label.set_text(_('Diff for ') + display_path)
+            self._diff_view.show_diff([path])
 
     @staticmethod
     def _rev_to_pending_info(rev):

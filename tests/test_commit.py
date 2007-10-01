@@ -338,3 +338,37 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertEqual([('a-id', 'a', True, 'a', 'removed'),
                           ('b-id', 'b', True, 'b/', 'removed'),
                          ], values)
+
+    def test_diff_view(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b'])
+        tree.add(['a', 'b'], ['a-id', 'b-id'])
+        tree.commit('one')
+
+        self.build_tree_contents([('tree/a', 'new contents for a\n')])
+        tree.remove('b')
+
+        dlg = commit.CommitDialog(tree)
+        diff_buffer = dlg._diff_view.buffer
+        text = diff_buffer.get_text(diff_buffer.get_start_iter(),
+                                    diff_buffer.get_end_iter()).splitlines(True)
+
+        self.assertEqual("=== removed file 'b'\n", text[0])
+        self.assertContainsRe(text[1],
+            r"--- b\t\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d\d\d")
+        self.assertEqual('+++ b\t1970-01-01 00:00:00 +0000\n', text[2])
+        self.assertEqual('@@ -1,1 +0,0 @@\n', text[3])
+        self.assertEqual('-contents of tree/b\n', text[4])
+        self.assertEqual('\n', text[5])
+
+        self.assertEqual("=== modified file 'a'\n", text[6])
+        self.assertContainsRe(text[7],
+            r"--- a\t\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d\d\d")
+        self.assertContainsRe(text[8],
+            r"\+\+\+ a\t\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d\d\d")
+        self.assertEqual('@@ -1,1 +1,1 @@\n', text[9])
+        self.assertEqual('-contents of tree/a\n', text[10])
+        self.assertEqual('+new contents for a\n', text[11])
+        self.assertEqual('\n', text[12])
+
+        self.assertEqual('Diff for whole tree', dlg._diff_label.get_text())
