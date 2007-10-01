@@ -372,3 +372,39 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertEqual('\n', text[12])
 
         self.assertEqual('Diff for whole tree', dlg._diff_label.get_text())
+
+    def test_file_selection(self):
+        """Several things should happen when a file has been selected."""
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b'])
+        tree.add(['a', 'b'], ['a-id', 'b-id'])
+
+        dlg = commit.CommitDialog(tree)
+        diff_buffer = dlg._diff_view.buffer
+        self.assertEqual('Diff for whole tree', dlg._diff_label.get_text())
+
+        dlg._treeview_files.set_cursor((0,))
+        self.assertEqual('Diff for a', dlg._diff_label.get_text())
+        text = diff_buffer.get_text(diff_buffer.get_start_iter(),
+                                    diff_buffer.get_end_iter()).splitlines(True)
+        self.assertEqual("=== added file 'a'\n", text[0])
+        self.assertContainsRe(text[1],
+            r"--- a\t\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d\d\d")
+        self.assertContainsRe(text[2],
+            r"\+\+\+ a\t\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d\d\d")
+        self.assertEqual('@@ -0,0 +1,1 @@\n', text[3])
+        self.assertEqual('+contents of tree/a\n', text[4])
+        self.assertEqual('\n', text[5])
+
+        dlg._treeview_files.set_cursor((1,))
+        self.assertEqual('Diff for b', dlg._diff_label.get_text())
+        text = diff_buffer.get_text(diff_buffer.get_start_iter(),
+                                    diff_buffer.get_end_iter()).splitlines(True)
+        self.assertEqual("=== added file 'b'\n", text[0])
+        self.assertContainsRe(text[1],
+            r"--- b\t\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d\d\d")
+        self.assertContainsRe(text[2],
+            r"\+\+\+ b\t\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d\d\d")
+        self.assertEqual('@@ -0,0 +1,1 @@\n', text[3])
+        self.assertEqual('+contents of tree/b\n', text[4])
+        self.assertEqual('\n', text[5])
