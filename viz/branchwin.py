@@ -12,11 +12,13 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 import gtk
 import gobject
 import pango
+import treemodel
 
 from bzrlib.osutils import format_date
 
-from graph import distances, graph, same_branch
+from linegraph import linegraph, same_branch
 from graphcell import CellRendererGraph
+from treemodel import TreeModel
 
 
 class BranchWindow(gtk.Window):
@@ -77,29 +79,44 @@ class BranchWindow(gtk.Window):
         self.treeview = gtk.TreeView()
         self.treeview.set_rules_hint(True)
         self.treeview.set_search_column(4)
-        self.treeview.connect("cursor-changed", self._treeview_cursor_cb)
+        self.treeview.get_selection().connect("changed", self._treeselection_changed_cb)
         self.treeview.connect("row-activated", self._treeview_row_activated_cb)
         self.treeview.connect("button-release-event", 
                 self._treeview_row_mouseclick)
+        self.treeview.set_property('fixed-height-mode', True)
         scrollwin.add(self.treeview)
         self.treeview.show()
 
-        cell = CellRendererGraph()
-        column = gtk.TreeViewColumn()
+        cell = gtk.CellRendererText()
+        cell.set_property("width-chars", 15)
+        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        column = gtk.TreeViewColumn("Revision No")
         column.set_resizable(True)
-        column.pack_start(cell, expand=False)
-        column.add_attribute(cell, "node", 1)
-        column.add_attribute(cell, "in-lines", 2)
-        column.add_attribute(cell, "out-lines", 3)
+        column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        column.set_fixed_width(cell.get_size(self.treeview)[2])
+        column.pack_start(cell, expand=True)
+        column.add_attribute(cell, "text", treemodel.REVNO)
         self.treeview.append_column(column)
+
+        self.graph_cell = CellRendererGraph()
+        self.graph_column = gtk.TreeViewColumn()
+        self.graph_column.set_resizable(True)
+        self.graph_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.graph_column.pack_start(self.graph_cell, expand=False)
+        self.graph_column.add_attribute(self.graph_cell, "node", treemodel.NODE)
+        self.graph_column.add_attribute(self.graph_cell, "in-lines", treemodel.LAST_LINES)
+        self.graph_column.add_attribute(self.graph_cell, "out-lines", treemodel.LINES)
+        self.treeview.append_column(self.graph_column)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 40)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         column = gtk.TreeViewColumn("Message")
         column.set_resizable(True)
+        column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        column.set_fixed_width(cell.get_size(self.treeview)[2])
         column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", 4)
+        column.add_attribute(cell, "text", treemodel.MESSAGE)
         self.treeview.append_column(column)
 
         cell = gtk.CellRendererText()
@@ -107,16 +124,21 @@ class BranchWindow(gtk.Window):
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         column = gtk.TreeViewColumn("Committer")
         column.set_resizable(True)
+        column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        column.set_fixed_width(cell.get_size(self.treeview)[2])
         column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", 5)
+        column.add_attribute(cell, "text", treemodel.COMMITER)
         self.treeview.append_column(column)
 
         cell = gtk.CellRendererText()
+        cell.set_property("width-chars", 40)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         column = gtk.TreeViewColumn("Date")
         column.set_resizable(True)
+        column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        column.set_fixed_width(cell.get_size(self.treeview)[2])
         column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", 6)
+        column.add_attribute(cell, "text", treemodel.TIMESTAMP)
         self.treeview.append_column(column)
 
         return scrollwin
@@ -152,7 +174,7 @@ class BranchWindow(gtk.Window):
     def construct_bottom(self):
         """Construct the bottom half of the window."""
         from bzrlib.plugins.gtk.logview import LogView
-        self.logview = LogView()
+        self.logview = LogView(None, True, [], True)
         (width, height) = self.get_size()
         self.logview.set_size_request(width, int(height / 2.5))
         self.logview.show()
@@ -168,41 +190,21 @@ class BranchWindow(gtk.Window):
         treeview itself.
         """
         self.branch = branch
-
-        # [ revision, node, last_lines, lines, message, committer, timestamp ]
-        self.model = gtk.ListStore(gobject.TYPE_PYOBJECT,
-                                   gobject.TYPE_PYOBJECT,
-                                   gobject.TYPE_PYOBJECT,
-                                   gobject.TYPE_PYOBJECT,
-                                   str, str, str)
-        self.index = {}
         self.set_title(branch.nick + " - bzrk")
         gobject.idle_add(self.populate_model, start, maxnum)
 
     def populate_model(self, start, maxnum):
-        index = 0
-        
-        last_lines = []
-        (self.revisions, colours, self.children, self.parent_ids,
-            merge_sorted) = distances(self.branch.repository, start,
-                                      maxnum=maxnum)
-        for (index, (revision, node, lines)) in enumerate(graph(
-                self.revisions, colours, merge_sorted)):
-            # FIXME: at this point we should be able to show the graph order
-            # and lines with no message or commit data - and then incrementally
-            # fill the timestamp, committer etc data as desired.
-            message = revision.message.split("\n")[0]
-            if revision.committer is not None:
-                timestamp = format_date(revision.timestamp, revision.timezone)
-            else:
-                timestamp = None
-            self.model.append([revision, node, last_lines, lines,
-                               message, revision.committer, timestamp])
-            self.index[revision] = index
-            last_lines = lines
-            if maxnum is not None and index > maxnum:
-                break
+        (linegraphdata, index, columns_len) = linegraph(self.branch,
+                                                        start,
+                                                        maxnum)
+        self.model = TreeModel(self.branch, linegraphdata)
+        self.graph_cell.columns_len = columns_len
+        width = self.graph_cell.get_size(self.treeview)[2]
+        self.graph_column.set_fixed_width(width)
+        self.graph_column.set_max_width(width)
+        self.index = index
         self.treeview.set_model(self.model)
+        self.treeview.get_selection().select_path(0)
         return False
     
     def _on_key_pressed(self, widget, event):
@@ -222,56 +224,61 @@ class BranchWindow(gtk.Window):
         if event.state & gtk.gdk.CONTROL_MASK:
             gtk.main_quit()
     
-    def _treeview_cursor_cb(self, *args):
-        """Callback for when the treeview cursor changes."""
-        (path, col) = self.treeview.get_cursor()
-        revision = self.model[path][0]
-
-        self.back_button.set_sensitive(len(self.parent_ids[revision]) > 0)
-        self.fwd_button.set_sensitive(len(self.children[revision]) > 0)
-        tags = []
-        if self.branch.supports_tags():
-            tagdict = self.branch.tags.get_reverse_tag_dict()
-            if tagdict.has_key(revision.revision_id):
-                tags = tagdict[revision.revision_id]
-        self.logview.set_revision(revision, tags)
+    def _treeselection_changed_cb(self, selection, *args):
+        """Callback for when the treeview changes."""
+        (model, selected_rows) = selection.get_selected_rows()
+        if len(selected_rows) > 0:
+            iter = self.model.get_iter(selected_rows[0])
+            revision = self.model.get_value(iter, treemodel.REVISION)
+            parents = self.model.get_value(iter, treemodel.PARENTS)
+            children = self.model.get_value(iter, treemodel.CHILDREN)
+            
+            self.back_button.set_sensitive(len(parents) > 0)
+            self.fwd_button.set_sensitive(len(children) > 0)
+            tags = []
+            if self.branch.supports_tags():
+                tagdict = self.branch.tags.get_reverse_tag_dict()
+                if tagdict.has_key(revision.revision_id):
+                    tags = tagdict[revision.revision_id]
+            self.logview.set_revision(revision, tags, children)
 
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
         (path, col) = self.treeview.get_cursor()
         revision = self.model[path][0]
-        if not len(self.parent_ids[revision]):
+        parents = self.model[path][4]
+        if not len(parents):
             return
 
-        for parent_id in self.parent_ids[revision]:
-            parent = self.revisions[parent_id]
+        for parent_id in parents:
+            parent = self.revisions[self.index[parent_id]]
             if same_branch(revision, parent):
-                self.treeview.set_cursor(self.index[parent])
+                self.treeview.set_cursor(self.index[parent_id])
                 break
         else:
-            next = self.revisions[self.parent_ids[revision][0]]
-            self.treeview.set_cursor(self.index[next])
+            self.treeview.set_cursor(self.index[parents[0]])
         self.treeview.grab_focus()
 
     def _fwd_clicked_cb(self, *args):
         """Callback for when the forward button is clicked."""
         (path, col) = self.treeview.get_cursor()
         revision = self.model[path][0]
-        if not len(self.children[revision]):
+        children = self.model[path][5]
+        if not len(children):
             return
 
-        for child in self.children[revision]:
+        for child_id in children:
+            child = self.revisions[self.index[child_id]]
             if same_branch(child, revision):
-                self.treeview.set_cursor(self.index[child])
+                self.treeview.set_cursor(self.index[child_id])
                 break
         else:
-            prev = list(self.children[revision])[0]
-            self.treeview.set_cursor(self.index[prev])
+            self.treeview.set_cursor(self.index[children[0]])
         self.treeview.grab_focus()
 
     def _go_clicked_cb(self, revid):
         """Callback for when the go button for a parent is clicked."""
-        self.treeview.set_cursor(self.index[self.revisions[revid]])
+        self.treeview.set_cursor(self.index[revid])
         self.treeview.grab_focus()
 
     def show_diff(self, branch, revid, parentid):
@@ -298,7 +305,7 @@ class BranchWindow(gtk.Window):
             menu.popup(None, None, None, event.button, event.get_time())
 
     def selected_revision(self, path):
-        return self.model[path][0]
+        return self.model[path][treemodel.REVISION]
 
     def selected_revisions(self):
         return [self.selected_revision(path) for path in \
@@ -307,10 +314,11 @@ class BranchWindow(gtk.Window):
     def _treeview_row_activated_cb(self, widget, path, col):
         # TODO: more than one parent
         """Callback for when a treeview row gets activated."""
-        revision = self.selected_revision(path)
-        if len(self.parent_ids[revision]) == 0:
+        revision_id = self.model[path][treemodel.REVID]
+        parents = self.model[path][treemodel.PARENTS]
+        if len(parents) == 0:
             # Ignore revisions without parent
             return
-        parent_id = self.parent_ids[revision][0]
-        self.show_diff(self.branch, revision.revision_id, parent_id)
+        parent_id = parents[0]
+        self.show_diff(self.branch, revision_id, parent_id)
         self.treeview.grab_focus()

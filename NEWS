@@ -1,14 +1,65 @@
-0.91.0	UNRELEASED
+0.92.0	UNRELEASED
+
+ FEATURES
+ 
+  * Rewrite of a large ammount of the viz code:
+        * Make use of the bzrlib.tsort.merge_sort for sorting the revisions.
+        * A new algorithm to work out how to draw the lines using the
+          revsion numbers returned from merge_sort.
+        * Lines that are very long are broken, which results in the graph
+          requiring less space to render and the graph is easier to interpret.
+          (#82907)
+        * Choose the color for a branch from the revsion number, which results
+          in stable colors. Revisions on the mainline are allways black.
+        * Implement a TreeModel that loads the revision data only when a a
+          revision is scrolled into view, improving the time it takes to display
+          the first screen of data by 92%. (#124143)
+        * Add a column to display the revision number. (#64167)
+        * Add buttons to navigate to child revisions.
+    (Gary van der Merwe)
+    
+ INTERNALS
+
+  * Use standard version tuple. (Jelmer)
+
+  * Add check command to setup.py. (Jelmer)
+
+0.91.0	2007-09-24
 
  UI
 
   * Added keyboard shortcuts for closing windows and exiting Olive.
     (#139559, Daniel Schierbeck)
  
+  * The tip revision will be automatically selected in the branch visualization
+    window. (#144244, Daniel Schierbeck)
+  
+  * Updated olive-gtk.desktop: Polish translation and additional categories.
+    (Mateusz Korniak)
+ 
  BUG FIXES
 
   * Fix the "Complete Diff" entry in DiffWindow to show the whole diff.
     (#140512, James Westby) 
+ 
+  * Right-clicking in Olive's file list works again. (#136310, Mark Lee)
+  
+  * Annotate context menu works again. (Daniel Schierbeck)
+  
+  * Fixed push (with overwite) behavior when branches are diverged.
+    (Mateusz Korniak)
+  
+  * Local missing revisions are remote extra revisions (Missing revisions menu
+    item in Olive). (Mateusz Korniak)
+ 
+ INTERNALS
+ 
+  * `bzr viz --limit` much more faster than before. (John Arbash Meinel)
+
+  * Use get_apparent_author, rename variables to 'author'. (Aaron Bentley)
+  
+  * Added default_branch_path to MergeDialog and use it from olive-gtk.
+    (Mateusz Korniak)
 
 0.90.0	2007-08-27
 
