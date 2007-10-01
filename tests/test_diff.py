@@ -17,10 +17,13 @@
 
 from cStringIO import StringIO
 
-from bzrlib.plugins.gtk.diff import DiffView
-from bzrlib.tests import TestCase
+from bzrlib import tests
 
-class TestDiffView(TestCase):
+from bzrlib.plugins.gtk.diff import DiffView
+
+
+class TestDiffView(tests.TestCase):
+
     def test_parse_colordiffrc(self):
         colordiffrc = '''\
 newtext=blue
