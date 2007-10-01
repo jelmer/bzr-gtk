@@ -148,13 +148,31 @@ class CommitDialog(gtk.Dialog):
         # commit, and 1 for file commit, and it looked good. But I don't seem
         # to have a way to do that with the gtk boxes... :( (Which is extra
         # weird since wx uses gtk on Linux...)
-        self._right_pane_box = gtk.VBox(homogeneous=False, spacing=3)
+        self._right_pane_table = gtk.Table(rows=10, columns=1, homogeneous=False)
+        self._right_pane_table_row = 0
         self._construct_diff_view()
         self._construct_file_message()
         self._construct_global_message()
 
-        self._right_pane_box.show()
-        self._hpane.pack2(self._right_pane_box, resize=True, shrink=True)
+        self._right_pane_table.show()
+        self._hpane.pack2(self._right_pane_table, resize=True, shrink=True)
+
+    def _add_to_right_table(self, widget, weight, expanding=False):
+        """Add another widget to the table
+
+        :param widget: The object to add
+        :param weight: How many rows does this widget get to request
+        :param expanding: Should expand|fill|shrink be set?
+        """
+        end_row = self._right_pane_table_row + weight
+        options = 0
+        expand_opts = gtk.EXPAND | gtk.FILL | gtk.SHRINK
+        if expanding:
+            options = expand_opts
+        self._right_pane_table.attach(widget, 0, 1,
+                                      self._right_pane_table_row, end_row,
+                                      xoptions=expand_opts, yoptions=options)
+        self._right_pane_table_row = end_row
 
     def _construct_file_list(self):
         self._files_box = gtk.VBox()
@@ -208,14 +226,14 @@ class CommitDialog(gtk.Dialog):
         from diff import DiffDisplay
 
         self._diff_label = gtk.Label(_('Diff for whole tree'))
-        self._right_pane_box.pack_start(self._diff_label, expand=False)
+        # We don't want this widget to resize
+        self._add_to_right_table(self._diff_label, 1, False)
         self._diff_label.show()
 
         self._diff_view = DiffDisplay()
         # self._diff_display.set_trees(self.wt, self.wt.basis_tree())
         # self._diff_display.show_diff(None)
-        self._right_pane_box.pack_start(self._diff_view,
-                                        expand=True, fill=True)
+        self._add_to_right_table(self._diff_view, 4, True)
         self._diff_view.show()
 
     def _construct_file_message(self):
@@ -240,23 +258,24 @@ class CommitDialog(gtk.Dialog):
         # When expanded, we want to change expand=True, so that the message box
         # gets more space. But when it is shrunk, it has nothing to do with
         # that space, so we start it at expand=False
-        self._right_pane_box.pack_start(self._file_message_expander,
-                                        expand=False, fill=True)
-        self._file_message_expander.connect('notify::expanded',
-                                            self._expand_file_message_callback)
+        self._add_to_right_table(self._file_message_expander, 1, False)
+        # self._right_pane_table.pack_start(self._file_message_expander,
+        #                                 expand=False, fill=True)
+        # self._file_message_expander.connect('notify::expanded',
+        #                                     self._expand_file_message_callback)
         self._file_message_expander.show()
 
     def _expand_file_message_callback(self, expander, param_spec):
         if expander.get_expanded():
-            self._right_pane_box.set_child_packing(expander,
+            self._right_pane_table.set_child_packing(expander,
                 expand=True, fill=True, padding=0, pack_type=gtk.PACK_START)
         else:
-            self._right_pane_box.set_child_packing(expander,
+            self._right_pane_table.set_child_packing(expander,
                 expand=False, fill=True, padding=0, pack_type=gtk.PACK_START)
 
     def _construct_global_message(self):
         self._global_message_label = gtk.Label(_('Global Commit Message'))
-        self._right_pane_box.pack_start(self._global_message_label, expand=False)
+        self._add_to_right_table(self._global_message_label, 1, False)
         self._global_message_label.show()
 
         scroller = gtk.ScrolledWindow()
@@ -267,8 +286,7 @@ class CommitDialog(gtk.Dialog):
         scroller.add(self._global_message_text_view)
         scroller.show()
         scroller.set_shadow_type(gtk.SHADOW_IN)
-        self._right_pane_box.pack_start(scroller,
-                                        expand=True, fill=True)
+        self._add_to_right_table(scroller, 2, True)
         self._file_message_text_view.set_wrap_mode(gtk.WRAP_WORD)
         self._file_message_text_view.set_accepts_tab(False)
         self._global_message_text_view.show()
