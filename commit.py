@@ -113,11 +113,13 @@ class CommitDialog(gtk.Dialog):
     def setup_params(self):
         """Setup the member variables for state."""
         self._basis_tree = self._wt.basis_tree()
-        self._delta = self._wt.changes_from(self._basis_tree)
-
+        self._delta = None
         self._pending = pending_revisions(self._wt)
 
         self._is_checkout = (self._wt.branch.get_bound_location() is not None)
+
+    def _compute_delta(self):
+        self._delta = self._wt.changes_from(self._basis_tree)
 
     def construct(self):
         """Build up the dialog widgets."""
@@ -225,7 +227,7 @@ class CommitDialog(gtk.Dialog):
         self._left_pane_box.pack_start(self._pending_box)
 
     def _construct_diff_view(self):
-        from diff import DiffDisplay
+        from diff import DiffView
 
         self._diff_label = gtk.Label(_('Diff for whole tree'))
         self._diff_label.set_alignment(0, 0)
@@ -233,7 +235,7 @@ class CommitDialog(gtk.Dialog):
         self._add_to_right_table(self._diff_label, 1, False)
         self._diff_label.show()
 
-        self._diff_view = DiffDisplay()
+        self._diff_view = DiffView()
         self._add_to_right_table(self._diff_view, 4, True)
         self._diff_view.show()
 
@@ -663,9 +665,9 @@ class CommitDialog(gtk.Dialog):
 #     
 # 
 #     def _create_diff_view(self):
-#         from diff import DiffDisplay
+#         from diff import DiffView
 # 
-#         self._diff_display = DiffDisplay()
+#         self._diff_display = DiffView()
 #         self._diff_display.set_trees(self.wt, self.wt.basis_tree())
 #         self._diff_display.show_diff(None)
 #         self._diff_display.show()

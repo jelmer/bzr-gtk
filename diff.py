@@ -37,7 +37,7 @@ from bzrlib.errors import NoSuchFile
 from bzrlib.trace import warning
 
 
-class DiffDisplay(gtk.ScrolledWindow):
+class DiffView(gtk.ScrolledWindow):
     """This is the soft and chewy filling for a DiffWindow."""
 
     def __init__(self):
@@ -152,7 +152,7 @@ class DiffDisplay(gtk.ScrolledWindow):
                 except IOError, e:
                     warning('could not open file %s: %s' % (f, str(e)))
                 else:
-                    colors.update(DiffDisplay.parse_colordiffrc(f))
+                    colors.update(DiffView.parse_colordiffrc(f))
                     f.close()
 
         if not colors:
@@ -271,9 +271,9 @@ class DiffWindow(gtk.Window):
 
         # The diffs of the  selected file: a scrollable source or
         # text view
-        self.diff_win = DiffDisplay()
-        pane.pack2(self.diff_win)
-        self.diff_win.show()
+        self.diff_view = DiffView()
+        pane.pack2(self.diff_view)
+        self.diff_view.show()
 
     def set_diff(self, description, rev_tree, parent_tree):
         """Set the differences showed by this window.
@@ -281,7 +281,7 @@ class DiffWindow(gtk.Window):
         Compares the two trees and populates the window with the
         differences.
         """
-        self.diff_win.set_trees(rev_tree, parent_tree)
+        self.diff_view.set_trees(rev_tree, parent_tree)
         self.rev_tree = rev_tree
         self.parent_tree = parent_tree
 
@@ -335,4 +335,4 @@ class DiffWindow(gtk.Window):
         elif specific_files == [ "" ]:
             specific_files = None
 
-        self.diff_win.show_diff(specific_files)
+        self.diff_view.show_diff(specific_files)

@@ -17,10 +17,10 @@
 
 from cStringIO import StringIO
 
-from bzrlib.plugins.gtk.diff import DiffWindow
+from bzrlib.plugins.gtk.diff import DiffView
 from bzrlib.tests import TestCase
 
-class TestDiffWindow(TestCase):
+class TestDiffView(TestCase):
     def test_parse_colordiffrc(self):
         colordiffrc = '''\
 newtext=blue
@@ -35,5 +35,5 @@ diffstuff = #ffff00
                 'oldtext': 'Red',
                 'diffstuff': '#ffff00',
         }
-        parsed_colors = DiffWindow.parse_colordiffrc(StringIO(colordiffrc))
+        parsed_colors = DiffView.parse_colordiffrc(StringIO(colordiffrc))
         self.assertEqual(colors, parsed_colors)

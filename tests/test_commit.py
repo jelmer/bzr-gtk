@@ -163,6 +163,9 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         tree.add(['a'], ['a-id'])
 
         dlg = CommitDialogNoWidgets(tree)
+        self.assertIs(None, dlg._delta)
+        dlg._compute_delta()
+
         delta = dlg._delta
         self.assertEqual([], delta.modified)
         self.assertEqual([], delta.renamed)
