@@ -198,7 +198,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree)
         # TODO: assert that the pending box is set to show
-        values = [(r[0], r[1], r[2], r[3]) for r in dlg._pending_liststore]
+        values = [(r[0], r[1], r[2], r[3]) for r in dlg._pending_store]
         self.assertEqual([(rev_id2, '2007-10-01', 'Joe Foo', 'two')], values)
 
     def test_pending_multiple(self):
@@ -228,9 +228,22 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree)
         # TODO: assert that the pending box is set to show
-        values = [(r[0], r[1], r[2], r[3]) for r in dlg._pending_liststore]
+        values = [(r[0], r[1], r[2], r[3]) for r in dlg._pending_store]
         self.assertEqual([(rev_id3, '2007-10-01', 'Jerry Foo', 'three'),
                           (rev_id2, '2007-10-01', 'Joe Foo', 'two'),
                           (rev_id5, '2007-10-03', 'Jerry Foo', 'five'),
                           (rev_id4, '2007-10-01', 'Joe Foo', 'four'),
+                         ], values)
+
+    def test_filelist(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b/', 'tree/b/c'])
+        tree.add(['a', 'b', 'b/c'], ['a-id', 'b-id', 'c-id'])
+
+        dlg = commit.CommitDialog(tree)
+
+        values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
+        self.assertEqual([('a-id', 'a', True, 'a', 'added'),
+                          ('b-id', 'b', True, 'b/', 'added'),
+                          ('c-id', 'b/c', True, 'b/c', 'added'),
                          ], values)

@@ -108,7 +108,10 @@ class CommitDialog(gtk.Dialog):
 
          self.setup_params()
          self.construct()
+         # These could potentially be set based on the size of your monitor.
+         # But for now, they seem like a reasonable default
          self.set_default_size(800, 600)
+         self._hpane.set_position(300)
          self.fill_in_data()
 
     def setup_params(self):
@@ -122,6 +125,7 @@ class CommitDialog(gtk.Dialog):
     def fill_in_data(self):
         # Now that we are built, handle changes to the view based on the state
         self._fill_in_pending()
+        self._fill_in_files()
 
     def _fill_in_pending(self):
         if not self._pending:
@@ -131,7 +135,7 @@ class CommitDialog(gtk.Dialog):
         # TODO: We'd really prefer this to be a nested list
         for rev, children in self._pending:
             rev_info = self._rev_to_pending_info(rev)
-            self._pending_liststore.append([
+            self._pending_store.append([
                 rev_info['revision_id'],
                 rev_info['date'],
                 rev_info['committer'],
@@ -139,13 +143,54 @@ class CommitDialog(gtk.Dialog):
                 ])
             for child in children:
                 rev_info = self._rev_to_pending_info(child)
-                self._pending_liststore.append([
+                self._pending_store.append([
                     rev_info['revision_id'],
                     rev_info['date'],
                     rev_info['committer'],
                     rev_info['summary'],
                     ])
         self._pending_box.show()
+
+    def _fill_in_files(self):
+        # We should really use _iter_changes, and then add a progress bar of
+        # some kind.
+        self._compute_delta()
+
+        # While we fill in the view, hide the store
+        store = self._files_store
+        self._treeview_files.set_model(None)
+
+        added = _('added')
+        removed = _('removed')
+        renamed = _('renamed')
+        renamed_and_modified = _('renamed and modified')
+        modified = _('modified')
+
+        # [file_id, real path, checkbox, display path, changes type]
+        for path, file_id, kind in self._delta.added:
+            marker = osutils.kind_marker(kind)
+            store.append([file_id, path, True, path+marker, added])
+
+        for path, file_id, kind in self._delta.removed:
+            marker = osutils.kind_marker(kind)
+            store.append([file_id, path, True, path+marker, removed])
+
+        for oldpath, newpath, file_id, kind, text_mod, meta_mod in self._delta.renamed:
+            marker = osutils.kind_marker(kind)
+            if text_mod or meta_mod:
+                changes = renamed_and_modified
+            else:
+                changes = renamed
+            store.append([file_id, newpath, True,
+                          oldpath+marker + '  =>  ' + newpath+marker,
+                          changes,
+                         ])
+
+        for path, file_id, kind, text_mod, meta_mod in self._delta.modified:
+            marker = osutils.kind_marker(kind)
+            store.append([file_id, path, True, path+marker, modified])
+
+        self._treeview_files.set_model(store)
 
     def _compute_delta(self):
         self._delta = self._wt.changes_from(self._basis_tree)
@@ -168,7 +213,7 @@ class CommitDialog(gtk.Dialog):
         self._construct_file_list()
         self._construct_pending_list()
 
-        self._hpane.pack1(self._left_pane_box, resize=False, shrink=True)
+        self._hpane.pack1(self._left_pane_box, resize=False, shrink=False)
         self._left_pane_box.show()
 
     def _construct_right_pane(self):
@@ -225,6 +270,29 @@ class CommitDialog(gtk.Dialog):
         self._files_box.show()
         self._left_pane_box.pack_start(self._files_box)
 
+        liststore = gtk.ListStore(
+            gobject.TYPE_STRING,  # [0] file_id
+            gobject.TYPE_STRING,  # [1] real path
+            gobject.TYPE_BOOLEAN, # [2] checkbox
+            gobject.TYPE_STRING,  # [3] display path
+            gobject.TYPE_STRING,  # [4] changes type
+            )
+        self._files_store = liststore
+        self._treeview_files.set_model(liststore)
+        crt = gtk.CellRendererToggle()
+        crt.set_property("activatable", True) # not bool(self._pending))
+        crt.connect("toggled", self._toggle_commit, self._files_store)
+        self._treeview_files.append_column(gtk.TreeViewColumn(_('Commit'),
+                                           crt, active=2))
+        self._treeview_files.append_column(gtk.TreeViewColumn(_('Path'),
+                                           gtk.CellRendererText(), text=3))
+        self._treeview_files.append_column(gtk.TreeViewColumn(_('Type'),
+                                           gtk.CellRendererText(), text=4))
+
+    def _toggle_commit(self, cell, path, model):
+        model[path][2] = not model[path][2]
+        return
+
     def _construct_pending_list(self):
         # Pending information defaults to hidden, we put it all in 1 box, so
         # that we can show/hide all of them at once
@@ -253,12 +321,12 @@ class CommitDialog(gtk.Dialog):
         self._treeview_pending.show()
         self._left_pane_box.pack_start(self._pending_box)
 
-        liststore = gtk.ListStore(gobject.TYPE_STRING,
-                                  gobject.TYPE_STRING,
-                                  gobject.TYPE_STRING,
-                                  gobject.TYPE_STRING,
+        liststore = gtk.ListStore(gobject.TYPE_STRING, # revision_id
+                                  gobject.TYPE_STRING, # date
+                                  gobject.TYPE_STRING, # committer
+                                  gobject.TYPE_STRING, # summary
                                  )
-        self._pending_liststore = liststore
+        self._pending_store = liststore
         self._treeview_pending.set_model(liststore)
         self._treeview_pending.append_column(gtk.TreeViewColumn(_('Date'),
                                              gtk.CellRendererText(), text=1))
