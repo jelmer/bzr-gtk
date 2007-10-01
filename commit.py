@@ -220,9 +220,14 @@ class CommitDialog(gtk.Dialog):
 
     def _construct_file_message(self):
         file_message_box = gtk.VBox()
-        self._file_message_text_view =  gtk.TextView()
-        # There should be some way to get at the TextView's ScrolledWindow
-        file_message_box.pack_start(self._file_message_text_view, expand=True, fill=True)
+        scroller = gtk.ScrolledWindow()
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+
+        self._file_message_text_view = gtk.TextView()
+        scroller.add(self._file_message_text_view)
+        scroller.show()
+        scroller.set_shadow_type(gtk.SHADOW_IN)
+        file_message_box.pack_start(scroller, expand=True, fill=True)
 
         self._file_message_text_view.modify_font(pango.FontDescription("Monospace"))
         self._file_message_text_view.set_wrap_mode(gtk.WRAP_WORD)
@@ -254,9 +259,15 @@ class CommitDialog(gtk.Dialog):
         self._right_pane_box.pack_start(self._global_message_label, expand=False)
         self._global_message_label.show()
 
-        self._global_message_text_view =  gtk.TextView()
+        scroller = gtk.ScrolledWindow()
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+
+        self._global_message_text_view = gtk.TextView()
         self._global_message_text_view.modify_font(pango.FontDescription("Monospace"))
-        self._right_pane_box.pack_start(self._global_message_text_view,
+        scroller.add(self._global_message_text_view)
+        scroller.show()
+        scroller.set_shadow_type(gtk.SHADOW_IN)
+        self._right_pane_box.pack_start(scroller,
                                         expand=True, fill=True)
         self._file_message_text_view.set_wrap_mode(gtk.WRAP_WORD)
         self._file_message_text_view.set_accepts_tab(False)
