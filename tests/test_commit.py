@@ -16,6 +16,8 @@
 
 """Test the Commit functionality."""
 
+import os
+
 from bzrlib import (
     tests,
     revision,
@@ -235,15 +237,96 @@ class TestCommitDialog(tests.TestCaseWithTransport):
                           (rev_id4, '2007-10-01', 'Joe Foo', 'four'),
                          ], values)
 
-    def test_filelist(self):
+    def test_filelist_added(self):
         tree = self.make_branch_and_tree('tree')
         self.build_tree(['tree/a', 'tree/b/', 'tree/b/c'])
         tree.add(['a', 'b', 'b/c'], ['a-id', 'b-id', 'c-id'])
 
         dlg = commit.CommitDialog(tree)
-
         values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
         self.assertEqual([('a-id', 'a', True, 'a', 'added'),
                           ('b-id', 'b', True, 'b/', 'added'),
                           ('c-id', 'b/c', True, 'b/c', 'added'),
+                         ], values)
+
+    def test_filelist_renamed(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b/', 'tree/b/c'])
+        tree.add(['a', 'b', 'b/c'], ['a-id', 'b-id', 'c-id'])
+        rev_id1 = tree.commit('one')
+
+        tree.rename_one('b', 'd')
+        tree.rename_one('a', 'd/a')
+
+        dlg = commit.CommitDialog(tree)
+        values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
+        self.assertEqual([('b-id', 'd', True, 'b/ => d/', 'renamed'),
+                          ('a-id', 'd/a', True, 'a => d/a', 'renamed'),
+                         ], values)
+
+    def test_filelist_modified(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a'])
+        tree.add(['a'], ['a-id'])
+        rev_id1 = tree.commit('one')
+
+        self.build_tree_contents([('tree/a', 'new contents for a\n')])
+
+        dlg = commit.CommitDialog(tree)
+        values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
+        self.assertEqual([('a-id', 'a', True, 'a', 'modified'),
+                         ], values)
+
+    def test_filelist_renamed_and_modified(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b/', 'tree/b/c'])
+        tree.add(['a', 'b', 'b/c'], ['a-id', 'b-id', 'c-id'])
+        rev_id1 = tree.commit('one')
+
+        tree.rename_one('b', 'd')
+        tree.rename_one('a', 'd/a')
+        self.build_tree_contents([('tree/d/a', 'new contents for a\n'),
+                                  ('tree/d/c', 'new contents for c\n'),
+                                 ])
+        # 'c' is not considered renamed, because only its parent was moved, it
+        # stayed in the same directory
+
+        dlg = commit.CommitDialog(tree)
+        values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
+        self.assertEqual([('b-id', 'd', True, 'b/ => d/', 'renamed'),
+                          ('a-id', 'd/a', True, 'a => d/a', 'renamed and modified'),
+                          ('c-id', 'd/c', True, 'd/c', 'modified'),
+                         ], values)
+
+    def test_filelist_kind_changed(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b'])
+        tree.add(['a', 'b'], ['a-id', 'b-id'])
+        tree.commit('one')
+
+        os.remove('tree/a')
+        self.build_tree(['tree/a/'])
+        tree.rename_one('b', 'c')
+        os.remove('tree/c')
+        self.build_tree(['tree/c/'])
+
+        dlg = commit.CommitDialog(tree)
+        values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
+        self.assertEqual([('a-id', 'a', True, 'a => a/', 'kind changed'),
+                          ('b-id', 'c', True, 'b => c/', 'renamed and modified'),
+                         ], values)
+
+    def test_filelist_removed(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b/'])
+        tree.add(['a', 'b'], ['a-id', 'b-id'])
+        tree.commit('one')
+
+        os.remove('tree/a')
+        tree.remove('b', force=True)
+
+        dlg = commit.CommitDialog(tree)
+        values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
+        self.assertEqual([('a-id', 'a', True, 'a', 'removed'),
+                          ('b-id', 'b', True, 'b/', 'removed'),
                          ], values)

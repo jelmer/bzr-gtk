@@ -99,20 +99,16 @@ class CommitDialog(gtk.Dialog):
     """Implementation of Commit."""
 
     def __init__(self, wt, selected=None, parent=None):
-         gtk.Dialog.__init__(self, title="Commit - Olive",
-                                   parent=parent,
-                                   flags=0,
-                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
-         self._wt = wt
-         self._selected = selected
+        gtk.Dialog.__init__(self, title="Commit - Olive",
+                                  parent=parent,
+                                  flags=0,
+                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+        self._wt = wt
+        self._selected = selected
 
-         self.setup_params()
-         self.construct()
-         # These could potentially be set based on the size of your monitor.
-         # But for now, they seem like a reasonable default
-         self.set_default_size(800, 600)
-         self._hpane.set_position(300)
-         self.fill_in_data()
+        self.setup_params()
+        self.construct()
+        self.fill_in_data()
 
     def setup_params(self):
         """Setup the member variables for state."""
@@ -154,8 +150,6 @@ class CommitDialog(gtk.Dialog):
     def _fill_in_files(self):
         # We should really use _iter_changes, and then add a progress bar of
         # some kind.
-        self._compute_delta()
-
         # While we fill in the view, hide the store
         store = self._files_store
         self._treeview_files.set_model(None)
@@ -165,30 +159,73 @@ class CommitDialog(gtk.Dialog):
         renamed = _('renamed')
         renamed_and_modified = _('renamed and modified')
         modified = _('modified')
+        kind_changed = _('kind changed')
 
+        # The store holds:
         # [file_id, real path, checkbox, display path, changes type]
-        for path, file_id, kind in self._delta.added:
-            marker = osutils.kind_marker(kind)
-            store.append([file_id, path, True, path+marker, added])
+        # _iter_changes returns:
+        # (file_id, (path_in_source, path_in_target),
+        #  changed_content, versioned, parent, name, kind,
+        #  executable)
 
-        for path, file_id, kind in self._delta.removed:
-            marker = osutils.kind_marker(kind)
-            store.append([file_id, path, True, path+marker, removed])
+        # should we pass specific_files?
+        self._wt.lock_read()
+        self._basis_tree.lock_read()
+        try:
+            for (file_id, paths, changed_content, versioned, parent_ids, names,
+                 kinds, executables) in self._wt._iter_changes(self._basis_tree):
 
-        for oldpath, newpath, file_id, kind, text_mod, meta_mod in self._delta.renamed:
-            marker = osutils.kind_marker(kind)
-            if text_mod or meta_mod:
-                changes = renamed_and_modified
-            else:
-                changes = renamed
-            store.append([file_id, newpath, True,
-                          oldpath+marker + '  =>  ' + newpath+marker,
-                          changes,
-                         ])
+                # Skip the root entry.
+                if parent_ids == (None, None):
+                    continue
 
-        for path, file_id, kind, text_mod, meta_mod in self._delta.modified:
-            marker = osutils.kind_marker(kind)
-            store.append([file_id, path, True, path+marker, modified])
+                change_type = None
+                if kinds[0] is None:
+                    source_marker = ''
+                else:
+                    source_marker = osutils.kind_marker(kinds[0])
+                if kinds[1] is None:
+                    assert kinds[0] is not None
+                    marker = osutils.kind_marker(kinds[0])
+                else:
+                    marker = osutils.kind_marker(kinds[1])
+
+                real_path = paths[1]
+                if real_path is None:
+                    real_path = paths[0]
+                assert real_path is not None
+                display_path = real_path + marker
+
+                present_source = versioned[0] and kinds[0] is not None
+                present_target = versioned[1] and kinds[1] is not None
+
+                if present_source != present_target:
+                    if present_target:
+                        change_type = added
+                    else:
+                        change_type = removed
+                elif names[0] != names[1] or parent_ids[0] != parent_ids[1]:
+                    # Renamed
+                    if changed_content or executables[0] != executables[1]:
+                        # and modified
+                        change_type = renamed_and_modified
+                    else:
+                        change_type = renamed
+                    display_path = (paths[0] + source_marker
+                                    + ' => ' + paths[1] + marker)
+                elif kinds[0] != kinds[1]:
+                    change_type = kind_changed
+                    display_path = (paths[0] + source_marker
+                                    + ' => ' + paths[1] + marker)
+                elif changed_content is True or executables[0] != executables[1]:
+                    change_type = modified
+                else:
+                    assert False, "How did we get here?"
+
+                store.append([file_id, real_path, True, display_path, change_type])
+        finally:
+            self._basis_tree.unlock()
+            self._wt.unlock()
 
         self._treeview_files.set_model(store)
 
@@ -207,6 +244,11 @@ class CommitDialog(gtk.Dialog):
         self.vbox.pack_start(self._hpane)
         self._hpane.show()
         self.set_focus(self._global_message_text_view)
+
+        # These could potentially be set based on the size of your monitor.
+        # But for now, they seem like a reasonable default
+        self.set_default_size(800, 600)
+        self._hpane.set_position(300)
 
     def _construct_left_pane(self):
         self._left_pane_box = gtk.VBox(homogeneous=False, spacing=5)
