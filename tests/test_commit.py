@@ -121,8 +121,11 @@ class CommitDialogNoWidgets(commit.CommitDialog):
     def construct(self):
         pass # Don't create any widgets here
 
+    def fill_in_data(self):
+        pass # With no widgets, there are no widgets to fill out
 
-class TestCommitDialog(tests.TestCaseWithTransport):
+
+class TestCommitDialogSimple(tests.TestCaseWithTransport):
 
     def test_setup_parameters_no_pending(self):
         tree = self.make_branch_and_tree('tree')
@@ -171,3 +174,63 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertEqual([], delta.renamed)
         self.assertEqual([], delta.removed)
         self.assertEqual([(u'a', 'a-id', 'file')], delta.added)
+
+
+class TestCommitDialog(tests.TestCaseWithTransport):
+
+    def test_no_pending(self):
+        tree = self.make_branch_and_tree('tree')
+        rev_id1 = tree.commit('one')
+
+        dlg = commit.CommitDialog(tree)
+        # TODO: assert that the pending box is hidden
+
+    def test_pending(self):
+        tree = self.make_branch_and_tree('tree')
+        rev_id1 = tree.commit('one')
+
+        tree2 = tree.bzrdir.sprout('tree2').open_workingtree()
+        rev_id2 = tree2.commit('two',
+                               committer='Joe Foo <joe@foo.com>',
+                               timestamp=1191264271.05,
+                               timezone=+7200)
+        tree.merge_from_branch(tree2.branch)
+
+        dlg = commit.CommitDialog(tree)
+        # TODO: assert that the pending box is set to show
+        values = [(r[0], r[1], r[2], r[3]) for r in dlg._pending_liststore]
+        self.assertEqual([(rev_id2, '2007-10-01', 'Joe Foo', 'two')], values)
+
+    def test_pending_multiple(self):
+        tree = self.make_branch_and_tree('tree')
+        rev_id1 = tree.commit('one')
+
+        tree2 = tree.bzrdir.sprout('tree2').open_workingtree()
+        rev_id2 = tree2.commit('two',
+                               committer='Joe Foo <joe@foo.com>',
+                               timestamp=1191264271.05,
+                               timezone=+7200)
+        rev_id3 = tree2.commit('three',
+                               committer='Jerry Foo <jerry@foo.com>',
+                               timestamp=1191264278.05,
+                               timezone=+7200)
+        tree.merge_from_branch(tree2.branch)
+        tree3 = tree.bzrdir.sprout('tree3').open_workingtree()
+        rev_id4 = tree3.commit('four',
+                               committer='Joe Foo <joe@foo.com>',
+                               timestamp=1191264279.05,
+                               timezone=+7200)
+        rev_id5 = tree3.commit('five',
+                               committer='Jerry Foo <jerry@foo.com>',
+                               timestamp=1191372278.05,
+                               timezone=+7200)
+        tree.merge_from_branch(tree3.branch)
+
+        dlg = commit.CommitDialog(tree)
+        # TODO: assert that the pending box is set to show
+        values = [(r[0], r[1], r[2], r[3]) for r in dlg._pending_liststore]
+        self.assertEqual([(rev_id3, '2007-10-01', 'Jerry Foo', 'three'),
+                          (rev_id2, '2007-10-01', 'Joe Foo', 'two'),
+                          (rev_id5, '2007-10-03', 'Jerry Foo', 'five'),
+                          (rev_id4, '2007-10-01', 'Joe Foo', 'four'),
+                         ], values)

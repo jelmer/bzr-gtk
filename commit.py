@@ -109,6 +109,7 @@ class CommitDialog(gtk.Dialog):
          self.setup_params()
          self.construct()
          self.set_default_size(800, 600)
+         self.fill_in_data()
 
     def setup_params(self):
         """Setup the member variables for state."""
@@ -117,6 +118,34 @@ class CommitDialog(gtk.Dialog):
         self._pending = pending_revisions(self._wt)
 
         self._is_checkout = (self._wt.branch.get_bound_location() is not None)
+
+    def fill_in_data(self):
+        # Now that we are built, handle changes to the view based on the state
+        self._fill_in_pending()
+
+    def _fill_in_pending(self):
+        if not self._pending:
+            self._pending_box.hide()
+            return
+
+        # TODO: We'd really prefer this to be a nested list
+        for rev, children in self._pending:
+            rev_info = self._rev_to_pending_info(rev)
+            self._pending_liststore.append([
+                rev_info['revision_id'],
+                rev_info['date'],
+                rev_info['committer'],
+                rev_info['summary'],
+                ])
+            for child in children:
+                rev_info = self._rev_to_pending_info(child)
+                self._pending_liststore.append([
+                    rev_info['revision_id'],
+                    rev_info['date'],
+                    rev_info['committer'],
+                    rev_info['summary'],
+                    ])
+        self._pending_box.show()
 
     def _compute_delta(self):
         self._delta = self._wt.changes_from(self._basis_tree)
@@ -139,7 +168,6 @@ class CommitDialog(gtk.Dialog):
         self._construct_file_list()
         self._construct_pending_list()
 
-        self._pending_box.show()
         self._hpane.pack1(self._left_pane_box, resize=False, shrink=True)
         self._left_pane_box.show()
 
@@ -203,7 +231,6 @@ class CommitDialog(gtk.Dialog):
         self._pending_box = gtk.VBox()
         self._pending_box.hide()
 
-        # TODO: This message should be centered
         pending_message = gtk.Label()
         pending_message.set_markup(
             _('<i>Cannot select specific files when merging</i>'))
@@ -225,6 +252,20 @@ class CommitDialog(gtk.Dialog):
                                      expand=True, fill=True, padding=5)
         self._treeview_pending.show()
         self._left_pane_box.pack_start(self._pending_box)
+
+        liststore = gtk.ListStore(gobject.TYPE_STRING,
+                                  gobject.TYPE_STRING,
+                                  gobject.TYPE_STRING,
+                                  gobject.TYPE_STRING,
+                                 )
+        self._pending_liststore = liststore
+        self._treeview_pending.set_model(liststore)
+        self._treeview_pending.append_column(gtk.TreeViewColumn(_('Date'),
+                                             gtk.CellRendererText(), text=1))
+        self._treeview_pending.append_column(gtk.TreeViewColumn(_('Committer'),
+                                             gtk.CellRendererText(), text=2))
+        self._treeview_pending.append_column(gtk.TreeViewColumn(_('Summary'),
+                                             gtk.CellRendererText(), text=3))
 
     def _construct_diff_view(self):
         from diff import DiffView
