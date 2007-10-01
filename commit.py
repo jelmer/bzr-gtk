@@ -122,6 +122,7 @@ class CommitDialog(gtk.Dialog):
         # Now that we are built, handle changes to the view based on the state
         self._fill_in_pending()
         self._fill_in_files()
+        self._fill_in_diff()
 
     def _fill_in_pending(self):
         if not self._pending:
@@ -229,6 +230,11 @@ class CommitDialog(gtk.Dialog):
 
         self._treeview_files.set_model(store)
 
+    def _fill_in_diff(self):
+        self._diff_label = gtk.Label(_('Diff for whole tree'))
+        self._diff_view.set_trees(self._wt, self._basis_tree)
+        self._diff_view.show_diff(None)
+
     def _compute_delta(self):
         self._delta = self._wt.changes_from(self._basis_tree)
 
@@ -245,9 +251,20 @@ class CommitDialog(gtk.Dialog):
         self._hpane.show()
         self.set_focus(self._global_message_text_view)
 
-        # These could potentially be set based on the size of your monitor.
-        # But for now, they seem like a reasonable default
-        self.set_default_size(800, 600)
+        # This seems like a reasonable default, we might like it to
+        # be a bit wider, so that by default we can fit an 80-line diff in the
+        # diff window.
+        # Alternatively, we should be saving the last position/size rather than
+        # setting it to a fixed value every time we start up.
+        screen = self.get_screen()
+        monitor = 0 # We would like it to be the monitor we are going to
+                    # display on, but I don't know how to figure that out
+                    # Only really useful for freaks like me that run dual
+                    # monitor, with different sizes on the monitors
+        monitor_rect = screen.get_monitor_geometry(monitor)
+        width = int(monitor_rect.width * 0.66)
+        height = int(monitor_rect.height * 0.66)
+        self.set_default_size(width, height)
         self._hpane.set_position(300)
 
     def _construct_left_pane(self):
@@ -295,8 +312,7 @@ class CommitDialog(gtk.Dialog):
 
     def _construct_file_list(self):
         self._files_box = gtk.VBox(homogeneous=False, spacing=0)
-        file_label = gtk.Label()
-        file_label.set_markup(_('<b>Files</b>'))
+        file_label = gtk.Label(_('Files'))
         file_label.show()
         self._files_box.pack_start(file_label, expand=False)
 
@@ -322,18 +338,23 @@ class CommitDialog(gtk.Dialog):
         self._files_store = liststore
         self._treeview_files.set_model(liststore)
         crt = gtk.CellRendererToggle()
-        crt.set_property("activatable", True) # not bool(self._pending))
+        crt.set_property("activatable", not bool(self._pending))
         crt.connect("toggled", self._toggle_commit, self._files_store)
-        self._treeview_files.append_column(gtk.TreeViewColumn(_('Commit'),
+        if self._pending:
+            name = _('Commit*')
+        else:
+            name = _('Commit')
+        self._treeview_files.append_column(gtk.TreeViewColumn(name,
                                            crt, active=2))
         self._treeview_files.append_column(gtk.TreeViewColumn(_('Path'),
                                            gtk.CellRendererText(), text=3))
         self._treeview_files.append_column(gtk.TreeViewColumn(_('Type'),
                                            gtk.CellRendererText(), text=4))
+        self._treeview_files.connect('cursor-changed',
+                                     self._on_treeview_files_cursor_changed)
 
     def _toggle_commit(self, cell, path, model):
         model[path][2] = not model[path][2]
-        return
 
     def _construct_pending_list(self):
         # Pending information defaults to hidden, we put it all in 1 box, so
@@ -343,12 +364,11 @@ class CommitDialog(gtk.Dialog):
 
         pending_message = gtk.Label()
         pending_message.set_markup(
-            _('<i>Cannot select specific files when merging</i>'))
+            _('<i>* Cannot select specific files when merging</i>'))
         self._pending_box.pack_start(pending_message, expand=False, padding=5)
         pending_message.show()
 
-        pending_label = gtk.Label()
-        pending_label.set_markup(_('<b>Pending Revisions</b>'))
+        pending_label = gtk.Label(_('Pending Revisions'))
         self._pending_box.pack_start(pending_label, expand=False, padding=0)
         pending_label.show()
 
@@ -406,7 +426,7 @@ class CommitDialog(gtk.Dialog):
         self._file_message_text_view.set_accepts_tab(False)
         self._file_message_text_view.show()
 
-        self._file_message_expander = gtk.Expander(_('Message for XXX'))
+        self._file_message_expander = gtk.Expander(_('Per File Message'))
         self._file_message_expander.add(file_message_box)
         file_message_box.show()
         self._add_to_right_table(self._file_message_expander, 1, False)
@@ -432,6 +452,14 @@ class CommitDialog(gtk.Dialog):
         self._file_message_text_view.set_wrap_mode(gtk.WRAP_WORD)
         self._file_message_text_view.set_accepts_tab(False)
         self._global_message_text_view.show()
+
+    def _on_treeview_files_cursor_changed(self, treeview):
+         treeselection = treeview.get_selection()
+         (model, iter) = treeselection.get_selected()
+
+         if iter is not None:
+             selected = model.get_value(iter, 1) # Get the real_path attribute
+             self._diff_view.show_diff([selected])
 
     @staticmethod
     def _rev_to_pending_info(rev):
