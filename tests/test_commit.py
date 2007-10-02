@@ -182,12 +182,28 @@ class TestCommitDialogSimple(tests.TestCaseWithTransport):
 
 class TestCommitDialog(tests.TestCaseWithTransport):
 
+    def test_bound(self):
+        tree = self.make_branch_and_tree('tree')
+        rev_id = tree.commit('first')
+        tree2 = tree.bzrdir.sprout('tree2').open_workingtree()
+        tree2.branch.bind(tree.branch)
+
+        # tree is not a checkout
+        dlg = commit.CommitDialog(tree)
+        self.assertFalse(dlg._check_local.get_property('visible'))
+
+        # tree2 is a checkout
+        dlg2 = commit.CommitDialog(tree2)
+        self.assertTrue(dlg2._check_local.get_property('visible'))
+
     def test_no_pending(self):
         tree = self.make_branch_and_tree('tree')
         rev_id1 = tree.commit('one')
 
         dlg = commit.CommitDialog(tree)
-        # TODO: assert that the pending box is hidden
+
+        self.assertFalse(dlg._pending_box.get_property('visible'))
+
         commit_col = dlg._treeview_files.get_column(0)
         self.assertEqual('Commit', commit_col.get_title())
         renderer = commit_col.get_cell_renderers()[0]
@@ -205,7 +221,9 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         tree.merge_from_branch(tree2.branch)
 
         dlg = commit.CommitDialog(tree)
-        # TODO: assert that the pending box is set to show
+
+        self.assertTrue(dlg._pending_box.get_property('visible'))
+
         commit_col = dlg._treeview_files.get_column(0)
         self.assertEqual('Commit*', commit_col.get_title())
         renderer = commit_col.get_cell_renderers()[0]
@@ -543,6 +561,48 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 class TestCommitDialog_Commit(tests.TestCaseWithTransport):
     """Tests on the actual 'commit' button being pushed."""
 
+    def test_bound_commit_local(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a'])
+        tree.add(['a'], ['a-id'])
+        rev_id1 = tree.commit('one')
+
+        tree2 = tree.bzrdir.sprout('tree2').open_workingtree()
+        self.build_tree(['tree2/b'])
+        tree2.add(['b'], ['b-id'])
+        tree2.branch.bind(tree.branch)
+
+        dlg = commit.CommitDialog(tree2)
+        # With the check box set, it should only effect the local branch
+        dlg._check_local.set_active(True)
+        dlg._set_global_commit_message('Commit message\n')
+        dlg._do_commit()
+
+        last_rev = tree2.last_revision()
+        self.assertEqual(last_rev, dlg.committed_revision_id)
+        self.assertEqual(rev_id1, tree.branch.last_revision())
+
+    def test_bound_commit_both(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a'])
+        tree.add(['a'], ['a-id'])
+        rev_id1 = tree.commit('one')
+
+        tree2 = tree.bzrdir.sprout('tree2').open_workingtree()
+        self.build_tree(['tree2/b'])
+        tree2.add(['b'], ['b-id'])
+        tree2.branch.bind(tree.branch)
+
+        dlg = commit.CommitDialog(tree2)
+        # With the check box set, it should only effect the local branch
+        dlg._check_local.set_active(False)
+        dlg._set_global_commit_message('Commit message\n')
+        dlg._do_commit()
+
+        last_rev = tree2.last_revision()
+        self.assertEqual(last_rev, dlg.committed_revision_id)
+        self.assertEqual(last_rev, tree.branch.last_revision())
+
     def test_commit_no_message(self):
         tree = self.make_branch_and_tree('tree')
         self.build_tree(['tree/a', 'tree/b'])
@@ -573,6 +633,7 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
         # By saying NO, nothing should be committed.
         self.assertEqual(rev_id, tree.last_revision())
         self.assertIs(None, dlg.committed_revision_id)
+        self.assertTrue(dlg._global_message_text_view.get_property('is-focus'))
 
         dlg._question_dialog = _question_ok
         del questions[:]
@@ -593,7 +654,7 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
         tree.add(['a'], ['a-id'])
 
         dlg = commit.CommitDialog(tree)
-        dlg._global_message_text_view.get_buffer().set_text('Some text\n')
+        dlg._set_global_commit_message('Some text\n')
         dlg._do_commit()
 
         last_rev = tree.last_revision()

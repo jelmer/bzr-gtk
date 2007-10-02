@@ -126,6 +126,7 @@ class CommitDialog(gtk.Dialog):
         self._fill_in_pending()
         self._fill_in_diff()
         self._fill_in_files()
+        self._fill_in_checkout()
 
     def _fill_in_pending(self):
         if not self._pending:
@@ -241,6 +242,25 @@ class CommitDialog(gtk.Dialog):
     def _fill_in_diff(self):
         self._diff_view.set_trees(self._wt, self._basis_tree)
 
+    def _fill_in_checkout(self):
+        if not self._is_checkout:
+            self._check_local.hide()
+            return
+        if have_dbus:
+            bus = dbus.SystemBus()
+            proxy_obj = bus.get_object('org.freedesktop.NetworkManager',
+                                       '/org/freedesktop/NetworkManager')
+            dbus_iface = dbus.Interface(proxy_obj,
+                                        'org.freedesktop.NetworkManager')
+            try:
+                # 3 is the enum value for STATE_CONNECTED
+                self._check_local.set_active(dbus_iface.state() != 3)
+            except dbus.DBusException, e:
+                # Silently drop errors. While DBus may be
+                # available, NetworkManager doesn't necessarily have to be
+                mutter("unable to get networkmanager state: %r" % e)
+        self._check_local.show()
+
     def _compute_delta(self):
         self._delta = self._wt.changes_from(self._basis_tree)
 
@@ -278,6 +298,11 @@ class CommitDialog(gtk.Dialog):
         self._left_pane_box = gtk.VBox(homogeneous=False, spacing=5)
         self._construct_file_list()
         self._construct_pending_list()
+
+        self._check_local = gtk.CheckButton(_("_Only commit locally"),
+                                            use_underline=True)
+        self._left_pane_box.pack_end(self._check_local, False, False)
+        self._check_local.set_active(False)
 
         self._hpane.pack1(self._left_pane_box, resize=False, shrink=False)
         self._left_pane_box.show()
@@ -521,9 +546,7 @@ class CommitDialog(gtk.Dialog):
         self._do_commit()
 
     def _do_commit(self):
-        buf = self._global_message_text_view.get_buffer()
-        start, end = buf.get_bounds()
-        message = buf.get_text(start, end).decode('utf-8')
+        message = self._get_global_commit_message()
 
         if message == '':
             response = self._question_dialog(
@@ -539,10 +562,7 @@ class CommitDialog(gtk.Dialog):
         # else:
         #     specific_files = None
 
-        # if self._is_checkout:
-        #     local = self._check_local.get_active()
-        # else:
-        #     local = False
+        local = self._check_local.get_active()
 
         # if list(self._wt.unknowns()) != []:
         #     response = question_dialog(_("Commit with unknowns?"),
@@ -550,8 +570,8 @@ class CommitDialog(gtk.Dialog):
         #     if response == gtk.RESPONSE_NO:
         #         return
 
-        local = False
         specific_files = None
+        rev_id = None
         try:
             rev_id = self._wt.commit(message,
                        allow_pointless=False,
@@ -569,6 +589,15 @@ class CommitDialog(gtk.Dialog):
                                specific_files=specific_files)
         self.committed_revision_id = rev_id
         self.response(gtk.RESPONSE_OK)
+
+    def _get_global_commit_message(self):
+        buf = self._global_message_text_view.get_buffer()
+        start, end = buf.get_bounds()
+        return buf.get_text(start, end).decode('utf-8')
+
+    def _set_global_commit_message(self, message):
+        """Just a helper for the test suite."""
+        self._global_message_text_view.get_buffer().set_text(message)
 
     @staticmethod
     def _rev_to_pending_info(rev):
