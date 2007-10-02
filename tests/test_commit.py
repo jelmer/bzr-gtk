@@ -839,3 +839,35 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
         self.assertEqual([{'path':'a', 'file_id':'a-id',
                            'message':'Message for A\n'},
                          ], bencode.bdecode(file_info))
+
+    def test_commit_messages_after_merge(self):
+        tree = self.make_branch_and_tree('tree')
+        rev_id1 = tree.commit('one')
+        tree2 = tree.bzrdir.sprout('tree2').open_workingtree()
+        self.build_tree(['tree2/a', 'tree2/b'])
+        tree2.add(['a', 'b'], ['a-id', 'b-id'])
+        rev_id2 = tree2.commit('two')
+
+        tree.merge_from_branch(tree2.branch)
+
+        dlg = commit.CommitDialog(tree)
+        dlg._treeview_files.set_cursor((1,)) # 'a'
+        dlg._set_file_commit_message('Message for A\n')
+        # No message for 'B'
+        dlg._set_global_commit_message('Merging from "tree2"\n')
+
+        dlg._do_commit()
+
+        rev_id3 = dlg.committed_revision_id
+        self.assertEqual(rev_id3, tree.last_revision())
+        rev = tree.branch.repository.get_revision(rev_id3)
+        self.assertEqual('Merging from "tree2"\n', rev.message)
+        self.assertEqual([rev_id1, rev_id2], rev.parent_ids)
+        file_info = rev.properties['file-info']
+        self.assertEqual('ld7:file_id4:a-id'
+                           '7:message14:Message for A\n'
+                           '4:path1:a'
+                         'ee', file_info)
+        self.assertEqual([{'path':'a', 'file_id':'a-id',
+                           'message':'Message for A\n'},
+                         ], bencode.bdecode(file_info))

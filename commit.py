@@ -579,6 +579,8 @@ class CommitDialog(gtk.Dialog):
                 return
 
         specific_files, file_info = self._get_specific_files()
+        if self._pending:
+            specific_files = None
 
         local = self._check_local.get_active()
 
