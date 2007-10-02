@@ -154,8 +154,7 @@ class CommitDialog(gtk.Dialog):
         self._pending_box.show()
 
     def _fill_in_files(self):
-        # We should really use _iter_changes, and then add a progress bar of
-        # some kind.
+        # We should really use add a progress bar of some kind.
         # While we fill in the view, hide the store
         store = self._files_store
         self._treeview_files.set_model(None)
@@ -180,57 +179,11 @@ class CommitDialog(gtk.Dialog):
         self._wt.lock_read()
         self._basis_tree.lock_read()
         try:
-            for (file_id, paths, changed_content, versioned, parent_ids, names,
-                 kinds, executables) in self._wt._iter_changes(self._basis_tree):
-
-                # Skip the root entry.
-                if parent_ids == (None, None):
-                    continue
-
-                change_type = None
-                if kinds[0] is None:
-                    source_marker = ''
-                else:
-                    source_marker = osutils.kind_marker(kinds[0])
-                if kinds[1] is None:
-                    assert kinds[0] is not None
-                    marker = osutils.kind_marker(kinds[0])
-                else:
-                    marker = osutils.kind_marker(kinds[1])
-
-                real_path = paths[1]
-                if real_path is None:
-                    real_path = paths[0]
-                assert real_path is not None
-                display_path = real_path + marker
-
-                present_source = versioned[0] and kinds[0] is not None
-                present_target = versioned[1] and kinds[1] is not None
-
-                if present_source != present_target:
-                    if present_target:
-                        change_type = added
-                    else:
-                        change_type = removed
-                elif names[0] != names[1] or parent_ids[0] != parent_ids[1]:
-                    # Renamed
-                    if changed_content or executables[0] != executables[1]:
-                        # and modified
-                        change_type = renamed_and_modified
-                    else:
-                        change_type = renamed
-                    display_path = (paths[0] + source_marker
-                                    + ' => ' + paths[1] + marker)
-                elif kinds[0] != kinds[1]:
-                    change_type = kind_changed
-                    display_path = (paths[0] + source_marker
-                                    + ' => ' + paths[1] + marker)
-                elif changed_content is True or executables[0] != executables[1]:
-                    change_type = modified
-                else:
-                    assert False, "How did we get here?"
-
-                store.append([file_id, real_path, True, display_path,
+            from diff import _iter_changes_to_status
+            for (file_id, real_path, change_type, display_path
+                ) in _iter_changes_to_status(self._basis_tree, self._wt):
+                store.append([file_id, real_path.encode('UTF-8'),
+                              True, display_path.encode('UTF-8'),
                               change_type, ''])
         finally:
             self._basis_tree.unlock()
@@ -510,7 +463,7 @@ class CommitDialog(gtk.Dialog):
             if path is None:
                 self._diff_view.show_diff(None)
             else:
-                self._diff_view.show_diff([path])
+                self._diff_view.show_diff([path.decode('UTF-8')])
             self._update_per_file_info(selection)
 
     def _save_current_file_message(self):
@@ -551,11 +504,12 @@ class CommitDialog(gtk.Dialog):
         file_info = []
         for record in records:
             if record[2]: # [2] checkbox
-                file_id = record[0]
-                path = record[1]
-                file_message = record[5]
-                files.append(record[1]) # [1] real path
+                file_id = record[0] # [0] file_id
+                path = record[1] # [1] real path
+                file_message = record[5] # [5] commit message
+                files.append(path.decode('UTF-8'))
                 if file_message:
+                    # All of this needs to be utf-8 information
                     file_info.append({'path':path, 'file_id':file_id,
                                      'message':file_message})
         file_info.sort(key=lambda x:(x['path'], x['file_id']))
@@ -630,10 +584,14 @@ class CommitDialog(gtk.Dialog):
 
     def _set_global_commit_message(self, message):
         """Just a helper for the test suite."""
+        if isinstance(message, unicode):
+            message = message.encode('UTF-8')
         self._global_message_text_view.get_buffer().set_text(message)
 
     def _set_file_commit_message(self, message):
         """Helper for the test suite."""
+        if isinstance(message, unicode):
+            message = message.encode('UTF-8')
         self._file_message_text_view.get_buffer().set_text(message)
 
     @staticmethod

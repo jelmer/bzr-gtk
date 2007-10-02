@@ -16,13 +16,14 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 from cStringIO import StringIO
+import os
 
 from bzrlib import tests
 
-from bzrlib.plugins.gtk.diff import DiffView
+from bzrlib.plugins.gtk.diff import DiffView, _iter_changes_to_status
 
 
-class TestDiffView(tests.TestCase):
+class TestDiffViewSimple(tests.TestCase):
 
     def test_parse_colordiffrc(self):
         colordiffrc = '''\
@@ -40,3 +41,127 @@ diffstuff = #ffff00
         }
         parsed_colors = DiffView.parse_colordiffrc(StringIO(colordiffrc))
         self.assertEqual(colors, parsed_colors)
+
+
+class TestDiffView(tests.TestCaseWithTransport):
+
+    def test_unicode(self):
+        from bzrlib.tests.test_diff import UnicodeFilename
+        self.requireFeature(UnicodeFilename)
+
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree([u'tree/\u03a9'])
+        tree.add([u'\u03a9'], ['omega-id'])
+
+        view = DiffView()
+        view.set_trees(tree, tree.basis_tree())
+        view.show_diff(None)
+        buf = view.buffer
+        start, end = buf.get_bounds()
+        text = buf.get_text(start, end)
+        self.assertContainsRe(text,
+            "=== added file '\xce\xa9'\n"
+            '--- .*\t1970-01-01 00:00:00 \\+0000\n'
+            r'\+\+\+ .*\t\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d\d\d\n'
+            '@@ -0,0 \\+1,1 @@\n'
+            '\\+contents of tree/\xce\xa9\n'
+            '\n'
+            )
+
+
+class Test_IterChangesToStatus(tests.TestCaseWithTransport):
+
+    def assertStatusEqual(self, expected, tree):
+        values = _iter_changes_to_status(tree.basis_tree(), tree)
+        self.assertEqual(expected, values)
+
+    def test_status_added(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b/', 'tree/b/c'])
+        tree.add(['a', 'b', 'b/c'], ['a-id', 'b-id', 'c-id'])
+
+        self.assertStatusEqual(
+            [('a-id', 'a', 'added', 'a'),
+             ('b-id', 'b', 'added', 'b/'),
+             ('c-id', 'b/c', 'added', 'b/c'),
+            ], tree)
+
+    def test_status_renamed(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b/', 'tree/b/c'])
+        tree.add(['a', 'b', 'b/c'], ['a-id', 'b-id', 'c-id'])
+        rev_id1 = tree.commit('one')
+
+        tree.rename_one('b', 'd')
+        tree.rename_one('a', 'd/a')
+
+        self.assertStatusEqual(
+            [('b-id', 'd', 'renamed', 'b/ => d/'),
+             ('a-id', 'd/a', 'renamed', 'a => d/a'),
+            ], tree)
+
+    def test_status_modified(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a'])
+        tree.add(['a'], ['a-id'])
+        rev_id1 = tree.commit('one')
+
+        self.build_tree_contents([('tree/a', 'new contents for a\n')])
+
+        self.assertStatusEqual(
+            [('a-id', 'a', 'modified', 'a'),
+            ], tree)
+
+    def test_status_renamed_and_modified(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b/', 'tree/b/c'])
+        tree.add(['a', 'b', 'b/c'], ['a-id', 'b-id', 'c-id'])
+        rev_id1 = tree.commit('one')
+
+        tree.rename_one('b', 'd')
+        tree.rename_one('a', 'd/a')
+        self.build_tree_contents([('tree/d/a', 'new contents for a\n'),
+                                  ('tree/d/c', 'new contents for c\n'),
+                                 ])
+        # 'c' is not considered renamed, because only its parent was moved, it
+        # stayed in the same directory
+
+        self.assertStatusEqual(
+            [('b-id', 'd', 'renamed', 'b/ => d/'),
+             ('a-id', 'd/a', 'renamed and modified', 'a => d/a'),
+             ('c-id', 'd/c', 'modified', 'd/c'),
+            ], tree)
+
+    def test_status_kind_changed(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b'])
+        tree.add(['a', 'b'], ['a-id', 'b-id'])
+        tree.commit('one')
+
+        os.remove('tree/a')
+        self.build_tree(['tree/a/'])
+        # XXX:  This is technically valid, and the file list handles it fine,
+        #       but 'show_diff_trees()' does not, so we skip this part of the
+        #       test for now.
+        # tree.rename_one('b', 'c')
+        # os.remove('tree/c')
+        # self.build_tree(['tree/c/'])
+
+        self.assertStatusEqual(
+            [('a-id', 'a', 'kind changed', 'a => a/'),
+            # ('b-id', 'c', True, 'b => c/', 'renamed and modified'),
+            ], tree)
+
+    def test_status_removed(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b/'])
+        tree.add(['a', 'b'], ['a-id', 'b-id'])
+        tree.commit('one')
+
+        os.remove('tree/a')
+        tree.remove('b', force=True)
+
+        self.assertStatusEqual(
+            [('a-id', 'a', 'removed', 'a'),
+             ('b-id', 'b', 'removed', 'b/'),
+            ], tree)

@@ -871,3 +871,53 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
         self.assertEqual([{'path':'a', 'file_id':'a-id',
                            'message':'Message for A\n'},
                          ], bencode.bdecode(file_info))
+
+    def test_commit_unicode_messages(self):
+        from bzrlib.tests.test_diff import UnicodeFilename
+        self.requireFeature(UnicodeFilename)
+
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', u'tree/\u03a9'])
+        tree.add(['a', u'\u03a9'], ['a-id', 'omega-id'])
+
+        dlg = commit.CommitDialog(tree)
+        dlg._treeview_files.set_cursor((1,)) # 'a'
+        dlg._set_file_commit_message(u'Test \xfan\xecc\xf6de\n')
+        dlg._treeview_files.set_cursor((2,)) # omega
+        dlg._set_file_commit_message(u'\u03a9 is the end of all things.\n')
+        dlg._set_global_commit_message(u'\u03a9 and \xfan\xecc\xf6de\n')
+
+        self.assertEqual(([u'a', u'\u03a9'],
+                          [{'path':'a', 'file_id':'a-id',
+                            'message':'Test \xc3\xban\xc3\xacc\xc3\xb6de\n'},
+                           {'path':'\xce\xa9', 'file_id':'omega-id',
+                            'message':'\xce\xa9 is the end of all things.\n'},
+                          ]), dlg._get_specific_files())
+
+        dlg._do_commit()
+
+        rev = tree.branch.repository.get_revision(dlg.committed_revision_id)
+        file_info = rev.properties['file-info']
+        value = ('ld7:file_id4:a-id'
+                   '7:message16:Test \xc3\xban\xc3\xacc\xc3\xb6de\n'
+                   '4:path1:a'
+                  'e'
+                  'd7:file_id8:omega-id'
+                   '7:message29:\xce\xa9 is the end of all things.\n'
+                   '4:path2:\xce\xa9'
+                  'e'
+                 'e')
+        self.expectFailure('bencode and unicode does not mix properly with'
+                           ' Revision XML serialization.',
+                           self.assertEqual, value, file_info)
+        self.assertEqual(value, file_info)
+        file_info_decoded = bencode.bdecode(file_info)
+        for d in file_info_decoded:
+            d['path'] = d['path'].decode('utf8')
+            d['message'] = d['message'].decode('utf8')
+
+        self.assertEqual([{'path':u'a', 'file_id':'a-id',
+                           'message':u'Test \xfan\xecc\xf6de\n'},
+                          {'path':u'\u03a9', 'file_id':'omega-id',
+                           'message':u'\u03a9 is the end of all things.\n'},
+                         ], file_info_decoded)

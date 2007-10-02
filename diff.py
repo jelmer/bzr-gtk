@@ -30,9 +30,8 @@ try:
 except ImportError:
     have_gconf = False
 
-import bzrlib
-
-from bzrlib.diff import show_diff_trees
+from bzrlib import osutils
+from bzrlib.diff import show_diff_trees, internal_diff
 from bzrlib.errors import NoSuchFile
 from bzrlib.trace import warning
 
@@ -210,6 +209,31 @@ class DiffView(gtk.ScrolledWindow):
     def set_trees(self, rev_tree, parent_tree):
         self.rev_tree = rev_tree
         self.parent_tree = parent_tree
+#        self._build_delta()
+
+#    def _build_delta(self):
+#        self.parent_tree.lock_read()
+#        self.rev_tree.lock_read()
+#        try:
+#            self.delta = _iter_changes_to_status(self.parent_tree, self.rev_tree)
+#            self.path_to_status = {}
+#            self.path_to_diff = {}
+#            source_inv = self.parent_tree.inventory
+#            target_inv = self.rev_tree.inventory
+#            for (file_id, real_path, change_type, display_path) in self.delta:
+#                self.path_to_status[real_path] = u'=== %s %s' % (change_type, display_path)
+#                if change_type in ('modified', 'renamed and modified'):
+#                    source_ie = source_inv[file_id]
+#                    target_ie = target_inv[file_id]
+#                    sio = StringIO()
+#                    source_ie.diff(internal_diff, *old path, *old_tree,
+#                                   *new_path, target_ie, self.rev_tree,
+#                                   sio)
+#                    self.path_to_diff[real_path] = 
+#
+#        finally:
+#            self.rev_tree.unlock()
+#            self.parent_tree.unlock()
 
     def show_diff(self, specific_files):
         s = StringIO()
@@ -220,7 +244,20 @@ class DiffView(gtk.ScrolledWindow):
                         # contents as getdefaultencoding(), so we should
                         # probably try to make the paths in the same encoding.
                         )
-        self.buffer.set_text(s.getvalue().decode(sys.getdefaultencoding(), 'replace'))
+        # str.decode(encoding, 'replace') doesn't do anything. Because if a
+        # character is not valid in 'encoding' there is nothing to replace, the
+        # 'replace' is for 'str.encode()'
+        try:
+            decoded = s.getvalue().decode(sys.getdefaultencoding())
+        except UnicodeDecodeError:
+            try:
+                decoded = s.getvalue().decode('UTF-8')
+            except UnicodeDecodeError:
+                decoded = s.getvalue().decode('iso-8859-1')
+                # This always works, because every byte has a valid
+                # mapping from iso-8859-1 to Unicode
+        # TextBuffer must contain pure UTF-8 data
+        self.buffer.set_text(decoded.encode('UTF-8'))
 
 
 class DiffWindow(gtk.Window):
@@ -342,3 +379,87 @@ class DiffWindow(gtk.Window):
             specific_files = None
 
         self.diff_view.show_diff(specific_files)
+
+
+def _iter_changes_to_status(source, target):
+    """Determine the differences between trees.
+
+    This is a wrapper around _iter_changes which just yields more
+    understandable results.
+
+    :param source: The source tree (basis tree)
+    :param target: The target tree
+    :return: A list of (file_id, real_path, change_type, display_path)
+    """
+    added = 'added'
+    removed = 'removed'
+    renamed = 'renamed'
+    renamed_and_modified = 'renamed and modified'
+    modified = 'modified'
+    kind_changed = 'kind changed'
+
+    # TODO: Handle metadata changes
+
+    status = []
+    target.lock_read()
+    try:
+        source.lock_read()
+        try:
+            for (file_id, paths, changed_content, versioned, parent_ids, names,
+                 kinds, executables) in target._iter_changes(source):
+
+                # Skip the root entry if it isn't very interesting
+                if parent_ids == (None, None):
+                    continue
+
+                change_type = None
+                if kinds[0] is None:
+                    source_marker = ''
+                else:
+                    source_marker = osutils.kind_marker(kinds[0])
+                if kinds[1] is None:
+                    assert kinds[0] is not None
+                    marker = osutils.kind_marker(kinds[0])
+                else:
+                    marker = osutils.kind_marker(kinds[1])
+
+                real_path = paths[1]
+                if real_path is None:
+                    real_path = paths[0]
+                assert real_path is not None
+                display_path = real_path + marker
+
+                present_source = versioned[0] and kinds[0] is not None
+                present_target = versioned[1] and kinds[1] is not None
+
+                if present_source != present_target:
+                    if present_target:
+                        change_type = added
+                    else:
+                        assert present_source
+                        change_type = removed
+                elif names[0] != names[1] or parent_ids[0] != parent_ids[1]:
+                    # Renamed
+                    if changed_content or executables[0] != executables[1]:
+                        # and modified
+                        change_type = renamed_and_modified
+                    else:
+                        change_type = renamed
+                    display_path = (paths[0] + source_marker
+                                    + ' => ' + paths[1] + marker)
+                elif kinds[0] != kinds[1]:
+                    change_type = kind_changed
+                    display_path = (paths[0] + source_marker
+                                    + ' => ' + paths[1] + marker)
+                elif changed_content is True or executables[0] != executables[1]:
+                    change_type = modified
+                else:
+                    assert False, "How did we get here?"
+
+                status.append((file_id, real_path, change_type, display_path))
+        finally:
+            source.unlock()
+    finally:
+        target.unlock()
+
+    return status
