@@ -119,7 +119,7 @@ class PreferencesWindow(gtk.Dialog):
         table.set_col_spacings(6)
 
         def row_selected(tv, path, tvc):
-            p = bzrlib.plugin.all_plugins()[model[path][0]]
+            p = bzrlib.plugin.plugins()[model[path][0]]
             from inspect import getdoc
 
             for w in table.get_children():
@@ -184,7 +184,7 @@ class PreferencesWindow(gtk.Dialog):
         treeview.append_column(column)
         
         import bzrlib.plugin
-        plugins = bzrlib.plugin.all_plugins()
+        plugins = bzrlib.plugin.plugins()
         plugin_names = plugins.keys()
         plugin_names.sort()
         for name in plugin_names:
