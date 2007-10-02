@@ -121,8 +121,8 @@ class CommitDialog(gtk.Dialog):
     def fill_in_data(self):
         # Now that we are built, handle changes to the view based on the state
         self._fill_in_pending()
-        self._fill_in_files()
         self._fill_in_diff()
+        self._fill_in_files()
 
     def _fill_in_pending(self):
         if not self._pending:
@@ -169,6 +169,8 @@ class CommitDialog(gtk.Dialog):
         #  changed_content, versioned, parent, name, kind,
         #  executable)
 
+        # The first entry is always the 'whole tree'
+        store.append([None, None, True, 'All Files', ''])
         # should we pass specific_files?
         self._wt.lock_read()
         self._basis_tree.lock_read()
@@ -229,11 +231,10 @@ class CommitDialog(gtk.Dialog):
             self._wt.unlock()
 
         self._treeview_files.set_model(store)
+        self._treeview_files.set_cursor(0)
 
     def _fill_in_diff(self):
-        self._diff_label.set_text(_('Diff for whole tree'))
         self._diff_view.set_trees(self._wt, self._basis_tree)
-        self._diff_view.show_diff(None)
 
     def _compute_delta(self):
         self._delta = self._wt.changes_from(self._basis_tree)
@@ -338,7 +339,7 @@ class CommitDialog(gtk.Dialog):
         self._files_store = liststore
         self._treeview_files.set_model(liststore)
         crt = gtk.CellRendererToggle()
-        crt.set_property("activatable", not bool(self._pending))
+        crt.set_active(not bool(self._pending))
         crt.connect("toggled", self._toggle_commit, self._files_store)
         if self._pending:
             name = _('Commit*')
@@ -354,7 +355,12 @@ class CommitDialog(gtk.Dialog):
                                      self._on_treeview_files_cursor_changed)
 
     def _toggle_commit(self, cell, path, model):
-        model[path][2] = not model[path][2]
+        if model[path][0] is None: # No file_id means 'All Files'
+            new_val = not model[path][2]
+            for node in model:
+                node[2] = new_val
+        else:
+            model[path][2] = not model[path][2]
 
     def _construct_pending_list(self):
         # Pending information defaults to hidden, we put it all in 1 box, so
@@ -460,7 +466,10 @@ class CommitDialog(gtk.Dialog):
         if iterable is not None:
             path, display_path = model.get(iterable, 1, 3) # Get the real_path attribute
             self._diff_label.set_text(_('Diff for ') + display_path)
-            self._diff_view.show_diff([path])
+            if path is None:
+                self._diff_view.show_diff(None)
+            else:
+                self._diff_view.show_diff([path])
 
     @staticmethod
     def _rev_to_pending_info(rev):

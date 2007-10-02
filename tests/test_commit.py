@@ -188,6 +188,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         # TODO: assert that the pending box is hidden
         commit_col = dlg._treeview_files.get_column(0)
         self.assertEqual('Commit', commit_col.get_title())
+        renderer = commit_col.get_cell_renderers()[0]
+        self.assertTrue(renderer.get_active())
 
     def test_pending(self):
         tree = self.make_branch_and_tree('tree')
@@ -204,6 +206,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         # TODO: assert that the pending box is set to show
         commit_col = dlg._treeview_files.get_column(0)
         self.assertEqual('Commit*', commit_col.get_title())
+        renderer = commit_col.get_cell_renderers()[0]
+        self.assertFalse(renderer.get_active())
 
         values = [(r[0], r[1], r[2], r[3]) for r in dlg._pending_store]
         self.assertEqual([(rev_id2, '2007-10-01', 'Joe Foo', 'two')], values)
@@ -249,7 +253,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree)
         values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
-        self.assertEqual([('a-id', 'a', True, 'a', 'added'),
+        self.assertEqual([(None, None, True, 'All Files', ''),
+                          ('a-id', 'a', True, 'a', 'added'),
                           ('b-id', 'b', True, 'b/', 'added'),
                           ('c-id', 'b/c', True, 'b/c', 'added'),
                          ], values)
@@ -265,7 +270,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree)
         values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
-        self.assertEqual([('b-id', 'd', True, 'b/ => d/', 'renamed'),
+        self.assertEqual([(None, None, True, 'All Files', ''),
+                          ('b-id', 'd', True, 'b/ => d/', 'renamed'),
                           ('a-id', 'd/a', True, 'a => d/a', 'renamed'),
                          ], values)
 
@@ -279,7 +285,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree)
         values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
-        self.assertEqual([('a-id', 'a', True, 'a', 'modified'),
+        self.assertEqual([(None, None, True, 'All Files', ''),
+                          ('a-id', 'a', True, 'a', 'modified'),
                          ], values)
 
     def test_filelist_renamed_and_modified(self):
@@ -298,7 +305,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree)
         values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
-        self.assertEqual([('b-id', 'd', True, 'b/ => d/', 'renamed'),
+        self.assertEqual([(None, None, True, 'All Files', ''),
+                          ('b-id', 'd', True, 'b/ => d/', 'renamed'),
                           ('a-id', 'd/a', True, 'a => d/a', 'renamed and modified'),
                           ('c-id', 'd/c', True, 'd/c', 'modified'),
                          ], values)
@@ -320,7 +328,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree)
         values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
-        self.assertEqual([('a-id', 'a', True, 'a => a/', 'kind changed'),
+        self.assertEqual([(None, None, True, 'All Files', ''),
+                          ('a-id', 'a', True, 'a => a/', 'kind changed'),
                           # ('b-id', 'c', True, 'b => c/', 'renamed and modified'),
                          ], values)
 
@@ -335,7 +344,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree)
         values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
-        self.assertEqual([('a-id', 'a', True, 'a', 'removed'),
+        self.assertEqual([(None, None, True, 'All Files', ''),
+                          ('a-id', 'a', True, 'a', 'removed'),
                           ('b-id', 'b', True, 'b/', 'removed'),
                          ], values)
 
@@ -371,7 +381,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertEqual('+new contents for a\n', text[11])
         self.assertEqual('\n', text[12])
 
-        self.assertEqual('Diff for whole tree', dlg._diff_label.get_text())
+        self.assertEqual('Diff for All Files', dlg._diff_label.get_text())
 
     def test_file_selection(self):
         """Several things should happen when a file has been selected."""
@@ -381,9 +391,9 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree)
         diff_buffer = dlg._diff_view.buffer
-        self.assertEqual('Diff for whole tree', dlg._diff_label.get_text())
+        self.assertEqual('Diff for All Files', dlg._diff_label.get_text())
 
-        dlg._treeview_files.set_cursor((0,))
+        dlg._treeview_files.set_cursor((1,))
         self.assertEqual('Diff for a', dlg._diff_label.get_text())
         text = diff_buffer.get_text(diff_buffer.get_start_iter(),
                                     diff_buffer.get_end_iter()).splitlines(True)
@@ -396,7 +406,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertEqual('+contents of tree/a\n', text[4])
         self.assertEqual('\n', text[5])
 
-        dlg._treeview_files.set_cursor((1,))
+        dlg._treeview_files.set_cursor((2,))
         self.assertEqual('Diff for b', dlg._diff_label.get_text())
         text = diff_buffer.get_text(diff_buffer.get_start_iter(),
                                     diff_buffer.get_end_iter()).splitlines(True)
@@ -408,3 +418,49 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertEqual('@@ -0,0 +1,1 @@\n', text[3])
         self.assertEqual('+contents of tree/b\n', text[4])
         self.assertEqual('\n', text[5])
+
+    def test_toggle_all_files(self):
+        """When checking the All Files entry, it should toggle all fields"""
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b/'])
+        tree.add(['a', 'b'], ['a-id', 'b-id'])
+
+        dlg = commit.CommitDialog(tree)
+        self.assertEqual([(None, None, True),
+                          ('a-id', 'a', True),
+                          ('b-id', 'b', True),
+                         ], [(r[0], r[1], r[2]) for r in dlg._files_store])
+
+        # TODO: jam 20071002 I'm not sure how to exactly trigger a toggle, it
+        #       looks like we need to call renderer.activate() and pass an
+        #       event and widget, and lots of other stuff I'm not sure what to
+        #       do with. So instead, we just call toggle directly, and assume
+        #       that toggle is hooked in correctly
+        # column = dlg._treeview_files.get_column(0)
+        # renderer = column.get_cell_renderers()[0]
+
+        # Toggle a single entry should set just that entry to False
+        dlg._toggle_commit(None, 1, dlg._files_store)
+        self.assertEqual([(None, None, True),
+                          ('a-id', 'a', False),
+                          ('b-id', 'b', True),
+                         ], [(r[0], r[1], r[2]) for r in dlg._files_store])
+
+        # Toggling the main entry should set all entries
+        dlg._toggle_commit(None, 0, dlg._files_store)
+        self.assertEqual([(None, None, False),
+                          ('a-id', 'a', False),
+                          ('b-id', 'b', False),
+                         ], [(r[0], r[1], r[2]) for r in dlg._files_store])
+
+        dlg._toggle_commit(None, 2, dlg._files_store)
+        self.assertEqual([(None, None, False),
+                          ('a-id', 'a', False),
+                          ('b-id', 'b', True),
+                         ], [(r[0], r[1], r[2]) for r in dlg._files_store])
+
+        dlg._toggle_commit(None, 0, dlg._files_store)
+        self.assertEqual([(None, None, True),
+                          ('a-id', 'a', True),
+                          ('b-id', 'b', True),
+                         ], [(r[0], r[1], r[2]) for r in dlg._files_store])
