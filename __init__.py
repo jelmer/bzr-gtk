@@ -31,6 +31,8 @@ gtags             Manage branch tags.
 visualise         Graphically visualise this branch. 
 """
 
+import sys
+
 import bzrlib
 
 version_info = (0, 92, 0, 'dev', 0)
@@ -605,6 +607,68 @@ class cmd_gselftest(GTKCommand):
 
 
 register_command(cmd_gselftest)
+
+
+class cmd_test_gtk(GTKCommand):
+    """Version of selftest that just runs the gtk test suite."""
+
+    takes_options = ['verbose',
+                     Option('one', short_name='1',
+                            help='stop when one test fails'),
+                     Option('benchmark', help='run the benchmarks.'),
+                     Option('lsprof-timed',
+                     help='generate lsprof output for benchmarked'
+                          ' sections of code.'),
+                     Option('list-only',
+                     help='list the tests instead of running them'),
+                     Option('randomize', type=str, argname="SEED",
+                     help='randomize the order of tests using the given'
+                          ' seed or "now" for the current time'),
+                    ]
+    takes_args = ['testspecs*']
+
+    def run(self, verbose=None, one=False, benchmark=None,
+            lsprof_timed=None, list_only=False, randomize=None,
+            testspecs_list=None):
+        from bzrlib import __path__ as bzrlib_path
+        from bzrlib.tests import selftest
+
+        print '%10s: %s' % ('bzrlib', bzrlib_path[0])
+        if benchmark:
+            print 'No benchmarks yet'
+            return 3
+
+            test_suite_factory = bench_suite
+            if verbose is None:
+                verbose = True
+            # TODO: should possibly lock the history file...
+            benchfile = open(".perf_history", "at", buffering=1)
+        else:
+            test_suite_factory = test_suite
+            if verbose is None:
+                verbose = False
+            benchfile = None
+
+        if testspecs_list is not None:
+            pattern = '|'.join(testspecs_list)
+        else:
+            pattern = ".*"
+
+        try:
+            result = selftest(verbose=verbose,
+                              pattern=pattern,
+                              stop_on_failure=one,
+                              test_suite_factory=test_suite_factory,
+                              lsprof_timed=lsprof_timed,
+                              bench_history=benchfile,
+                              list_only=list_only,
+                              random_seed=randomize,
+                             )
+        finally:
+            if benchfile is not None:
+                benchfile.close()
+
+register_command(cmd_test_gtk)
 
 
 import gettext
