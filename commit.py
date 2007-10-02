@@ -98,13 +98,13 @@ def pending_revisions(wt):
 class CommitDialog(gtk.Dialog):
     """Implementation of Commit."""
 
-    _question_dialog = question_dialog
-
     def __init__(self, wt, selected=None, parent=None):
         gtk.Dialog.__init__(self, title="Commit - Olive",
                                   parent=parent,
                                   flags=0,
                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+        self._question_dialog = question_dialog
+
         self._wt = wt
         self._selected = selected
         self.committed_revision_id = None # Nothing has been committed yet
@@ -304,7 +304,9 @@ class CommitDialog(gtk.Dialog):
         self._button_commit = gtk.Button(_("Comm_it"), use_underline=True)
         self._button_commit.connect('clicked', self._on_commit_clicked)
         self._button_commit.set_flags(gtk.CAN_DEFAULT)
+        self._button_commit.show()
         self.action_area.pack_end(self._button_commit)
+        self._button_commit.grab_default()
 
     def _add_to_right_table(self, widget, weight, expanding=False):
         """Add another widget to the table
