@@ -98,6 +98,8 @@ def pending_revisions(wt):
 class CommitDialog(gtk.Dialog):
     """Implementation of Commit."""
 
+    _question_dialog = question_dialog
+
     def __init__(self, wt, selected=None, parent=None):
         gtk.Dialog.__init__(self, title="Commit - Olive",
                                   parent=parent,
@@ -105,6 +107,7 @@ class CommitDialog(gtk.Dialog):
                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         self._wt = wt
         self._selected = selected
+        self.committed_revision_id = None # Nothing has been committed yet
 
         self.setup_params()
         self.construct()
@@ -249,6 +252,7 @@ class CommitDialog(gtk.Dialog):
 
         self._construct_left_pane()
         self._construct_right_pane()
+        self._construct_action_pane()
 
         self.vbox.pack_start(self._hpane)
         self._hpane.show()
@@ -295,6 +299,12 @@ class CommitDialog(gtk.Dialog):
 
         self._right_pane_table.show()
         self._hpane.pack2(self._right_pane_table, resize=True, shrink=True)
+
+    def _construct_action_pane(self):
+        self._button_commit = gtk.Button(_("Comm_it"), use_underline=True)
+        self._button_commit.connect('clicked', self._on_commit_clicked)
+        self._button_commit.set_flags(gtk.CAN_DEFAULT)
+        self.action_area.pack_end(self._button_commit)
 
     def _add_to_right_table(self, widget, weight, expanding=False):
         """Add another widget to the table
@@ -502,6 +512,61 @@ class CommitDialog(gtk.Dialog):
             self._file_message_expander.set_sensitive(True)
             text_buffer.set_text(message)
             self._last_selected_file = self._files_store.get_path(selection)
+
+    @show_bzr_error
+    def _on_commit_clicked(self, button):
+        """ Commit button clicked handler. """
+        self._do_commit()
+
+    def _do_commit(self):
+        buf = self._global_message_text_view.get_buffer()
+        start, end = buf.get_bounds()
+        message = buf.get_text(start, end).decode('utf-8')
+
+        if message == '':
+            response = self._question_dialog(
+                            _('Commit with an empty message?'),
+                            _('You can describe your commit intent in the message.'))
+            if response == gtk.RESPONSE_NO:
+                # Kindly give focus to message area
+                self._global_message_text_view.grab_focus()
+                return
+
+        # if not self.pending:
+        #     specific_files = self._get_specific_files()
+        # else:
+        #     specific_files = None
+
+        # if self._is_checkout:
+        #     local = self._check_local.get_active()
+        # else:
+        #     local = False
+
+        # if list(self._wt.unknowns()) != []:
+        #     response = question_dialog(_("Commit with unknowns?"),
+        #        _("Unknown files exist in the working tree. Commit anyway?"))
+        #     if response == gtk.RESPONSE_NO:
+        #         return
+
+        local = False
+        specific_files = None
+        try:
+            rev_id = self._wt.commit(message,
+                       allow_pointless=False,
+                       strict=False,
+                       local=local,
+                       specific_files=specific_files)
+        except errors.PointlessCommit:
+            response = question_dialog(_('Commit with no changes?'),
+                                       _('There are no changes in the working tree.'))
+            if response == gtk.RESPONSE_YES:
+                rev_id = self._wt.commit(message,
+                               allow_pointless=True,
+                               strict=False,
+                               local=local,
+                               specific_files=specific_files)
+        self.committed_revision_id = rev_id
+        self.response(gtk.RESPONSE_OK)
 
     @staticmethod
     def _rev_to_pending_info(rev):

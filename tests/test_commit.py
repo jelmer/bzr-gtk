@@ -18,6 +18,8 @@
 
 import os
 
+import gtk
+
 from bzrlib import (
     tests,
     revision,
@@ -536,3 +538,66 @@ class TestCommitDialog(tests.TestCaseWithTransport):
                           ('a-id', 'a', True),
                           ('b-id', 'b', True),
                          ], [(r[0], r[1], r[2]) for r in dlg._files_store])
+
+
+class TestCommitDialog_Commit(tests.TestCaseWithTransport):
+    """Tests on the actual 'commit' button being pushed."""
+
+    def test_commit_no_message(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b'])
+        tree.add(['a'], ['a-id'])
+        rev_id = tree.commit('one')
+
+        tree.add(['b'], ['b-id'])
+
+        dlg = commit.CommitDialog(tree)
+        questions = []
+        def _question_cancel(*args):
+            questions.append(args)
+            questions.append('NO')
+            return gtk.RESPONSE_NO
+
+        def _question_ok(*args):
+            questions.append(args)
+            questions.append('OK')
+            return gtk.RESPONSE_OK
+
+        dlg._question_dialog = _question_cancel
+        dlg._do_commit()
+        self.assertEqual(
+            [('Commit with an empty message?',
+              'You can describe your commit intent in the message.'),
+              'NO',
+            ], questions)
+        # By saying NO, nothing should be committed.
+        self.assertEqual(rev_id, tree.last_revision())
+        self.assertIs(None, dlg.committed_revision_id)
+
+        dlg._question_dialog = _question_ok
+        del questions[:]
+
+        dlg._do_commit()
+        self.assertEqual(
+            [('Commit with an empty message?',
+              'You can describe your commit intent in the message.'),
+              'OK',
+            ], questions)
+        committed = tree.last_revision()
+        self.assertNotEqual(rev_id, committed)
+        self.assertEqual(committed, dlg.committed_revision_id)
+
+    def test_initial_commit(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a'])
+        tree.add(['a'], ['a-id'])
+
+        dlg = commit.CommitDialog(tree)
+        dlg._global_message_text_view.get_buffer().set_text('Some text\n')
+        dlg._do_commit()
+
+        last_rev = tree.last_revision()
+        self.assertEqual(last_rev, dlg.committed_revision_id)
+        rev = tree.branch.repository.get_revision(last_rev)
+        self.assertEqual(last_rev, rev.revision_id)
+        self.assertEqual('Some text\n', rev.message)
