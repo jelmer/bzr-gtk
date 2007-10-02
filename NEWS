@@ -17,6 +17,11 @@
         * Add a column to display the revision number. (#64167)
         * Add buttons to navigate to child revisions.
     (Gary van der Merwe)
+
+ BUG FIXES
+
+  * Show children on new row in table to avoid very broad windows in viz. 
+    (Jelmer)
     
  INTERNALS
 

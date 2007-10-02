@@ -116,7 +116,6 @@ class LogView(gtk.ScrolledWindow):
         self.tags_list.show_all()
         self.tags_label.show_all()
         
-
     def _add_parents_or_children(self, revids, widgets, table):
         while len(widgets) > 0:
             widget = widgets.pop()
@@ -161,7 +160,9 @@ class LogView(gtk.ScrolledWindow):
         vbox = gtk.VBox(False, 6)
         vbox.set_border_width(6)
         vbox.pack_start(self._create_headers(), expand=False, fill=True)
-        vbox.pack_start(self._create_parents_and_children(), expand=False, fill=True)
+        vbox.pack_start(self._create_parents(), expand=False, fill=True)
+        if self.show_children:
+            vbox.pack_start(self._create_children(), expand=False, fill=True)
         vbox.pack_start(self._create_message_view())
         self.add_with_viewport(vbox)
         vbox.show()
@@ -272,20 +273,23 @@ class LogView(gtk.ScrolledWindow):
         return self.table
 
     
-    def _create_parents_and_children(self):
-        hbox = gtk.HBox(True, 6)
+    def _create_parents(self):
+        hbox = gtk.HBox(True, 3)
         
         self.parents_table = self._create_parents_or_children_table(
             "<b>Parents:</b>")
         self.parents_widgets = []
         hbox.pack_start(self.parents_table)
-        
-        if self.show_children:
-            self.children_table = self._create_parents_or_children_table(
-                "<b>Children:</b>")
-            self.children_widgets = []
-            hbox.pack_start(self.children_table)
-        
+
+        hbox.show()
+        return hbox
+
+    def _create_children(self):
+        hbox = gtk.HBox(True, 3)
+        self.children_table = self._create_parents_or_children_table(
+            "<b>Children:</b>")
+        self.children_widgets = []
+        hbox.pack_start(self.children_table)
         hbox.show()
         return hbox
         
