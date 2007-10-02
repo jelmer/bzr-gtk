@@ -24,6 +24,7 @@ from bzrlib import (
     tests,
     revision,
     )
+from bzrlib.util import bencode
 
 from bzrlib.plugins.gtk import commit
 
@@ -487,7 +488,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertEqual('', get_file_text())
 
         self.assertEqual('', get_saved_text(1))
-        dlg._file_message_text_view.get_buffer().set_text('Some text\nfor a\n')
+        dlg._set_file_commit_message('Some text\nfor a\n')
         dlg._save_current_file_message()
         # We should have updated the ListStore with the new file commit info
         self.assertEqual('Some text\nfor a\n', get_saved_text(1))
@@ -500,7 +501,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertEqual('', get_file_text())
 
         self.assertEqual('', get_saved_text(2))
-        dlg._file_message_text_view.get_buffer().set_text('More text\nfor b\n')
+        dlg._set_file_commit_message('More text\nfor b\n')
         # Now switch back to 'a'. The message should be saved, and the buffer
         # should be updated with the other text
         dlg._treeview_files.set_cursor((1,))
@@ -556,6 +557,46 @@ class TestCommitDialog(tests.TestCaseWithTransport):
                           ('a-id', 'a', True),
                           ('b-id', 'b', True),
                          ], [(r[0], r[1], r[2]) for r in dlg._files_store])
+
+    def test_specific_files(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b/'])
+        tree.add(['a', 'b'], ['a-id', 'b-id'])
+
+        dlg = commit.CommitDialog(tree)
+        self.assertEqual((['a', 'b'], []), dlg._get_specific_files())
+
+        dlg._toggle_commit(None, 0, dlg._files_store)
+        self.assertEqual(([], []), dlg._get_specific_files())
+
+        dlg._toggle_commit(None, 1, dlg._files_store)
+        self.assertEqual((['a'], []), dlg._get_specific_files())
+
+    def test_specific_files_with_messages(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a_file', 'tree/b_dir/'])
+        tree.add(['a_file', 'b_dir'], ['1a-id', '0b-id'])
+
+        dlg = commit.CommitDialog(tree)
+        self.assertEqual((['a_file', 'b_dir'], []), dlg._get_specific_files())
+
+        dlg._treeview_files.set_cursor((1,))
+        dlg._set_file_commit_message('Test\nmessage\nfor a_file\n')
+        dlg._treeview_files.set_cursor((2,))
+        dlg._set_file_commit_message('message\nfor b_dir\n')
+
+        self.assertEqual((['a_file', 'b_dir'],
+                          [{'path':'a_file', 'file_id':'1a-id',
+                            'message':'Test\nmessage\nfor a_file\n'},
+                           {'path':'b_dir', 'file_id':'0b-id',
+                            'message':'message\nfor b_dir\n'},
+                          ]), dlg._get_specific_files())
+
+        dlg._toggle_commit(None, 1, dlg._files_store)
+        self.assertEqual((['b_dir'],
+                          [{'path':'b_dir', 'file_id':'0b-id',
+                            'message':'message\nfor b_dir\n'},
+                          ]), dlg._get_specific_files())
 
 
 class TestCommitDialog_Commit(tests.TestCaseWithTransport):
@@ -736,3 +777,65 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
               "YES",
             ], self.questions)
 
+    def test_commit_specific_files(self):
+        tree = self.make_branch_and_tree('tree')
+        rev_id1 = tree.commit('one')
+        self.build_tree(['tree/a', 'tree/b'])
+        tree.add(['a', 'b'], ['a-id', 'b-id'])
+
+        dlg = commit.CommitDialog(tree)
+        dlg._toggle_commit(None, 2, dlg._files_store) # unset 'b'
+
+        dlg._set_global_commit_message('Committing just "a"\n')
+        dlg._do_commit()
+
+        rev_id2 = dlg.committed_revision_id
+        self.assertIsNot(None, rev_id2)
+        self.assertEqual(rev_id2, tree.last_revision())
+
+        rt = tree.branch.repository.revision_tree(rev_id2)
+        entries = [(path, ie.file_id) for path, ie in rt.iter_entries_by_dir()
+                                       if path] # Ignore the root entry
+        self.assertEqual([('a', 'a-id')], entries)
+
+    def test_commit_no_messages(self):
+        tree = self.make_branch_and_tree('tree')
+        rev_id1 = tree.commit('one')
+        self.build_tree(['tree/a', 'tree/b'])
+        tree.add(['a', 'b'], ['a-id', 'b-id'])
+
+        dlg = commit.CommitDialog(tree)
+        dlg._set_global_commit_message('Simple commit\n')
+        dlg._do_commit()
+
+        rev = tree.branch.repository.get_revision(dlg.committed_revision_id)
+        self.failIf('file-info' in rev.properties)
+
+    def test_commit_specific_files_with_messages(self):
+        tree = self.make_branch_and_tree('tree')
+        rev_id1 = tree.commit('one')
+        self.build_tree(['tree/a', 'tree/b'])
+        tree.add(['a', 'b'], ['a-id', 'b-id'])
+
+        dlg = commit.CommitDialog(tree)
+        dlg._treeview_files.set_cursor((1,))
+        dlg._set_file_commit_message('Message for A\n')
+        dlg._treeview_files.set_cursor((2,))
+        dlg._set_file_commit_message('Message for B\n')
+        dlg._toggle_commit(None, 2, dlg._files_store) # unset 'b'
+        dlg._set_global_commit_message('Commit just "a"')
+
+        dlg._do_commit()
+
+        rev_id2 = dlg.committed_revision_id
+        self.assertEqual(rev_id2, tree.last_revision())
+        rev = tree.branch.repository.get_revision(rev_id2)
+        self.assertEqual('Commit just "a"', rev.message)
+        file_info = rev.properties['file-info']
+        self.assertEqual('ld7:file_id4:a-id'
+                           '7:message14:Message for A\n'
+                           '4:path1:a'
+                         'ee', file_info)
+        self.assertEqual([{'path':'a', 'file_id':'a-id',
+                           'message':'Message for A\n'},
+                         ], bencode.bdecode(file_info))

@@ -29,6 +29,7 @@ import re
 
 from bzrlib import errors, osutils
 from bzrlib.trace import mutter
+from bzrlib.util import bencode
 
 from dialog import error_dialog, question_dialog
 from errors import show_bzr_error
@@ -540,6 +541,26 @@ class CommitDialog(gtk.Dialog):
             text_buffer.set_text(message)
             self._last_selected_file = self._files_store.get_path(selection)
 
+    def _get_specific_files(self):
+        self._save_current_file_message()
+        files = []
+        records = iter(self._files_store)
+        rec = records.next() # Skip the All Files record
+        assert rec[0] is None, "Are we skipping the wrong record?"
+
+        file_info = []
+        for record in records:
+            if record[2]: # [2] checkbox
+                file_id = record[0]
+                path = record[1]
+                file_message = record[5]
+                files.append(record[1]) # [1] real path
+                if file_message:
+                    file_info.append({'path':path, 'file_id':file_id,
+                                     'message':file_message})
+        file_info.sort(key=lambda x:(x['path'], x['file_id']))
+        return files, file_info
+
     @show_bzr_error
     def _on_commit_clicked(self, button):
         """ Commit button clicked handler. """
@@ -557,10 +578,7 @@ class CommitDialog(gtk.Dialog):
                 self._global_message_text_view.grab_focus()
                 return
 
-        # if not self.pending:
-        #     specific_files = self._get_specific_files()
-        # else:
-        #     specific_files = None
+        specific_files, file_info = self._get_specific_files()
 
         local = self._check_local.get_active()
 
@@ -577,14 +595,17 @@ class CommitDialog(gtk.Dialog):
                 return
             break
 
-        specific_files = None
         rev_id = None
+        revprops = {}
+        if file_info:
+            revprops['file-info'] = bencode.bencode(file_info)
         try:
             rev_id = self._wt.commit(message,
                        allow_pointless=False,
                        strict=False,
                        local=local,
-                       specific_files=specific_files)
+                       specific_files=specific_files,
+                       revprops=revprops)
         except errors.PointlessCommit:
             response = self._question_dialog(
                                 _('Commit with no changes?'),
@@ -595,7 +616,8 @@ class CommitDialog(gtk.Dialog):
                                allow_pointless=True,
                                strict=False,
                                local=local,
-                               specific_files=specific_files)
+                               specific_files=specific_files,
+                               revprops=revprops)
         self.committed_revision_id = rev_id
         self.response(gtk.RESPONSE_OK)
 
@@ -607,6 +629,10 @@ class CommitDialog(gtk.Dialog):
     def _set_global_commit_message(self, message):
         """Just a helper for the test suite."""
         self._global_message_text_view.get_buffer().set_text(message)
+
+    def _set_file_commit_message(self, message):
+        """Helper for the test suite."""
+        self._file_message_text_view.get_buffer().set_text(message)
 
     @staticmethod
     def _rev_to_pending_info(rev):
