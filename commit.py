@@ -564,11 +564,18 @@ class CommitDialog(gtk.Dialog):
 
         local = self._check_local.get_active()
 
-        # if list(self._wt.unknowns()) != []:
-        #     response = question_dialog(_("Commit with unknowns?"),
-        #        _("Unknown files exist in the working tree. Commit anyway?"))
-        #     if response == gtk.RESPONSE_NO:
-        #         return
+        # All we care about is if there is a single unknown, so if this loop is
+        # entered, then there are unknown files.
+        # TODO: jam 20071002 It seems like this should cancel the dialog
+        #       entirely, since there isn't a way for them to add the unknown
+        #       files at this point.
+        for path in self._wt.unknowns():
+            response = self._question_dialog(
+                _("Commit with unknowns?"),
+                _("Unknown files exist in the working tree. Commit anyway?"))
+            if response == gtk.RESPONSE_NO:
+                return
+            break
 
         specific_files = None
         rev_id = None
@@ -579,8 +586,10 @@ class CommitDialog(gtk.Dialog):
                        local=local,
                        specific_files=specific_files)
         except errors.PointlessCommit:
-            response = question_dialog(_('Commit with no changes?'),
-                                       _('There are no changes in the working tree.'))
+            response = self._question_dialog(
+                                _('Commit with no changes?'),
+                                _('There are no changes in the working tree.'
+                                  ' Do you want to commit anyway?'))
             if response == gtk.RESPONSE_YES:
                 rev_id = self._wt.commit(message,
                                allow_pointless=True,

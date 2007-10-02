@@ -561,6 +561,24 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 class TestCommitDialog_Commit(tests.TestCaseWithTransport):
     """Tests on the actual 'commit' button being pushed."""
 
+    def _set_question_yes(self, dlg):
+        """Set the dialog to answer YES to any questions."""
+        self.questions = []
+        def _question_yes(*args):
+            self.questions.append(args)
+            self.questions.append('YES')
+            return gtk.RESPONSE_YES
+        dlg._question_dialog = _question_yes
+
+    def _set_question_no(self, dlg):
+        """Set the dialog to answer NO to any questions."""
+        self.questions = []
+        def _question_no(*args):
+            self.questions.append(args)
+            self.questions.append('NO')
+            return gtk.RESPONSE_NO
+        dlg._question_dialog = _question_no
+
     def test_bound_commit_local(self):
         tree = self.make_branch_and_tree('tree')
         self.build_tree(['tree/a'])
@@ -612,38 +630,26 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
         tree.add(['b'], ['b-id'])
 
         dlg = commit.CommitDialog(tree)
-        questions = []
-        def _question_cancel(*args):
-            questions.append(args)
-            questions.append('NO')
-            return gtk.RESPONSE_NO
-
-        def _question_ok(*args):
-            questions.append(args)
-            questions.append('OK')
-            return gtk.RESPONSE_OK
-
-        dlg._question_dialog = _question_cancel
+        self._set_question_no(dlg)
         dlg._do_commit()
         self.assertEqual(
             [('Commit with an empty message?',
               'You can describe your commit intent in the message.'),
               'NO',
-            ], questions)
+            ], self.questions)
         # By saying NO, nothing should be committed.
         self.assertEqual(rev_id, tree.last_revision())
         self.assertIs(None, dlg.committed_revision_id)
         self.assertTrue(dlg._global_message_text_view.get_property('is-focus'))
 
-        dlg._question_dialog = _question_ok
-        del questions[:]
+        self._set_question_yes(dlg)
 
         dlg._do_commit()
         self.assertEqual(
             [('Commit with an empty message?',
               'You can describe your commit intent in the message.'),
-              'OK',
-            ], questions)
+              'YES',
+            ], self.questions)
         committed = tree.last_revision()
         self.assertNotEqual(rev_id, committed)
         self.assertEqual(committed, dlg.committed_revision_id)
@@ -662,3 +668,71 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
         rev = tree.branch.repository.get_revision(last_rev)
         self.assertEqual(last_rev, rev.revision_id)
         self.assertEqual('Some text\n', rev.message)
+
+    def test_pointless_commit(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a'])
+        tree.add(['a'], ['a-id'])
+        rev_id1 = tree.commit('one')
+
+        dlg = commit.CommitDialog(tree)
+        dlg._set_global_commit_message('Some text\n')
+
+        self._set_question_no(dlg)
+        dlg._do_commit()
+
+        self.assertIs(None, dlg.committed_revision_id)
+        self.assertEqual(rev_id1, tree.last_revision())
+        self.assertEqual(
+            [('Commit with no changes?',
+              'There are no changes in the working tree.'
+              ' Do you want to commit anyway?'),
+              'NO',
+            ], self.questions)
+
+        self._set_question_yes(dlg)
+        dlg._do_commit()
+
+        rev_id2 = tree.last_revision()
+        self.assertEqual(rev_id2, dlg.committed_revision_id)
+        self.assertNotEqual(rev_id1, rev_id2)
+        self.assertEqual(
+            [('Commit with no changes?',
+              'There are no changes in the working tree.'
+              ' Do you want to commit anyway?'),
+              'YES',
+            ], self.questions)
+
+    def test_unknowns(self):
+        """We should check if there are unknown files."""
+        tree = self.make_branch_and_tree('tree')
+        rev_id1 = tree.commit('one')
+        self.build_tree(['tree/a', 'tree/b'])
+        tree.add(['a'], ['a-id'])
+
+        dlg = commit.CommitDialog(tree)
+        dlg._set_global_commit_message('Some text\n')
+        self._set_question_no(dlg)
+
+        dlg._do_commit()
+
+        self.assertIs(None, dlg.committed_revision_id)
+        self.assertEqual(rev_id1, tree.last_revision())
+        self.assertEqual(
+            [("Commit with unknowns?",
+              "Unknown files exist in the working tree. Commit anyway?"),
+              "NO",
+            ], self.questions)
+
+        self._set_question_yes(dlg)
+        dlg._do_commit()
+
+        rev_id2 = tree.last_revision()
+        self.assertNotEqual(rev_id1, rev_id2)
+        self.assertEqual(rev_id2, dlg.committed_revision_id)
+        self.assertEqual(
+            [("Commit with unknowns?",
+              "Unknown files exist in the working tree. Commit anyway?"),
+              "YES",
+            ], self.questions)
+
