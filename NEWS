@@ -29,6 +29,8 @@
 
   * Add check command to setup.py. (Jelmer)
 
+  * Avoid deprecation warning for all_plugins() in gpreferences. (Jelmer)
+
 0.91.0	2007-09-24
 
  UI
