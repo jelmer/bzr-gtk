@@ -163,14 +163,14 @@ class CommitDialog(gtk.Dialog):
         kind_changed = _('kind changed')
 
         # The store holds:
-        # [file_id, real path, checkbox, display path, changes type]
+        # [file_id, real path, checkbox, display path, changes type, message]
         # _iter_changes returns:
         # (file_id, (path_in_source, path_in_target),
         #  changed_content, versioned, parent, name, kind,
         #  executable)
 
         # The first entry is always the 'whole tree'
-        store.append([None, None, True, 'All Files', ''])
+        store.append([None, None, True, 'All Files', '', ''])
         # should we pass specific_files?
         self._wt.lock_read()
         self._basis_tree.lock_read()
@@ -225,12 +225,14 @@ class CommitDialog(gtk.Dialog):
                 else:
                     assert False, "How did we get here?"
 
-                store.append([file_id, real_path, True, display_path, change_type])
+                store.append([file_id, real_path, True, display_path,
+                              change_type, ''])
         finally:
             self._basis_tree.unlock()
             self._wt.unlock()
 
         self._treeview_files.set_model(store)
+        self._last_selected_file = None
         self._treeview_files.set_cursor(0)
 
     def _fill_in_diff(self):
@@ -335,6 +337,7 @@ class CommitDialog(gtk.Dialog):
             gobject.TYPE_BOOLEAN, # [2] checkbox
             gobject.TYPE_STRING,  # [3] display path
             gobject.TYPE_STRING,  # [4] changes type
+            gobject.TYPE_STRING,  # [5] commit message
             )
         self._files_store = liststore
         self._treeview_files.set_model(liststore)
@@ -432,7 +435,7 @@ class CommitDialog(gtk.Dialog):
         self._file_message_text_view.set_accepts_tab(False)
         self._file_message_text_view.show()
 
-        self._file_message_expander = gtk.Expander(_('Per File Message'))
+        self._file_message_expander = gtk.Expander(_('File commit message'))
         self._file_message_expander.add(file_message_box)
         file_message_box.show()
         self._add_to_right_table(self._file_message_expander, 1, False)
@@ -461,15 +464,44 @@ class CommitDialog(gtk.Dialog):
 
     def _on_treeview_files_cursor_changed(self, treeview):
         treeselection = treeview.get_selection()
-        (model, iterable) = treeselection.get_selected()
+        (model, selection) = treeselection.get_selected()
 
-        if iterable is not None:
-            path, display_path = model.get(iterable, 1, 3) # Get the real_path attribute
+        if selection is not None:
+            path, display_path = model.get(selection, 1, 3)
             self._diff_label.set_text(_('Diff for ') + display_path)
             if path is None:
                 self._diff_view.show_diff(None)
             else:
                 self._diff_view.show_diff([path])
+            self._update_per_file_info(selection)
+
+    def _save_current_file_message(self):
+        if self._last_selected_file is None:
+            return # Nothing to save
+        text_buffer = self._file_message_text_view.get_buffer()
+        cur_text = text_buffer.get_text(text_buffer.get_start_iter(),
+                                        text_buffer.get_end_iter())
+        last_selected = self._files_store.get_iter(self._last_selected_file)
+        self._files_store.set_value(last_selected, 5, cur_text)
+
+    def _update_per_file_info(self, selection):
+        # The node is changing, so cache the current message
+        self._save_current_file_message()
+        text_buffer = self._file_message_text_view.get_buffer()
+        file_id, display_path, message = self._files_store.get(selection, 0, 3, 5)
+        if file_id is None: # Whole tree
+            self._file_message_expander.set_label(_('File commit message'))
+            self._file_message_expander.set_expanded(False)
+            self._file_message_expander.set_sensitive(False)
+            text_buffer.set_text('')
+            self._last_selected_file = None
+        else:
+            self._file_message_expander.set_label(_('Commit message for ')
+                                                  + display_path)
+            self._file_message_expander.set_expanded(True)
+            self._file_message_expander.set_sensitive(True)
+            text_buffer.set_text(message)
+            self._last_selected_file = self._files_store.get_path(selection)
 
     @staticmethod
     def _rev_to_pending_info(rev):

@@ -392,6 +392,10 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         dlg = commit.CommitDialog(tree)
         diff_buffer = dlg._diff_view.buffer
         self.assertEqual('Diff for All Files', dlg._diff_label.get_text())
+        self.assertEqual('File commit message',
+                         dlg._file_message_expander.get_label())
+        self.assertFalse(dlg._file_message_expander.get_expanded())
+        self.assertFalse(dlg._file_message_expander.get_property('sensitive'))
 
         dlg._treeview_files.set_cursor((1,))
         self.assertEqual('Diff for a', dlg._diff_label.get_text())
@@ -405,6 +409,10 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertEqual('@@ -0,0 +1,1 @@\n', text[3])
         self.assertEqual('+contents of tree/a\n', text[4])
         self.assertEqual('\n', text[5])
+        self.assertEqual('Commit message for a',
+                         dlg._file_message_expander.get_label())
+        self.assertTrue(dlg._file_message_expander.get_expanded())
+        self.assertTrue(dlg._file_message_expander.get_property('sensitive'))
 
         dlg._treeview_files.set_cursor((2,))
         self.assertEqual('Diff for b', dlg._diff_label.get_text())
@@ -418,6 +426,70 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertEqual('@@ -0,0 +1,1 @@\n', text[3])
         self.assertEqual('+contents of tree/b\n', text[4])
         self.assertEqual('\n', text[5])
+        self.assertEqual('Commit message for b',
+                         dlg._file_message_expander.get_label())
+        self.assertTrue(dlg._file_message_expander.get_expanded())
+        self.assertTrue(dlg._file_message_expander.get_property('sensitive'))
+
+        dlg._treeview_files.set_cursor((0,))
+        self.assertEqual('Diff for All Files', dlg._diff_label.get_text())
+        self.assertEqual('File commit message',
+                         dlg._file_message_expander.get_label())
+        self.assertFalse(dlg._file_message_expander.get_expanded())
+        self.assertFalse(dlg._file_message_expander.get_property('sensitive'))
+
+    def test_file_selection_message(self):
+        """Selecting a file should bring up its commit message."""
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b/'])
+        tree.add(['a', 'b'], ['a-id', 'b-id'])
+
+        def get_file_text():
+            buf = dlg._file_message_text_view.get_buffer()
+            return buf.get_text(buf.get_start_iter(), buf.get_end_iter())
+
+        def get_saved_text(path):
+            """Get the saved text for a given record."""
+            return dlg._files_store.get_value(dlg._files_store.get_iter(path), 5)
+
+        dlg = commit.CommitDialog(tree)
+        self.assertEqual('File commit message',
+                         dlg._file_message_expander.get_label())
+        self.assertFalse(dlg._file_message_expander.get_expanded())
+        self.assertFalse(dlg._file_message_expander.get_property('sensitive'))
+        self.assertEqual('', get_file_text())
+
+        dlg._treeview_files.set_cursor((1,))
+        self.assertEqual('Commit message for a',
+                         dlg._file_message_expander.get_label())
+        self.assertTrue(dlg._file_message_expander.get_expanded())
+        self.assertTrue(dlg._file_message_expander.get_property('sensitive'))
+        self.assertEqual('', get_file_text())
+
+        self.assertEqual('', get_saved_text(1))
+        dlg._file_message_text_view.get_buffer().set_text('Some text\nfor a\n')
+        dlg._save_current_file_message()
+        # We should have updated the ListStore with the new file commit info
+        self.assertEqual('Some text\nfor a\n', get_saved_text(1))
+
+        dlg._treeview_files.set_cursor((2,))
+        self.assertEqual('Commit message for b/',
+                         dlg._file_message_expander.get_label())
+        self.assertTrue(dlg._file_message_expander.get_expanded())
+        self.assertTrue(dlg._file_message_expander.get_property('sensitive'))
+        self.assertEqual('', get_file_text())
+
+        self.assertEqual('', get_saved_text(2))
+        dlg._file_message_text_view.get_buffer().set_text('More text\nfor b\n')
+        # Now switch back to 'a'. The message should be saved, and the buffer
+        # should be updated with the other text
+        dlg._treeview_files.set_cursor((1,))
+        self.assertEqual('More text\nfor b\n', get_saved_text(2))
+        self.assertEqual('Commit message for a',
+                         dlg._file_message_expander.get_label())
+        self.assertTrue(dlg._file_message_expander.get_expanded())
+        self.assertTrue(dlg._file_message_expander.get_property('sensitive'))
+        self.assertEqual('Some text\nfor a\n', get_file_text())
 
     def test_toggle_all_files(self):
         """When checking the All Files entry, it should toggle all fields"""
