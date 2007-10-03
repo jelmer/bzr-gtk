@@ -59,7 +59,8 @@ class BranchWindow(gtk.Window):
         self.add(vbox)
 
         vbox.pack_start(self.construct_navigation(), expand=False, fill=True)
-
+        vbox.pack_start(self.construct_loading_msg(), expand=False, fill=True)
+        
         paned = gtk.VPaned()
         paned.pack1(self.construct_top(), resize=True, shrink=False)
         paned.pack2(self.construct_bottom(), resize=False, shrink=True)
@@ -68,6 +69,24 @@ class BranchWindow(gtk.Window):
         vbox.set_focus_child(paned)
 
         vbox.show()
+    
+    def construct_loading_msg(self):
+        image_loading = gtk.image_new_from_stock(gtk.STOCK_REFRESH,
+                                                 gtk.ICON_SIZE_BUTTON)
+        image_loading.show()
+        
+        label_loading = gtk.Label(_("Please wait, loading ancestral graph..."))
+        label_loading.set_alignment(0.0, 0.5)        
+        label_loading.show()
+        
+        self.loading_msg_box = gtk.HBox()
+        self.loading_msg_box.set_spacing(5)
+        self.loading_msg_box.set_border_width(5)        
+        self.loading_msg_box.pack_start(image_loading, False, False)
+        self.loading_msg_box.pack_start(label_loading, True, True)
+        self.loading_msg_box.show()
+        
+        return self.loading_msg_box
 
     def construct_top(self):
         """Construct the top-half of the window."""
@@ -205,6 +224,7 @@ class BranchWindow(gtk.Window):
         self.index = index
         self.treeview.set_model(self.model)
         self.treeview.get_selection().select_path(0)
+        self.loading_msg_box.hide()
         return False
     
     def _on_key_pressed(self, widget, event):
