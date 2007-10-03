@@ -897,7 +897,7 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
         dlg._do_commit()
 
         rev = tree.branch.repository.get_revision(dlg.committed_revision_id)
-        file_info = rev.properties['file-info']
+        file_info = rev.properties['file-info'].encode('UTF-8')
         value = ('ld7:file_id4:a-id'
                    '7:message16:Test \xc3\xban\xc3\xacc\xc3\xb6de\n'
                    '4:path1:a'
@@ -907,14 +907,11 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
                    '4:path2:\xce\xa9'
                   'e'
                  'e')
-        self.expectFailure('bencode and unicode does not mix properly with'
-                           ' Revision XML serialization.',
-                           self.assertEqual, value, file_info)
         self.assertEqual(value, file_info)
         file_info_decoded = bencode.bdecode(file_info)
         for d in file_info_decoded:
-            d['path'] = d['path'].decode('utf8')
-            d['message'] = d['message'].decode('utf8')
+            d['path'] = d['path'].decode('UTF-8')
+            d['message'] = d['message'].decode('UTF-8')
 
         self.assertEqual([{'path':u'a', 'file_id':'a-id',
                            'message':u'Test \xfan\xecc\xf6de\n'},

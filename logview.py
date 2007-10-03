@@ -101,7 +101,7 @@ class LogView(gtk.ScrolledWindow):
 
         file_info = revision.properties.get('file-info', None)
         if file_info is not None:
-            file_info = bencode.bdecode(file_info)
+            file_info = bencode.bdecode(file_info.encode('UTF-8'))
 
         if file_info:
             if self._file_id is None:

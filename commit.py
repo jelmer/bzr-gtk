@@ -322,6 +322,9 @@ class CommitDialog(gtk.Dialog):
         self._files_box.show()
         self._left_pane_box.pack_start(self._files_box)
 
+        # Keep note that all strings stored in a ListStore must be UTF-8
+        # strings. GTK does not support directly setting and restoring Unicode
+        # objects.
         liststore = gtk.ListStore(
             gobject.TYPE_STRING,  # [0] file_id
             gobject.TYPE_STRING,  # [1] real path
@@ -495,6 +498,10 @@ class CommitDialog(gtk.Dialog):
             self._last_selected_file = self._files_store.get_path(selection)
 
     def _get_specific_files(self):
+        """Return the list of selected paths, and file info.
+
+        :return: ([unicode paths], [{utf-8 file info}]
+        """
         self._save_current_file_message()
         files = []
         records = iter(self._files_store)
@@ -503,9 +510,9 @@ class CommitDialog(gtk.Dialog):
 
         file_info = []
         for record in records:
-            if record[2]: # [2] checkbox
+            if record[2]:           # [2] checkbox
                 file_id = record[0] # [0] file_id
-                path = record[1] # [1] real path
+                path = record[1]    # [1] real path
                 file_message = record[5] # [5] commit message
                 files.append(path.decode('UTF-8'))
                 if file_message:
@@ -554,7 +561,7 @@ class CommitDialog(gtk.Dialog):
         rev_id = None
         revprops = {}
         if file_info:
-            revprops['file-info'] = bencode.bencode(file_info)
+            revprops['file-info'] = bencode.bencode(file_info).decode('UTF-8')
         try:
             rev_id = self._wt.commit(message,
                        allow_pointless=False,
