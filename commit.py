@@ -191,7 +191,14 @@ class CommitDialog(gtk.Dialog):
 
         self._treeview_files.set_model(store)
         self._last_selected_file = None
+        # This sets the cursor, which causes the expander to close, which
+        # causes the _file_message_text_view to never get realized. So we have
+        # to give it a little kick, or it warns when we try to grab the focus
         self._treeview_files.set_cursor(0)
+
+        def _realize_file_message_tree_view(*args):
+            self._file_message_text_view.realize()
+        self.connect_after('realize', _realize_file_message_tree_view)
 
     def _fill_in_diff(self):
         self._diff_view.set_trees(self._wt, self._basis_tree)
@@ -232,6 +239,10 @@ class CommitDialog(gtk.Dialog):
         self._hpane.show()
         self.set_focus(self._global_message_text_view)
 
+        self._construct_accelerators()
+        self._set_sizes()
+
+    def _set_sizes(self):
         # This seems like a reasonable default, we might like it to
         # be a bit wider, so that by default we can fit an 80-line diff in the
         # diff window.
@@ -247,6 +258,12 @@ class CommitDialog(gtk.Dialog):
         height = int(monitor_rect.height * 0.66)
         self.set_default_size(width, height)
         self._hpane.set_position(300)
+
+    def _construct_accelerators(self):
+        group = gtk.AccelGroup()
+        group.connect_group(gtk.gdk.keyval_from_name('N'),
+                            gtk.gdk.CONTROL_MASK, 0, self._on_accel_next)
+        self.add_accel_group(group)
 
     def _construct_left_pane(self):
         self._left_pane_box = gtk.VBox(homogeneous=False, spacing=5)
@@ -315,8 +332,8 @@ class CommitDialog(gtk.Dialog):
         self._treeview_files = gtk.TreeView()
         self._treeview_files.show()
         scroller.add(self._treeview_files)
-        scroller.show()
         scroller.set_shadow_type(gtk.SHADOW_IN)
+        scroller.show()
         self._files_box.pack_start(scroller,
                                    expand=True, fill=True)
         self._files_box.show()
@@ -379,8 +396,8 @@ class CommitDialog(gtk.Dialog):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self._treeview_pending = gtk.TreeView()
         scroller.add(self._treeview_pending)
-        scroller.show()
         scroller.set_shadow_type(gtk.SHADOW_IN)
+        scroller.show()
         self._pending_box.pack_start(scroller,
                                      expand=True, fill=True, padding=5)
         self._treeview_pending.show()
@@ -414,15 +431,13 @@ class CommitDialog(gtk.Dialog):
         self._diff_view.show()
 
     def _construct_file_message(self):
-        file_message_box = gtk.VBox()
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 
         self._file_message_text_view = gtk.TextView()
         scroller.add(self._file_message_text_view)
-        scroller.show()
         scroller.set_shadow_type(gtk.SHADOW_IN)
-        file_message_box.pack_start(scroller, expand=True, fill=True)
+        scroller.show()
 
         self._file_message_text_view.modify_font(pango.FontDescription("Monospace"))
         self._file_message_text_view.set_wrap_mode(gtk.WRAP_WORD)
@@ -430,8 +445,8 @@ class CommitDialog(gtk.Dialog):
         self._file_message_text_view.show()
 
         self._file_message_expander = gtk.Expander(_('File commit message'))
-        self._file_message_expander.add(file_message_box)
-        file_message_box.show()
+        self._file_message_expander.set_expanded(True)
+        self._file_message_expander.add(scroller)
         self._add_to_right_table(self._file_message_expander, 1, False)
         self._file_message_expander.show()
 
@@ -449,8 +464,8 @@ class CommitDialog(gtk.Dialog):
         self._global_message_text_view = gtk.TextView()
         self._global_message_text_view.modify_font(pango.FontDescription("Monospace"))
         scroller.add(self._global_message_text_view)
-        scroller.show()
         scroller.set_shadow_type(gtk.SHADOW_IN)
+        scroller.show()
         self._add_to_right_table(scroller, 2, True)
         self._file_message_text_view.set_wrap_mode(gtk.WRAP_WORD)
         self._file_message_text_view.set_accepts_tab(False)
@@ -468,6 +483,28 @@ class CommitDialog(gtk.Dialog):
             else:
                 self._diff_view.show_diff([path.decode('UTF-8')])
             self._update_per_file_info(selection)
+
+    def _on_accel_next(self, accel_group, window, keyval, modifier):
+        # We don't really care about any of the parameters, because we know
+        # where this message came from
+        tree_selection = self._treeview_files.get_selection()
+        (model, selection) = tree_selection.get_selected()
+        if selection is None:
+            next = None
+        else:
+            next = model.iter_next(selection)
+
+        if next is None:
+            # We have either made it to the end of the list, or nothing was
+            # selected. Either way, select All Files, and jump to the global
+            # commit message.
+            self._treeview_files.set_cursor((0,))
+            self._global_message_text_view.grab_focus()
+        else:
+            # Set the cursor to this entry, and jump to the per-file commit
+            # message
+            self._treeview_files.set_cursor(model.get_path(next))
+            self._file_message_text_view.grab_focus()
 
     def _save_current_file_message(self):
         if self._last_selected_file is None:
