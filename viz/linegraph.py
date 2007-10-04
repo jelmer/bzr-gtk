@@ -46,7 +46,8 @@ def linegraph(branch, start, maxnum):
     
     # We get the mainline so we can pass it to merge_sort to make merge_sort
     # run faster.
-    mainline = branch.revision_history()
+    mainline = [None]
+    mainline.extend(branch.revision_history())
     graph_parents = branch.repository.get_revision_graph(start)
     graph_children = {}
     for revid in graph_parents.iterkeys():
