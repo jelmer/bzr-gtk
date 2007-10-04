@@ -31,7 +31,7 @@ class BranchWindow(gtk.Window):
     def __init__(self, parent=None):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.set_border_width(0)
-        self.set_title("bzrk")
+        self.set_title("Revision history")
 
         self._parent = parent
 
@@ -209,7 +209,7 @@ class BranchWindow(gtk.Window):
         treeview itself.
         """
         self.branch = branch
-        self.set_title(branch.nick + " - bzrk")
+        self.set_title(branch.nick + " - revision history")
         gobject.idle_add(self.populate_model, start, maxnum)
 
     def populate_model(self, start, maxnum):
