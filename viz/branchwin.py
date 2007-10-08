@@ -128,7 +128,7 @@ class BranchWindow(gtk.Window):
         self.treeview.append_column(self.graph_column)
 
         cell = gtk.CellRendererText()
-        cell.set_property("width-chars", 40)
+        cell.set_property("width-chars", 65)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         column = gtk.TreeViewColumn("Message")
         column.set_resizable(True)
@@ -139,7 +139,7 @@ class BranchWindow(gtk.Window):
         self.treeview.append_column(column)
 
         cell = gtk.CellRendererText()
-        cell.set_property("width-chars", 40)
+        cell.set_property("width-chars", 15)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         column = gtk.TreeViewColumn("Committer")
         column.set_resizable(True)
