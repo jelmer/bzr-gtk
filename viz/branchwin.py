@@ -149,17 +149,6 @@ class BranchWindow(gtk.Window):
         column.add_attribute(cell, "text", treemodel.COMMITER)
         self.treeview.append_column(column)
 
-        cell = gtk.CellRendererText()
-        cell.set_property("width-chars", 40)
-        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        column = gtk.TreeViewColumn("Date")
-        column.set_resizable(True)
-        column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        column.set_fixed_width(cell.get_size(self.treeview)[2])
-        column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", treemodel.TIMESTAMP)
-        self.treeview.append_column(column)
-
         return scrollwin
 
     def construct_navigation(self):
