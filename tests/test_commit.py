@@ -407,6 +407,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
     def test_file_selection(self):
         """Several things should happen when a file has been selected."""
         tree = self.make_branch_and_tree('tree')
+        tree.branch.get_config().set_user_option('per_file_commits', 'true')
         self.build_tree(['tree/a', 'tree/b'])
         tree.add(['a', 'b'], ['a-id', 'b-id'])
 
@@ -462,6 +463,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
     def test_file_selection_message(self):
         """Selecting a file should bring up its commit message."""
         tree = self.make_branch_and_tree('tree')
+        tree.branch.get_config().set_user_option('per_file_commits', 'true')
         self.build_tree(['tree/a', 'tree/b/'])
         tree.add(['a', 'b'], ['a-id', 'b-id'])
 
@@ -574,6 +576,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
     def test_specific_files_with_messages(self):
         tree = self.make_branch_and_tree('tree')
+        tree.branch.get_config().set_user_option('per_file_commits', 'true')
         self.build_tree(['tree/a_file', 'tree/b_dir/'])
         tree.add(['a_file', 'b_dir'], ['1a-id', '0b-id'])
 
@@ -811,8 +814,35 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
         rev = tree.branch.repository.get_revision(dlg.committed_revision_id)
         self.failIf('file-info' in rev.properties)
 
+    def test_commit_disabled_messages(self):
+        tree = self.make_branch_and_tree('tree')
+        rev_id1 = tree.commit('one')
+
+        self.build_tree(['tree/a', 'tree/b'])
+        tree.add(['a', 'b'], ['a-id', 'b-id'])
+
+        dlg = commit.CommitDialog(tree)
+        self.assertFalse(dlg._file_message_expander.get_property('visible'))
+
+        tree.branch.get_config().set_user_option('per_file_commits', 'true')
+        dlg = commit.CommitDialog(tree)
+        self.assertTrue(dlg._file_message_expander.get_property('visible'))
+
+        tree.branch.get_config().set_user_option('per_file_commits', 'on')
+        dlg = commit.CommitDialog(tree)
+        self.assertTrue(dlg._file_message_expander.get_property('visible'))
+
+        tree.branch.get_config().set_user_option('per_file_commits', 'y')
+        dlg = commit.CommitDialog(tree)
+        self.assertTrue(dlg._file_message_expander.get_property('visible'))
+
+        tree.branch.get_config().set_user_option('per_file_commits', 'n')
+        dlg = commit.CommitDialog(tree)
+        self.assertFalse(dlg._file_message_expander.get_property('visible'))
+
     def test_commit_specific_files_with_messages(self):
         tree = self.make_branch_and_tree('tree')
+        tree.branch.get_config().set_user_option('per_file_commits', 'true')
         rev_id1 = tree.commit('one')
         self.build_tree(['tree/a', 'tree/b'])
         tree.add(['a', 'b'], ['a-id', 'b-id'])
@@ -842,6 +872,7 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
 
     def test_commit_messages_after_merge(self):
         tree = self.make_branch_and_tree('tree')
+        tree.branch.get_config().set_user_option('per_file_commits', 'true')
         rev_id1 = tree.commit('one')
         tree2 = tree.bzrdir.sprout('tree2').open_workingtree()
         self.build_tree(['tree2/a', 'tree2/b'])
@@ -877,6 +908,7 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
         self.requireFeature(UnicodeFilename)
 
         tree = self.make_branch_and_tree('tree')
+        tree.branch.get_config().set_user_option('per_file_commits', 'true')
         self.build_tree(['tree/a', u'tree/\u03a9'])
         tree.add(['a', u'\u03a9'], ['a-id', 'omega-id'])
 

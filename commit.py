@@ -108,6 +108,7 @@ class CommitDialog(gtk.Dialog):
 
         self._wt = wt
         self._selected = selected
+        self._enable_per_file_commits = True
         self.committed_revision_id = None # Nothing has been committed yet
 
         self.setup_params()
@@ -128,6 +129,7 @@ class CommitDialog(gtk.Dialog):
         self._fill_in_diff()
         self._fill_in_files()
         self._fill_in_checkout()
+        self._fill_in_per_file_info()
 
     def _fill_in_pending(self):
         if not self._pending:
@@ -221,6 +223,18 @@ class CommitDialog(gtk.Dialog):
                 # available, NetworkManager doesn't necessarily have to be
                 mutter("unable to get networkmanager state: %r" % e)
         self._check_local.show()
+
+    def _fill_in_per_file_info(self):
+        config = self._wt.branch.get_config()
+        enable_per_file_commits = config.get_user_option('per_file_commits')
+        if (enable_per_file_commits is None
+            or enable_per_file_commits.lower()
+                not in ('y', 'yes', 'on', 'enable', '1', 't', 'true')):
+            self._enable_per_file_commits = False
+        else:
+            self._enable_per_file_commits = True
+        if not self._enable_per_file_commits:
+            self._file_message_expander.hide()
 
     def _compute_delta(self):
         self._delta = self._wt.changes_from(self._basis_tree)
@@ -517,6 +531,9 @@ class CommitDialog(gtk.Dialog):
 
     def _update_per_file_info(self, selection):
         # The node is changing, so cache the current message
+        if not self._enable_per_file_commits:
+            return
+
         self._save_current_file_message()
         text_buffer = self._file_message_text_view.get_buffer()
         file_id, display_path, message = self._files_store.get(selection, 0, 3, 5)
@@ -552,12 +569,15 @@ class CommitDialog(gtk.Dialog):
                 path = record[1]    # [1] real path
                 file_message = record[5] # [5] commit message
                 files.append(path.decode('UTF-8'))
-                if file_message:
+                if self._enable_per_file_commits and file_message:
                     # All of this needs to be utf-8 information
                     file_info.append({'path':path, 'file_id':file_id,
                                      'message':file_message})
         file_info.sort(key=lambda x:(x['path'], x['file_id']))
-        return files, file_info
+        if self._enable_per_file_commits:
+            return files, file_info
+        else:
+            return files, []
 
     @show_bzr_error
     def _on_commit_clicked(self, button):
