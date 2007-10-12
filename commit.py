@@ -177,8 +177,10 @@ class CommitDialog(gtk.Dialog):
         #  changed_content, versioned, parent, name, kind,
         #  executable)
 
+        all_enabled = (self._selected is None)
         # The first entry is always the 'whole tree'
-        store.append([None, None, True, 'All Files', '', ''])
+        all_iter = store.append([None, None, all_enabled, 'All Files', '', ''])
+        initial_cursor = store.get_path(all_iter)
         # should we pass specific_files?
         self._wt.lock_read()
         self._basis_tree.lock_read()
@@ -186,9 +188,20 @@ class CommitDialog(gtk.Dialog):
             from diff import _iter_changes_to_status
             for (file_id, real_path, change_type, display_path
                 ) in _iter_changes_to_status(self._basis_tree, self._wt):
-                store.append([file_id, real_path.encode('UTF-8'),
-                              True, display_path.encode('UTF-8'),
-                              change_type, ''])
+                if self._selected and real_path != self._selected:
+                    enabled = False
+                else:
+                    enabled = True
+                item_iter = store.append([
+                    file_id,
+                    real_path.encode('UTF-8'),
+                    enabled,
+                    display_path.encode('UTF-8'),
+                    change_type,
+                    '', # Initial comment
+                    ])
+                if self._selected and enabled:
+                    initial_cursor = store.get_path(item_iter)
         finally:
             self._basis_tree.unlock()
             self._wt.unlock()
@@ -198,7 +211,7 @@ class CommitDialog(gtk.Dialog):
         # This sets the cursor, which causes the expander to close, which
         # causes the _file_message_text_view to never get realized. So we have
         # to give it a little kick, or it warns when we try to grab the focus
-        self._treeview_files.set_cursor(0)
+        self._treeview_files.set_cursor(initial_cursor)
 
         def _realize_file_message_tree_view(*args):
             self._file_message_text_view.realize()

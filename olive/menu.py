@@ -288,7 +288,11 @@ class OliveMenu:
         except NotBranchError, e:
             path = e.path
         
-        commit = CommitDialog(wt, path, not branch, self.selected)
+        if self.selected:
+            selected = os.path.join(path, self.selected)
+        else:
+            selected = None
+        commit = CommitDialog(wt=wt, selected=selected, parent=None)
         response = commit.run()
         if response != gtk.RESPONSE_NONE:
             commit.hide()

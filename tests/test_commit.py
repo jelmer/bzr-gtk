@@ -369,6 +369,23 @@ class TestCommitDialog(tests.TestCaseWithTransport):
                           ('a-id', 'a', True, 'a', 'removed'),
                           ('b-id', 'b', True, 'b/', 'removed'),
                          ], values)
+        # All Files should be selected
+        self.assertEqual(((0,), None), dlg._treeview_files.get_cursor())
+
+    def test_filelist_with_selected(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b/'])
+        tree.add(['a', 'b'], ['a-id', 'b-id'])
+
+        dlg = commit.CommitDialog(tree, selected='a')
+        values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
+        self.assertEqual([(None, None, False, 'All Files', ''),
+                          ('a-id', 'a', True, 'a', 'added'),
+                          ('b-id', 'b', False, 'b/', 'added'),
+                         ], values)
+        # This file should also be selected in the file list, rather than the
+        # 'All Files' selection
+        self.assertEqual(((1,), None), dlg._treeview_files.get_cursor())
 
     def test_diff_view(self):
         tree = self.make_branch_and_tree('tree')
