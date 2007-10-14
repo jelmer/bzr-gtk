@@ -302,7 +302,7 @@ class OliveMenu:
     def diff(self, action):
         """ Right context menu -> Diff """
         wt = WorkingTree.open_containing(self.path)[0]
-        window = DiffWindow()
+        window = DiffWindow(self.app)
         parent_tree = wt.branch.repository.revision_tree(wt.branch.last_revision())
         window.set_diff(wt.branch.nick, wt, parent_tree)
         window.set_file(wt.relpath(self.path + os.sep + self.selected))

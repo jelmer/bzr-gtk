@@ -14,6 +14,7 @@ import gobject
 import pango
 import treemodel
 
+from bzrlib.plugins.gtk.window import Window
 from bzrlib.osutils import format_date
 
 from linegraph import linegraph, same_branch
@@ -21,7 +22,7 @@ from graphcell import CellRendererGraph
 from treemodel import TreeModel
 
 
-class BranchWindow(gtk.Window):
+class BranchWindow(Window):
     """Branch window.
 
     This object represents and manages a single window containing information
@@ -29,13 +30,9 @@ class BranchWindow(gtk.Window):
     """
 
     def __init__(self, parent=None):
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        Window.__init__(self, parent=parent)
         self.set_border_width(0)
         self.set_title("Revision history")
-
-        self._parent = parent
-
-        self.connect('key-press-event', self._on_key_pressed)
 
         # Use three-quarters of the screen by default
         screen = self.get_screen()
@@ -216,23 +213,6 @@ class BranchWindow(gtk.Window):
         self.loading_msg_box.hide()
         return False
     
-    def _on_key_pressed(self, widget, event):
-        """ Key press event handler. """
-        keyname = gtk.gdk.keyval_name(event.keyval)
-        func = getattr(self, '_on_key_press_' + keyname, None)
-        if func:
-            return func(event)
-
-    def _on_key_press_w(self, event):
-        if event.state & gtk.gdk.CONTROL_MASK:
-            self.destroy()
-            if self._parent is None:
-                gtk.main_quit()
-
-    def _on_key_press_q(self, event):
-        if event.state & gtk.gdk.CONTROL_MASK:
-            gtk.main_quit()
-    
     def _treeselection_changed_cb(self, selection, *args):
         """Callback for when the treeview changes."""
         (model, selected_rows) = selection.get_selected_rows()
@@ -293,7 +273,7 @@ class BranchWindow(gtk.Window):
     def show_diff(self, branch, revid, parentid):
         """Open a new window to show a diff between the given revisions."""
         from bzrlib.plugins.gtk.diff import DiffWindow
-        window = DiffWindow()
+        window = DiffWindow(parent=self)
         (parent_tree, rev_tree) = branch.repository.revision_trees([parentid, 
                                                                    revid])
         description = revid + " - " + branch.nick
