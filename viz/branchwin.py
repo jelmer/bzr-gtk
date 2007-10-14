@@ -293,7 +293,7 @@ class BranchWindow(gtk.Window):
     def show_diff(self, branch, revid, parentid):
         """Open a new window to show a diff between the given revisions."""
         from bzrlib.plugins.gtk.diff import DiffWindow
-        window = DiffWindow()
+        window = DiffWindow(parent=self)
         (parent_tree, rev_tree) = branch.repository.revision_trees([parentid, 
                                                                    revid])
         description = revid + " - " + branch.nick

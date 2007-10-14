@@ -726,7 +726,7 @@ class OliveGtk:
     
     def on_menuitem_stats_diff_activate(self, widget):
         """ Statistics/Differences... menu handler. """
-        window = DiffWindow()
+        window = DiffWindow(parent=self)
         parent_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
         window.set_diff(self.wt.branch.nick, self.wt, parent_tree)
         window.show()
