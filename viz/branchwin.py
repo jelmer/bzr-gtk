@@ -36,6 +36,7 @@ class BranchWindow(gtk.Window):
         self._parent = parent
 
         self.connect('key-press-event', self._on_key_pressed)
+        self.connect("destroy", lambda w: self.branch.unlock())
 
         # Use three-quarters of the screen by default
         screen = self.get_screen()
@@ -202,6 +203,7 @@ class BranchWindow(gtk.Window):
         gobject.idle_add(self.populate_model, start, maxnum)
 
     def populate_model(self, start, maxnum):
+        self.branch.lock_read()
         (linegraphdata, index, columns_len) = linegraph(self.branch,
                                                         start,
                                                         maxnum)

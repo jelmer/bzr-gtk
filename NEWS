@@ -22,6 +22,8 @@
 
   * Show children on new row in table to avoid very broad windows in viz. 
     (Jelmer)
+
+  * viz slow when run from olive. (#70463, Gary van der Merwe)
     
  INTERNALS
 

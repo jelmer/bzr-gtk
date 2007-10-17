@@ -225,11 +225,9 @@ def start_viz_window(branch, revision, limit=None):
     :return: The viz window object.
     """
     from viz.branchwin import BranchWindow
-    branch.lock_read()
     pp = BranchWindow()
     pp.set_branch(branch, revision, limit)
     # cleanup locks when the window is closed
-    pp.connect("destroy", lambda w: branch.unlock())
     return pp
 
 
