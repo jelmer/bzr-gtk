@@ -193,8 +193,7 @@ class BranchWindow(gtk.Window):
 
     def _go_clicked_cb(self, revid):
         """Callback for when the go button for a parent is clicked."""
-        self.treeview.set_cursor(self.index[revid])
-        self.treeview.grab_focus()
+        self.treeview.set_revision(revid)
 
     def show_diff(self, branch, revid, parentid):
         """Open a new window to show a diff between the given revisions."""

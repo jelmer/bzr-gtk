@@ -33,6 +33,10 @@ class TreeView(gtk.ScrolledWindow):
     def get_revision(self):
         return self.revision
 
+    def set_revision(self, revid):
+        self.treeview.set_cursor(self.index[revid])
+        self.treeview.grab_focus()
+
     def get_children(self):
         return self.children
 
