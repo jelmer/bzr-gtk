@@ -212,7 +212,7 @@ class BranchWindow(gtk.Window):
         self.graph_column.set_max_width(width)
         self.index = index
         self.treeview.set_model(self.model)
-        self.treeview.get_selection().select_path(0)
+        self.treeview.set_cursor(0)
         self.loading_msg_box.hide()
         return False
     
