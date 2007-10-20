@@ -39,6 +39,63 @@ class TreeView(gtk.ScrolledWindow):
     def get_parents(self):
         return self.parents
 
+    def set_branch(self, branch, start, maxnum):
+        self.branch = branch
+
+        gobject.idle_add(self.populate, start, maxnum)
+
+    def back(self):
+        (path, col) = self.treeview.get_cursor()
+        revision = self.model[path][treemodel.REVISION]
+        parents = self.model[path][treemodel.PARENTS]
+        if not len(parents):
+            return
+
+        for parent_id in parents:
+            parent_index = self.index[parent_id]
+            parent = self.model[parent_index][treemodel.REVISION]
+            if same_branch(revision, parent):
+                self.treeview.set_cursor(parent_index)
+                break
+        else:
+            self.treeview.set_cursor(self.index[parents[0]])
+        self.treeview.grab_focus()
+
+    def forward(self):
+        (path, col) = self.treeview.get_cursor()
+        revision = self.model[path][treemodel.REVISION]
+        children = self.model[path][treemodel.CHILDREN]
+        if not len(children):
+            return
+
+        for child_id in children:
+            child_index = self.index[child_id]
+            child = self.model[child_index][treemodel.REVISION]
+            if same_branch(child, revision):
+                self.treeview.set_cursor(child_index)
+                break
+        else:
+            self.treeview.set_cursor(self.index[children[0]])
+        self.treeview.grab_focus()
+
+    def populate(self, start, maxnum):
+        self.branch.lock_read()
+
+        (linegraphdata, index, columns_len) = linegraph(self.branch,
+                                                        start,
+                                                        maxnum)
+
+        self.model = TreeModel(self.branch, linegraphdata)
+        self.graph_cell.columns_len = columns_len
+        width = self.graph_cell.get_size(self.treeview)[2]
+        self.graph_column.set_fixed_width(width)
+        self.graph_column.set_max_width(width)
+        self.index = index
+        self.treeview.set_model(self.model)
+        self.treeview.set_cursor(0)
+
+        return False
+
     def construct_treeview(self):
         self.treeview = gtk.TreeView()
 
@@ -102,29 +159,6 @@ class TreeView(gtk.ScrolledWindow):
         column.add_attribute(cell, "text", treemodel.COMMITER)
         self.treeview.append_column(column)
 
-    def set_branch(self, branch, start, maxnum):
-        self.branch = branch
-
-        gobject.idle_add(self.populate, start, maxnum)
-
-    def populate(self, start, maxnum):
-        self.branch.lock_read()
-
-        (linegraphdata, index, columns_len) = linegraph(self.branch,
-                                                        start,
-                                                        maxnum)
-
-        self.model = TreeModel(self.branch, linegraphdata)
-        self.graph_cell.columns_len = columns_len
-        width = self.graph_cell.get_size(self.treeview)[2]
-        self.graph_column.set_fixed_width(width)
-        self.graph_column.set_max_width(width)
-        self.index = index
-        self.treeview.set_model(self.model)
-        self.treeview.get_selection().select_path(0)
-
-        return False
-    
     def _on_selection_changed(self, selection, *args):
         """callback for when the treeview changes."""
         (model, selected_rows) = selection.get_selected_rows()
