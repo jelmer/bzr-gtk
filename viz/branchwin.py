@@ -195,28 +195,10 @@ class BranchWindow(gtk.Window):
         """Callback for when the go button for a parent is clicked."""
         self.treeview.set_revision(revid)
 
-    def show_diff(self, branch, revid, parentid):
-        """Open a new window to show a diff between the given revisions."""
-        from bzrlib.plugins.gtk.diff import DiffWindow
-        window = DiffWindow(parent=self)
-        (parent_tree, rev_tree) = branch.repository.revision_trees([parentid, 
-                                                                   revid])
-        description = revid + " - " + branch.nick
-        window.set_diff(description, rev_tree, parent_tree)
-        window.show()
-
     def _show_clicked_cb(self, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
         self.show_diff(self.branch, revid, parentid)
         self.treeview.grab_focus()
-
-    def _treeview_row_mouseclick(self, widget, event):
-        from bzrlib.plugins.gtk.revisionmenu import RevisionPopupMenu
-        if event.button == 3:
-            menu = RevisionPopupMenu(self.branch.repository, 
-                [x.revision_id for x in self.selected_revisions()],
-                self.branch)
-            menu.popup(None, None, None, event.button, event.get_time())
 
     def selected_revision(self, path):
         return self.model[path][treemodel.REVISION]
@@ -224,15 +206,3 @@ class BranchWindow(gtk.Window):
     def selected_revisions(self):
         return [self.selected_revision(path) for path in \
                 self.treeview.get_selection().get_selected_rows()[1]]
-
-    def _treeview_row_activated_cb(self, widget, path, col):
-        # TODO: more than one parent
-        """Callback for when a treeview row gets activated."""
-        revision_id = self.model[path][treemodel.REVID]
-        parents = self.model[path][treemodel.PARENTS]
-        if len(parents) == 0:
-            # Ignore revisions without parent
-            return
-        parent_id = parents[0]
-        self.show_diff(self.branch, revision_id, parent_id)
-        self.treeview.grab_focus()
