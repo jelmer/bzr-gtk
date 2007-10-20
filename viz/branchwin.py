@@ -19,7 +19,7 @@ from bzrlib.osutils import format_date
 from linegraph import linegraph, same_branch
 from graphcell import CellRendererGraph
 from treemodel import TreeModel
-
+from treeview  import TreeView
 
 class BranchWindow(gtk.Window):
     """Branch window.
@@ -91,66 +91,14 @@ class BranchWindow(gtk.Window):
 
     def construct_top(self):
         """Construct the top-half of the window."""
-        scrollwin = gtk.ScrolledWindow()
-        scrollwin.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-        scrollwin.set_shadow_type(gtk.SHADOW_IN)
-        scrollwin.show()
+        self.treeview = TreeView()
 
-        self.treeview = gtk.TreeView()
-        self.treeview.set_rules_hint(True)
-        self.treeview.set_search_column(4)
-        self.treeview.get_selection().connect("changed", self._treeselection_changed_cb)
-        self.treeview.connect("row-activated", self._treeview_row_activated_cb)
-        self.treeview.connect("button-release-event", 
-                self._treeview_row_mouseclick)
-        self.treeview.set_property('fixed-height-mode', True)
-        scrollwin.add(self.treeview)
+        self.treeview.treeview.get_selection().connect("changed",
+                self._treeselection_changed_cb)
+
         self.treeview.show()
 
-        cell = gtk.CellRendererText()
-        cell.set_property("width-chars", 15)
-        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        column = gtk.TreeViewColumn("Revision No")
-        column.set_resizable(True)
-        column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        column.set_fixed_width(cell.get_size(self.treeview)[2])
-        column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", treemodel.REVNO)
-        self.treeview.append_column(column)
-
-        self.graph_cell = CellRendererGraph()
-        self.graph_column = gtk.TreeViewColumn()
-        self.graph_column.set_resizable(True)
-        self.graph_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.graph_column.pack_start(self.graph_cell, expand=False)
-        self.graph_column.add_attribute(self.graph_cell, "node", treemodel.NODE)
-        self.graph_column.add_attribute(self.graph_cell, "in-lines", treemodel.LAST_LINES)
-        self.graph_column.add_attribute(self.graph_cell, "out-lines", treemodel.LINES)
-        self.treeview.append_column(self.graph_column)
-
-        cell = gtk.CellRendererText()
-        cell.set_property("width-chars", 65)
-        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        column = gtk.TreeViewColumn("Message")
-        column.set_resizable(True)
-        column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        column.set_fixed_width(cell.get_size(self.treeview)[2])
-        column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", treemodel.MESSAGE)
-        self.treeview.append_column(column)
-
-        cell = gtk.CellRendererText()
-        cell.set_property("width-chars", 15)
-        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        column = gtk.TreeViewColumn("Committer")
-        column.set_resizable(True)
-        column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        column.set_fixed_width(cell.get_size(self.treeview)[2])
-        column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", treemodel.COMMITER)
-        self.treeview.append_column(column)
-
-        return scrollwin
+        return self.treeview
 
     def construct_navigation(self):
         """Construct the navigation buttons."""
@@ -200,23 +148,7 @@ class BranchWindow(gtk.Window):
         """
         self.branch = branch
         self.set_title(branch.nick + " - revision history")
-        gobject.idle_add(self.populate_model, start, maxnum)
-
-    def populate_model(self, start, maxnum):
-        self.branch.lock_read()
-        (linegraphdata, index, columns_len) = linegraph(self.branch,
-                                                        start,
-                                                        maxnum)
-        self.model = TreeModel(self.branch, linegraphdata)
-        self.graph_cell.columns_len = columns_len
-        width = self.graph_cell.get_size(self.treeview)[2]
-        self.graph_column.set_fixed_width(width)
-        self.graph_column.set_max_width(width)
-        self.index = index
-        self.treeview.set_model(self.model)
-        self.treeview.set_cursor(0)
-        self.loading_msg_box.hide()
-        return False
+        self.treeview.set_branch(branch, start, maxnum)
     
     def _on_key_pressed(self, widget, event):
         """ Key press event handler. """
@@ -236,14 +168,12 @@ class BranchWindow(gtk.Window):
             gtk.main_quit()
     
     def _treeselection_changed_cb(self, selection, *args):
-        """Callback for when the treeview changes."""
-        (model, selected_rows) = selection.get_selected_rows()
-        if len(selected_rows) > 0:
-            iter = self.model.get_iter(selected_rows[0])
-            revision = self.model.get_value(iter, treemodel.REVISION)
-            parents = self.model.get_value(iter, treemodel.PARENTS)
-            children = self.model.get_value(iter, treemodel.CHILDREN)
-            
+        """callback for when the treeview changes."""
+        revision = self.treeview.get_revision()
+        parents  = self.treeview.get_parents()
+        children = self.treeview.get_children()
+
+        if revision is not None:
             self.back_button.set_sensitive(len(parents) > 0)
             self.fwd_button.set_sensitive(len(children) > 0)
             tags = []
