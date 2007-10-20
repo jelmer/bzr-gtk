@@ -93,7 +93,7 @@ class BranchWindow(gtk.Window):
         """Construct the top-half of the window."""
         self.treeview = TreeView()
 
-        self.treeview.treeview.get_selection().connect("changed",
+        self.treeview.connect("revision-selected",
                 self._treeselection_changed_cb)
 
         self.treeview.connect('revisions-loaded', 

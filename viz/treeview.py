@@ -192,6 +192,8 @@ class TreeView(gtk.ScrolledWindow):
             self.parents = self.model.get_value(iter, treemodel.PARENTS)
             self.children = self.model.get_value(iter, treemodel.CHILDREN)
 
+            self.emit('revision-selected')
+
     def _on_revision_selected(self, widget, event):
         from bzrlib.plugins.gtk.revisionmenu import RevisionPopupMenu
         if event.button == 3:
