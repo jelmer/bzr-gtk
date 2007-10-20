@@ -200,7 +200,7 @@ class BranchWindow(gtk.Window):
 
     def _show_clicked_cb(self, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
-        self.show_diff(self.branch, revid, parentid)
+        self.treeview.show_diff(self.branch, revid, parentid)
         self.treeview.grab_focus()
 
     #def selected_revision(self, path):

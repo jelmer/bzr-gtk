@@ -21,7 +21,10 @@ class TreeView(gtk.ScrolledWindow):
     __gsignals__ = {
             'revisions-loaded': (gobject.SIGNAL_RUN_FIRST, 
                                  gobject.TYPE_NONE,
-                                 ())
+                                 ()),
+            'revision-selected': (gobject.SIGNAL_RUN_FIRST,
+                                  gobject.TYPE_NONE,
+                                  ())
     }
 
     def __init__(self):
