@@ -254,15 +254,16 @@ class BranchWindow(gtk.Window):
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
         (path, col) = self.treeview.get_cursor()
-        revision = self.model[path][0]
-        parents = self.model[path][4]
+        revision = self.model[path][treemodel.REVISION]
+        parents = self.model[path][treemodel.PARENTS]
         if not len(parents):
             return
 
         for parent_id in parents:
-            parent = self.revisions[self.index[parent_id]]
+            parent_index = self.index[parent_id]
+            parent = self.model[parent_index][treemodel.REVISION]
             if same_branch(revision, parent):
-                self.treeview.set_cursor(self.index[parent_id])
+                self.treeview.set_cursor(parent_index)
                 break
         else:
             self.treeview.set_cursor(self.index[parents[0]])
@@ -271,15 +272,16 @@ class BranchWindow(gtk.Window):
     def _fwd_clicked_cb(self, *args):
         """Callback for when the forward button is clicked."""
         (path, col) = self.treeview.get_cursor()
-        revision = self.model[path][0]
-        children = self.model[path][5]
+        revision = self.model[path][treemodel.REVISION]
+        children = self.model[path][treemodel.CHILDREN]
         if not len(children):
             return
 
         for child_id in children:
-            child = self.revisions[self.index[child_id]]
+            child_index = self.index[child_id]
+            child = self.model[child_index][treemodel.REVISION]
             if same_branch(child, revision):
-                self.treeview.set_cursor(self.index[child_id])
+                self.treeview.set_cursor(child_index)
                 break
         else:
             self.treeview.set_cursor(self.index[children[0]])
