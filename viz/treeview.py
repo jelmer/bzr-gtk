@@ -18,6 +18,12 @@ from treemodel import TreeModel
 
 class TreeView(gtk.ScrolledWindow):
 
+    __gsignals__ = {
+            'revisions-loaded': (gobject.SIGNAL_RUN_FIRST, 
+                                 gobject.TYPE_NONE,
+                                 ())
+    }
+
     def __init__(self):
         gtk.ScrolledWindow.__init__(self)
 
@@ -97,6 +103,7 @@ class TreeView(gtk.ScrolledWindow):
         self.index = index
         self.treeview.set_model(self.model)
         self.treeview.set_cursor(0)
+        self.emit('revisions-loaded')
 
         return False
 

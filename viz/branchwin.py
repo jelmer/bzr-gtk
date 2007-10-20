@@ -96,6 +96,9 @@ class BranchWindow(gtk.Window):
         self.treeview.treeview.get_selection().connect("changed",
                 self._treeselection_changed_cb)
 
+        self.treeview.connect('revisions-loaded', 
+                lambda x: self.loading_msg_box.hide())
+
         self.treeview.show()
 
         return self.treeview
@@ -200,9 +203,9 @@ class BranchWindow(gtk.Window):
         self.show_diff(self.branch, revid, parentid)
         self.treeview.grab_focus()
 
-    def selected_revision(self, path):
-        return self.model[path][treemodel.REVISION]
+    #def selected_revision(self, path):
+    #    return self.model[path][treemodel.REVISION]
 
-    def selected_revisions(self):
-        return [self.selected_revision(path) for path in \
-                self.treeview.get_selection().get_selected_rows()[1]]
+    #def selected_revisions(self):
+    #    return [self.selected_revision(path) for path in \
+    #            self.treeview.get_selection().get_selected_rows()[1]]
