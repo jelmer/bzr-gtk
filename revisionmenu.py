@@ -61,7 +61,7 @@ class RevisionPopupMenu(gtk.Menu):
 
     def show_diff(self, item):
         from bzrlib.plugins.gtk.diff import DiffWindow
-        window = DiffWindow()
+        window = DiffWindow(parent=self.parent)
         parentid = self.repository.revision_parents(self.revids[0])[0]
         (parent_tree, rev_tree) = self.repository.revision_trees(
             [parentid, self.revids[0]])
