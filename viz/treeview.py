@@ -92,8 +92,6 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.grab_focus()
 
     def populate(self, start, maxnum):
-        self.branch.lock_read()
-
         (linegraphdata, index, columns_len) = linegraph(self.branch,
                                                         start,
                                                         maxnum)

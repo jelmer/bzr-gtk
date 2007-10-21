@@ -150,6 +150,7 @@ class BranchWindow(gtk.Window):
         treeview itself.
         """
         self.branch = branch
+        self.branch.lock_read()
         self.set_title(branch.nick + " - revision history")
         self.treeview.set_branch(branch, start, maxnum)
     
