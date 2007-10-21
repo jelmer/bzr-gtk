@@ -14,6 +14,7 @@ import gobject
 import pango
 import treemodel
 
+from bzrlib.plugins.gtk.window import Window
 from bzrlib.osutils import format_date
 
 from linegraph import linegraph, same_branch
@@ -21,7 +22,7 @@ from graphcell import CellRendererGraph
 from treemodel import TreeModel
 from treeview  import TreeView
 
-class BranchWindow(gtk.Window):
+class BranchWindow(Window):
     """Branch window.
 
     This object represents and manages a single window containing information
@@ -29,7 +30,7 @@ class BranchWindow(gtk.Window):
     """
 
     def __init__(self, branch, start, maxnum, parent=None):
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        Window.__init__(self, parent=parent)
         self.set_border_width(0)
 
         self.branch = branch
@@ -37,10 +38,6 @@ class BranchWindow(gtk.Window):
         self.maxnum = maxnum
 
         self.set_title(branch.nick + " - revision history")
-
-        self._parent = parent
-
-        self.connect('key-press-event', self._on_key_pressed)
 
         # Use three-quarters of the screen by default
         screen = self.get_screen()
@@ -145,23 +142,6 @@ class BranchWindow(gtk.Window):
         self.logview.set_show_callback(self._show_clicked_cb)
         self.logview.set_go_callback(self._go_clicked_cb)
         return self.logview
-
-    def _on_key_pressed(self, widget, event):
-        """ Key press event handler. """
-        keyname = gtk.gdk.keyval_name(event.keyval)
-        func = getattr(self, '_on_key_press_' + keyname, None)
-        if func:
-            return func(event)
-
-    def _on_key_press_w(self, event):
-        if event.state & gtk.gdk.CONTROL_MASK:
-            self.destroy()
-            if self._parent is None:
-                gtk.main_quit()
-
-    def _on_key_press_q(self, event):
-        if event.state & gtk.gdk.CONTROL_MASK:
-            gtk.main_quit()
     
     def _treeselection_changed_cb(self, selection, *args):
         """callback for when the treeview changes."""

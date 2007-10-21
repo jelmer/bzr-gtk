@@ -35,9 +35,9 @@ import bzrlib
 from bzrlib.diff import show_diff_trees
 from bzrlib.errors import NoSuchFile
 from bzrlib.trace import warning
+from bzrlib.plugins.gtk.window import Window
 
-
-class DiffWindow(gtk.Window):
+class DiffWindow(Window):
     """Diff window.
 
     This object represents and manages a single window containing the
@@ -45,7 +45,7 @@ class DiffWindow(gtk.Window):
     """
 
     def __init__(self, parent=None):
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        Window.__init__(self, parent)
         self.set_border_width(0)
         self.set_title("bzrk diff")
 
@@ -55,11 +55,6 @@ class DiffWindow(gtk.Window):
         width = int(monitor.width * 0.66)
         height = int(monitor.height * 0.66)
         self.set_default_size(width, height)
-
-        self._parent = parent
-        self.connect('key-press-event', self._on_key_pressed)
-        if parent is None:
-            self.connect('delete-event', gtk.main_quit)
 
         self.construct()
 
@@ -320,22 +315,4 @@ class DiffWindow(gtk.Window):
             key, val = line.split('=', 1)
             colors[key.strip()] = val.strip()
         return colors
-
-    def _on_key_pressed(self, widget, event):
-        """ Key press event handler. """
-        keyname = gtk.gdk.keyval_name(event.keyval)
-        func = getattr(self, '_on_key_press_' + keyname, None)
-        if func:
-            return func(event)
-
-    def _on_key_press_w(self, event):
-        if event.state & gtk.gdk.CONTROL_MASK:
-            self.destroy()
-            if self._parent is None:
-                gtk.main_quit()
-
-    def _on_key_press_q(self, event):
-        if event.state & gtk.gdk.CONTROL_MASK:
-            gtk.main_quit()
-    
 
