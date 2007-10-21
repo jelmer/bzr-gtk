@@ -29,13 +29,18 @@ class TreeView(gtk.ScrolledWindow):
                                   ())
     }
 
-    def __init__(self):
+    def __init__(self, branch, start, maxnum):
         gtk.ScrolledWindow.__init__(self)
 
         self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         self.set_shadow_type(gtk.SHADOW_IN)
 
         self.construct_treeview()
+
+        self.branch = branch
+        self.branch.lock_read()
+
+        gobject.idle_add(self.populate, start, maxnum)
 
         self.revision = None
         self.children = None
@@ -55,13 +60,7 @@ class TreeView(gtk.ScrolledWindow):
 
     def get_parents(self):
         return self.parents
-
-    def set_branch(self, branch, start, maxnum):
-        self.branch = branch
-        self.branch.lock_read()
-
-        gobject.idle_add(self.populate, start, maxnum)
-
+        
     def back(self):
         (path, col) = self.treeview.get_cursor()
         revision = self.model[path][treemodel.REVISION]

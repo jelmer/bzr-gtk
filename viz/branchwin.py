@@ -95,9 +95,7 @@ class BranchWindow(gtk.Window):
 
     def construct_top(self):
         """Construct the top-half of the window."""
-        self.treeview = TreeView()
-
-        self.treeview.set_branch(self.branch, self.start, self.maxnum)
+        self.treeview = TreeView(self.branch, self.start, self.maxnum)
 
         self.treeview.connect("revision-selected",
                 self._treeselection_changed_cb)
