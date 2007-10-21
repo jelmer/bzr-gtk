@@ -28,10 +28,15 @@ class BranchWindow(gtk.Window):
     for a particular branch.
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, branch, start, maxnum, parent=None):
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.set_border_width(0)
-        self.set_title("Revision history")
+
+        self.branch = branch
+        self.start  = start
+        self.maxnum = maxnum
+
+        self.set_title(branch.nick + " - revision history")
 
         self._parent = parent
 
@@ -92,6 +97,8 @@ class BranchWindow(gtk.Window):
         """Construct the top-half of the window."""
         self.treeview = TreeView()
 
+        self.treeview.set_branch(self.branch, self.start, self.maxnum)
+
         self.treeview.connect("revision-selected",
                 self._treeselection_changed_cb)
 
@@ -141,17 +148,6 @@ class BranchWindow(gtk.Window):
         self.logview.set_go_callback(self._go_clicked_cb)
         return self.logview
 
-    def set_branch(self, branch, start, maxnum):
-        """Set the branch and start position for this window.
-
-        Creates a new TreeModel and populates it with information about
-        the new branch before updating the window title and model of the
-        treeview itself.
-        """
-        self.branch = branch
-        self.set_title(branch.nick + " - revision history")
-        self.treeview.set_branch(branch, start, maxnum)
-    
     def _on_key_pressed(self, widget, event):
         """ Key press event handler. """
         keyname = gtk.gdk.keyval_name(event.keyval)
