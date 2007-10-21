@@ -196,7 +196,7 @@ class TreeView(gtk.ScrolledWindow):
         from bzrlib.plugins.gtk.revisionmenu import RevisionPopupMenu
         if event.button == 3:
             menu = RevisionPopupMenu(self.branch.repository, 
-                [x.revision_id for x in self.selected_revisions()],
+                [self.get_revision().revision_id],
                 self.branch)
             menu.popup(None, None, None, event.button, event.get_time())
 
