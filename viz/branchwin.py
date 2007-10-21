@@ -36,7 +36,6 @@ class BranchWindow(gtk.Window):
         self._parent = parent
 
         self.connect('key-press-event', self._on_key_pressed)
-        self.connect("destroy", lambda w: self.branch.unlock())
 
         # Use three-quarters of the screen by default
         screen = self.get_screen()
@@ -150,7 +149,6 @@ class BranchWindow(gtk.Window):
         treeview itself.
         """
         self.branch = branch
-        self.branch.lock_read()
         self.set_title(branch.nick + " - revision history")
         self.treeview.set_branch(branch, start, maxnum)
     

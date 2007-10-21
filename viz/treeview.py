@@ -6,6 +6,8 @@
 __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__    = "Daniel Schierbeck <daniel.schierbeck@gmail.com>"
 
+import sys
+import string
 import gtk
 import gobject
 import pango
@@ -39,6 +41,8 @@ class TreeView(gtk.ScrolledWindow):
         self.children = None
         self.parents  = None
 
+        self.connect('destroy', lambda w: self.branch.unlock())
+
     def get_revision(self):
         return self.revision
 
@@ -54,6 +58,7 @@ class TreeView(gtk.ScrolledWindow):
 
     def set_branch(self, branch, start, maxnum):
         self.branch = branch
+        self.branch.lock_read()
 
         gobject.idle_add(self.populate, start, maxnum)
 
