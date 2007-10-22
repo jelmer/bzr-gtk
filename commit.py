@@ -100,6 +100,8 @@ class CommitDialog(gtk.Dialog):
             self._vpaned_list = gtk.VPaned()
             self._scrolledwindow_merges = gtk.ScrolledWindow()
             self._treeview_merges = gtk.TreeView()
+            self._scrolledwindow_merges.set_policy(gtk.POLICY_AUTOMATIC,
+                                                   gtk.POLICY_AUTOMATIC)
 
         # Set callbacks
         self._button_commit.connect('clicked', self._on_commit_clicked)
@@ -115,11 +117,6 @@ class CommitDialog(gtk.Dialog):
         self._vpaned_main.set_position(200)
         self._button_commit.set_flags(gtk.CAN_DEFAULT)
 
-        if self._is_pending:
-            self._scrolledwindow_merges.set_policy(gtk.POLICY_AUTOMATIC,
-                                                   gtk.POLICY_AUTOMATIC)
-            self._treeview_files.set_sensitive(False)
-        
         # Construct the dialog
         self.action_area.pack_end(self._button_commit)
         
@@ -320,8 +317,10 @@ class CommitDialog(gtk.Dialog):
         crt = gtk.CellRendererToggle()
         crt.set_property("activatable", True)
         crt.connect("toggled", self._toggle_commit, self._file_store)
-        self._treeview_files.append_column(gtk.TreeViewColumn(_('Commit'),
-                                     crt, active=0))
+        commit_column = gtk.TreeViewColumn(_('Commit'), crt, active=0)
+        if self._is_pending:
+            commit_column.set_visible(False)
+        self._treeview_files.append_column(commit_column)
         self._treeview_files.append_column(gtk.TreeViewColumn(_('Path'),
                                      gtk.CellRendererText(), text=1))
         self._treeview_files.append_column(gtk.TreeViewColumn(_('Type'),
