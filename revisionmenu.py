@@ -23,6 +23,7 @@ except:
 
 import bzrlib
 import gtk
+from bzrlib import (errors, ui)
 
 class RevisionPopupMenu(gtk.Menu):
     def __init__(self, repository, revids, branch=None):
@@ -53,6 +54,18 @@ class RevisionPopupMenu(gtk.Menu):
             item.connect('activate', self.store_merge_directive)
             # FIXME: self.append(item)
             self.show_all()
+            
+            self.bzrdir = self.branch.bzrdir
+            self.wt = None
+            try:
+                self.wt = self.bzrdir.open_workingtree()
+            except errors.NoWorkingTree:
+                return False
+            if self.wt :
+                item = gtk.MenuItem("_Revert")
+                item.connect('activate', self.revert)
+                self.append(item)
+                self.show_all()
 
     def store_merge_directive(self, item):
         from bzrlib.plugins.gtk.mergedirective import CreateMergeDirectiveDialog
@@ -86,3 +99,11 @@ class RevisionPopupMenu(gtk.Menu):
                 self.branch.unlock()
             
             dialog.destroy()
+    
+    def revert(self, item):
+        pb = ui.ui_factory.nested_progress_bar()
+        revision_tree = self.branch.repository.revision_tree(self.revids[0])
+        try:
+            self.wt.revert(old_tree = revision_tree, pb = pb)
+        finally:
+            pb.finished()
