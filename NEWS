@@ -30,6 +30,9 @@
     (Jelmer)
 
   * viz slow when run from olive. (#70463, Gary van der Merwe)
+  
+  * Make it possible to open diff from the commit window when there are pending
+    merges. (Gary van der Merwe)
     
  INTERNALS
 
