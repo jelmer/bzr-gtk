@@ -18,6 +18,8 @@
         * Add buttons to navigate to child revisions.
     (Gary van der Merwe)
 
+  * Added a revert option to the revision menu. (Gary van der Merwe)
+
  BUG FIXES
 
   * Show children on new row in table to avoid very broad windows in viz. 
