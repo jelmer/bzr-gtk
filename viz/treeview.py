@@ -30,6 +30,13 @@ class TreeView(gtk.ScrolledWindow):
     }
 
     def __init__(self, branch, start, maxnum):
+        """Create a new TreeView.
+
+        :param branch: Branch object for branch to show.
+        :param start: Revision id of top revision.
+        :param maxnum: Maximum number of revisions to display, 
+                       None for no limit.
+        """
         gtk.ScrolledWindow.__init__(self)
 
         self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
@@ -49,19 +56,33 @@ class TreeView(gtk.ScrolledWindow):
         self.connect('destroy', lambda w: self.branch.unlock())
 
     def get_revision(self):
+        """Return revision id of currently selected revision, or None."""
         return self.revision
 
     def set_revision(self, revid):
+        """Change the currently selected revision.
+
+        :param revid: Revision id of revision to display.
+        """
         self.treeview.set_cursor(self.index[revid])
         self.treeview.grab_focus()
 
     def get_children(self):
+        """Return the children of the currently selected revision.
+
+        :return: list of revision ids.
+        """
         return self.children
 
     def get_parents(self):
+        """Return the parents of the currently selected revision.
+
+        :return: list of revision ids.
+        """
         return self.parents
         
     def back(self):
+        """Signal handler for the Back button."""
         (path, col) = self.treeview.get_cursor()
         revision = self.model[path][treemodel.REVISION]
         parents = self.model[path][treemodel.PARENTS]
@@ -79,6 +100,7 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.grab_focus()
 
     def forward(self):
+        """Signal handler for the Forward button."""
         (path, col) = self.treeview.get_cursor()
         revision = self.model[path][treemodel.REVISION]
         children = self.model[path][treemodel.CHILDREN]
@@ -96,6 +118,12 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.grab_focus()
 
     def populate(self, start, maxnum):
+        """Fill the treeview with contents.
+
+        :param start: Revision id of revision to start with.
+        :param maxnum: Maximum number of revisions to display, or None 
+                       for no limit.
+        """
         (linegraphdata, index, columns_len) = linegraph(self.branch,
                                                         start,
                                                         maxnum)

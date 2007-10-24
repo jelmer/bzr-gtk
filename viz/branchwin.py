@@ -30,6 +30,14 @@ class BranchWindow(Window):
     """
 
     def __init__(self, branch, start, maxnum, parent=None):
+        """Create a new BranchWindow.
+
+        :param branch: Branch object for branch to show.
+        :param start: Revision id of top revision.
+        :param maxnum: Maximum number of revisions to display, 
+                       None for no limit.
+        """
+
         Window.__init__(self, parent=parent)
         self.set_border_width(0)
 
