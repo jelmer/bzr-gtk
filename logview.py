@@ -21,6 +21,7 @@ import gtk
 import pango
 
 from bzrlib.osutils import format_date
+from bzrlib.util import bencode
 
 
 class LogView(gtk.ScrolledWindow):
@@ -46,12 +47,21 @@ class LogView(gtk.ScrolledWindow):
 
         if revision is not None:
             self.set_revision(revision, tags=tags)
+        self.set_file_id(None)
 
     def set_show_callback(self, callback):
         self._show_callback = callback
 
     def set_go_callback(self, callback):
         self._go_callback = callback
+
+    def set_file_id(self, file_id):
+        """Set a specific file id that we want to track.
+
+        This just effects the display of a per-file commit message.
+        If it is set to None, then all commit messages will be shown.
+        """
+        self._file_id = file_id
 
     def set_revision(self, revision, tags=[], children=[]):
         self._revision = revision
@@ -88,6 +98,32 @@ class LogView(gtk.ScrolledWindow):
                                           self.children_table)
         
         self._add_tags(tags)
+
+        file_info = revision.properties.get('file-info', None)
+        if file_info is not None:
+            file_info = bencode.bdecode(file_info.encode('UTF-8'))
+
+        if file_info:
+            if self._file_id is None:
+                text = []
+                for fi in file_info:
+                    text.append('%(path)s\n%(message)s' % fi)
+                self.file_info_buffer.set_text('\n'.join(text))
+                self.file_info_label.set_markup("<b>File Messages:</b>")
+                self.file_info_box.show()
+            else:
+                text = []
+                for fi in file_info:
+                    if fi['file_id'] == self._file_id:
+                        text.append(fi['message'])
+                if text:
+                    self.file_info_buffer.set_text('\n'.join(text))
+                    self.file_info_label.set_markup("<b>File Message:</b>")
+                    self.file_info_box.show()
+                else:
+                    self.file_info_box.hide()
+        else:
+            self.file_info_box.hide()
 
     def _show_clicked_cb(self, widget, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
@@ -164,6 +200,7 @@ class LogView(gtk.ScrolledWindow):
         if self.show_children:
             vbox.pack_start(self._create_children(), expand=False, fill=True)
         vbox.pack_start(self._create_message_view())
+        vbox.pack_start(self._create_file_info_view(), expand=True, fill=True)
         self.add_with_viewport(vbox)
         vbox.show()
 
@@ -319,4 +356,20 @@ class LogView(gtk.ScrolledWindow):
         tv.modify_font(pango.FontDescription("Monospace"))
         tv.show()
         return tv
+
+    def _create_file_info_view(self):
+        self.file_info_box = gtk.VBox()
+        self.file_info_label = gtk.Label()
+        self.file_info_label.set_markup("<b>File Messages:</b>")
+        self.file_info_label.show()
+        self.file_info_buffer = gtk.TextBuffer()
+        tv = gtk.TextView(self.file_info_buffer)
+        tv.set_editable(False)
+        tv.set_wrap_mode(gtk.WRAP_WORD)
+        tv.modify_font(pango.FontDescription("Monospace"))
+        tv.show()
+        self.file_info_box.pack_start(self.file_info_label)
+        self.file_info_box.pack_start(tv)
+        self.file_info_box.hide() # Only shown when there are per-file messages
+        return self.file_info_box
 

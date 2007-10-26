@@ -502,7 +502,14 @@ class OliveGtk:
     @show_bzr_error
     def on_menuitem_branch_commit_activate(self, widget):
         """ Branch/Commit... menu handler. """
-        commit = CommitDialog(self.wt, self.wtpath, self.notbranch, self.get_selected_right(), self.window)
+#     def __init__(self, wt, wtpath, notbranch, selected=None, parent=None):
+        selected = self.get_selected_right()
+        if selected:
+            selected = os.path.join(self.wtpath, selected)
+        commit = CommitDialog(wt=self.wt,
+                              parent=self.window,
+                              selected=selected,
+                             )
         response = commit.run()
         if response != gtk.RESPONSE_NONE:
             commit.hide()

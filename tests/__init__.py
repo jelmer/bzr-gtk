@@ -25,6 +25,7 @@ def test_suite():
     loader = TestUtil.TestLoader()
 
     testmod_names = [
+        'test_commit',
         'test_diff',
         'test_preferences',
         'test_history',
