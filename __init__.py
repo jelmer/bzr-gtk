@@ -389,9 +389,18 @@ class cmd_gsend(GTKCommand):
     """
     def run(self):
         (br, path) = branch.Branch.open_containing(".")
+        gtk = self.open_display()
         from bzrlib.plugins.gtk.mergedirective import SendMergeDirectiveDialog
+        from StringIO import StringIO
         dialog = SendMergeDirectiveDialog(br)
-        dialog.run()
+        if dialog.run() == gtk.RESPONSE_OK:
+            outf = StringIO()
+            outf.writelines(dialog.get_merge_directive().to_lines())
+            mail_client = br.get_config().get_mail_client()
+            mail_client.compose_merge_request(dialog.get_mail_to(), "[MERGE]", 
+                outf.getvalue())
+
+            
 
 
 class cmd_gconflicts(GTKCommand):
