@@ -19,14 +19,15 @@ commit-notify     Start the graphical notifier of commits.
 gannotate         GTK+ annotate. 
 gbranch           GTK+ branching. 
 gcheckout         GTK+ checkout. 
-gcommit           GTK+ commit dialog 
+gcommit           GTK+ commit dialog.
 gconflicts        GTK+ conflicts. 
 gdiff             Show differences in working tree in a GTK+ Window. 
 ginit             Initialise a new branch.
 gmissing          GTK+ missing revisions dialog. 
 gpreferences      GTK+ preferences dialog. 
-gpush             GTK+ push. 
-gstatus           GTK+ status dialog 
+gpush             GTK+ push.
+gsend             GTK+ send merge directive.
+gstatus           GTK+ status dialog.
 gtags             Manage branch tags.
 visualise         Graphically visualise this branch. 
 """
@@ -382,9 +383,19 @@ class cmd_gstatus(GTKCommand):
         status.run()
 
 
+class cmd_gsend(GTKCommand):
+    """GTK+ send merge directive.
+
+    """
+    def run(self):
+        (br, path) = branch.Branch.open_containing(".")
+        from bzrlib.plugins.gtk.mergedirective import SendMergeDirectiveDialog
+        dialog = SendMergeDirectiveDialog(br)
+        dialog.run()
+
 
 class cmd_gconflicts(GTKCommand):
-    """ GTK+ conflicts.
+    """GTK+ conflicts.
     
     Select files from the list of conflicts and run an external utility to
     resolve them.
@@ -397,7 +408,6 @@ class cmd_gconflicts(GTKCommand):
         dialog.run()
 
 
-
 class cmd_gpreferences(GTKCommand):
     """ GTK+ preferences dialog.
 
@@ -407,7 +417,6 @@ class cmd_gpreferences(GTKCommand):
         from bzrlib.plugins.gtk.preferences import PreferencesWindow
         dialog = PreferencesWindow()
         dialog.run()
-
 
 
 class cmd_gmissing(Command):
@@ -466,19 +475,20 @@ class cmd_gtags(GTKCommand):
 
 
 commands = [
+    cmd_gannotate, 
+    cmd_gbranch,
+    cmd_gcheckout, 
+    cmd_gcommit, 
+    cmd_gconflicts, 
+    cmd_gdiff,
+    cmd_ginit,
     cmd_gmissing, 
     cmd_gpreferences, 
-    cmd_gconflicts, 
-    cmd_gstatus,
-    cmd_gcommit, 
-    cmd_gannotate, 
-    cmd_visualise, 
-    cmd_gdiff,
     cmd_gpush, 
-    cmd_gcheckout, 
-    cmd_gbranch,
-    cmd_ginit,
-    cmd_gtags
+    cmd_gsend,
+    cmd_gstatus,
+    cmd_gtags,
+    cmd_visualise
     ]
 
 for cmd in commands:

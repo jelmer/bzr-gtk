@@ -43,8 +43,14 @@ class CreateMergeDirectiveDialog(gtk.Dialog):
 
 
 class SendMergeDirectiveDialog(gtk.Dialog):
-    def __init__(self):
+    def __init__(self, branch):
         super(SendMergeDirectiveDialog, self).__init__()
+        self.branch = branch
+        self._create()
+
+    def _create(self):
+        # FIXME: Add field for submit branch
+        # FIXME: add field for send to address
 
 
 class ApplyMergeDirectiveDialog(gtk.Dialog):
