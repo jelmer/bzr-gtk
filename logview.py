@@ -203,11 +203,19 @@ class LogView(gtk.Notebook):
 
         sourceview.show()
 
-        win = gtk.ScrolledWindow()
-        win.add(sourceview)
+        vbox = gtk.VBox(False, 6)
+        vbox.set_border_width(6)
 
-        self.append_page(win, tab_label=gtk.Label("Changes"))
+        win = gtk.ScrolledWindow()
+        win.set_shadow_type(gtk.SHADOW_IN)
+        win.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        win.add(sourceview)
         win.show()
+
+        vbox.pack_start(win)
+        vbox.show()
+
+        self.append_page(vbox, tab_label=gtk.Label("Changes"))
         
     def _create_headers(self):
         self.table = gtk.Table(rows=5, columns=2)
