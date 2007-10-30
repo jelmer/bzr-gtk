@@ -43,6 +43,8 @@ class LogView(gtk.Notebook):
         self._create_general()
         self._create_relations()
         self._create_changes()
+
+        self.set_current_page(0)
         
         self._show_callback = None
         self._go_callback = None
