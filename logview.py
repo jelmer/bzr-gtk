@@ -96,15 +96,18 @@ class LogView(gtk.Notebook):
         self._set_diff()
 
     def _set_diff(self):
-        parentid = self._revision.parent_ids[0]
-        revid    = self._revision.revision_id
+        if len(self._revision.parent_ids) > 0:
+            parentid = self._revision.parent_ids[0]
+            revid    = self._revision.revision_id
 
-        (parent_tree, rev_tree) = self._branch.repository.revision_trees([parentid, 
-                                                                   revid])
+            (parent_tree, rev_tree) = self._branch.repository.revision_trees([parentid, 
+                                                                       revid])
 
-        s = StringIO()
-        show_diff_trees(parent_tree, rev_tree, s, None)
-        self.diff_buffer.set_text(s.getvalue().decode(sys.getdefaultencoding(), 'replace'))
+            s = StringIO()
+            show_diff_trees(parent_tree, rev_tree, s, None)
+            self.diff_buffer.set_text(s.getvalue().decode(sys.getdefaultencoding(), 'replace'))
+        else:
+            self.diff_buffer.set_text("")
 
     def _show_clicked_cb(self, widget, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
