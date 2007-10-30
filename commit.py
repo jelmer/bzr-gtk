@@ -357,6 +357,15 @@ class CommitDialog(gtk.Dialog):
         # file_label.show()
         self._files_box.pack_start(file_label, expand=False)
 
+        self._commit_all_files_radio = gtk.RadioButton(
+            None, _("Commit all changes"))
+        self._files_box.pack_start(self._commit_all_files_radio, expand=False)
+        self._commit_all_files_radio.show()
+        self._commit_selected_radio = gtk.RadioButton(
+            self._commit_all_files_radio, _("Only commit selected changes"))
+        self._files_box.pack_start(self._commit_selected_radio, expand=False)
+        self._commit_selected_radio.show()
+
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self._treeview_files = gtk.TreeView()
