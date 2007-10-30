@@ -26,6 +26,7 @@ from cStringIO import StringIO
 
 from bzrlib.osutils import format_date
 from bzrlib.diff import show_diff_trees
+from bzrlib.revision import NULL_REVISION
 
 class LogView(gtk.Notebook):
     """ Custom widget for commit log details.
@@ -96,18 +97,19 @@ class LogView(gtk.Notebook):
         self._set_diff()
 
     def _set_diff(self):
+        revid = self._revision.revision_id
+
         if len(self._revision.parent_ids) > 0:
             parentid = self._revision.parent_ids[0]
-            revid    = self._revision.revision_id
-
             (parent_tree, rev_tree) = self._branch.repository.revision_trees([parentid, 
-                                                                       revid])
-
-            s = StringIO()
-            show_diff_trees(parent_tree, rev_tree, s, None)
-            self.diff_buffer.set_text(s.getvalue().decode(sys.getdefaultencoding(), 'replace'))
+                                                               revid])
         else:
-            self.diff_buffer.set_text("")
+            rev_tree = self._branch.repository.revision_tree(revid)
+            parent_tree = self._branch.repository.revision_tree(None)
+
+        s = StringIO()
+        show_diff_trees(parent_tree, rev_tree, s, None)
+        self.diff_buffer.set_text(s.getvalue().decode(sys.getdefaultencoding(), 'replace'))
 
     def _show_clicked_cb(self, widget, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
