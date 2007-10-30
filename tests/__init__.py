@@ -28,7 +28,6 @@ def test_suite():
         'test_diff',
         'test_preferences',
         'test_history',
-        'test_viz'
         ]
 
     if os.name == 'nt':
