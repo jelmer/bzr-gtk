@@ -114,31 +114,28 @@ class BranchWindow(Window):
 
     def construct_navigation(self):
         """Construct the navigation buttons."""
-        frame = gtk.Frame()
-        frame.set_shadow_type(gtk.SHADOW_OUT)
-        frame.show()
-        
-        hbox = gtk.HBox(spacing=12)
-        frame.add(hbox)
-        hbox.show()
+        self.toolbar = gtk.Toolbar()
+        self.toolbar.set_style(gtk.TOOLBAR_BOTH_HORIZ)
 
-        self.back_button = gtk.Button(stock=gtk.STOCK_GO_BACK)
-        self.back_button.set_relief(gtk.RELIEF_NONE)
+        self.back_button = gtk.ToolButton(stock_id=gtk.STOCK_GO_BACK)
+        self.back_button.set_is_important(True)
         self.back_button.add_accelerator("clicked", self.accel_group, ord('['),
                                          0, 0)
         self.back_button.connect("clicked", self._back_clicked_cb)
-        hbox.pack_start(self.back_button, expand=False, fill=True)
+        self.toolbar.insert(self.back_button, -1)
         self.back_button.show()
 
-        self.fwd_button = gtk.Button(stock=gtk.STOCK_GO_FORWARD)
-        self.fwd_button.set_relief(gtk.RELIEF_NONE)
+        self.fwd_button = gtk.ToolButton(stock_id=gtk.STOCK_GO_FORWARD)
+        self.fwd_button.set_is_important(True)
         self.fwd_button.add_accelerator("clicked", self.accel_group, ord(']'),
                                         0, 0)
         self.fwd_button.connect("clicked", self._fwd_clicked_cb)
-        hbox.pack_start(self.fwd_button, expand=False, fill=True)
+        self.toolbar.insert(self.fwd_button, -1)
         self.fwd_button.show()
 
-        return frame
+        self.toolbar.show()
+
+        return self.toolbar
 
     def construct_bottom(self):
         """Construct the bottom half of the window."""
