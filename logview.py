@@ -99,12 +99,12 @@ class LogView(gtk.Notebook):
     def _set_diff(self):
         revid = self._revision.revision_id
 
+        rev_tree = self._branch.repository.revision_tree(revid)
+
         if len(self._revision.parent_ids) > 0:
             parentid = self._revision.parent_ids[0]
-            (parent_tree, rev_tree) = self._branch.repository.revision_trees([parentid, 
-                                                               revid])
+            parent_tree = self._branch.repository.revision_tree(parentid)
         else:
-            rev_tree = self._branch.repository.revision_tree(revid)
             parent_tree = self._branch.repository.revision_tree(None)
 
         s = StringIO()
