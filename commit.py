@@ -354,7 +354,7 @@ class CommitDialog(gtk.Dialog):
     def _construct_file_list(self):
         self._files_box = gtk.VBox(homogeneous=False, spacing=0)
         file_label = gtk.Label(_('Files'))
-        file_label.show()
+        # file_label.show()
         self._files_box.pack_start(file_label, expand=False)
 
         scroller = gtk.ScrolledWindow()
@@ -450,11 +450,15 @@ class CommitDialog(gtk.Dialog):
     def _construct_diff_view(self):
         from diff import DiffView
 
+        # TODO: jam 2007-10-30 The diff label is currently disabled. If we
+        #       decide that we really don't ever want to display it, we should
+        #       actually remove it, and other references to it, along with the
+        #       tests that it is set properly.
         self._diff_label = gtk.Label(_('Diff for whole tree'))
         self._diff_label.set_alignment(0, 0)
         self._right_pane_table.set_row_spacing(self._right_pane_table_row, 0)
         self._add_to_right_table(self._diff_label, 1, False)
-        self._diff_label.show()
+        # self._diff_label.show()
 
         self._diff_view = DiffView()
         self._add_to_right_table(self._diff_view, 4, True)
