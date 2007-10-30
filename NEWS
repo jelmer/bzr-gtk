@@ -5,6 +5,7 @@
   * Removed email part of committer id from committer column in the revision
     history window. (Daniel Schierbeck)
   * Removed date column from revision history window. (Daniel Schierbeck)
+  * Rearranged the logview into a notebook. (Daniel Schierbeck)
 
  FEATURES
  

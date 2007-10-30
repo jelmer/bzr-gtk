@@ -140,7 +140,7 @@ class BranchWindow(Window):
     def construct_bottom(self):
         """Construct the bottom half of the window."""
         from bzrlib.plugins.gtk.logview import LogView
-        self.logview = LogView(None, True, [], True)
+        self.logview = LogView(None, True, [], True, branch=self.branch)
         (width, height) = self.get_size()
         self.logview.set_size_request(width, int(height / 2.5))
         self.logview.show()
