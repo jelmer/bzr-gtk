@@ -208,7 +208,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         commit_col = dlg._treeview_files.get_column(0)
         self.assertEqual('Commit', commit_col.get_title())
         renderer = commit_col.get_cell_renderers()[0]
-        self.assertTrue(renderer.get_active())
+        self.assertTrue(renderer.get_property('activatable'))
 
     def test_pending(self):
         tree = self.make_branch_and_tree('tree')
@@ -228,7 +228,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         commit_col = dlg._treeview_files.get_column(0)
         self.assertEqual('Commit*', commit_col.get_title())
         renderer = commit_col.get_cell_renderers()[0]
-        self.assertFalse(renderer.get_active())
+        self.assertFalse(renderer.get_property('activatable'))
 
         values = [(r[0], r[1], r[2], r[3]) for r in dlg._pending_store]
         self.assertEqual([(rev_id2, '2007-10-01', 'Joe Foo', 'two')], values)

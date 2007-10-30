@@ -383,7 +383,7 @@ class CommitDialog(gtk.Dialog):
         self._files_store = liststore
         self._treeview_files.set_model(liststore)
         crt = gtk.CellRendererToggle()
-        crt.set_active(not bool(self._pending))
+        crt.set_property('activatable', not bool(self._pending))
         crt.connect("toggled", self._toggle_commit, self._files_store)
         if self._pending:
             name = _('Commit*')
