@@ -250,7 +250,7 @@ class CommitDialog(gtk.Dialog):
             self._enable_per_file_commits = True
         if not self._enable_per_file_commits:
             self._file_message_expander.hide()
-            self._global_message_label.set_label('Commit Message')
+            self._global_message_label.set_markup(_('<b>Commit Message</b>'))
 
     def _compute_delta(self):
         self._delta = self._wt.changes_from(self._basis_tree)
@@ -482,6 +482,7 @@ class CommitDialog(gtk.Dialog):
 
     def _construct_global_message(self):
         self._global_message_label = gtk.Label(_('Global Commit Message'))
+        self._global_message_label.set_markup(_('<b>Global Commit Message</b>'))
         self._global_message_label.set_alignment(0, 0)
         self._right_pane_table.set_row_spacing(self._right_pane_table_row, 0)
         self._add_to_right_table(self._global_message_label, 1, False)
