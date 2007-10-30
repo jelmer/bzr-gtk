@@ -29,6 +29,7 @@ from bzrlib.revision import NULL_REVISION, CURRENT_REVISION
 
 from colormap import AnnotateColorMap, AnnotateColorSaturation
 from bzrlib.plugins.gtk.logview import LogView
+from bzrlib.plugins.gtk.window import Window
 
 
 (
@@ -41,17 +42,14 @@ from bzrlib.plugins.gtk.logview import LogView
 ) = range(6)
 
 
-class GAnnotateWindow(gtk.Window):
+class GAnnotateWindow(Window):
     """Annotate window."""
 
     def __init__(self, all=False, plain=False, parent=None):
         self.all = all
         self.plain = plain
-        self._parent = parent
         
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
-
-        self.connect("key-press-event", self._on_key_pressed)
+        Window.__init__(self, parent)
         
         self.set_icon(self.render_icon(gtk.STOCK_FIND, gtk.ICON_SIZE_BUTTON))
         self.annotate_colormap = AnnotateColorSaturation()
@@ -394,25 +392,6 @@ class GAnnotateWindow(gtk.Window):
         for i, j, n in matcher.get_matching_blocks():
             if i + n >= row:
                 return j - i
-
-    def _on_key_pressed(self, widget, event):
-        """ Key press event handler. """
-        keyname = gtk.gdk.keyval_name(event.keyval)
-        func = getattr(self, '_on_key_press_' + keyname, None)
-        if func:
-            return func(event)
-
-    def _on_key_press_w(self, event):
-        if event.state & gtk.gdk.CONTROL_MASK:
-            self.destroy()
-            if self._parent is None:
-                gtk.main_quit()
-
-    def _on_key_press_q(self, event):
-        if event.state & gtk.gdk.CONTROL_MASK:
-            gtk.main_quit()
-    
-
 
 
 class FakeRevision:

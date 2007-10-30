@@ -733,7 +733,7 @@ class OliveGtk:
     
     def on_menuitem_stats_diff_activate(self, widget):
         """ Statistics/Differences... menu handler. """
-        window = DiffWindow()
+        window = DiffWindow(parent=self.window)
         parent_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
         window.set_diff(self.wt.branch.nick, self.wt, parent_tree)
         window.show()
@@ -749,11 +749,13 @@ class OliveGtk:
     
     def on_menuitem_stats_log_activate(self, widget):
         """ Statistics/Log... menu handler. """
-        window = branchwin.BranchWindow(parent=self.window)
+
         if not self.remote:
-            window.set_branch(self.wt.branch, self.wt.branch.last_revision(), None)
+            branch = self.wt.branch
         else:
-            window.set_branch(self.remote_branch, self.remote_branch.last_revision(), None)
+            branch = self.remote_branch
+
+        window = branchwin.BranchWindow(branch, branch.last_revision(), None, parent=self.window)
         window.show()
     
     def on_menuitem_view_refresh_activate(self, widget):

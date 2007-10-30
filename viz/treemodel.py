@@ -10,6 +10,7 @@ __author__    = "Gary van der Merwe <garyvdm@gmail.com>"
 import gtk
 import gobject
 import pango
+import re
 
 from bzrlib.osutils import format_date
 
@@ -82,7 +83,8 @@ class TreeModel(gtk.GenericTreeModel):
         
         if column == REVISION: return revision
         if column == MESSAGE: return revision.message.split("\n")[0]
-        if column == COMMITER: return revision.committer
+        if column == COMMITER: return re.sub('<.*@.*>', '', 
+                                             revision.committer).strip(' ')
         if column == TIMESTAMP: return format_date(revision.timestamp,
                                                    revision.timezone)
     

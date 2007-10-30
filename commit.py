@@ -677,7 +677,6 @@ class CommitDialog(gtk.Dialog):
     def _rev_to_pending_info(rev):
         """Get the information from a pending merge."""
         from bzrlib.osutils import format_date
-
         rev_dict = {}
         rev_dict['committer'] = re.sub('<.*@.*>', '', rev.committer).strip(' ')
         rev_dict['summary'] = rev.get_summary()

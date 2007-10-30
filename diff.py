@@ -34,6 +34,7 @@ from bzrlib import osutils
 from bzrlib.diff import show_diff_trees, internal_diff
 from bzrlib.errors import NoSuchFile
 from bzrlib.trace import warning
+from bzrlib.plugins.gtk.window import Window
 
 
 class DiffView(gtk.ScrolledWindow):
@@ -260,15 +261,15 @@ class DiffView(gtk.ScrolledWindow):
         self.buffer.set_text(decoded.encode('UTF-8'))
 
 
-class DiffWindow(gtk.Window):
+class DiffWindow(Window):
     """Diff window.
 
     This object represents and manages a single window containing the
     differences between two revisions on a branch.
     """
 
-    def __init__(self):
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+    def __init__(self, parent=None):
+        Window.__init__(self, parent)
         self.set_border_width(0)
         self.set_title("bzrk diff")
 

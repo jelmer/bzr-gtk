@@ -1,5 +1,11 @@
 0.92.0	UNRELEASED
 
+ UI
+
+  * Removed email part of committer id from committer column in the revision
+    history window. (Daniel Schierbeck)
+  * Removed date column from revision history window. (Daniel Schierbeck)
+
  FEATURES
  
   * Rewrite of a large ammount of the viz code:
@@ -17,6 +23,18 @@
         * Add a column to display the revision number. (#64167)
         * Add buttons to navigate to child revisions.
     (Gary van der Merwe)
+
+  * Added a revert option to the revision menu. (Gary van der Merwe)
+
+ BUG FIXES
+
+  * Show children on new row in table to avoid very broad windows in viz. 
+    (Jelmer)
+
+  * viz slow when run from olive. (#70463, Gary van der Merwe)
+  
+  * Make it possible to open diff from the commit window when there are pending
+    merges. (Gary van der Merwe)
     
  INTERNALS
 
@@ -24,12 +42,16 @@
 
   * Add check command to setup.py. (Jelmer)
 
+  * Avoid deprecation warning for all_plugins() in gpreferences. (Jelmer)
+
 0.91.0	2007-09-24
 
  UI
 
   * Added keyboard shortcuts for closing windows and exiting Olive.
     (#139559, Daniel Schierbeck)
+  * Add a message to the viz window to indicate that the graph is still loading.
+    (Gary van der Merwe)
  
   * The tip revision will be automatically selected in the branch visualization
     window. (#144244, Daniel Schierbeck)
