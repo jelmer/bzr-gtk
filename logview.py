@@ -23,7 +23,7 @@ import pango
 from bzrlib.osutils import format_date
 
 
-class LogView(gtk.ScrolledWindow):
+class LogView(gtk.Notebook):
     """ Custom widget for commit log details.
 
     A variety of bzr tools may need to implement such a thing. This is a
@@ -32,14 +32,10 @@ class LogView(gtk.ScrolledWindow):
 
     def __init__(self, revision=None, scroll=True, tags=[],
                  show_children=False):
-        super(LogView, self).__init__()
-        if scroll:
-            self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-        else:
-            self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
-        self.set_shadow_type(gtk.SHADOW_NONE)
+        gtk.Notebook.__init__(self)
         self.show_children = show_children
-        self._create()
+        self._create_general()
+        self._create_relations()
         self._show_callback = None
         self._go_callback = None
         self._clicked_callback = None
@@ -156,17 +152,23 @@ class LogView(gtk.ScrolledWindow):
             hbox.pack_start(button, expand=False, fill=True)
             button.show()
 
-    def _create(self):
+    def _create_general(self):
         vbox = gtk.VBox(False, 6)
         vbox.set_border_width(6)
         vbox.pack_start(self._create_headers(), expand=False, fill=True)
+        vbox.pack_start(self._create_message_view())
+        self.append_page(vbox, tab_label=gtk.Label("General"))
+        vbox.show()
+
+    def _create_relations(self):
+        vbox = gtk.VBox(False, 6)
+        vbox.set_border_width(6)
         vbox.pack_start(self._create_parents(), expand=False, fill=True)
         if self.show_children:
             vbox.pack_start(self._create_children(), expand=False, fill=True)
-        vbox.pack_start(self._create_message_view())
-        self.add_with_viewport(vbox)
+        self.append_page(vbox, tab_label=gtk.Label("Relations"))
         vbox.show()
-
+        
     def _create_headers(self):
         self.table = gtk.Table(rows=5, columns=2)
         self.table.set_row_spacings(6)
