@@ -45,6 +45,7 @@ class LogView(gtk.Notebook):
         self._create_changes()
 
         self.set_current_page(0)
+        self.connect('switch-page', self._switch_page_cb)
         
         self._show_callback = None
         self._go_callback = None
@@ -96,7 +97,8 @@ class LogView(gtk.Notebook):
                                           self.children_table)
         
         self._add_tags(tags)
-        self._set_diff()
+        if self.get_current_page() == 2:
+            self._set_diff()
 
     def _set_diff(self):
         revid = self._revision.revision_id
@@ -112,6 +114,10 @@ class LogView(gtk.Notebook):
         s = StringIO()
         show_diff_trees(parent_tree, rev_tree, s, None)
         self.diff_buffer.set_text(s.getvalue().decode(sys.getdefaultencoding(), 'replace'))
+
+    def _switch_page_cb(self, *args):
+        #if self.get_current_page() == 2:
+        self._set_diff()
 
     def _show_clicked_cb(self, widget, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
