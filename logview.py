@@ -19,14 +19,8 @@ import pygtk
 pygtk.require("2.0")
 import gtk
 import pango
-import gtksourceview
-import sys
-
-from cStringIO import StringIO
 
 from bzrlib.osutils import format_date
-from bzrlib.diff import show_diff_trees
-from bzrlib.revision import NULL_REVISION
 
 class LogView(gtk.Notebook):
     """ Custom widget for commit log details.
@@ -42,10 +36,8 @@ class LogView(gtk.Notebook):
 
         self._create_general()
         self._create_relations()
-        self._create_changes()
 
         self.set_current_page(0)
-        self.connect('switch-page', self._switch_page_cb)
         
         self._show_callback = None
         self._go_callback = None
@@ -97,27 +89,6 @@ class LogView(gtk.Notebook):
                                           self.children_table)
         
         self._add_tags(tags)
-        if self.get_current_page() == 2:
-            self._set_diff()
-
-    def _set_diff(self):
-        revid = self._revision.revision_id
-
-        rev_tree = self._branch.repository.revision_tree(revid)
-
-        if len(self._revision.parent_ids) > 0:
-            parentid = self._revision.parent_ids[0]
-            parent_tree = self._branch.repository.revision_tree(parentid)
-        else:
-            parent_tree = self._branch.repository.revision_tree(None)
-
-        s = StringIO()
-        show_diff_trees(parent_tree, rev_tree, s, None)
-        self.diff_buffer.set_text(s.getvalue().decode(sys.getdefaultencoding(), 'replace'))
-
-    def _switch_page_cb(self, *args):
-        #if self.get_current_page() == 2:
-        self._set_diff()
 
     def _show_clicked_cb(self, widget, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
@@ -203,33 +174,6 @@ class LogView(gtk.Notebook):
         self.append_page(vbox, tab_label=gtk.Label("Relations"))
         vbox.show()
 
-    def _create_changes(self):
-        slm = gtksourceview.SourceLanguagesManager()
-
-        self.diff_buffer = gtksourceview.SourceBuffer()
-        self.diff_buffer.set_language(slm.get_language_from_mime_type("text/x-patch"))
-        self.diff_buffer.set_highlight(True)
-
-        sourceview = gtksourceview.SourceView(self.diff_buffer)
-        sourceview.set_editable(False)
-        sourceview.modify_font(pango.FontDescription("Monospace"))
-
-        sourceview.show()
-
-        vbox = gtk.VBox(False, 6)
-        vbox.set_border_width(6)
-
-        win = gtk.ScrolledWindow()
-        win.set_shadow_type(gtk.SHADOW_IN)
-        win.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        win.add(sourceview)
-        win.show()
-
-        vbox.pack_start(win)
-        vbox.show()
-
-        self.append_page(vbox, tab_label=gtk.Label("Changes"))
-        
     def _create_headers(self):
         self.table = gtk.Table(rows=5, columns=2)
         self.table.set_row_spacings(6)
