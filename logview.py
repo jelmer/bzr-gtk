@@ -315,10 +315,15 @@ class LogView(gtk.Notebook):
 
     def _create_message_view(self):
         self.message_buffer = gtk.TextBuffer()
+        window = gtk.ScrolledWindow()
+        window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        window.set_shadow_type(gtk.SHADOW_IN)
         tv = gtk.TextView(self.message_buffer)
         tv.set_editable(False)
         tv.set_wrap_mode(gtk.WRAP_WORD)
         tv.modify_font(pango.FontDescription("Monospace"))
         tv.show()
-        return tv
+        window.add(tv)
+        window.show()
+        return window
 
