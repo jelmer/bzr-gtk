@@ -24,6 +24,8 @@ import bzrlib
 import gtk
 import os
 
+from bzrlib.plugins.gtk.branchbox import BranchSelectionBox
+
 class CreateMergeDirectiveDialog(gtk.Dialog):
     def __init__(self, branch, stop_revid=None):
         super(CreateMergeDirectiveDialog, self).__init__()
@@ -43,8 +45,66 @@ class CreateMergeDirectiveDialog(gtk.Dialog):
 
 
 class SendMergeDirectiveDialog(gtk.Dialog):
-    def __init__(self):
-        super(SendMergeDirectiveDialog, self).__init__()
+    def __init__(self, branch, parent=None):
+        super(SendMergeDirectiveDialog, self).__init__(parent)
+        self.branch = branch
+        self.set_title("Send Merge Directive")
+        self._create()
+
+    def _create(self):
+        table = gtk.Table(rows=3, columns=2)
+        self.vbox.add(table)
+
+        label = gtk.Label()
+        label.set_markup("<b>Branch to Submit:</b>")
+        table.attach(label, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
+
+        label = gtk.Label(str(self.branch))
+        table.attach(label, 1, 2, 0, 1, gtk.FILL, gtk.FILL)
+
+        label = gtk.Label()
+        label.set_markup("<b>Target Branch:</b>")
+        table.attach(label, 0, 1, 1, 2, gtk.FILL, gtk.FILL)
+
+        self.submit_branch = BranchSelectionBox(self.branch.get_submit_branch())
+        table.attach(self.submit_branch, 1, 2, 1, 2, gtk.FILL, gtk.FILL)
+
+        # TODO: Display number of revisions to be send whenever 
+        # submit branch changes
+
+        label = gtk.Label()
+        label.set_markup("<b>Email To:</b>")
+        table.attach(label, 0, 1, 2, 3, gtk.FILL, gtk.FILL)
+
+        self.mail_to = gtk.ComboBoxEntry()
+        mail_to = self.branch.get_config().get_user_option('submit_to')
+        if mail_to is not None:
+            self.mail_to.get_child().set_text(mail_to)
+        table.attach(self.mail_to, 1, 2, 2, 3, gtk.FILL, gtk.FILL)
+
+        self.add_buttons(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, 
+                         gtk.STOCK_OK, gtk.RESPONSE_OK)
+
+        self.show_all()
+
+    def get_mail_to(self):
+        return self.mail_to.get_child().get_text()
+
+    def get_merge_directive(self):
+        from bzrlib.merge_directive import MergeDirective2
+        from bzrlib import osutils
+        import time
+        return MergeDirective2.from_objects(self.branch.repository,
+                                            self.branch.last_revision(),
+                                            time.time(),
+                                            osutils.local_time_offset(),
+                                            self.submit_branch.get_url(),
+                                            public_branch=None,
+                                            include_patch=True,
+                                            include_bundle=True,
+                                            message=None,
+                                            base_revision_id=None)
+
 
 
 class ApplyMergeDirectiveDialog(gtk.Dialog):

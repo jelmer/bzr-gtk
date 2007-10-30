@@ -19,14 +19,15 @@ commit-notify     Start the graphical notifier of commits.
 gannotate         GTK+ annotate. 
 gbranch           GTK+ branching. 
 gcheckout         GTK+ checkout. 
-gcommit           GTK+ commit dialog 
+gcommit           GTK+ commit dialog.
 gconflicts        GTK+ conflicts. 
 gdiff             Show differences in working tree in a GTK+ Window. 
 ginit             Initialise a new branch.
 gmissing          GTK+ missing revisions dialog. 
 gpreferences      GTK+ preferences dialog. 
-gpush             GTK+ push. 
-gstatus           GTK+ status dialog 
+gpush             GTK+ push.
+gsend             GTK+ send merge directive.
+gstatus           GTK+ status dialog.
 gtags             Manage branch tags.
 visualise         Graphically visualise this branch. 
 """
@@ -393,9 +394,28 @@ class cmd_gstatus(GTKCommand):
         status.run()
 
 
+class cmd_gsend(GTKCommand):
+    """GTK+ send merge directive.
+
+    """
+    def run(self):
+        (br, path) = branch.Branch.open_containing(".")
+        gtk = self.open_display()
+        from bzrlib.plugins.gtk.mergedirective import SendMergeDirectiveDialog
+        from StringIO import StringIO
+        dialog = SendMergeDirectiveDialog(br)
+        if dialog.run() == gtk.RESPONSE_OK:
+            outf = StringIO()
+            outf.writelines(dialog.get_merge_directive().to_lines())
+            mail_client = br.get_config().get_mail_client()
+            mail_client.compose_merge_request(dialog.get_mail_to(), "[MERGE]", 
+                outf.getvalue())
+
+            
+
 
 class cmd_gconflicts(GTKCommand):
-    """ GTK+ conflicts.
+    """GTK+ conflicts.
     
     Select files from the list of conflicts and run an external utility to
     resolve them.
@@ -408,7 +428,6 @@ class cmd_gconflicts(GTKCommand):
         dialog.run()
 
 
-
 class cmd_gpreferences(GTKCommand):
     """ GTK+ preferences dialog.
 
@@ -418,7 +437,6 @@ class cmd_gpreferences(GTKCommand):
         from bzrlib.plugins.gtk.preferences import PreferencesWindow
         dialog = PreferencesWindow()
         dialog.run()
-
 
 
 class cmd_gmissing(Command):
@@ -477,19 +495,20 @@ class cmd_gtags(GTKCommand):
 
 
 commands = [
+    cmd_gannotate, 
+    cmd_gbranch,
+    cmd_gcheckout, 
+    cmd_gcommit, 
+    cmd_gconflicts, 
+    cmd_gdiff,
+    cmd_ginit,
     cmd_gmissing, 
     cmd_gpreferences, 
-    cmd_gconflicts, 
-    cmd_gstatus,
-    cmd_gcommit, 
-    cmd_gannotate, 
-    cmd_visualise, 
-    cmd_gdiff,
     cmd_gpush, 
-    cmd_gcheckout, 
-    cmd_gbranch,
-    cmd_ginit,
-    cmd_gtags
+    cmd_gsend,
+    cmd_gstatus,
+    cmd_gtags,
+    cmd_visualise
     ]
 
 for cmd in commands:
