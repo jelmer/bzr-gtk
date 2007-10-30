@@ -250,6 +250,7 @@ class CommitDialog(gtk.Dialog):
             self._enable_per_file_commits = True
         if not self._enable_per_file_commits:
             self._file_message_expander.hide()
+            self._global_message_label.set_label('Commit Message')
 
     def _compute_delta(self):
         self._delta = self._wt.changes_from(self._basis_tree)

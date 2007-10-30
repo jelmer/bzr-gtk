@@ -840,22 +840,32 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree)
         self.assertFalse(dlg._file_message_expander.get_property('visible'))
+        self.assertEqual('Commit Message',
+                         dlg._global_message_label.get_text())
 
         tree.branch.get_config().set_user_option('per_file_commits', 'true')
         dlg = commit.CommitDialog(tree)
         self.assertTrue(dlg._file_message_expander.get_property('visible'))
+        self.assertEqual('Global Commit Message',
+                         dlg._global_message_label.get_text())
 
         tree.branch.get_config().set_user_option('per_file_commits', 'on')
         dlg = commit.CommitDialog(tree)
         self.assertTrue(dlg._file_message_expander.get_property('visible'))
+        self.assertEqual('Global Commit Message',
+                         dlg._global_message_label.get_text())
 
         tree.branch.get_config().set_user_option('per_file_commits', 'y')
         dlg = commit.CommitDialog(tree)
         self.assertTrue(dlg._file_message_expander.get_property('visible'))
+        self.assertEqual('Global Commit Message',
+                         dlg._global_message_label.get_text())
 
         tree.branch.get_config().set_user_option('per_file_commits', 'n')
         dlg = commit.CommitDialog(tree)
         self.assertFalse(dlg._file_message_expander.get_property('visible'))
+        self.assertEqual('Commit Message',
+                         dlg._global_message_label.get_text())
 
     def test_commit_specific_files_with_messages(self):
         tree = self.make_branch_and_tree('tree')
