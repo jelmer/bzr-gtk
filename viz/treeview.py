@@ -124,11 +124,11 @@ class TreeView(gtk.ScrolledWindow):
         :param maxnum: Maximum number of revisions to display, or None 
                        for no limit.
         """
-        (linegraphdata, index, columns_len) = linegraph(self.branch,
+        (linegraphdata, index, columns_len) = linegraph(self.branch.repository,
                                                         start,
                                                         maxnum)
 
-        self.model = TreeModel(self.branch, linegraphdata)
+        self.model = TreeModel(self.branch.repository, linegraphdata)
         self.graph_cell.columns_len = columns_len
         width = self.graph_cell.get_size(self.treeview)[2]
         self.graph_column.set_fixed_width(width)

@@ -29,10 +29,10 @@ CHILDREN = 10
 class TreeModel(gtk.GenericTreeModel):
 
     
-    def __init__ (self, branch, line_graph_data):
+    def __init__ (self, repository, line_graph_data):
         gtk.GenericTreeModel.__init__(self)
         self.revisions = {}
-        self.branch = branch
+        self.repository = repository
         self.line_graph_data = line_graph_data
     
     def on_get_flags(self):
@@ -76,7 +76,7 @@ class TreeModel(gtk.GenericTreeModel):
                                       for revno in revno_sequence])
         
         if revid not in self.revisions:
-            revision = self.branch.repository.get_revisions([revid])[0]
+            revision = self.repository.get_revisions([revid])[0]
             self.revisions[revid] = revision
         else:
             revision = self.revisions[revid]
