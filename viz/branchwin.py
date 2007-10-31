@@ -65,7 +65,7 @@ class BranchWindow(Window):
 
     def construct(self):
         """Construct the window contents."""
-        vbox = gtk.VBox(spacing=0)
+        vbox = gtk.VBox(spacing=5)
         self.add(vbox)
 
         vbox.pack_start(self.construct_navigation(), expand=False, fill=True)
