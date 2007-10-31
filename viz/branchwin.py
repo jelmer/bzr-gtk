@@ -100,7 +100,8 @@ class BranchWindow(Window):
 
     def construct_top(self):
         """Construct the top-half of the window."""
-        self.treeview = TreeView(self.branch, self.start, self.maxnum)
+        # FIXME: Make broken_line_length configurable
+        self.treeview = TreeView(self.branch, self.start, self.maxnum, 32)
 
         self.treeview.connect("revision-selected",
                 self._treeselection_changed_cb)

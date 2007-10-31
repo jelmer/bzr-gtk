@@ -11,7 +11,7 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 from bzrlib.tsort import merge_sort
 
-def linegraph(repository, start, maxnum):
+def linegraph(repository, start, maxnum, broken_line_length=None):
     """Produce a directed graph of a bzr repository.
 
     Returns a tuple of (line_graph, revid_index, columns_len) where
@@ -40,9 +40,6 @@ def linegraph(repository, start, maxnum):
     It's up to you how to actually draw the nodes and lines (straight,
     curved, kinked, etc.) and to pick the actual colours for each index.
     """
-    
-    # FIXME: This should be configurable
-    BROKEN_LINE_LENGTH = 32
     
     graph_parents = repository.get_revision_graph(start)
     graph_children = {}
@@ -150,8 +147,8 @@ def linegraph(repository, start, maxnum):
         last_rev_index = None
         for rev_index in branch_line:
             if last_rev_index:
-                if BROKEN_LINE_LENGTH and \
-                   rev_index - last_rev_index > BROKEN_LINE_LENGTH:
+                if broken_line_length and \
+                   rev_index - last_rev_index > broken_line_length:
                     line_range.append(last_rev_index+1)
                     line_range.append(rev_index-1)
                 else:
@@ -161,8 +158,8 @@ def linegraph(repository, start, maxnum):
             last_rev_index = rev_index
         
         if parent_index:
-            if BROKEN_LINE_LENGTH and \
-               parent_index - last_rev_index > BROKEN_LINE_LENGTH:
+            if broken_line_length and \
+               parent_index - last_rev_index > broken_line_length:
                 line_range.append(last_rev_index+1)
             else:
                 line_range.extend(range(last_rev_index+1, parent_index))
@@ -202,8 +199,8 @@ def linegraph(repository, start, maxnum):
                         
                     # If this line is really long, break it.
                     if len(branch_id) > 0 and \
-                       BROKEN_LINE_LENGTH and \
-                       parent_index - rev_index > BROKEN_LINE_LENGTH:
+                       broken_line_length and \
+                       parent_index - rev_index > broken_line_length:
                         child_line_col_index = \
                             _find_free_column(columns,
                                               empty_column,
