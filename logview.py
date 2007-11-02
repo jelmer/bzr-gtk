@@ -37,6 +37,7 @@ class LogView(gtk.Notebook):
 
         self._create_general()
         self._create_relations()
+        self._create_file_info_view()
 
         self.set_current_page(0)
         
@@ -110,7 +111,6 @@ class LogView(gtk.Notebook):
                 for fi in file_info:
                     text.append('%(path)s\n%(message)s' % fi)
                 self.file_info_buffer.set_text('\n'.join(text))
-                self.file_info_label.set_markup("<b>File Messages:</b>")
                 self.file_info_box.show()
             else:
                 text = []
@@ -119,7 +119,6 @@ class LogView(gtk.Notebook):
                         text.append(fi['message'])
                 if text:
                     self.file_info_buffer.set_text('\n'.join(text))
-                    self.file_info_label.set_markup("<b>File Message:</b>")
                     self.file_info_box.show()
                 else:
                     self.file_info_box.hide()
@@ -198,7 +197,6 @@ class LogView(gtk.Notebook):
         vbox.set_border_width(6)
         vbox.pack_start(self._create_headers(), expand=False, fill=True)
         vbox.pack_start(self._create_message_view())
-        vbox.pack_start(self._create_file_info_view(), expand=True, fill=True)
         self.append_page(vbox, tab_label=gtk.Label("General"))
         vbox.show()
 
@@ -370,10 +368,8 @@ class LogView(gtk.Notebook):
         return window
 
     def _create_file_info_view(self):
-        self.file_info_box = gtk.VBox()
-        self.file_info_label = gtk.Label()
-        self.file_info_label.set_markup("<b>File Messages:</b>")
-        self.file_info_label.show()
+        self.file_info_box = gtk.VBox(False, 6)
+        self.file_info_box.set_border_width(6)
         self.file_info_buffer = gtk.TextBuffer()
         window = gtk.ScrolledWindow()
         window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
@@ -383,10 +379,9 @@ class LogView(gtk.Notebook):
         tv.set_wrap_mode(gtk.WRAP_WORD)
         tv.modify_font(pango.FontDescription("Monospace"))
         tv.show()
-        self.file_info_box.pack_start(self.file_info_label)
         window.add(tv)
         window.show()
         self.file_info_box.pack_start(window)
         self.file_info_box.hide() # Only shown when there are per-file messages
-        return self.file_info_box
+        self.append_page(self.file_info_box, tab_label=gtk.Label('Per-file'))
 
