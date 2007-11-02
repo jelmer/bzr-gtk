@@ -111,6 +111,13 @@ class BranchWindow(Window):
         go_menu.add(gtk.SeparatorMenuItem())
         go_menu.add(go_menu_tags)
 
+        revision_menu = gtk.Menu()
+        revision_menuitem = gtk.MenuItem("_Revision")
+        revision_menuitem.set_submenu(revision_menu)
+
+        revision_menu.add(gtk.MenuItem("Tag revision"))
+        revision_menu.add(gtk.MenuItem("View changes"))
+
         branch_menu = gtk.Menu()
         branch_menuitem = gtk.MenuItem("_Branch")
         branch_menuitem.set_submenu(branch_menu)
@@ -120,6 +127,7 @@ class BranchWindow(Window):
        
         menubar.add(file_menuitem)
         menubar.add(go_menuitem)
+        menubar.add(revision_menuitem)
         menubar.add(branch_menuitem)
         menubar.show_all()
 
