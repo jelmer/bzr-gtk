@@ -28,7 +28,7 @@ from bzrlib.errors import NoSuchRevision
 from bzrlib.revision import NULL_REVISION, CURRENT_REVISION
 
 from colormap import AnnotateColorMap, AnnotateColorSaturation
-from bzrlib.plugins.gtk.logview import LogView
+from bzrlib.plugins.gtk.revisionview import RevisionView
 from bzrlib.plugins.gtk.window import Window
 
 
@@ -185,7 +185,7 @@ class GAnnotateWindow(Window):
         if rev_id is None:
             return
         selected = self.revisions[rev_id]
-        self.logview.set_revision(selected)
+        self.revisionview.set_revision(selected)
         if (len(selected.parent_ids) != 0 and selected.parent_ids[0] not in
             self._no_back):
             enable_back = True
@@ -194,7 +194,7 @@ class GAnnotateWindow(Window):
         self.back_button.set_sensitive(enable_back)
 
     def _create(self):
-        self.logview = self._create_log_view()
+        self.revisionview = self._create_log_view()
         self.annoview = self._create_annotate_view()
 
         vbox = gtk.VBox(False)
@@ -221,7 +221,7 @@ class GAnnotateWindow(Window):
         
         self.pane = pane = gtk.VPaned()
         pane.add1(swbox)
-        pane.add2(self.logview)
+        pane.add2(self.revisionview)
         pane.show()
         vbox.pack_start(pane, expand=True, fill=True)
 
@@ -325,7 +325,7 @@ class GAnnotateWindow(Window):
         return tv
 
     def _create_log_view(self):
-        lv = LogView()
+        lv = RevisionView()
         lv.show()
         return lv
 
