@@ -65,9 +65,10 @@ class BranchWindow(Window):
 
     def construct(self):
         """Construct the window contents."""
-        vbox = gtk.VBox(spacing=5)
+        vbox = gtk.VBox(spacing=0)
         self.add(vbox)
 
+        vbox.pack_start(self.construct_menubar(), expand=False, fill=True)
         vbox.pack_start(self.construct_navigation(), expand=False, fill=True)
         vbox.pack_start(self.construct_loading_msg(), expand=False, fill=True)
         
@@ -79,6 +80,42 @@ class BranchWindow(Window):
         vbox.set_focus_child(paned)
 
         vbox.show()
+
+    def construct_menubar(self):
+        menubar = gtk.MenuBar()
+
+        file_menu = gtk.Menu()
+        file_menuitem = gtk.MenuItem("_File", True)
+        file_menuitem.set_submenu(file_menu)
+
+        file_menu_close = gtk.MenuItem("_Close", True)
+        file_menu_close.connect('activate', lambda x: self.destroy())
+        
+        file_menu.add(file_menu_close)
+
+        go_menu = gtk.Menu()
+        go_menuitem = gtk.MenuItem("_Go", True)
+        go_menuitem.set_submenu(go_menu)
+        
+        go_menu_back = gtk.MenuItem("_Back", True)
+        go_menu_forward = gtk.MenuItem("_Forward", True)
+
+        go_menu.add(go_menu_back)
+        go_menu.add(go_menu_forward)
+
+        branch_menu = gtk.Menu()
+        branch_menuitem = gtk.MenuItem("_Branch", True)
+        branch_menuitem.set_submenu(branch_menu)
+
+        branch_menu.add(gtk.MenuItem("Pu_ll changes from another branch", True))
+        branch_menu.add(gtk.MenuItem("Pu_sh changes to another branch", True))
+
+        menubar.add(file_menuitem)
+        menubar.add(go_menuitem)
+        menubar.add(branch_menuitem)
+        menubar.show_all()
+
+        return menubar
     
     def construct_loading_msg(self):
         image_loading = gtk.image_new_from_stock(gtk.STOCK_REFRESH,
@@ -86,7 +123,7 @@ class BranchWindow(Window):
         image_loading.show()
         
         label_loading = gtk.Label(_("Please wait, loading ancestral graph..."))
-        label_loading.set_alignment(0.0, 0.5)        
+        label_loading.set_alignment(0.0, 0.5)  
         label_loading.show()
         
         self.loading_msg_box = gtk.HBox()
