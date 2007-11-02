@@ -210,6 +210,11 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         renderer = commit_col.get_cell_renderers()[0]
         self.assertTrue(renderer.get_property('activatable'))
 
+        self.assertEqual('Commit all changes',
+                         dlg._commit_all_files_radio.get_label())
+        self.assertTrue(dlg._commit_all_files_radio.get_property('sensitive'))
+        self.assertTrue(dlg._commit_selected_radio.get_property('sensitive'))
+
     def test_pending(self):
         tree = self.make_branch_and_tree('tree')
         rev_id1 = tree.commit('one')
@@ -232,6 +237,11 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         values = [(r[0], r[1], r[2], r[3]) for r in dlg._pending_store]
         self.assertEqual([(rev_id2, '2007-10-01', 'Joe Foo', 'two')], values)
+
+        self.assertEqual('Commit all changes*',
+                         dlg._commit_all_files_radio.get_label())
+        self.assertFalse(dlg._commit_all_files_radio.get_property('sensitive'))
+        self.assertFalse(dlg._commit_selected_radio.get_property('sensitive'))
 
     def test_pending_multiple(self):
         tree = self.make_branch_and_tree('tree')
@@ -421,6 +431,20 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         self.assertEqual('Diff for All Files', dlg._diff_label.get_text())
 
+    def test_commit_partial_toggle(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a', 'tree/b'])
+        tree.add(['a', 'b'], ['a-id', 'b-id'])
+
+        dlg = commit.CommitDialog(tree)
+        checked_col = dlg._treeview_files.get_column(0)
+        self.assertFalse(checked_col.get_property('visible'))
+        self.assertTrue(dlg._commit_all_changes)
+
+        dlg._commit_selected_radio.set_active(True)
+        self.assertTrue(checked_col.get_property('visible'))
+        self.assertFalse(dlg._commit_all_changes)
+
     def test_file_selection(self):
         """Several things should happen when a file has been selected."""
         tree = self.make_branch_and_tree('tree')
@@ -585,6 +609,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         dlg = commit.CommitDialog(tree)
         self.assertEqual((['a', 'b'], []), dlg._get_specific_files())
 
+        dlg._commit_selected_radio.set_active(True)
         dlg._toggle_commit(None, 0, dlg._files_store)
         self.assertEqual(([], []), dlg._get_specific_files())
 
@@ -598,6 +623,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         tree.add(['a_file', 'b_dir'], ['1a-id', '0b-id'])
 
         dlg = commit.CommitDialog(tree)
+        dlg._commit_selected_radio.set_active(True)
         self.assertEqual((['a_file', 'b_dir'], []), dlg._get_specific_files())
 
         dlg._treeview_files.set_cursor((1,))
@@ -804,6 +830,7 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
         tree.add(['a', 'b'], ['a-id', 'b-id'])
 
         dlg = commit.CommitDialog(tree)
+        dlg._commit_selected_radio.set_active(True) # enable partial
         dlg._toggle_commit(None, 2, dlg._files_store) # unset 'b'
 
         dlg._set_global_commit_message('Committing just "a"\n')
@@ -817,6 +844,32 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
         entries = [(path, ie.file_id) for path, ie in rt.iter_entries_by_dir()
                                        if path] # Ignore the root entry
         self.assertEqual([('a', 'a-id')], entries)
+
+    def test_commit_partial_no_partial(self):
+        """Ignore the checkboxes if committing all files."""
+        tree = self.make_branch_and_tree('tree')
+        rev_id1 = tree.commit('one')
+        self.build_tree(['tree/a', 'tree/b'])
+        tree.add(['a', 'b'], ['a-id', 'b-id'])
+
+        dlg = commit.CommitDialog(tree)
+        dlg._commit_selected_radio.set_active(True) # enable partial
+        dlg._toggle_commit(None, 2, dlg._files_store) # unset 'b'
+
+        # Switch back to committing all changes
+        dlg._commit_all_files_radio.set_active(True)
+
+        dlg._set_global_commit_message('Committing everything\n')
+        dlg._do_commit()
+
+        rev_id2 = dlg.committed_revision_id
+        self.assertIsNot(None, rev_id2)
+        self.assertEqual(rev_id2, tree.last_revision())
+
+        rt = tree.branch.repository.revision_tree(rev_id2)
+        entries = [(path, ie.file_id) for path, ie in rt.iter_entries_by_dir()
+                                       if path] # Ignore the root entry
+        self.assertEqual([('a', 'a-id'), ('b', 'b-id')], entries)
 
     def test_commit_no_messages(self):
         tree = self.make_branch_and_tree('tree')
@@ -875,6 +928,7 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
         tree.add(['a', 'b'], ['a-id', 'b-id'])
 
         dlg = commit.CommitDialog(tree)
+        dlg._commit_selected_radio.set_active(True) # enable partial
         dlg._treeview_files.set_cursor((1,))
         dlg._set_file_commit_message('Message for A\n')
         dlg._treeview_files.set_cursor((2,))

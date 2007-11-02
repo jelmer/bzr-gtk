@@ -111,6 +111,7 @@ class CommitDialog(gtk.Dialog):
         #       It used to set all changes but this one to False
         self._selected = selected
         self._enable_per_file_commits = True
+        self._commit_all_changes = True
         self.committed_revision_id = None # Nothing has been committed yet
 
         self.setup_params()
@@ -361,10 +362,18 @@ class CommitDialog(gtk.Dialog):
             None, _("Commit all changes"))
         self._files_box.pack_start(self._commit_all_files_radio, expand=False)
         self._commit_all_files_radio.show()
+        self._commit_all_files_radio.connect('toggled',
+            self._toggle_commit_selection)
         self._commit_selected_radio = gtk.RadioButton(
             self._commit_all_files_radio, _("Only commit selected changes"))
         self._files_box.pack_start(self._commit_selected_radio, expand=False)
         self._commit_selected_radio.show()
+        self._commit_selected_radio.connect('toggled',
+            self._toggle_commit_selection)
+        if self._pending:
+            self._commit_all_files_radio.set_label(_('Commit all changes*'))
+            self._commit_all_files_radio.set_sensitive(False)
+            self._commit_selected_radio.set_sensitive(False)
 
         scroller = gtk.ScrolledWindow()
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -398,8 +407,9 @@ class CommitDialog(gtk.Dialog):
             name = _('Commit*')
         else:
             name = _('Commit')
-        self._treeview_files.append_column(gtk.TreeViewColumn(name,
-                                           crt, active=2))
+        commit_col = gtk.TreeViewColumn(name, crt, active=2)
+        commit_col.set_visible(False)
+        self._treeview_files.append_column(commit_col)
         self._treeview_files.append_column(gtk.TreeViewColumn(_('Path'),
                                            gtk.CellRendererText(), text=3))
         self._treeview_files.append_column(gtk.TreeViewColumn(_('Type'),
@@ -414,6 +424,18 @@ class CommitDialog(gtk.Dialog):
                 node[2] = new_val
         else:
             model[path][2] = not model[path][2]
+
+    def _toggle_commit_selection(self, button):
+        all_files = self._commit_all_files_radio.get_active()
+        if self._commit_all_changes != all_files:
+            checked_col = self._treeview_files.get_column(0)
+            self._commit_all_changes = all_files
+            if all_files:
+                checked_col.set_visible(False)
+            else:
+                checked_col.set_visible(True)
+            renderer = checked_col.get_cell_renderers()[0]
+            renderer.set_property('activatable', not all_files)
 
     def _construct_pending_list(self):
         # Pending information defaults to hidden, we put it all in 1 box, so
@@ -594,7 +616,7 @@ class CommitDialog(gtk.Dialog):
 
         file_info = []
         for record in records:
-            if record[2]:           # [2] checkbox
+            if self._commit_all_changes or record[2]:# [2] checkbox
                 file_id = record[0] # [0] file_id
                 path = record[1]    # [1] real path
                 file_message = record[5] # [5] commit message
