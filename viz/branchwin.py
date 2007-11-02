@@ -110,9 +110,22 @@ class BranchWindow(Window):
         branch_menu.add(gtk.MenuItem("Pu_ll changes from another branch", True))
         branch_menu.add(gtk.MenuItem("Pu_sh changes to another branch", True))
 
+        tags_menu = gtk.Menu()
+        tags_menuitem = gtk.MenuItem("_Tags", True)
+        tags_menuitem.set_submenu(tags_menu)
+
+        tags_menu.add(gtk.MenuItem("Tag selected revision"))
+        tags_menu.add(gtk.SeparatorMenuItem())
+
+        for (tag, revid) in self.branch.tags.get_tag_dict().items():
+            tag_item = gtk.MenuItem(tag)
+            tag_item.connect('activate', self._tag_selected_cb, revid)
+            tags_menu.add(tag_item)
+
         menubar.add(file_menuitem)
         menubar.add(go_menuitem)
         menubar.add(branch_menuitem)
+        menubar.add(tags_menuitem)
         menubar.show_all()
 
         return menubar
@@ -185,6 +198,9 @@ class BranchWindow(Window):
         self.logview.set_show_callback(self._show_clicked_cb)
         self.logview.set_go_callback(self._go_clicked_cb)
         return self.logview
+
+    def _tag_selected_cb(self, menuitem, revid):
+        self.treeview.set_revision(revid)
     
     def _treeselection_changed_cb(self, selection, *args):
         """callback for when the treeview changes."""
