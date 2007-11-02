@@ -12,15 +12,9 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 import gtk
 import gobject
 import pango
-import treemodel
 
 from bzrlib.plugins.gtk.window import Window
-from bzrlib.osutils import format_date
-
-from linegraph import linegraph, same_branch
-from graphcell import CellRendererGraph
-from treemodel import TreeModel
-from treeview  import TreeView
+from treeview import TreeView
 
 class BranchWindow(Window):
     """Branch window.
