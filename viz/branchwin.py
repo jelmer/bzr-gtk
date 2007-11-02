@@ -79,47 +79,48 @@ class BranchWindow(Window):
         menubar = gtk.MenuBar()
 
         file_menu = gtk.Menu()
-        file_menuitem = gtk.MenuItem("_File", True)
+        file_menuitem = gtk.MenuItem("_File")
         file_menuitem.set_submenu(file_menu)
 
-        file_menu_close = gtk.MenuItem("_Close", True)
+        file_menu_close = gtk.ImageMenuItem(gtk.STOCK_CLOSE)
         file_menu_close.connect('activate', lambda x: self.destroy())
         
         file_menu.add(file_menu_close)
 
         go_menu = gtk.Menu()
-        go_menuitem = gtk.MenuItem("_Go", True)
+        go_menuitem = gtk.MenuItem("_Go")
         go_menuitem.set_submenu(go_menu)
         
-        go_menu_back = gtk.MenuItem("_Back", True)
-        go_menu_forward = gtk.MenuItem("_Forward", True)
+        go_menu_back = gtk.ImageMenuItem(gtk.STOCK_GO_BACK)
+        go_menu_back.connect("activate", self._back_clicked_cb)
 
-        go_menu.add(go_menu_back)
-        go_menu.add(go_menu_forward)
-
-        branch_menu = gtk.Menu()
-        branch_menuitem = gtk.MenuItem("_Branch", True)
-        branch_menuitem.set_submenu(branch_menu)
-
-        branch_menu.add(gtk.MenuItem("Pu_ll changes from another branch", True))
-        branch_menu.add(gtk.MenuItem("Pu_sh changes to another branch", True))
+        go_menu_forward = gtk.ImageMenuItem(gtk.STOCK_GO_FORWARD)
+        go_menu_forward.connect("activate", self._fwd_clicked_cb)
 
         tags_menu = gtk.Menu()
-        tags_menuitem = gtk.MenuItem("_Tags", True)
-        tags_menuitem.set_submenu(tags_menu)
-
-        tags_menu.add(gtk.MenuItem("Tag selected revision"))
-        tags_menu.add(gtk.SeparatorMenuItem())
+        go_menu_tags = gtk.MenuItem("_Tags")
+        go_menu_tags.set_submenu(tags_menu)
 
         for (tag, revid) in self.branch.tags.get_tag_dict().items():
             tag_item = gtk.MenuItem(tag)
             tag_item.connect('activate', self._tag_selected_cb, revid)
             tags_menu.add(tag_item)
 
+        go_menu.add(go_menu_back)
+        go_menu.add(go_menu_forward)
+        go_menu.add(gtk.SeparatorMenuItem())
+        go_menu.add(go_menu_tags)
+
+        branch_menu = gtk.Menu()
+        branch_menuitem = gtk.MenuItem("_Branch")
+        branch_menuitem.set_submenu(branch_menu)
+
+        branch_menu.add(gtk.MenuItem("Pu_ll changes from another branch"))
+        branch_menu.add(gtk.MenuItem("Pu_sh changes to another branch"))
+       
         menubar.add(file_menuitem)
         menubar.add(go_menuitem)
         menubar.add(branch_menuitem)
-        menubar.add(tags_menuitem)
         menubar.show_all()
 
         return menubar
