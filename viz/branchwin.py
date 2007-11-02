@@ -65,7 +65,7 @@ class BranchWindow(Window):
 
     def construct(self):
         """Construct the window contents."""
-        vbox = gtk.VBox(spacing=0)
+        vbox = gtk.VBox(spacing=5)
         self.add(vbox)
 
         vbox.pack_start(self.construct_navigation(), expand=False, fill=True)
@@ -100,7 +100,8 @@ class BranchWindow(Window):
 
     def construct_top(self):
         """Construct the top-half of the window."""
-        self.treeview = TreeView(self.branch, self.start, self.maxnum)
+        # FIXME: Make broken_line_length configurable
+        self.treeview = TreeView(self.branch, self.start, self.maxnum, 32)
 
         self.treeview.connect("revision-selected",
                 self._treeselection_changed_cb)
@@ -140,7 +141,7 @@ class BranchWindow(Window):
     def construct_bottom(self):
         """Construct the bottom half of the window."""
         from bzrlib.plugins.gtk.logview import LogView
-        self.logview = LogView(None, True, [], True)
+        self.logview = LogView(None, True, [], True, branch=self.branch)
         (width, height) = self.get_size()
         self.logview.set_size_request(width, int(height / 2.5))
         self.logview.show()

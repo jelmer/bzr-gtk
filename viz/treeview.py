@@ -29,13 +29,15 @@ class TreeView(gtk.ScrolledWindow):
                                   ())
     }
 
-    def __init__(self, branch, start, maxnum):
+    def __init__(self, branch, start, maxnum, broken_line_length=None):
         """Create a new TreeView.
 
         :param branch: Branch object for branch to show.
         :param start: Revision id of top revision.
         :param maxnum: Maximum number of revisions to display, 
                        None for no limit.
+        :param broken_line_length: After how much lines to break 
+                                   branches.
         """
         gtk.ScrolledWindow.__init__(self)
 
@@ -47,7 +49,8 @@ class TreeView(gtk.ScrolledWindow):
         self.branch = branch
         self.branch.lock_read()
 
-        gobject.idle_add(self.populate, start, maxnum)
+        gobject.idle_add(self.populate, start, maxnum, 
+                         broken_line_length)
 
         self.revision = None
         self.children = None
@@ -117,18 +120,21 @@ class TreeView(gtk.ScrolledWindow):
             self.treeview.set_cursor(self.index[children[0]])
         self.treeview.grab_focus()
 
-    def populate(self, start, maxnum):
+    def populate(self, start, maxnum, broken_line_length=None):
         """Fill the treeview with contents.
 
         :param start: Revision id of revision to start with.
         :param maxnum: Maximum number of revisions to display, or None 
                        for no limit.
+        :param broken_line_length: After how much lines branches \
+                       should be broken.
         """
-        (linegraphdata, index, columns_len) = linegraph(self.branch,
+        (linegraphdata, index, columns_len) = linegraph(self.branch.repository,
                                                         start,
-                                                        maxnum)
+                                                        maxnum, 
+                                                        broken_line_length)
 
-        self.model = TreeModel(self.branch, linegraphdata)
+        self.model = TreeModel(self.branch.repository, linegraphdata)
         self.graph_cell.columns_len = columns_len
         width = self.graph_cell.get_size(self.treeview)[2]
         self.graph_column.set_fixed_width(width)

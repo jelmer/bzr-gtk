@@ -11,8 +11,8 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 from bzrlib.tsort import merge_sort
 
-def linegraph(branch, start, maxnum):
-    """Produce a directed graph of a bzr branch.
+def linegraph(repository, start, maxnum, broken_line_length=None):
+    """Produce a directed graph of a bzr repository.
 
     Returns a tuple of (line_graph, revid_index, columns_len) where
     * line_graph is a list of tuples of (revid,
@@ -41,14 +41,7 @@ def linegraph(branch, start, maxnum):
     curved, kinked, etc.) and to pick the actual colours for each index.
     """
     
-    # FIXME: This should be configurable
-    BROKEN_LINE_LENGTH = 32
-    
-    # We get the mainline so we can pass it to merge_sort to make merge_sort
-    # run faster.
-    mainline = [None]
-    mainline.extend(branch.revision_history())
-    graph_parents = branch.repository.get_revision_graph(start)
+    graph_parents = repository.get_revision_graph(start)
     graph_children = {}
     for revid in graph_parents.iterkeys():
         graph_children[revid] = []
@@ -56,7 +49,6 @@ def linegraph(branch, start, maxnum):
     merge_sorted_revisions = merge_sort(
         graph_parents,
         start,
-        mainline,
         generate_revno=True)
     
     revid_index = {}
@@ -155,8 +147,8 @@ def linegraph(branch, start, maxnum):
         last_rev_index = None
         for rev_index in branch_line:
             if last_rev_index:
-                if BROKEN_LINE_LENGTH and \
-                   rev_index - last_rev_index > BROKEN_LINE_LENGTH:
+                if broken_line_length and \
+                   rev_index - last_rev_index > broken_line_length:
                     line_range.append(last_rev_index+1)
                     line_range.append(rev_index-1)
                 else:
@@ -166,8 +158,8 @@ def linegraph(branch, start, maxnum):
             last_rev_index = rev_index
         
         if parent_index:
-            if BROKEN_LINE_LENGTH and \
-               parent_index - last_rev_index > BROKEN_LINE_LENGTH:
+            if broken_line_length and \
+               parent_index - last_rev_index > broken_line_length:
                 line_range.append(last_rev_index+1)
             else:
                 line_range.extend(range(last_rev_index+1, parent_index))
@@ -207,8 +199,8 @@ def linegraph(branch, start, maxnum):
                         
                     # If this line is really long, break it.
                     if len(branch_id) > 0 and \
-                       BROKEN_LINE_LENGTH and \
-                       parent_index - rev_index > BROKEN_LINE_LENGTH:
+                       broken_line_length and \
+                       parent_index - rev_index > broken_line_length:
                         child_line_col_index = \
                             _find_free_column(columns,
                                               empty_column,

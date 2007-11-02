@@ -26,10 +26,11 @@ import gtk
 from bzrlib import (errors, ui)
 
 class RevisionPopupMenu(gtk.Menu):
-    def __init__(self, repository, revids, branch=None):
+    def __init__(self, repository, revids, branch=None, wt=None):
         super(RevisionPopupMenu, self).__init__()
         self.branch = branch
         self.repository = repository
+        self.wt = wt
         self.revids = revids
         self.create_items()
 
@@ -55,13 +56,7 @@ class RevisionPopupMenu(gtk.Menu):
             # FIXME: self.append(item)
             self.show_all()
             
-            self.bzrdir = self.branch.bzrdir
-            self.wt = None
-            try:
-                self.wt = self.bzrdir.open_workingtree()
-            except errors.NoWorkingTree:
-                return False
-            if self.wt :
+            if self.wt:
                 item = gtk.MenuItem("_Revert to this revision")
                 item.connect('activate', self.revert)
                 self.append(item)
