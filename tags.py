@@ -23,7 +23,7 @@ except:
 
 import gtk
 
-from bzrlib.plugins.gtk.logview import LogView
+from bzrlib.plugins.gtk.revisionview import RevisionView
 from bzrlib.plugins.gtk.window import Window
 
 from dialog import error_dialog
@@ -47,7 +47,7 @@ class TagsWindow(Window):
         self._model = gtk.ListStore(str, str)
         self._treeview_tags = gtk.TreeView(self._model)
         self._scrolledwindow_tags = gtk.ScrolledWindow()
-        self._logview = LogView()
+        self._revisionview = RevisionView()
         self._hbox = gtk.HBox()
         self._vbox_buttons = gtk.VBox()
         self._vbox_buttons_top = gtk.VBox()
@@ -88,7 +88,7 @@ class TagsWindow(Window):
         self._vbox_buttons.pack_start(self._vbox_buttons_bottom, False, False)
         
         self._vpaned.add1(self._scrolledwindow_tags)
-        self._vpaned.add2(self._logview)
+        self._vpaned.add2(self._revisionview)
         
         self._hbox.pack_start(self._vpaned, True, True)
         self._hbox.pack_start(self._vbox_buttons, False, True)
@@ -201,12 +201,12 @@ class TagsWindow(Window):
     
     def _on_treeview_changed(self, *args):
         """ When a user clicks on a tag. """
-        # Refresh LogView only if there are tags available
+        # Refresh RevisionView only if there are tags available
         if not self._no_tags:
             (path, col) = self._treeview_tags.get_cursor()
             revision = self._model[path][1]
             
-            self._logview.set_revision(self.branch.repository.get_revision(revision))
+            self._revisionview.set_revision(self.branch.repository.get_revision(revision))
 
 
 class RemoveTagDialog(gtk.Dialog):
