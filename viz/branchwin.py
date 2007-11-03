@@ -97,6 +97,8 @@ class BranchWindow(Window):
         go_menu_forward = gtk.ImageMenuItem(gtk.STOCK_GO_FORWARD)
         go_menu_forward.connect("activate", self._fwd_clicked_cb)
 
+        go_menu_rev = gtk.MenuItem("Revision")
+
         tags_menu = gtk.Menu()
         go_menu_tags = gtk.MenuItem("_Tags")
         go_menu_tags.set_submenu(tags_menu)
@@ -108,6 +110,7 @@ class BranchWindow(Window):
 
         go_menu.add(go_menu_back)
         go_menu.add(go_menu_forward)
+        go_menu.add(go_menu_rev)
         go_menu.add(gtk.SeparatorMenuItem())
         go_menu.add(go_menu_tags)
 
