@@ -161,6 +161,7 @@ class TreeView(gtk.ScrolledWindow):
 
         self.treeview.set_rules_hint(True)
         self.treeview.set_search_column(4)
+        self.treeview.set_tooltip_column(treemodel.MESSAGE)
 
         self.treeview.get_selection().connect("changed",
                 self._on_selection_changed)
