@@ -25,9 +25,11 @@ import gobject
 import pango
 
 import os.path
+import re
 
 from bzrlib import errors, osutils
 from bzrlib.trace import mutter
+from bzrlib.util import bencode
 
 from dialog import error_dialog, question_dialog
 from errors import show_bzr_error
@@ -39,381 +41,685 @@ try:
 except ImportError:
     have_dbus = False
 
+
+def pending_revisions(wt):
+    """Return a list of pending merges or None if there are none of them.
+
+    Arguably this should be a core function, and
+    ``bzrlib.status.show_pending_merges`` should be built on top of it.
+
+    :return: [(rev, [children])]
+    """
+    parents = wt.get_parent_ids()
+    if len(parents) < 2:
+        return None
+
+    # The basic pending merge algorithm uses the same algorithm as
+    # bzrlib.status.show_pending_merges
+    pending = parents[1:]
+    branch = wt.branch
+    last_revision = parents[0]
+
+    if last_revision is not None:
+        try:
+            ignore = set(branch.repository.get_ancestry(last_revision,
+                                                        topo_sorted=False))
+        except errors.NoSuchRevision:
+            # the last revision is a ghost : assume everything is new
+            # except for it
+            ignore = set([None, last_revision])
+    else:
+        ignore = set([None])
+
+    pm = []
+    for merge in pending:
+        ignore.add(merge)
+        try:
+            rev = branch.repository.get_revision(merge)
+            children = []
+            pm.append((rev, children))
+
+            # This does need to be topo sorted, so we search backwards
+            inner_merges = branch.repository.get_ancestry(merge)
+            assert inner_merges[0] is None
+            inner_merges.pop(0)
+            for mmerge in reversed(inner_merges):
+                if mmerge in ignore:
+                    continue
+                rev = branch.repository.get_revision(mmerge)
+                children.append(rev)
+
+                ignore.add(mmerge)
+        except errors.NoSuchRevision:
+            print "DEBUG: NoSuchRevision:", merge
+
+    return pm
+
+
 class CommitDialog(gtk.Dialog):
-    """ New implementation of the Commit dialog. """
-    def __init__(self, wt, wtpath, notbranch, selected=None, parent=None):
-        """ Initialize the Commit Dialog. """
+    """Implementation of Commit."""
+
+    def __init__(self, wt, selected=None, parent=None):
         gtk.Dialog.__init__(self, title="Commit - Olive",
                                   parent=parent,
                                   flags=0,
                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
-        
-        # Get arguments
-        self.wt = wt
-        self.wtpath = wtpath
-        self.notbranch = notbranch
-        self.selected = selected
-        
-        # Set the delta
-        self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
-        self.delta = self.wt.changes_from(self.old_tree)
-        
-        # Get pending merges
-        self.pending = self._pending_merges(self.wt)
-        
-        # Do some preliminary checks
-        self._is_checkout = False
-        self._is_pending = False
-        if self.wt is None and not self.notbranch:
-            error_dialog(_('Directory does not have a working tree'),
-                         _('Operation aborted.'))
-            self.close()
+        self._question_dialog = question_dialog
+
+        self._wt = wt
+        # TODO: Do something with this value, it is used by Olive
+        #       It used to set all changes but this one to False
+        self._selected = selected
+        self._enable_per_file_commits = True
+        self._commit_all_changes = True
+        self.committed_revision_id = None # Nothing has been committed yet
+
+        self.setup_params()
+        self.construct()
+        self.fill_in_data()
+
+    def setup_params(self):
+        """Setup the member variables for state."""
+        self._basis_tree = self._wt.basis_tree()
+        self._delta = None
+        self._pending = pending_revisions(self._wt)
+
+        self._is_checkout = (self._wt.branch.get_bound_location() is not None)
+
+    def fill_in_data(self):
+        # Now that we are built, handle changes to the view based on the state
+        self._fill_in_pending()
+        self._fill_in_diff()
+        self._fill_in_files()
+        self._fill_in_checkout()
+        self._fill_in_per_file_info()
+
+    def _fill_in_pending(self):
+        if not self._pending:
+            self._pending_box.hide()
             return
 
-        if self.notbranch:
-            error_dialog(_('Directory is not a branch'),
-                         _('You can perform this action only in a branch.'))
-            self.close()
+        # TODO: We'd really prefer this to be a nested list
+        for rev, children in self._pending:
+            rev_info = self._rev_to_pending_info(rev)
+            self._pending_store.append([
+                rev_info['revision_id'],
+                rev_info['date'],
+                rev_info['committer'],
+                rev_info['summary'],
+                ])
+            for child in children:
+                rev_info = self._rev_to_pending_info(child)
+                self._pending_store.append([
+                    rev_info['revision_id'],
+                    rev_info['date'],
+                    rev_info['committer'],
+                    rev_info['summary'],
+                    ])
+        self._pending_box.show()
+
+    def _fill_in_files(self):
+        # We should really use add a progress bar of some kind.
+        # While we fill in the view, hide the store
+        store = self._files_store
+        self._treeview_files.set_model(None)
+
+        added = _('added')
+        removed = _('removed')
+        renamed = _('renamed')
+        renamed_and_modified = _('renamed and modified')
+        modified = _('modified')
+        kind_changed = _('kind changed')
+
+        # The store holds:
+        # [file_id, real path, checkbox, display path, changes type, message]
+        # _iter_changes returns:
+        # (file_id, (path_in_source, path_in_target),
+        #  changed_content, versioned, parent, name, kind,
+        #  executable)
+
+        all_enabled = (self._selected is None)
+        # The first entry is always the 'whole tree'
+        all_iter = store.append([None, None, all_enabled, 'All Files', '', ''])
+        initial_cursor = store.get_path(all_iter)
+        # should we pass specific_files?
+        self._wt.lock_read()
+        self._basis_tree.lock_read()
+        try:
+            from diff import _iter_changes_to_status
+            for (file_id, real_path, change_type, display_path
+                ) in _iter_changes_to_status(self._basis_tree, self._wt):
+                if self._selected and real_path != self._selected:
+                    enabled = False
+                else:
+                    enabled = True
+                item_iter = store.append([
+                    file_id,
+                    real_path.encode('UTF-8'),
+                    enabled,
+                    display_path.encode('UTF-8'),
+                    change_type,
+                    '', # Initial comment
+                    ])
+                if self._selected and enabled:
+                    initial_cursor = store.get_path(item_iter)
+        finally:
+            self._basis_tree.unlock()
+            self._wt.unlock()
+
+        self._treeview_files.set_model(store)
+        self._last_selected_file = None
+        # This sets the cursor, which causes the expander to close, which
+        # causes the _file_message_text_view to never get realized. So we have
+        # to give it a little kick, or it warns when we try to grab the focus
+        self._treeview_files.set_cursor(initial_cursor)
+
+        def _realize_file_message_tree_view(*args):
+            self._file_message_text_view.realize()
+        self.connect_after('realize', _realize_file_message_tree_view)
+
+    def _fill_in_diff(self):
+        self._diff_view.set_trees(self._wt, self._basis_tree)
+
+    def _fill_in_checkout(self):
+        if not self._is_checkout:
+            self._check_local.hide()
             return
-        else:
-            if self.wt.branch.get_bound_location() is not None:
-                # we have a checkout, so the local commit checkbox must appear
-                self._is_checkout = True
-            
-            if self.pending:
-                # There are pending merges, file selection not supported
-                self._is_pending = True
-        
-        # Create the widgets
-        self._button_commit = gtk.Button(_("Comm_it"), use_underline=True)
-        self._expander_files = gtk.Expander(_("File(s) to commit"))
-        self._vpaned_main = gtk.VPaned()
-        self._scrolledwindow_files = gtk.ScrolledWindow()
-        self._scrolledwindow_message = gtk.ScrolledWindow()
-        self._treeview_files = gtk.TreeView()
-        self._vbox_message = gtk.VBox()
-        self._label_message = gtk.Label(_("Commit message:"))
-        self._textview_message = gtk.TextView()
-        
-        if self._is_pending:
-            self._expander_merges = gtk.Expander(_("Pending merges"))
-            self._vpaned_list = gtk.VPaned()
-            self._scrolledwindow_merges = gtk.ScrolledWindow()
-            self._treeview_merges = gtk.TreeView()
-            self._scrolledwindow_merges.set_policy(gtk.POLICY_AUTOMATIC,
-                                                   gtk.POLICY_AUTOMATIC)
-
-        # Set callbacks
-        self._button_commit.connect('clicked', self._on_commit_clicked)
-        self._treeview_files.connect('row_activated', self._on_treeview_files_row_activated)
-        
-        # Set properties
-        self._scrolledwindow_files.set_policy(gtk.POLICY_AUTOMATIC,
-                                              gtk.POLICY_AUTOMATIC)
-        self._scrolledwindow_message.set_policy(gtk.POLICY_AUTOMATIC,
-                                                gtk.POLICY_AUTOMATIC)
-        self._textview_message.modify_font(pango.FontDescription("Monospace"))
-        self.set_default_size(500, 500)
-        self._vpaned_main.set_position(200)
-        self._button_commit.set_flags(gtk.CAN_DEFAULT)
-
-        # Construct the dialog
-        self.action_area.pack_end(self._button_commit)
-        
-        self._scrolledwindow_files.add(self._treeview_files)
-        self._scrolledwindow_message.add(self._textview_message)
-        
-        self._expander_files.add(self._scrolledwindow_files)
-        
-        self._vbox_message.pack_start(self._label_message, False, False)
-        self._vbox_message.pack_start(self._scrolledwindow_message, True, True)
-        
-        if self._is_pending:        
-            self._expander_merges.add(self._scrolledwindow_merges)
-            self._scrolledwindow_merges.add(self._treeview_merges)
-            self._vpaned_list.add1(self._expander_files)
-            self._vpaned_list.add2(self._expander_merges)
-            self._vpaned_main.add1(self._vpaned_list)
-        else:
-            self._vpaned_main.add1(self._expander_files)
-
-        self._vpaned_main.add2(self._vbox_message)
-        
-        self.vbox.pack_start(self._vpaned_main, True, True)
-        if self._is_checkout: 
-            self._check_local = gtk.CheckButton(_("_Only commit locally"),
-                                                use_underline=True)
-            self.vbox.pack_start(self._check_local, False, False)
-            if have_dbus:
-                bus = dbus.SystemBus()
-                proxy_obj = bus.get_object('org.freedesktop.NetworkManager', 
-                              '/org/freedesktop/NetworkManager')
-                dbus_iface = dbus.Interface(
-                        proxy_obj, 'org.freedesktop.NetworkManager')
-                try:
-                    # 3 is the enum value for STATE_CONNECTED
-                    self._check_local.set_active(dbus_iface.state() != 3)
-                except dbus.DBusException, e:
-                    # Silently drop errors. While DBus may be 
-                    # available, NetworkManager doesn't necessarily have to be
-                    mutter("unable to get networkmanager state: %r" % e)
-                
-        # Create the file list
-        self._create_file_view()
-        # Create the pending merges
-        self._create_pending_merges()
-        
-        # Expand the corresponding expander
-        if self._is_pending:
-            self._expander_merges.set_expanded(True)
-        else:
-            self._expander_files.set_expanded(True)
-        
-        # Display dialog
-        self.vbox.show_all()
-        
-        # Default to Commit button
-        self._button_commit.grab_default()
-    
-    def _on_treeview_files_row_activated(self, treeview, path, view_column):
-        # FIXME: the diff window freezes for some reason
-        treeselection = treeview.get_selection()
-        (model, iter) = treeselection.get_selected()
-        
-        if iter is not None:
-            from diff import DiffWindow
-            
-            _selected = model.get_value(iter, 1)
-            
-            diff = DiffWindow()
-            diff.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
-            diff.set_modal(True)
-            parent_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
-            diff.set_diff(self.wt.branch.nick, self.wt, parent_tree)
+        if have_dbus:
+            bus = dbus.SystemBus()
+            proxy_obj = bus.get_object('org.freedesktop.NetworkManager',
+                                       '/org/freedesktop/NetworkManager')
+            dbus_iface = dbus.Interface(proxy_obj,
+                                        'org.freedesktop.NetworkManager')
             try:
-                diff.set_file(_selected)
-            except errors.NoSuchFile:
-                pass
-            diff.show()
-    
+                # 3 is the enum value for STATE_CONNECTED
+                self._check_local.set_active(dbus_iface.state() != 3)
+            except dbus.DBusException, e:
+                # Silently drop errors. While DBus may be
+                # available, NetworkManager doesn't necessarily have to be
+                mutter("unable to get networkmanager state: %r" % e)
+        self._check_local.show()
+
+    def _fill_in_per_file_info(self):
+        config = self._wt.branch.get_config()
+        enable_per_file_commits = config.get_user_option('per_file_commits')
+        if (enable_per_file_commits is None
+            or enable_per_file_commits.lower()
+                not in ('y', 'yes', 'on', 'enable', '1', 't', 'true')):
+            self._enable_per_file_commits = False
+        else:
+            self._enable_per_file_commits = True
+        if not self._enable_per_file_commits:
+            self._file_message_expander.hide()
+            self._global_message_label.set_markup(_('<b>Commit Message</b>'))
+
+    def _compute_delta(self):
+        self._delta = self._wt.changes_from(self._basis_tree)
+
+    def construct(self):
+        """Build up the dialog widgets."""
+        # The primary pane which splits it into left and right (adjustable)
+        # sections.
+        self._hpane = gtk.HPaned()
+
+        self._construct_left_pane()
+        self._construct_right_pane()
+        self._construct_action_pane()
+
+        self.vbox.pack_start(self._hpane)
+        self._hpane.show()
+        self.set_focus(self._global_message_text_view)
+
+        self._construct_accelerators()
+        self._set_sizes()
+
+    def _set_sizes(self):
+        # This seems like a reasonable default, we might like it to
+        # be a bit wider, so that by default we can fit an 80-line diff in the
+        # diff window.
+        # Alternatively, we should be saving the last position/size rather than
+        # setting it to a fixed value every time we start up.
+        screen = self.get_screen()
+        monitor = 0 # We would like it to be the monitor we are going to
+                    # display on, but I don't know how to figure that out
+                    # Only really useful for freaks like me that run dual
+                    # monitor, with different sizes on the monitors
+        monitor_rect = screen.get_monitor_geometry(monitor)
+        width = int(monitor_rect.width * 0.66)
+        height = int(monitor_rect.height * 0.66)
+        self.set_default_size(width, height)
+        self._hpane.set_position(300)
+
+    def _construct_accelerators(self):
+        group = gtk.AccelGroup()
+        group.connect_group(gtk.gdk.keyval_from_name('N'),
+                            gtk.gdk.CONTROL_MASK, 0, self._on_accel_next)
+        self.add_accel_group(group)
+
+    def _construct_left_pane(self):
+        self._left_pane_box = gtk.VBox(homogeneous=False, spacing=5)
+        self._construct_file_list()
+        self._construct_pending_list()
+
+        self._check_local = gtk.CheckButton(_("_Only commit locally"),
+                                            use_underline=True)
+        self._left_pane_box.pack_end(self._check_local, False, False)
+        self._check_local.set_active(False)
+
+        self._hpane.pack1(self._left_pane_box, resize=False, shrink=False)
+        self._left_pane_box.show()
+
+    def _construct_right_pane(self):
+        # TODO: I really want to make it so the diff view gets more space than
+        # the global commit message, and the per-file commit message gets even
+        # less. When I did it with wxGlade, I set it to 4 for diff, 2 for
+        # commit, and 1 for file commit, and it looked good. But I don't seem
+        # to have a way to do that with the gtk boxes... :( (Which is extra
+        # weird since wx uses gtk on Linux...)
+        self._right_pane_table = gtk.Table(rows=10, columns=1, homogeneous=False)
+        self._right_pane_table.set_row_spacings(5)
+        self._right_pane_table.set_col_spacings(5)
+        self._right_pane_table_row = 0
+        self._construct_diff_view()
+        self._construct_file_message()
+        self._construct_global_message()
+
+        self._right_pane_table.show()
+        self._hpane.pack2(self._right_pane_table, resize=True, shrink=True)
+
+    def _construct_action_pane(self):
+        self._button_commit = gtk.Button(_("Comm_it"), use_underline=True)
+        self._button_commit.connect('clicked', self._on_commit_clicked)
+        self._button_commit.set_flags(gtk.CAN_DEFAULT)
+        self._button_commit.show()
+        self.action_area.pack_end(self._button_commit)
+        self._button_commit.grab_default()
+
+    def _add_to_right_table(self, widget, weight, expanding=False):
+        """Add another widget to the table
+
+        :param widget: The object to add
+        :param weight: How many rows does this widget get to request
+        :param expanding: Should expand|fill|shrink be set?
+        """
+        end_row = self._right_pane_table_row + weight
+        options = 0
+        expand_opts = gtk.EXPAND | gtk.FILL | gtk.SHRINK
+        if expanding:
+            options = expand_opts
+        self._right_pane_table.attach(widget, 0, 1,
+                                      self._right_pane_table_row, end_row,
+                                      xoptions=expand_opts, yoptions=options)
+        self._right_pane_table_row = end_row
+
+    def _construct_file_list(self):
+        self._files_box = gtk.VBox(homogeneous=False, spacing=0)
+        file_label = gtk.Label(_('Files'))
+        # file_label.show()
+        self._files_box.pack_start(file_label, expand=False)
+
+        self._commit_all_files_radio = gtk.RadioButton(
+            None, _("Commit all changes"))
+        self._files_box.pack_start(self._commit_all_files_radio, expand=False)
+        self._commit_all_files_radio.show()
+        self._commit_all_files_radio.connect('toggled',
+            self._toggle_commit_selection)
+        self._commit_selected_radio = gtk.RadioButton(
+            self._commit_all_files_radio, _("Only commit selected changes"))
+        self._files_box.pack_start(self._commit_selected_radio, expand=False)
+        self._commit_selected_radio.show()
+        self._commit_selected_radio.connect('toggled',
+            self._toggle_commit_selection)
+        if self._pending:
+            self._commit_all_files_radio.set_label(_('Commit all changes*'))
+            self._commit_all_files_radio.set_sensitive(False)
+            self._commit_selected_radio.set_sensitive(False)
+
+        scroller = gtk.ScrolledWindow()
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self._treeview_files = gtk.TreeView()
+        self._treeview_files.show()
+        scroller.add(self._treeview_files)
+        scroller.set_shadow_type(gtk.SHADOW_IN)
+        scroller.show()
+        self._files_box.pack_start(scroller,
+                                   expand=True, fill=True)
+        self._files_box.show()
+        self._left_pane_box.pack_start(self._files_box)
+
+        # Keep note that all strings stored in a ListStore must be UTF-8
+        # strings. GTK does not support directly setting and restoring Unicode
+        # objects.
+        liststore = gtk.ListStore(
+            gobject.TYPE_STRING,  # [0] file_id
+            gobject.TYPE_STRING,  # [1] real path
+            gobject.TYPE_BOOLEAN, # [2] checkbox
+            gobject.TYPE_STRING,  # [3] display path
+            gobject.TYPE_STRING,  # [4] changes type
+            gobject.TYPE_STRING,  # [5] commit message
+            )
+        self._files_store = liststore
+        self._treeview_files.set_model(liststore)
+        crt = gtk.CellRendererToggle()
+        crt.set_property('activatable', not bool(self._pending))
+        crt.connect("toggled", self._toggle_commit, self._files_store)
+        if self._pending:
+            name = _('Commit*')
+        else:
+            name = _('Commit')
+        commit_col = gtk.TreeViewColumn(name, crt, active=2)
+        commit_col.set_visible(False)
+        self._treeview_files.append_column(commit_col)
+        self._treeview_files.append_column(gtk.TreeViewColumn(_('Path'),
+                                           gtk.CellRendererText(), text=3))
+        self._treeview_files.append_column(gtk.TreeViewColumn(_('Type'),
+                                           gtk.CellRendererText(), text=4))
+        self._treeview_files.connect('cursor-changed',
+                                     self._on_treeview_files_cursor_changed)
+
+    def _toggle_commit(self, cell, path, model):
+        if model[path][0] is None: # No file_id means 'All Files'
+            new_val = not model[path][2]
+            for node in model:
+                node[2] = new_val
+        else:
+            model[path][2] = not model[path][2]
+
+    def _toggle_commit_selection(self, button):
+        all_files = self._commit_all_files_radio.get_active()
+        if self._commit_all_changes != all_files:
+            checked_col = self._treeview_files.get_column(0)
+            self._commit_all_changes = all_files
+            if all_files:
+                checked_col.set_visible(False)
+            else:
+                checked_col.set_visible(True)
+            renderer = checked_col.get_cell_renderers()[0]
+            renderer.set_property('activatable', not all_files)
+
+    def _construct_pending_list(self):
+        # Pending information defaults to hidden, we put it all in 1 box, so
+        # that we can show/hide all of them at once
+        self._pending_box = gtk.VBox()
+        self._pending_box.hide()
+
+        pending_message = gtk.Label()
+        pending_message.set_markup(
+            _('<i>* Cannot select specific files when merging</i>'))
+        self._pending_box.pack_start(pending_message, expand=False, padding=5)
+        pending_message.show()
+
+        pending_label = gtk.Label(_('Pending Revisions'))
+        self._pending_box.pack_start(pending_label, expand=False, padding=0)
+        pending_label.show()
+
+        scroller = gtk.ScrolledWindow()
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self._treeview_pending = gtk.TreeView()
+        scroller.add(self._treeview_pending)
+        scroller.set_shadow_type(gtk.SHADOW_IN)
+        scroller.show()
+        self._pending_box.pack_start(scroller,
+                                     expand=True, fill=True, padding=5)
+        self._treeview_pending.show()
+        self._left_pane_box.pack_start(self._pending_box)
+
+        liststore = gtk.ListStore(gobject.TYPE_STRING, # revision_id
+                                  gobject.TYPE_STRING, # date
+                                  gobject.TYPE_STRING, # committer
+                                  gobject.TYPE_STRING, # summary
+                                 )
+        self._pending_store = liststore
+        self._treeview_pending.set_model(liststore)
+        self._treeview_pending.append_column(gtk.TreeViewColumn(_('Date'),
+                                             gtk.CellRendererText(), text=1))
+        self._treeview_pending.append_column(gtk.TreeViewColumn(_('Committer'),
+                                             gtk.CellRendererText(), text=2))
+        self._treeview_pending.append_column(gtk.TreeViewColumn(_('Summary'),
+                                             gtk.CellRendererText(), text=3))
+
+    def _construct_diff_view(self):
+        from diff import DiffView
+
+        # TODO: jam 2007-10-30 The diff label is currently disabled. If we
+        #       decide that we really don't ever want to display it, we should
+        #       actually remove it, and other references to it, along with the
+        #       tests that it is set properly.
+        self._diff_label = gtk.Label(_('Diff for whole tree'))
+        self._diff_label.set_alignment(0, 0)
+        self._right_pane_table.set_row_spacing(self._right_pane_table_row, 0)
+        self._add_to_right_table(self._diff_label, 1, False)
+        # self._diff_label.show()
+
+        self._diff_view = DiffView()
+        self._add_to_right_table(self._diff_view, 4, True)
+        self._diff_view.show()
+
+    def _construct_file_message(self):
+        scroller = gtk.ScrolledWindow()
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+
+        self._file_message_text_view = gtk.TextView()
+        scroller.add(self._file_message_text_view)
+        scroller.set_shadow_type(gtk.SHADOW_IN)
+        scroller.show()
+
+        self._file_message_text_view.modify_font(pango.FontDescription("Monospace"))
+        self._file_message_text_view.set_wrap_mode(gtk.WRAP_WORD)
+        self._file_message_text_view.set_accepts_tab(False)
+        self._file_message_text_view.show()
+
+        self._file_message_expander = gtk.Expander(_('File commit message'))
+        self._file_message_expander.set_expanded(True)
+        self._file_message_expander.add(scroller)
+        self._add_to_right_table(self._file_message_expander, 1, False)
+        self._file_message_expander.show()
+
+    def _construct_global_message(self):
+        self._global_message_label = gtk.Label(_('Global Commit Message'))
+        self._global_message_label.set_markup(_('<b>Global Commit Message</b>'))
+        self._global_message_label.set_alignment(0, 0)
+        self._right_pane_table.set_row_spacing(self._right_pane_table_row, 0)
+        self._add_to_right_table(self._global_message_label, 1, False)
+        # Can we remove the spacing between the label and the box?
+        self._global_message_label.show()
+
+        scroller = gtk.ScrolledWindow()
+        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+
+        self._global_message_text_view = gtk.TextView()
+        self._global_message_text_view.modify_font(pango.FontDescription("Monospace"))
+        scroller.add(self._global_message_text_view)
+        scroller.set_shadow_type(gtk.SHADOW_IN)
+        scroller.show()
+        self._add_to_right_table(scroller, 2, True)
+        self._file_message_text_view.set_wrap_mode(gtk.WRAP_WORD)
+        self._file_message_text_view.set_accepts_tab(False)
+        self._global_message_text_view.show()
+
+    def _on_treeview_files_cursor_changed(self, treeview):
+        treeselection = treeview.get_selection()
+        (model, selection) = treeselection.get_selected()
+
+        if selection is not None:
+            path, display_path = model.get(selection, 1, 3)
+            self._diff_label.set_text(_('Diff for ') + display_path)
+            if path is None:
+                self._diff_view.show_diff(None)
+            else:
+                self._diff_view.show_diff([path.decode('UTF-8')])
+            self._update_per_file_info(selection)
+
+    def _on_accel_next(self, accel_group, window, keyval, modifier):
+        # We don't really care about any of the parameters, because we know
+        # where this message came from
+        tree_selection = self._treeview_files.get_selection()
+        (model, selection) = tree_selection.get_selected()
+        if selection is None:
+            next = None
+        else:
+            next = model.iter_next(selection)
+
+        if next is None:
+            # We have either made it to the end of the list, or nothing was
+            # selected. Either way, select All Files, and jump to the global
+            # commit message.
+            self._treeview_files.set_cursor((0,))
+            self._global_message_text_view.grab_focus()
+        else:
+            # Set the cursor to this entry, and jump to the per-file commit
+            # message
+            self._treeview_files.set_cursor(model.get_path(next))
+            self._file_message_text_view.grab_focus()
+
+    def _save_current_file_message(self):
+        if self._last_selected_file is None:
+            return # Nothing to save
+        text_buffer = self._file_message_text_view.get_buffer()
+        cur_text = text_buffer.get_text(text_buffer.get_start_iter(),
+                                        text_buffer.get_end_iter())
+        last_selected = self._files_store.get_iter(self._last_selected_file)
+        self._files_store.set_value(last_selected, 5, cur_text)
+
+    def _update_per_file_info(self, selection):
+        # The node is changing, so cache the current message
+        if not self._enable_per_file_commits:
+            return
+
+        self._save_current_file_message()
+        text_buffer = self._file_message_text_view.get_buffer()
+        file_id, display_path, message = self._files_store.get(selection, 0, 3, 5)
+        if file_id is None: # Whole tree
+            self._file_message_expander.set_label(_('File commit message'))
+            self._file_message_expander.set_expanded(False)
+            self._file_message_expander.set_sensitive(False)
+            text_buffer.set_text('')
+            self._last_selected_file = None
+        else:
+            self._file_message_expander.set_label(_('Commit message for ')
+                                                  + display_path)
+            self._file_message_expander.set_expanded(True)
+            self._file_message_expander.set_sensitive(True)
+            text_buffer.set_text(message)
+            self._last_selected_file = self._files_store.get_path(selection)
+
+    def _get_specific_files(self):
+        """Return the list of selected paths, and file info.
+
+        :return: ([unicode paths], [{utf-8 file info}]
+        """
+        self._save_current_file_message()
+        files = []
+        records = iter(self._files_store)
+        rec = records.next() # Skip the All Files record
+        assert rec[0] is None, "Are we skipping the wrong record?"
+
+        file_info = []
+        for record in records:
+            if self._commit_all_changes or record[2]:# [2] checkbox
+                file_id = record[0] # [0] file_id
+                path = record[1]    # [1] real path
+                file_message = record[5] # [5] commit message
+                files.append(path.decode('UTF-8'))
+                if self._enable_per_file_commits and file_message:
+                    # All of this needs to be utf-8 information
+                    file_info.append({'path':path, 'file_id':file_id,
+                                     'message':file_message})
+        file_info.sort(key=lambda x:(x['path'], x['file_id']))
+        if self._enable_per_file_commits:
+            return files, file_info
+        else:
+            return files, []
+
     @show_bzr_error
     def _on_commit_clicked(self, button):
         """ Commit button clicked handler. """
-        textbuffer = self._textview_message.get_buffer()
-        start, end = textbuffer.get_bounds()
-        message = textbuffer.get_text(start, end).decode('utf-8')
-        
-        if not self.pending:
-            specific_files = self._get_specific_files()
-        else:
-            specific_files = None
+        self._do_commit()
+
+    def _do_commit(self):
+        message = self._get_global_commit_message()
 
         if message == '':
-            response = question_dialog(_('Commit with an empty message?'),
-                                       _('You can describe your commit intent in the message.'))
+            response = self._question_dialog(
+                            _('Commit with an empty message?'),
+                            _('You can describe your commit intent in the message.'))
             if response == gtk.RESPONSE_NO:
                 # Kindly give focus to message area
-                self._textview_message.grab_focus()
+                self._global_message_text_view.grab_focus()
                 return
 
-        if self._is_checkout:
-            local = self._check_local.get_active()
-        else:
-            local = False
+        specific_files, file_info = self._get_specific_files()
+        if self._pending:
+            specific_files = None
 
-        if list(self.wt.unknowns()) != []:
-            response = question_dialog(_("Commit with unknowns?"),
-               _("Unknown files exist in the working tree. Commit anyway?"))
+        local = self._check_local.get_active()
+
+        # All we care about is if there is a single unknown, so if this loop is
+        # entered, then there are unknown files.
+        # TODO: jam 20071002 It seems like this should cancel the dialog
+        #       entirely, since there isn't a way for them to add the unknown
+        #       files at this point.
+        for path in self._wt.unknowns():
+            response = self._question_dialog(
+                _("Commit with unknowns?"),
+                _("Unknown files exist in the working tree. Commit anyway?"))
             if response == gtk.RESPONSE_NO:
                 return
-        
+            break
+
+        rev_id = None
+        revprops = {}
+        if file_info:
+            revprops['file-info'] = bencode.bencode(file_info).decode('UTF-8')
         try:
-            self.wt.commit(message,
+            rev_id = self._wt.commit(message,
                        allow_pointless=False,
                        strict=False,
                        local=local,
-                       specific_files=specific_files)
+                       specific_files=specific_files,
+                       revprops=revprops)
         except errors.PointlessCommit:
-            response = question_dialog(_('Commit with no changes?'),
-                                       _('There are no changes in the working tree.'))
+            response = self._question_dialog(
+                                _('Commit with no changes?'),
+                                _('There are no changes in the working tree.'
+                                  ' Do you want to commit anyway?'))
             if response == gtk.RESPONSE_YES:
-                self.wt.commit(message,
+                rev_id = self._wt.commit(message,
                                allow_pointless=True,
                                strict=False,
                                local=local,
-                               specific_files=specific_files)
+                               specific_files=specific_files,
+                               revprops=revprops)
+        self.committed_revision_id = rev_id
         self.response(gtk.RESPONSE_OK)
 
-    def _pending_merges(self, wt):
-        """ Return a list of pending merges or None if there are none of them. """
-        parents = wt.get_parent_ids()
-        if len(parents) < 2:
-            return None
-        
-        import re
+    def _get_global_commit_message(self):
+        buf = self._global_message_text_view.get_buffer()
+        start, end = buf.get_bounds()
+        return buf.get_text(start, end).decode('utf-8')
+
+    def _set_global_commit_message(self, message):
+        """Just a helper for the test suite."""
+        if isinstance(message, unicode):
+            message = message.encode('UTF-8')
+        self._global_message_text_view.get_buffer().set_text(message)
+
+    def _set_file_commit_message(self, message):
+        """Helper for the test suite."""
+        if isinstance(message, unicode):
+            message = message.encode('UTF-8')
+        self._file_message_text_view.get_buffer().set_text(message)
+
+    @staticmethod
+    def _rev_to_pending_info(rev):
+        """Get the information from a pending merge."""
         from bzrlib.osutils import format_date
-        
-        pending = parents[1:]
-        branch = wt.branch
-        last_revision = parents[0]
-        
-        if last_revision is not None:
-            try:
-                ignore = set(branch.repository.get_ancestry(last_revision))
-            except errors.NoSuchRevision:
-                # the last revision is a ghost : assume everything is new 
-                # except for it
-                ignore = set([None, last_revision])
-        else:
-            ignore = set([None])
-        
-        pm = []
-        for merge in pending:
-            ignore.add(merge)
-            try:
-                m_revision = branch.repository.get_revision(merge)
-                
-                rev = {}
-                rev['committer'] = re.sub('<.*@.*>', '', m_revision.committer).strip(' ')
-                rev['summary'] = m_revision.get_summary()
-                rev['date'] = format_date(m_revision.timestamp,
-                                          m_revision.timezone or 0, 
-                                          'original', date_fmt="%Y-%m-%d",
-                                          show_offset=False)
-                
-                pm.append(rev)
-                
-                inner_merges = branch.repository.get_ancestry(merge)
-                assert inner_merges[0] is None
-                inner_merges.pop(0)
-                inner_merges.reverse()
-                for mmerge in inner_merges:
-                    if mmerge in ignore:
-                        continue
-                    mm_revision = branch.repository.get_revision(mmerge)
-                    
-                    rev = {}
-                    rev['committer'] = re.sub('<.*@.*>', '', mm_revision.committer).strip(' ')
-                    rev['summary'] = mm_revision.get_summary()
-                    rev['date'] = format_date(mm_revision.timestamp,
-                                              mm_revision.timezone or 0, 
-                                              'original', date_fmt="%Y-%m-%d",
-                                              show_offset=False)
-                
-                    pm.append(rev)
-                    
-                    ignore.add(mmerge)
-            except errors.NoSuchRevision:
-                print "DEBUG: NoSuchRevision:", merge
-        
-        return pm
-
-    def _create_file_view(self):
-        self._file_store = gtk.ListStore(gobject.TYPE_BOOLEAN,   # [0] checkbox
-                                         gobject.TYPE_STRING,    # [1] path to display
-                                         gobject.TYPE_STRING,    # [2] changes type
-                                         gobject.TYPE_STRING)    # [3] real path
-        self._treeview_files.set_model(self._file_store)
-        crt = gtk.CellRendererToggle()
-        crt.set_property("activatable", True)
-        crt.connect("toggled", self._toggle_commit, self._file_store)
-        commit_column = gtk.TreeViewColumn(_('Commit'), crt, active=0)
-        if self._is_pending:
-            commit_column.set_visible(False)
-        self._treeview_files.append_column(commit_column)
-        self._treeview_files.append_column(gtk.TreeViewColumn(_('Path'),
-                                     gtk.CellRendererText(), text=1))
-        self._treeview_files.append_column(gtk.TreeViewColumn(_('Type'),
-                                     gtk.CellRendererText(), text=2))
-
-        for path, id, kind in self.delta.added:
-            marker = osutils.kind_marker(kind)
-            if self.selected is not None:
-                if path == os.path.join(self.wtpath, self.selected):
-                    self._file_store.append([ True, path+marker, _('added'), path ])
-                else:
-                    self._file_store.append([ False, path+marker, _('added'), path ])
-            else:
-                self._file_store.append([ True, path+marker, _('added'), path ])
-
-        for path, id, kind in self.delta.removed:
-            marker = osutils.kind_marker(kind)
-            if self.selected is not None:
-                if path == os.path.join(self.wtpath, self.selected):
-                    self._file_store.append([ True, path+marker, _('removed'), path ])
-                else:
-                    self._file_store.append([ False, path+marker, _('removed'), path ])
-            else:
-                self._file_store.append([ True, path+marker, _('removed'), path ])
-
-        for oldpath, newpath, id, kind, text_modified, meta_modified in self.delta.renamed:
-            marker = osutils.kind_marker(kind)
-            if text_modified or meta_modified:
-                changes = _('renamed and modified')
-            else:
-                changes = _('renamed')
-            if self.selected is not None:
-                if newpath == os.path.join(self.wtpath, self.selected):
-                    self._file_store.append([ True,
-                                              oldpath+marker + '  =>  ' + newpath+marker,
-                                              changes,
-                                              newpath
-                                            ])
-                else:
-                    self._file_store.append([ False,
-                                              oldpath+marker + '  =>  ' + newpath+marker,
-                                              changes,
-                                              newpath
-                                            ])
-            else:
-                self._file_store.append([ True,
-                                          oldpath+marker + '  =>  ' + newpath+marker,
-                                          changes,
-                                          newpath
-                                        ])
-
-        for path, id, kind, text_modified, meta_modified in self.delta.modified:
-            marker = osutils.kind_marker(kind)
-            if self.selected is not None:
-                if path == os.path.join(self.wtpath, self.selected):
-                    self._file_store.append([ True, path+marker, _('modified'), path ])
-                else:
-                    self._file_store.append([ False, path+marker, _('modified'), path ])
-            else:
-                self._file_store.append([ True, path+marker, _('modified'), path ])
-    
-    def _create_pending_merges(self):
-        if not self.pending:
-            return
-        
-        liststore = gtk.ListStore(gobject.TYPE_STRING,
-                                  gobject.TYPE_STRING,
-                                  gobject.TYPE_STRING)
-        self._treeview_merges.set_model(liststore)
-        
-        self._treeview_merges.append_column(gtk.TreeViewColumn(_('Date'),
-                                            gtk.CellRendererText(), text=0))
-        self._treeview_merges.append_column(gtk.TreeViewColumn(_('Committer'),
-                                            gtk.CellRendererText(), text=1))
-        self._treeview_merges.append_column(gtk.TreeViewColumn(_('Summary'),
-                                            gtk.CellRendererText(), text=2))
-        
-        for item in self.pending:
-            liststore.append([ item['date'],
-                               item['committer'],
-                               item['summary'] ])
-    
-    def _get_specific_files(self):
-        ret = []
-        it = self._file_store.get_iter_first()
-        while it:
-            if self._file_store.get_value(it, 0):
-                # get real path from hidden column 3
-                ret.append(self._file_store.get_value(it, 3))
-            it = self._file_store.iter_next(it)
-
-        return ret
-    
-    def _toggle_commit(self, cell, path, model):
-        model[path][0] = not model[path][0]
-        return
+        rev_dict = {}
+        rev_dict['committer'] = re.sub('<.*@.*>', '', rev.committer).strip(' ')
+        rev_dict['summary'] = rev.get_summary()
+        rev_dict['date'] = format_date(rev.timestamp,
+                                       rev.timezone or 0,
+                                       'original', date_fmt="%Y-%m-%d",
+                                       show_offset=False)
+        rev_dict['revision_id'] = rev.revision_id
+        return rev_dict
