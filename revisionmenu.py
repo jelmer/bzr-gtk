@@ -37,7 +37,7 @@ class RevisionPopupMenu(gtk.Menu):
 
     def create_items(self):
         if len(self.revids) == 1:
-            item = gtk.MenuItem("View _Diff")
+            item = gtk.MenuItem("View _Changes")
             item.connect('activate', self.show_diff)
             self.append(item)
             self.show_all()

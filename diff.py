@@ -47,7 +47,7 @@ class DiffWindow(Window):
     def __init__(self, parent=None):
         Window.__init__(self, parent)
         self.set_border_width(0)
-        self.set_title("bzrk diff")
+        self.set_title("Changes")
 
         # Use two thirds of the screen by default
         screen = self.get_screen()
@@ -129,7 +129,7 @@ class DiffWindow(Window):
         self.model.clear()
         delta = self.rev_tree.changes_from(self.parent_tree)
 
-        self.model.append(None, [ "Complete Diff", "" ])
+        self.model.append(None, [ "All Changes", "" ])
 
         if len(delta.added):
             titer = self.model.append(None, [ "Added", None ])
@@ -153,7 +153,7 @@ class DiffWindow(Window):
                 self.model.append(titer, [ path, path ])
 
         self.treeview.expand_all()
-        self.set_title(description + " - bzrk diff")
+        self.set_title(description + " - Changes")
 
     def set_file(self, file_path):
         tv_path = None
