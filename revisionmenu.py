@@ -24,6 +24,7 @@ except:
 import bzrlib
 import gtk
 from bzrlib import (errors, ui)
+from bzrlib.revision import NULL_REVISION
 
 class RevisionPopupMenu(gtk.Menu):
     def __init__(self, repository, revids, branch=None, wt=None):
@@ -70,9 +71,15 @@ class RevisionPopupMenu(gtk.Menu):
     def show_diff(self, item):
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow(parent=self.parent)
-        parentid = self.repository.revision_parents(self.revids[0])[0]
-        (parent_tree, rev_tree) = self.repository.revision_trees(
-            [parentid, self.revids[0]])
+        parentids = self.repository.revision_parents(self.revids[0])
+
+        if len(parentids) == 0:
+            parentid = NULL_REVISION
+        else:
+            parentid = parentids[0]
+
+        rev_tree    = self.repository.revision_tree(self.revids[0])
+        parent_tree = self.repository.revision_tree(parentid)
         window.set_diff(self.revids[0], rev_tree, parent_tree)
         window.show()
 
