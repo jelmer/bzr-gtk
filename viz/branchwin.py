@@ -115,15 +115,15 @@ class BranchWindow(Window):
         revision_menuitem = gtk.MenuItem("_Revision")
         revision_menuitem.set_submenu(revision_menu)
 
-        revision_menu.add(gtk.MenuItem("Tag revision"))
-        revision_menu.add(gtk.MenuItem("View changes"))
+        revision_menu.add(gtk.MenuItem("Tag Revision"))
+        revision_menu.add(gtk.MenuItem("View Changes"))
 
         branch_menu = gtk.Menu()
         branch_menuitem = gtk.MenuItem("_Branch")
         branch_menuitem.set_submenu(branch_menu)
 
-        branch_menu.add(gtk.MenuItem("Pu_ll changes from another branch"))
-        branch_menu.add(gtk.MenuItem("Pu_sh changes to another branch"))
+        branch_menu.add(gtk.MenuItem("Pu_ll Revisions"))
+        branch_menu.add(gtk.MenuItem("Pu_sh Revisions"))
        
         menubar.add(file_menuitem)
         menubar.add(go_menuitem)
