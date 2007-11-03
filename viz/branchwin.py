@@ -14,6 +14,7 @@ import gobject
 import pango
 
 from bzrlib.plugins.gtk.window import Window
+from bzrlib.plugins.gtk.preferences import PreferencesWindow
 from treeview import TreeView
 
 class BranchWindow(Window):
@@ -87,6 +88,15 @@ class BranchWindow(Window):
         
         file_menu.add(file_menu_close)
 
+        edit_menu = gtk.Menu()
+        edit_menuitem = gtk.MenuItem("_Edit")
+        edit_menuitem.set_submenu(edit_menu)
+
+        edit_menu_prefs = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
+        edit_menu_prefs.connect('activate', lambda x: PreferencesWindow(self.branch.get_config()).show())
+
+        edit_menu.add(edit_menu_prefs)
+
         go_menu = gtk.Menu()
         go_menuitem = gtk.MenuItem("_Go")
         go_menuitem.set_submenu(go_menu)
@@ -129,6 +139,7 @@ class BranchWindow(Window):
         branch_menu.add(gtk.MenuItem("Pu_sh Revisions"))
        
         menubar.add(file_menuitem)
+        menubar.add(edit_menuitem)
         menubar.add(go_menuitem)
         menubar.add(revision_menuitem)
         menubar.add(branch_menuitem)
