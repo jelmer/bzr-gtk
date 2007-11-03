@@ -22,14 +22,14 @@ import pango
 
 from bzrlib.osutils import format_date
 
-class LogView(gtk.Notebook):
+class RevisionView(gtk.Notebook):
     """ Custom widget for commit log details.
 
     A variety of bzr tools may need to implement such a thing. This is a
     start.
     """
 
-    def __init__(self, revision=None, scroll=True, tags=[],
+    def __init__(self, revision=None, tags=[],
                  show_children=False, branch=None):
         gtk.Notebook.__init__(self)
         self.show_children = show_children

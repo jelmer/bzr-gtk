@@ -25,7 +25,7 @@ import gtk
 from bzrlib.config import GlobalConfig
 from bzrlib.missing import find_unmerged
 
-from logview import LogView
+from revisionview import RevisionView
 
 class MissingWindow(gtk.Dialog):
     """Displays revisions present in one branch but missing in 
@@ -44,7 +44,7 @@ class MissingWindow(gtk.Dialog):
         extra_revs = gtk.ScrolledWindow()
         vbox = gtk.VBox()
         for rev in revisions:
-            vbox.pack_start(LogView(rev, scroll=False), True, True)
+            vbox.pack_start(RevisionView(rev), True, True)
         extra_revs.add_with_viewport(vbox)
         extra_revs.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         return extra_revs

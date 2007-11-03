@@ -207,18 +207,18 @@ class BranchWindow(Window):
 
     def construct_bottom(self):
         """Construct the bottom half of the window."""
-        from bzrlib.plugins.gtk.logview import LogView
-        self.logview = LogView(None, True, [], True, branch=self.branch)
+        from bzrlib.plugins.gtk.revisionview import RevisionView
+        self.revisionview = RevisionView(None, tags=[], show_children=True, branch=self.branch)
         (width, height) = self.get_size()
-        self.logview.set_size_request(width, int(height / 2.5))
-        self.logview.show()
-        self.logview.set_show_callback(self._show_clicked_cb)
-        self.logview.set_go_callback(self._go_clicked_cb)
-        return self.logview
+        self.revisionview.set_size_request(width, int(height / 2.5))
+        self.revisionview.show()
+        self.revisionview.set_show_callback(self._show_clicked_cb)
+        self.revisionview.set_go_callback(self._go_clicked_cb)
+        return self.revisionview
 
     def _tag_selected_cb(self, menuitem, revid):
         self.treeview.set_revision(revid)
-    
+
     def _treeselection_changed_cb(self, selection, *args):
         """callback for when the treeview changes."""
         revision = self.treeview.get_revision()
@@ -233,7 +233,7 @@ class BranchWindow(Window):
                 tagdict = self.branch.tags.get_reverse_tag_dict()
                 if tagdict.has_key(revision.revision_id):
                     tags = tagdict[revision.revision_id]
-            self.logview.set_revision(revision, tags, children)
+            self.revisionview.set_revision(revision, tags, children)
 
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
