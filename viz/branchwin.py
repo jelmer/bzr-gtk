@@ -92,9 +92,12 @@ class BranchWindow(Window):
         edit_menuitem = gtk.MenuItem("_Edit")
         edit_menuitem.set_submenu(edit_menu)
 
+        edit_menu_find = gtk.ImageMenuItem(gtk.STOCK_FIND)
+
         edit_menu_prefs = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
         edit_menu_prefs.connect('activate', lambda x: PreferencesWindow(self.branch.get_config()).show())
 
+        edit_menu.add(edit_menu_find)
         edit_menu.add(edit_menu_prefs)
 
         go_menu = gtk.Menu()
