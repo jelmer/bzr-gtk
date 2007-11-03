@@ -152,7 +152,7 @@ class TreeView(gtk.ScrolledWindow):
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow(parent=self)
 
-        rev_tree    = branch.repository.revision_tree(revid)
+        rev_tree = branch.repository.revision_tree(revid)
 
         if parentid is None:
             parentid = NULL_REVISION
