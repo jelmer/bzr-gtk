@@ -17,6 +17,7 @@ import treemodel
 from linegraph import linegraph, same_branch
 from graphcell import CellRendererGraph
 from treemodel import TreeModel
+from bzrlib.revision import NULL_REVISION
 
 class TreeView(gtk.ScrolledWindow):
 
@@ -152,6 +153,10 @@ class TreeView(gtk.ScrolledWindow):
         window = DiffWindow(parent=self)
 
         rev_tree    = branch.repository.revision_tree(revid)
+
+        if parentid is None:
+            parentid = NULL_REVISION
+
         parent_tree = branch.repository.revision_tree(parentid)
 
         description = revid + " - " + branch.nick

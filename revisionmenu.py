@@ -24,6 +24,7 @@ except:
 import bzrlib
 import gtk
 from bzrlib import (errors, ui)
+from bzrlib.revision import NULL_REVISION
 
 class RevisionPopupMenu(gtk.Menu):
     def __init__(self, repository, revids, branch=None, wt=None):
@@ -73,7 +74,7 @@ class RevisionPopupMenu(gtk.Menu):
         parentids = self.repository.revision_parents(self.revids[0])
 
         if len(parentids) == 0:
-            parentid = None
+            parentid = NULL_REVISION
         else:
             parentid = parentids[0]
 
