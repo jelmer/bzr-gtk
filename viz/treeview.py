@@ -67,6 +67,18 @@ class TreeView(gtk.ScrolledWindow):
 
         self.connect('destroy', lambda w: self.branch.unlock())
 
+    def do_get_property(self, property):
+        if property.name == 'revno-column-visible':
+            self.revno_column.get_visible()
+        else:
+            raise AttributeError, 'unknown property %s' % property.name
+
+    def do_set_property(self, property, value):
+        if property.name == 'revno-column-visible':
+            self.revno_column.set_visible(value)
+        else:
+            raise AttributeError, 'unknown property %s' % property.name
+
     def get_revision(self):
         """Return revision id of currently selected revision, or None."""
         return self.revision
