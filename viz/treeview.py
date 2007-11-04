@@ -27,6 +27,11 @@ class TreeView(gtk.ScrolledWindow):
                    'The Bazaar branch being visualized',
                    gobject.PARAM_CONSTRUCT_ONLY | gobject.PARAM_WRITABLE),
 
+        'revision': (gobject.TYPE_PYOBJECT,
+                     'Revision',
+                     'The currently selected revision',
+                     gobject.PARAM_READWRITE),
+
         'revno-column-visible': (gobject.TYPE_BOOLEAN,
                                  'Revision number',
                                  'Show revision number column',
@@ -77,6 +82,8 @@ class TreeView(gtk.ScrolledWindow):
             return self.revno_column.get_visible()
         elif property.name == 'branch':
             return self.branch
+        elif property.name == 'revision':
+            return self.revision
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
@@ -85,6 +92,8 @@ class TreeView(gtk.ScrolledWindow):
             self.revno_column.set_visible(value)
         elif property.name == 'branch':
             self.branch = value
+        elif property.name == 'revision':
+            self.set_revision_id(value.revision_id)
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
@@ -92,7 +101,7 @@ class TreeView(gtk.ScrolledWindow):
         """Return revision id of currently selected revision, or None."""
         return self.revision
 
-    def set_revision(self, revid):
+    def set_revision_id(self, revid):
         """Change the currently selected revision.
 
         :param revid: Revision id of revision to display.

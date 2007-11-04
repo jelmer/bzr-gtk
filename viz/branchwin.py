@@ -233,7 +233,7 @@ class BranchWindow(Window):
         return self.revisionview
 
     def _tag_selected_cb(self, menuitem, revid):
-        self.treeview.set_revision(revid)
+        self.treeview.set_revision_id(revid)
 
     def _treeselection_changed_cb(self, selection, *args):
         """callback for when the treeview changes."""
@@ -299,7 +299,7 @@ class BranchWindow(Window):
 
     def _go_clicked_cb(self, revid):
         """Callback for when the go button for a parent is clicked."""
-        self.treeview.set_revision(revid)
+        self.treeview.set_revision_id(revid)
 
     def _show_clicked_cb(self, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
@@ -307,7 +307,7 @@ class BranchWindow(Window):
         self.treeview.grab_focus()
 
     def _set_revision_cb(self, w, revision_id):
-        self.treeview.set_revision(revision_id)
+        self.treeview.set_revision_id(revision_id)
 
     def _col_visibility_changed(self, col, property):
         self.treeview.set_property(property + '-column-visible', col.get_active())
