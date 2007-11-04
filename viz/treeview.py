@@ -22,6 +22,11 @@ from bzrlib.revision import NULL_REVISION
 class TreeView(gtk.ScrolledWindow):
 
     __gproperties__ = {
+        'branch': (gobject.TYPE_PYOBJECT,
+                   'Branch',
+                   'The Bazaar branch being visualized',
+                   gobject.PARAM_CONSTRUCT_ONLY | gobject.PARAM_WRITABLE),
+
         'revno-column-visible': (gobject.TYPE_BOOLEAN,
                                  'Revision number',
                                  'Show revision number column',
@@ -69,13 +74,17 @@ class TreeView(gtk.ScrolledWindow):
 
     def do_get_property(self, property):
         if property.name == 'revno-column-visible':
-            self.revno_column.get_visible()
+            return self.revno_column.get_visible()
+        elif property.name == 'branch':
+            return self.branch
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
     def do_set_property(self, property, value):
         if property.name == 'revno-column-visible':
             self.revno_column.set_visible(value)
+        elif property.name == 'branch':
+            self.branch = value
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
