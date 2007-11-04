@@ -22,12 +22,12 @@ from bzrlib.revision import NULL_REVISION
 class TreeView(gtk.ScrolledWindow):
 
     __gsignals__ = {
-            'revisions-loaded': (gobject.SIGNAL_RUN_FIRST, 
-                                 gobject.TYPE_NONE,
-                                 ()),
-            'revision-selected': (gobject.SIGNAL_RUN_FIRST,
-                                  gobject.TYPE_NONE,
-                                  ())
+        'revisions-loaded': (gobject.SIGNAL_RUN_FIRST, 
+                             gobject.TYPE_NONE,
+                             ()),
+        'revision-selected': (gobject.SIGNAL_RUN_FIRST,
+                              gobject.TYPE_NONE,
+                              ())
     }
 
     def __init__(self, branch, start, maxnum, broken_line_length=None):
@@ -187,13 +187,13 @@ class TreeView(gtk.ScrolledWindow):
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 15)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        column = gtk.TreeViewColumn("Revision No")
-        column.set_resizable(True)
-        column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        column.set_fixed_width(cell.get_size(self.treeview)[2])
-        column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", treemodel.REVNO)
-        self.treeview.append_column(column)
+        self.revno_column = gtk.TreeViewColumn("Revision No")
+        self.revno_column.set_resizable(True)
+        self.revno_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.revno_column.set_fixed_width(cell.get_size(self.treeview)[2])
+        self.revno_column.pack_start(cell, expand=True)
+        self.revno_column.add_attribute(cell, "text", treemodel.REVNO)
+        self.treeview.append_column(self.revno_column)
 
         self.graph_cell = CellRendererGraph()
         self.graph_column = gtk.TreeViewColumn()
@@ -208,24 +208,24 @@ class TreeView(gtk.ScrolledWindow):
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 65)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        column = gtk.TreeViewColumn("Message")
-        column.set_resizable(True)
-        column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        column.set_fixed_width(cell.get_size(self.treeview)[2])
-        column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", treemodel.MESSAGE)
-        self.treeview.append_column(column)
+        self.msg_column = gtk.TreeViewColumn("Message")
+        self.msg_column.set_resizable(True)
+        self.msg_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.msg_column.set_fixed_width(cell.get_size(self.treeview)[2])
+        self.msg_column.pack_start(cell, expand=True)
+        self.msg_column.add_attribute(cell, "text", treemodel.MESSAGE)
+        self.treeview.append_column(self.msg_column)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 15)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        column = gtk.TreeViewColumn("Committer")
-        column.set_resizable(True)
-        column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        column.set_fixed_width(cell.get_size(self.treeview)[2])
-        column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", treemodel.COMMITER)
-        self.treeview.append_column(column)
+        self.committer_column = gtk.TreeViewColumn("Committer")
+        self.committer_column.set_resizable(True)
+        self.committer_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.committer_column.set_fixed_width(cell.get_size(self.treeview)[2])
+        self.committer_column.pack_start(cell, expand=True)
+        self.committer_column.add_attribute(cell, "text", treemodel.COMMITER)
+        self.treeview.append_column(self.committer_column)
 
     def _on_selection_changed(self, selection, *args):
         """callback for when the treeview changes."""
