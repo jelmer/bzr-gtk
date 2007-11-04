@@ -21,6 +21,14 @@ from bzrlib.revision import NULL_REVISION
 
 class TreeView(gtk.ScrolledWindow):
 
+    __gproperties__ = {
+        'revno-column-visible': (gobject.TYPE_BOOLEAN,
+                                 'Revision number',
+                                 'Show revision number column',
+                                 True,
+                                 gobject.PARAM_READWRITE)
+    }
+
     __gsignals__ = {
         'revisions-loaded': (gobject.SIGNAL_RUN_FIRST, 
                              gobject.TYPE_NONE,
