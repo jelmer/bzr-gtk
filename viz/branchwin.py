@@ -247,7 +247,12 @@ class BranchWindow(Window):
                 self.back_button.set_sensitive(True)
                 for parent_id in parents:
                     parent = self.branch.repository.get_revision(parent_id)
-                    item = gtk.MenuItem(parent.message.split("\n")[0])
+                    try:
+                        str = ' (' + parent.properties['branch-nick'] + ')'
+                    except KeyError:
+                        str = ""
+
+                    item = gtk.MenuItem(parent.message.split("\n")[0] + str)
                     item.connect('activate', self._set_revision_cb, parent_id)
                     back_menu.add(item)
                 back_menu.show_all()
@@ -262,7 +267,12 @@ class BranchWindow(Window):
                 self.fwd_button.set_sensitive(True)
                 for child_id in children:
                     child = self.branch.repository.get_revision(child_id)
-                    item = gtk.MenuItem(child.message.split("\n")[0])
+                    try:
+                        str = ' (' + child.properties['branch-nick'] + ')'
+                    except KeyError:
+                        str = ""
+
+                    item = gtk.MenuItem(child.message.split("\n")[0] + str)
                     item.connect('activate', self._set_revision_cb, child_id)
                     fwd_menu.add(item)
                 fwd_menu.show_all()
