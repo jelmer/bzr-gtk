@@ -121,10 +121,10 @@ class BranchWindow(Window):
         go_menuitem = gtk.MenuItem("_Go")
         go_menuitem.set_submenu(go_menu)
         
-        go_menu_back = gtk.ImageMenuItem(gtk.STOCK_GO_BACK)
+        go_menu_back = gtk.ImageMenuItem(gtk.STOCK_GO_DOWN)
         go_menu_back.connect("activate", self._back_clicked_cb)
 
-        go_menu_forward = gtk.ImageMenuItem(gtk.STOCK_GO_FORWARD)
+        go_menu_forward = gtk.ImageMenuItem(gtk.STOCK_GO_UP)
         go_menu_forward.connect("activate", self._fwd_clicked_cb)
 
         tags_menu = gtk.Menu()
@@ -203,16 +203,14 @@ class BranchWindow(Window):
         self.toolbar = gtk.Toolbar()
         self.toolbar.set_style(gtk.TOOLBAR_BOTH_HORIZ)
 
-        self.back_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_BACK)
-        self.back_button.set_is_important(True)
+        self.back_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_DOWN)
         self.back_button.add_accelerator("clicked", self.accel_group, ord('['),
                                          0, 0)
         self.back_button.connect("clicked", self._back_clicked_cb)
         self.toolbar.insert(self.back_button, -1)
         self.back_button.show()
 
-        self.fwd_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_FORWARD)
-        self.fwd_button.set_is_important(True)
+        self.fwd_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_UP)
         self.fwd_button.add_accelerator("clicked", self.accel_group, ord(']'),
                                         0, 0)
         self.fwd_button.connect("clicked", self._fwd_clicked_cb)
