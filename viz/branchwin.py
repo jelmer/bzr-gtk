@@ -16,6 +16,7 @@ import treemodel
 
 from bzrlib.plugins.gtk.window import Window
 from bzrlib.osutils import format_date
+from bzrlib.config import GlobalConfig
 
 from linegraph import linegraph, same_branch
 from graphcell import CellRendererGraph
@@ -44,7 +45,12 @@ class BranchWindow(Window):
         self.branch      = branch
         self.start       = start
         self.maxnum      = maxnum
-        self.brokenlines = 32
+        self.config      = GlobalConfig()
+
+        if self.config.get_user_option('viz-compact-view') == 'yes':
+            self.compact_view = True
+        else:
+            self.compact_view = False
 
         self.set_title(branch.nick + " - revision history")
 
@@ -105,7 +111,12 @@ class BranchWindow(Window):
     def construct_top(self):
         """Construct the top-half of the window."""
         # FIXME: Make broken_line_length configurable
-        self.treeview = TreeView(self.branch, self.start, self.maxnum, self.brokenlines)
+        if self.compact_view:
+            brokenlines = 32
+        else:
+            brokenlines = None
+
+        self.treeview = TreeView(self.branch, self.start, self.maxnum, brokenlines)
 
         self.treeview.connect("revision-selected",
                 self._treeselection_changed_cb)
@@ -140,7 +151,7 @@ class BranchWindow(Window):
 
         brokenlines_button = gtk.ToggleToolButton()
         brokenlines_button.set_label("Compact View")
-        brokenlines_button.set_active(True)
+        brokenlines_button.set_active(self.compact_view)
         brokenlines_button.set_is_important(True)
         brokenlines_button.connect('toggled', self._brokenlines_toggled_cb)
         self.toolbar.insert(brokenlines_button, -1)
@@ -194,10 +205,14 @@ class BranchWindow(Window):
         self.treeview.grab_focus()
 
     def _brokenlines_toggled_cb(self, button):
-        if button.get_active():
-            self.brokenlines = 32
+        self.compact_view = button.get_active()
+
+        if self.compact_view:
+            option = 'yes'
         else:
-            self.brokenlines = None
+            option = 'no'
+
+        self.config.set_user_option('viz-compact-view', option)
 
         revision = self.treeview.get_revision()
 
