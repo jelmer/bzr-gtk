@@ -100,6 +100,16 @@ class BranchWindow(Window):
         edit_menu.add(edit_menu_find)
         edit_menu.add(edit_menu_prefs)
 
+        view_menu = gtk.Menu()
+        view_menuitem = gtk.MenuItem("_View")
+        view_menuitem.set_submenu(view_menu)
+
+        view_menu_revno_col = gtk.CheckMenuItem("Show revision number")
+        view_menu_revno_col.set_active(True)
+        view_menu_revno_col.connect('toggled', self._col_visibility_changed, 'revno')
+
+        view_menu.add(view_menu_revno_col)
+
         go_menu = gtk.Menu()
         go_menuitem = gtk.MenuItem("_Go")
         go_menuitem.set_submenu(go_menu)
@@ -140,6 +150,7 @@ class BranchWindow(Window):
        
         menubar.add(file_menuitem)
         menubar.add(edit_menuitem)
+        menubar.add(view_menuitem)
         menubar.add(go_menuitem)
         menubar.add(revision_menuitem)
         menubar.add(branch_menuitem)
@@ -252,3 +263,5 @@ class BranchWindow(Window):
         self.treeview.show_diff(self.branch, revid, parentid)
         self.treeview.grab_focus()
 
+    def _col_visibility_changed(self, col, property):
+        self.treeview.set_property(property + '-column-visible', col.get_active())
