@@ -211,7 +211,7 @@ class BranchWindow(Window):
         self.toolbar.insert(self.back_button, -1)
         self.back_button.show()
 
-        self.fwd_button = gtk.ToolButton(stock_id=gtk.STOCK_GO_FORWARD)
+        self.fwd_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_FORWARD)
         self.fwd_button.set_is_important(True)
         self.fwd_button.add_accelerator("clicked", self.accel_group, ord(']'),
                                         0, 0)
@@ -259,7 +259,21 @@ class BranchWindow(Window):
 
             self.back_button.set_menu(back_menu)
 
-            self.fwd_button.set_sensitive(len(children) > 0)
+            fwd_menu = gtk.Menu()
+            if len(children) > 0:
+                self.fwd_button.set_sensitive(True)
+                for child_id in children:
+                    child = self.branch.repository.get_revision(child_id)
+                    item = gtk.MenuItem(child.message.split("\n")[0])
+                    item.connect('activate', self._set_revision_cb, child_id)
+                    fwd_menu.add(item)
+                fwd_menu.show_all()
+            else:
+                self.fwd_button.set_sensitive(False)
+                fwd_menu.hide()
+
+            self.fwd_button.set_menu(fwd_menu)
+
             tags = []
             if self.branch.supports_tags():
                 tagdict = self.branch.tags.get_reverse_tag_dict()
