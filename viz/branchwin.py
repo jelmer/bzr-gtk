@@ -104,7 +104,7 @@ class BranchWindow(Window):
         view_menuitem = gtk.MenuItem("_View")
         view_menuitem.set_submenu(view_menu)
 
-        view_menu_revno_col = gtk.CheckMenuItem("Show revision number")
+        view_menu_revno_col = gtk.CheckMenuItem("Show revision number column")
         view_menu_revno_col.set_active(True)
         view_menu_revno_col.connect('toggled', self._col_visibility_changed, 'revno')
 
