@@ -15,6 +15,7 @@ import pango
 
 from bzrlib.plugins.gtk.window import Window
 from bzrlib.plugins.gtk.preferences import PreferencesWindow
+from bzrlib.revision import Revision
 from treeview import TreeView
 
 class BranchWindow(Window):
@@ -202,7 +203,7 @@ class BranchWindow(Window):
         self.toolbar = gtk.Toolbar()
         self.toolbar.set_style(gtk.TOOLBAR_BOTH_HORIZ)
 
-        self.back_button = gtk.ToolButton(stock_id=gtk.STOCK_GO_BACK)
+        self.back_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_BACK)
         self.back_button.set_is_important(True)
         self.back_button.add_accelerator("clicked", self.accel_group, ord('['),
                                          0, 0)
@@ -210,7 +211,7 @@ class BranchWindow(Window):
         self.toolbar.insert(self.back_button, -1)
         self.back_button.show()
 
-        self.fwd_button = gtk.ToolButton(stock_id=gtk.STOCK_GO_FORWARD)
+        self.fwd_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_FORWARD)
         self.fwd_button.set_is_important(True)
         self.fwd_button.add_accelerator("clicked", self.accel_group, ord(']'),
                                         0, 0)
@@ -243,8 +244,36 @@ class BranchWindow(Window):
         children = self.treeview.get_children()
 
         if revision is not None:
-            self.back_button.set_sensitive(len(parents) > 0)
-            self.fwd_button.set_sensitive(len(children) > 0)
+            back_menu = gtk.Menu()
+            if len(parents) > 0:
+                self.back_button.set_sensitive(True)
+                for parent_id in parents:
+                    parent = self.branch.repository.get_revision(parent_id)
+                    item = gtk.MenuItem(parent.message.split("\n")[0])
+                    item.connect('activate', self._set_revision_cb, parent_id)
+                    back_menu.add(item)
+                back_menu.show_all()
+            else:
+                self.back_button.set_sensitive(False)
+                back_menu.hide()
+
+            self.back_button.set_menu(back_menu)
+
+            fwd_menu = gtk.Menu()
+            if len(children) > 0:
+                self.fwd_button.set_sensitive(True)
+                for child_id in children:
+                    child = self.branch.repository.get_revision(child_id)
+                    item = gtk.MenuItem(child.message.split("\n")[0])
+                    item.connect('activate', self._set_revision_cb, child_id)
+                    fwd_menu.add(item)
+                fwd_menu.show_all()
+            else:
+                self.fwd_button.set_sensitive(False)
+                fwd_menu.hide()
+
+            self.fwd_button.set_menu(fwd_menu)
+
             tags = []
             if self.branch.supports_tags():
                 tagdict = self.branch.tags.get_reverse_tag_dict()
@@ -268,6 +297,9 @@ class BranchWindow(Window):
         """Callback for when the show button for a parent is clicked."""
         self.treeview.show_diff(self.branch, revid, parentid)
         self.treeview.grab_focus()
+
+    def _set_revision_cb(self, w, revision_id):
+        self.treeview.set_revision(revision_id)
 
     def _col_visibility_changed(self, col, property):
         self.treeview.set_property(property + '-column-visible', col.get_active())
