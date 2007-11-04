@@ -104,10 +104,16 @@ class BranchWindow(Window):
         view_menuitem = gtk.MenuItem("_View")
         view_menuitem.set_submenu(view_menu)
 
+        view_menu_toolbar = gtk.CheckMenuItem("Show Toolbar")
+        view_menu_toolbar.set_active(True)
+        view_menu_toolbar.connect('toggled', self._toolbar_visibility_changed)
+
         view_menu_revno_col = gtk.CheckMenuItem("Show Revision _Number Column")
         view_menu_revno_col.set_active(True)
         view_menu_revno_col.connect('toggled', self._col_visibility_changed, 'revno')
 
+        view_menu.add(view_menu_toolbar)
+        view_menu.add(gtk.SeparatorMenuItem())
         view_menu.add(view_menu_revno_col)
 
         go_menu = gtk.Menu()
@@ -265,3 +271,9 @@ class BranchWindow(Window):
 
     def _col_visibility_changed(self, col, property):
         self.treeview.set_property(property + '-column-visible', col.get_active())
+
+    def _toolbar_visibility_changed(self, col):
+        if col.get_active():
+            self.toolbar.show() 
+        else:
+            self.toolbar.hide()
