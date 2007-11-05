@@ -64,12 +64,14 @@ class BranchWindow(Window):
         vbox = gtk.VBox(spacing=0)
         self.add(vbox)
 
+        top = self.construct_top()
+
         vbox.pack_start(self.construct_menubar(), expand=False, fill=True)
         vbox.pack_start(self.construct_navigation(), expand=False, fill=True)
         vbox.pack_start(self.construct_loading_msg(), expand=False, fill=True)
         
         paned = gtk.VPaned()
-        paned.pack1(self.construct_top(), resize=True, shrink=False)
+        paned.pack1(top, resize=True, shrink=False)
         paned.pack2(self.construct_bottom(), resize=False, shrink=True)
         paned.show()
         vbox.pack_start(paned, expand=True, fill=True)
@@ -109,18 +111,14 @@ class BranchWindow(Window):
         view_menu_toolbar.set_active(True)
         view_menu_toolbar.connect('toggled', self._toolbar_visibility_changed)
 
-        view_menu_revno_col = gtk.CheckMenuItem("Show Revision _Number Column")
-        view_menu_revno_col.set_active(True)
-        view_menu_revno_col.connect('toggled', self._col_visibility_changed, 'revno')
-
-        view_menu_date_col = gtk.CheckMenuItem("Show _Date Column")
-        view_menu_date_col.set_active(False)
-        view_menu_date_col.connect('toggled', self._col_visibility_changed, 'date')
-
         view_menu.add(view_menu_toolbar)
         view_menu.add(gtk.SeparatorMenuItem())
-        view_menu.add(view_menu_revno_col)
-        view_menu.add(view_menu_date_col)
+
+        for (label, name) in [("Revision _Number", "revno"), ("_Date", "date")]:
+            col = gtk.CheckMenuItem("Show " + label + " Column")
+            col.set_active(self.treeview.get_property(name + "-column-visible"))
+            col.connect('toggled', self._col_visibility_changed, name)
+            view_menu.add(col)
 
         go_menu = gtk.Menu()
         go_menuitem = gtk.MenuItem("_Go")
