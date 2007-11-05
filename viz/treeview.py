@@ -39,8 +39,8 @@ class TreeView(gtk.ScrolledWindow):
                                  gobject.PARAM_READWRITE),
 
         'date-column-visible': (gobject.TYPE_BOOLEAN,
-                                 'Revision number',
-                                 'Show revision number column',
+                                 'Date',
+                                 'Show date column',
                                  False,
                                  gobject.PARAM_READWRITE)
 
