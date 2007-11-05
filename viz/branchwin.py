@@ -113,9 +113,14 @@ class BranchWindow(Window):
         view_menu_revno_col.set_active(True)
         view_menu_revno_col.connect('toggled', self._col_visibility_changed, 'revno')
 
+        view_menu_date_col = gtk.CheckMenuItem("Show _Date Column")
+        view_menu_date_col.set_active(False)
+        view_menu_date_col.connect('toggled', self._col_visibility_changed, 'date')
+
         view_menu.add(view_menu_toolbar)
         view_menu.add(gtk.SeparatorMenuItem())
         view_menu.add(view_menu_revno_col)
+        view_menu.add(view_menu_date_col)
 
         go_menu = gtk.Menu()
         go_menuitem = gtk.MenuItem("_Go")

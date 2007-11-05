@@ -36,7 +36,14 @@ class TreeView(gtk.ScrolledWindow):
                                  'Revision number',
                                  'Show revision number column',
                                  True,
+                                 gobject.PARAM_READWRITE),
+
+        'date-column-visible': (gobject.TYPE_BOOLEAN,
+                                 'Revision number',
+                                 'Show revision number column',
+                                 False,
                                  gobject.PARAM_READWRITE)
+
     }
 
     __gsignals__ = {
@@ -80,6 +87,8 @@ class TreeView(gtk.ScrolledWindow):
     def do_get_property(self, property):
         if property.name == 'revno-column-visible':
             return self.revno_column.get_visible()
+        elif property.name == 'date-column-visible':
+            return self.date_column.get_visible()
         elif property.name == 'branch':
             return self.branch
         elif property.name == 'revision':
@@ -90,6 +99,8 @@ class TreeView(gtk.ScrolledWindow):
     def do_set_property(self, property, value):
         if property.name == 'revno-column-visible':
             self.revno_column.set_visible(value)
+        elif property.name == 'date-column-visible':
+            self.date_column.set_visible(value)
         elif property.name == 'branch':
             self.branch = value
         elif property.name == 'revision':
@@ -264,6 +275,18 @@ class TreeView(gtk.ScrolledWindow):
         self.committer_column.pack_start(cell, expand=True)
         self.committer_column.add_attribute(cell, "text", treemodel.COMMITER)
         self.treeview.append_column(self.committer_column)
+
+        cell = gtk.CellRendererText()
+        cell.set_property("width-chars", 40)
+        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        self.date_column = gtk.TreeViewColumn("Date")
+        self.date_column.set_visible(False)
+        self.date_column.set_resizable(True)
+        self.date_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.date_column.set_fixed_width(cell.get_size(self.treeview)[2])
+        self.date_column.pack_start(cell, expand=True)
+        self.date_column.add_attribute(cell, "text", treemodel.TIMESTAMP)
+        self.treeview.append_column(self.date_column)
 
     def _on_selection_changed(self, selection, *args):
         """callback for when the treeview changes."""
