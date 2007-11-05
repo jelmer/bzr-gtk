@@ -277,7 +277,7 @@ class TreeView(gtk.ScrolledWindow):
         self.treeview.append_column(self.committer_column)
 
         cell = gtk.CellRendererText()
-        cell.set_property("width-chars", 40)
+        cell.set_property("width-chars", 20)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         self.date_column = gtk.TreeViewColumn("Date")
         self.date_column.set_visible(False)

@@ -12,7 +12,7 @@ import gobject
 import pango
 import re
 
-from bzrlib.osutils import format_date
+from time import (strftime, localtime)
 
 REVID = 0
 NODE = 1
@@ -85,9 +85,9 @@ class TreeModel(gtk.GenericTreeModel):
         if column == MESSAGE: return revision.message.split("\n")[0]
         if column == COMMITER: return re.sub('<.*@.*>', '', 
                                              revision.committer).strip(' ')
-        if column == TIMESTAMP: return format_date(revision.timestamp,
-                                                   revision.timezone)
-    
+        if column == TIMESTAMP: 
+            return strftime("%Y-%m-%d %H:%M", localtime(revision.timestamp))
+
     def on_iter_next(self, rowref):
         if rowref < len(self.line_graph_data) - 1:
             return rowref+1
