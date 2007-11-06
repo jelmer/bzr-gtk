@@ -196,19 +196,24 @@ class TreeView(gtk.ScrolledWindow):
 
         return False
 
-    def show_diff(self, branch, revid, parentid=None):
+    def show_diff(self, revid=None, parentid=None):
         """Open a new window to show a diff between the given revisions."""
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow(parent=self)
 
-        rev_tree = branch.repository.revision_tree(revid)
+        if revid is None:
+            revid = self.revision.revision_id
+
+            if parentid is None and len(self.parents) > 0:
+                parentid = self.parents[0]
 
         if parentid is None:
             parentid = NULL_REVISION
 
-        parent_tree = branch.repository.revision_tree(parentid)
+        rev_tree    = self.branch.repository.revision_tree(revid)
+        parent_tree = self.branch.repository.revision_tree(parentid)
 
-        description = revid + " - " + branch.nick
+        description = revid + " - " + self.branch.nick
         window.set_diff(description, rev_tree, parent_tree)
         window.show()
 
@@ -318,5 +323,5 @@ class TreeView(gtk.ScrolledWindow):
         else:
             parent_id = parents[0]
 
-        self.show_diff(self.branch, revision_id, parent_id)
+        self.show_diff(revision_id, parent_id)
         self.treeview.grab_focus()

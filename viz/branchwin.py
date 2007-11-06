@@ -157,8 +157,12 @@ class BranchWindow(Window):
         revision_menuitem = gtk.MenuItem("_Revision")
         revision_menuitem.set_submenu(revision_menu)
 
+        revision_menu_diff = gtk.MenuItem("View Changes")
+        revision_menu_diff.connect('activate', 
+                lambda w: self.treeview.show_diff())
+
         revision_menu.add(gtk.MenuItem("Tag Revision"))
-        revision_menu.add(gtk.MenuItem("View Changes"))
+        revision_menu.add(revision_menu_diff)
 
         branch_menu = gtk.Menu()
         branch_menuitem = gtk.MenuItem("_Branch")
@@ -315,7 +319,7 @@ class BranchWindow(Window):
 
     def _show_clicked_cb(self, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
-        self.treeview.show_diff(self.branch, revid, parentid)
+        self.treeview.show_diff(revid, parentid)
         self.treeview.grab_focus()
 
     def _set_revision_cb(self, w, revision_id):
