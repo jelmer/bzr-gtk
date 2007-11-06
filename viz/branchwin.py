@@ -90,7 +90,11 @@ class BranchWindow(Window):
         file_menu_close = gtk.ImageMenuItem(gtk.STOCK_CLOSE, self.accel_group)
         file_menu_close.connect('activate', lambda x: self.destroy())
         
+        file_menu_quit = gtk.ImageMenuItem(gtk.STOCK_QUIT, self.accel_group)
+        file_menu_quit.connect('activate', lambda x: gtk.main_quit())
+        
         file_menu.add(file_menu_close)
+        file_menu.add(file_menu_quit)
 
         edit_menu = gtk.Menu()
         edit_menuitem = gtk.MenuItem("_Edit")
