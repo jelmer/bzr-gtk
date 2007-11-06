@@ -16,6 +16,7 @@ import pango
 from bzrlib.plugins.gtk.window import Window
 from bzrlib.plugins.gtk.preferences import PreferencesWindow
 from bzrlib.revision import Revision
+from bzrlib.config import BranchConfig
 from treeview import TreeView
 
 class BranchWindow(Window):
@@ -97,10 +98,14 @@ class BranchWindow(Window):
 
         edit_menu_find = gtk.ImageMenuItem(gtk.STOCK_FIND)
 
+        edit_menu_branchopts = gtk.MenuItem("Branch Settings")
+        edit_menu_branchopts.connect('activate', lambda x: PreferencesWindow(self.branch.get_config()).show())
+
         edit_menu_prefs = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
-        edit_menu_prefs.connect('activate', lambda x: PreferencesWindow(self.branch.get_config()).show())
+        edit_menu_prefs.connect('activate', lambda x: PreferencesWindow().show())
 
         edit_menu.add(edit_menu_find)
+        edit_menu.add(edit_menu_branchopts)
         edit_menu.add(edit_menu_prefs)
 
         view_menu = gtk.Menu()
