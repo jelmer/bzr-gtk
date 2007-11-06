@@ -163,7 +163,12 @@ class TreeView(gtk.ScrolledWindow):
 
         self.treeview.set_rules_hint(True)
         self.treeview.set_search_column(treemodel.REVNO)
-        self.treeview.set_tooltip_column(treemodel.MESSAGE)
+        
+        try:
+            self.treeview.set_tooltip_column(treemodel.MESSAGE)
+        except AttributeError:
+            # Method not present in older PyGTK, just skip it.
+            pass
 
         self.treeview.get_selection().connect("changed",
                 self._on_selection_changed)
