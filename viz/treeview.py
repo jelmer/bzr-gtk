@@ -137,6 +137,8 @@ class TreeView(gtk.ScrolledWindow):
         self.model = TreeModel(self.branch.repository, linegraphdata)
         self.graph_cell.columns_len = columns_len
         width = self.graph_cell.get_size(self.treeview)[2]
+        if width > 500:
+            width = 500
         self.graph_column.set_fixed_width(width)
         self.graph_column.set_max_width(width)
         self.index = index
