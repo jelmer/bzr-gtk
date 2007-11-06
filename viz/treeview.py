@@ -73,7 +73,6 @@ class TreeView(gtk.ScrolledWindow):
         self.construct_treeview()
 
         self.branch = branch
-        self.branch.lock_read()
 
         gobject.idle_add(self.populate, start, maxnum, 
                          broken_line_length)
@@ -81,8 +80,6 @@ class TreeView(gtk.ScrolledWindow):
         self.revision = None
         self.children = None
         self.parents  = None
-
-        self.connect('destroy', lambda w: self.branch.unlock())
 
     def do_get_property(self, property):
         if property.name == 'revno-column-visible':
@@ -179,20 +176,25 @@ class TreeView(gtk.ScrolledWindow):
         :param broken_line_length: After how much lines branches \
                        should be broken.
         """
-        (linegraphdata, index, columns_len) = linegraph(self.branch.repository,
-                                                        start,
-                                                        maxnum, 
-                                                        broken_line_length)
+        try:
+            self.branch.lock_read()
+            (linegraphdata, index, columns_len) = linegraph(self.branch.repository,
+                                                            start,
+                                                            maxnum, 
+                                                            broken_line_length)
 
-        self.model = TreeModel(self.branch.repository, linegraphdata)
-        self.graph_cell.columns_len = columns_len
-        width = self.graph_cell.get_size(self.treeview)[2]
-        self.graph_column.set_fixed_width(width)
-        self.graph_column.set_max_width(width)
-        self.index = index
-        self.treeview.set_model(self.model)
-        self.treeview.set_cursor(0)
-        self.emit('revisions-loaded')
+            self.model = TreeModel(self.branch.repository, linegraphdata)
+            self.graph_cell.columns_len = columns_len
+            width = self.graph_cell.get_size(self.treeview)[2]
+            self.graph_column.set_fixed_width(width)
+            self.graph_column.set_max_width(width)
+            self.index = index
+            self.treeview.set_model(self.model)
+            self.treeview.set_cursor(0)
+            self.emit('revisions-loaded')
+
+        finally:
+            self.branch.unlock()
 
         return False
 

@@ -248,22 +248,18 @@ class cmd_visualise(Command):
     def run(self, location=".", revision=None, limit=None):
         set_ui_factory()
         (br, path) = branch.Branch.open_containing(location)
-        br.lock_read()
-        try:
-            if revision is None:
-                revid = br.last_revision()
-                if revid is None:
-                    return
-            else:
-                (revno, revid) = revision[0].in_history(br)
+        if revision is None:
+            revid = br.last_revision()
+            if revid is None:
+                return
+        else:
+            (revno, revid) = revision[0].in_history(br)
 
-            import gtk
-            pp = start_viz_window(br, revid, limit)
-            pp.connect("destroy", lambda w: gtk.main_quit())
-            pp.show()
-            gtk.main()
-        finally:
-            br.unlock()
+        import gtk
+        pp = start_viz_window(br, revid, limit)
+        pp.connect("destroy", lambda w: gtk.main_quit())
+        pp.show()
+        gtk.main()
 
 
 class cmd_gannotate(GTKCommand):

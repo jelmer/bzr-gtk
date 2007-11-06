@@ -14,6 +14,7 @@ import gobject
 import pango
 
 from bzrlib.plugins.gtk.window import Window
+from bzrlib.plugins.gtk.tags import AddTagDialog
 from bzrlib.plugins.gtk.preferences import PreferencesWindow
 from bzrlib.revision import Revision
 from bzrlib.config import BranchConfig
@@ -161,7 +162,10 @@ class BranchWindow(Window):
         revision_menu_diff.connect('activate', 
                 lambda w: self.treeview.show_diff())
 
-        revision_menu.add(gtk.MenuItem("Tag Revision"))
+        revision_menu_tag = gtk.MenuItem("Tag Revision")
+        revision_menu_tag.connect('activate', self._tag_revision_cb)
+
+        revision_menu.add(revision_menu_tag)
         revision_menu.add(revision_menu_diff)
 
         branch_menu = gtk.Menu()
@@ -324,6 +328,21 @@ class BranchWindow(Window):
 
     def _set_revision_cb(self, w, revision_id):
         self.treeview.set_revision_id(revision_id)
+
+    def _tag_revision_cb(self, w):
+        dialog = AddTagDialog(self.branch.repository, self.treeview.get_revision().revision_id, self.branch)
+        response = dialog.run()
+        if response != gtk.RESPONSE_NONE:
+            dialog.hide()
+        
+            if response == gtk.RESPONSE_OK:
+                try:
+                    self.branch.lock_write()
+                    self.branch.tags.set_tag(dialog.tagname, dialog._revid)
+                finally:
+                    self.branch.unlock()
+            
+            dialog.destroy()
 
     def _col_visibility_changed(self, col, property):
         self.treeview.set_property(property + '-column-visible', col.get_active())
