@@ -96,9 +96,11 @@ class RevisionPopupMenu(gtk.Menu):
             dialog.hide()
         
             if response == gtk.RESPONSE_OK:
-                self.branch.lock_write()
-                self.branch.tags.set_tag(dialog.tagname, dialog._revid)
-                self.branch.unlock()
+                try:
+                    self.branch.lock_write()
+                    self.branch.tags.set_tag(dialog.tagname, dialog._revid)
+                finally:
+                    self.branch.unlock()
             
             dialog.destroy()
     
