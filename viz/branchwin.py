@@ -87,7 +87,7 @@ class BranchWindow(Window):
         file_menuitem = gtk.MenuItem("_File")
         file_menuitem.set_submenu(file_menu)
 
-        file_menu_close = gtk.ImageMenuItem(gtk.STOCK_CLOSE)
+        file_menu_close = gtk.ImageMenuItem(gtk.STOCK_CLOSE, self.accel_group)
         file_menu_close.connect('activate', lambda x: self.destroy())
         
         file_menu.add(file_menu_close)
