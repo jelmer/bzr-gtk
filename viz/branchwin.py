@@ -18,6 +18,7 @@ from bzrlib.plugins.gtk.tags import AddTagDialog
 from bzrlib.plugins.gtk.preferences import PreferencesWindow
 from bzrlib.revision import Revision
 from bzrlib.config import BranchConfig
+from bzrlib.config import GlobalConfig
 from treeview import TreeView
 
 class BranchWindow(Window):
@@ -39,9 +40,15 @@ class BranchWindow(Window):
         Window.__init__(self, parent=parent)
         self.set_border_width(0)
 
-        self.branch = branch
-        self.start  = start
-        self.maxnum = maxnum
+        self.branch      = branch
+        self.start       = start
+        self.maxnum      = maxnum
+        self.config      = GlobalConfig()
+
+        if self.config.get_user_option('viz-compact-view') == 'yes':
+            self.compact_view = True
+        else:
+            self.compact_view = False
 
         self.set_title(branch.nick + " - revision history")
 
@@ -60,6 +67,9 @@ class BranchWindow(Window):
         self.add_accel_group(self.accel_group)
 
         self.construct()
+
+    def set_revision(self, revision):
+        self.treeview.set_revision(revision)
 
     def construct(self):
         """Construct the window contents."""
@@ -192,7 +202,7 @@ class BranchWindow(Window):
         image_loading.show()
         
         label_loading = gtk.Label(_("Please wait, loading ancestral graph..."))
-        label_loading.set_alignment(0.0, 0.5)  
+        label_loading.set_alignment(0.0, 0.5)
         label_loading.show()
         
         self.loading_msg_box = gtk.HBox()
@@ -207,7 +217,12 @@ class BranchWindow(Window):
     def construct_top(self):
         """Construct the top-half of the window."""
         # FIXME: Make broken_line_length configurable
-        self.treeview = TreeView(self.branch, self.start, self.maxnum, 32)
+        if self.compact_view:
+            brokenlines = 32
+        else:
+            brokenlines = None
+
+        self.treeview = TreeView(self.branch, self.start, self.maxnum, brokenlines)
 
         self.treeview.connect("revision-selected",
                 self._treeselection_changed_cb)
@@ -229,16 +244,23 @@ class BranchWindow(Window):
                                          0, 0)
         self.back_button.connect("clicked", self._back_clicked_cb)
         self.toolbar.insert(self.back_button, -1)
-        self.back_button.show()
 
         self.fwd_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_UP)
         self.fwd_button.add_accelerator("clicked", self.accel_group, ord(']'),
                                         0, 0)
         self.fwd_button.connect("clicked", self._fwd_clicked_cb)
         self.toolbar.insert(self.fwd_button, -1)
-        self.fwd_button.show()
 
-        self.toolbar.show()
+        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
+
+        brokenlines_button = gtk.ToggleToolButton()
+        brokenlines_button.set_label("Compact View")
+        brokenlines_button.set_active(self.compact_view)
+        brokenlines_button.set_is_important(True)
+        brokenlines_button.connect('toggled', self._brokenlines_toggled_cb)
+        self.toolbar.insert(brokenlines_button, -1)
+
+        self.toolbar.show_all()
 
         return self.toolbar
 
@@ -329,6 +351,23 @@ class BranchWindow(Window):
 
     def _set_revision_cb(self, w, revision_id):
         self.treeview.set_revision_id(revision_id)
+
+    def _brokenlines_toggled_cb(self, button):
+        self.compact_view = button.get_active()
+
+        if self.compact_view:
+            option = 'yes'
+        else:
+            option = 'no'
+
+        self.config.set_user_option('viz-compact-view', option)
+
+        revision = self.treeview.get_revision()
+
+        self.treeview.destroy()
+        self.paned.pack1(self.construct_top(), resize=True, shrink=False)
+
+        gobject.idle_add(self.set_revision, revision.revision_id)
 
     def _tag_revision_cb(self, w):
         dialog = AddTagDialog(self.branch.repository, self.treeview.get_revision().revision_id, self.branch)

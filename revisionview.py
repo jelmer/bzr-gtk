@@ -21,6 +21,7 @@ import gtk
 import pango
 
 from bzrlib.osutils import format_date
+from bzrlib.util import bencode
 
 class RevisionView(gtk.Notebook):
     """ Custom widget for commit log details.
@@ -36,6 +37,7 @@ class RevisionView(gtk.Notebook):
 
         self._create_general()
         self._create_relations()
+        self._create_file_info_view()
 
         self.set_current_page(0)
         
@@ -47,12 +49,21 @@ class RevisionView(gtk.Notebook):
 
         if revision is not None:
             self.set_revision(revision, tags=tags)
+        self.set_file_id(None)
 
     def set_show_callback(self, callback):
         self._show_callback = callback
 
     def set_go_callback(self, callback):
         self._go_callback = callback
+
+    def set_file_id(self, file_id):
+        """Set a specific file id that we want to track.
+
+        This just effects the display of a per-file commit message.
+        If it is set to None, then all commit messages will be shown.
+        """
+        self._file_id = file_id
 
     def set_revision(self, revision, tags=[], children=[]):
         self._revision = revision
@@ -89,6 +100,30 @@ class RevisionView(gtk.Notebook):
                                           self.children_table)
         
         self._add_tags(tags)
+
+        file_info = revision.properties.get('file-info', None)
+        if file_info is not None:
+            file_info = bencode.bdecode(file_info.encode('UTF-8'))
+
+        if file_info:
+            if self._file_id is None:
+                text = []
+                for fi in file_info:
+                    text.append('%(path)s\n%(message)s' % fi)
+                self.file_info_buffer.set_text('\n'.join(text))
+                self.file_info_box.show()
+            else:
+                text = []
+                for fi in file_info:
+                    if fi['file_id'] == self._file_id:
+                        text.append(fi['message'])
+                if text:
+                    self.file_info_buffer.set_text('\n'.join(text))
+                    self.file_info_box.show()
+                else:
+                    self.file_info_box.hide()
+        else:
+            self.file_info_box.hide()
 
     def _show_clicked_cb(self, widget, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
@@ -331,4 +366,22 @@ class RevisionView(gtk.Notebook):
         window.add(tv)
         window.show()
         return window
+
+    def _create_file_info_view(self):
+        self.file_info_box = gtk.VBox(False, 6)
+        self.file_info_box.set_border_width(6)
+        self.file_info_buffer = gtk.TextBuffer()
+        window = gtk.ScrolledWindow()
+        window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        window.set_shadow_type(gtk.SHADOW_IN)
+        tv = gtk.TextView(self.file_info_buffer)
+        tv.set_editable(False)
+        tv.set_wrap_mode(gtk.WRAP_WORD)
+        tv.modify_font(pango.FontDescription("Monospace"))
+        tv.show()
+        window.add(tv)
+        window.show()
+        self.file_info_box.pack_start(window)
+        self.file_info_box.hide() # Only shown when there are per-file messages
+        self.append_page(self.file_info_box, tab_label=gtk.Label('Per-file'))
 
