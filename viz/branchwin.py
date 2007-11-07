@@ -240,11 +240,16 @@ class BranchWindow(Window):
 
         self.treeview = TreeView(self.branch, self.start, self.maxnum, brokenlines)
 
-        self.treeview.connect("revision-selected",
+        self.treeview.connect('revision-selected',
                 self._treeselection_changed_cb)
 
         self.treeview.connect('revisions-loaded', 
                 lambda x: self.loading_msg_box.hide())
+
+        for col in ["revno", "date"]:
+            option = self.config.get_user_option(col + '-column-visible')
+            if option is not None:
+                self.treeview.set_property(col + '-column-visible', option == 'True')
 
         self.treeview.show()
 
@@ -392,6 +397,7 @@ class BranchWindow(Window):
             dialog.destroy()
 
     def _col_visibility_changed(self, col, property):
+        self.config.set_user_option(property + '-column-visible', col.get_active())
         self.treeview.set_property(property + '-column-visible', col.get_active())
 
     def _toolbar_visibility_changed(self, col):
