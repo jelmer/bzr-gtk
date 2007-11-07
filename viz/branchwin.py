@@ -68,8 +68,8 @@ class BranchWindow(Window):
 
         self.construct()
 
-    def set_revision(self, revision):
-        self.treeview.set_revision(revision)
+    def set_revision(self, revid):
+        self.treeview.set_revision_id(revid)
 
     def construct(self):
         """Construct the window contents."""
@@ -82,12 +82,12 @@ class BranchWindow(Window):
         vbox.pack_start(self.construct_navigation(), expand=False, fill=True)
         vbox.pack_start(self.construct_loading_msg(), expand=False, fill=True)
         
-        paned = gtk.VPaned()
-        paned.pack1(top, resize=True, shrink=False)
-        paned.pack2(self.construct_bottom(), resize=False, shrink=True)
-        paned.show()
-        vbox.pack_start(paned, expand=True, fill=True)
-        vbox.set_focus_child(paned)
+        self.paned = gtk.VPaned()
+        self.paned.pack1(top, resize=True, shrink=False)
+        self.paned.pack2(self.construct_bottom(), resize=False, shrink=True)
+        self.paned.show()
+        vbox.pack_start(self.paned, expand=True, fill=True)
+        vbox.set_focus_child(self.paned)
 
         vbox.show()
 
