@@ -131,7 +131,12 @@ class BranchWindow(Window):
         view_menu_toolbar.set_active(True)
         view_menu_toolbar.connect('toggled', self._toolbar_visibility_changed)
 
+        view_menu_compact = gtk.CheckMenuItem("Show Compact Graph")
+        view_menu_compact.set_active(self.compact_view)
+        view_menu_compact.connect('activate', self._brokenlines_toggled_cb)
+
         view_menu.add(view_menu_toolbar)
+        view_menu.add(view_menu_compact)
         view_menu.add(gtk.SeparatorMenuItem())
 
         for (label, name) in [("Revision _Number", "revno"), ("_Date", "date")]:
@@ -250,15 +255,6 @@ class BranchWindow(Window):
                                         0, 0)
         self.fwd_button.connect("clicked", self._fwd_clicked_cb)
         self.toolbar.insert(self.fwd_button, -1)
-
-        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
-
-        brokenlines_button = gtk.ToggleToolButton()
-        brokenlines_button.set_label("Compact View")
-        brokenlines_button.set_active(self.compact_view)
-        brokenlines_button.set_is_important(True)
-        brokenlines_button.connect('toggled', self._brokenlines_toggled_cb)
-        self.toolbar.insert(brokenlines_button, -1)
 
         self.toolbar.show_all()
 
