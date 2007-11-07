@@ -144,10 +144,11 @@ class BranchWindow(Window):
         go_menu_tags = gtk.MenuItem("_Tags")
         go_menu_tags.set_submenu(tags_menu)
 
-        for (tag, revid) in self.branch.tags.get_tag_dict().items():
-            tag_item = gtk.MenuItem(tag)
-            tag_item.connect('activate', self._tag_selected_cb, revid)
-            tags_menu.add(tag_item)
+        if self.branch.supports_tags():
+            for (tag, revid) in self.branch.tags.get_tag_dict().items():
+                tag_item = gtk.MenuItem(tag)
+                tag_item.connect('activate', self._tag_selected_cb, revid)
+                tags_menu.add(tag_item)
 
         go_menu.add(go_menu_back)
         go_menu.add(go_menu_forward)
