@@ -1,11 +1,17 @@
-0.92.0	UNRELEASED
+0.92.0	2007-11-07
 
  UI
 
   * Removed email part of committer id from committer column in the revision
     history window. (Daniel Schierbeck)
+    
   * Removed date column from revision history window. (Daniel Schierbeck)
+  
   * Rearranged the logview into a notebook. (Daniel Schierbeck)
+  
+  * Redesigned the Commit dialog. (John Arbash Meinel)
+  
+  * Broken lines support made optional. (Daniel Schierbeck)
 
  FEATURES
  

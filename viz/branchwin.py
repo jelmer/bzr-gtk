@@ -16,6 +16,7 @@ import treemodel
 
 from bzrlib.plugins.gtk.window import Window
 from bzrlib.osutils import format_date
+from bzrlib.config import GlobalConfig
 
 from linegraph import linegraph, same_branch
 from graphcell import CellRendererGraph
@@ -41,9 +42,15 @@ class BranchWindow(Window):
         Window.__init__(self, parent=parent)
         self.set_border_width(0)
 
-        self.branch = branch
-        self.start  = start
-        self.maxnum = maxnum
+        self.branch      = branch
+        self.start       = start
+        self.maxnum      = maxnum
+        self.config      = GlobalConfig()
+
+        if self.config.get_user_option('viz-compact-view') == 'yes':
+            self.compact_view = True
+        else:
+            self.compact_view = False
 
         self.set_title(branch.nick + " - revision history")
 
@@ -63,6 +70,9 @@ class BranchWindow(Window):
 
         self.construct()
 
+    def set_revision(self, revision):
+        self.treeview.set_revision(revision)
+
     def construct(self):
         """Construct the window contents."""
         vbox = gtk.VBox(spacing=5)
@@ -71,12 +81,12 @@ class BranchWindow(Window):
         vbox.pack_start(self.construct_navigation(), expand=False, fill=True)
         vbox.pack_start(self.construct_loading_msg(), expand=False, fill=True)
         
-        paned = gtk.VPaned()
-        paned.pack1(self.construct_top(), resize=True, shrink=False)
-        paned.pack2(self.construct_bottom(), resize=False, shrink=True)
-        paned.show()
-        vbox.pack_start(paned, expand=True, fill=True)
-        vbox.set_focus_child(paned)
+        self.paned = gtk.VPaned()
+        self.paned.pack1(self.construct_top(), resize=True, shrink=False)
+        self.paned.pack2(self.construct_bottom(), resize=False, shrink=True)
+        self.paned.show()
+        vbox.pack_start(self.paned, expand=True, fill=True)
+        vbox.set_focus_child(self.paned)
 
         vbox.show()
     
@@ -101,7 +111,12 @@ class BranchWindow(Window):
     def construct_top(self):
         """Construct the top-half of the window."""
         # FIXME: Make broken_line_length configurable
-        self.treeview = TreeView(self.branch, self.start, self.maxnum, 32)
+        if self.compact_view:
+            brokenlines = 32
+        else:
+            brokenlines = None
+
+        self.treeview = TreeView(self.branch, self.start, self.maxnum, brokenlines)
 
         self.treeview.connect("revision-selected",
                 self._treeselection_changed_cb)
@@ -124,7 +139,6 @@ class BranchWindow(Window):
                                          0, 0)
         self.back_button.connect("clicked", self._back_clicked_cb)
         self.toolbar.insert(self.back_button, -1)
-        self.back_button.show()
 
         self.fwd_button = gtk.ToolButton(stock_id=gtk.STOCK_GO_FORWARD)
         self.fwd_button.set_is_important(True)
@@ -132,9 +146,17 @@ class BranchWindow(Window):
                                         0, 0)
         self.fwd_button.connect("clicked", self._fwd_clicked_cb)
         self.toolbar.insert(self.fwd_button, -1)
-        self.fwd_button.show()
 
-        self.toolbar.show()
+        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
+
+        brokenlines_button = gtk.ToggleToolButton()
+        brokenlines_button.set_label("Compact View")
+        brokenlines_button.set_active(self.compact_view)
+        brokenlines_button.set_is_important(True)
+        brokenlines_button.connect('toggled', self._brokenlines_toggled_cb)
+        self.toolbar.insert(brokenlines_button, -1)
+
+        self.toolbar.show_all()
 
         return self.toolbar
 
@@ -182,3 +204,19 @@ class BranchWindow(Window):
         self.treeview.show_diff(self.branch, revid, parentid)
         self.treeview.grab_focus()
 
+    def _brokenlines_toggled_cb(self, button):
+        self.compact_view = button.get_active()
+
+        if self.compact_view:
+            option = 'yes'
+        else:
+            option = 'no'
+
+        self.config.set_user_option('viz-compact-view', option)
+
+        revision = self.treeview.get_revision()
+
+        self.treeview.destroy()
+        self.paned.pack1(self.construct_top(), resize=True, shrink=False)
+
+        gobject.idle_add(self.set_revision, revision.revision_id)
