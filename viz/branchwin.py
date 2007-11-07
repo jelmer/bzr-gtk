@@ -20,6 +20,7 @@ from bzrlib.revision import Revision
 from bzrlib.config import BranchConfig
 from bzrlib.config import GlobalConfig
 from treeview import TreeView
+from about import AboutDialog
 
 class BranchWindow(Window):
     """Branch window.
@@ -190,6 +191,15 @@ class BranchWindow(Window):
 
         branch_menu.add(gtk.MenuItem("Pu_ll Revisions"))
         branch_menu.add(gtk.MenuItem("Pu_sh Revisions"))
+
+        help_menu = gtk.Menu()
+        help_menuitem = gtk.MenuItem("_Help")
+        help_menuitem.set_submenu(help_menu)
+
+        help_menu_about = gtk.ImageMenuItem(gtk.STOCK_ABOUT)
+        help_menu_about.connect('activate', self._show_about_cb)
+
+        help_menu.add(help_menu_about)
        
         menubar.add(file_menuitem)
         menubar.add(edit_menuitem)
@@ -197,6 +207,7 @@ class BranchWindow(Window):
         menubar.add(go_menuitem)
         menubar.add(revision_menuitem)
         menubar.add(branch_menuitem)
+        menubar.add(help_menuitem)
         menubar.show_all()
 
         return menubar
@@ -388,3 +399,8 @@ class BranchWindow(Window):
             self.toolbar.show() 
         else:
             self.toolbar.hide()
+
+    def _show_about_cb(self, w):
+        dialog = AboutDialog()
+        dialog.connect('response', lambda d,r: d.destroy())
+        dialog.run()
