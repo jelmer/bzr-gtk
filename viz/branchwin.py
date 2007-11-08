@@ -149,11 +149,17 @@ class BranchWindow(Window):
         go_menuitem = gtk.MenuItem("_Go")
         go_menuitem.set_submenu(go_menu)
         
-        go_menu_back = gtk.ImageMenuItem(gtk.STOCK_GO_DOWN)
-        go_menu_back.connect("activate", self._back_clicked_cb)
-
-        go_menu_forward = gtk.ImageMenuItem(gtk.STOCK_GO_UP)
+        next_image = gtk.Image()
+        next_image.set_from_stock(gtk.STOCK_GO_UP, gtk.ICON_SIZE_MENU)
+        go_menu_forward = gtk.ImageMenuItem("_Next Revision")
+        go_menu_forward.set_image(next_image)
         go_menu_forward.connect("activate", self._fwd_clicked_cb)
+
+        prev_image = gtk.Image()
+        prev_image.set_from_stock(gtk.STOCK_GO_DOWN, gtk.ICON_SIZE_MENU)
+        go_menu_back = gtk.ImageMenuItem("_Previous Revision")
+        go_menu_back.set_image(prev_image)
+        go_menu_back.connect("activate", self._back_clicked_cb)
 
         tags_menu = gtk.Menu()
         go_menu_tags = gtk.MenuItem("_Tags")
@@ -165,8 +171,8 @@ class BranchWindow(Window):
                 tag_item.connect('activate', self._tag_selected_cb, revid)
                 tags_menu.add(tag_item)
 
-        go_menu.add(go_menu_back)
         go_menu.add(go_menu_forward)
+        go_menu.add(go_menu_back)
         go_menu.add(gtk.SeparatorMenuItem())
         go_menu.add(go_menu_tags)
 
