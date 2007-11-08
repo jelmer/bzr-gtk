@@ -77,19 +77,15 @@ class BranchWindow(Window):
         vbox = gtk.VBox(spacing=0)
         self.add(vbox)
 
-        top = gtk.Alignment(0.0, 0.0, 1.0, 1.0)
-        top.set_padding(5, 0, 0, 0)
-        top.add(self.construct_top())
-        top.show()
+        self.paned = gtk.VPaned()
+        self.paned.pack1(self.construct_top(), resize=True, shrink=False)
+        self.paned.pack2(self.construct_bottom(), resize=False, shrink=True)
+        self.paned.show()
 
         vbox.pack_start(self.construct_menubar(), expand=False, fill=True)
         vbox.pack_start(self.construct_navigation(), expand=False, fill=True)
         vbox.pack_start(self.construct_loading_msg(), expand=False, fill=True)
         
-        self.paned = gtk.VPaned()
-        self.paned.pack1(top, resize=True, shrink=False)
-        self.paned.pack2(self.construct_bottom(), resize=False, shrink=True)
-        self.paned.show()
         vbox.pack_start(self.paned, expand=True, fill=True)
         vbox.set_focus_child(self.paned)
 
@@ -256,7 +252,12 @@ class BranchWindow(Window):
 
         self.treeview.show()
 
-        return self.treeview
+        align = gtk.Alignment(0.0, 0.0, 1.0, 1.0)
+        align.set_padding(5, 0, 0, 0)
+        align.add(self.treeview)
+        align.show()
+
+        return align
 
     def construct_navigation(self):
         """Construct the navigation buttons."""
@@ -379,7 +380,7 @@ class BranchWindow(Window):
 
         revision = self.treeview.get_revision()
 
-        self.treeview.destroy()
+        self.paned.get_child1().destroy()
         self.paned.pack1(self.construct_top(), resize=True, shrink=False)
 
         gobject.idle_add(self.set_revision, revision.revision_id)
