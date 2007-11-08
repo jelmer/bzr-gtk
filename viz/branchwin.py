@@ -151,15 +151,15 @@ class BranchWindow(Window):
         
         next_image = gtk.Image()
         next_image.set_from_stock(gtk.STOCK_GO_UP, gtk.ICON_SIZE_MENU)
-        go_menu_next = gtk.ImageMenuItem("_Next Revision")
-        go_menu_next.set_image(next_image)
-        go_menu_next.connect("activate", self._fwd_clicked_cb)
+        self.go_menu_next = gtk.ImageMenuItem("_Next Revision")
+        self.go_menu_next.set_image(next_image)
+        self.go_menu_next.connect("activate", self._fwd_clicked_cb)
 
         prev_image = gtk.Image()
         prev_image.set_from_stock(gtk.STOCK_GO_DOWN, gtk.ICON_SIZE_MENU)
-        go_menu_prev = gtk.ImageMenuItem("_Previous Revision")
-        go_menu_prev.set_image(prev_image)
-        go_menu_prev.connect("activate", self._back_clicked_cb)
+        self.go_menu_prev = gtk.ImageMenuItem("_Previous Revision")
+        self.go_menu_prev.set_image(prev_image)
+        self.go_menu_prev.connect("activate", self._back_clicked_cb)
 
         tags_menu = gtk.Menu()
         go_menu_tags = gtk.MenuItem("_Tags")
@@ -171,8 +171,8 @@ class BranchWindow(Window):
                 tag_item.connect('activate', self._tag_selected_cb, revid)
                 tags_menu.add(tag_item)
 
-        go_menu.add(go_menu_next)
-        go_menu.add(go_menu_prev)
+        go_menu.add(self.go_menu_next)
+        go_menu.add(self.go_menu_prev)
         go_menu.add(gtk.SeparatorMenuItem())
         go_menu.add(go_menu_tags)
 
@@ -310,6 +310,7 @@ class BranchWindow(Window):
             prev_menu = gtk.Menu()
             if len(parents) > 0:
                 self.prev_button.set_sensitive(True)
+                self.go_menu_prev.set_sensitive(True)
                 for parent_id in parents:
                     parent = self.branch.repository.get_revision(parent_id)
                     try:
@@ -323,6 +324,7 @@ class BranchWindow(Window):
                 prev_menu.show_all()
             else:
                 self.prev_button.set_sensitive(False)
+                self.go_menu_prev.set_sensitive(False)
                 prev_menu.hide()
 
             self.prev_button.set_menu(prev_menu)
@@ -330,6 +332,7 @@ class BranchWindow(Window):
             next_menu = gtk.Menu()
             if len(children) > 0:
                 self.next_button.set_sensitive(True)
+                self.go_menu_next.set_sensitive(True)
                 for child_id in children:
                     child = self.branch.repository.get_revision(child_id)
                     try:
@@ -343,6 +346,7 @@ class BranchWindow(Window):
                 next_menu.show_all()
             else:
                 self.next_button.set_sensitive(False)
+                self.go_menu_next.set_sensitive(False)
                 next_menu.hide()
 
             self.next_button.set_menu(next_menu)
