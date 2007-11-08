@@ -264,17 +264,17 @@ class BranchWindow(Window):
         self.toolbar = gtk.Toolbar()
         self.toolbar.set_style(gtk.TOOLBAR_BOTH_HORIZ)
 
-        self.back_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_DOWN)
-        self.back_button.add_accelerator("clicked", self.accel_group, ord('['),
+        self.prev_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_DOWN)
+        self.prev_button.add_accelerator("clicked", self.accel_group, ord('['),
                                          0, 0)
-        self.back_button.connect("clicked", self._back_clicked_cb)
-        self.toolbar.insert(self.back_button, -1)
+        self.prev_button.connect("clicked", self._back_clicked_cb)
+        self.toolbar.insert(self.prev_button, -1)
 
-        self.fwd_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_UP)
-        self.fwd_button.add_accelerator("clicked", self.accel_group, ord(']'),
+        self.next_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_UP)
+        self.next_button.add_accelerator("clicked", self.accel_group, ord(']'),
                                         0, 0)
-        self.fwd_button.connect("clicked", self._fwd_clicked_cb)
-        self.toolbar.insert(self.fwd_button, -1)
+        self.next_button.connect("clicked", self._fwd_clicked_cb)
+        self.toolbar.insert(self.next_button, -1)
 
         self.toolbar.show_all()
 
@@ -301,9 +301,9 @@ class BranchWindow(Window):
         children = self.treeview.get_children()
 
         if revision is not None:
-            back_menu = gtk.Menu()
+            prev_menu = gtk.Menu()
             if len(parents) > 0:
-                self.back_button.set_sensitive(True)
+                self.prev_button.set_sensitive(True)
                 for parent_id in parents:
                     parent = self.branch.repository.get_revision(parent_id)
                     try:
@@ -313,17 +313,17 @@ class BranchWindow(Window):
 
                     item = gtk.MenuItem(parent.message.split("\n")[0] + str)
                     item.connect('activate', self._set_revision_cb, parent_id)
-                    back_menu.add(item)
-                back_menu.show_all()
+                    prev_menu.add(item)
+                prev_menu.show_all()
             else:
-                self.back_button.set_sensitive(False)
-                back_menu.hide()
+                self.prev_button.set_sensitive(False)
+                prev_menu.hide()
 
-            self.back_button.set_menu(back_menu)
+            self.prev_button.set_menu(prev_menu)
 
-            fwd_menu = gtk.Menu()
+            next_menu = gtk.Menu()
             if len(children) > 0:
-                self.fwd_button.set_sensitive(True)
+                self.next_button.set_sensitive(True)
                 for child_id in children:
                     child = self.branch.repository.get_revision(child_id)
                     try:
@@ -333,13 +333,13 @@ class BranchWindow(Window):
 
                     item = gtk.MenuItem(child.message.split("\n")[0] + str)
                     item.connect('activate', self._set_revision_cb, child_id)
-                    fwd_menu.add(item)
-                fwd_menu.show_all()
+                    next_menu.add(item)
+                next_menu.show_all()
             else:
-                self.fwd_button.set_sensitive(False)
-                fwd_menu.hide()
+                self.next_button.set_sensitive(False)
+                next_menu.hide()
 
-            self.fwd_button.set_menu(fwd_menu)
+            self.next_button.set_menu(next_menu)
 
             tags = []
             if self.branch.supports_tags():
