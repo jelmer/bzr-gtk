@@ -77,7 +77,10 @@ class BranchWindow(Window):
         vbox = gtk.VBox(spacing=0)
         self.add(vbox)
 
-        top = self.construct_top()
+        top = gtk.Alignment(0.0, 0.0, 1.0, 1.0)
+        top.set_padding(5, 0, 0, 0)
+        top.add(self.construct_top())
+        top.show()
 
         vbox.pack_start(self.construct_menubar(), expand=False, fill=True)
         vbox.pack_start(self.construct_navigation(), expand=False, fill=True)
