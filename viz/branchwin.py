@@ -167,8 +167,8 @@ class BranchWindow(Window):
         go_menuitem = gtk.MenuItem("_Go")
         go_menuitem.set_submenu(go_menu)
         
-        self.go_menu_next = self.next_rev_action.create_menu_item()
-        self.go_menu_prev = self.prev_rev_action.create_menu_item()
+        go_menu_next = self.next_rev_action.create_menu_item()
+        go_menu_prev = self.prev_rev_action.create_menu_item()
 
         tags_menu = gtk.Menu()
         go_menu_tags = gtk.MenuItem("_Tags")
@@ -180,8 +180,8 @@ class BranchWindow(Window):
                 tag_item.connect('activate', self._tag_selected_cb, revid)
                 tags_menu.add(tag_item)
 
-        go_menu.add(self.go_menu_next)
-        go_menu.add(self.go_menu_prev)
+        go_menu.add(go_menu_next)
+        go_menu.add(go_menu_prev)
         go_menu.add(gtk.SeparatorMenuItem())
         go_menu.add(go_menu_tags)
 
