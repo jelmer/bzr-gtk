@@ -64,7 +64,7 @@ class BranchWindow(Window):
         icon = self.render_icon(gtk.STOCK_INDEX, gtk.ICON_SIZE_BUTTON)
         self.set_icon(icon)
 
-        gtk.accel_map_add_entry("<viz>/Go/Previous Revision", 65364, gtk.gdk.MOD1_MASK)
+        gtk.accel_map_add_entry("<viz>/Go/Previous Revision", gtk.keysyms.Down, gtk.gdk.MOD1_MASK)
 
         self.accel_group = gtk.AccelGroup()
         self.add_accel_group(self.accel_group)
