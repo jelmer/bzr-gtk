@@ -70,6 +70,8 @@ class BranchWindow(Window):
         self.accel_group = gtk.AccelGroup()
         self.add_accel_group(self.accel_group)
 
+        gtk.Action.set_tool_item_type(gtk.MenuToolButton)
+
         self.prev_rev_action = gtk.Action("prev-rev", "_Previous Revision", "Go to the previous revision", gtk.STOCK_GO_DOWN)
         self.prev_rev_action.set_accel_path("<viz>/Go/Previous Revision")
         self.prev_rev_action.set_accel_group(self.accel_group)
@@ -287,12 +289,10 @@ class BranchWindow(Window):
         self.toolbar = gtk.Toolbar()
         self.toolbar.set_style(gtk.TOOLBAR_BOTH_HORIZ)
 
-        self.prev_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_DOWN)
-        self.prev_rev_action.connect_proxy(self.prev_button)
+        self.prev_button = self.prev_rev_action.create_tool_item()
         self.toolbar.insert(self.prev_button, -1)
 
-        self.next_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_UP)
-        self.next_rev_action.connect_proxy(self.next_button)
+        self.next_button = self.next_rev_action.create_tool_item()
         self.toolbar.insert(self.next_button, -1)
 
         self.toolbar.show_all()
