@@ -288,14 +288,10 @@ class BranchWindow(Window):
         self.toolbar.set_style(gtk.TOOLBAR_BOTH_HORIZ)
 
         self.prev_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_DOWN)
-        self.prev_button.add_accelerator("clicked", self.accel_group, ord('['),
-                                         0, 0)
         self.prev_rev_action.connect_proxy(self.prev_button)
         self.toolbar.insert(self.prev_button, -1)
 
         self.next_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_UP)
-        self.next_button.add_accelerator("clicked", self.accel_group, ord(']'),
-                                        0, 0)
         self.next_rev_action.connect_proxy(self.next_button)
         self.toolbar.insert(self.next_button, -1)
 
