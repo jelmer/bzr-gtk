@@ -167,18 +167,8 @@ class BranchWindow(Window):
         go_menuitem = gtk.MenuItem("_Go")
         go_menuitem.set_submenu(go_menu)
         
-        next_image = gtk.Image()
-        next_image.set_from_stock(gtk.STOCK_GO_UP, gtk.ICON_SIZE_MENU)
-        self.go_menu_next = gtk.ImageMenuItem("_Next Revision")
-        self.go_menu_next.set_image(next_image)
-        self.next_rev_action.connect_proxy(self.go_menu_next)
-
-        prev_image = gtk.Image()
-        prev_image.set_from_stock(gtk.STOCK_GO_DOWN, gtk.ICON_SIZE_MENU)
-        self.go_menu_prev = gtk.ImageMenuItem("_Previous Revision")
-        self.go_menu_prev.set_image(prev_image)
-        self.go_menu_prev.set_accel_path("<viz>/Go/Previous Revision")
-        self.prev_rev_action.connect_proxy(self.go_menu_prev)
+        self.go_menu_next = self.next_rev_action.create_menu_item()
+        self.go_menu_prev = self.prev_rev_action.create_menu_item()
 
         tags_menu = gtk.Menu()
         go_menu_tags = gtk.MenuItem("_Tags")
