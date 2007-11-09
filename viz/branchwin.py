@@ -414,6 +414,7 @@ class BranchWindow(Window):
 
         finally:
             self.branch.lock_read()
+            self.treeview.emit("revision-selected")
             self.treeview.set_sensitive(True)
 
     def _col_visibility_changed(self, col, property):
