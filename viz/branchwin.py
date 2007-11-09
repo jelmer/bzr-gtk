@@ -395,19 +395,26 @@ class BranchWindow(Window):
         gobject.idle_add(self.set_revision, revision.revision_id)
 
     def _tag_revision_cb(self, w):
-        dialog = AddTagDialog(self.branch.repository, self.treeview.get_revision().revision_id, self.branch)
-        response = dialog.run()
-        if response != gtk.RESPONSE_NONE:
-            dialog.hide()
-        
-            if response == gtk.RESPONSE_OK:
-                try:
-                    self.branch.lock_write()
-                    self.branch.tags.set_tag(dialog.tagname, dialog._revid)
-                finally:
-                    self.branch.unlock()
+        try:
+            self.treeview.set_sensitive(False)
+            self.branch.unlock()
+            dialog = AddTagDialog(self.branch.repository, self.treeview.get_revision().revision_id, self.branch)
+            response = dialog.run()
+            if response != gtk.RESPONSE_NONE:
+                dialog.hide()
             
-            dialog.destroy()
+                if response == gtk.RESPONSE_OK:
+                    try:
+                        self.branch.lock_write()
+                        self.branch.tags.set_tag(dialog.tagname, dialog._revid)
+                    finally:
+                        self.branch.unlock()
+                
+                dialog.destroy()
+
+        finally:
+            self.branch.lock_read()
+            self.treeview.set_sensitive(True)
 
     def _col_visibility_changed(self, col, property):
         self.config.set_user_option(property + '-column-visible', col.get_active())
