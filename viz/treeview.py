@@ -81,6 +81,8 @@ class TreeView(gtk.ScrolledWindow):
         self.children = None
         self.parents  = None
 
+        self.connect("destroy", lambda x: self.branch.unlock())
+
     def do_get_property(self, property):
         if property.name == 'revno-column-visible':
             return self.revno_column.get_visible()
@@ -176,25 +178,21 @@ class TreeView(gtk.ScrolledWindow):
         :param broken_line_length: After how much lines branches \
                        should be broken.
         """
-        try:
-            self.branch.lock_read()
-            (linegraphdata, index, columns_len) = linegraph(self.branch.repository,
-                                                            start,
-                                                            maxnum, 
-                                                            broken_line_length)
+        self.branch.lock_read()
+        (linegraphdata, index, columns_len) = linegraph(self.branch.repository,
+                                                        start,
+                                                        maxnum, 
+                                                        broken_line_length)
 
-            self.model = TreeModel(self.branch.repository, linegraphdata)
-            self.graph_cell.columns_len = columns_len
-            width = self.graph_cell.get_size(self.treeview)[2]
-            self.graph_column.set_fixed_width(width)
-            self.graph_column.set_max_width(width)
-            self.index = index
-            self.treeview.set_model(self.model)
-            self.treeview.set_cursor(0)
-            self.emit('revisions-loaded')
-
-        finally:
-            self.branch.unlock()
+        self.model = TreeModel(self.branch.repository, linegraphdata)
+        self.graph_cell.columns_len = columns_len
+        width = self.graph_cell.get_size(self.treeview)[2]
+        self.graph_column.set_fixed_width(width)
+        self.graph_column.set_max_width(width)
+        self.index = index
+        self.treeview.set_model(self.model)
+        self.treeview.set_cursor(0)
+        self.emit('revisions-loaded')
 
         return False
 
