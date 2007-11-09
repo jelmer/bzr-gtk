@@ -64,8 +64,9 @@ class BranchWindow(Window):
         icon = self.render_icon(gtk.STOCK_INDEX, gtk.ICON_SIZE_BUTTON)
         self.set_icon(icon)
 
+        gtk.accel_map_add_entry("<viz>/Go/Previous Revision", 65364, gtk.gdk.MOD1_MASK)
+
         self.accel_group = gtk.AccelGroup()
-        self.accel_group.connect_group(65364, gtk.gdk.MOD1_MASK, gtk.ACCEL_VISIBLE, self._back_clicked_cb)
         self.add_accel_group(self.accel_group)
 
         self.construct()
@@ -147,6 +148,7 @@ class BranchWindow(Window):
             view_menu.add(col)
 
         go_menu = gtk.Menu()
+        go_menu.set_accel_group(self.accel_group)
         go_menuitem = gtk.MenuItem("_Go")
         go_menuitem.set_submenu(go_menu)
         
@@ -160,6 +162,7 @@ class BranchWindow(Window):
         prev_image.set_from_stock(gtk.STOCK_GO_DOWN, gtk.ICON_SIZE_MENU)
         self.go_menu_prev = gtk.ImageMenuItem("_Previous Revision")
         self.go_menu_prev.set_image(prev_image)
+        self.go_menu_prev.set_accel_path("<viz>/Go/Previous Revision")
         self.go_menu_prev.connect("activate", self._back_clicked_cb)
 
         tags_menu = gtk.Menu()
