@@ -70,6 +70,12 @@ class BranchWindow(Window):
         self.accel_group = gtk.AccelGroup()
         self.add_accel_group(self.accel_group)
 
+        self.prev_rev_action = gtk.Action("prev-rev", "_Previous Revision", "Go to the previous revision", gtk.STOCK_GO_DOWN)
+        self.prev_rev_action.set_accel_path("<viz>/Go/Previous Revision")
+        self.prev_rev_action.set_accel_group(self.accel_group)
+        self.prev_rev_action.connect("activate", self._back_clicked_cb)
+        self.prev_rev_action.connect_accelerator()
+
         self.construct()
 
     def set_revision(self, revid):
@@ -165,7 +171,7 @@ class BranchWindow(Window):
         self.go_menu_prev = gtk.ImageMenuItem("_Previous Revision")
         self.go_menu_prev.set_image(prev_image)
         self.go_menu_prev.set_accel_path("<viz>/Go/Previous Revision")
-        self.go_menu_prev.connect("activate", self._back_clicked_cb)
+        self.prev_rev_action.connect_proxy(self.go_menu_prev)
 
         tags_menu = gtk.Menu()
         go_menu_tags = gtk.MenuItem("_Tags")
@@ -279,7 +285,7 @@ class BranchWindow(Window):
         self.prev_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_DOWN)
         self.prev_button.add_accelerator("clicked", self.accel_group, ord('['),
                                          0, 0)
-        self.prev_button.connect("clicked", self._back_clicked_cb)
+        self.prev_rev_action.connect_proxy(self.prev_button)
         self.toolbar.insert(self.prev_button, -1)
 
         self.next_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_UP)
@@ -315,8 +321,7 @@ class BranchWindow(Window):
         if revision is not None:
             prev_menu = gtk.Menu()
             if len(parents) > 0:
-                self.prev_button.set_sensitive(True)
-                self.go_menu_prev.set_sensitive(True)
+                self.prev_rev_action.set_sensitive(True)
                 for parent_id in parents:
                     parent = self.branch.repository.get_revision(parent_id)
                     try:
@@ -329,8 +334,7 @@ class BranchWindow(Window):
                     prev_menu.add(item)
                 prev_menu.show_all()
             else:
-                self.prev_button.set_sensitive(False)
-                self.go_menu_prev.set_sensitive(False)
+                self.prev_rev_action.set_sensitive(False)
                 prev_menu.hide()
 
             self.prev_button.set_menu(prev_menu)
