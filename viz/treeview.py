@@ -230,7 +230,7 @@ class TreeView(gtk.ScrolledWindow):
         if set_tooltip is not None:
             set_tooltip(treemodel.MESSAGE)
 
-        self.treeview.get_selection().connect("changed",
+        self.treeview.connect("cursor-changed",
                 self._on_selection_changed)
 
         self.treeview.connect("row-activated", 
@@ -299,11 +299,11 @@ class TreeView(gtk.ScrolledWindow):
         self.date_column.add_attribute(cell, "text", treemodel.TIMESTAMP)
         self.treeview.append_column(self.date_column)
 
-    def _on_selection_changed(self, selection, *args):
+    def _on_selection_changed(self, treeview):
         """callback for when the treeview changes."""
-        (model, selected_rows) = selection.get_selected_rows()
-        if len(selected_rows) > 0:
-            iter = self.model.get_iter(selected_rows[0])
+        (path, focus) = treeview.get_cursor()
+        if path is not None:
+            iter = self.model.get_iter(path)
             self.revision = self.model.get_value(iter, treemodel.REVISION)
             self.parents = self.model.get_value(iter, treemodel.PARENTS)
             self.children = self.model.get_value(iter, treemodel.CHILDREN)
