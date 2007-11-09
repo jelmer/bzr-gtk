@@ -76,6 +76,12 @@ class BranchWindow(Window):
         self.prev_rev_action.connect("activate", self._back_clicked_cb)
         self.prev_rev_action.connect_accelerator()
 
+        self.next_rev_action = gtk.Action("next-rev", "_Next Revision", "Go to the next revision", gtk.STOCK_GO_UP)
+        self.next_rev_action.set_accel_path("<viz>/Go/Next Revision")
+        self.next_rev_action.set_accel_group(self.accel_group)
+        self.next_rev_action.connect("activate", self._fwd_clicked_cb)
+        self.next_rev_action.connect_accelerator()
+
         self.construct()
 
     def set_revision(self, revid):
@@ -163,8 +169,7 @@ class BranchWindow(Window):
         next_image.set_from_stock(gtk.STOCK_GO_UP, gtk.ICON_SIZE_MENU)
         self.go_menu_next = gtk.ImageMenuItem("_Next Revision")
         self.go_menu_next.set_image(next_image)
-        self.go_menu_next.set_accel_path("<viz>/Go/Next Revision")
-        self.go_menu_next.connect("activate", self._fwd_clicked_cb)
+        self.next_rev_action.connect_proxy(self.go_menu_next)
 
         prev_image = gtk.Image()
         prev_image.set_from_stock(gtk.STOCK_GO_DOWN, gtk.ICON_SIZE_MENU)
@@ -291,7 +296,7 @@ class BranchWindow(Window):
         self.next_button = gtk.MenuToolButton(stock_id=gtk.STOCK_GO_UP)
         self.next_button.add_accelerator("clicked", self.accel_group, ord(']'),
                                         0, 0)
-        self.next_button.connect("clicked", self._fwd_clicked_cb)
+        self.next_rev_action.connect_proxy(self.next_button)
         self.toolbar.insert(self.next_button, -1)
 
         self.toolbar.show_all()
@@ -341,8 +346,7 @@ class BranchWindow(Window):
 
             next_menu = gtk.Menu()
             if len(children) > 0:
-                self.next_button.set_sensitive(True)
-                self.go_menu_next.set_sensitive(True)
+                self.next_rev_action.set_sensitive(True)
                 for child_id in children:
                     child = self.branch.repository.get_revision(child_id)
                     try:
@@ -355,8 +359,7 @@ class BranchWindow(Window):
                     next_menu.add(item)
                 next_menu.show_all()
             else:
-                self.next_button.set_sensitive(False)
-                self.go_menu_next.set_sensitive(False)
+                self.next_rev_action.set_sensitive(False)
                 next_menu.hide()
 
             self.next_button.set_menu(next_menu)
