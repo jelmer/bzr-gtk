@@ -64,7 +64,7 @@ class GAnnotateWindow(Window):
         self.branch = branch
         self.tree = tree
         self.file_id = file_id
-        self.logview.set_file_id(file_id)
+        self.revisionview.set_file_id(file_id)
         self.revision_id = getattr(tree, 'get_revision_id', 
                                    lambda: CURRENT_REVISION)()
         
