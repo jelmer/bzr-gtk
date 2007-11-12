@@ -32,6 +32,12 @@ class TreeView(gtk.ScrolledWindow):
                      'The currently selected revision',
                      gobject.PARAM_READWRITE),
 
+        'revision-number': (gobject.TYPE_STRING,
+                            'Revision number',
+                            'The number of the selected revision',
+                            '',
+                            gobject.PARAM_READABLE),
+
         'children': (gobject.TYPE_PYOBJECT,
                      'Child revisions',
                      'Children of the currently selected revision',
@@ -99,6 +105,8 @@ class TreeView(gtk.ScrolledWindow):
             return self.branch
         elif property.name == 'revision':
             return self.model.get_value(self.iter, treemodel.REVISION)
+        elif property.name == 'revision-number':
+            return self.model.get_value(self.iter, treemodel.REVNO)
         elif property.name == 'children':
             return self.model.get_value(self.iter, treemodel.CHILDREN)
         elif property.name == 'parents':
@@ -157,11 +165,10 @@ class TreeView(gtk.ScrolledWindow):
             parent_index = self.index[parent_id]
             parent = self.model[parent_index][treemodel.REVISION]
             if same_branch(self.get_revision(), parent):
-                self.treeview.set_cursor(parent_index)
+                self.set_revision(parent)
                 break
         else:
-            self.treeview.set_cursor(self.index[parents[0]])
-        self.treeview.grab_focus()
+            self.set_revision_id(parents[0])
 
     def forward(self):
         """Signal handler for the Forward button."""
@@ -173,11 +180,10 @@ class TreeView(gtk.ScrolledWindow):
             child_index = self.index[child_id]
             child = self.model[child_index][treemodel.REVISION]
             if same_branch(child, self.get_revision()):
-                self.treeview.set_cursor(child_index)
+                self.set_revision(child)
                 break
         else:
-            self.treeview.set_cursor(self.index[children[0]])
-        self.treeview.grab_focus()
+            self.set_revision_id(children[0])
 
     def populate(self, start, maxnum, broken_line_length=None):
         """Fill the treeview with contents.
