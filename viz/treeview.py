@@ -32,6 +32,16 @@ class TreeView(gtk.ScrolledWindow):
                      'The currently selected revision',
                      gobject.PARAM_READWRITE),
 
+        'children': (gobject.TYPE_PYOBJECT,
+                     'Child revisions',
+                     'Children of the currently selected revision',
+                     gobject.PARAM_READABLE),
+
+        'parents': (gobject.TYPE_PYOBJECT,
+                    'Parent revisions',
+                    'Parents to the currently selected revision',
+                    gobject.PARAM_READABLE),
+
         'revno-column-visible': (gobject.TYPE_BOOLEAN,
                                  'Revision number',
                                  'Show revision number column',
@@ -72,14 +82,11 @@ class TreeView(gtk.ScrolledWindow):
 
         self.construct_treeview()
 
+        self.iter   = None
         self.branch = branch
 
         gobject.idle_add(self.populate, start, maxnum, 
                          broken_line_length)
-
-        self.revision = None
-        self.children = None
-        self.parents  = None
 
         self.connect("destroy", lambda x: self.branch.unlock())
 
@@ -91,7 +98,11 @@ class TreeView(gtk.ScrolledWindow):
         elif property.name == 'branch':
             return self.branch
         elif property.name == 'revision':
-            return self.revision
+            return self.model.get_value(self.iter, treemodel.REVISION)
+        elif property.name == 'children':
+            return self.model.get_value(self.iter, treemodel.CHILDREN)
+        elif property.name == 'parents':
+            return self.model.get_value(self.iter, treemodel.PARENTS)
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
@@ -109,7 +120,10 @@ class TreeView(gtk.ScrolledWindow):
 
     def get_revision(self):
         """Return revision id of currently selected revision, or None."""
-        return self.revision
+        return self.get_property('revision')
+
+    def set_revision(self, revision):
+        self.set_property('revision', revision)
 
     def set_revision_id(self, revid):
         """Change the currently selected revision.
@@ -124,27 +138,25 @@ class TreeView(gtk.ScrolledWindow):
 
         :return: list of revision ids.
         """
-        return self.children
+        return self.get_property('children')
 
     def get_parents(self):
         """Return the parents of the currently selected revision.
 
         :return: list of revision ids.
         """
-        return self.parents
+        return self.get_property('parents')
         
     def back(self):
         """Signal handler for the Back button."""
-        (path, col) = self.treeview.get_cursor()
-        revision = self.model[path][treemodel.REVISION]
-        parents = self.model[path][treemodel.PARENTS]
+        parents = self.get_parents()
         if not len(parents):
             return
 
         for parent_id in parents:
             parent_index = self.index[parent_id]
             parent = self.model[parent_index][treemodel.REVISION]
-            if same_branch(revision, parent):
+            if same_branch(self.get_revision(), parent):
                 self.treeview.set_cursor(parent_index)
                 break
         else:
@@ -153,16 +165,14 @@ class TreeView(gtk.ScrolledWindow):
 
     def forward(self):
         """Signal handler for the Forward button."""
-        (path, col) = self.treeview.get_cursor()
-        revision = self.model[path][treemodel.REVISION]
-        children = self.model[path][treemodel.CHILDREN]
+        children = self.get_children()
         if not len(children):
             return
 
         for child_id in children:
             child_index = self.index[child_id]
             child = self.model[child_index][treemodel.REVISION]
-            if same_branch(child, revision):
+            if same_branch(child, self.get_revision()):
                 self.treeview.set_cursor(child_index)
                 break
         else:
@@ -201,11 +211,13 @@ class TreeView(gtk.ScrolledWindow):
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow(parent=self)
 
-        if revid is None:
-            revid = self.revision.revision_id
+        parents = self.get_parents()
 
-            if parentid is None and len(self.parents) > 0:
-                parentid = self.parents[0]
+        if revid is None:
+            revid = self.get_revision().revision_id
+
+            if parentid is None and len(parents) > 0:
+                parentid = parents[0]
 
         if parentid is None:
             parentid = NULL_REVISION
@@ -301,11 +313,7 @@ class TreeView(gtk.ScrolledWindow):
         """callback for when the treeview changes."""
         (path, focus) = treeview.get_cursor()
         if path is not None:
-            iter = self.model.get_iter(path)
-            self.revision = self.model.get_value(iter, treemodel.REVISION)
-            self.parents = self.model.get_value(iter, treemodel.PARENTS)
-            self.children = self.model.get_value(iter, treemodel.CHILDREN)
-
+            self.iter = self.model.get_iter(path)
             self.emit('revision-selected')
 
     def _on_revision_selected(self, widget, event):
