@@ -1,6 +1,10 @@
 0.93.0  UNRELEASED
 
+0.92.1  2007-11-10
 
+ BUG FIXES
+ 
+  * Fixed logview bug in gannotate. (Daniel Schierbeck)
 
 0.92.0	2007-11-07
 
