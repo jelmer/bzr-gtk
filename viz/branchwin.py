@@ -177,6 +177,7 @@ class BranchWindow(Window):
         if self.branch.supports_tags():
             tags = self.branch.tags.get_tag_dict().items()
             tags.sort()
+            tags.reverse()
             for tag, revid in tags:
                 tag_item = gtk.MenuItem(tag)
                 tag_item.connect('activate', self._tag_selected_cb, revid)
