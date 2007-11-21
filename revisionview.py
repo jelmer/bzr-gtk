@@ -37,7 +37,7 @@ class RevisionView(gtk.Notebook):
 
         self._create_general()
         self._create_relations()
-        self._create_signatures()
+        self._create_signature()
         self._create_file_info_view()
 
         self.set_current_page(0)
@@ -384,7 +384,7 @@ class RevisionView(gtk.Notebook):
         window.show()
         return window
 
-    def _create_signatures(self):
+    def _create_signature(self):
         signature_box = gtk.Table(rows=1, columns=2)
         signature_box.set_col_spacing(0, 12)
 
@@ -398,7 +398,7 @@ class RevisionView(gtk.Notebook):
         box.set_border_width(6)
         box.pack_start(signature_box, expand=False)
         box.show_all()
-        self.append_page(box, tab_label=gtk.Label("Signatures"))
+        self.append_page(box, tab_label=gtk.Label("Signature"))
 
     def _create_file_info_view(self):
         self.file_info_box = gtk.VBox(False, 6)
