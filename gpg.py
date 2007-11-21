@@ -82,7 +82,7 @@ class GPGSubprocess:
 
         if resp.has_key('VALIDSIG'):
             L = string.split(resp['VALIDSIG'], None)
-            sig.fingerprint, sig.creation_date, sig.timestamp = L
+            sig.fingerprint, sig.creation_date, sig.timestamp = L[0], L[1], L[2]
 
         if resp.has_key('SIG_ID'):
             L = string.split(resp['SIG_ID'], None)
