@@ -132,6 +132,9 @@ class RevisionView(gtk.Notebook):
             signature_text = self._branch.repository.get_signature_text(revision.revision_id)
             signature = gpg.verify(signature_text)
 
+            if signature.key_id is not None:
+                self.signature_key_id.set_text(signature.key_id)
+
             if signature.is_valid():
                 self.signature_image.set_from_file("icons/sign-ok.png")
                 self.signature_label.set_text("This revision has been signed.")
@@ -139,6 +142,7 @@ class RevisionView(gtk.Notebook):
                 self.signature_image.set_from_file("icons/sign-bad.png")
                 self.signature_label.set_text("This revision has been signed, but the authenticity of the signature cannot be verified.")
         else:
+            self.signature_key_id.set_text("")
             self.signature_image.set_from_file("icons/sign-unknown.png")
             self.signature_label.set_text("This revision has not been signed.")
 
@@ -394,9 +398,26 @@ class RevisionView(gtk.Notebook):
         self.signature_label = gtk.Label()
         signature_box.attach(self.signature_label, 1, 2, 0, 1, gtk.FILL)
 
+        signature_info = gtk.Table(rows=1, columns=2)
+        signature_info.set_row_spacings(6)
+        signature_info.set_col_spacings(6)
+
+        align = gtk.Alignment(1.0, 0.5)
+        label = gtk.Label()
+        label.set_markup("<b>Key Id:</b>")
+        align.add(label)
+        signature_info.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.signature_key_id = gtk.Label()
+        self.signature_key_id.set_selectable(True)
+        align.add(self.signature_key_id)
+        signature_info.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
+
         box = gtk.VBox(False, 6)
         box.set_border_width(6)
         box.pack_start(signature_box, expand=False)
+        box.pack_start(signature_info, expand=False)
         box.show_all()
         self.append_page(box, tab_label=gtk.Label("Signature"))
 
