@@ -183,6 +183,10 @@ class BranchWindow(Window):
                 tag_item.connect('activate', self._tag_selected_cb, revid)
                 tags_menu.add(tag_item)
 
+            go_menu_tags.set_sensitive(len(tags) != 0)
+        else:
+            go_menu_tags.set_sensitive(False)
+
         go_menu.add(go_menu_next)
         go_menu.add(go_menu_prev)
         go_menu.add(gtk.SeparatorMenuItem())
