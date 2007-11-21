@@ -127,8 +127,10 @@ class RevisionView(gtk.Notebook):
             self.file_info_box.hide()
 
         if self._branch is not None and self._branch.repository.has_signature_for_revision_id(revision.revision_id):
+            self.signature_image.set_from_file("icons/sign-bad.png")
             self.signature_label.set_text("This revision has been signed, but the authenticity of the signature cannot be verified.")
         else:
+            self.signature_image.set_from_file("icons/sign-unknown.png")
             self.signature_label.set_text("This revision has not been signed.")
 
     def _show_clicked_cb(self, widget, revid, parentid):
@@ -374,14 +376,20 @@ class RevisionView(gtk.Notebook):
         return window
 
     def _create_signatures(self):
-        signature_box = gtk.VBox(False, 6)
+        signature_box = gtk.Table(rows=1, columns=2)
+        signature_box.set_col_spacing(0, 12)
+
+        self.signature_image = gtk.Image()
+        signature_box.attach(self.signature_image, 0, 1, 0, 1, gtk.FILL)
 
         self.signature_label = gtk.Label()
+        signature_box.attach(self.signature_label, 1, 2, 0, 1, gtk.FILL)
 
-        signature_box.pack_start(self.signature_label, False)
-
-        signature_box.show_all()
-        self.append_page(signature_box, tab_label=gtk.Label("Signatures"))
+        box = gtk.VBox(False, 6)
+        box.set_border_width(6)
+        box.pack_start(signature_box, expand=False)
+        box.show_all()
+        self.append_page(box, tab_label=gtk.Label("Signatures"))
 
     def _create_file_info_view(self):
         self.file_info_box = gtk.VBox(False, 6)
