@@ -37,6 +37,7 @@ class RevisionView(gtk.Notebook):
 
         self._create_general()
         self._create_relations()
+        self._create_signatures()
         self._create_file_info_view()
 
         self.set_current_page(0)
@@ -124,6 +125,11 @@ class RevisionView(gtk.Notebook):
                     self.file_info_box.hide()
         else:
             self.file_info_box.hide()
+
+        if self._branch is not None and self._branch.repository.has_signature_for_revision_id(revision.revision_id):
+            self.signature_label.set_text("This revision has been signed, but the authenticity of the signature cannot be verified.")
+        else:
+            self.signature_label.set_text("This revision has not been signed.")
 
     def _show_clicked_cb(self, widget, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
@@ -366,6 +372,16 @@ class RevisionView(gtk.Notebook):
         window.add(tv)
         window.show()
         return window
+
+    def _create_signatures(self):
+        signature_box = gtk.VBox(False, 6)
+
+        self.signature_label = gtk.Label()
+
+        signature_box.pack_start(self.signature_label, False)
+
+        signature_box.show_all()
+        self.append_page(signature_box, tab_label=gtk.Label("Signatures"))
 
     def _create_file_info_view(self):
         self.file_info_box = gtk.VBox(False, 6)
