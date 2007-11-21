@@ -127,8 +127,17 @@ class RevisionView(gtk.Notebook):
             self.file_info_box.hide()
 
         if self._branch is not None and self._branch.repository.has_signature_for_revision_id(revision.revision_id):
-            self.signature_image.set_from_file("icons/sign-bad.png")
-            self.signature_label.set_text("This revision has been signed, but the authenticity of the signature cannot be verified.")
+            from gpg import GPGSubprocess
+            gpg = GPGSubprocess()
+            signature_text = self._branch.repository.get_signature_text(revision.revision_id)
+            signature = gpg.verify(signature_text)
+
+            if signature.is_valid():
+                self.signature_image.set_from_file("icons/sign-ok.png")
+                self.signature_label.set_text("This revision has been signed.")
+            else:
+                self.signature_image.set_from_file("icons/sign-bad.png")
+                self.signature_label.set_text("This revision has been signed, but the authenticity of the signature cannot be verified.")
         else:
             self.signature_image.set_from_file("icons/sign-unknown.png")
             self.signature_label.set_text("This revision has not been signed.")
