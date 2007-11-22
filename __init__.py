@@ -699,6 +699,10 @@ def test_suite():
     default_encoding = sys.getdefaultencoding()
     try:
         result = TestSuite()
+        try:
+            import_pygtk()
+        except errors.BzrCommandError:
+            return result
         result.addTest(tests.test_suite())
     finally:
         if sys.getdefaultencoding() != default_encoding:
