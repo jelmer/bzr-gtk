@@ -700,11 +700,13 @@ def test_suite():
     from unittest import TestSuite
     import tests
     import sys
-    import pygtk
-    pygtk.require('2.0')
     default_encoding = sys.getdefaultencoding()
     try:
         result = TestSuite()
+        try:
+            import_pygtk()
+        except errors.BzrCommandError:
+            return result
         result.addTest(tests.test_suite())
     finally:
         if sys.getdefaultencoding() != default_encoding:
