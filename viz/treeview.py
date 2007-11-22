@@ -91,8 +91,11 @@ class TreeView(gtk.ScrolledWindow):
         self.iter   = None
         self.branch = branch
 
-        gobject.idle_add(self.populate, start, maxnum, 
-                         broken_line_length)
+        self.start = start
+        self.maxnum = maxnum
+        self.broken_line_length = broken_line_length
+
+        gobject.idle_add(self.populate)
 
         self.connect("destroy", lambda x: self.branch.unlock())
 
@@ -155,6 +158,10 @@ class TreeView(gtk.ScrolledWindow):
         """
         return self.get_property('parents')
         
+    def update(self):
+        self.iter = None
+        gobject.idle_add(self.populate)
+
     def back(self):
         """Signal handler for the Back button."""
         parents = self.get_parents()
@@ -185,7 +192,7 @@ class TreeView(gtk.ScrolledWindow):
         else:
             self.set_revision_id(children[0])
 
-    def populate(self, start, maxnum, broken_line_length=None):
+    def populate(self):
         """Fill the treeview with contents.
 
         :param start: Revision id of revision to start with.
@@ -196,9 +203,9 @@ class TreeView(gtk.ScrolledWindow):
         """
         self.branch.lock_read()
         (linegraphdata, index, columns_len) = linegraph(self.branch.repository,
-                                                        start,
-                                                        maxnum, 
-                                                        broken_line_length)
+                                                        self.start,
+                                                        self.maxnum, 
+                                                        self.broken_line_length)
 
         self.model = TreeModel(self.branch.repository, linegraphdata)
         self.graph_cell.columns_len = columns_len
