@@ -292,6 +292,12 @@ class BranchWindow(Window):
         self.next_button = self.next_rev_action.create_tool_item()
         self.toolbar.insert(self.next_button, -1)
 
+        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
+
+        refresh_button = gtk.ToolButton(gtk.STOCK_REFRESH)
+        refresh_button.connect('clicked', lambda x: self.treeview.refresh())
+        self.toolbar.insert(refresh_button, -1)
+
         self.toolbar.show_all()
 
         return self.toolbar

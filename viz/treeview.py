@@ -158,9 +158,8 @@ class TreeView(gtk.ScrolledWindow):
         """
         return self.get_property('parents')
         
-    def update(self):
-        self.iter = None
-        gobject.idle_add(self.populate)
+    def refresh(self):
+        gobject.idle_add(self.populate, self.get_revision())
 
     def back(self):
         """Signal handler for the Back button."""
@@ -192,7 +191,7 @@ class TreeView(gtk.ScrolledWindow):
         else:
             self.set_revision_id(children[0])
 
-    def populate(self):
+    def populate(self, revision=None):
         """Fill the treeview with contents.
 
         :param start: Revision id of revision to start with.
@@ -214,7 +213,12 @@ class TreeView(gtk.ScrolledWindow):
         self.graph_column.set_max_width(width)
         self.index = index
         self.treeview.set_model(self.model)
-        self.treeview.set_cursor(0)
+
+        if revision is None:
+            self.treeview.set_cursor(0)
+        else:
+            self.set_revision(revision)
+
         self.emit('revisions-loaded')
 
         return False
