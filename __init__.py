@@ -700,6 +700,8 @@ def test_suite():
     from unittest import TestSuite
     import tests
     import sys
+    import pygtk
+    pygtk.require('2.0')
     default_encoding = sys.getdefaultencoding()
     try:
         result = TestSuite()
