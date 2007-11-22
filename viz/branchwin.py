@@ -291,7 +291,7 @@ class BranchWindow(Window):
         self.toolbar.insert(gtk.SeparatorToolItem(), -1)
 
         refresh_button = gtk.ToolButton(gtk.STOCK_REFRESH)
-        refresh_button.connect('clicked', lambda x: self.treeview.refresh())
+        refresh_button.connect('clicked', self._refresh_clicked)
         self.toolbar.insert(refresh_button, -1)
 
         self.toolbar.show_all()
@@ -435,3 +435,6 @@ class BranchWindow(Window):
         dialog = AboutDialog()
         dialog.connect('response', lambda d,r: d.destroy())
         dialog.run()
+
+    def _refresh_clicked(self, w):
+        self.treeview.update()

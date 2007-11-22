@@ -171,6 +171,17 @@ class TreeView(gtk.ScrolledWindow):
     def refresh(self):
         gobject.idle_add(self.populate, self.get_revision())
 
+    def update(self):
+        try:
+            self.branch.unlock()
+            try:
+                self.branch.lock_write()
+                self.branch.update()
+            finally:
+                self.branch.unlock()
+        finally:
+            self.branch.lock_read()
+
     def back(self):
         """Signal handler for the Back button."""
         parents = self.get_parents()
