@@ -254,12 +254,8 @@ class BranchWindow(Window):
     def construct_top(self):
         """Construct the top-half of the window."""
         # FIXME: Make broken_line_length configurable
-        if self.compact_view:
-            brokenlines = 32
-        else:
-            brokenlines = None
 
-        self.treeview = TreeView(self.branch, self.start, self.maxnum, brokenlines)
+        self.treeview = TreeView(self.branch, self.start, self.maxnum, self.compact_view)
 
         self.treeview.connect('revision-selected',
                 self._treeselection_changed_cb)
@@ -291,6 +287,12 @@ class BranchWindow(Window):
 
         self.next_button = self.next_rev_action.create_tool_item()
         self.toolbar.insert(self.next_button, -1)
+
+        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
+
+        refresh_button = gtk.ToolButton(gtk.STOCK_REFRESH)
+        refresh_button.connect('clicked', lambda x: self.treeview.refresh())
+        self.toolbar.insert(refresh_button, -1)
 
         self.toolbar.show_all()
 
@@ -393,13 +395,8 @@ class BranchWindow(Window):
             option = 'no'
 
         self.config.set_user_option('viz-compact-view', option)
-
-        revision = self.treeview.get_revision()
-
-        self.paned.get_child1().destroy()
-        self.paned.pack1(self.construct_top(), resize=True, shrink=False)
-
-        gobject.idle_add(self.set_revision, revision.revision_id)
+        self.treeview.set_property('compact', self.compact_view)
+        self.treeview.refresh()
 
     def _tag_revision_cb(self, w):
         try:

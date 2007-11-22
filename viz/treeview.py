@@ -58,7 +58,13 @@ class TreeView(gtk.ScrolledWindow):
                                  'Date',
                                  'Show date column',
                                  False,
-                                 gobject.PARAM_READWRITE)
+                                 gobject.PARAM_READWRITE),
+
+        'compact': (gobject.TYPE_BOOLEAN,
+                    'Compact view',
+                    'Break ancestry lines to save space',
+                    True,
+                    gobject.PARAM_CONSTRUCT | gobject.PARAM_READWRITE)
 
     }
 
@@ -71,7 +77,7 @@ class TreeView(gtk.ScrolledWindow):
                               ())
     }
 
-    def __init__(self, branch, start, maxnum, broken_line_length=None):
+    def __init__(self, branch, start, maxnum, compact=True):
         """Create a new TreeView.
 
         :param branch: Branch object for branch to show.
@@ -91,8 +97,11 @@ class TreeView(gtk.ScrolledWindow):
         self.iter   = None
         self.branch = branch
 
-        gobject.idle_add(self.populate, start, maxnum, 
-                         broken_line_length)
+        self.start = start
+        self.maxnum = maxnum
+        self.compact = compact
+
+        gobject.idle_add(self.populate)
 
         self.connect("destroy", lambda x: self.branch.unlock())
 
@@ -101,6 +110,8 @@ class TreeView(gtk.ScrolledWindow):
             return self.revno_column.get_visible()
         elif property.name == 'date-column-visible':
             return self.date_column.get_visible()
+        elif property.name == 'compact':
+            return self.compact
         elif property.name == 'branch':
             return self.branch
         elif property.name == 'revision':
@@ -119,6 +130,8 @@ class TreeView(gtk.ScrolledWindow):
             self.revno_column.set_visible(value)
         elif property.name == 'date-column-visible':
             self.date_column.set_visible(value)
+        elif property.name == 'compact':
+            self.compact = value
         elif property.name == 'branch':
             self.branch = value
         elif property.name == 'revision':
@@ -155,6 +168,9 @@ class TreeView(gtk.ScrolledWindow):
         """
         return self.get_property('parents')
         
+    def refresh(self):
+        gobject.idle_add(self.populate, self.get_revision())
+
     def back(self):
         """Signal handler for the Back button."""
         parents = self.get_parents()
@@ -185,7 +201,7 @@ class TreeView(gtk.ScrolledWindow):
         else:
             self.set_revision_id(children[0])
 
-    def populate(self, start, maxnum, broken_line_length=None):
+    def populate(self, revision=None):
         """Fill the treeview with contents.
 
         :param start: Revision id of revision to start with.
@@ -194,10 +210,16 @@ class TreeView(gtk.ScrolledWindow):
         :param broken_line_length: After how much lines branches \
                        should be broken.
         """
+
+        if self.compact:
+            broken_line_length = 32
+        else:
+            broken_line_length = None
+
         self.branch.lock_read()
         (linegraphdata, index, columns_len) = linegraph(self.branch.repository,
-                                                        start,
-                                                        maxnum, 
+                                                        self.start,
+                                                        self.maxnum, 
                                                         broken_line_length)
 
         self.model = TreeModel(self.branch.repository, linegraphdata)
@@ -207,7 +229,12 @@ class TreeView(gtk.ScrolledWindow):
         self.graph_column.set_max_width(width)
         self.index = index
         self.treeview.set_model(self.model)
-        self.treeview.set_cursor(0)
+
+        if revision is None:
+            self.treeview.set_cursor(0)
+        else:
+            self.set_revision(revision)
+
         self.emit('revisions-loaded')
 
         return False
