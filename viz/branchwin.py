@@ -134,12 +134,12 @@ class BranchWindow(Window):
         edit_menu_branchopts = gtk.MenuItem("Branch Settings")
         edit_menu_branchopts.connect('activate', lambda x: PreferencesWindow(self.branch.get_config()).show())
 
-        edit_menu_prefs = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
-        edit_menu_prefs.connect('activate', lambda x: PreferencesWindow().show())
+        edit_menu_globopts = gtk.MenuItem("Global Settings")
+        edit_menu_globopts.connect('activate', lambda x: PreferencesWindow().show())
 
         edit_menu.add(edit_menu_find)
         edit_menu.add(edit_menu_branchopts)
-        edit_menu.add(edit_menu_prefs)
+        edit_menu.add(edit_menu_globopts)
 
         view_menu = gtk.Menu()
         view_menuitem = gtk.MenuItem("_View")
