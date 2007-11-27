@@ -121,7 +121,7 @@ class BranchWindow(Window):
         file_menu_quit = gtk.ImageMenuItem(gtk.STOCK_QUIT, self.accel_group)
         file_menu_quit.connect('activate', lambda x: gtk.main_quit())
         
-        if self.parent is not None:
+        if self._parent is not None:
             file_menu.add(file_menu_close)
         file_menu.add(file_menu_quit)
 
