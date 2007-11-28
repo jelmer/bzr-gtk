@@ -214,22 +214,12 @@ class BranchWindow(Window):
         branch_menu.add(gtk.MenuItem("Pu_ll Revisions"))
         branch_menu.add(gtk.MenuItem("Pu_sh Revisions"))
 
-        help_menu = gtk.Menu()
-        help_menuitem = gtk.MenuItem("_Help")
-        help_menuitem.set_submenu(help_menu)
-
-        help_menu_about = gtk.ImageMenuItem(gtk.STOCK_ABOUT)
-        help_menu_about.connect('activate', self._show_about_cb)
-
-        help_menu.add(help_menu_about)
-       
         menubar.add(file_menuitem)
         menubar.add(edit_menuitem)
         menubar.add(view_menuitem)
         menubar.add(go_menuitem)
         menubar.add(revision_menuitem)
         menubar.add(branch_menuitem)
-        menubar.add(help_menuitem)
         menubar.show_all()
 
         return menubar
