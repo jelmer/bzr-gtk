@@ -20,7 +20,6 @@ from bzrlib.revision import Revision
 from bzrlib.config import BranchConfig
 from bzrlib.config import GlobalConfig
 from treeview import TreeView
-from about import AboutDialog
 
 class BranchWindow(Window):
     """Branch window.
