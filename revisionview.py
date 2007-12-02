@@ -108,7 +108,6 @@ class RevisionView(gtk.Notebook):
         if revision is None: return
 
         self._revision = revision
-        self.revision_id.set_text(revision.revision_id)
         if revision.committer is not None:
             self.committer.set_text(revision.committer)
         else:
@@ -269,12 +268,14 @@ class RevisionView(gtk.Notebook):
         label.show()
 
         align = gtk.Alignment(0.0, 0.5)
-        self.revision_id = gtk.Label()
-        self.revision_id.set_selectable(True)
-        align.add(self.revision_id)
+        revision_id = gtk.Label()
+        revision_id.set_selectable(True)
+        self.connect('notify::revision', 
+                lambda w, p: revision_id.set_text(self._revision.revision_id))
+        align.add(revision_id)
         self.table.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
         align.show()
-        self.revision_id.show()
+        revision_id.show()
 
         align = gtk.Alignment(1.0, 0.5)
         self.author_label = gtk.Label()
