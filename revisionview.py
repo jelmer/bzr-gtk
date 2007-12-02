@@ -140,12 +140,6 @@ class RevisionView(gtk.Notebook):
                                           self.children_widgets,
                                           self.children_table)
         
-        if self._tagdict.has_key(revision.revision_id):
-            tags = self._tagdict[revision.revision_id]
-        else:
-            tags = []
-            
-        self._add_tags(tags)
 
         file_info = revision.properties.get('file-info', None)
         if file_info is not None:
@@ -179,7 +173,12 @@ class RevisionView(gtk.Notebook):
         """Callback for when the go button for a parent is clicked."""
         self._go_callback(revid)
 
-    def _add_tags(self, tags):
+    def _add_tags(self, *args):
+        if self._tagdict.has_key(self._revision.revision_id):
+            tags = self._tagdict[self._revision.revision_id]
+        else:
+            tags = []
+            
         if tags == []:
             self.tags_list.hide()
             self.tags_label.hide()
@@ -357,6 +356,8 @@ class RevisionView(gtk.Notebook):
         align.show()
         self.tags_list.show()
         self.tags_widgets = []
+
+        self.connect('notify::revision', self._add_tags)
 
         return self.table
 
