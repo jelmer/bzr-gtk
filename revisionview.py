@@ -124,7 +124,6 @@ class RevisionView(gtk.Notebook):
         if revision.timestamp is not None:
             self.timestamp.set_text(format_date(revision.timestamp,
                                                 revision.timezone))
-        self.message_buffer.set_text(revision.message)
         try:
             self.branchnick_label.set_text(revision.properties['branch-nick'])
         except KeyError:
@@ -402,11 +401,13 @@ class RevisionView(gtk.Notebook):
 
 
     def _create_message_view(self):
-        self.message_buffer = gtk.TextBuffer()
+        msg_buffer = gtk.TextBuffer()
+        self.connect('notify::revision',
+                lambda w, p: msg_buffer.set_text(self._revision.message))
         window = gtk.ScrolledWindow()
         window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         window.set_shadow_type(gtk.SHADOW_IN)
-        tv = gtk.TextView(self.message_buffer)
+        tv = gtk.TextView(msg_buffer)
         tv.set_editable(False)
         tv.set_wrap_mode(gtk.WRAP_WORD)
         tv.modify_font(pango.FontDescription("Monospace"))
