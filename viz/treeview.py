@@ -329,7 +329,7 @@ class TreeView(gtk.ScrolledWindow):
         self.msg_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.msg_column.set_fixed_width(cell.get_size(self.treeview)[2])
         self.msg_column.pack_start(cell, expand=True)
-        self.msg_column.add_attribute(cell, "text", treemodel.MESSAGE)
+        self.msg_column.add_attribute(cell, "markup", treemodel.MESSAGE)
         self.treeview.append_column(self.msg_column)
 
         cell = gtk.CellRendererText()
