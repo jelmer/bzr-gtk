@@ -43,15 +43,14 @@ class RevisionView(gtk.Notebook):
             gobject.TYPE_PYOBJECT,
             'Revision',
             'The revision being displayed',
-            gobject.PARAM_CONSTRUCT | gobject.PARAM_READWRITE
+            gobject.PARAM_READWRITE
         )
     }
 
 
-    def __init__(self, revision=None, tags=[],
-                 show_children=False, branch=None):
+    def __init__(self, branch=None):
         gtk.Notebook.__init__(self)
-        self.show_children = show_children
+        self.show_children = False
 
         self._create_general()
         self._create_relations()
@@ -65,8 +64,9 @@ class RevisionView(gtk.Notebook):
 
         self._branch = branch
 
-        if revision is not None:
-            self.set_revision(revision, tags=tags)
+        if self._branch.supports_tags():
+            self._tagdict = self._branch.tags.get_reverse_tag_dict()
+
         self.set_file_id(None)
 
     def do_get_property(self, property):
@@ -99,10 +99,10 @@ class RevisionView(gtk.Notebook):
         """
         self._file_id = file_id
 
-    def set_revision(self, revision, tags=[], children=[]):
+    def set_revision(self, revision, children=[]):
         self.set_property('revision', revision)
 
-    def _set_revision(self, revision, tags=[], children=[]):
+    def _set_revision(self, revision, children=[]):
         if revision is None: return
 
         self._revision = revision
@@ -138,6 +138,11 @@ class RevisionView(gtk.Notebook):
                                           self.children_widgets,
                                           self.children_table)
         
+        if self._tagdict.has_key(revision.revision_id):
+            tags = self._tagdict[revision.revision_id]
+        else:
+            tags = []
+            
         self._add_tags(tags)
 
         file_info = revision.properties.get('file-info', None)

@@ -291,7 +291,7 @@ class BranchWindow(Window):
     def construct_bottom(self):
         """Construct the bottom half of the window."""
         from bzrlib.plugins.gtk.revisionview import RevisionView
-        self.revisionview = RevisionView(None, tags=[], show_children=True, branch=self.branch)
+        self.revisionview = RevisionView(branch=self.branch)
         (width, height) = self.get_size()
         self.revisionview.set_size_request(width, int(height / 2.5))
         self.revisionview.show()
@@ -349,12 +349,7 @@ class BranchWindow(Window):
 
             self.next_button.set_menu(next_menu)
 
-            tags = []
-            if self.branch.supports_tags():
-                tagdict = self.branch.tags.get_reverse_tag_dict()
-                if tagdict.has_key(revision.revision_id):
-                    tags = tagdict[revision.revision_id]
-            self.revisionview.set_revision(revision, tags, children)
+            self.revisionview.set_revision(revision, children)
 
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
