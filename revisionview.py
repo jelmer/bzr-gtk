@@ -19,6 +19,7 @@ import pygtk
 pygtk.require("2.0")
 import gtk
 import pango
+import gobject
 
 from bzrlib.osutils import format_date
 from bzrlib.util import bencode
@@ -29,6 +30,23 @@ class RevisionView(gtk.Notebook):
     A variety of bzr tools may need to implement such a thing. This is a
     start.
     """
+
+    __gproperties__ = {
+        'branch': (
+            gobject.TYPE_PYOBJECT,
+            'Branch',
+            'The branch holding the revision being displayed',
+            gobject.PARAM_CONSTRUCT_ONLY | gobject.PARAM_WRITABLE
+        ),
+
+        'revision': (
+            gobject.TYPE_PYOBJECT,
+            'Revision',
+            'The revision being displayed',
+            gobject.PARAM_CONSTRUCT | gobject.PARAM_READWRITE
+        )
+    }
+
 
     def __init__(self, revision=None, tags=[],
                  show_children=False, branch=None):
@@ -51,6 +69,22 @@ class RevisionView(gtk.Notebook):
             self.set_revision(revision, tags=tags)
         self.set_file_id(None)
 
+    def do_get_property(self, property):
+        if property.name == 'branch':
+            return self._branch
+        elif property.name == 'revision':
+            return self._revision
+        else:
+            raise AttributeError, 'unknown property %s' % property.name
+
+    def do_set_property(self, property, value):
+        if property.name == 'branch':
+            self._branch = value
+        elif property.name == 'revision':
+            self._set_revision(value)
+        else:
+            raise AttributeError, 'unknown property %s' % property.name
+
     def set_show_callback(self, callback):
         self._show_callback = callback
 
@@ -66,6 +100,11 @@ class RevisionView(gtk.Notebook):
         self._file_id = file_id
 
     def set_revision(self, revision, tags=[], children=[]):
+        self.set_property('revision', revision)
+
+    def _set_revision(self, revision, tags=[], children=[]):
+        if revision is None: return
+
         self._revision = revision
         self.revision_id.set_text(revision.revision_id)
         if revision.committer is not None:
