@@ -378,7 +378,6 @@
         <child>
           <widget class="GtkToolbar" id="toolbar">
             <property name="visible">True</property>
-            <property name="toolbar_style">GTK_TOOLBAR_BOTH</property>
             <child>
               <widget class="GtkToolButton" id="toolbutton_refresh">
                 <property name="visible">True</property>
@@ -427,6 +426,7 @@
             <child>
               <widget class="GtkToolButton" id="toolbutton_commit">
                 <property name="visible">True</property>
+                <property name="is_important">True</property>
                 <property name="label">Commit</property>
                 <property name="use_underline">True</property>
                 <property name="icon">icons/commit.png</property>
@@ -448,6 +448,7 @@
             <child>
               <widget class="GtkToolButton" id="toolbutton_pull">
                 <property name="visible">True</property>
+                <property name="is_important">True</property>
                 <property name="label">Pull</property>
                 <property name="use_underline">True</property>
                 <property name="icon">icons/pull.png</property>
@@ -460,6 +461,7 @@
             <child>
               <widget class="GtkToolButton" id="toolbutton_push">
                 <property name="visible">True</property>
+                <property name="is_important">True</property>
                 <property name="label">Push</property>
                 <property name="use_underline">True</property>
                 <property name="icon">icons/push.png</property>

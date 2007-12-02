@@ -86,12 +86,16 @@ class RevisionPopupMenu(gtk.Menu):
     def show_push(self, item):
         from bzrlib.plugins.gtk.push import PushDialog
         dialog = PushDialog(self.repository, self.revids[0], self.branch)
-        dialog.run()
+        response = dialog.run()
+
+        if response != gtk.RESPONSE_NONE:
+            dialog.destroy()
 
     def show_tag(self, item):
         from bzrlib.plugins.gtk.tags import AddTagDialog
         dialog = AddTagDialog(self.repository, self.revids[0], self.branch)
         response = dialog.run()
+
         if response != gtk.RESPONSE_NONE:
             dialog.hide()
         

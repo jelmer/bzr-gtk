@@ -624,16 +624,16 @@ class cmd_test_gtk(GTKCommand):
 
     takes_options = ['verbose',
                      Option('one', short_name='1',
-                            help='stop when one test fails'),
-                     Option('benchmark', help='run the benchmarks.'),
+                            help='Stop when one test fails.'),
+                     Option('benchmark', help='Run the benchmarks.'),
                      Option('lsprof-timed',
-                     help='generate lsprof output for benchmarked'
+                     help='Generate lsprof output for benchmarked'
                           ' sections of code.'),
                      Option('list-only',
-                     help='list the tests instead of running them'),
+                     help='List the tests instead of running them.'),
                      Option('randomize', type=str, argname="SEED",
-                     help='randomize the order of tests using the given'
-                          ' seed or "now" for the current time'),
+                     help='Randomize the order of tests using the given'
+                          ' seed or "now" for the current time.'),
                     ]
     takes_args = ['testspecs*']
 
@@ -699,6 +699,10 @@ def test_suite():
     default_encoding = sys.getdefaultencoding()
     try:
         result = TestSuite()
+        try:
+            import_pygtk()
+        except errors.BzrCommandError:
+            return result
         result.addTest(tests.test_suite())
     finally:
         if sys.getdefaultencoding() != default_encoding:

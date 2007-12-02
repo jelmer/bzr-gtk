@@ -20,7 +20,6 @@ from bzrlib.revision import Revision
 from bzrlib.config import BranchConfig
 from bzrlib.config import GlobalConfig
 from treeview import TreeView
-from about import AboutDialog
 
 class BranchWindow(Window):
     """Branch window.
@@ -121,7 +120,8 @@ class BranchWindow(Window):
         file_menu_quit = gtk.ImageMenuItem(gtk.STOCK_QUIT, self.accel_group)
         file_menu_quit.connect('activate', lambda x: gtk.main_quit())
         
-        file_menu.add(file_menu_close)
+        if self._parent is not None:
+            file_menu.add(file_menu_close)
         file_menu.add(file_menu_quit)
 
         edit_menu = gtk.Menu()
@@ -133,12 +133,12 @@ class BranchWindow(Window):
         edit_menu_branchopts = gtk.MenuItem("Branch Settings")
         edit_menu_branchopts.connect('activate', lambda x: PreferencesWindow(self.branch.get_config()).show())
 
-        edit_menu_prefs = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
-        edit_menu_prefs.connect('activate', lambda x: PreferencesWindow().show())
+        edit_menu_globopts = gtk.MenuItem("Global Settings")
+        edit_menu_globopts.connect('activate', lambda x: PreferencesWindow().show())
 
         edit_menu.add(edit_menu_find)
         edit_menu.add(edit_menu_branchopts)
-        edit_menu.add(edit_menu_prefs)
+        edit_menu.add(edit_menu_globopts)
 
         view_menu = gtk.Menu()
         view_menuitem = gtk.MenuItem("_View")
@@ -213,22 +213,12 @@ class BranchWindow(Window):
         branch_menu.add(gtk.MenuItem("Pu_ll Revisions"))
         branch_menu.add(gtk.MenuItem("Pu_sh Revisions"))
 
-        help_menu = gtk.Menu()
-        help_menuitem = gtk.MenuItem("_Help")
-        help_menuitem.set_submenu(help_menu)
-
-        help_menu_about = gtk.ImageMenuItem(gtk.STOCK_ABOUT)
-        help_menu_about.connect('activate', self._show_about_cb)
-
-        help_menu.add(help_menu_about)
-       
         menubar.add(file_menuitem)
         menubar.add(edit_menuitem)
         menubar.add(view_menuitem)
         menubar.add(go_menuitem)
         menubar.add(revision_menuitem)
         menubar.add(branch_menuitem)
-        menubar.add(help_menuitem)
         menubar.show_all()
 
         return menubar
@@ -254,12 +244,8 @@ class BranchWindow(Window):
     def construct_top(self):
         """Construct the top-half of the window."""
         # FIXME: Make broken_line_length configurable
-        if self.compact_view:
-            brokenlines = 32
-        else:
-            brokenlines = None
 
-        self.treeview = TreeView(self.branch, self.start, self.maxnum, brokenlines)
+        self.treeview = TreeView(self.branch, self.start, self.maxnum, self.compact_view)
 
         self.treeview.connect('revision-selected',
                 self._treeselection_changed_cb)
@@ -291,6 +277,12 @@ class BranchWindow(Window):
 
         self.next_button = self.next_rev_action.create_tool_item()
         self.toolbar.insert(self.next_button, -1)
+
+        self.toolbar.insert(gtk.SeparatorToolItem(), -1)
+
+        refresh_button = gtk.ToolButton(gtk.STOCK_REFRESH)
+        refresh_button.connect('clicked', self._refresh_clicked)
+        self.toolbar.insert(refresh_button, -1)
 
         self.toolbar.show_all()
 
@@ -393,13 +385,8 @@ class BranchWindow(Window):
             option = 'no'
 
         self.config.set_user_option('viz-compact-view', option)
-
-        revision = self.treeview.get_revision()
-
-        self.paned.get_child1().destroy()
-        self.paned.pack1(self.construct_top(), resize=True, shrink=False)
-
-        gobject.idle_add(self.set_revision, revision.revision_id)
+        self.treeview.set_property('compact', self.compact_view)
+        self.treeview.refresh()
 
     def _tag_revision_cb(self, w):
         try:
@@ -438,3 +425,6 @@ class BranchWindow(Window):
         dialog = AboutDialog()
         dialog.connect('response', lambda d,r: d.destroy())
         dialog.run()
+
+    def _refresh_clicked(self, w):
+        self.treeview.update()

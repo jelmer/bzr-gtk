@@ -1,5 +1,15 @@
 0.93.0  UNRELEASED
 
+ UI
+
+  * Added a menu bar to the viz. (Daniel Schierbeck)
+     - Select a revision by tag.
+     - Show/hide tree view columns.
+
+ BUG FIXES
+
+  * Make toolbars in Olive follow GNOME standards. (#137074)
+
 0.92.1  2007-11-10
 
  BUG FIXES
