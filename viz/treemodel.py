@@ -83,7 +83,7 @@ class TreeModel(gtk.GenericTreeModel):
             revision = self.revisions[revid]
         
         if column == REVISION: return revision
-        if column == MESSAGE: return escape(revision.message.split("\n")[0])
+        if column == MESSAGE: return escape(revision.get_summary())
         if column == COMMITER: return re.sub('<.*@.*>', '', 
                                              revision.committer).strip(' ')
         if column == TIMESTAMP: 
