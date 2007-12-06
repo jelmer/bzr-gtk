@@ -248,7 +248,7 @@ class RevisionView(gtk.Notebook):
 
             button = gtk.Button(revid)
             button.connect("clicked",
-                    lambda w, r: self.set_revision(self._branch.repository.get_revision(revid)), revid)
+                    lambda w, r: self.set_revision(self._branch.repository.get_revision(r)), revid)
             button.set_use_underline(False)
             hbox.pack_start(button, expand=False, fill=True)
             button.show()
