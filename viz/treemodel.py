@@ -11,6 +11,7 @@ import gtk
 import gobject
 import pango
 import re
+from xml.sax.saxutils import escape
 
 from time import (strftime, localtime)
 
@@ -82,7 +83,7 @@ class TreeModel(gtk.GenericTreeModel):
             revision = self.revisions[revid]
         
         if column == REVISION: return revision
-        if column == MESSAGE: return revision.message.split("\n")[0]
+        if column == MESSAGE: return escape(revision.get_summary())
         if column == COMMITER: return re.sub('<.*@.*>', '', 
                                              revision.committer).strip(' ')
         if column == TIMESTAMP: 
