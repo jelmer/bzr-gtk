@@ -296,7 +296,7 @@ class BranchWindow(Window):
         self.revisionview.set_size_request(width, int(height / 2.5))
         self.revisionview.show()
         self.revisionview.set_show_callback(self._show_clicked_cb)
-        self.revisionview.set_go_callback(self._go_clicked_cb)
+        self.revisionview.connect('notify::revision', self._go_clicked_cb)
         return self.revisionview
 
     def _tag_selected_cb(self, menuitem, revid):
@@ -359,9 +359,10 @@ class BranchWindow(Window):
         """Callback for when the forward button is clicked."""
         self.treeview.forward()
 
-    def _go_clicked_cb(self, revid):
+    def _go_clicked_cb(self, w, p):
         """Callback for when the go button for a parent is clicked."""
-        self.treeview.set_revision_id(revid)
+        if self.revisionview.get_revision() is not None:
+            self.treeview.set_revision(self.revisionview.get_revision())
 
     def _show_clicked_cb(self, revid, parentid):
         """Callback for when the show button for a parent is clicked."""

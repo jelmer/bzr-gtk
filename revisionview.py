@@ -66,9 +66,9 @@ class RevisionView(gtk.Notebook):
         self.set_current_page(0)
         
         self._show_callback = None
-        self._go_callback = None
         self._clicked_callback = None
 
+        self._revision = None
         self._branch = branch
 
         if self._branch.supports_tags():
@@ -101,9 +101,6 @@ class RevisionView(gtk.Notebook):
     def set_show_callback(self, callback):
         self._show_callback = callback
 
-    def set_go_callback(self, callback):
-        self._go_callback = callback
-
     def set_file_id(self, file_id):
         """Set a specific file id that we want to track.
 
@@ -113,7 +110,11 @@ class RevisionView(gtk.Notebook):
         self.set_property('file-id', file_id)
 
     def set_revision(self, revision, children=[]):
-        self.set_property('revision', revision)
+        if revision != self._revision:
+            self.set_property('revision', revision)
+
+    def get_revision(self):
+        return self.get_property('revision')
 
     def _set_revision(self, revision, children=[]):
         if revision is None: return
@@ -180,7 +181,6 @@ class RevisionView(gtk.Notebook):
 
     def _go_clicked_cb(self, widget, revid):
         """Callback for when the go button for a parent is clicked."""
-        self._go_callback(revid)
 
     def _add_tags(self, *args):
         if self._tagdict.has_key(self._revision.revision_id):
@@ -237,11 +237,9 @@ class RevisionView(gtk.Notebook):
                 hbox.pack_start(button, expand=False, fill=True)
                 button.show()
 
-            if self._go_callback is not None:
-                button = gtk.Button(revid)
-                button.connect("clicked", self._go_clicked_cb, revid)
-            else:
-                button = gtk.Label(revid)
+            button = gtk.Button(revid)
+            button.connect("clicked",
+                    lambda w, r: self.set_revision(self._branch.repository.get_revision(revid)), revid)
             button.set_use_underline(False)
             hbox.pack_start(button, expand=False, fill=True)
             button.show()
