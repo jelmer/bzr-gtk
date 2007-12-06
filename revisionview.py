@@ -44,6 +44,13 @@ class RevisionView(gtk.Notebook):
             'Revision',
             'The revision being displayed',
             gobject.PARAM_READWRITE
+        ),
+
+        'file-id': (
+            gobject.TYPE_PYOBJECT,
+            'File Id',
+            'The file id',
+            gobject.PARAM_READWRITE
         )
     }
 
@@ -76,6 +83,8 @@ class RevisionView(gtk.Notebook):
             return self._branch
         elif property.name == 'revision':
             return self._revision
+        elif property.name == 'file-id':
+            return self._file_id
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
@@ -84,6 +93,8 @@ class RevisionView(gtk.Notebook):
             self._branch = value
         elif property.name == 'revision':
             self._set_revision(value)
+        elif property.name == 'file-id':
+            self._file_id = value
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
@@ -99,7 +110,7 @@ class RevisionView(gtk.Notebook):
         This just effects the display of a per-file commit message.
         If it is set to None, then all commit messages will be shown.
         """
-        self._file_id = file_id
+        self.set_property('file-id', file_id)
 
     def set_revision(self, revision, children=[]):
         self.set_property('revision', revision)
