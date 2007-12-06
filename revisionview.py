@@ -46,6 +46,13 @@ class RevisionView(gtk.Notebook):
             gobject.PARAM_READWRITE
         ),
 
+        'children': (
+            gobject.TYPE_PYOBJECT,
+            'Children',
+            'Child revisions',
+            gobject.PARAM_READWRITE
+        ),
+
         'file-id': (
             gobject.TYPE_PYOBJECT,
             'File Id',
@@ -57,7 +64,6 @@ class RevisionView(gtk.Notebook):
 
     def __init__(self, branch=None):
         gtk.Notebook.__init__(self)
-        self.show_children = False
 
         self._create_general()
         self._create_relations()
@@ -83,6 +89,8 @@ class RevisionView(gtk.Notebook):
             return self._branch
         elif property.name == 'revision':
             return self._revision
+        elif property.name == 'children':
+            return self._children
         elif property.name == 'file-id':
             return self._file_id
         else:
@@ -93,6 +101,8 @@ class RevisionView(gtk.Notebook):
             self._branch = value
         elif property.name == 'revision':
             self._set_revision(value)
+        elif property.name == 'children':
+            self.set_children(value)
         elif property.name == 'file-id':
             self._file_id = value
         else:
@@ -109,7 +119,7 @@ class RevisionView(gtk.Notebook):
         """
         self.set_property('file-id', file_id)
 
-    def set_revision(self, revision, children=[]):
+    def set_revision(self, revision):
         if revision != self._revision:
             self.set_property('revision', revision)
 
@@ -145,12 +155,6 @@ class RevisionView(gtk.Notebook):
                                       self.parents_widgets,
                                       self.parents_table)
         
-        if self.show_children:
-            self._add_parents_or_children(children,
-                                          self.children_widgets,
-                                          self.children_table)
-        
-
         file_info = revision.properties.get('file-info', None)
         if file_info is not None:
             file_info = bdecode(file_info.encode('UTF-8'))
@@ -174,6 +178,11 @@ class RevisionView(gtk.Notebook):
                     self.file_info_box.hide()
         else:
             self.file_info_box.hide()
+
+    def set_children(self, children):
+        self._add_parents_or_children(children,
+                                      self.children_widgets,
+                                      self.children_table)
 
     def _show_clicked_cb(self, widget, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
@@ -256,8 +265,7 @@ class RevisionView(gtk.Notebook):
         vbox = gtk.VBox(False, 6)
         vbox.set_border_width(6)
         vbox.pack_start(self._create_parents(), expand=False, fill=True)
-        if self.show_children:
-            vbox.pack_start(self._create_children(), expand=False, fill=True)
+        vbox.pack_start(self._create_children(), expand=False, fill=True)
         self.append_page(vbox, tab_label=gtk.Label("Relations"))
         vbox.show()
 

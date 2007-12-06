@@ -349,7 +349,8 @@ class BranchWindow(Window):
 
             self.next_button.set_menu(next_menu)
 
-            self.revisionview.set_revision(revision, children)
+            self.revisionview.set_revision(revision)
+            self.revisionview.set_children(children)
 
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
