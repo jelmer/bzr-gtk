@@ -71,7 +71,7 @@ class RevisionView(gtk.Notebook):
         self._revision = None
         self._branch = branch
 
-        if self._branch.supports_tags():
+        if self._branch is not None and self._branch.supports_tags():
             self._tagdict = self._branch.tags.get_reverse_tag_dict()
         else:
             self._tagdict = {}
