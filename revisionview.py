@@ -126,7 +126,7 @@ class RevisionView(gtk.Notebook):
     def get_revision(self):
         return self.get_property('revision')
 
-    def _set_revision(self, revision, children=[]):
+    def _set_revision(self, revision):
         if revision is None: return
 
         self._revision = revision
