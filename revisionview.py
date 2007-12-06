@@ -406,8 +406,6 @@ class RevisionView(gtk.Notebook):
         align.show()
 
         return table
-    
-
 
     def _create_message_view(self):
         msg_buffer = gtk.TextBuffer()
