@@ -36,7 +36,7 @@ import sys
 
 import bzrlib
 
-version_info = (0, 93, 0, 'dev', 0)
+version_info = (0, 93, 0, 'final', 0)
 
 if version_info[3] == 'final':
     version_string = '%d.%d.%d' % version_info[:3]

@@ -1,4 +1,4 @@
-0.93.0  UNRELEASED
+0.93.0  2007-12-10
 
  UI
 
@@ -9,6 +9,10 @@
  BUG FIXES
 
   * Make toolbars in Olive follow GNOME standards. (#137074)
+
+ INTERNALS
+
+  * Allow test suite to run without PyGTK. (Aaron Bentley)
 
 0.92.1  2007-11-10
 
