@@ -1,5 +1,9 @@
 0.94.0  UNRELEASED
 
+  INTERNALS
+
+   * Refactored the revisionview. (Daniel Schierbeck)
+
 0.93.0  2007-12-10
 
  UI
