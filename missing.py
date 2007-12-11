@@ -44,7 +44,9 @@ class MissingWindow(gtk.Dialog):
         extra_revs = gtk.ScrolledWindow()
         vbox = gtk.VBox()
         for rev in revisions:
-            vbox.pack_start(RevisionView(rev), True, True)
+            rv = RevisionView()
+            rv.set_revision(rev)
+            vbox.pack_start(rv, True, True)
         extra_revs.add_with_viewport(vbox)
         extra_revs.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         return extra_revs
