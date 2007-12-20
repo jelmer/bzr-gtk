@@ -4,7 +4,7 @@
  
   * Catch UnsupportedProtocol exception in the Nautilus extension. (#77965)
   
-  * Make Nautilus extension work again. (Toshio Kuratomi)
+  * Make Nautilus extension work again. (#111826, Toshio Kuratomi)
 
  INTERNALS
 
