@@ -46,10 +46,13 @@ def linegraph(repository, start, maxnum, broken_line_length=None):
     for revid in graph_parents.iterkeys():
         graph_children[revid] = []
 
-    merge_sorted_revisions = merge_sort(
-        graph_parents,
-        start,
-        generate_revno=True)
+    if len(graph_parents)>0:
+        merge_sorted_revisions = merge_sort(
+            graph_parents,
+            start,
+            generate_revno=True)
+    else:
+        merge_sorted_revisions = ()
     
     revid_index = {}
     revno_index = {}

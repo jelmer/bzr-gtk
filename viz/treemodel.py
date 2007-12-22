@@ -62,8 +62,13 @@ class TreeModel(gtk.GenericTreeModel):
         return rowref
     
     def on_get_value(self, rowref, column):
-        (revid, node, lines, parents,
-         children, revno_sequence) = self.line_graph_data[rowref]
+        if len(self.line_graph_data) > 0:
+            (revid, node, lines, parents,
+             children, revno_sequence) = self.line_graph_data[rowref]
+        else:
+            (revid, node, lines, parents,
+             children, revno_sequence) = (None, (0, 0), (), (),
+                                          (), ())
         if column == REVID: return revid
         if column == NODE: return node
         if column == LINES: return lines
@@ -76,6 +81,8 @@ class TreeModel(gtk.GenericTreeModel):
         if column == REVNO: return ".".join(["%d" % (revno)
                                       for revno in revno_sequence])
         
+        if revid is None:
+            return None
         if revid not in self.revisions:
             revision = self.repository.get_revisions([revid])[0]
             self.revisions[revid] = revision

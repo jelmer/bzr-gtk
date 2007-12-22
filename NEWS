@@ -5,6 +5,9 @@
   * Catch UnsupportedProtocol exception in the Nautilus extension. (#77965)
   
   * Make Nautilus extension work again. (#111826, Toshio Kuratomi)
+  
+  * Make viz not throw errors when there are 0 commits. (#173698, Gary van der
+    Merwe)
 
  INTERNALS
 
