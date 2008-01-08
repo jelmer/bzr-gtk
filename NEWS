@@ -9,6 +9,12 @@
   * Make viz not throw errors when there are 0 commits. (#173698, Gary van der
     Merwe)
 
+ FEATURES
+ 
+  * Only check for old Bazaar versions that are known to be incompatible and 
+    no longer warn about newer (unknown) versions of Bazaar, on the assumption
+	the API is sufficiently stable now. (Jelmer Vernooij)
+
  INTERNALS
 
   * Refactored the revisionview. (Daniel Schierbeck)
