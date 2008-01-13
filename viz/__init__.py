@@ -11,6 +11,8 @@ left hand side that joins them up and shows how they relate to each other.
 The bottom hald of the window shows the details for the selected revision.
 """
 
+from branchwin import BranchWindow
+
 __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
