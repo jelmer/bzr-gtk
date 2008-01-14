@@ -33,6 +33,7 @@ except ImportError:
 from bzrlib import osutils
 from bzrlib.diff import show_diff_trees, internal_diff
 from bzrlib.errors import NoSuchFile
+from bzrlib.patches import parse_patches
 from bzrlib.trace import warning
 from bzrlib.plugins.gtk.window import Window
 
@@ -234,7 +235,13 @@ class DiffFileView(gtk.ScrolledWindow):
 #            self.parent_tree.unlock()
 
     def show_diff(self, specific_files):
-        self.buffer.set_text(self._diffs[None])
+        sections = []
+        if specific_files is None:
+            self.buffer.set_text(self._diffs[None])
+        else:
+            for specific_file in specific_files:
+                sections.append(self._diffs[specific_file])
+            self.buffer.set_text(''.join(sections))
 
 
 class DiffView(DiffFileView):
@@ -322,14 +329,19 @@ class DiffWindow(Window):
         column.add_attribute(cell, "text", 0)
         self.treeview.append_column(column)
 
-    def set_diff_text(self, description, text):
+    def set_diff_text(self, description, lines):
         # The diffs of the  selected file: a scrollable source or
         # text view
         self.diff_view = DiffFileView()
         self.diff_view.show()
         self.pane.pack2(self.diff_view)
         self.model.append(None, [ "Complete Diff", "" ])
-        self.diff_view._diffs[None] = text
+        self.diff_view._diffs[None] = ''.join(lines)
+        for patch in parse_patches(lines):
+            oldname = patch.oldname.split('\t')[0]
+            newname = patch.newname.split('\t')[0]
+            self.model.append(None, [oldname, newname])
+            self.diff_view._diffs[newname] = str(patch)
         
 
     def set_diff(self, description, rev_tree, parent_tree):

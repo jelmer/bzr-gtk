@@ -77,6 +77,7 @@ from bzrlib import (
     branch,
     builtins,
     errors,
+    merge_directive,
     workingtree,
     )
 """)
@@ -679,7 +680,13 @@ class cmd_ghandle_patch(GTKCommand):
     def run(self, path):
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow()
-        window.set_diff_text(path, open(path, 'rb').read())
+        lines = open(path, 'rb').readlines()
+        try:
+            directive = merge_directive.MergeDirective.from_lines(lines)
+        except errors.NotAMergeDirective:
+            window.set_diff_text(path, lines)
+        else:
+            window.set_diff_text(path, directive.patch.splitlines(True))
         window.show()
         gtk = self.open_display()
         window.connect("destroy", gtk.main_quit)
