@@ -681,6 +681,23 @@ class cmd_test_gtk(GTKCommand):
 register_command(cmd_test_gtk)
 
 
+class cmd_ghandle_patch(GTKCommand):
+
+    takes_args = ['path']
+
+    def run(self, path):
+        from bzrlib.plugins.gtk.diff import DiffWindow
+        window = DiffWindow()
+        window.set_diff_text(path, open(path, 'rb').read())
+        window.show()
+        gtk = self.open_display()
+        window.connect("destroy", gtk.main_quit)
+        gtk.main()
+
+
+register_command(cmd_ghandle_patch)
+
+
 import gettext
 gettext.install('olive-gtk')
 

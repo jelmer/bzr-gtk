@@ -37,15 +37,12 @@ from bzrlib.trace import warning
 from bzrlib.plugins.gtk.window import Window
 
 
-class DiffView(gtk.ScrolledWindow):
-    """This is the soft and chewy filling for a DiffWindow."""
+class DiffFileView(gtk.ScrolledWindow):
 
     def __init__(self):
         gtk.ScrolledWindow.__init__(self)
-
         self.construct()
-        self.rev_tree = None
-        self.parent_tree = None
+        self._diffs = {}
 
     def construct(self):
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -134,8 +131,8 @@ class DiffView(gtk.ScrolledWindow):
 
             lang.set_tag_style(tag_id, style)
 
-    @staticmethod
-    def apply_colordiff_colors(lang):
+    @classmethod
+    def apply_colordiff_colors(klass, lang):
         """Set style colors for lang using the colordiff configuration file.
 
         Both ~/.colordiffrc and ~/.colordiffrc.bzr-gtk are read.
@@ -152,7 +149,7 @@ class DiffView(gtk.ScrolledWindow):
                 except IOError, e:
                     warning('could not open file %s: %s' % (f, str(e)))
                 else:
-                    colors.update(DiffView.parse_colordiffrc(f))
+                    colors.update(klass.parse_colordiffrc(f))
                     f.close()
 
         if not colors:
@@ -237,6 +234,18 @@ class DiffView(gtk.ScrolledWindow):
 #            self.parent_tree.unlock()
 
     def show_diff(self, specific_files):
+        self.buffer.set_text(self._diffs[None])
+
+
+class DiffView(DiffFileView):
+    """This is the soft and chewy filling for a DiffWindow."""
+
+    def __init__(self):
+        DiffFileView.__init__(self)
+        self.rev_tree = None
+        self.parent_tree = None
+
+    def show_diff(self, specific_files):
         s = StringIO()
         show_diff_trees(self.parent_tree, self.rev_tree, s, specific_files,
                         old_label='', new_label='',
@@ -287,15 +296,15 @@ class DiffWindow(Window):
         # The   window  consists  of   a  pane   containing:  the
         # hierarchical list  of files on  the left, and  the diff
         # for the currently selected file on the right.
-        pane = gtk.HPaned()
-        self.add(pane)
-        pane.show()
+        self.pane = gtk.HPaned()
+        self.add(self.pane)
+        self.pane.show()
 
         # The file hierarchy: a scrollable treeview
         scrollwin = gtk.ScrolledWindow()
         scrollwin.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         scrollwin.set_shadow_type(gtk.SHADOW_IN)
-        pane.pack1(scrollwin)
+        self.pane.pack1(scrollwin)
         scrollwin.show()
 
         self.model = gtk.TreeStore(str, str)
@@ -313,11 +322,15 @@ class DiffWindow(Window):
         column.add_attribute(cell, "text", 0)
         self.treeview.append_column(column)
 
+    def set_diff_text(self, description, text):
         # The diffs of the  selected file: a scrollable source or
         # text view
-        self.diff_view = DiffView()
-        pane.pack2(self.diff_view)
+        self.diff_view = DiffFileView()
         self.diff_view.show()
+        self.pane.pack2(self.diff_view)
+        self.model.append(None, [ "Complete Diff", "" ])
+        self.diff_view._diffs[None] = text
+        
 
     def set_diff(self, description, rev_tree, parent_tree):
         """Set the differences showed by this window.
@@ -325,6 +338,11 @@ class DiffWindow(Window):
         Compares the two trees and populates the window with the
         differences.
         """
+        # The diffs of the  selected file: a scrollable source or
+        # text view
+        self.diff_view = DiffView()
+        self.pane.pack2(self.diff_view)
+        self.diff_view.show()
         self.diff_view.set_trees(rev_tree, parent_tree)
         self.rev_tree = rev_tree
         self.parent_tree = parent_tree
