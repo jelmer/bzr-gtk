@@ -30,12 +30,18 @@ try:
 except ImportError:
     have_gconf = False
 
-from bzrlib import osutils
+from bzrlib import merge as _mod_merge, osutils, progress, workingtree
 from bzrlib.diff import show_diff_trees, internal_diff
 from bzrlib.errors import NoSuchFile
 from bzrlib.patches import parse_patches
 from bzrlib.trace import warning
 from bzrlib.plugins.gtk.window import Window
+from dialog import error_dialog
+
+
+class SelectCancelled(Exception):
+
+    pass
 
 
 class DiffFileView(gtk.ScrolledWindow):
@@ -424,15 +430,60 @@ class DiffWindow(Window):
 
 class MergeDirectiveWindow(DiffWindow):
 
+    def __init__(self, directive, parent=None):
+        DiffWindow.__init__(self, parent)
+        self._merge_target = None
+        self.directive = directive
+
     def _get_button_bar(self):
         merge_button = gtk.Button('Merge')
         merge_button.show()
         merge_button.set_relief(gtk.RELIEF_NONE)
+        merge_button.connect("clicked", self.perform_merge)
+
         hbox = gtk.HButtonBox()
         hbox.set_layout(gtk.BUTTONBOX_START)
         hbox.pack_start(merge_button, expand=False, fill=True)
         hbox.show()
         return hbox
+
+    def perform_merge(self, window):
+        try:
+            tree = self._get_merge_target()
+        except SelectCancelled:
+            return
+        tree.lock_write()
+        try:
+            try:
+                merger, verified = _mod_merge.Merger.from_mergeable(tree,
+                    self.directive, progress.DummyProgress())
+                merger.check_basis(True)
+                merger.merge_type = _mod_merge.Merge3Merger
+                merger.set_pending()
+                conflict_count = merger.do_merge()
+                self.destroy()
+            except Exception, e:
+                error_dialog('Error', str(e))
+        finally:
+            tree.unlock()
+
+    def _get_merge_target(self):
+        if self._merge_target is not None:
+            return self._merge_target
+        d = gtk.FileChooserDialog('Merge branch', self,
+                                  gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                  buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
+                                           gtk.STOCK_CANCEL,
+                                           gtk.RESPONSE_CANCEL,))
+        try:
+            result = d.run()
+            if result == gtk.RESPONSE_OK:
+                uri = d.get_current_folder_uri()
+                return workingtree.WorkingTree.open(uri)
+            else:
+                raise SelectCancelled()
+        finally:
+            d.destroy()
 
 
 def _iter_changes_to_status(source, target):

@@ -686,7 +686,7 @@ class cmd_ghandle_patch(GTKCommand):
             window = DiffWindow()
             window.set_diff_text(path, lines)
         else:
-            window = MergeDirectiveWindow()
+            window = MergeDirectiveWindow(directive)
             window.set_diff_text(path, directive.patch.splitlines(True))
         window.show()
         gtk = self.open_display()
