@@ -298,13 +298,22 @@ class DiffWindow(Window):
 
         self.construct()
 
+    def _get_button_bar(self):
+        return None
+
     def construct(self):
         """Construct the window contents."""
         # The   window  consists  of   a  pane   containing:  the
         # hierarchical list  of files on  the left, and  the diff
         # for the currently selected file on the right.
+        self.vbox = gtk.VBox()
+        self.add(self.vbox)
+        self.vbox.show()
         self.pane = gtk.HPaned()
-        self.add(self.pane)
+        self.vbox.pack_end(self.pane, expand=True, fill=True)
+        hbox = self._get_button_bar()
+        if hbox is not None:
+            self.vbox.pack_start(hbox, expand=False, fill=True)
         self.pane.show()
 
         # The file hierarchy: a scrollable treeview
@@ -342,7 +351,7 @@ class DiffWindow(Window):
             newname = patch.newname.split('\t')[0]
             self.model.append(None, [oldname, newname])
             self.diff_view._diffs[newname] = str(patch)
-        
+        self.diff_view.show_diff(None)
 
     def set_diff(self, description, rev_tree, parent_tree):
         """Set the differences showed by this window.
@@ -387,6 +396,7 @@ class DiffWindow(Window):
 
         self.treeview.expand_all()
         self.set_title(description + " - bzrk diff")
+        self.diff_view.show_diff(None)
 
     def set_file(self, file_path):
         tv_path = None
@@ -410,6 +420,19 @@ class DiffWindow(Window):
             specific_files = None
 
         self.diff_view.show_diff(specific_files)
+
+
+class MergeDirectiveWindow(DiffWindow):
+
+    def _get_button_bar(self):
+        merge_button = gtk.Button('Merge')
+        merge_button.show()
+        merge_button.set_relief(gtk.RELIEF_NONE)
+        hbox = gtk.HButtonBox()
+        hbox.set_layout(gtk.BUTTONBOX_START)
+        hbox.pack_start(merge_button, expand=False, fill=True)
+        hbox.show()
+        return hbox
 
 
 def _iter_changes_to_status(source, target):
