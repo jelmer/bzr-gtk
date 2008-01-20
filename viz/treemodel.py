@@ -20,7 +20,7 @@ NODE = 1
 LINES = 2
 LAST_LINES = 3
 REVNO = 4
-MESSAGE = 5
+SUMMARY = 5
 COMMITER = 6
 TIMESTAMP = 7
 REVISION = 8
@@ -48,7 +48,7 @@ class TreeModel(gtk.GenericTreeModel):
         if index == LINES: return gobject.TYPE_PYOBJECT
         if index == LAST_LINES: return gobject.TYPE_PYOBJECT
         if index == REVNO: return gobject.TYPE_STRING
-        if index == MESSAGE: return gobject.TYPE_STRING
+        if index == SUMMARY: return gobject.TYPE_STRING
         if index == COMMITER: return gobject.TYPE_STRING
         if index == TIMESTAMP: return gobject.TYPE_STRING
         if index == REVISION: return gobject.TYPE_PYOBJECT
@@ -90,7 +90,7 @@ class TreeModel(gtk.GenericTreeModel):
             revision = self.revisions[revid]
         
         if column == REVISION: return revision
-        if column == MESSAGE: return escape(revision.get_summary())
+        if column == SUMMARY: return escape(revision.get_summary())
         if column == COMMITER: return re.sub('<.*@.*>', '', 
                                              revision.committer).strip(' ')
         if column == TIMESTAMP: 

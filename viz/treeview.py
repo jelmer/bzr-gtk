@@ -284,7 +284,7 @@ class TreeView(gtk.ScrolledWindow):
         # Fix old PyGTK bug - by JAM
         set_tooltip = getattr(self.treeview, 'set_tooltip_column', None)
         if set_tooltip is not None:
-            set_tooltip(treemodel.MESSAGE)
+            set_tooltip(treemodel.SUMMARY)
 
         self.treeview.connect("cursor-changed",
                 self._on_selection_changed)
@@ -324,13 +324,13 @@ class TreeView(gtk.ScrolledWindow):
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 65)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.msg_column = gtk.TreeViewColumn("Message")
-        self.msg_column.set_resizable(True)
-        self.msg_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.msg_column.set_fixed_width(cell.get_size(self.treeview)[2])
-        self.msg_column.pack_start(cell, expand=True)
-        self.msg_column.add_attribute(cell, "markup", treemodel.MESSAGE)
-        self.treeview.append_column(self.msg_column)
+        self.summary_column = gtk.TreeViewColumn("Summary")
+        self.summary_column.set_resizable(True)
+        self.summary_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.summary_column.set_fixed_width(cell.get_size(self.treeview)[2])
+        self.summary_column.pack_start(cell, expand=True)
+        self.summary_column.add_attribute(cell, "markup", treemodel.SUMMARY)
+        self.treeview.append_column(self.summary_column)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 15)
