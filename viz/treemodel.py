@@ -15,17 +15,18 @@ from xml.sax.saxutils import escape
 
 from time import (strftime, localtime)
 
-REVID = 0
-NODE = 1
-LINES = 2
-LAST_LINES = 3
-REVNO = 4
-SUMMARY = 5
-COMMITER = 6
-TIMESTAMP = 7
-REVISION = 8
-PARENTS = 9
-CHILDREN = 10
+REVID      =  0
+NODE       =  1
+LINES      =  2
+LAST_LINES =  3
+REVNO      =  4
+SUMMARY    =  5
+MESSAGE    =  6
+COMMITER   =  7
+TIMESTAMP  =  8
+REVISION   =  9
+PARENTS    = 10
+CHILDREN   = 11
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -40,20 +41,21 @@ class TreeModel(gtk.GenericTreeModel):
         return gtk.TREE_MODEL_LIST_ONLY
     
     def on_get_n_columns(self):
-        return 11
+        return 12
     
     def on_get_column_type(self, index):
-        if index == REVID: return gobject.TYPE_STRING
-        if index == NODE: return gobject.TYPE_PYOBJECT
-        if index == LINES: return gobject.TYPE_PYOBJECT
+        if index == REVID:      return gobject.TYPE_STRING
+        if index == NODE:       return gobject.TYPE_PYOBJECT
+        if index == LINES:      return gobject.TYPE_PYOBJECT
         if index == LAST_LINES: return gobject.TYPE_PYOBJECT
-        if index == REVNO: return gobject.TYPE_STRING
-        if index == SUMMARY: return gobject.TYPE_STRING
-        if index == COMMITER: return gobject.TYPE_STRING
-        if index == TIMESTAMP: return gobject.TYPE_STRING
-        if index == REVISION: return gobject.TYPE_PYOBJECT
-        if index == PARENTS: return gobject.TYPE_PYOBJECT
-        if index == CHILDREN: return gobject.TYPE_PYOBJECT
+        if index == REVNO:      return gobject.TYPE_STRING
+        if index == SUMMARY:    return gobject.TYPE_STRING
+        if index == MESSAGE:    return gobject.TYPE_STRING
+        if index == COMMITER:   return gobject.TYPE_STRING
+        if index == TIMESTAMP:  return gobject.TYPE_STRING
+        if index == REVISION:   return gobject.TYPE_PYOBJECT
+        if index == PARENTS:    return gobject.TYPE_PYOBJECT
+        if index == CHILDREN:   return gobject.TYPE_PYOBJECT
         
     def on_get_iter(self, path):
         return path[0]
@@ -91,6 +93,7 @@ class TreeModel(gtk.GenericTreeModel):
         
         if column == REVISION: return revision
         if column == SUMMARY: return escape(revision.get_summary())
+        if column == MESSAGE: return escape(revision.message)
         if column == COMMITER: return re.sub('<.*@.*>', '', 
                                              revision.committer).strip(' ')
         if column == TIMESTAMP: 
