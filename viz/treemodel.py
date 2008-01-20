@@ -15,18 +15,18 @@ from xml.sax.saxutils import escape
 
 from time import (strftime, localtime)
 
-REVID      =  0
-NODE       =  1
-LINES      =  2
+REVID  =  0
+NODE =  1
+LINES =  2
 LAST_LINES =  3
-REVNO      =  4
-SUMMARY    =  5
-MESSAGE    =  6
-COMMITTER  =  7
-TIMESTAMP  =  8
-REVISION   =  9
-PARENTS    = 10
-CHILDREN   = 11
+REVNO =  4
+SUMMARY =  5
+MESSAGE =  6
+COMMITTER =  7
+TIMESTAMP =  8
+REVISION =  9
+PARENTS = 10
+CHILDREN = 11
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -44,18 +44,18 @@ class TreeModel(gtk.GenericTreeModel):
         return 12
     
     def on_get_column_type(self, index):
-        if index == REVID:      return gobject.TYPE_STRING
-        if index == NODE:       return gobject.TYPE_PYOBJECT
-        if index == LINES:      return gobject.TYPE_PYOBJECT
+        if index == REVID: return gobject.TYPE_STRING
+        if index == NODE: return gobject.TYPE_PYOBJECT
+        if index == LINES: return gobject.TYPE_PYOBJECT
         if index == LAST_LINES: return gobject.TYPE_PYOBJECT
-        if index == REVNO:      return gobject.TYPE_STRING
-        if index == SUMMARY:    return gobject.TYPE_STRING
-        if index == MESSAGE:    return gobject.TYPE_STRING
-        if index == COMMITTER:  return gobject.TYPE_STRING
-        if index == TIMESTAMP:  return gobject.TYPE_STRING
-        if index == REVISION:   return gobject.TYPE_PYOBJECT
-        if index == PARENTS:    return gobject.TYPE_PYOBJECT
-        if index == CHILDREN:   return gobject.TYPE_PYOBJECT
+        if index == REVNO: return gobject.TYPE_STRING
+        if index == SUMMARY: return gobject.TYPE_STRING
+        if index == MESSAGE: return gobject.TYPE_STRING
+        if index == COMMITTER: return gobject.TYPE_STRING
+        if index == TIMESTAMP: return gobject.TYPE_STRING
+        if index == REVISION: return gobject.TYPE_PYOBJECT
+        if index == PARENTS: return gobject.TYPE_PYOBJECT
+        if index == CHILDREN: return gobject.TYPE_PYOBJECT
         
     def on_get_iter(self, path):
         return path[0]
