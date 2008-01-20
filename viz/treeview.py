@@ -284,7 +284,7 @@ class TreeView(gtk.ScrolledWindow):
         # Fix old PyGTK bug - by JAM
         set_tooltip = getattr(self.treeview, 'set_tooltip_column', None)
         if set_tooltip is not None:
-            set_tooltip(treemodel.SUMMARY)
+            set_tooltip(treemodel.MESSAGE)
 
         self.treeview.connect("cursor-changed",
                 self._on_selection_changed)
