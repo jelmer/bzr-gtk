@@ -397,7 +397,7 @@ class BranchWindow(Window):
                 if response == gtk.RESPONSE_OK:
                     try:
                         self.branch.lock_write()
-                        self.branch.tags.set_tag(dialog.tagname, dialog._revid)
+                        self.treeview.add_tag(dialog.tagname, dialog._revid)
                     finally:
                         self.branch.unlock()
                 

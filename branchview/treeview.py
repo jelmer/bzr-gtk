@@ -94,8 +94,9 @@ class TreeView(gtk.ScrolledWindow):
 
         self.construct_treeview()
 
-        self.iter   = None
+        self.iter = None
         self.branch = branch
+        self.revision = None
 
         self.start = start
         self.maxnum = maxnum
@@ -167,6 +168,21 @@ class TreeView(gtk.ScrolledWindow):
         :return: list of revision ids.
         """
         return self.get_property('parents')
+
+    def add_tag(self, tag, revid=None):
+        if revid is None: revid = self.revision.revision_id
+
+        try:
+            self.branch.unlock()
+
+            try:
+                self.branch.lock_write()
+                self.model.add_tag(tag, revid)
+            finally:
+                self.branch.unlock()
+
+        finally:
+            self.branch.lock_read()
         
     def refresh(self):
         gobject.idle_add(self.populate, self.get_revision())
