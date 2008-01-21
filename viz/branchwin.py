@@ -170,27 +170,13 @@ class BranchWindow(Window):
         go_menu_next = self.next_rev_action.create_menu_item()
         go_menu_prev = self.prev_rev_action.create_menu_item()
 
-        tags_menu = gtk.Menu()
-        go_menu_tags = gtk.MenuItem("_Tags")
-        go_menu_tags.set_submenu(tags_menu)
-
-        if self.branch.supports_tags():
-            tags = self.branch.tags.get_tag_dict().items()
-            tags.sort()
-            tags.reverse()
-            for tag, revid in tags:
-                tag_item = gtk.MenuItem(tag)
-                tag_item.connect('activate', self._tag_selected_cb, revid)
-                tags_menu.add(tag_item)
-
-            go_menu_tags.set_sensitive(len(tags) != 0)
-        else:
-            go_menu_tags.set_sensitive(False)
+        self.go_menu_tags = gtk.MenuItem("_Tags")
+        self._update_tags()
 
         go_menu.add(go_menu_next)
         go_menu.add(go_menu_prev)
         go_menu.add(gtk.SeparatorMenuItem())
-        go_menu.add(go_menu_tags)
+        go_menu.add(self.go_menu_tags)
 
         revision_menu = gtk.Menu()
         revision_menuitem = gtk.MenuItem("_Revision")
@@ -252,6 +238,8 @@ class BranchWindow(Window):
 
         self.treeview.connect('revisions-loaded', 
                 lambda x: self.loading_msg_box.hide())
+
+        self.treeview.connect('tag-added', lambda w, t, r: self._update_tags())
 
         for col in ["revno", "date"]:
             option = self.config.get_user_option(col + '-column-visible')
@@ -426,3 +414,24 @@ class BranchWindow(Window):
 
     def _refresh_clicked(self, w):
         self.treeview.update()
+
+    def _update_tags(self):
+        menu = gtk.Menu()
+
+        if self.branch.supports_tags():
+            tags = self.branch.tags.get_tag_dict().items()
+            tags.sort()
+            tags.reverse()
+            for tag, revid in tags:
+                tag_item = gtk.MenuItem(tag)
+                tag_item.connect('activate', self._tag_selected_cb, revid)
+                menu.add(tag_item)
+            self.go_menu_tags.set_submenu(menu)
+
+            self.go_menu_tags.set_sensitive(len(tags) != 0)
+        else:
+            self.go_menu_tags.set_sensitive(False)
+
+        self.go_menu_tags.show_all()
+
+
