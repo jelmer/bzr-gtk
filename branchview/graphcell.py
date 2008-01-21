@@ -242,9 +242,16 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             ctx.line_to(x0, y0 + text_height)
             ctx.line_to(x0 - box_size / 3, y0 + text_height / 2)
 
+            ctx.new_sub_path()
+            ctx.arc(x0 - box_size / 6,
+                        y0 + text_height / 2,
+                        box_size / 8,
+                        0, 2 * math.pi);
+
             self.set_colour(ctx, TAG_COLOUR_ID, 0.0, 0.5)
             ctx.stroke_preserve()
 
+            ctx.set_fill_rule (cairo.FILL_RULE_EVEN_ODD)
             self.set_colour(ctx, TAG_COLOUR_ID, 0.5, 1.0)
             ctx.fill()
 
