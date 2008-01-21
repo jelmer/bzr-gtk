@@ -243,9 +243,9 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             ctx.line_to(x0 - box_size / 3, y0 + text_height / 2)
 
             ctx.new_sub_path()
-            ctx.arc(x0 - box_size / 6,
+            ctx.arc(x0 - box_size / 12,
                         y0 + text_height / 2,
-                        box_size / 8,
+                        box_size / 7,
                         0, 2 * math.pi);
 
             self.set_colour(ctx, TAG_COLOUR_ID, 0.0, 0.5)
