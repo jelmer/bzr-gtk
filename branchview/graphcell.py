@@ -216,13 +216,16 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         tag_layout = pango.Layout(pango_ctx)
 
         for tag_idx, tag in enumerate(self.tags):
-            tag_layout.set_markup("<small>" + tag + "</small>")
+            tag_layout.set_markup(" <small>" + tag + "</small> ")
             text_width, text_height = tag_layout.get_pixel_size()
 
-            x0 = cell_area.x + box_size * (column + 1.3)
+            x0 = cell_area.x + \
+                 box_size * (column + 1.3) + \
+                 (text_width - (text_width / 4)) * tag_idx
+
             y0 = cell_area.y + \
-                    cell_area.height * (tag_idx + 1) / (len(self.tags) + 1) - \
-                    text_height / 2
+                 cell_area.height / 2 - \
+                 text_height / 2
 
             # Draw the tag border
             ctx.move_to(x0 - box_size / 3, y0 + text_height / 2)
