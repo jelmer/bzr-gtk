@@ -297,6 +297,7 @@ class BranchWindow(Window):
         self.revisionview.show()
         self.revisionview.set_show_callback(self._show_clicked_cb)
         self.revisionview.connect('notify::revision', self._go_clicked_cb)
+        self.treeview.connect('tag-added', lambda w, t, r: self.revisionview.update_tags())
         return self.revisionview
 
     def _tag_selected_cb(self, menuitem, revid):

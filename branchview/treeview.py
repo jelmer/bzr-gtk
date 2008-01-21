@@ -74,7 +74,10 @@ class TreeView(gtk.ScrolledWindow):
                              ()),
         'revision-selected': (gobject.SIGNAL_RUN_FIRST,
                               gobject.TYPE_NONE,
-                              ())
+                              ()),
+        'tag-added': (gobject.SIGNAL_RUN_FIRST,
+                              gobject.TYPE_NONE,
+                              (gobject.TYPE_STRING, gobject.TYPE_STRING))
     }
 
     def __init__(self, branch, start, maxnum, compact=True):
@@ -183,6 +186,8 @@ class TreeView(gtk.ScrolledWindow):
 
         finally:
             self.branch.lock_read()
+
+        self.emit('tag-added', tag, revid)
         
     def refresh(self):
         gobject.idle_add(self.populate, self.get_revision())
