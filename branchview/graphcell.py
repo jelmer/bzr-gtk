@@ -212,6 +212,9 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         ctx.stroke()
 
     def render_tags(self, ctx, pango_ctx, cell_area, box_size):
+        # colour ID used in self.set_colour on the tags
+        TAG_COLOUR_ID = 1
+
         (column, colour) = self.node
         tag_layout = pango.Layout(pango_ctx)
 
@@ -239,14 +242,14 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             ctx.line_to(x0, y0 + text_height)
             ctx.line_to(x0 - box_size / 3, y0 + text_height / 2)
 
-            self.set_colour(ctx, colour, 0.0, 0.5)
+            self.set_colour(ctx, TAG_COLOUR_ID, 0.0, 0.5)
             ctx.stroke_preserve()
 
-            self.set_colour(ctx, colour, 0.5, 1.0)
+            self.set_colour(ctx, TAG_COLOUR_ID, 0.5, 1.0)
             ctx.fill()
 
             # Draw the tag text
-            self.set_colour(ctx, 0.0, 0.0, 0.0)
+            self.set_colour(ctx, 0, 0.0, 0.0)
             ctx.move_to(x0, y0)
             ctx.show_layout(tag_layout)
 
