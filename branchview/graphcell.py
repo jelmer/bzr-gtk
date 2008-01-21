@@ -38,6 +38,10 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                           "revision node instruction",
                           gobject.PARAM_WRITABLE
                         ),
+        "tags":         ( gobject.TYPE_PYOBJECT, "tags",
+                          "list of tags associated with the node",
+                          gobject.PARAM_WRITABLE
+                        ),
         "in-lines":     ( gobject.TYPE_PYOBJECT, "in-lines",
                           "instructions to draw lines into the cell",
                           gobject.PARAM_WRITABLE
@@ -52,6 +56,8 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         """Set properties from GObject properties."""
         if property.name == "node":
             self.node = value
+        elif property.name == "tags":
+            self.tags = value
         elif property.name == "in-lines":
             self.in_lines = value
         elif property.name == "out-lines":
@@ -168,8 +174,10 @@ class CellRendererGraph(gtk.GenericCellRenderer):
 
         self.set_colour(ctx, colour, 0.5, 1.0)
         ctx.fill()
+
+        self.render_tags(ctx, widget.create_pango_context(), cell_area, box_size)
     
-    def render_line (self, ctx, cell_area, box_size, mid, height, start, end, colour):
+    def render_line(self, ctx, cell_area, box_size, mid, height, start, end, colour):
         if start is None:
             x = cell_area.x + box_size * end + box_size / 2
             ctx.move_to(x, mid + height / 3)
@@ -202,4 +210,36 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                 
         self.set_colour(ctx, colour, 0.0, 0.65)
         ctx.stroke()
-        
+
+    def render_tags(self, ctx, pango_ctx, cell_area, box_size):
+        (column, colour) = self.node
+        tag_layout = pango.Layout(pango_ctx)
+
+        for tag_idx, tag in enumerate(self.tags):
+            tag_layout.set_text(tag)
+            text_width, text_height = tag_layout.get_pixel_size()
+
+            x0 = cell_area.x + box_size * (column + 1.3)
+            y0 = cell_area.y + \
+                    cell_area.height * (tag_idx + 1) / (len(self.tags) + 1) - \
+                    text_height / 2
+
+            # Draw the tag border
+            ctx.move_to(x0 - box_size / 3, y0 + text_height / 2)
+            ctx.line_to(x0, y0)
+            ctx.line_to(x0 + text_width, y0)
+            ctx.line_to(x0 + text_width, y0 + text_height)
+            ctx.line_to(x0, y0 + text_height)
+            ctx.line_to(x0 - box_size / 3, y0 + text_height / 2)
+
+            self.set_colour(ctx, colour, 0.0, 0.5)
+            ctx.stroke_preserve()
+
+            self.set_colour(ctx, colour, 0.5, 1.0)
+            ctx.fill()
+
+            # Draw the tag text
+            self.set_colour(ctx, 0.0, 0.0, 0.0)
+            ctx.move_to(x0, y0)
+            ctx.show_layout(tag_layout)
+

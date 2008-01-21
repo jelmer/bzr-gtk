@@ -233,7 +233,7 @@ class TreeView(gtk.ScrolledWindow):
                                                         self.maxnum, 
                                                         broken_line_length)
 
-        self.model = TreeModel(self.branch.repository, linegraphdata)
+        self.model = TreeModel(self.branch, linegraphdata)
         self.graph_cell.columns_len = columns_len
         width = self.graph_cell.get_size(self.treeview)[2]
         if width > 500:
@@ -317,6 +317,7 @@ class TreeView(gtk.ScrolledWindow):
         self.graph_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.graph_column.pack_start(self.graph_cell, expand=False)
         self.graph_column.add_attribute(self.graph_cell, "node", treemodel.NODE)
+        self.graph_column.add_attribute(self.graph_cell, "tags", treemodel.TAGS)
         self.graph_column.add_attribute(self.graph_cell, "in-lines", treemodel.LAST_LINES)
         self.graph_column.add_attribute(self.graph_cell, "out-lines", treemodel.LINES)
         self.treeview.append_column(self.graph_column)
