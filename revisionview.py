@@ -20,6 +20,7 @@ pygtk.require("2.0")
 import gtk
 import pango
 import gobject
+import subprocess
 
 from bzrlib.osutils import format_date
 from bzrlib.util.bencode import bdecode
@@ -68,6 +69,7 @@ class RevisionView(gtk.Notebook):
         self._create_general()
         self._create_relations()
         self._create_file_info_view()
+        self._create_bugs()
 
         self.set_current_page(0)
         
@@ -126,6 +128,9 @@ class RevisionView(gtk.Notebook):
     def get_revision(self):
         return self.get_property('revision')
 
+    def _open_link(self, widget, uri):
+        subprocess.Popen(['sensible-browser', uri], close_fds=True)
+
     def _set_revision(self, revision):
         if revision is None: return
 
@@ -178,6 +183,25 @@ class RevisionView(gtk.Notebook):
                     self.file_info_box.hide()
         else:
             self.file_info_box.hide()
+
+        bugs_text = revision.properties.get('bugs', None)
+        if bugs_text:
+            for c in self.bugs_table.get_children():
+                self.bugs_table.remove(c)
+            idx = 0
+            for bugline in bugs_text.splitlines():
+                (url, status) = bugline.split(" ")
+                button = gtk.LinkButton(url, url)
+                gtk.link_button_set_uri_hook(self._open_link)
+                self.bugs_table.attach(button, 0, 1, idx, idx + 1,
+                                      gtk.EXPAND | gtk.FILL, gtk.FILL)
+                status_label = gtk.Label(status)
+                self.bugs_table.attach(status_label, 1, 2, idx, idx + 1,
+                                      gtk.EXPAND | gtk.FILL, gtk.FILL)
+                idx += 1
+            self.bugs_table.show_all()
+        else:
+            self.bugs_table.hide()
 
     def set_children(self, children):
         self._add_parents_or_children(children,
@@ -430,6 +454,13 @@ class RevisionView(gtk.Notebook):
         window.add(tv)
         window.show()
         return window
+
+    def _create_bugs(self):
+        self.bugs_table = gtk.Table(rows=5, columns=2)
+        self.bugs_table.set_row_spacings(6)
+        self.bugs_table.set_col_spacings(6)
+        self.bugs_table.hide() # Only shown when there are bugs
+        self.append_page(self.bugs_table, tab_label=gtk.Label('Bugs'))
 
     def _create_file_info_view(self):
         self.file_info_box = gtk.VBox(False, 6)
