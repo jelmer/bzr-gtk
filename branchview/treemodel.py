@@ -11,6 +11,7 @@ import gtk
 import gobject
 import pango
 import re
+from xml.sax.saxutils import escape
 
 from time import (strftime, localtime)
 
@@ -19,12 +20,13 @@ NODE = 1
 LINES = 2
 LAST_LINES = 3
 REVNO = 4
-MESSAGE = 5
-COMMITER = 6
-TIMESTAMP = 7
-REVISION = 8
-PARENTS = 9
-CHILDREN = 10
+SUMMARY = 5
+MESSAGE = 6
+COMMITTER = 7
+TIMESTAMP = 8
+REVISION = 9
+PARENTS = 10
+CHILDREN = 11
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -39,7 +41,7 @@ class TreeModel(gtk.GenericTreeModel):
         return gtk.TREE_MODEL_LIST_ONLY
     
     def on_get_n_columns(self):
-        return 11
+        return 12
     
     def on_get_column_type(self, index):
         if index == REVID: return gobject.TYPE_STRING
@@ -47,8 +49,9 @@ class TreeModel(gtk.GenericTreeModel):
         if index == LINES: return gobject.TYPE_PYOBJECT
         if index == LAST_LINES: return gobject.TYPE_PYOBJECT
         if index == REVNO: return gobject.TYPE_STRING
+        if index == SUMMARY: return gobject.TYPE_STRING
         if index == MESSAGE: return gobject.TYPE_STRING
-        if index == COMMITER: return gobject.TYPE_STRING
+        if index == COMMITTER: return gobject.TYPE_STRING
         if index == TIMESTAMP: return gobject.TYPE_STRING
         if index == REVISION: return gobject.TYPE_PYOBJECT
         if index == PARENTS: return gobject.TYPE_PYOBJECT
@@ -61,8 +64,13 @@ class TreeModel(gtk.GenericTreeModel):
         return rowref
     
     def on_get_value(self, rowref, column):
-        (revid, node, lines, parents,
-         children, revno_sequence) = self.line_graph_data[rowref]
+        if len(self.line_graph_data) > 0:
+            (revid, node, lines, parents,
+             children, revno_sequence) = self.line_graph_data[rowref]
+        else:
+            (revid, node, lines, parents,
+             children, revno_sequence) = (None, (0, 0), (), (),
+                                          (), ())
         if column == REVID: return revid
         if column == NODE: return node
         if column == LINES: return lines
@@ -75,6 +83,8 @@ class TreeModel(gtk.GenericTreeModel):
         if column == REVNO: return ".".join(["%d" % (revno)
                                       for revno in revno_sequence])
         
+        if revid is None:
+            return None
         if revid not in self.revisions:
             revision = self.repository.get_revisions([revid])[0]
             self.revisions[revid] = revision
@@ -82,8 +92,9 @@ class TreeModel(gtk.GenericTreeModel):
             revision = self.revisions[revid]
         
         if column == REVISION: return revision
-        if column == MESSAGE: return revision.message.split("\n")[0]
-        if column == COMMITER: return re.sub('<.*@.*>', '', 
+        if column == SUMMARY: return escape(revision.get_summary())
+        if column == MESSAGE: return escape(revision.message)
+        if column == COMMITTER: return re.sub('<.*@.*>', '', 
                                              revision.committer).strip(' ')
         if column == TIMESTAMP: 
             return strftime("%Y-%m-%d %H:%M", localtime(revision.timestamp))

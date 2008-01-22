@@ -36,7 +36,7 @@ import sys
 
 import bzrlib
 
-version_info = (0, 93, 0, 'dev', 0)
+version_info = (0, 94, 0, 'dev', 0)
 
 if version_info[3] == 'final':
     version_string = '%d.%d.%d' % version_info[:3]
@@ -44,19 +44,14 @@ else:
     version_string = '%d.%d.%d%s%d' % version_info
 __version__ = version_string
 
+required_bzrlib = (1, 0)
+
 def check_bzrlib_version(desired):
     """Check that bzrlib is compatible.
 
     If version is < bzr-gtk version, assume incompatible.
-    If version == bzr-gtk version, assume completely compatible
-    If version == bzr-gtk version + 1, assume compatible, with deprecations
-    Otherwise, assume incompatible.
     """
-    desired_plus = (desired[0], desired[1]+1)
     bzrlib_version = bzrlib.version_info[:2]
-    if bzrlib_version == desired or (bzrlib_version == desired_plus and
-                                     bzrlib.version_info[3] == 'dev'):
-        return
     try:
         from bzrlib.trace import warning
     except ImportError:
@@ -67,14 +62,10 @@ def check_bzrlib_version(desired):
         warning('Installed Bazaar version %s is too old to be used with bzr-gtk'
                 ' %s.' % (bzrlib.__version__, __version__))
         raise BzrError('Version mismatch: %r, %r' % (version_info, bzrlib.version_info) )
-    else:
-        warning('bzr-gtk is not up to date with installed bzr version %s.'
-                ' \nThere should be a newer version available, e.g. %i.%i.' 
-                % (bzrlib.__version__, bzrlib_version[0], bzrlib_version[1]))
 
 
 if version_info[2] == "final":
-    check_bzrlib_version(version_info[:2])
+    check_bzrlib_version(required_bzrlib)
 
 from bzrlib.trace import warning
 if __name__ != 'bzrlib.plugins.gtk':
@@ -227,7 +218,7 @@ def start_viz_window(branch, revision, limit=None):
     
     :return: The viz window object.
     """
-    from viz.branchwin import BranchWindow
+    from viz import BranchWindow
     return BranchWindow(branch, revision, limit)
 
 

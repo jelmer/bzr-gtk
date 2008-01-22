@@ -1,4 +1,29 @@
-0.93.0  UNRELEASED
+0.94.0  UNRELEASED
+
+ UI
+
+  * Made the tag list in the revision view be comma-separated. (Daniel Schierbeck)
+
+ BUG FIXES
+ 
+  * Catch UnsupportedProtocol exception in the Nautilus extension. (#77965)
+  
+  * Make Nautilus extension work again. (#111826, Toshio Kuratomi)
+  
+  * Make viz not throw errors when there are 0 commits. (#173698, Gary van der
+    Merwe)
+
+ FEATURES
+ 
+  * Only check for old Bazaar versions that are known to be incompatible and 
+    no longer warn about newer (unknown) versions of Bazaar, on the assumption
+	the API is sufficiently stable now. (Jelmer Vernooij)
+
+ INTERNALS
+
+  * Refactored the revisionview. (Daniel Schierbeck)
+
+0.93.0  2007-12-10
 
  UI
 
@@ -9,6 +34,10 @@
  BUG FIXES
 
   * Make toolbars in Olive follow GNOME standards. (#137074)
+
+ INTERNALS
+
+  * Allow test suite to run without PyGTK. (Aaron Bentley)
 
 0.92.1  2007-11-10
 

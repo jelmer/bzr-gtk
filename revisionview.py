@@ -18,10 +18,11 @@
 import pygtk
 pygtk.require("2.0")
 import gtk
+import gobject
 import pango
 
 from bzrlib.osutils import format_date
-from bzrlib.util import bencode
+from bzrlib.util.bencode import bdecode
 
 class RevisionView(gtk.Notebook):
     """ Custom widget for commit log details.
@@ -30,10 +31,39 @@ class RevisionView(gtk.Notebook):
     start.
     """
 
-    def __init__(self, revision=None, tags=[],
-                 show_children=False, branch=None):
+    __gproperties__ = {
+        'branch': (
+            gobject.TYPE_PYOBJECT,
+            'Branch',
+            'The branch holding the revision being displayed',
+            gobject.PARAM_CONSTRUCT_ONLY | gobject.PARAM_WRITABLE
+        ),
+
+        'revision': (
+            gobject.TYPE_PYOBJECT,
+            'Revision',
+            'The revision being displayed',
+            gobject.PARAM_READWRITE
+        ),
+
+        'children': (
+            gobject.TYPE_PYOBJECT,
+            'Children',
+            'Child revisions',
+            gobject.PARAM_READWRITE
+        ),
+
+        'file-id': (
+            gobject.TYPE_PYOBJECT,
+            'File Id',
+            'The file id',
+            gobject.PARAM_READWRITE
+        )
+    }
+
+
+    def __init__(self, branch=None):
         gtk.Notebook.__init__(self)
-        self.show_children = show_children
 
         self._create_general()
         self._create_relations()
@@ -43,20 +73,44 @@ class RevisionView(gtk.Notebook):
         self.set_current_page(0)
         
         self._show_callback = None
-        self._go_callback = None
         self._clicked_callback = None
 
+        self._revision = None
         self._branch = branch
 
-        if revision is not None:
-            self.set_revision(revision, tags=tags)
+        if self._branch is not None and self._branch.supports_tags():
+            self._tagdict = self._branch.tags.get_reverse_tag_dict()
+        else:
+            self._tagdict = {}
+
         self.set_file_id(None)
+
+    def do_get_property(self, property):
+        if property.name == 'branch':
+            return self._branch
+        elif property.name == 'revision':
+            return self._revision
+        elif property.name == 'children':
+            return self._children
+        elif property.name == 'file-id':
+            return self._file_id
+        else:
+            raise AttributeError, 'unknown property %s' % property.name
+
+    def do_set_property(self, property, value):
+        if property.name == 'branch':
+            self._branch = value
+        elif property.name == 'revision':
+            self._set_revision(value)
+        elif property.name == 'children':
+            self.set_children(value)
+        elif property.name == 'file-id':
+            self._file_id = value
+        else:
+            raise AttributeError, 'unknown property %s' % property.name
 
     def set_show_callback(self, callback):
         self._show_callback = callback
-
-    def set_go_callback(self, callback):
-        self._go_callback = callback
 
     def set_file_id(self, file_id):
         """Set a specific file id that we want to track.
@@ -64,11 +118,24 @@ class RevisionView(gtk.Notebook):
         This just effects the display of a per-file commit message.
         If it is set to None, then all commit messages will be shown.
         """
-        self._file_id = file_id
+        self.set_property('file-id', file_id)
 
-    def set_revision(self, revision, tags=[], children=[]):
+    def set_revision(self, revision):
+        if revision != self._revision:
+            self.set_property('revision', revision)
+
+    def get_revision(self):
+        return self.get_property('revision')
+
+    def set_children(self, children):
+        self._add_parents_or_children(children,
+                                      self.children_widgets,
+                                      self.children_table)
+
+    def _set_revision(self, revision):
+        if revision is None: return
+
         self._revision = revision
-        self.revision_id.set_text(revision.revision_id)
         if revision.committer is not None:
             self.committer.set_text(revision.committer)
         else:
@@ -85,7 +152,6 @@ class RevisionView(gtk.Notebook):
         if revision.timestamp is not None:
             self.timestamp.set_text(format_date(revision.timestamp,
                                                 revision.timezone))
-        self.message_buffer.set_text(revision.message)
         try:
             self.branchnick_label.set_text(revision.properties['branch-nick'])
         except KeyError:
@@ -95,16 +161,9 @@ class RevisionView(gtk.Notebook):
                                       self.parents_widgets,
                                       self.parents_table)
         
-        if self.show_children:
-            self._add_parents_or_children(children,
-                                          self.children_widgets,
-                                          self.children_table)
-        
-        self._add_tags(tags)
-
         file_info = revision.properties.get('file-info', None)
         if file_info is not None:
-            file_info = bencode.bdecode(file_info.encode('UTF-8'))
+            file_info = bdecode(file_info.encode('UTF-8'))
 
         if file_info:
             if self._file_id is None:
@@ -126,7 +185,7 @@ class RevisionView(gtk.Notebook):
         else:
             self.file_info_box.hide()
 
-        if self._branch is not None and self._branch.repository.has_signature_for_revision_id(revision.revision_id):
+        if self._branch.repository.has_signature_for_revision_id(revision.revision_id):
             from gpg import GPGSubprocess
             gpg = GPGSubprocess()
             signature_text = self._branch.repository.get_signature_text(revision.revision_id)
@@ -152,24 +211,20 @@ class RevisionView(gtk.Notebook):
 
     def _go_clicked_cb(self, widget, revid):
         """Callback for when the go button for a parent is clicked."""
-        self._go_callback(revid)
 
-    def _add_tags(self, tags):
+    def _add_tags(self, *args):
+        if self._tagdict.has_key(self._revision.revision_id):
+            tags = self._tagdict[self._revision.revision_id]
+        else:
+            tags = []
+            
         if tags == []:
             self.tags_list.hide()
             self.tags_label.hide()
             return
 
-        for widget in self.tags_widgets:
-            self.tags_list.remove(widget)
+        self.tags_list.set_text(", ".join(tags))
 
-        self.tags_widgets = []
-
-        for tag in tags:
-            widget = gtk.Label(tag)
-            widget.set_selectable(True)
-            self.tags_widgets.append(widget)
-            self.tags_list.add(widget)
         self.tags_list.show_all()
         self.tags_label.show_all()
         
@@ -204,11 +259,9 @@ class RevisionView(gtk.Notebook):
                 hbox.pack_start(button, expand=False, fill=True)
                 button.show()
 
-            if self._go_callback is not None:
-                button = gtk.Button(revid)
-                button.connect("clicked", self._go_clicked_cb, revid)
-            else:
-                button = gtk.Label(revid)
+            button = gtk.Button(revid)
+            button.connect("clicked",
+                    lambda w, r: self.set_revision(self._branch.repository.get_revision(r)), revid)
             button.set_use_underline(False)
             hbox.pack_start(button, expand=False, fill=True)
             button.show()
@@ -225,8 +278,7 @@ class RevisionView(gtk.Notebook):
         vbox = gtk.VBox(False, 6)
         vbox.set_border_width(6)
         vbox.pack_start(self._create_parents(), expand=False, fill=True)
-        if self.show_children:
-            vbox.pack_start(self._create_children(), expand=False, fill=True)
+        vbox.pack_start(self._create_children(), expand=False, fill=True)
         self.append_page(vbox, tab_label=gtk.Label("Relations"))
         vbox.show()
 
@@ -245,12 +297,14 @@ class RevisionView(gtk.Notebook):
         label.show()
 
         align = gtk.Alignment(0.0, 0.5)
-        self.revision_id = gtk.Label()
-        self.revision_id.set_selectable(True)
-        align.add(self.revision_id)
+        revision_id = gtk.Label()
+        revision_id.set_selectable(True)
+        self.connect('notify::revision', 
+                lambda w, p: revision_id.set_text(self._revision.revision_id))
+        align.add(revision_id)
         self.table.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
         align.show()
-        self.revision_id.show()
+        revision_id.show()
 
         align = gtk.Alignment(1.0, 0.5)
         self.author_label = gtk.Label()
@@ -326,12 +380,13 @@ class RevisionView(gtk.Notebook):
         self.tags_label.show()
 
         align = gtk.Alignment(0.0, 0.5)
-        self.tags_list = gtk.VBox()
+        self.tags_list = gtk.Label()
         align.add(self.tags_list)
         self.table.attach(align, 1, 2, 5, 6, gtk.EXPAND | gtk.FILL, gtk.FILL)
         align.show()
         self.tags_list.show()
-        self.tags_widgets = []
+
+        self.connect('notify::revision', self._add_tags)
 
         return self.table
 
@@ -371,15 +426,15 @@ class RevisionView(gtk.Notebook):
         align.show()
 
         return table
-    
-
 
     def _create_message_view(self):
-        self.message_buffer = gtk.TextBuffer()
+        msg_buffer = gtk.TextBuffer()
+        self.connect('notify::revision',
+                lambda w, p: msg_buffer.set_text(self._revision.message))
         window = gtk.ScrolledWindow()
         window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         window.set_shadow_type(gtk.SHADOW_IN)
-        tv = gtk.TextView(self.message_buffer)
+        tv = gtk.TextView(msg_buffer)
         tv.set_editable(False)
         tv.set_wrap_mode(gtk.WRAP_WORD)
         tv.modify_font(pango.FontDescription("Monospace"))

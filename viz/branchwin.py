@@ -16,10 +16,10 @@ import pango
 from bzrlib.plugins.gtk.window import Window
 from bzrlib.plugins.gtk.tags import AddTagDialog
 from bzrlib.plugins.gtk.preferences import PreferencesWindow
+from bzrlib.plugins.gtk.branchview import TreeView
 from bzrlib.revision import Revision
 from bzrlib.config import BranchConfig
 from bzrlib.config import GlobalConfig
-from treeview import TreeView
 
 class BranchWindow(Window):
     """Branch window.
@@ -291,12 +291,12 @@ class BranchWindow(Window):
     def construct_bottom(self):
         """Construct the bottom half of the window."""
         from bzrlib.plugins.gtk.revisionview import RevisionView
-        self.revisionview = RevisionView(None, tags=[], show_children=True, branch=self.branch)
+        self.revisionview = RevisionView(branch=self.branch)
         (width, height) = self.get_size()
         self.revisionview.set_size_request(width, int(height / 2.5))
         self.revisionview.show()
         self.revisionview.set_show_callback(self._show_clicked_cb)
-        self.revisionview.set_go_callback(self._go_clicked_cb)
+        self.revisionview.connect('notify::revision', self._go_clicked_cb)
         return self.revisionview
 
     def _tag_selected_cb(self, menuitem, revid):
@@ -349,12 +349,8 @@ class BranchWindow(Window):
 
             self.next_button.set_menu(next_menu)
 
-            tags = []
-            if self.branch.supports_tags():
-                tagdict = self.branch.tags.get_reverse_tag_dict()
-                if tagdict.has_key(revision.revision_id):
-                    tags = tagdict[revision.revision_id]
-            self.revisionview.set_revision(revision, tags, children)
+            self.revisionview.set_revision(revision)
+            self.revisionview.set_children(children)
 
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
@@ -364,9 +360,10 @@ class BranchWindow(Window):
         """Callback for when the forward button is clicked."""
         self.treeview.forward()
 
-    def _go_clicked_cb(self, revid):
+    def _go_clicked_cb(self, w, p):
         """Callback for when the go button for a parent is clicked."""
-        self.treeview.set_revision_id(revid)
+        if self.revisionview.get_revision() is not None:
+            self.treeview.set_revision(self.revisionview.get_revision())
 
     def _show_clicked_cb(self, revid, parentid):
         """Callback for when the show button for a parent is clicked."""

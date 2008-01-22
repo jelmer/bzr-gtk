@@ -6,11 +6,15 @@
 #
 # Published under the GNU GPL
 
+import gtk
 import nautilus
 import bzrlib
 from bzrlib.bzrdir import BzrDir
 from bzrlib.errors import NotBranchError
+from bzrlib.errors import NoWorkingTree
+from bzrlib.errors import UnsupportedProtocol
 from bzrlib.workingtree import WorkingTree
+from bzrlib.branch import Branch
 from bzrlib.tree import file_status
 
 from bzrlib.plugin import load_plugins
@@ -78,7 +82,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         except NotBranchError:
             return
 
-        from bzrlib.plugins.gtk.viz.diff import DiffWindow
+        from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow()
         window.set_diff(tree.branch.nick, tree, tree.branch.basis_tree())
         window.show()
@@ -96,7 +100,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         try:
             tree, path = WorkingTree.open_containing(file)
         except NotBranchError:
-            BzrDir.create_branch_and_repo(file)
+            BzrDir.create_standalone_workingtree(file)
 
     def remove_cb(self, menu, vfs_file):
         # We can only cope with local files
@@ -129,7 +133,10 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         from bzrlib.plugins.gtk.branch import BranchDialog
         
         dialog = BranchDialog(vfs_file.get_name())
-        dialog.display()
+        response = dialog.run()
+        if response != gtk.RESPONSE_NONE:
+            dialog.hide()
+            dialog.destroy()
  
     def commit_cb(self, menu, vfs_file=None):
         # We can only cope with local files
@@ -137,15 +144,27 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
             return
 
         file = vfs_file.get_uri()
+        tree = None
+        branch = None
         try:
             tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            return
+            branch = tree.branch
+        except NotBranchError, e:
+            path = e.path
+            #return
+        except NoWorkingTree, e:
+            path = e.base
+            try:
+                (branch, path) = Branch.open_containing(path)
+            except NotBranchError, e:
+                path = e.path
 
         from bzrlib.plugins.gtk.commit import CommitDialog
-        dialog = CommitDialog(tree, path)
-        dialog.display()
-        gtk.main()
+        dialog = CommitDialog(tree, path, not branch)
+        response = dialog.run()
+        if response != gtk.RESPONSE_NONE:
+            dialog.hide()
+            dialog.destroy()
 
     def log_cb(self, menu, vfs_file):
         # We can only cope with local files
@@ -206,6 +225,8 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         file = vfs_file.get_uri()
         try:
             tree, path = WorkingTree.open_containing(file)
+        except UnsupportedProtocol:
+            return
         except NotBranchError:
             item = nautilus.MenuItem('BzrNautilus::newtree',
                                  'Make directory versioned',
@@ -251,6 +272,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
     def get_file_items(self, window, files):
         items = []
 
+        wtfiles = {}
         for vfs_file in files:
             # We can only cope with local files
             if vfs_file.get_uri_scheme() != 'file':
@@ -267,10 +289,15 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
                                      'Create new Bazaar tree in %s' % vfs_file.get_name())
                 item.connect('activate', self.newtree_cb, vfs_file)
                 return item,
+            # Refresh the list of filestatuses in the working tree
+            if path not in wtfiles.keys():
+                tree.lock_read()
+                for rpath, file_class, kind, id, entry in tree.list_files():
+                    wtfiles[rpath] = file_class
+                tree.unlock()
+                wtfiles[u''] = 'V'
 
-            file_class = tree.file_class(path)
-
-            if file_class == '?':
+            if wtfiles[path] == '?':
                 item = nautilus.MenuItem('BzrNautilus::add',
                                      'Add',
                                      'Add as versioned file')
@@ -282,13 +309,13 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
                                      'Ignore file for versioning')
                 item.connect('activate', self.ignore_cb, vfs_file)
                 items.append(item)
-            elif file_class == 'I':
+            elif wtfiles[path] == 'I':
                 item = nautilus.MenuItem('BzrNautilus::unignore',
                                      'Unignore',
                                      'Unignore file for versioning')
                 item.connect('activate', self.unignore_cb, vfs_file)
                 items.append(item)
-            elif file_class == 'V':
+            elif wtfiles[path] == 'V':
                 item = nautilus.MenuItem('BzrNautilus::log',
                                  'Log',
                                  'List changes')
