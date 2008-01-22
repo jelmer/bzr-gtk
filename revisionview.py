@@ -20,9 +20,12 @@ pygtk.require("2.0")
 import gtk
 import gobject
 import pango
+from gpg import GPGSubprocess
 
 from bzrlib.osutils import format_date
 from bzrlib.util.bencode import bdecode
+
+gpg = GPGSubprocess()
 
 class RevisionView(gtk.Notebook):
     """ Custom widget for commit log details.
@@ -77,6 +80,7 @@ class RevisionView(gtk.Notebook):
 
         self._revision = None
         self._branch = branch
+        self._repository = branch.repository
 
         if self._branch is not None and self._branch.supports_tags():
             self._tagdict = self._branch.tags.get_reverse_tag_dict()
@@ -185,26 +189,6 @@ class RevisionView(gtk.Notebook):
         else:
             self.file_info_box.hide()
 
-        if self._branch.repository.has_signature_for_revision_id(revision.revision_id):
-            from gpg import GPGSubprocess
-            gpg = GPGSubprocess()
-            signature_text = self._branch.repository.get_signature_text(revision.revision_id)
-            signature = gpg.verify(signature_text)
-
-            if signature.key_id is not None:
-                self.signature_key_id.set_text(signature.key_id)
-
-            if signature.is_valid():
-                self.signature_image.set_from_file("icons/sign-ok.png")
-                self.signature_label.set_text("This revision has been signed.")
-            else:
-                self.signature_image.set_from_file("icons/sign-bad.png")
-                self.signature_label.set_text("This revision has been signed, but the authenticity of the signature cannot be verified.")
-        else:
-            self.signature_key_id.set_text("")
-            self.signature_image.set_from_file("icons/sign-unknown.png")
-            self.signature_label.set_text("This revision has not been signed.")
-
     def _show_clicked_cb(self, widget, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
         self._show_callback(revid, parentid)
@@ -281,6 +265,41 @@ class RevisionView(gtk.Notebook):
         vbox.pack_start(self._create_children(), expand=False, fill=True)
         self.append_page(vbox, tab_label=gtk.Label("Relations"))
         vbox.show()
+
+    def _create_signature(self):
+        signature_box = gtk.Table(rows=1, columns=2)
+        signature_box.set_col_spacing(0, 12)
+
+        self.signature_image = gtk.Image()
+        signature_box.attach(self.signature_image, 0, 1, 0, 1, gtk.FILL)
+
+        self.signature_label = gtk.Label()
+        signature_box.attach(self.signature_label, 1, 2, 0, 1, gtk.FILL)
+
+        signature_info = gtk.Table(rows=1, columns=2)
+        signature_info.set_row_spacings(6)
+        signature_info.set_col_spacings(6)
+
+        align = gtk.Alignment(1.0, 0.5)
+        label = gtk.Label()
+        label.set_markup("<b>Key Id:</b>")
+        align.add(label)
+        signature_info.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.signature_key_id = gtk.Label()
+        self.signature_key_id.set_selectable(True)
+        align.add(self.signature_key_id)
+        signature_info.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
+
+        box = gtk.VBox(False, 6)
+        box.set_border_width(6)
+        box.pack_start(signature_box, expand=False)
+        box.pack_start(signature_info, expand=False)
+        box.show_all()
+        self.append_page(box, tab_label=gtk.Label("Signature"))
+
+        self.connect_after('notify::revision', self._update_signature)
 
     def _create_headers(self):
         self.table = gtk.Table(rows=5, columns=2)
@@ -389,7 +408,6 @@ class RevisionView(gtk.Notebook):
         self.connect('notify::revision', self._add_tags)
 
         return self.table
-
     
     def _create_parents(self):
         hbox = gtk.HBox(True, 3)
@@ -443,39 +461,6 @@ class RevisionView(gtk.Notebook):
         window.show()
         return window
 
-    def _create_signature(self):
-        signature_box = gtk.Table(rows=1, columns=2)
-        signature_box.set_col_spacing(0, 12)
-
-        self.signature_image = gtk.Image()
-        signature_box.attach(self.signature_image, 0, 1, 0, 1, gtk.FILL)
-
-        self.signature_label = gtk.Label()
-        signature_box.attach(self.signature_label, 1, 2, 0, 1, gtk.FILL)
-
-        signature_info = gtk.Table(rows=1, columns=2)
-        signature_info.set_row_spacings(6)
-        signature_info.set_col_spacings(6)
-
-        align = gtk.Alignment(1.0, 0.5)
-        label = gtk.Label()
-        label.set_markup("<b>Key Id:</b>")
-        align.add(label)
-        signature_info.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
-
-        align = gtk.Alignment(0.0, 0.5)
-        self.signature_key_id = gtk.Label()
-        self.signature_key_id.set_selectable(True)
-        align.add(self.signature_key_id)
-        signature_info.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
-
-        box = gtk.VBox(False, 6)
-        box.set_border_width(6)
-        box.pack_start(signature_box, expand=False)
-        box.pack_start(signature_info, expand=False)
-        box.show_all()
-        self.append_page(box, tab_label=gtk.Label("Signature"))
-
     def _create_file_info_view(self):
         self.file_info_box = gtk.VBox(False, 6)
         self.file_info_box.set_border_width(6)
@@ -493,4 +478,26 @@ class RevisionView(gtk.Notebook):
         self.file_info_box.pack_start(window)
         self.file_info_box.hide() # Only shown when there are per-file messages
         self.append_page(self.file_info_box, tab_label=gtk.Label('Per-file'))
+
+    def _update_signature(self, widget, param):
+        revid = self._revision.revision_id
+
+        if self._repository.has_signature_for_revision_id(revid):
+            signature_text = self._repository.get_signature_text(revid)
+            signature = gpg.verify(signature_text)
+
+            if signature.key_id is not None:
+                self.signature_key_id.set_text(signature.key_id)
+
+            if signature.is_valid():
+                self.signature_image.set_from_file("icons/sign-ok.png")
+                self.signature_label.set_text("This revision has been signed.")
+            else:
+                self.signature_image.set_from_file("icons/sign-bad.png")
+                self.signature_label.set_text("This revision has been signed, but the authenticity of the signature cannot be verified.")
+        else:
+            self.signature_key_id.set_text("")
+            self.signature_image.set_from_file("icons/sign-unknown.png")
+            self.signature_label.set_text("This revision has not been signed.")
+
 
