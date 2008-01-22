@@ -494,7 +494,8 @@ class RevisionView(gtk.Notebook):
                 self.signature_label.set_text("This revision has been signed.")
             else:
                 self.signature_image.set_from_file("icons/sign-bad.png")
-                self.signature_label.set_text("This revision has been signed, but the authenticity of the signature cannot be verified.")
+                self.signature_label.set_text("This revision has been signed, " + 
+                        "but the authenticity of the signature cannot be verified.")
         else:
             self.signature_key_id.set_text("")
             self.signature_image.set_from_file("icons/sign-unknown.png")
