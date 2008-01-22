@@ -15,16 +15,16 @@ from xml.sax.saxutils import escape
 
 from time import (strftime, localtime)
 
-REVID  =  0
-NODE =  1
-LINES =  2
-LAST_LINES =  3
-REVNO =  4
-SUMMARY =  5
-MESSAGE =  6
-COMMITTER =  7
-TIMESTAMP =  8
-REVISION =  9
+REVID = 0
+NODE = 1
+LINES = 2
+LAST_LINES = 3
+REVNO = 4
+SUMMARY = 5
+MESSAGE = 6
+COMMITTER = 7
+TIMESTAMP = 8
+REVISION = 9
 PARENTS = 10
 CHILDREN = 11
 
