@@ -209,16 +209,8 @@ class RevisionView(gtk.Notebook):
             self.tags_label.hide()
             return
 
-        for widget in self.tags_widgets:
-            self.tags_list.remove(widget)
+        self.tags_list.set_text(", ".join(tags))
 
-        self.tags_widgets = []
-
-        for tag in tags:
-            widget = gtk.Label(tag)
-            widget.set_selectable(True)
-            self.tags_widgets.append(widget)
-            self.tags_list.add(widget)
         self.tags_list.show_all()
         self.tags_label.show_all()
         
@@ -374,12 +366,11 @@ class RevisionView(gtk.Notebook):
         self.tags_label.show()
 
         align = gtk.Alignment(0.0, 0.5)
-        self.tags_list = gtk.VBox()
+        self.tags_list = gtk.Label()
         align.add(self.tags_list)
         self.table.attach(align, 1, 2, 5, 6, gtk.EXPAND | gtk.FILL, gtk.FILL)
         align.show()
         self.tags_list.show()
-        self.tags_widgets = []
 
         self.connect('notify::revision', self._add_tags)
 

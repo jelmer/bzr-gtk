@@ -216,13 +216,18 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         TAG_COLOUR_ID = 1
 
         (column, colour) = self.node
+
+        font_desc = pango.FontDescription()
+        font_desc.set_size(pango.SCALE * 7)
+
         tag_layout = pango.Layout(pango_ctx)
+        tag_layout.set_font_description(font_desc)
 
         # The width of the tag label stack
         width = 0
 
         for tag_idx, tag in enumerate(self.tags):
-            tag_layout.set_markup(" <small>" + tag + "</small> ")
+            tag_layout.set_text(" " + tag + " ")
             text_width, text_height = tag_layout.get_pixel_size()
 
             x0 = cell_area.x + \

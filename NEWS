@@ -1,5 +1,12 @@
 0.94.0  UNRELEASED
 
+ UI
+
+  * Made the tags associated with a revision render next to the revision
+    node in the branch view. (Ali Sabil)
+
+  * Made the tag list in the revision view be comma-separated. (Daniel Schierbeck)
+
  BUG FIXES
  
   * Catch UnsupportedProtocol exception in the Nautilus extension. (#77965)

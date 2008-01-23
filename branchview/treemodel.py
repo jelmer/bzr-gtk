@@ -20,13 +20,14 @@ NODE = 1
 LINES = 2
 LAST_LINES = 3
 REVNO = 4
-MESSAGE = 5
-COMMITER = 6
-TIMESTAMP = 7
-REVISION = 8
-PARENTS = 9
-CHILDREN = 10
-TAGS = 11
+SUMMARY = 5
+MESSAGE = 6
+COMMITTER = 7
+TIMESTAMP = 8
+REVISION = 9
+PARENTS = 10
+CHILDREN = 11
+TAGS = 12
 
 class TreeModel(gtk.GenericTreeModel):
 
@@ -34,11 +35,11 @@ class TreeModel(gtk.GenericTreeModel):
     def __init__ (self, branch, line_graph_data):
         gtk.GenericTreeModel.__init__(self)
         self.revisions = {}
-        self.branch = branch
+	self.branch = branch
         self.repository = branch.repository
         self.line_graph_data = line_graph_data
 
-        if self.branch.supports_tags():
+    	if self.branch.supports_tags():
             self.tags = self.branch.tags.get_reverse_tag_dict()
         else:
             self.tags = {}
@@ -54,7 +55,7 @@ class TreeModel(gtk.GenericTreeModel):
         return gtk.TREE_MODEL_LIST_ONLY
     
     def on_get_n_columns(self):
-        return 12
+        return 13
     
     def on_get_column_type(self, index):
         if index == REVID: return gobject.TYPE_STRING
@@ -62,8 +63,9 @@ class TreeModel(gtk.GenericTreeModel):
         if index == LINES: return gobject.TYPE_PYOBJECT
         if index == LAST_LINES: return gobject.TYPE_PYOBJECT
         if index == REVNO: return gobject.TYPE_STRING
+        if index == SUMMARY: return gobject.TYPE_STRING
         if index == MESSAGE: return gobject.TYPE_STRING
-        if index == COMMITER: return gobject.TYPE_STRING
+        if index == COMMITTER: return gobject.TYPE_STRING
         if index == TIMESTAMP: return gobject.TYPE_STRING
         if index == REVISION: return gobject.TYPE_PYOBJECT
         if index == PARENTS: return gobject.TYPE_PYOBJECT
@@ -107,8 +109,9 @@ class TreeModel(gtk.GenericTreeModel):
             revision = self.revisions[revid]
         
         if column == REVISION: return revision
-        if column == MESSAGE: return escape(revision.get_summary())
-        if column == COMMITER: return re.sub('<.*@.*>', '', 
+        if column == SUMMARY: return escape(revision.get_summary())
+        if column == MESSAGE: return escape(revision.message)
+        if column == COMMITTER: return re.sub('<.*@.*>', '', 
                                              revision.committer).strip(' ')
         if column == TIMESTAMP: 
             return strftime("%Y-%m-%d %H:%M", localtime(revision.timestamp))
