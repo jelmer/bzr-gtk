@@ -27,21 +27,28 @@ TIMESTAMP = 8
 REVISION = 9
 PARENTS = 10
 CHILDREN = 11
+TAGS = 12
 
 class TreeModel(gtk.GenericTreeModel):
 
     
-    def __init__ (self, repository, line_graph_data):
+    def __init__ (self, branch, line_graph_data):
         gtk.GenericTreeModel.__init__(self)
         self.revisions = {}
-        self.repository = repository
+	self.branch = branch
+        self.repository = branch.repository
         self.line_graph_data = line_graph_data
+
+    	if self.branch.supports_tags():
+            self.tags = self.branch.tags.get_reverse_tag_dict()
+        else:
+            self.tags = {}
     
     def on_get_flags(self):
         return gtk.TREE_MODEL_LIST_ONLY
     
     def on_get_n_columns(self):
-        return 12
+        return 13
     
     def on_get_column_type(self, index):
         if index == REVID: return gobject.TYPE_STRING
@@ -56,6 +63,7 @@ class TreeModel(gtk.GenericTreeModel):
         if index == REVISION: return gobject.TYPE_PYOBJECT
         if index == PARENTS: return gobject.TYPE_PYOBJECT
         if index == CHILDREN: return gobject.TYPE_PYOBJECT
+        if index == TAGS: return gobject.TYPE_PYOBJECT
         
     def on_get_iter(self, path):
         return path[0]
@@ -83,6 +91,8 @@ class TreeModel(gtk.GenericTreeModel):
         if column == REVNO: return ".".join(["%d" % (revno)
                                       for revno in revno_sequence])
         
+        if column == TAGS: return self.tags.get(revid, [])
+
         if revid is None:
             return None
         if revid not in self.revisions:
