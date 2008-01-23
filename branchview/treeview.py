@@ -390,6 +390,7 @@ class TreeView(gtk.ScrolledWindow):
             menu = RevisionPopupMenu(self.branch.repository, 
                 [self.get_revision().revision_id],
                 self.branch)
+            menu.connect('tag-added', lambda w, t, r: self.add_tag(t, r))
             menu.popup(None, None, None, event.button, event.get_time())
 
     def _on_revision_activated(self, widget, path, col):
