@@ -377,24 +377,17 @@ class BranchWindow(Window):
     def _tag_revision_cb(self, w):
         try:
             self.treeview.set_sensitive(False)
-            self.branch.unlock()
             dialog = AddTagDialog(self.branch.repository, self.treeview.get_revision().revision_id, self.branch)
             response = dialog.run()
             if response != gtk.RESPONSE_NONE:
                 dialog.hide()
             
                 if response == gtk.RESPONSE_OK:
-                    try:
-                        self.branch.lock_write()
-                        self.treeview.add_tag(dialog.tagname, dialog._revid)
-                    finally:
-                        self.branch.unlock()
+                    self.treeview.add_tag(dialog.tagname, dialog._revid)
                 
                 dialog.destroy()
 
         finally:
-            self.branch.lock_read()
-            self.treeview.emit("revision-selected")
             self.treeview.set_sensitive(True)
 
     def _col_visibility_changed(self, col, property):
