@@ -43,7 +43,14 @@ class TreeModel(gtk.GenericTreeModel):
             self.tags = self.branch.tags.get_reverse_tag_dict()
         else:
             self.tags = {}
-    
+
+    def add_tag(self, tag, revid):
+        self.branch.tags.set_tag(tag, revid)
+        try:
+            self.tags[revid].append(tag)
+        except KeyError:
+            self.tags[revid] = [tag]
+
     def on_get_flags(self):
         return gtk.TREE_MODEL_LIST_ONLY
     
@@ -90,7 +97,7 @@ class TreeModel(gtk.GenericTreeModel):
             return []
         if column == REVNO: return ".".join(["%d" % (revno)
                                       for revno in revno_sequence])
-        
+
         if column == TAGS: return self.tags.get(revid, [])
 
         if revid is None:

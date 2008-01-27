@@ -74,7 +74,10 @@ class TreeView(gtk.ScrolledWindow):
                              ()),
         'revision-selected': (gobject.SIGNAL_RUN_FIRST,
                               gobject.TYPE_NONE,
-                              ())
+                              ()),
+        'tag-added': (gobject.SIGNAL_RUN_FIRST,
+                              gobject.TYPE_NONE,
+                              (gobject.TYPE_STRING, gobject.TYPE_STRING))
     }
 
     def __init__(self, branch, start, maxnum, compact=True):
@@ -94,8 +97,9 @@ class TreeView(gtk.ScrolledWindow):
 
         self.construct_treeview()
 
-        self.iter   = None
+        self.iter = None
         self.branch = branch
+        self.revision = None
 
         self.start = start
         self.maxnum = maxnum
@@ -167,6 +171,23 @@ class TreeView(gtk.ScrolledWindow):
         :return: list of revision ids.
         """
         return self.get_property('parents')
+
+    def add_tag(self, tag, revid=None):
+        if revid is None: revid = self.revision.revision_id
+
+        try:
+            self.branch.unlock()
+
+            try:
+                self.branch.lock_write()
+                self.model.add_tag(tag, revid)
+            finally:
+                self.branch.unlock()
+
+        finally:
+            self.branch.lock_read()
+
+        self.emit('tag-added', tag, revid)
         
     def refresh(self):
         gobject.idle_add(self.populate, self.get_revision())
@@ -369,6 +390,7 @@ class TreeView(gtk.ScrolledWindow):
             menu = RevisionPopupMenu(self.branch.repository, 
                 [self.get_revision().revision_id],
                 self.branch)
+            menu.connect('tag-added', lambda w, t, r: self.add_tag(t, r))
             menu.popup(None, None, None, event.button, event.get_time())
 
     def _on_revision_activated(self, widget, path, col):

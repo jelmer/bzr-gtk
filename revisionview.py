@@ -77,10 +77,7 @@ class RevisionView(gtk.Notebook):
         self._revision = None
         self._branch = branch
 
-        if self._branch is not None and self._branch.supports_tags():
-            self._tagdict = self._branch.tags.get_reverse_tag_dict()
-        else:
-            self._tagdict = {}
+        self.update_tags()
 
         self.set_file_id(None)
 
@@ -179,6 +176,14 @@ class RevisionView(gtk.Notebook):
         else:
             self.file_info_box.hide()
 
+    def update_tags(self):
+        if self._branch is not None and self._branch.supports_tags():
+            self._tagdict = self._branch.tags.get_reverse_tag_dict()
+        else:
+            self._tagdict = {}
+
+        self._add_tags()
+
     def set_children(self, children):
         self._add_parents_or_children(children,
                                       self.children_widgets,
@@ -192,6 +197,8 @@ class RevisionView(gtk.Notebook):
         """Callback for when the go button for a parent is clicked."""
 
     def _add_tags(self, *args):
+        if self._revision is None: return
+
         if self._tagdict.has_key(self._revision.revision_id):
             tags = self._tagdict[self._revision.revision_id]
         else:

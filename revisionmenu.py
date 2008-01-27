@@ -23,10 +23,20 @@ except:
 
 import bzrlib
 import gtk
+import gobject
 from bzrlib import (errors, ui)
 from bzrlib.revision import NULL_REVISION
 
 class RevisionPopupMenu(gtk.Menu):
+
+    __gsignals__ = {
+            'tag-added': (
+                gobject.SIGNAL_RUN_FIRST,
+                gobject.TYPE_NONE,
+                (gobject.TYPE_STRING, gobject.TYPE_STRING)
+            )
+    }
+
     def __init__(self, repository, revids, branch=None, wt=None):
         super(RevisionPopupMenu, self).__init__()
         self.branch = branch
@@ -100,11 +110,7 @@ class RevisionPopupMenu(gtk.Menu):
             dialog.hide()
         
             if response == gtk.RESPONSE_OK:
-                try:
-                    self.branch.lock_write()
-                    self.branch.tags.set_tag(dialog.tagname, dialog._revid)
-                finally:
-                    self.branch.unlock()
+                self.emit('tag-added', dialog.tagname, dialog._revid)
             
             dialog.destroy()
     
