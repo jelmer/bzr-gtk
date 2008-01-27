@@ -208,14 +208,12 @@ class RevisionView(gtk.Notebook):
         else:
             self.file_info_box.hide()
 
+        self.bugs_table.clear()
         bugs_text = revision.properties.get('bugs', None)
         if bugs_text:
             for bugline in bugs_text.splitlines():
                 (url, status) = bugline.split(" ")
                 self.bugs_table.add_bug(url, status)
-            self.bugs_table.show_all()
-        else:
-            self.bugs_table.hide()
 
     def set_children(self, children):
         self._add_parents_or_children(children,
@@ -471,6 +469,7 @@ class RevisionView(gtk.Notebook):
 
     def _create_bugs(self):
         self.bugs_table = BugsTab()
+        self.bugs_table.show_all()
         self.append_page(self.bugs_table, tab_label=gtk.Label('Bugs'))
 
     def _create_file_info_view(self):
