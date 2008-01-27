@@ -25,6 +25,33 @@ import subprocess
 from bzrlib.osutils import format_date
 from bzrlib.util.bencode import bdecode
 
+def _open_link(widget, uri):
+    subprocess.Popen(['sensible-browser', uri], close_fds=True)
+
+gtk.link_button_set_uri_hook(_open_link)
+
+class BugsTab(gtk.Table):
+    def __init__(self):
+        super(BugsTab, self).__init__(rows=5, columns=2)
+        self.set_row_spacings(6)
+        self.set_col_spacings(6)
+        self.hide() # Only shown when there are bugs
+
+    def clear(self):
+        for c in self.get_children():
+            self.remove(c)
+        self.count = 0
+
+    def add_bug(self, url, status):
+        button = gtk.LinkButton(url, url)
+        self.attach(button, 0, 1, self.count, self.count + 1,
+                              gtk.EXPAND | gtk.FILL, gtk.FILL)
+        status_label = gtk.Label(status)
+        self.attach(status_label, 1, 2, self.count, self.count + 1,
+                              gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.count += 1
+
+
 class RevisionView(gtk.Notebook):
     """ Custom widget for commit log details.
 
@@ -128,9 +155,6 @@ class RevisionView(gtk.Notebook):
     def get_revision(self):
         return self.get_property('revision')
 
-    def _open_link(self, widget, uri):
-        subprocess.Popen(['sensible-browser', uri], close_fds=True)
-
     def _set_revision(self, revision):
         if revision is None: return
 
@@ -186,19 +210,9 @@ class RevisionView(gtk.Notebook):
 
         bugs_text = revision.properties.get('bugs', None)
         if bugs_text:
-            for c in self.bugs_table.get_children():
-                self.bugs_table.remove(c)
-            idx = 0
             for bugline in bugs_text.splitlines():
                 (url, status) = bugline.split(" ")
-                button = gtk.LinkButton(url, url)
-                gtk.link_button_set_uri_hook(self._open_link)
-                self.bugs_table.attach(button, 0, 1, idx, idx + 1,
-                                      gtk.EXPAND | gtk.FILL, gtk.FILL)
-                status_label = gtk.Label(status)
-                self.bugs_table.attach(status_label, 1, 2, idx, idx + 1,
-                                      gtk.EXPAND | gtk.FILL, gtk.FILL)
-                idx += 1
+                self.bugs_table.add_bug(url, status)
             self.bugs_table.show_all()
         else:
             self.bugs_table.hide()
@@ -456,10 +470,7 @@ class RevisionView(gtk.Notebook):
         return window
 
     def _create_bugs(self):
-        self.bugs_table = gtk.Table(rows=5, columns=2)
-        self.bugs_table.set_row_spacings(6)
-        self.bugs_table.set_col_spacings(6)
-        self.bugs_table.hide() # Only shown when there are bugs
+        self.bugs_table = BugsTab()
         self.append_page(self.bugs_table, tab_label=gtk.Label('Bugs'))
 
     def _create_file_info_view(self):
