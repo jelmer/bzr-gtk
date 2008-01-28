@@ -199,12 +199,22 @@ class BranchWindow(Window):
         branch_menu.add(gtk.MenuItem("Pu_ll Revisions"))
         branch_menu.add(gtk.MenuItem("Pu_sh Revisions"))
 
+        help_menu = gtk.Menu()
+        help_menuitem = gtk.MenuItem("_Help")
+        help_menuitem.set_submenu(help_menu)
+
+        help_about_menuitem = gtk.ImageMenuItem(gtk.STOCK_ABOUT, self.accel_group)
+        help_about_menuitem.connect('activate', self._about_dialog_cb)
+
+        help_menu.add(help_about_menuitem)
+
         menubar.add(file_menuitem)
         menubar.add(edit_menuitem)
         menubar.add(view_menuitem)
         menubar.add(go_menuitem)
         menubar.add(revision_menuitem)
         menubar.add(branch_menuitem)
+        menubar.add(help_menuitem)
         menubar.show_all()
 
         return menubar
@@ -389,6 +399,11 @@ class BranchWindow(Window):
 
         finally:
             self.treeview.set_sensitive(True)
+
+    def _about_dialog_cb(self, w):
+        from bzrlib.plugins.gtk.about import AboutDialog
+
+        AboutDialog().run()
 
     def _col_visibility_changed(self, col, property):
         self.config.set_user_option(property + '-column-visible', col.get_active())
