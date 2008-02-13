@@ -19,7 +19,7 @@ from graphcell import CellRendererGraph
 from treemodel import TreeModel
 from bzrlib.revision import NULL_REVISION
 
-class TreeView(gtk.ScrolledWindow):
+class TreeView(gtk.VBox):
 
     __gproperties__ = {
         'branch': (gobject.TYPE_PYOBJECT,
@@ -90,12 +90,20 @@ class TreeView(gtk.ScrolledWindow):
         :param broken_line_length: After how much lines to break 
                                    branches.
         """
-        gtk.ScrolledWindow.__init__(self)
+        gtk.VBox.__init__(self, spacing=0)
 
-        self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-        self.set_shadow_type(gtk.SHADOW_IN)
+        self.pack_start(self.construct_loading_msg(), expand=False, fill=True)
+        self.connect('revisions-loaded', 
+                lambda x: self.loading_msg_box.hide())
 
-        self.construct_treeview()
+        self.scrolled_window = gtk.ScrolledWindow()
+        self.scrolled_window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        self.scrolled_window.set_shadow_type(gtk.SHADOW_IN)
+        self.scrolled_window.show()
+        self.pack_start(self.scrolled_window, expand=True, fill=True)
+
+        self.scrolled_window.add(self.construct_treeview())
+        
 
         self.iter = None
         self.branch = branch
@@ -190,6 +198,7 @@ class TreeView(gtk.ScrolledWindow):
         self.emit('tag-added', tag, revid)
         
     def refresh(self):
+        self.loading_msg_box.show()
         gobject.idle_add(self.populate, self.get_revision())
 
     def update(self):
@@ -318,7 +327,6 @@ class TreeView(gtk.ScrolledWindow):
 
         self.treeview.set_property('fixed-height-mode', True)
 
-        self.add(self.treeview)
         self.treeview.show()
 
         cell = gtk.CellRendererText()
@@ -376,6 +384,26 @@ class TreeView(gtk.ScrolledWindow):
         self.date_column.pack_start(cell, expand=True)
         self.date_column.add_attribute(cell, "text", treemodel.TIMESTAMP)
         self.treeview.append_column(self.date_column)
+        
+        return self.treeview
+    
+    def construct_loading_msg(self):
+        image_loading = gtk.image_new_from_stock(gtk.STOCK_REFRESH,
+                                                 gtk.ICON_SIZE_BUTTON)
+        image_loading.show()
+        
+        label_loading = gtk.Label(_("Please wait, loading ancestral graph..."))
+        label_loading.set_alignment(0.0, 0.5)
+        label_loading.show()
+        
+        self.loading_msg_box = gtk.HBox()
+        self.loading_msg_box.set_spacing(5)
+        self.loading_msg_box.set_border_width(5)        
+        self.loading_msg_box.pack_start(image_loading, False, False)
+        self.loading_msg_box.pack_start(label_loading, True, True)
+        self.loading_msg_box.show()
+        
+        return self.loading_msg_box
 
     def _on_selection_changed(self, treeview):
         """callback for when the treeview changes."""

@@ -100,7 +100,6 @@ class BranchWindow(Window):
 
         vbox.pack_start(self.construct_menubar(), expand=False, fill=True)
         vbox.pack_start(self.construct_navigation(), expand=False, fill=True)
-        vbox.pack_start(self.construct_loading_msg(), expand=False, fill=True)
         
         vbox.pack_start(self.paned, expand=True, fill=True)
         vbox.set_focus_child(self.paned)
@@ -218,24 +217,6 @@ class BranchWindow(Window):
         menubar.show_all()
 
         return menubar
-    
-    def construct_loading_msg(self):
-        image_loading = gtk.image_new_from_stock(gtk.STOCK_REFRESH,
-                                                 gtk.ICON_SIZE_BUTTON)
-        image_loading.show()
-        
-        label_loading = gtk.Label(_("Please wait, loading ancestral graph..."))
-        label_loading.set_alignment(0.0, 0.5)
-        label_loading.show()
-        
-        self.loading_msg_box = gtk.HBox()
-        self.loading_msg_box.set_spacing(5)
-        self.loading_msg_box.set_border_width(5)        
-        self.loading_msg_box.pack_start(image_loading, False, False)
-        self.loading_msg_box.pack_start(label_loading, True, True)
-        self.loading_msg_box.show()
-        
-        return self.loading_msg_box
 
     def construct_top(self):
         """Construct the top-half of the window."""
@@ -245,9 +226,6 @@ class BranchWindow(Window):
 
         self.treeview.connect('revision-selected',
                 self._treeselection_changed_cb)
-
-        self.treeview.connect('revisions-loaded', 
-                lambda x: self.loading_msg_box.hide())
 
         self.treeview.connect('tag-added', lambda w, t, r: self._update_tags())
 
@@ -421,7 +399,7 @@ class BranchWindow(Window):
         dialog.run()
 
     def _refresh_clicked(self, w):
-        self.treeview.update()
+        self.treeview.refresh()
 
     def _update_tags(self):
         menu = gtk.Menu()
