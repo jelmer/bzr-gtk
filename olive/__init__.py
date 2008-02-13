@@ -67,13 +67,30 @@ def about():
     # Set version
     dialog.set_version(__version__)
     dialog.set_authors([ _("Lead Developer:"),
-			 "Szilveszter Farkas <szilveszter.farkas@gmail.com>",
-			 _("Contributors:"),
-			 "Jelmer Vernooij <jelmer@samba.org>",
-			 "Mateusz Korniak <mateusz.korniak@ant.gliwice.pl>",
-			 "Gary van der Merwe <garyvdm@gmail.com>" ])
+                         "Szilveszter Farkas <szilveszter.farkas@gmail.com>",
+                         _("Contributors:"),
+                         "David Allouche <david.allouche@canonical.com>",
+                         "Tom Badran <tom@badrunner.net>",
+                         "Alexander Belchenko <bialix@ukr.net>",
+                         "Aaron Bentley <abentley@panoramicfeedback.com>",
+                         "Robert Collins <robertc@robertcollins.net>",
+                         "Richard Ferguson <ubuntu@fergusnet.com>",
+                         "Mateusz Korniak <mateusz.korniak@ant.gliwice.pl>",
+                         "Vincent Ladeuil",
+                         "Dan Loda <danloda@gmail.com>",
+                         "John Arbash Meinel <john@arbash-meinel.com>",
+                         "Scott James Remnant <scott@netsplit.com>",
+                         "Ali Sabil <ali.sabil@gmail.com>",
+                         "Daniel Schierbeck <daniel.schierbeck@gmail.com>",
+                         "Adeodato Simó <dato@net.com.org.es>",
+                         "Gary van der Merwe <garyvdm@gmail.com>",
+                         "Wouter van Heyst <larstiq@larstiq.dyndns.org>",
+                         "Jelmer Vernooij <jelmer@samba.org>",
+                         "Jamie Wilkinson <jaq@spacepants.org>",
+                         ])
     dialog.set_artists([ "Simon Pascal Klein <klepas@klepas.org>",
-			 "Jakub Steiner <jimmac@novell.com>" ])
+                         "Jakub Steiner <jimmac@novell.com>",
+                         ])
 
     dialog.run()
     # Destroy the dialog
