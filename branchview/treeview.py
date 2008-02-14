@@ -49,8 +49,14 @@ class TreeView(gtk.VBox):
                     gobject.PARAM_READABLE),
 
         'revno-column-visible': (gobject.TYPE_BOOLEAN,
-                                 'Revision number',
+                                 'Revision number column',
                                  'Show revision number column',
+                                 True,
+                                 gobject.PARAM_READWRITE),
+
+        'graph-column-visible': (gobject.TYPE_BOOLEAN,
+                                 'Graph column',
+                                 'Show graph column',
                                  True,
                                  gobject.PARAM_READWRITE),
 
@@ -64,7 +70,13 @@ class TreeView(gtk.VBox):
                     'Compact view',
                     'Break ancestry lines to save space',
                     True,
-                    gobject.PARAM_CONSTRUCT | gobject.PARAM_READWRITE)
+                    gobject.PARAM_CONSTRUCT | gobject.PARAM_READWRITE),
+
+        'mainline-only': (gobject.TYPE_BOOLEAN,
+                    'Mainline only',
+                    'Only show the mainline history.',
+                    False,
+                    gobject.PARAM_CONSTRUCT | gobject.PARAM_READWRITE),
 
     }
 
@@ -100,7 +112,8 @@ class TreeView(gtk.VBox):
                 lambda x: self.loading_msg_box.hide())
 
         self.scrolled_window = gtk.ScrolledWindow()
-        self.scrolled_window.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        self.scrolled_window.set_policy(gtk.POLICY_AUTOMATIC,
+                                        gtk.POLICY_AUTOMATIC)
         self.scrolled_window.set_shadow_type(gtk.SHADOW_IN)
         self.scrolled_window.show()
         self.pack_start(self.scrolled_window, expand=True, fill=True)
@@ -123,10 +136,14 @@ class TreeView(gtk.VBox):
     def do_get_property(self, property):
         if property.name == 'revno-column-visible':
             return self.revno_column.get_visible()
+        elif property.name == 'graph-column-visible':
+            return self.graph_column.get_visible()
         elif property.name == 'date-column-visible':
             return self.date_column.get_visible()
         elif property.name == 'compact':
             return self.compact
+        elif property.name == 'mainline-only':
+            return self.mainline_only
         elif property.name == 'branch':
             return self.branch
         elif property.name == 'revision':
@@ -143,10 +160,14 @@ class TreeView(gtk.VBox):
     def do_set_property(self, property, value):
         if property.name == 'revno-column-visible':
             self.revno_column.set_visible(value)
+        elif property.name == 'graph-column-visible':
+            self.graph_column.set_visible(value)
         elif property.name == 'date-column-visible':
             self.date_column.set_visible(value)
         elif property.name == 'compact':
             self.compact = value
+        elif property.name == 'mainline-only':
+            self.mainline_only = value
         elif property.name == 'branch':
             self.branch = value
         elif property.name == 'revision':
@@ -259,12 +280,16 @@ class TreeView(gtk.VBox):
             broken_line_length = 32
         else:
             broken_line_length = None
+        
+        show_graph = self.graph_column.get_visible()
 
         self.branch.lock_read()
         (linegraphdata, index, columns_len) = linegraph(self.branch.repository,
                                                         self.start,
                                                         self.maxnum, 
-                                                        broken_line_length)
+                                                        broken_line_length,
+                                                        show_graph,
+                                                        self.mainline_only)
 
         self.model = TreeModel(self.branch, linegraphdata)
         self.graph_cell.columns_len = columns_len

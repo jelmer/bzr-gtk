@@ -52,6 +52,9 @@ class RevisionBrowser(gtk.Dialog):
         # Set properties
         self.set_default_size(600, 400)
         self.vbox.set_spacing(3)
+        self.treeview.set_property('graph-column-visible', False)
+        self.treeview.set_property('date-column-visible', True)
+        self.treeview.set_property('mainline-only', True)
         
         # Construct the dialog
         self.action_area.pack_end(self._button_select)
