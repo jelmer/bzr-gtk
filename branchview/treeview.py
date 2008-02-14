@@ -75,6 +75,9 @@ class TreeView(gtk.VBox):
         'revision-selected': (gobject.SIGNAL_RUN_FIRST,
                               gobject.TYPE_NONE,
                               ()),
+        'revision-activated': (gobject.SIGNAL_RUN_FIRST,
+                              gobject.TYPE_NONE,
+                              (gobject.TYPE_PYOBJECT, gobject.TYPE_PYOBJECT)),
         'tag-added': (gobject.SIGNAL_RUN_FIRST,
                               gobject.TYPE_NONE,
                               (gobject.TYPE_STRING, gobject.TYPE_STRING))
@@ -282,29 +285,6 @@ class TreeView(gtk.VBox):
 
         return False
 
-    def show_diff(self, revid=None, parentid=None):
-        """Open a new window to show a diff between the given revisions."""
-        from bzrlib.plugins.gtk.diff import DiffWindow
-        window = DiffWindow(parent=self)
-
-        parents = self.get_parents()
-
-        if revid is None:
-            revid = self.get_revision().revision_id
-
-            if parentid is None and len(parents) > 0:
-                parentid = parents[0]
-
-        if parentid is None:
-            parentid = NULL_REVISION
-
-        rev_tree    = self.branch.repository.revision_tree(revid)
-        parent_tree = self.branch.repository.revision_tree(parentid)
-
-        description = revid + " - " + self.branch.nick
-        window.set_diff(description, rev_tree, parent_tree)
-        window.show()
-
     def construct_treeview(self):
         self.treeview = gtk.TreeView()
 
@@ -422,15 +402,4 @@ class TreeView(gtk.VBox):
             menu.popup(None, None, None, event.button, event.get_time())
 
     def _on_revision_activated(self, widget, path, col):
-        # TODO: more than one parent
-        """Callback for when a treeview row gets activated."""
-        revision_id = self.model[path][treemodel.REVID]
-        parents = self.model[path][treemodel.PARENTS]
-
-        if len(parents) == 0:
-            parent_id = None
-        else:
-            parent_id = parents[0]
-
-        self.show_diff(revision_id, parent_id)
-        self.treeview.grab_focus()
+        self.emit('revision-activated', path, col)

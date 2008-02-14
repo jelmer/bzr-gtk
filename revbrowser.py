@@ -26,6 +26,7 @@ import gobject
 import gtk
 
 from bzrlib.osutils import format_date
+from bzrlib.plugins.gtk.branchview.treeview import TreeView
 
 
 class RevisionBrowser(gtk.Dialog):
@@ -40,114 +41,35 @@ class RevisionBrowser(gtk.Dialog):
         self.branch = branch
         
         # Create the widgets
-        self._hbox = gtk.HBox()
-        self._image_loading = gtk.image_new_from_stock(gtk.STOCK_REFRESH, gtk.ICON_SIZE_BUTTON)
-        self._label_loading = gtk.Label(_("Please wait, revisions are being loaded..."))
-        self._scrolledwindow = gtk.ScrolledWindow()
-        self._treeview = gtk.TreeView()
         self._button_select = gtk.Button(_("_Select"), use_underline=True)
+        self.treeview = TreeView(branch,branch.last_revision(), None)
         
         # Set callbacks
         self._button_select.connect('clicked', self._on_select_clicked)
-        self._treeview.connect('row-activated', self._on_treeview_row_activated)
+        self.treeview.connect('revision-activated',
+                               self._on_treeview_revision_activated)
         
         # Set properties
-        self._scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
-                                        gtk.POLICY_AUTOMATIC)
-        self.vbox.set_spacing(3)
         self.set_default_size(600, 400)
-        self._label_loading.set_alignment(0.0, 0.5)
-        self._hbox.set_spacing(5)
-        self._hbox.set_border_width(5)
-        
-        # Construct the TreeView columns
-        self._treeview.append_column(gtk.TreeViewColumn(_('Revno'),
-                                     gtk.CellRendererText(), text=0))
-        self._treeview.append_column(gtk.TreeViewColumn(_('Summary'),
-                                     gtk.CellRendererText(), text=1))
-        self._treeview.append_column(gtk.TreeViewColumn(_('Committer'),
-                                     gtk.CellRendererText(), text=2))
-        self._treeview.append_column(gtk.TreeViewColumn(_('Time'),
-                                     gtk.CellRendererText(), text=3))
-        self._treeview.get_column(1).get_cell_renderers()[0].set_property("width-chars", 40)
-        self._treeview.get_column(2).get_cell_renderers()[0].set_property("width-chars", 40)
-        self._treeview.get_column(3).get_cell_renderers()[0].set_property("width-chars", 40)
+        self.vbox.set_spacing(3)
         
         # Construct the dialog
         self.action_area.pack_end(self._button_select)
         
-        self._scrolledwindow.add(self._treeview)
-        
-        self._hbox.pack_start(self._image_loading, False, False)
-        self._hbox.pack_start(self._label_loading, True, True)
-        
-        self.vbox.pack_start(self._hbox, False, False)
-        self.vbox.pack_start(self._scrolledwindow, True, True)
+        self.vbox.pack_start(self.treeview, True, True)
 
         # Show the dialog
         self.show_all()
-        
-        # Fill up with revisions
-        self._fill_revisions()
 
-    def _fill_revisions(self):
-        """ Fill up the treeview with the revisions. """
-        # [ revno, message, committer, timestamp, revid ]
-        self.model = gtk.ListStore(gobject.TYPE_STRING,
-                                   gobject.TYPE_STRING,
-                                   gobject.TYPE_STRING,
-                                   gobject.TYPE_STRING,
-                                   gobject.TYPE_STRING)
-        self._treeview.set_model(self.model)
-
-        repo = self.branch.repository
-        revs = self.branch.revision_history()
-        r = repo.get_revisions(revs)
-        r.reverse()
-
-        for rev in r:
-            if rev.committer is not None:
-                timestamp = format_date(rev.timestamp, rev.timezone)
-            else:
-                timestamp = None
-            self.model.append([ self.branch.revision_id_to_revno(rev.revision_id),
-                                rev.get_summary(),
-                                rev.committer,
-                                timestamp,
-                                rev.revision_id ])
-            while gtk.events_pending():
-                gtk.main_iteration()
-        tend = time.time()
-        
-        # Finished loading
-        self._hbox.hide()
     
-    def _get_selected_revno(self):
-        """ Return the selected revision's revno. """
-        treeselection = self._treeview.get_selection()
-        (model, iter) = treeselection.get_selected()
-        
-        if iter is None:
-            return None
-        else:
-            return model.get_value(iter, 0)
-    
-    def _get_selected_revid(self):
-        """ Return the selected revision's revid. """
-        treeselection = self._treeview.get_selection()
-        (model, iter) = treeselection.get_selected()
-        
-        if iter is None:
-            return None
-        else:
-            return model.get_value(iter, 4)
-    
-    def _on_treeview_row_activated(self, treeview, path, column):
+    def _on_treeview_revision_activated(self, treeview, path, column):
         """ Double-click on a row should also select a revision. """
         self._on_select_clicked(treeview)
     
     def _on_select_clicked(self, widget):
         """ Select button clicked handler. """
-        self.selected_revno = self._get_selected_revno()
-        self.selected_revid = self._get_selected_revid()
+        
+        self.selected_revno = self.treeview.get_property('revision-number')
+        self.selected_revid = \
+                    self.treeview.get_property('revision').revision_id
         self.response(gtk.RESPONSE_OK)
