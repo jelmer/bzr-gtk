@@ -16,7 +16,7 @@ import pango
 from bzrlib.plugins.gtk.window import Window
 from bzrlib.plugins.gtk.tags import AddTagDialog
 from bzrlib.plugins.gtk.preferences import PreferencesWindow
-from bzrlib.plugins.gtk.branchview import TreeView
+from bzrlib.plugins.gtk.branchview import TreeView, treemodel
 from bzrlib.revision import Revision
 from bzrlib.config import BranchConfig
 from bzrlib.config import GlobalConfig
@@ -226,6 +226,8 @@ class BranchWindow(Window):
 
         self.treeview.connect('revision-selected',
                 self._treeselection_changed_cb)
+        self.treeview.connect('revision-activated',
+                self._tree_revision_activated)
 
         self.treeview.connect('tag-added', lambda w, t, r: self._update_tags())
 
@@ -328,6 +330,21 @@ class BranchWindow(Window):
 
             self.revisionview.set_revision(revision)
             self.revisionview.set_children(children)
+    
+    def _tree_revision_activated(self, widget, path, col):
+        # TODO: more than one parent
+        """Callback for when a treeview row gets activated."""
+        revision = self.treeview.get_revision()
+        parents  = self.treeview.get_parents()
+
+        if len(parents) == 0:
+            parent_id = None
+        else:
+            parent_id = parents[0]
+
+        self.show_diff(revision.revision_id, parent_id)
+        self.treeview.grab_focus()
+    
 
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
@@ -344,7 +361,7 @@ class BranchWindow(Window):
 
     def _show_clicked_cb(self, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
-        self.treeview.show_diff(revid, parentid)
+        self.show_diff(revid, parentid)
         self.treeview.grab_focus()
 
     def _set_revision_cb(self, w, revision_id):
@@ -419,5 +436,20 @@ class BranchWindow(Window):
             self.go_menu_tags.set_sensitive(False)
 
         self.go_menu_tags.show_all()
+
+    def show_diff(self, revid=None, parentid=None):
+        """Open a new window to show a diff between the given revisions."""
+        from bzrlib.plugins.gtk.diff import DiffWindow
+        window = DiffWindow(parent=self)
+
+        if parentid is None:
+            parentid = NULL_REVISION
+
+        rev_tree    = self.branch.repository.revision_tree(revid)
+        parent_tree = self.branch.repository.revision_tree(parentid)
+
+        description = revid + " - " + self.branch.nick
+        window.set_diff(description, rev_tree, parent_tree)
+        window.show()
 
 
