@@ -36,7 +36,7 @@ from bzrlib.errors import NoSuchFile
 from bzrlib.patches import parse_patches
 from bzrlib.trace import warning
 from bzrlib.plugins.gtk.window import Window
-from dialog import error_dialog
+from dialog import error_dialog, info_dialog, warning_dialog
 
 
 class SelectCancelled(Exception):
@@ -476,8 +476,17 @@ class MergeDirectiveWindow(DiffWindow):
                     self.directive, progress.DummyProgress())
                 merger.check_basis(True)
                 merger.merge_type = _mod_merge.Merge3Merger
-                merger.set_pending()
                 conflict_count = merger.do_merge()
+                merger.set_pending()
+                if conflict_count == 0:
+                    # No conflicts found.
+                    info_dialog(_('Merge successful'),
+                                _('All changes applied successfully.'))
+                else:
+                    # There are conflicts to be resolved.
+                    warning_dialog(_('Conflicts encountered'),
+                                   _('Please resolve the conflicts manually'
+                                     ' before committing.'))
                 self.destroy()
             except Exception, e:
                 error_dialog('Error', str(e))
