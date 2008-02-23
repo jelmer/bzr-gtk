@@ -22,6 +22,7 @@ gcheckout         GTK+ checkout.
 gcommit           GTK+ commit dialog.
 gconflicts        GTK+ conflicts. 
 gdiff             Show differences in working tree in a GTK+ Window. 
+ghandle-patch     Display and optionally merge a merge directive or patch.
 ginit             Initialise a new branch.
 gmissing          GTK+ missing revisions dialog. 
 gpreferences      GTK+ preferences dialog. 
@@ -674,6 +675,12 @@ register_command(cmd_test_gtk)
 
 
 class cmd_ghandle_patch(GTKCommand):
+    """Display a patch or merge directive, possibly merging.
+
+    This is a helper, meant to be launched from other programs like browsers
+    or email clients.  Since these programs often do not allow parameters to
+    be provided, a "handle-patch" script is included.
+    """
 
     takes_args = ['path']
 

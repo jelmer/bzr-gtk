@@ -45,6 +45,7 @@ class SelectCancelled(Exception):
 
 
 class DiffFileView(gtk.ScrolledWindow):
+    """Window for displaying diffs from a diff file"""
 
     def __init__(self):
         gtk.ScrolledWindow.__init__(self)
@@ -259,6 +260,7 @@ class DiffView(DiffFileView):
         self.parent_tree = None
 
     def show_diff(self, specific_files):
+        """Show the diff for the specified files"""
         s = StringIO()
         show_diff_trees(self.parent_tree, self.rev_tree, s, specific_files,
                         old_label='', new_label='',
@@ -313,6 +315,10 @@ class DiffWidget(gtk.HPaned):
         self.treeview.append_column(column)
 
     def set_diff_text(self, lines):
+        """Set the current diff from a list of lines
+
+        :param lines: The diff to show, in unified diff format
+        """
         # The diffs of the  selected file: a scrollable source or
         # text view
         self.diff_view = DiffFileView()
@@ -369,6 +375,7 @@ class DiffWidget(gtk.HPaned):
         self.treeview.expand_all()
 
     def set_file(self, file_path):
+        """Select the current file to display"""
         tv_path = None
         for data in self.model:
             for child in data.iterchildren():
@@ -426,9 +433,18 @@ class DiffWindow(Window):
         self.diff.show_all()
 
     def _get_button_bar(self):
+        """Return a button bar to use.
+
+        :return: None, meaning that no button bar will be used.
+        """
         return None
 
     def set_diff_text(self, description, lines):
+        """Set the diff from a text.
+
+        The diff must be in unified diff format, and will be parsed to
+        determine filenames.
+        """
         self.diff.set_diff_text(lines)
         self.set_title(description + " - bzrk diff")
 
@@ -453,6 +469,7 @@ class MergeDirectiveWindow(DiffWindow):
         self.directive = directive
 
     def _get_button_bar(self):
+        """The button bar has only the Merge button"""
         merge_button = gtk.Button('Merge')
         merge_button.show()
         merge_button.set_relief(gtk.RELIEF_NONE)
@@ -503,13 +520,12 @@ class MergeDirectiveWindow(DiffWindow):
                                            gtk.RESPONSE_CANCEL,))
         try:
             result = d.run()
-            if result == gtk.RESPONSE_OK:
-                uri = d.get_current_folder_uri()
-                return workingtree.WorkingTree.open(uri)
-            else:
+            if result != gtk.RESPONSE_OK:
                 raise SelectCancelled()
+            uri = d.get_current_folder_uri()
         finally:
             d.destroy()
+        return workingtree.WorkingTree.open(uri)
 
 
 def _iter_changes_to_status(source, target):
