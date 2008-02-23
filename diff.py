@@ -283,50 +283,18 @@ class DiffView(DiffFileView):
         self.buffer.set_text(decoded.encode('UTF-8'))
 
 
-class DiffWindow(Window):
-    """Diff window.
+class DiffWidget(gtk.HPaned):
+    """Diff widget
 
-    This object represents and manages a single window containing the
-    differences between two revisions on a branch.
     """
-
-    def __init__(self, parent=None):
-        Window.__init__(self, parent)
-        self.set_border_width(0)
-        self.set_title("bzrk diff")
-
-        # Use two thirds of the screen by default
-        screen = self.get_screen()
-        monitor = screen.get_monitor_geometry(0)
-        width = int(monitor.width * 0.66)
-        height = int(monitor.height * 0.66)
-        self.set_default_size(width, height)
-
-        self.construct()
-
-    def _get_button_bar(self):
-        return None
-
-    def construct(self):
-        """Construct the window contents."""
-        # The   window  consists  of   a  pane   containing:  the
-        # hierarchical list  of files on  the left, and  the diff
-        # for the currently selected file on the right.
-        self.vbox = gtk.VBox()
-        self.add(self.vbox)
-        self.vbox.show()
-        self.pane = gtk.HPaned()
-        self.vbox.pack_end(self.pane, expand=True, fill=True)
-        hbox = self._get_button_bar()
-        if hbox is not None:
-            self.vbox.pack_start(hbox, expand=False, fill=True)
-        self.pane.show()
+    def __init__(self):
+        super(DiffWidget, self).__init__()
 
         # The file hierarchy: a scrollable treeview
         scrollwin = gtk.ScrolledWindow()
         scrollwin.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         scrollwin.set_shadow_type(gtk.SHADOW_IN)
-        self.pane.pack1(scrollwin)
+        self.pack1(scrollwin)
         scrollwin.show()
 
         self.model = gtk.TreeStore(str, str)
@@ -344,12 +312,12 @@ class DiffWindow(Window):
         column.add_attribute(cell, "text", 0)
         self.treeview.append_column(column)
 
-    def set_diff_text(self, description, lines):
+    def set_diff_text(self, lines):
         # The diffs of the  selected file: a scrollable source or
         # text view
         self.diff_view = DiffFileView()
         self.diff_view.show()
-        self.pane.pack2(self.diff_view)
+        self.pack2(self.diff_view)
         self.model.append(None, [ "Complete Diff", "" ])
         self.diff_view._diffs[None] = ''.join(lines)
         for patch in parse_patches(lines):
@@ -359,16 +327,14 @@ class DiffWindow(Window):
             self.diff_view._diffs[newname] = str(patch)
         self.diff_view.show_diff(None)
 
-    def set_diff(self, description, rev_tree, parent_tree):
+    def set_diff(self, rev_tree, parent_tree):
         """Set the differences showed by this window.
 
         Compares the two trees and populates the window with the
         differences.
         """
-        # The diffs of the  selected file: a scrollable source or
-        # text view
         self.diff_view = DiffView()
-        self.pane.pack2(self.diff_view)
+        self.pack2(self.diff_view)
         self.diff_view.show()
         self.diff_view.set_trees(rev_tree, parent_tree)
         self.rev_tree = rev_tree
@@ -401,8 +367,6 @@ class DiffWindow(Window):
                 self.model.append(titer, [ path, path ])
 
         self.treeview.expand_all()
-        self.set_title(description + " - bzrk diff")
-        self.diff_view.show_diff(None)
 
     def set_file(self, file_path):
         tv_path = None
@@ -426,6 +390,59 @@ class DiffWindow(Window):
             specific_files = None
 
         self.diff_view.show_diff(specific_files)
+
+
+class DiffWindow(Window):
+    """Diff window.
+
+    This object represents and manages a single window containing the
+    differences between two revisions on a branch.
+    """
+
+    def __init__(self, parent=None):
+        Window.__init__(self, parent)
+        self.set_border_width(0)
+        self.set_title("bzrk diff")
+
+        # Use two thirds of the screen by default
+        screen = self.get_screen()
+        monitor = screen.get_monitor_geometry(0)
+        width = int(monitor.width * 0.66)
+        height = int(monitor.height * 0.66)
+        self.set_default_size(width, height)
+
+        self.construct()
+
+    def construct(self):
+        """Construct the window contents."""
+        self.vbox = gtk.VBox()
+        self.add(self.vbox)
+        self.vbox.show()
+        hbox = self._get_button_bar()
+        if hbox is not None:
+            self.vbox.pack_start(hbox, expand=False, fill=True)
+        self.diff = DiffWidget()
+        self.vbox.add(self.diff)
+        self.diff.show_all()
+
+    def _get_button_bar(self):
+        return None
+
+    def set_diff_text(self, description, lines):
+        self.diff.set_diff_text(lines)
+        self.set_title(description + " - bzrk diff")
+
+    def set_diff(self, description, rev_tree, parent_tree):
+        """Set the differences showed by this window.
+
+        Compares the two trees and populates the window with the
+        differences.
+        """
+        self.diff.set_diff(rev_tree, parent_tree)
+        self.set_title(description + " - bzrk diff")
+
+    def set_file(self, file_path):
+        self.diff.set_file(file_path)
 
 
 class MergeDirectiveWindow(DiffWindow):

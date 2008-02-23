@@ -28,10 +28,10 @@ from bzrlib.plugins.gtk import data_path
 class AboutDialog(gtk.AboutDialog):
     def __init__(self):
         super(AboutDialog, self).__init__()
-        self.set_name("Bazaar")
-        self.set_version(bzrlib.version_string)
-        self.set_website("http://bazaar-vcs.org/")
-        self.set_license("GNU GPLv2")
+        self.set_name("Bazaar GTK")
+        self.set_version(bzrlib.plugins.gtk.version_string)
+        self.set_website("http://bazaar-vcs.org/BzrGtk")
+        self.set_license("GNU GPL v2")
         self.set_icon(gtk.gdk.pixbuf_new_from_file(os.path.join(data_path(), "bzr-icon-64.png")))
         self.connect ("response", lambda d, r: d.destroy())
 

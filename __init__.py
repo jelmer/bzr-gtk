@@ -219,7 +219,7 @@ def start_viz_window(branch, revision, limit=None):
     
     :return: The viz window object.
     """
-    from viz.branchwin import BranchWindow
+    from viz import BranchWindow
     return BranchWindow(branch, revision, limit)
 
 

@@ -1,3 +1,6 @@
+﻿#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
 # Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify

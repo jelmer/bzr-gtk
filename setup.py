@@ -98,7 +98,8 @@ setup(
         "bzrlib.plugins.gtk.viz": "viz", 
         "bzrlib.plugins.gtk.annotate": "annotate",
         "bzrlib.plugins.gtk.olive": "olive",
-        "bzrlib.plugins.gtk.tests": "tests"
+        "bzrlib.plugins.gtk.tests": "tests",
+        "bzrlib.plugins.gtk.branchview": "branchview",
         },
     packages = [
         "olive",
@@ -106,7 +107,8 @@ setup(
         "bzrlib.plugins.gtk.viz",
         "bzrlib.plugins.gtk.annotate",
         "bzrlib.plugins.gtk.olive",
-        "bzrlib.plugins.gtk.tests"
+        "bzrlib.plugins.gtk.tests",
+        "bzrlib.plugins.gtk.branchview",
         ],
     data_files=[('share/olive', ['olive.glade',
                                  'cmenu.ui',
