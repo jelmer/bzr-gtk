@@ -30,7 +30,13 @@ try:
 except ImportError:
     have_gconf = False
 
-from bzrlib import merge as _mod_merge, osutils, progress, workingtree
+from bzrlib import (
+    merge as _mod_merge,
+    osutils,
+    progress,
+    urlutils,
+    workingtree,
+)
 from bzrlib.diff import show_diff_trees, internal_diff
 from bzrlib.errors import NoSuchFile
 from bzrlib.patches import parse_patches
@@ -463,10 +469,11 @@ class DiffWindow(Window):
 
 class MergeDirectiveWindow(DiffWindow):
 
-    def __init__(self, directive, parent=None):
-        DiffWindow.__init__(self, parent)
+    def __init__(self, directive, path):
+        DiffWindow.__init__(self, None)
         self._merge_target = None
         self.directive = directive
+        self.path = path
 
     def _get_button_bar(self):
         """The button bar has only the Merge button"""
@@ -475,9 +482,15 @@ class MergeDirectiveWindow(DiffWindow):
         merge_button.set_relief(gtk.RELIEF_NONE)
         merge_button.connect("clicked", self.perform_merge)
 
+        save_button = gtk.Button('Save')
+        save_button.show()
+        save_button.set_relief(gtk.RELIEF_NONE)
+        save_button.connect("clicked", self.perform_save)
+
         hbox = gtk.HButtonBox()
         hbox.set_layout(gtk.BUTTONBOX_START)
         hbox.pack_start(merge_button, expand=False, fill=True)
+        hbox.pack_start(save_button, expand=False, fill=True)
         hbox.show()
         return hbox
 
@@ -526,6 +539,33 @@ class MergeDirectiveWindow(DiffWindow):
         finally:
             d.destroy()
         return workingtree.WorkingTree.open(uri)
+
+    def perform_save(self, window):
+        d = gtk.FileChooserDialog('Save As', self,
+                                  gtk.FILE_CHOOSER_ACTION_SAVE,
+                                  buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
+                                           gtk.STOCK_CANCEL,
+                                           gtk.RESPONSE_CANCEL,))
+        d.set_current_name(osutils.basename(self.path))
+        try:
+            try:
+                result = d.run()
+                if result != gtk.RESPONSE_OK:
+                    raise SelectCancelled()
+                uri = d.get_uri()
+            finally:
+                d.destroy()
+        except SelectCancelled:
+            return
+        source = open(self.path, 'rb')
+        try:
+            target = open(urlutils.local_path_from_url(uri), 'wb')
+            try:
+                target.write(source.read())
+            finally:
+                target.close()
+        finally:
+            source.close()
 
 
 def _iter_changes_to_status(source, target):
