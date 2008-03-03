@@ -22,6 +22,7 @@ gcheckout         GTK+ checkout.
 gcommit           GTK+ commit dialog.
 gconflicts        GTK+ conflicts. 
 gdiff             Show differences in working tree in a GTK+ Window. 
+ghandle-patch     Display and optionally merge a merge directive or patch.
 ginit             Initialise a new branch.
 gmissing          GTK+ missing revisions dialog. 
 gpreferences      GTK+ preferences dialog. 
@@ -77,6 +78,7 @@ from bzrlib import (
     branch,
     builtins,
     errors,
+    merge_directive,
     workingtree,
     )
 """)
@@ -670,6 +672,36 @@ class cmd_test_gtk(GTKCommand):
                 benchfile.close()
 
 register_command(cmd_test_gtk)
+
+
+class cmd_ghandle_patch(GTKCommand):
+    """Display a patch or merge directive, possibly merging.
+
+    This is a helper, meant to be launched from other programs like browsers
+    or email clients.  Since these programs often do not allow parameters to
+    be provided, a "handle-patch" script is included.
+    """
+
+    takes_args = ['path']
+
+    def run(self, path):
+        from bzrlib.plugins.gtk.diff import DiffWindow, MergeDirectiveWindow
+        lines = open(path, 'rb').readlines()
+        try:
+            directive = merge_directive.MergeDirective.from_lines(lines)
+        except errors.NotAMergeDirective:
+            window = DiffWindow()
+            window.set_diff_text(path, lines)
+        else:
+            window = MergeDirectiveWindow(directive)
+            window.set_diff_text(path, directive.patch.splitlines(True))
+        window.show()
+        gtk = self.open_display()
+        window.connect("destroy", gtk.main_quit)
+        gtk.main()
+
+
+register_command(cmd_ghandle_patch)
 
 
 import gettext
