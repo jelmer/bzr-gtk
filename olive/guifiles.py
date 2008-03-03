@@ -22,6 +22,7 @@ GLADEFILENAMES = ["/usr/share/olive/olive.glade",
                   "/usr/local/share/olive/olive.glade",
                   "/opt/share/olive/olive.glade",
                   "/opt/local/share/olive/olive.glade",
+                  "~/share/olive/olive.glade",
                  ]
 
 # Get the glade file name
@@ -36,6 +37,7 @@ GLADEFILENAMES.insert(0, os.path.join(dir_, "olive.glade"))
 GLADEFILENAME = None
 
 for path in GLADEFILENAMES:
+    path = os.path.expanduser(path)
     if os.path.isfile(path):
         GLADEFILENAME = path
         break
