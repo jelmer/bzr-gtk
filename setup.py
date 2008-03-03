@@ -102,7 +102,6 @@ setup(
         "bzrlib.plugins.gtk.branchview": "branchview",
         },
     packages = [
-        "olive",
         "bzrlib.plugins.gtk",
         "bzrlib.plugins.gtk.viz",
         "bzrlib.plugins.gtk.annotate",

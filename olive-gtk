@@ -90,6 +90,6 @@ import bzrlib.ui
 import bzrlib.plugins.gtk.ui as ui
 bzrlib.ui.ui_factory = ui.GtkUIFactory()
 
-from olive import OliveGtk
+from bzrlib.plugins.gtk.olive import OliveGtk
 app = OliveGtk()
 gtk.main()
