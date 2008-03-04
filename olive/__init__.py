@@ -1270,7 +1270,13 @@ class OliveGtk:
                 
             # Add'em to the ListStore
             for item in dirs:
-                statinfo = os.stat(self.path + os.sep + item)
+                try:
+                    statinfo = os.stat(self.path + os.sep + item)
+                except OSError, e:
+                    if e.errno == 40:
+                        continue
+                    else:
+                        raise
                 liststore.append([gtk.STOCK_DIRECTORY,
                                   True,
                                   item,
@@ -1333,7 +1339,13 @@ class OliveGtk:
                 else:
                     st = _('unknown')
                 
-                statinfo = os.stat(self.path + os.sep + item)
+                try:
+                    statinfo = os.stat(self.path + os.sep + item)
+                except OSError, e:
+                    if e.errno == 40:
+                        continue
+                    else:
+                        raise
                 liststore.append([gtk.STOCK_FILE,
                                   False,
                                   item,
