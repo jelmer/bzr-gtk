@@ -2,20 +2,18 @@
 #
 # Copyright (C) 2006 Jeff Bailey
 # Copyright (C) 2006 Wouter van Heyst
-# Copyright (C) 2006 Jelmer Vernooij
+# Copyright (C) 2006-2008 Jelmer Vernooij <jelmer@samba.org>
 #
 # Published under the GNU GPL
 
 import gtk
 import nautilus
 import bzrlib
-from bzrlib.bzrdir import BzrDir
-from bzrlib.errors import NotBranchError
-from bzrlib.errors import NoWorkingTree
-from bzrlib.errors import UnsupportedProtocol
-from bzrlib.workingtree import WorkingTree
 from bzrlib.branch import Branch
+from bzrlib.bzrdir import BzrDir
+from bzrlib.errors import NotBranchError, NoWorkingTree, UnsupportedProtocol
 from bzrlib.tree import file_status
+from bzrlib.workingtree import WorkingTree
 
 from bzrlib.plugin import load_plugins
 load_plugins()
@@ -268,7 +266,6 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
 
         return items
 
-
     def get_file_items(self, window, files):
         items = []
 
@@ -361,6 +358,8 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         try:
             tree, path = WorkingTree.open_containing(file.get_uri())
         except NotBranchError:
+            return
+        except NoWorkingTree:
             return
 
         emblem = None
