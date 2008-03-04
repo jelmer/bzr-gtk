@@ -58,6 +58,14 @@
                       </widget>
                     </child>
                     <child>
+                      <widget class="GtkMenuItem" id="menuitem_file_bookmark">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">_Bookmark current directory</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_menuitem_file_bookmark_activate"/>
+                      </widget>
+                    </child>
+                    <child>
                       <widget class="GtkMenuItem" id="menuitem_file_make_directory">
                         <property name="visible">True</property>
                         <property name="label" translatable="yes">Make _directory...</property>
