@@ -306,7 +306,6 @@ class cmd_gannotate(GTKCommand):
 
         window = GAnnotateWindow(all, plain)
         window.connect("destroy", lambda w: gtk.main_quit())
-        window.set_title(path + " - gannotate")
         config = GAnnotateConfig(window)
         window.show()
         br.lock_read()

@@ -113,6 +113,9 @@ class GAnnotateWindow(Window):
 
         self.annoview.set_model(self.annomodel)
         self.annoview.grab_focus()
+        my_revno = self.dotted.get(self.revision_id, 'current')
+        title = '%s (%s) - gannotate' % (self.tree.id2path(file_id), my_revno)
+        self.set_title(title)
 
     def jump_to_line(self, lineno):
         if lineno > len(self.annomodel) or lineno < 1:
@@ -238,7 +241,7 @@ class GAnnotateWindow(Window):
         self._search.show_for('line')
         self._search.set_target(self.annoview, LINE_NUM_COL)
 
-    def row_diff(self, tv, path, tvc):
+    def line_diff(self, tv, path, tvc):
         row = path[0]
         revision = self.annotations[row]
         repository = self.branch.repository
@@ -253,7 +256,7 @@ class GAnnotateWindow(Window):
                 tree2 = repository.revision_tree(NULL_REVISION)
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow()
-        window.set_diff("Diff for row %d" % (row+1), tree1, tree2)
+        window.set_diff("Diff for line %d" % (row+1), tree1, tree2)
         window.set_file(tree1.id2path(self.file_id))
         window.show()
 
@@ -263,7 +266,7 @@ class GAnnotateWindow(Window):
         tv.set_rules_hint(False)
         tv.connect("cursor-changed", self._activate_selected_revision)
         tv.show()
-        tv.connect("row-activated", self.row_diff)
+        tv.connect("row-activated", self.line_diff)
 
         cell = gtk.CellRendererText()
         cell.set_property("xalign", 1.0)
