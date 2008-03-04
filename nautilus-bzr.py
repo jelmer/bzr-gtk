@@ -370,17 +370,17 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         status = None
 
         if tree.has_filename(path):
-            emblem = 'cvs-controlled'
+            emblem = 'bzr-controlled'
             status = 'unchanged'
             id = tree.path2id(path)
 
             delta = tree.changes_from(tree.branch.basis_tree())
             if delta.touches_file_id(id):
-                emblem = 'cvs-modified'
+                emblem = 'bzr-modified'
                 status = 'modified'
             for f, _, _ in delta.added:
                 if f == path:
-                    emblem = 'cvs-added'
+                    emblem = 'bzr-added'
                     status = 'added'
 
             for of, f, _, _, _, _ in delta.renamed:
@@ -388,11 +388,12 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
                     status = 'renamed from %s' % f
 
         elif tree.branch.basis_tree().has_filename(path):
-            emblem = 'cvs-removed'
+            emblem = 'bzr-removed'
             status = 'removed'
         else:
             # FIXME: Check for ignored files
             status = 'unversioned'
+            emblem = 'bzr-unversioned'
         
         if emblem is not None:
             file.add_emblem(emblem)
