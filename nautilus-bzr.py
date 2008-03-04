@@ -158,7 +158,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
                 path = e.path
 
         from bzrlib.plugins.gtk.commit import CommitDialog
-        dialog = CommitDialog(tree, path, not branch)
+        dialog = CommitDialog(tree, path)
         response = dialog.run()
         if response != gtk.RESPONSE_NONE:
             dialog.hide()
