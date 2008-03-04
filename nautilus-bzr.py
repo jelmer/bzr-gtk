@@ -8,6 +8,7 @@
 
 import gtk
 import nautilus
+import os
 import bzrlib
 from bzrlib.branch import Branch
 from bzrlib.bzrdir import BzrDir
@@ -177,8 +178,9 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         except NotBranchError:
             return
 
-        vis = cmd_visualise()
-        vis.run(file)
+        if os.fork() == 0:
+            vis = cmd_visualise()
+            vis.run(file)
 
         return
 
@@ -239,6 +241,8 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
             items.append(item)
 
             return items
+        except NoWorkingTree:
+            return
 
         item = nautilus.MenuItem('BzrNautilus::log',
                              'Log',
@@ -273,19 +277,21 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         for vfs_file in files:
             # We can only cope with local files
             if vfs_file.get_uri_scheme() != 'file':
-                return
+                continue
 
             file = vfs_file.get_uri()
             try:
                 tree, path = WorkingTree.open_containing(file)
             except NotBranchError:
                 if not vfs_file.is_directory():
-                    return
+                    continue
                 item = nautilus.MenuItem('BzrNautilus::newtree',
                                      'Make directory versioned',
                                      'Create new Bazaar tree in %s' % vfs_file.get_name())
                 item.connect('activate', self.newtree_cb, vfs_file)
                 return item,
+            except NoWorkingTree:
+                continue
             # Refresh the list of filestatuses in the working tree
             if path not in wtfiles.keys():
                 tree.lock_read()
