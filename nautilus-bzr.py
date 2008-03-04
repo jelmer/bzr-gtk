@@ -8,7 +8,6 @@
 
 import gtk
 import nautilus
-import os
 import bzrlib
 from bzrlib.branch import Branch
 from bzrlib.bzrdir import BzrDir
@@ -178,9 +177,8 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         except NotBranchError:
             return
 
-        if os.fork() == 0:
-            vis = cmd_visualise()
-            vis.run(file)
+        vis = cmd_visualise()
+        vis.run(file)
 
         return
 
