@@ -40,8 +40,10 @@ class InstallData(install_data):
         #self.data_files.extend(self._nautilus_plugin())
         install_data.run(self)
 
-        if sys.platform[:5] == 'linux':
-            cmd = os.popen('gtk-update-icon-cache -f -t /usr/share/icons/hicolor')
+        try:
+            subprocess.check_call('gtk-update-icon-cache -f -t /usr/share/icons/hicolor')
+        except:
+            pass
 
     def _compile_po_files(self):
         data_files = []
