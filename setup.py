@@ -39,7 +39,8 @@ class InstallData(install_data):
         # Disable for now - performance issues
         #self.data_files.extend(self._nautilus_plugin())
         install_data.run(self)
-    
+        cmd = os.popen('gtk-update-icon-cache -f -t /usr/share/icons/hicolor')
+
     def _compile_po_files(self):
         data_files = []
         
@@ -127,7 +128,13 @@ setup(
                 ('share/applications', ['olive-gtk.desktop',
                                         'bazaar-properties.desktop',
                                         'bzr-notify.desktop']),
-                ('share/pixmaps', ['icons/olive-gtk.png'])
+                ('share/pixmaps', ['icons/olive-gtk.png']),
+                ('share/icons/hicolor/scalable/emblems', 
+                    ['icons/emblem-bzr-added.svg', 
+                        'icons/emblem-bzr-conflict.svg', 
+                        'icons/emblem-bzr-controlled.svg', 
+                        'icons/emblem-bzr-modified.svg',
+                        'icons/emblem-bzr-removed.svg'])
                ],
     cmdclass={'install_data': InstallData,
               'check': Check}
