@@ -227,8 +227,14 @@ class CommitDialog(gtk.Dialog):
             return
         if have_dbus:
             bus = dbus.SystemBus()
-            proxy_obj = bus.get_object('org.freedesktop.NetworkManager',
-                                       '/org/freedesktop/NetworkManager')
+            try:
+                proxy_obj = bus.get_object('org.freedesktop.NetworkManager',
+                                           '/org/freedesktop/NetworkManager')
+            except DBusException:
+                mutter("networkmanager not available.")
+                self._check_local.show()
+                return
+            
             dbus_iface = dbus.Interface(proxy_obj,
                                         'org.freedesktop.NetworkManager')
             try:
