@@ -100,6 +100,7 @@ class ConflictsDialog(gtk.Dialog):
                                          gtk.CellRendererText(), text=0))
             self._treeview.set_headers_visible(False)            
             self.model.append([ _("No conflicts in working tree.") ])
+            self._button_diff3.set_sensitive(False)
         else:
             self.model = gtk.ListStore(gobject.TYPE_STRING,
                                        gobject.TYPE_STRING,
