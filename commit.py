@@ -230,7 +230,7 @@ class CommitDialog(gtk.Dialog):
             try:
                 proxy_obj = bus.get_object('org.freedesktop.NetworkManager',
                                            '/org/freedesktop/NetworkManager')
-            except DBusException:
+            except dbus.DBusException:
                 mutter("networkmanager not available.")
                 self._check_local.show()
                 return
