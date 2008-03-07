@@ -17,7 +17,7 @@ from bzrlib.plugins.gtk.window import Window
 from bzrlib.plugins.gtk.tags import AddTagDialog
 from bzrlib.plugins.gtk.preferences import PreferencesWindow
 from bzrlib.plugins.gtk.branchview import TreeView, treemodel
-from bzrlib.revision import Revision
+from bzrlib.revision import Revision, NULL_REVISION
 from bzrlib.config import BranchConfig
 from bzrlib.config import GlobalConfig
 
