@@ -7,6 +7,8 @@
 
   * Made the tag list in the revision view be comma-separated. (Daniel Schierbeck)
 
+  * Add bugs tab in the branch view. (Jelmer Vernooij)
+
  BUG FIXES
 
   * Make adding tags from the viz work again. (Daniel Schierbeck)

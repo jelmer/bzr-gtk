@@ -20,9 +20,39 @@ pygtk.require("2.0")
 import gtk
 import pango
 import gobject
+import subprocess
 
 from bzrlib.osutils import format_date
 from bzrlib.util.bencode import bdecode
+
+def _open_link(widget, uri):
+    subprocess.Popen(['sensible-browser', uri], close_fds=True)
+
+gtk.link_button_set_uri_hook(_open_link)
+
+class BugsTab(gtk.Table):
+    def __init__(self):
+        super(BugsTab, self).__init__(rows=5, columns=2)
+        self.set_row_spacings(6)
+        self.set_col_spacings(6)
+        self.clear()
+
+    def clear(self):
+        for c in self.get_children():
+            self.remove(c)
+        self.count = 0
+        self.hide_all() # Only shown when there are bugs
+
+    def add_bug(self, url, status):
+        button = gtk.LinkButton(url, url)
+        self.attach(button, 0, 1, self.count, self.count + 1,
+                              gtk.EXPAND | gtk.FILL, gtk.FILL)
+        status_label = gtk.Label(status)
+        self.attach(status_label, 1, 2, self.count, self.count + 1,
+                              gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.count += 1
+        self.show_all()
+
 
 class RevisionView(gtk.Notebook):
     """ Custom widget for commit log details.
@@ -68,6 +98,7 @@ class RevisionView(gtk.Notebook):
         self._create_general()
         self._create_relations()
         self._create_file_info_view()
+        self._create_bugs()
 
         self.set_current_page(0)
         
@@ -175,6 +206,13 @@ class RevisionView(gtk.Notebook):
                     self.file_info_box.hide()
         else:
             self.file_info_box.hide()
+
+        self.bugs_table.clear()
+        bugs_text = revision.properties.get('bugs', None)
+        if bugs_text:
+            for bugline in bugs_text.splitlines():
+                (url, status) = bugline.split(" ")
+                self.bugs_table.add_bug(url, status)
 
     def update_tags(self):
         if self._branch is not None and self._branch.supports_tags():
@@ -428,6 +466,10 @@ class RevisionView(gtk.Notebook):
         window.add(tv)
         window.show()
         return window
+
+    def _create_bugs(self):
+        self.bugs_table = BugsTab()
+        self.append_page(self.bugs_table, tab_label=gtk.Label('Bugs'))
 
     def _create_file_info_view(self):
         self.file_info_box = gtk.VBox(False, 6)
