@@ -49,6 +49,11 @@ Note: the plugin directory of bzr-gtk must be called 'gtk'.
 To use the nautilus integration, either place the nautilus-bzr.py file in
 ~/.nautilus/python-extensions or in /usr/lib/nautilus/extensions-1.0/python
 
+Please note that python-nautilus currently uses the .so file of Python 
+so you will need to have python-dev installed or you need to manually create a 
+libpythonVER.so symlink in /usr/lib (where VER is your version of python, e.g.
+2.4 or 2.5).
+
 Usage - Visualisation
 ---------------------
 
