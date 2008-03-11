@@ -227,7 +227,7 @@ class DiffFileView(gtk.ScrolledWindow):
 #        self.parent_tree.lock_read()
 #        self.rev_tree.lock_read()
 #        try:
-#            self.delta = _iter_changes_to_status(self.parent_tree, self.rev_tree)
+#            self.delta = iter_changes_to_status(self.parent_tree, self.rev_tree)
 #            self.path_to_status = {}
 #            self.path_to_diff = {}
 #            source_inv = self.parent_tree.inventory
@@ -568,10 +568,10 @@ class MergeDirectiveWindow(DiffWindow):
             source.close()
 
 
-def _iter_changes_to_status(source, target):
+def iter_changes_to_status(source, target):
     """Determine the differences between trees.
 
-    This is a wrapper around _iter_changes which just yields more
+    This is a wrapper around iter_changes which just yields more
     understandable results.
 
     :param source: The source tree (basis tree)
@@ -593,7 +593,7 @@ def _iter_changes_to_status(source, target):
         source.lock_read()
         try:
             for (file_id, paths, changed_content, versioned, parent_ids, names,
-                 kinds, executables) in target._iter_changes(source):
+                 kinds, executables) in target.iter_changes(source):
 
                 # Skip the root entry if it isn't very interesting
                 if parent_ids == (None, None):
