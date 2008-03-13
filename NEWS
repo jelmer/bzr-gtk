@@ -20,6 +20,9 @@
   * Make viz not throw errors when there are 0 commits. (#173698, Gary van der
     Merwe)
 
+  * Fixed underscores in tags being interpreted as mnemonics in the viz. (#201733, 
+    Daniel Schierbeck)
+
  FEATURES
  
   * Only check for old Bazaar versions that are known to be incompatible and 
