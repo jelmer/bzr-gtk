@@ -381,6 +381,13 @@ class BranchWindow(Window):
 
     def _tag_revision_cb(self, w):
         try:
+            if self.branch.get_physical_lock_status():
+                dialog = gtk.Dialog('Branch is locked', parent=self)
+                dialog.vbox.add(gtk.Label('This branch has been locked by another process.'))
+                dialog.show_all()
+                dialog.run()
+                return
+
             self.treeview.set_sensitive(False)
             dialog = AddTagDialog(self.branch.repository, self.treeview.get_revision().revision_id, self.branch)
             response = dialog.run()
