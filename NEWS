@@ -2,9 +2,16 @@
 
  UI
 
+  * Made the tags associated with a revision render next to the revision
+    node in the branch view. (Ali Sabil)
+
   * Made the tag list in the revision view be comma-separated. (Daniel Schierbeck)
 
+  * Add bugs tab in the branch view. (Jelmer Vernooij)
+
  BUG FIXES
+
+  * Make adding tags from the viz work again. (Daniel Schierbeck)
  
   * Catch UnsupportedProtocol exception in the Nautilus extension. (#77965)
   
@@ -12,6 +19,9 @@
   
   * Make viz not throw errors when there are 0 commits. (#173698, Gary van der
     Merwe)
+
+  * Fixed underscores in tags being interpreted as mnemonics in the viz. (#201733, 
+    Daniel Schierbeck)
 
  FEATURES
  

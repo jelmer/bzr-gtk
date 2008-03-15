@@ -2,20 +2,18 @@
 #
 # Copyright (C) 2006 Jeff Bailey
 # Copyright (C) 2006 Wouter van Heyst
-# Copyright (C) 2006 Jelmer Vernooij
+# Copyright (C) 2006-2008 Jelmer Vernooij <jelmer@samba.org>
 #
 # Published under the GNU GPL
 
 import gtk
 import nautilus
 import bzrlib
-from bzrlib.bzrdir import BzrDir
-from bzrlib.errors import NotBranchError
-from bzrlib.errors import NoWorkingTree
-from bzrlib.errors import UnsupportedProtocol
-from bzrlib.workingtree import WorkingTree
 from bzrlib.branch import Branch
+from bzrlib.bzrdir import BzrDir
+from bzrlib.errors import NotBranchError, NoWorkingTree, UnsupportedProtocol
 from bzrlib.tree import file_status
+from bzrlib.workingtree import WorkingTree
 
 from bzrlib.plugin import load_plugins
 load_plugins()
@@ -160,7 +158,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
                 path = e.path
 
         from bzrlib.plugins.gtk.commit import CommitDialog
-        dialog = CommitDialog(tree, path, not branch)
+        dialog = CommitDialog(tree, path)
         response = dialog.run()
         if response != gtk.RESPONSE_NONE:
             dialog.hide()
@@ -241,6 +239,8 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
             items.append(item)
 
             return items
+        except NoWorkingTree:
+            return
 
         item = nautilus.MenuItem('BzrNautilus::log',
                              'Log',
@@ -268,7 +268,6 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
 
         return items
 
-
     def get_file_items(self, window, files):
         items = []
 
@@ -276,19 +275,21 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         for vfs_file in files:
             # We can only cope with local files
             if vfs_file.get_uri_scheme() != 'file':
-                return
+                continue
 
             file = vfs_file.get_uri()
             try:
                 tree, path = WorkingTree.open_containing(file)
             except NotBranchError:
                 if not vfs_file.is_directory():
-                    return
+                    continue
                 item = nautilus.MenuItem('BzrNautilus::newtree',
                                      'Make directory versioned',
                                      'Create new Bazaar tree in %s' % vfs_file.get_name())
                 item.connect('activate', self.newtree_cb, vfs_file)
                 return item,
+            except NoWorkingTree:
+                continue
             # Refresh the list of filestatuses in the working tree
             if path not in wtfiles.keys():
                 tree.lock_read()
@@ -362,22 +363,24 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
             tree, path = WorkingTree.open_containing(file.get_uri())
         except NotBranchError:
             return
+        except NoWorkingTree:
+            return
 
         emblem = None
         status = None
 
         if tree.has_filename(path):
-            emblem = 'cvs-controlled'
+            emblem = 'bzr-controlled'
             status = 'unchanged'
             id = tree.path2id(path)
 
             delta = tree.changes_from(tree.branch.basis_tree())
             if delta.touches_file_id(id):
-                emblem = 'cvs-modified'
+                emblem = 'bzr-modified'
                 status = 'modified'
             for f, _, _ in delta.added:
                 if f == path:
-                    emblem = 'cvs-added'
+                    emblem = 'bzr-added'
                     status = 'added'
 
             for of, f, _, _, _, _ in delta.renamed:
@@ -385,11 +388,12 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
                     status = 'renamed from %s' % f
 
         elif tree.branch.basis_tree().has_filename(path):
-            emblem = 'cvs-removed'
+            emblem = 'bzr-removed'
             status = 'removed'
         else:
             # FIXME: Check for ignored files
             status = 'unversioned'
+            emblem = 'bzr-unversioned'
         
         if emblem is not None:
             file.add_emblem(emblem)

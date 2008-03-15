@@ -1,3 +1,6 @@
+﻿#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
 # Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
@@ -962,7 +965,13 @@ class OliveGtk:
         
         # Add'em to the ListStore
         for item in dirs:
-            statinfo = os.stat(self.path + os.sep + item)
+            try:
+                statinfo = os.stat(self.path + os.sep + item)
+            except OSError, e:
+                if e.errno == 40:
+                    continue
+                else:
+                    raise
             liststore.append([ gtk.STOCK_DIRECTORY,
                                True,
                                item,
@@ -1023,7 +1032,13 @@ class OliveGtk:
             else:
                 st = _('unknown')
             
-            statinfo = os.stat(self.path + os.sep + item)
+            try:
+                statinfo = os.stat(self.path + os.sep + item)
+            except OSError, e:
+                if e.errno == 40:
+                    continue
+                else:
+                    raise
             liststore.append([gtk.STOCK_FILE,
                               False,
                               item,
@@ -1255,7 +1270,13 @@ class OliveGtk:
                 
             # Add'em to the ListStore
             for item in dirs:
-                statinfo = os.stat(self.path + os.sep + item)
+                try:
+                    statinfo = os.stat(self.path + os.sep + item)
+                except OSError, e:
+                    if e.errno == 40:
+                        continue
+                    else:
+                        raise
                 liststore.append([gtk.STOCK_DIRECTORY,
                                   True,
                                   item,
@@ -1318,7 +1339,13 @@ class OliveGtk:
                 else:
                     st = _('unknown')
                 
-                statinfo = os.stat(self.path + os.sep + item)
+                try:
+                    statinfo = os.stat(self.path + os.sep + item)
+                except OSError, e:
+                    if e.errno == 40:
+                        continue
+                    else:
+                        raise
                 liststore.append([gtk.STOCK_FILE,
                                   False,
                                   item,

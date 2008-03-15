@@ -43,6 +43,9 @@ class BranchSelectionBox(gtk.HBox):
                            gobject.SIGNAL_RUN_LAST,
                            gobject.TYPE_NONE, (gobject.TYPE_OBJECT,))
 
+        if path is not None:
+            self.set_url(path)
+
     def set_url(self, url):
         self._combo.get_child().set_text(url)
 

@@ -22,6 +22,7 @@ gcheckout         GTK+ checkout.
 gcommit           GTK+ commit dialog.
 gconflicts        GTK+ conflicts. 
 gdiff             Show differences in working tree in a GTK+ Window. 
+ghandle-patch     Display and optionally merge a merge directive or patch.
 ginit             Initialise a new branch.
 gmissing          GTK+ missing revisions dialog. 
 gpreferences      GTK+ preferences dialog. 
@@ -44,7 +45,7 @@ else:
     version_string = '%d.%d.%d%s%d' % version_info
 __version__ = version_string
 
-required_bzrlib = (1, 0)
+required_bzrlib = (1, 3)
 
 def check_bzrlib_version(desired):
     """Check that bzrlib is compatible.
@@ -77,6 +78,7 @@ from bzrlib import (
     branch,
     builtins,
     errors,
+    merge_directive,
     workingtree,
     )
 """)
@@ -304,7 +306,6 @@ class cmd_gannotate(GTKCommand):
 
         window = GAnnotateWindow(all, plain)
         window.connect("destroy", lambda w: gtk.main_quit())
-        window.set_title(path + " - gannotate")
         config = GAnnotateConfig(window)
         window.show()
         br.lock_read()
@@ -670,6 +671,43 @@ class cmd_test_gtk(GTKCommand):
                 benchfile.close()
 
 register_command(cmd_test_gtk)
+
+
+class cmd_ghandle_patch(GTKCommand):
+    """Display a patch or merge directive, possibly merging.
+
+    This is a helper, meant to be launched from other programs like browsers
+    or email clients.  Since these programs often do not allow parameters to
+    be provided, a "handle-patch" script is included.
+    """
+
+    takes_args = ['path']
+
+    def run(self, path):
+        try:
+            from bzrlib.plugins.gtk.diff import (DiffWindow,
+                                                 MergeDirectiveWindow)
+            lines = open(path, 'rb').readlines()
+            lines = [l.replace('\r\n', '\n') for l in lines]
+            try:
+                directive = merge_directive.MergeDirective.from_lines(lines)
+            except errors.NotAMergeDirective:
+                window = DiffWindow()
+                window.set_diff_text(path, lines)
+            else:
+                window = MergeDirectiveWindow(directive, path)
+                window.set_diff_text(path, directive.patch.splitlines(True))
+            window.show()
+            gtk = self.open_display()
+            window.connect("destroy", gtk.main_quit)
+        except Exception, e:
+            from dialog import error_dialog
+            error_dialog('Error', str(e))
+            raise
+        gtk.main()
+
+
+register_command(cmd_ghandle_patch)
 
 
 import gettext

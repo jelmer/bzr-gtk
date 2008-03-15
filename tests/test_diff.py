@@ -20,7 +20,7 @@ import os
 
 from bzrlib import tests
 
-from bzrlib.plugins.gtk.diff import DiffView, _iter_changes_to_status
+from bzrlib.plugins.gtk.diff import DiffView, iter_changes_to_status
 
 
 class TestDiffViewSimple(tests.TestCase):
@@ -72,7 +72,7 @@ class TestDiffView(tests.TestCaseWithTransport):
 class Test_IterChangesToStatus(tests.TestCaseWithTransport):
 
     def assertStatusEqual(self, expected, tree):
-        values = _iter_changes_to_status(tree.basis_tree(), tree)
+        values = iter_changes_to_status(tree.basis_tree(), tree)
         self.assertEqual(expected, values)
 
     def test_status_added(self):

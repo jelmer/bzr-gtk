@@ -78,6 +78,11 @@ class SendMergeDirectiveDialog(gtk.Dialog):
 
         self.mail_to = gtk.ComboBoxEntry()
         mail_to = self.branch.get_config().get_user_option('submit_to')
+        if mail_to is None:
+            submit_branch = self.submit_branch.get_branch()
+            if submit_branch is not None:
+                mail_to = submit_branch.get_config().get_user_option(
+                            'child_submit_to')
         if mail_to is not None:
             self.mail_to.get_child().set_text(mail_to)
         table.attach(self.mail_to, 1, 2, 2, 3, gtk.FILL, gtk.FILL)

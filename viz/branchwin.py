@@ -16,8 +16,8 @@ import pango
 from bzrlib.plugins.gtk.window import Window
 from bzrlib.plugins.gtk.tags import AddTagDialog
 from bzrlib.plugins.gtk.preferences import PreferencesWindow
-from bzrlib.plugins.gtk.branchview import TreeView
-from bzrlib.revision import Revision
+from bzrlib.plugins.gtk.branchview import TreeView, treemodel
+from bzrlib.revision import Revision, NULL_REVISION
 from bzrlib.config import BranchConfig
 from bzrlib.config import GlobalConfig
 
@@ -100,7 +100,6 @@ class BranchWindow(Window):
 
         vbox.pack_start(self.construct_menubar(), expand=False, fill=True)
         vbox.pack_start(self.construct_navigation(), expand=False, fill=True)
-        vbox.pack_start(self.construct_loading_msg(), expand=False, fill=True)
         
         vbox.pack_start(self.paned, expand=True, fill=True)
         vbox.set_focus_child(self.paned)
@@ -170,27 +169,13 @@ class BranchWindow(Window):
         go_menu_next = self.next_rev_action.create_menu_item()
         go_menu_prev = self.prev_rev_action.create_menu_item()
 
-        tags_menu = gtk.Menu()
-        go_menu_tags = gtk.MenuItem("_Tags")
-        go_menu_tags.set_submenu(tags_menu)
-
-        if self.branch.supports_tags():
-            tags = self.branch.tags.get_tag_dict().items()
-            tags.sort()
-            tags.reverse()
-            for tag, revid in tags:
-                tag_item = gtk.MenuItem(tag)
-                tag_item.connect('activate', self._tag_selected_cb, revid)
-                tags_menu.add(tag_item)
-
-            go_menu_tags.set_sensitive(len(tags) != 0)
-        else:
-            go_menu_tags.set_sensitive(False)
+        self.go_menu_tags = gtk.MenuItem("_Tags")
+        self._update_tags()
 
         go_menu.add(go_menu_next)
         go_menu.add(go_menu_prev)
         go_menu.add(gtk.SeparatorMenuItem())
-        go_menu.add(go_menu_tags)
+        go_menu.add(self.go_menu_tags)
 
         revision_menu = gtk.Menu()
         revision_menuitem = gtk.MenuItem("_Revision")
@@ -213,33 +198,25 @@ class BranchWindow(Window):
         branch_menu.add(gtk.MenuItem("Pu_ll Revisions"))
         branch_menu.add(gtk.MenuItem("Pu_sh Revisions"))
 
+        help_menu = gtk.Menu()
+        help_menuitem = gtk.MenuItem("_Help")
+        help_menuitem.set_submenu(help_menu)
+
+        help_about_menuitem = gtk.ImageMenuItem(gtk.STOCK_ABOUT, self.accel_group)
+        help_about_menuitem.connect('activate', self._about_dialog_cb)
+
+        help_menu.add(help_about_menuitem)
+
         menubar.add(file_menuitem)
         menubar.add(edit_menuitem)
         menubar.add(view_menuitem)
         menubar.add(go_menuitem)
         menubar.add(revision_menuitem)
         menubar.add(branch_menuitem)
+        menubar.add(help_menuitem)
         menubar.show_all()
 
         return menubar
-    
-    def construct_loading_msg(self):
-        image_loading = gtk.image_new_from_stock(gtk.STOCK_REFRESH,
-                                                 gtk.ICON_SIZE_BUTTON)
-        image_loading.show()
-        
-        label_loading = gtk.Label(_("Please wait, loading ancestral graph..."))
-        label_loading.set_alignment(0.0, 0.5)
-        label_loading.show()
-        
-        self.loading_msg_box = gtk.HBox()
-        self.loading_msg_box.set_spacing(5)
-        self.loading_msg_box.set_border_width(5)        
-        self.loading_msg_box.pack_start(image_loading, False, False)
-        self.loading_msg_box.pack_start(label_loading, True, True)
-        self.loading_msg_box.show()
-        
-        return self.loading_msg_box
 
     def construct_top(self):
         """Construct the top-half of the window."""
@@ -249,9 +226,10 @@ class BranchWindow(Window):
 
         self.treeview.connect('revision-selected',
                 self._treeselection_changed_cb)
+        self.treeview.connect('revision-activated',
+                self._tree_revision_activated)
 
-        self.treeview.connect('revisions-loaded', 
-                lambda x: self.loading_msg_box.hide())
+        self.treeview.connect('tag-added', lambda w, t, r: self._update_tags())
 
         for col in ["revno", "date"]:
             option = self.config.get_user_option(col + '-column-visible')
@@ -297,6 +275,7 @@ class BranchWindow(Window):
         self.revisionview.show()
         self.revisionview.set_show_callback(self._show_clicked_cb)
         self.revisionview.connect('notify::revision', self._go_clicked_cb)
+        self.treeview.connect('tag-added', lambda w, t, r: self.revisionview.update_tags())
         return self.revisionview
 
     def _tag_selected_cb(self, menuitem, revid):
@@ -351,6 +330,21 @@ class BranchWindow(Window):
 
             self.revisionview.set_revision(revision)
             self.revisionview.set_children(children)
+    
+    def _tree_revision_activated(self, widget, path, col):
+        # TODO: more than one parent
+        """Callback for when a treeview row gets activated."""
+        revision = self.treeview.get_revision()
+        parents  = self.treeview.get_parents()
+
+        if len(parents) == 0:
+            parent_id = None
+        else:
+            parent_id = parents[0]
+
+        self.show_diff(revision.revision_id, parent_id)
+        self.treeview.grab_focus()
+    
 
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
@@ -367,7 +361,7 @@ class BranchWindow(Window):
 
     def _show_clicked_cb(self, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
-        self.treeview.show_diff(revid, parentid)
+        self.show_diff(revid, parentid)
         self.treeview.grab_focus()
 
     def _set_revision_cb(self, w, revision_id):
@@ -388,25 +382,23 @@ class BranchWindow(Window):
     def _tag_revision_cb(self, w):
         try:
             self.treeview.set_sensitive(False)
-            self.branch.unlock()
             dialog = AddTagDialog(self.branch.repository, self.treeview.get_revision().revision_id, self.branch)
             response = dialog.run()
             if response != gtk.RESPONSE_NONE:
                 dialog.hide()
             
                 if response == gtk.RESPONSE_OK:
-                    try:
-                        self.branch.lock_write()
-                        self.branch.tags.set_tag(dialog.tagname, dialog._revid)
-                    finally:
-                        self.branch.unlock()
+                    self.treeview.add_tag(dialog.tagname, dialog._revid)
                 
                 dialog.destroy()
 
         finally:
-            self.branch.lock_read()
-            self.treeview.emit("revision-selected")
             self.treeview.set_sensitive(True)
+
+    def _about_dialog_cb(self, w):
+        from bzrlib.plugins.gtk.about import AboutDialog
+
+        AboutDialog().run()
 
     def _col_visibility_changed(self, col, property):
         self.config.set_user_option(property + '-column-visible', col.get_active())
@@ -424,4 +416,40 @@ class BranchWindow(Window):
         dialog.run()
 
     def _refresh_clicked(self, w):
-        self.treeview.update()
+        self.treeview.refresh()
+
+    def _update_tags(self):
+        menu = gtk.Menu()
+
+        if self.branch.supports_tags():
+            tags = self.branch.tags.get_tag_dict().items()
+            tags.sort()
+            tags.reverse()
+            for tag, revid in tags:
+                tag_item = gtk.MenuItem(tag, use_underline=False)
+                tag_item.connect('activate', self._tag_selected_cb, revid)
+                menu.add(tag_item)
+            self.go_menu_tags.set_submenu(menu)
+
+            self.go_menu_tags.set_sensitive(len(tags) != 0)
+        else:
+            self.go_menu_tags.set_sensitive(False)
+
+        self.go_menu_tags.show_all()
+
+    def show_diff(self, revid=None, parentid=None):
+        """Open a new window to show a diff between the given revisions."""
+        from bzrlib.plugins.gtk.diff import DiffWindow
+        window = DiffWindow(parent=self)
+
+        if parentid is None:
+            parentid = NULL_REVISION
+
+        rev_tree    = self.branch.repository.revision_tree(revid)
+        parent_tree = self.branch.repository.revision_tree(parentid)
+
+        description = revid + " - " + self.branch.nick
+        window.set_diff(description, rev_tree, parent_tree)
+        window.show()
+
+

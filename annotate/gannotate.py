@@ -80,6 +80,10 @@ class GAnnotateWindow(Window):
         try:
             branch.lock_read()
             branch.repository.lock_read()
+            self.dotted = {}
+            revno_map = self.branch.get_revision_id_to_revno_map()
+            for revision_id, revno in revno_map.iteritems():
+                self.dotted[revision_id] = '.'.join(str(num) for num in revno)
             for line_no, (revision, revno, line)\
                     in enumerate(self._annotate(tree, file_id)):
                 if revision.revision_id == last_seen and not self.all:
@@ -109,6 +113,9 @@ class GAnnotateWindow(Window):
 
         self.annoview.set_model(self.annomodel)
         self.annoview.grab_focus()
+        my_revno = self.dotted.get(self.revision_id, 'current')
+        title = '%s (%s) - gannotate' % (self.tree.id2path(file_id), my_revno)
+        self.set_title(title)
 
     def jump_to_line(self, lineno):
         if lineno > len(self.annomodel) or lineno < 1:
@@ -124,18 +131,6 @@ class GAnnotateWindow(Window):
         self.annoview.set_cursor(row)
         self.annoview.scroll_to_cell(row, use_align=True)
 
-    def _dotted_revnos(self, repository, revision_id):
-        """Return a dict of revision_id -> dotted revno
-        
-        :param repository: The repository to get the graph from
-        :param revision_id: The last revision for which this info is needed
-        """
-        graph = repository.get_revision_graph(revision_id)
-        dotted = {}
-        for n, revision_id, d, revno, e in tsort.merge_sort(graph, 
-            revision_id, generate_revno=True):
-            dotted[revision_id] = '.'.join(str(num) for num in revno)
-        return dotted
 
     def _annotate(self, tree, file_id):
         current_revision = FakeRevision(CURRENT_REVISION)
@@ -150,7 +145,6 @@ class GAnnotateWindow(Window):
             revision_id = self.branch.last_revision()
         else:
             revision_id = self.revision_id
-        dotted = self._dotted_revnos(repository, revision_id)
         revision_cache = RevisionCache(repository, self.revisions)
         for origin, text in tree.annotate_iter(file_id):
             rev_id = origin
@@ -160,7 +154,7 @@ class GAnnotateWindow(Window):
             else:
                 try:
                     revision = revision_cache.get_revision(rev_id)
-                    revno = dotted.get(rev_id, 'merge')
+                    revno = self.dotted.get(rev_id, 'merge')
                     if len(revno) > 15:
                         revno = 'merge'
                 except NoSuchRevision:
@@ -247,7 +241,7 @@ class GAnnotateWindow(Window):
         self._search.show_for('line')
         self._search.set_target(self.annoview, LINE_NUM_COL)
 
-    def row_diff(self, tv, path, tvc):
+    def line_diff(self, tv, path, tvc):
         row = path[0]
         revision = self.annotations[row]
         repository = self.branch.repository
@@ -262,7 +256,7 @@ class GAnnotateWindow(Window):
                 tree2 = repository.revision_tree(NULL_REVISION)
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow()
-        window.set_diff("Diff for row %d" % (row+1), tree1, tree2)
+        window.set_diff("Diff for line %d" % (row+1), tree1, tree2)
         window.set_file(tree1.id2path(self.file_id))
         window.show()
 
@@ -272,7 +266,7 @@ class GAnnotateWindow(Window):
         tv.set_rules_hint(False)
         tv.connect("cursor-changed", self._activate_selected_revision)
         tv.show()
-        tv.connect("row-activated", self.row_diff)
+        tv.connect("row-activated", self.line_diff)
 
         cell = gtk.CellRendererText()
         cell.set_property("xalign", 1.0)

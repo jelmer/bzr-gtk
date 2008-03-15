@@ -173,7 +173,7 @@ class CommitDialog(gtk.Dialog):
 
         # The store holds:
         # [file_id, real path, checkbox, display path, changes type, message]
-        # _iter_changes returns:
+        # iter_changes returns:
         # (file_id, (path_in_source, path_in_target),
         #  changed_content, versioned, parent, name, kind,
         #  executable)
@@ -186,9 +186,9 @@ class CommitDialog(gtk.Dialog):
         self._wt.lock_read()
         self._basis_tree.lock_read()
         try:
-            from diff import _iter_changes_to_status
+            from diff import iter_changes_to_status
             for (file_id, real_path, change_type, display_path
-                ) in _iter_changes_to_status(self._basis_tree, self._wt):
+                ) in iter_changes_to_status(self._basis_tree, self._wt):
                 if self._selected and real_path != self._selected:
                     enabled = False
                 else:
@@ -227,8 +227,14 @@ class CommitDialog(gtk.Dialog):
             return
         if have_dbus:
             bus = dbus.SystemBus()
-            proxy_obj = bus.get_object('org.freedesktop.NetworkManager',
-                                       '/org/freedesktop/NetworkManager')
+            try:
+                proxy_obj = bus.get_object('org.freedesktop.NetworkManager',
+                                           '/org/freedesktop/NetworkManager')
+            except dbus.DBusException:
+                mutter("networkmanager not available.")
+                self._check_local.show()
+                return
+            
             dbus_iface = dbus.Interface(proxy_obj,
                                         'org.freedesktop.NetworkManager')
             try:

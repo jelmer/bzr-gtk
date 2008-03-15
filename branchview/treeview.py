@@ -19,7 +19,7 @@ from graphcell import CellRendererGraph
 from treemodel import TreeModel
 from bzrlib.revision import NULL_REVISION
 
-class TreeView(gtk.ScrolledWindow):
+class TreeView(gtk.VBox):
 
     __gproperties__ = {
         'branch': (gobject.TYPE_PYOBJECT,
@@ -49,8 +49,14 @@ class TreeView(gtk.ScrolledWindow):
                     gobject.PARAM_READABLE),
 
         'revno-column-visible': (gobject.TYPE_BOOLEAN,
-                                 'Revision number',
+                                 'Revision number column',
                                  'Show revision number column',
+                                 True,
+                                 gobject.PARAM_READWRITE),
+
+        'graph-column-visible': (gobject.TYPE_BOOLEAN,
+                                 'Graph column',
+                                 'Show graph column',
                                  True,
                                  gobject.PARAM_READWRITE),
 
@@ -64,7 +70,13 @@ class TreeView(gtk.ScrolledWindow):
                     'Compact view',
                     'Break ancestry lines to save space',
                     True,
-                    gobject.PARAM_CONSTRUCT | gobject.PARAM_READWRITE)
+                    gobject.PARAM_CONSTRUCT | gobject.PARAM_READWRITE),
+
+        'mainline-only': (gobject.TYPE_BOOLEAN,
+                    'Mainline only',
+                    'Only show the mainline history.',
+                    False,
+                    gobject.PARAM_CONSTRUCT | gobject.PARAM_READWRITE),
 
     }
 
@@ -74,7 +86,13 @@ class TreeView(gtk.ScrolledWindow):
                              ()),
         'revision-selected': (gobject.SIGNAL_RUN_FIRST,
                               gobject.TYPE_NONE,
-                              ())
+                              ()),
+        'revision-activated': (gobject.SIGNAL_RUN_FIRST,
+                              gobject.TYPE_NONE,
+                              (gobject.TYPE_PYOBJECT, gobject.TYPE_PYOBJECT)),
+        'tag-added': (gobject.SIGNAL_RUN_FIRST,
+                              gobject.TYPE_NONE,
+                              (gobject.TYPE_STRING, gobject.TYPE_STRING))
     }
 
     def __init__(self, branch, start, maxnum, compact=True):
@@ -87,15 +105,25 @@ class TreeView(gtk.ScrolledWindow):
         :param broken_line_length: After how much lines to break 
                                    branches.
         """
-        gtk.ScrolledWindow.__init__(self)
+        gtk.VBox.__init__(self, spacing=0)
 
-        self.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-        self.set_shadow_type(gtk.SHADOW_IN)
+        self.pack_start(self.construct_loading_msg(), expand=False, fill=True)
+        self.connect('revisions-loaded', 
+                lambda x: self.loading_msg_box.hide())
 
-        self.construct_treeview()
+        self.scrolled_window = gtk.ScrolledWindow()
+        self.scrolled_window.set_policy(gtk.POLICY_AUTOMATIC,
+                                        gtk.POLICY_AUTOMATIC)
+        self.scrolled_window.set_shadow_type(gtk.SHADOW_IN)
+        self.scrolled_window.show()
+        self.pack_start(self.scrolled_window, expand=True, fill=True)
 
-        self.iter   = None
+        self.scrolled_window.add(self.construct_treeview())
+        
+
+        self.iter = None
         self.branch = branch
+        self.revision = None
 
         self.start = start
         self.maxnum = maxnum
@@ -108,10 +136,14 @@ class TreeView(gtk.ScrolledWindow):
     def do_get_property(self, property):
         if property.name == 'revno-column-visible':
             return self.revno_column.get_visible()
+        elif property.name == 'graph-column-visible':
+            return self.graph_column.get_visible()
         elif property.name == 'date-column-visible':
             return self.date_column.get_visible()
         elif property.name == 'compact':
             return self.compact
+        elif property.name == 'mainline-only':
+            return self.mainline_only
         elif property.name == 'branch':
             return self.branch
         elif property.name == 'revision':
@@ -128,10 +160,14 @@ class TreeView(gtk.ScrolledWindow):
     def do_set_property(self, property, value):
         if property.name == 'revno-column-visible':
             self.revno_column.set_visible(value)
+        elif property.name == 'graph-column-visible':
+            self.graph_column.set_visible(value)
         elif property.name == 'date-column-visible':
             self.date_column.set_visible(value)
         elif property.name == 'compact':
             self.compact = value
+        elif property.name == 'mainline-only':
+            self.mainline_only = value
         elif property.name == 'branch':
             self.branch = value
         elif property.name == 'revision':
@@ -167,8 +203,26 @@ class TreeView(gtk.ScrolledWindow):
         :return: list of revision ids.
         """
         return self.get_property('parents')
+
+    def add_tag(self, tag, revid=None):
+        if revid is None: revid = self.revision.revision_id
+
+        try:
+            self.branch.unlock()
+
+            try:
+                self.branch.lock_write()
+                self.model.add_tag(tag, revid)
+            finally:
+                self.branch.unlock()
+
+        finally:
+            self.branch.lock_read()
+
+        self.emit('tag-added', tag, revid)
         
     def refresh(self):
+        self.loading_msg_box.show()
         gobject.idle_add(self.populate, self.get_revision())
 
     def update(self):
@@ -226,14 +280,18 @@ class TreeView(gtk.ScrolledWindow):
             broken_line_length = 32
         else:
             broken_line_length = None
+        
+        show_graph = self.graph_column.get_visible()
 
         self.branch.lock_read()
         (linegraphdata, index, columns_len) = linegraph(self.branch.repository,
                                                         self.start,
                                                         self.maxnum, 
-                                                        broken_line_length)
+                                                        broken_line_length,
+                                                        show_graph,
+                                                        self.mainline_only)
 
-        self.model = TreeModel(self.branch.repository, linegraphdata)
+        self.model = TreeModel(self.branch, linegraphdata)
         self.graph_cell.columns_len = columns_len
         width = self.graph_cell.get_size(self.treeview)[2]
         if width > 500:
@@ -251,29 +309,6 @@ class TreeView(gtk.ScrolledWindow):
         self.emit('revisions-loaded')
 
         return False
-
-    def show_diff(self, revid=None, parentid=None):
-        """Open a new window to show a diff between the given revisions."""
-        from bzrlib.plugins.gtk.diff import DiffWindow
-        window = DiffWindow(parent=self)
-
-        parents = self.get_parents()
-
-        if revid is None:
-            revid = self.get_revision().revision_id
-
-            if parentid is None and len(parents) > 0:
-                parentid = parents[0]
-
-        if parentid is None:
-            parentid = NULL_REVISION
-
-        rev_tree    = self.branch.repository.revision_tree(revid)
-        parent_tree = self.branch.repository.revision_tree(parentid)
-
-        description = revid + " - " + self.branch.nick
-        window.set_diff(description, rev_tree, parent_tree)
-        window.show()
 
     def construct_treeview(self):
         self.treeview = gtk.TreeView()
@@ -297,7 +332,6 @@ class TreeView(gtk.ScrolledWindow):
 
         self.treeview.set_property('fixed-height-mode', True)
 
-        self.add(self.treeview)
         self.treeview.show()
 
         cell = gtk.CellRendererText()
@@ -317,6 +351,7 @@ class TreeView(gtk.ScrolledWindow):
         self.graph_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.graph_column.pack_start(self.graph_cell, expand=False)
         self.graph_column.add_attribute(self.graph_cell, "node", treemodel.NODE)
+        self.graph_column.add_attribute(self.graph_cell, "tags", treemodel.TAGS)
         self.graph_column.add_attribute(self.graph_cell, "in-lines", treemodel.LAST_LINES)
         self.graph_column.add_attribute(self.graph_cell, "out-lines", treemodel.LINES)
         self.treeview.append_column(self.graph_column)
@@ -354,6 +389,26 @@ class TreeView(gtk.ScrolledWindow):
         self.date_column.pack_start(cell, expand=True)
         self.date_column.add_attribute(cell, "text", treemodel.TIMESTAMP)
         self.treeview.append_column(self.date_column)
+        
+        return self.treeview
+    
+    def construct_loading_msg(self):
+        image_loading = gtk.image_new_from_stock(gtk.STOCK_REFRESH,
+                                                 gtk.ICON_SIZE_BUTTON)
+        image_loading.show()
+        
+        label_loading = gtk.Label(_("Please wait, loading ancestral graph..."))
+        label_loading.set_alignment(0.0, 0.5)
+        label_loading.show()
+        
+        self.loading_msg_box = gtk.HBox()
+        self.loading_msg_box.set_spacing(5)
+        self.loading_msg_box.set_border_width(5)        
+        self.loading_msg_box.pack_start(image_loading, False, False)
+        self.loading_msg_box.pack_start(label_loading, True, True)
+        self.loading_msg_box.show()
+        
+        return self.loading_msg_box
 
     def _on_selection_changed(self, treeview):
         """callback for when the treeview changes."""
@@ -368,18 +423,8 @@ class TreeView(gtk.ScrolledWindow):
             menu = RevisionPopupMenu(self.branch.repository, 
                 [self.get_revision().revision_id],
                 self.branch)
+            menu.connect('tag-added', lambda w, t, r: self.add_tag(t, r))
             menu.popup(None, None, None, event.button, event.get_time())
 
     def _on_revision_activated(self, widget, path, col):
-        # TODO: more than one parent
-        """Callback for when a treeview row gets activated."""
-        revision_id = self.model[path][treemodel.REVID]
-        parents = self.model[path][treemodel.PARENTS]
-
-        if len(parents) == 0:
-            parent_id = None
-        else:
-            parent_id = parents[0]
-
-        self.show_diff(revision_id, parent_id)
-        self.treeview.grab_focus()
+        self.emit('revision-activated', path, col)

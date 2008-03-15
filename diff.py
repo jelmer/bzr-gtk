@@ -30,22 +30,33 @@ try:
 except ImportError:
     have_gconf = False
 
-from bzrlib import osutils
+from bzrlib import (
+    merge as _mod_merge,
+    osutils,
+    progress,
+    urlutils,
+    workingtree,
+)
 from bzrlib.diff import show_diff_trees, internal_diff
 from bzrlib.errors import NoSuchFile
+from bzrlib.patches import parse_patches
 from bzrlib.trace import warning
 from bzrlib.plugins.gtk.window import Window
+from dialog import error_dialog, info_dialog, warning_dialog
 
 
-class DiffView(gtk.ScrolledWindow):
-    """This is the soft and chewy filling for a DiffWindow."""
+class SelectCancelled(Exception):
+
+    pass
+
+
+class DiffFileView(gtk.ScrolledWindow):
+    """Window for displaying diffs from a diff file"""
 
     def __init__(self):
         gtk.ScrolledWindow.__init__(self)
-
         self.construct()
-        self.rev_tree = None
-        self.parent_tree = None
+        self._diffs = {}
 
     def construct(self):
         self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
@@ -134,8 +145,8 @@ class DiffView(gtk.ScrolledWindow):
 
             lang.set_tag_style(tag_id, style)
 
-    @staticmethod
-    def apply_colordiff_colors(lang):
+    @classmethod
+    def apply_colordiff_colors(klass, lang):
         """Set style colors for lang using the colordiff configuration file.
 
         Both ~/.colordiffrc and ~/.colordiffrc.bzr-gtk are read.
@@ -152,7 +163,7 @@ class DiffView(gtk.ScrolledWindow):
                 except IOError, e:
                     warning('could not open file %s: %s' % (f, str(e)))
                 else:
-                    colors.update(DiffView.parse_colordiffrc(f))
+                    colors.update(klass.parse_colordiffrc(f))
                     f.close()
 
         if not colors:
@@ -216,7 +227,7 @@ class DiffView(gtk.ScrolledWindow):
 #        self.parent_tree.lock_read()
 #        self.rev_tree.lock_read()
 #        try:
-#            self.delta = _iter_changes_to_status(self.parent_tree, self.rev_tree)
+#            self.delta = iter_changes_to_status(self.parent_tree, self.rev_tree)
 #            self.path_to_status = {}
 #            self.path_to_diff = {}
 #            source_inv = self.parent_tree.inventory
@@ -237,6 +248,25 @@ class DiffView(gtk.ScrolledWindow):
 #            self.parent_tree.unlock()
 
     def show_diff(self, specific_files):
+        sections = []
+        if specific_files is None:
+            self.buffer.set_text(self._diffs[None])
+        else:
+            for specific_file in specific_files:
+                sections.append(self._diffs[specific_file])
+            self.buffer.set_text(''.join(sections))
+
+
+class DiffView(DiffFileView):
+    """This is the soft and chewy filling for a DiffWindow."""
+
+    def __init__(self):
+        DiffFileView.__init__(self)
+        self.rev_tree = None
+        self.parent_tree = None
+
+    def show_diff(self, specific_files):
+        """Show the diff for the specified files"""
         s = StringIO()
         show_diff_trees(self.parent_tree, self.rev_tree, s, specific_files,
                         old_label='', new_label='',
@@ -261,41 +291,18 @@ class DiffView(gtk.ScrolledWindow):
         self.buffer.set_text(decoded.encode('UTF-8'))
 
 
-class DiffWindow(Window):
-    """Diff window.
+class DiffWidget(gtk.HPaned):
+    """Diff widget
 
-    This object represents and manages a single window containing the
-    differences between two revisions on a branch.
     """
-
-    def __init__(self, parent=None):
-        Window.__init__(self, parent)
-        self.set_border_width(0)
-        self.set_title("bzrk diff")
-
-        # Use two thirds of the screen by default
-        screen = self.get_screen()
-        monitor = screen.get_monitor_geometry(0)
-        width = int(monitor.width * 0.66)
-        height = int(monitor.height * 0.66)
-        self.set_default_size(width, height)
-
-        self.construct()
-
-    def construct(self):
-        """Construct the window contents."""
-        # The   window  consists  of   a  pane   containing:  the
-        # hierarchical list  of files on  the left, and  the diff
-        # for the currently selected file on the right.
-        pane = gtk.HPaned()
-        self.add(pane)
-        pane.show()
+    def __init__(self):
+        super(DiffWidget, self).__init__()
 
         # The file hierarchy: a scrollable treeview
         scrollwin = gtk.ScrolledWindow()
         scrollwin.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         scrollwin.set_shadow_type(gtk.SHADOW_IN)
-        pane.pack1(scrollwin)
+        self.pack1(scrollwin)
         scrollwin.show()
 
         self.model = gtk.TreeStore(str, str)
@@ -313,18 +320,34 @@ class DiffWindow(Window):
         column.add_attribute(cell, "text", 0)
         self.treeview.append_column(column)
 
+    def set_diff_text(self, lines):
+        """Set the current diff from a list of lines
+
+        :param lines: The diff to show, in unified diff format
+        """
         # The diffs of the  selected file: a scrollable source or
         # text view
-        self.diff_view = DiffView()
-        pane.pack2(self.diff_view)
+        self.diff_view = DiffFileView()
         self.diff_view.show()
+        self.pack2(self.diff_view)
+        self.model.append(None, [ "Complete Diff", "" ])
+        self.diff_view._diffs[None] = ''.join(lines)
+        for patch in parse_patches(lines):
+            oldname = patch.oldname.split('\t')[0]
+            newname = patch.newname.split('\t')[0]
+            self.model.append(None, [oldname, newname])
+            self.diff_view._diffs[newname] = str(patch)
+        self.diff_view.show_diff(None)
 
-    def set_diff(self, description, rev_tree, parent_tree):
+    def set_diff(self, rev_tree, parent_tree):
         """Set the differences showed by this window.
 
         Compares the two trees and populates the window with the
         differences.
         """
+        self.diff_view = DiffView()
+        self.pack2(self.diff_view)
+        self.diff_view.show()
         self.diff_view.set_trees(rev_tree, parent_tree)
         self.rev_tree = rev_tree
         self.parent_tree = parent_tree
@@ -356,9 +379,9 @@ class DiffWindow(Window):
                 self.model.append(titer, [ path, path ])
 
         self.treeview.expand_all()
-        self.set_title(description + " - bzrk diff")
 
     def set_file(self, file_path):
+        """Select the current file to display"""
         tv_path = None
         for data in self.model:
             for child in data.iterchildren():
@@ -382,10 +405,173 @@ class DiffWindow(Window):
         self.diff_view.show_diff(specific_files)
 
 
-def _iter_changes_to_status(source, target):
+class DiffWindow(Window):
+    """Diff window.
+
+    This object represents and manages a single window containing the
+    differences between two revisions on a branch.
+    """
+
+    def __init__(self, parent=None):
+        Window.__init__(self, parent)
+        self.set_border_width(0)
+        self.set_title("bzrk diff")
+
+        # Use two thirds of the screen by default
+        screen = self.get_screen()
+        monitor = screen.get_monitor_geometry(0)
+        width = int(monitor.width * 0.66)
+        height = int(monitor.height * 0.66)
+        self.set_default_size(width, height)
+
+        self.construct()
+
+    def construct(self):
+        """Construct the window contents."""
+        self.vbox = gtk.VBox()
+        self.add(self.vbox)
+        self.vbox.show()
+        hbox = self._get_button_bar()
+        if hbox is not None:
+            self.vbox.pack_start(hbox, expand=False, fill=True)
+        self.diff = DiffWidget()
+        self.vbox.add(self.diff)
+        self.diff.show_all()
+
+    def _get_button_bar(self):
+        """Return a button bar to use.
+
+        :return: None, meaning that no button bar will be used.
+        """
+        return None
+
+    def set_diff_text(self, description, lines):
+        """Set the diff from a text.
+
+        The diff must be in unified diff format, and will be parsed to
+        determine filenames.
+        """
+        self.diff.set_diff_text(lines)
+        self.set_title(description + " - bzrk diff")
+
+    def set_diff(self, description, rev_tree, parent_tree):
+        """Set the differences showed by this window.
+
+        Compares the two trees and populates the window with the
+        differences.
+        """
+        self.diff.set_diff(rev_tree, parent_tree)
+        self.set_title(description + " - bzrk diff")
+
+    def set_file(self, file_path):
+        self.diff.set_file(file_path)
+
+
+class MergeDirectiveWindow(DiffWindow):
+
+    def __init__(self, directive, path):
+        DiffWindow.__init__(self, None)
+        self._merge_target = None
+        self.directive = directive
+        self.path = path
+
+    def _get_button_bar(self):
+        """The button bar has only the Merge button"""
+        merge_button = gtk.Button('Merge')
+        merge_button.show()
+        merge_button.set_relief(gtk.RELIEF_NONE)
+        merge_button.connect("clicked", self.perform_merge)
+
+        save_button = gtk.Button('Save')
+        save_button.show()
+        save_button.set_relief(gtk.RELIEF_NONE)
+        save_button.connect("clicked", self.perform_save)
+
+        hbox = gtk.HButtonBox()
+        hbox.set_layout(gtk.BUTTONBOX_START)
+        hbox.pack_start(merge_button, expand=False, fill=True)
+        hbox.pack_start(save_button, expand=False, fill=True)
+        hbox.show()
+        return hbox
+
+    def perform_merge(self, window):
+        try:
+            tree = self._get_merge_target()
+        except SelectCancelled:
+            return
+        tree.lock_write()
+        try:
+            try:
+                merger, verified = _mod_merge.Merger.from_mergeable(tree,
+                    self.directive, progress.DummyProgress())
+                merger.check_basis(True)
+                merger.merge_type = _mod_merge.Merge3Merger
+                conflict_count = merger.do_merge()
+                merger.set_pending()
+                if conflict_count == 0:
+                    # No conflicts found.
+                    info_dialog(_('Merge successful'),
+                                _('All changes applied successfully.'))
+                else:
+                    # There are conflicts to be resolved.
+                    warning_dialog(_('Conflicts encountered'),
+                                   _('Please resolve the conflicts manually'
+                                     ' before committing.'))
+                self.destroy()
+            except Exception, e:
+                error_dialog('Error', str(e))
+        finally:
+            tree.unlock()
+
+    def _get_merge_target(self):
+        if self._merge_target is not None:
+            return self._merge_target
+        d = gtk.FileChooserDialog('Merge branch', self,
+                                  gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                  buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
+                                           gtk.STOCK_CANCEL,
+                                           gtk.RESPONSE_CANCEL,))
+        try:
+            result = d.run()
+            if result != gtk.RESPONSE_OK:
+                raise SelectCancelled()
+            uri = d.get_current_folder_uri()
+        finally:
+            d.destroy()
+        return workingtree.WorkingTree.open(uri)
+
+    def perform_save(self, window):
+        d = gtk.FileChooserDialog('Save As', self,
+                                  gtk.FILE_CHOOSER_ACTION_SAVE,
+                                  buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
+                                           gtk.STOCK_CANCEL,
+                                           gtk.RESPONSE_CANCEL,))
+        d.set_current_name(osutils.basename(self.path))
+        try:
+            try:
+                result = d.run()
+                if result != gtk.RESPONSE_OK:
+                    raise SelectCancelled()
+                uri = d.get_uri()
+            finally:
+                d.destroy()
+        except SelectCancelled:
+            return
+        source = open(self.path, 'rb')
+        try:
+            target = open(urlutils.local_path_from_url(uri), 'wb')
+            try:
+                target.write(source.read())
+            finally:
+                target.close()
+        finally:
+            source.close()
+
+
+def iter_changes_to_status(source, target):
     """Determine the differences between trees.
 
-    This is a wrapper around _iter_changes which just yields more
+    This is a wrapper around iter_changes which just yields more
     understandable results.
 
     :param source: The source tree (basis tree)
@@ -407,7 +593,7 @@ def _iter_changes_to_status(source, target):
         source.lock_read()
         try:
             for (file_id, paths, changed_content, versioned, parent_ids, names,
-                 kinds, executables) in target._iter_changes(source):
+                 kinds, executables) in target.iter_changes(source):
 
                 # Skip the root entry if it isn't very interesting
                 if parent_ids == (None, None):

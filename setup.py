@@ -39,7 +39,12 @@ class InstallData(install_data):
         # Disable for now - performance issues
         #self.data_files.extend(self._nautilus_plugin())
         install_data.run(self)
-    
+
+        try:
+            subprocess.check_call('gtk-update-icon-cache -f -t /usr/share/icons/hicolor')
+        except:
+            pass
+
     def _compile_po_files(self):
         data_files = []
         
@@ -98,15 +103,16 @@ setup(
         "bzrlib.plugins.gtk.viz": "viz", 
         "bzrlib.plugins.gtk.annotate": "annotate",
         "bzrlib.plugins.gtk.olive": "olive",
-        "bzrlib.plugins.gtk.tests": "tests"
+        "bzrlib.plugins.gtk.tests": "tests",
+        "bzrlib.plugins.gtk.branchview": "branchview",
         },
     packages = [
-        "olive",
         "bzrlib.plugins.gtk",
         "bzrlib.plugins.gtk.viz",
         "bzrlib.plugins.gtk.annotate",
         "bzrlib.plugins.gtk.olive",
-        "bzrlib.plugins.gtk.tests"
+        "bzrlib.plugins.gtk.tests",
+        "bzrlib.plugins.gtk.branchview",
         ],
     data_files=[('share/olive', ['olive.glade',
                                  'cmenu.ui',
@@ -126,7 +132,13 @@ setup(
                 ('share/applications', ['olive-gtk.desktop',
                                         'bazaar-properties.desktop',
                                         'bzr-notify.desktop']),
-                ('share/pixmaps', ['icons/olive-gtk.png'])
+                ('share/pixmaps', ['icons/olive-gtk.png']),
+                ('share/icons/hicolor/scalable/emblems', 
+                    ['icons/emblem-bzr-added.svg', 
+                        'icons/emblem-bzr-conflict.svg', 
+                        'icons/emblem-bzr-controlled.svg', 
+                        'icons/emblem-bzr-modified.svg',
+                        'icons/emblem-bzr-removed.svg'])
                ],
     cmdclass={'install_data': InstallData,
               'check': Check}

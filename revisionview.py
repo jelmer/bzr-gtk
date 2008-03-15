@@ -18,14 +18,44 @@
 import pygtk
 pygtk.require("2.0")
 import gtk
-import gobject
 import pango
+import gobject
+import subprocess
 from gpg import GPGSubprocess
 
 from bzrlib.osutils import format_date
 from bzrlib.util.bencode import bdecode
 
 gpg = GPGSubprocess()
+
+def _open_link(widget, uri):
+    subprocess.Popen(['sensible-browser', uri], close_fds=True)
+
+gtk.link_button_set_uri_hook(_open_link)
+
+class BugsTab(gtk.Table):
+    def __init__(self):
+        super(BugsTab, self).__init__(rows=5, columns=2)
+        self.set_row_spacings(6)
+        self.set_col_spacings(6)
+        self.clear()
+
+    def clear(self):
+        for c in self.get_children():
+            self.remove(c)
+        self.count = 0
+        self.hide_all() # Only shown when there are bugs
+
+    def add_bug(self, url, status):
+        button = gtk.LinkButton(url, url)
+        self.attach(button, 0, 1, self.count, self.count + 1,
+                              gtk.EXPAND | gtk.FILL, gtk.FILL)
+        status_label = gtk.Label(status)
+        self.attach(status_label, 1, 2, self.count, self.count + 1,
+                              gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.count += 1
+        self.show_all()
+
 
 class RevisionView(gtk.Notebook):
     """ Custom widget for commit log details.
@@ -72,6 +102,7 @@ class RevisionView(gtk.Notebook):
         self._create_relations()
         self._create_signature()
         self._create_file_info_view()
+        self._create_bugs()
 
         self.set_current_page(0)
         
@@ -80,12 +111,8 @@ class RevisionView(gtk.Notebook):
 
         self._revision = None
         self._branch = branch
-        self._repository = branch.repository
 
-        if self._branch is not None and self._branch.supports_tags():
-            self._tagdict = self._branch.tags.get_reverse_tag_dict()
-        else:
-            self._tagdict = {}
+        self.update_tags()
 
         self.set_file_id(None)
 
@@ -130,11 +157,6 @@ class RevisionView(gtk.Notebook):
 
     def get_revision(self):
         return self.get_property('revision')
-
-    def set_children(self, children):
-        self._add_parents_or_children(children,
-                                      self.children_widgets,
-                                      self.children_table)
 
     def _set_revision(self, revision):
         if revision is None: return
@@ -189,6 +211,48 @@ class RevisionView(gtk.Notebook):
         else:
             self.file_info_box.hide()
 
+        self.bugs_table.clear()
+        bugs_text = revision.properties.get('bugs', None)
+        if bugs_text:
+            for bugline in bugs_text.splitlines():
+                (url, status) = bugline.split(" ")
+                self.bugs_table.add_bug(url, status)
+
+    def update_tags(self):
+        if self._branch is not None and self._branch.supports_tags():
+            self._tagdict = self._branch.tags.get_reverse_tag_dict()
+        else:
+            self._tagdict = {}
+
+        self._add_tags()
+
+    def _update_signature(self, widget, param):
+        revid = self._revision.revision_id
+
+        if self._branch.repository.has_signature_for_revision_id(revid):
+            signature_text = self._branch.repository.get_signature_text(revid)
+            signature = gpg.verify(signature_text)
+
+            if signature.key_id is not None:
+                self.signature_key_id.set_text(signature.key_id)
+
+            if signature.is_valid():
+                self.signature_image.set_from_file("icons/sign-ok.png")
+                self.signature_label.set_text("This revision has been signed.")
+            else:
+                self.signature_image.set_from_file("icons/sign-bad.png")
+                self.signature_label.set_text("This revision has been signed, " + 
+                        "but the authenticity of the signature cannot be verified.")
+        else:
+            self.signature_key_id.set_text("")
+            self.signature_image.set_from_file("icons/sign-unknown.png")
+            self.signature_label.set_text("This revision has not been signed.")
+
+    def set_children(self, children):
+        self._add_parents_or_children(children,
+                                      self.children_widgets,
+                                      self.children_table)
+
     def _show_clicked_cb(self, widget, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
         self._show_callback(revid, parentid)
@@ -197,6 +261,9 @@ class RevisionView(gtk.Notebook):
         """Callback for when the go button for a parent is clicked."""
 
     def _add_tags(self, *args):
+        if self._revision is None:
+            return
+
         if self._tagdict.has_key(self._revision.revision_id):
             tags = self._tagdict[self._revision.revision_id]
         else:
@@ -455,11 +522,16 @@ class RevisionView(gtk.Notebook):
         tv = gtk.TextView(msg_buffer)
         tv.set_editable(False)
         tv.set_wrap_mode(gtk.WRAP_WORD)
+
         tv.modify_font(pango.FontDescription("Monospace"))
         tv.show()
         window.add(tv)
         window.show()
         return window
+
+    def _create_bugs(self):
+        self.bugs_table = BugsTab()
+        self.append_page(self.bugs_table, tab_label=gtk.Label('Bugs'))
 
     def _create_file_info_view(self):
         self.file_info_box = gtk.VBox(False, 6)
@@ -478,27 +550,4 @@ class RevisionView(gtk.Notebook):
         self.file_info_box.pack_start(window)
         self.file_info_box.hide() # Only shown when there are per-file messages
         self.append_page(self.file_info_box, tab_label=gtk.Label('Per-file'))
-
-    def _update_signature(self, widget, param):
-        revid = self._revision.revision_id
-
-        if self._repository.has_signature_for_revision_id(revid):
-            signature_text = self._repository.get_signature_text(revid)
-            signature = gpg.verify(signature_text)
-
-            if signature.key_id is not None:
-                self.signature_key_id.set_text(signature.key_id)
-
-            if signature.is_valid():
-                self.signature_image.set_from_file("icons/sign-ok.png")
-                self.signature_label.set_text("This revision has been signed.")
-            else:
-                self.signature_image.set_from_file("icons/sign-bad.png")
-                self.signature_label.set_text("This revision has been signed, " + 
-                        "but the authenticity of the signature cannot be verified.")
-        else:
-            self.signature_key_id.set_text("")
-            self.signature_image.set_from_file("icons/sign-unknown.png")
-            self.signature_label.set_text("This revision has not been signed.")
-
 
