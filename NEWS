@@ -8,6 +8,9 @@
   * Made the tag list in the revision view be comma-separated. (Daniel Schierbeck)
 
   * Add bugs tab in the branch view. (Jelmer Vernooij)
+  
+  * New Tango-styled icons. This time properly licensed under the GPL.
+    (Simon Pascal Klein)
 
  BUG FIXES
 
