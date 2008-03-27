@@ -28,11 +28,11 @@ class BranchWindow(Window):
     for a particular branch.
     """
 
-    def __init__(self, branch, start, maxnum, parent=None):
+    def __init__(self, branch, start_revs, maxnum, parent=None):
         """Create a new BranchWindow.
 
         :param branch: Branch object for branch to show.
-        :param start: Revision id of top revision.
+        :param start_revs: Revision ids of top revisions.
         :param maxnum: Maximum number of revisions to display, 
                        None for no limit.
         """
@@ -41,7 +41,7 @@ class BranchWindow(Window):
         self.set_border_width(0)
 
         self.branch      = branch
-        self.start       = start
+        self.start_revs  = start_revs
         self.maxnum      = maxnum
         self.config      = GlobalConfig()
 
@@ -222,7 +222,7 @@ class BranchWindow(Window):
         """Construct the top-half of the window."""
         # FIXME: Make broken_line_length configurable
 
-        self.treeview = TreeView(self.branch, self.start, self.maxnum, self.compact_view)
+        self.treeview = TreeView(self.branch, self.start_revs, self.maxnum, self.compact_view)
 
         self.treeview.connect('revision-selected',
                 self._treeselection_changed_cb)
