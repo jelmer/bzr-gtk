@@ -1,5 +1,9 @@
 0.94.0  UNRELEASED
 
+ CHANGES
+
+  * Removed tortoise-bzr, which now has its own project (http://launchpad.net/tortoisebzr)
+
  UI
 
   * Made the tags associated with a revision render next to the revision
@@ -18,7 +22,7 @@
  
   * Catch UnsupportedProtocol exception in the Nautilus extension. (#77965)
   
-  * Make Nautilus extension work again. (#111826, Toshio Kuratomi)
+  * Make Nautilus extension work again. (#111826, Toshio Kuratomi, Jelmer Vernooij)
   
   * Make viz not throw errors when there are 0 commits. (#173698, Gary van der
     Merwe)
@@ -32,9 +36,13 @@
     no longer warn about newer (unknown) versions of Bazaar, on the assumption
 	the API is sufficiently stable now. (Jelmer Vernooij)
 
+  * Support child_submit_to setting in gsend. (Jelmer Vernooij)
+
  INTERNALS
 
   * Refactored the revisionview. (Daniel Schierbeck)
+
+  * It is now possible to use the diff view as a widget. (Jelmer Vernooij)
 
 0.93.0  2007-12-10
 
