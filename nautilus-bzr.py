@@ -224,10 +224,21 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
 
     def get_background_items(self, window, vfs_file):
         if disabled_flag == 'False':
-            return
+            item = nautilus.MenuItem('BzrNautilus::enable',
+                                     'Enable Bazaar Plugin',
+                                     'Enable Bazaar plugin for nautilus')
+            item.connect('activate', self.enable_integration, vfs_file)
+            return item,
 
         items = []
         file = vfs_file.get_uri()
+ 
+        item = nautilus.MenuItem('BzrNautilus::disable',
+                                  'Disable Bazaar Plugin',
+                                  'Disable Bazaar plugin for nautilus')
+        item.connect('activate', self.disable_integration, vfs_file)
+        items.append(item)
+
         try:
             tree, path = WorkingTree.open_containing(file)
         except UnsupportedProtocol:
@@ -276,11 +287,11 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         return items
 
     def get_file_items(self, window, files):
+
         if disabled_flag == 'False':
             return
 
         items = []
-
         wtfiles = {}
         for vfs_file in files:
             # We can only cope with local files
@@ -411,8 +422,8 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
             file.add_emblem(emblem)
         file.add_string_attribute('bzr_status', status)
 
-    def enable_integration(self):
+    def enable_integration(self, menu, vfs_file=None):
         config.set_user_option('nautilus_integration','True')
 
-    def disable_integration(self):
+    def disable_integration(self, menu, vfs_file=None):
         config.set_user_option('nautilus_integration','False')
