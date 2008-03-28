@@ -23,6 +23,7 @@ except:
 import gtk
 
 from bzrlib.config import GlobalConfig
+from identity import IdentityPage
 from plugins import PluginsPage
 
 class PreferencesWindow(gtk.Dialog):
@@ -40,79 +41,20 @@ class PreferencesWindow(gtk.Dialog):
         if self.config is None:
             self.config = GlobalConfig()
         self._create()
+        self._create_pages()
 
-    def _create_mainpage(self):
-        table = gtk.Table(rows=4, columns=2)
-        table.set_row_spacings(6)
-        table.set_col_spacings(6)
-
-        align = gtk.Alignment(1.0, 0.5)
-        label = gtk.Label()
-        label.set_markup("<b>User Id:</b>")
-        align.add(label)
-        table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
-
-        self.username = gtk.Entry()
-        self.username.set_text(self.config.username())
-        table.attach(self.username, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
-
-        align = gtk.Alignment(1.0, 0.5)
-        label = gtk.Label()
-        label.set_markup("<b>GPG signing command:</b>")
-        align.add(label)
-        table.attach(align, 0, 1, 1, 2, gtk.FILL, gtk.FILL)
-
-        self.email = gtk.Entry()
-        self.email.set_text(self.config.gpg_signing_command())
-        table.attach(self.email, 1, 2, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
-
-        align = gtk.Alignment(1.0, 0.5)
-        label = gtk.Label()
-        label.set_markup("<b>Check GPG Signatures:</b>")
-        align.add(label)
-        table.attach(align, 0, 1, 2, 3, gtk.FILL, gtk.FILL)
-
-        sigvals = gtk.VBox()
-        self.check_sigs_if_possible = gtk.RadioButton(None, 
-                                                      "_Check if possible")
-        sigvals.pack_start(self.check_sigs_if_possible)
-        self.check_sigs_always = gtk.RadioButton(self.check_sigs_if_possible, 
-                                                 "Check _always")
-        sigvals.pack_start(self.check_sigs_always)
-        self.check_sigs_never = gtk.RadioButton(self.check_sigs_if_possible,
-                                                "Check _never")
-        sigvals.pack_start(self.check_sigs_never)
-        # FIXME: Set default
-        table.attach(sigvals, 1, 2, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
-
-        align = gtk.Alignment(1.0, 0.5)
-        label = gtk.Label()
-        label.set_markup("<b>Create GPG Signatures:</b>")
-        align.add(label)
-        table.attach(align, 0, 1, 3, 4, gtk.FILL, gtk.FILL)
-
-        create_sigs = gtk.VBox()
-        self.create_sigs_when_required = gtk.RadioButton(None, 
-                                                         "Sign When _Required")
-        create_sigs.pack_start(self.create_sigs_when_required)
-        self.create_sigs_always = gtk.RadioButton(
-            self.create_sigs_when_required, "Sign _Always")
-        create_sigs.pack_start(self.create_sigs_always)
-        self.create_sigs_never = gtk.RadioButton(
-            self.create_sigs_when_required, "Sign _Never")
-        create_sigs.pack_start(self.create_sigs_never)
-        # FIXME: Set default
-        table.attach(create_sigs, 1, 2, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
-
-        return table
 
     def _create(self):
         self.set_default_size(600, 600)
         notebook = gtk.Notebook()
-        notebook.insert_page(self._create_mainpage(), gtk.Label("Main"))
-        notebook.insert_page(PluginsPage(), gtk.Label("Plugins"))
+        for (label, page) in self._create_pages():
+            notebook.insert_page(page, gtk.Label(label))
         self.vbox.pack_start(notebook, True, True)
         self.vbox.show_all()
+
+    def _create_pages(self):
+        return [("Identity", IdentityPage(self.config)), 
+                ("Plugins", PluginsPage())]
 
     def display(self):
         self.window.show_all()
