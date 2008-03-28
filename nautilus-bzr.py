@@ -6,7 +6,6 @@
 #
 # Published under the GNU GPL
 
-import sys
 import gtk
 import nautilus
 import bzrlib
@@ -287,7 +286,6 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         return items
 
     def get_file_items(self, window, files):
-
         if disabled_flag == 'False':
             return
 
