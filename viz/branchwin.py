@@ -28,11 +28,11 @@ class BranchWindow(Window):
     for a particular branch.
     """
 
-    def __init__(self, branch, start, maxnum, parent=None):
+    def __init__(self, branch, start_revs, maxnum, parent=None):
         """Create a new BranchWindow.
 
         :param branch: Branch object for branch to show.
-        :param start: Revision id of top revision.
+        :param start_revs: Revision ids of top revisions.
         :param maxnum: Maximum number of revisions to display, 
                        None for no limit.
         """
@@ -41,7 +41,7 @@ class BranchWindow(Window):
         self.set_border_width(0)
 
         self.branch      = branch
-        self.start       = start
+        self.start_revs  = start_revs
         self.maxnum      = maxnum
         self.config      = GlobalConfig()
 
@@ -155,8 +155,16 @@ class BranchWindow(Window):
         view_menu.add(view_menu_compact)
         view_menu.add(gtk.SeparatorMenuItem())
 
-        for (label, name) in [("Revision _Number", "revno"), ("_Date", "date")]:
-            col = gtk.CheckMenuItem("Show " + label + " Column")
+        self.mnu_show_revno_column = gtk.CheckMenuItem("Show Revision _Number Column")
+        self.mnu_show_date_column = gtk.CheckMenuItem("Show _Date Column")
+
+        # Revision numbers are pointless if there are multiple branches
+        if len(self.start_revs) > 1:
+            self.mnu_show_revno_column.set_sensitive(False)
+            self.treeview.set_property('revno-column-visible', False)
+
+        for (col, name) in [(self.mnu_show_revno_column, "revno"), 
+                            (self.mnu_show_date_column, "date")]:
             col.set_active(self.treeview.get_property(name + "-column-visible"))
             col.connect('toggled', self._col_visibility_changed, name)
             view_menu.add(col)
@@ -222,7 +230,7 @@ class BranchWindow(Window):
         """Construct the top-half of the window."""
         # FIXME: Make broken_line_length configurable
 
-        self.treeview = TreeView(self.branch, self.start, self.maxnum, self.compact_view)
+        self.treeview = TreeView(self.branch, self.start_revs, self.maxnum, self.compact_view)
 
         self.treeview.connect('revision-selected',
                 self._treeselection_changed_cb)
@@ -236,6 +244,7 @@ class BranchWindow(Window):
             if option is not None:
                 self.treeview.set_property(col + '-column-visible', option == 'True')
 
+        self.treeview.set_property(col + '-column-visible', False)
         self.treeview.show()
 
         align = gtk.Alignment(0.0, 0.0, 1.0, 1.0)
