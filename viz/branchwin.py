@@ -426,7 +426,7 @@ class BranchWindow(Window):
             tags.sort()
             tags.reverse()
             for tag, revid in tags:
-                tag_item = gtk.MenuItem(tag)
+                tag_item = gtk.MenuItem(tag, use_underline=False)
                 tag_item.connect('activate', self._tag_selected_cb, revid)
                 menu.add(tag_item)
             self.go_menu_tags.set_submenu(menu)
