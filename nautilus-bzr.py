@@ -6,6 +6,7 @@
 #
 # Published under the GNU GPL
 
+import sys
 import gtk
 import nautilus
 import bzrlib
@@ -14,6 +15,9 @@ from bzrlib.bzrdir import BzrDir
 from bzrlib.errors import NotBranchError, NoWorkingTree, UnsupportedProtocol
 from bzrlib.tree import file_status
 from bzrlib.workingtree import WorkingTree
+from bzrlib.config import GlobalConfig
+config = GlobalConfig()
+disabled_flag = config.get_user_option('nautilus_integration')
 
 from bzrlib.plugin import load_plugins
 load_plugins()
@@ -219,6 +223,9 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         gtk.main()
 
     def get_background_items(self, window, vfs_file):
+        if disabled_flag == 'False':
+            return
+
         items = []
         file = vfs_file.get_uri()
         try:
@@ -269,6 +276,9 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         return items
 
     def get_file_items(self, window, files):
+        if disabled_flag == 'False':
+            return
+
         items = []
 
         wtfiles = {}
@@ -356,6 +366,9 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
                                "Version control status"),
 
     def update_file_info(self, file):
+        if disabled_flag == 'False':
+            return
+
         if file.get_uri_scheme() != 'file':
             return
         
@@ -393,8 +406,13 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         else:
             # FIXME: Check for ignored files
             status = 'unversioned'
-            emblem = 'bzr-unversioned'
         
         if emblem is not None:
             file.add_emblem(emblem)
         file.add_string_attribute('bzr_status', status)
+
+    def enable_integration(self):
+        config.set_user_option('nautilus_integration','True')
+
+    def disable_integration(self):
+        config.set_user_option('nautilus_integration','False')
