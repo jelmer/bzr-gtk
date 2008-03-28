@@ -23,6 +23,7 @@ except:
 import gtk
 
 from bzrlib.config import GlobalConfig
+from plugins import PluginsPage
 
 class PreferencesWindow(gtk.Dialog):
     """Displays global preferences windows."""
@@ -105,104 +106,11 @@ class PreferencesWindow(gtk.Dialog):
 
         return table
 
-    def _create_pluginpage(self):
-        paned = gtk.VPaned()
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        model = gtk.ListStore(str, str)
-        treeview = gtk.TreeView()
-        scrolledwindow.add(treeview)
-        paned.pack1(scrolledwindow, resize=True, shrink=False)
-
-        table = gtk.Table(columns=2)
-        table.set_row_spacings(6)
-        table.set_col_spacings(6)
-
-        def row_selected(tv, path, tvc):
-            p = bzrlib.plugin.plugins()[model[path][0]]
-            from inspect import getdoc
-
-            for w in table.get_children():
-                table.remove(w)
-
-            if getattr(p, '__author__', None) is not None:
-                align = gtk.Alignment(1.0, 0.5)
-                label = gtk.Label()
-                label.set_markup("<b>Author:</b>")
-                align.add(label)
-                table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
-                align.show()
-                label.show()
-
-                align = gtk.Alignment(0.0, 0.5)
-                author = gtk.Label()
-                author.set_text(p.__author__)
-                author.set_selectable(True)
-                align.add(author)
-                table.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
-
-            if getattr(p, '__version__', None) is not None:
-                align = gtk.Alignment(1.0, 0.5)
-                label = gtk.Label()
-                label.set_markup("<b>Version:</b>")
-                align.add(label)
-                table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
-                align.show()
-                label.show()
-
-                align = gtk.Alignment(0.0, 0.5)
-                author = gtk.Label()
-                author.set_text(p.__version__)
-                author.set_selectable(True)
-                align.add(author)
-                table.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
-
-            if getdoc(p) is not None:
-                align = gtk.Alignment(0.0, 0.5)
-                description = gtk.Label()
-                description.set_text(getdoc(p))
-                description.set_selectable(True)
-                align.add(description)
-                table.attach(align, 0, 2, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
-
-            table.show_all()
-
-        treeview.set_headers_visible(False)
-        treeview.set_model(model)
-        treeview.connect("row-activated", row_selected)
-
-        cell = gtk.CellRendererText()
-        column = gtk.TreeViewColumn()
-        column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", 0)
-        treeview.append_column(column)
-
-        cell = gtk.CellRendererText()
-        column = gtk.TreeViewColumn()
-        column.pack_start(cell, expand=True)
-        column.add_attribute(cell, "text", 1)
-        treeview.append_column(column)
-        
-        import bzrlib.plugin
-        plugins = bzrlib.plugin.plugins()
-        plugin_names = plugins.keys()
-        plugin_names.sort()
-        for name in plugin_names:
-            model.append([name, getattr(plugins[name], '__file__', None)])
-                 
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scrolledwindow.add_with_viewport(table)
-        paned.pack2(scrolledwindow, resize=False, shrink=True)
-        paned.show()
-
-        return paned
-
     def _create(self):
         self.set_default_size(600, 600)
         notebook = gtk.Notebook()
         notebook.insert_page(self._create_mainpage(), gtk.Label("Main"))
-        notebook.insert_page(self._create_pluginpage(), gtk.Label("Plugins"))
+        notebook.insert_page(PluginsPage(), gtk.Label("Plugins"))
         self.vbox.pack_start(notebook, True, True)
         self.vbox.show_all()
 
