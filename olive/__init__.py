@@ -198,6 +198,7 @@ class OliveGtk:
                 "on_treeview_right_button_press_event": self.on_treeview_right_button_press_event,
                 "on_treeview_right_row_activated": self.on_treeview_right_row_activated,
                 "on_treeview_left_button_press_event": self.on_treeview_left_button_press_event,
+                "on_treeview_left_button_release_event": self.on_treeview_left_button_release_event,
                 "on_treeview_left_row_activated": self.on_treeview_left_row_activated,
                 "on_button_location_up_clicked": self.on_button_location_up_clicked,
                 "on_button_location_jump_clicked": self.on_button_location_jump_clicked,
@@ -809,6 +810,20 @@ class OliveGtk:
             
             menu.left_context_menu().popup(None, None, None, 0,
                                            event.time)
+
+    def on_treeview_left_button_release_event(self, widget, event):
+        """ Occurs when somebody just clicks a bookmark. """
+        if event.button != 3:
+            # Allow one-click bookmark opening
+            if self.get_selected_left() == None:
+                return
+            
+            newdir = self.get_selected_left()
+            if newdir == None:
+                return
+
+            if self.set_path(newdir):
+                self.refresh_right()
 
     def on_treeview_left_row_activated(self, treeview, path, view_column):
         """ Occurs when somebody double-clicks or enters an item in the
