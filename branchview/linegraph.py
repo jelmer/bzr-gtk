@@ -11,7 +11,7 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 from bzrlib.tsort import merge_sort
 
-def linegraph(repository, start, maxnum, broken_line_length = None,
+def linegraph(repository, start_revs, maxnum, broken_line_length = None,
               graph_data = True, mainline_only = False):
     """Produce a directed graph of a bzr repository.
 
@@ -42,15 +42,19 @@ def linegraph(repository, start, maxnum, broken_line_length = None,
     curved, kinked, etc.) and to pick the actual colours for each index.
     """
     
-    graph_parents = repository.get_revision_graph(start)
+    graph = repository.get_graph()
+    graph_parents = {}
     graph_children = {}
-    for revid in graph_parents.iterkeys():
+    for (revid, parent_revids) in graph.iter_ancestry(start_revs):
+        graph_parents[revid] = parent_revids
         graph_children[revid] = []
+
+    graph_parents["top:"] = start_revs
 
     if len(graph_parents)>0:
         merge_sorted_revisions = merge_sort(
             graph_parents,
-            start,
+            "top:",
             generate_revno=True)
     else:
         merge_sorted_revisions = ()
@@ -58,6 +62,9 @@ def linegraph(repository, start, maxnum, broken_line_length = None,
     if mainline_only:
         merge_sorted_revisions = [elem for elem in merge_sorted_revisions \
                                   if len(elem[3])==1 ]
+
+    assert merge_sorted_revisions[0][1] == "top:"
+    merge_sorted_revisions = merge_sorted_revisions[1:]
     
     revid_index = {}
     revno_index = {}
