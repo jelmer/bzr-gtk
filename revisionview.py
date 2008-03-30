@@ -22,6 +22,7 @@ import pango
 import gobject
 import subprocess
 
+from bzrlib.plugins.gtk import icon_path
 from bzrlib.osutils import format_date
 from bzrlib.util.bencode import bdecode
 
@@ -91,7 +92,7 @@ class SignatureTab(gtk.VBox):
 
     def show_no_signature(self):
         self.signature_key_id.set_text("")
-        self.signature_image.set_from_file("icons/sign-unknown.png")
+        self.signature_image.set_from_file(icon_path("sign-unknown.png"))
         self.signature_label.set_text("This revision has not been signed.")
 
     def show_signature(self, text):
@@ -101,10 +102,10 @@ class SignatureTab(gtk.VBox):
             self.signature_key_id.set_text(signature.key_id)
 
         if signature.is_valid():
-            self.signature_image.set_from_file("icons/sign-ok.png")
+            self.signature_image.set_from_file(icon_path("sign-ok.png"))
             self.signature_label.set_text("This revision has been signed.")
         else:
-            self.signature_image.set_from_file("icons/sign-bad.png")
+            self.signature_image.set_from_file(icon_path("sign-bad.png"))
             self.signature_label.set_text("This revision has been signed, " + 
                     "but the authenticity of the signature cannot be verified.")
 
