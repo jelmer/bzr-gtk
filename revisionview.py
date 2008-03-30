@@ -62,34 +62,32 @@ class SignatureTab(gtk.VBox):
         from gpg import GPGSubprocess
         self.gpg = GPGSubprocess()
         super(SignatureTab, self).__init__(False, 6)
-        signature_box = gtk.Table(rows=1, columns=2)
+        signature_box = gtk.Table(rows=2, columns=3)
         signature_box.set_col_spacing(0, 12)
+        signature_box.set_col_spacing(1, 6)
 
         self.signature_image = gtk.Image()
         signature_box.attach(self.signature_image, 0, 1, 0, 1, gtk.FILL)
 
         self.signature_label = gtk.Label()
-        signature_box.attach(self.signature_label, 1, 2, 0, 1, gtk.FILL)
-
-        signature_info = gtk.Table(rows=1, columns=2)
-        signature_info.set_row_spacings(6)
-        signature_info.set_col_spacings(6)
+        align = gtk.Alignment(0.0, 0.5)
+        align.add(self.signature_label)
+        signature_box.attach(align, 1, 3, 0, 1, gtk.FILL)
 
         align = gtk.Alignment(1.0, 0.5)
         self.signature_key_id_label = gtk.Label()
         self.signature_key_id_label.set_markup("<b>Key Id:</b>")
         align.add(self.signature_key_id_label)
-        signature_info.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
+        signature_box.attach(align, 1, 2, 1, 2, gtk.FILL, gtk.FILL)
 
         align = gtk.Alignment(0.0, 0.5)
         self.signature_key_id = gtk.Label()
         self.signature_key_id.set_selectable(True)
         align.add(self.signature_key_id)
-        signature_info.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        signature_box.attach(align, 2, 3, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
         self.set_border_width(6)
         self.pack_start(signature_box, expand=False)
-        self.pack_start(signature_info, expand=False)
         self.show_all()
 
     def show_no_signature(self):
