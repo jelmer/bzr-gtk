@@ -109,6 +109,10 @@ def data_path():
     return os.path.dirname(__file__)
 
 
+def icon_path(*args):
+    return os.path.join(data_path(), *args)
+
+
 class GTKCommand(Command):
     """Abstract class providing GTK specific run commands."""
 
@@ -516,7 +520,7 @@ class cmd_commit_notify(GTKCommand):
         from notify import NotifyPopupMenu
         gtk = self.open_display()
         menu = NotifyPopupMenu()
-        icon = gtk.status_icon_new_from_file(os.path.join(data_path(), "bzr-icon-64.png"))
+        icon = gtk.status_icon_new_from_file(icon_path("bzr-icon-64.png"))
         icon.connect('popup-menu', menu.display)
 
         import cgi
