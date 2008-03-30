@@ -89,6 +89,25 @@ class SignatureTab(gtk.VBox):
         self.pack_start(signature_info, expand=False)
         self.show_all()
 
+    def show_no_signature(self):
+        self.signature_key_id.set_text("")
+        self.signature_image.set_from_file("icons/sign-unknown.png")
+        self.signature_label.set_text("This revision has not been signed.")
+
+    def show_signature(self, text):
+        signature = self.gpg.verify(text)
+
+        if signature.key_id is not None:
+            self.signature_key_id.set_text(signature.key_id)
+
+        if signature.is_valid():
+            self.signature_image.set_from_file("icons/sign-ok.png")
+            self.signature_label.set_text("This revision has been signed.")
+        else:
+            self.signature_image.set_from_file("icons/sign-bad.png")
+            self.signature_label.set_text("This revision has been signed, " + 
+                    "but the authenticity of the signature cannot be verified.")
+
 
 class RevisionView(gtk.Notebook):
     """ Custom widget for commit log details.
@@ -264,22 +283,9 @@ class RevisionView(gtk.Notebook):
 
         if self._branch.repository.has_signature_for_revision_id(revid):
             signature_text = self._branch.repository.get_signature_text(revid)
-            signature = self.signature_table.gpg.verify(signature_text)
-
-            if signature.key_id is not None:
-                self.signature_key_id.set_text(signature.key_id)
-
-            if signature.is_valid():
-                self.signature_image.set_from_file("icons/sign-ok.png")
-                self.signature_label.set_text("This revision has been signed.")
-            else:
-                self.signature_image.set_from_file("icons/sign-bad.png")
-                self.signature_label.set_text("This revision has been signed, " + 
-                        "but the authenticity of the signature cannot be verified.")
+            self.signature_table.show_signature(signature_text)
         else:
-            self.signature_key_id.set_text("")
-            self.signature_image.set_from_file("icons/sign-unknown.png")
-            self.signature_label.set_text("This revision has not been signed.")
+            self.signature_table.show_no_signature()
 
     def set_children(self, children):
         self._add_parents_or_children(children,
