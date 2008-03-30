@@ -21,12 +21,9 @@ import gtk
 import pango
 import gobject
 import subprocess
-from gpg import GPGSubprocess
 
 from bzrlib.osutils import format_date
 from bzrlib.util.bencode import bdecode
-
-gpg = GPGSubprocess()
 
 def _open_link(widget, uri):
     subprocess.Popen(['sensible-browser', uri], close_fds=True)
@@ -54,6 +51,42 @@ class BugsTab(gtk.Table):
         self.attach(status_label, 1, 2, self.count, self.count + 1,
                               gtk.EXPAND | gtk.FILL, gtk.FILL)
         self.count += 1
+        self.show_all()
+
+
+class SignatureTab(gtk.VBox):
+    def __init__(self):
+        from gpg import GPGSubprocess
+        self.gpg = GPGSubprocess()
+        super(SignatureTab, self).__init__(False, 6)
+        signature_box = gtk.Table(rows=1, columns=2)
+        signature_box.set_col_spacing(0, 12)
+
+        self.signature_image = gtk.Image()
+        signature_box.attach(self.signature_image, 0, 1, 0, 1, gtk.FILL)
+
+        self.signature_label = gtk.Label()
+        signature_box.attach(self.signature_label, 1, 2, 0, 1, gtk.FILL)
+
+        signature_info = gtk.Table(rows=1, columns=2)
+        signature_info.set_row_spacings(6)
+        signature_info.set_col_spacings(6)
+
+        align = gtk.Alignment(1.0, 0.5)
+        label = gtk.Label()
+        label.set_markup("<b>Key Id:</b>")
+        align.add(label)
+        signature_info.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.signature_key_id = gtk.Label()
+        self.signature_key_id.set_selectable(True)
+        align.add(self.signature_key_id)
+        signature_info.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
+
+        self.set_border_width(6)
+        self.pack_start(signature_box, expand=False)
+        self.pack_start(signature_info, expand=False)
         self.show_all()
 
 
@@ -231,7 +264,7 @@ class RevisionView(gtk.Notebook):
 
         if self._branch.repository.has_signature_for_revision_id(revid):
             signature_text = self._branch.repository.get_signature_text(revid)
-            signature = gpg.verify(signature_text)
+            signature = self.signature_table.gpg.verify(signature_text)
 
             if signature.key_id is not None:
                 self.signature_key_id.set_text(signature.key_id)
@@ -334,38 +367,12 @@ class RevisionView(gtk.Notebook):
         vbox.show()
 
     def _create_signature(self):
-        signature_box = gtk.Table(rows=1, columns=2)
-        signature_box.set_col_spacing(0, 12)
-
-        self.signature_image = gtk.Image()
-        signature_box.attach(self.signature_image, 0, 1, 0, 1, gtk.FILL)
-
-        self.signature_label = gtk.Label()
-        signature_box.attach(self.signature_label, 1, 2, 0, 1, gtk.FILL)
-
-        signature_info = gtk.Table(rows=1, columns=2)
-        signature_info.set_row_spacings(6)
-        signature_info.set_col_spacings(6)
-
-        align = gtk.Alignment(1.0, 0.5)
-        label = gtk.Label()
-        label.set_markup("<b>Key Id:</b>")
-        align.add(label)
-        signature_info.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
-
-        align = gtk.Alignment(0.0, 0.5)
-        self.signature_key_id = gtk.Label()
-        self.signature_key_id.set_selectable(True)
-        align.add(self.signature_key_id)
-        signature_info.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
-
-        box = gtk.VBox(False, 6)
-        box.set_border_width(6)
-        box.pack_start(signature_box, expand=False)
-        box.pack_start(signature_info, expand=False)
-        box.show_all()
-        self.append_page(box, tab_label=gtk.Label("Signature"))
-
+        try:
+            self.signature_table = SignatureTab()
+        except ImportError: # No GPG module installed
+            self.signature_table = None
+            return
+        self.append_page(self.signature_table, tab_label=gtk.Label('Signature'))
         self.connect_after('notify::revision', self._update_signature)
 
     def _create_headers(self):
