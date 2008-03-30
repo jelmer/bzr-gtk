@@ -21,12 +21,16 @@ import gtk
 import pango
 import gobject
 import subprocess
-from gpg import GPGSubprocess
 
 from bzrlib.osutils import format_date
 from bzrlib.util.bencode import bdecode
 
-gpg = GPGSubprocess()
+try:
+    from gpg import GPGSubprocess
+except ImportError:
+    gpg = None
+else:
+    gpg = GPGSubprocess()
 
 def _open_link(widget, uri):
     subprocess.Popen(['sensible-browser', uri], close_fds=True)
@@ -100,7 +104,8 @@ class RevisionView(gtk.Notebook):
 
         self._create_general()
         self._create_relations()
-        self._create_signature()
+        if gpg is not None:
+            self._create_signature()
         self._create_file_info_view()
         self._create_bugs()
 
