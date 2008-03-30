@@ -40,6 +40,8 @@
 
   * Support child_submit_to setting in gsend. (Jelmer Vernooij)
 
+  * Add tab if revision view showing the signature status. (Daniel Schierbeck, Jelmer Vernooij)
+
  INTERNALS
 
   * Refactored the revisionview. (Daniel Schierbeck)
