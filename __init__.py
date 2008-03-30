@@ -109,6 +109,10 @@ def data_path():
     return os.path.dirname(__file__)
 
 
+def icon_path(*args):
+    return os.path.join(data_path(), *args)
+
+
 class GTKCommand(Command):
     """Abstract class providing GTK specific run commands."""
 
@@ -215,13 +219,13 @@ class cmd_gdiff(GTKCommand):
             wt.unlock()
 
 
-def start_viz_window(branch, revision, limit=None):
+def start_viz_window(branch, revisions, limit=None):
     """Start viz on branch with revision revision.
     
     :return: The viz window object.
     """
     from viz import BranchWindow
-    return BranchWindow(branch, revision, limit)
+    return BranchWindow(branch, revisions, limit)
 
 
 class cmd_visualise(Command):
@@ -237,21 +241,23 @@ class cmd_visualise(Command):
         "revision",
         Option('limit', "Maximum number of revisions to display.",
                int, 'count')]
-    takes_args = [ "location?" ]
+    takes_args = [ "locations*" ]
     aliases = [ "visualize", "vis", "viz" ]
 
-    def run(self, location=".", revision=None, limit=None):
+    def run(self, locations_list, revision=None, limit=None):
         set_ui_factory()
-        (br, path) = branch.Branch.open_containing(location)
-        if revision is None:
-            revid = br.last_revision()
-            if revid is None:
-                return
-        else:
-            (revno, revid) = revision[0].in_history(br)
-
+        if locations_list is None:
+            locations_list = ["."]
+        revids = []
+        for location in locations_list:
+            (br, path) = branch.Branch.open_containing(location)
+            if revision is None:
+                revids.append(br.last_revision())
+            else:
+                (revno, revid) = revision[0].in_history(br)
+                revids.append(revid)
         import gtk
-        pp = start_viz_window(br, revid, limit)
+        pp = start_viz_window(br, revids, limit)
         pp.connect("destroy", lambda w: gtk.main_quit())
         pp.show()
         gtk.main()
@@ -514,7 +520,7 @@ class cmd_commit_notify(GTKCommand):
         from notify import NotifyPopupMenu
         gtk = self.open_display()
         menu = NotifyPopupMenu()
-        icon = gtk.status_icon_new_from_file(os.path.join(data_path(), "bzr-icon-64.png"))
+        icon = gtk.status_icon_new_from_file(icon_path("bzr-icon-64.png"))
         icon.connect('popup-menu', menu.display)
 
         import cgi

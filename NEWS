@@ -16,6 +16,8 @@
   * New Tango-styled icons. This time properly licensed under the GPL.
     (Simon Pascal Klein)
 
+  * Support showing multiple branches in "bzr viz". (Jelmer Vernooij)
+
  BUG FIXES
 
   * Make adding tags from the viz work again. (Daniel Schierbeck)
