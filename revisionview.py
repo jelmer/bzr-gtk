@@ -21,6 +21,7 @@ import gtk
 import pango
 import gobject
 import subprocess
+import dbus
 
 from bzrlib.plugins.gtk import icon_path
 from bzrlib.osutils import format_date
@@ -59,8 +60,9 @@ class BugsTab(gtk.Table):
 class SignatureTab(gtk.VBox):
 
     def __init__(self):
-        from gpg import GPGSubprocess
-        self.gpg = GPGSubprocess()
+        bus = dbus.SessionBus()
+        seahorse_object = bus.get_object('org.gnome.seahorse', '/org/gnome/seahorse/crypto')
+        self.seahorse = dbus.Interface(seahorse_object, 'org.gnome.seahorse.CryptoService')
         super(SignatureTab, self).__init__(False, 6)
         signature_box = gtk.Table(rows=2, columns=3)
         signature_box.set_col_spacing(0, 12)
@@ -97,19 +99,13 @@ class SignatureTab(gtk.VBox):
         self.signature_label.set_text("This revision has not been signed.")
 
     def show_signature(self, text):
+        (cleartext, signer) = self.seahorse.VerifyText('openpgp', 0x00000001, text)
+
         self.signature_key_id_label.show()
-        signature = self.gpg.verify(text)
+        self.signature_key_id.set_text(signer.split(':')[1])
 
-        if signature.key_id is not None:
-            self.signature_key_id.set_text(signature.key_id)
-
-        if signature.is_valid():
-            self.signature_image.set_from_file(icon_path("sign-ok.png"))
-            self.signature_label.set_text("This revision has been signed.")
-        else:
-            self.signature_image.set_from_file(icon_path("sign-bad.png"))
-            self.signature_label.set_text("This revision has been signed, " + 
-                    "but the authenticity of the signature cannot be verified.")
+        self.signature_image.set_from_file(icon_path("sign-ok.png"))
+        self.signature_label.set_text("This revision has been signed.")
 
 
 class RevisionView(gtk.Notebook):
@@ -376,11 +372,7 @@ class RevisionView(gtk.Notebook):
         vbox.show()
 
     def _create_signature(self):
-        try:
-            self.signature_table = SignatureTab()
-        except ImportError: # No GPG module installed
-            self.signature_table = None
-            return
+        self.signature_table = SignatureTab()
         self.append_page(self.signature_table, tab_label=gtk.Label('Signature'))
         self.connect_after('notify::revision', self._update_signature)
 
