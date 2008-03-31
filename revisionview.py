@@ -376,7 +376,7 @@ class RevisionView(gtk.Notebook):
     def _create_signature(self):
         try:
             self.signature_table = SignatureTab()
-        except ImportError: # No GPG module installed
+        except ValueError: # No GPG found
             self.signature_table = None
             return
         self.append_page(self.signature_table, tab_label=gtk.Label('Signature'))
