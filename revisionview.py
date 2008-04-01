@@ -38,7 +38,7 @@ class BugsTab(gtk.VBox):
         table = gtk.Table(rows=2, columns=2)
 
         table.set_row_spacings(6)
-        table.set_col_spacings(12)
+        table.set_col_spacing(0, 16)
 
         image = gtk.Image()
         image.set_from_file(icon_path("bug.png"))
