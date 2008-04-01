@@ -62,7 +62,7 @@ class SignatureTab(gtk.VBox):
 
     def __init__(self):
         super(SignatureTab, self).__init__(False, 6)
-        signature_box = gtk.Table(rows=2, columns=3)
+        signature_box = gtk.Table(rows=3, columns=3)
         signature_box.set_col_spacing(0, 12)
         signature_box.set_col_spacing(1, 6)
 
@@ -86,6 +86,18 @@ class SignatureTab(gtk.VBox):
         align.add(self.signature_key_id)
         signature_box.attach(align, 2, 3, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
+        align = gtk.Alignment(1.0, 0.5)
+        self.signature_fingerprint_label = gtk.Label()
+        self.signature_fingerprint_label.set_markup("<b>Fingerprint:</b>")
+        align.add(self.signature_fingerprint_label)
+        signature_box.attach(align, 1, 2, 2, 3, gtk.FILL, gtk.FILL)
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.signature_fingerprint = gtk.Label()
+        self.signature_fingerprint.set_selectable(True)
+        align.add(self.signature_fingerprint)
+        signature_box.attach(align, 2, 3, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
+
         self.set_border_width(6)
         self.pack_start(signature_box, expand=False)
         self.show_all()
@@ -93,14 +105,22 @@ class SignatureTab(gtk.VBox):
     def show_no_signature(self):
         self.signature_key_id_label.hide()
         self.signature_key_id.set_text("")
+        self.signature_fingerprint_label.hide()
+        self.signature_fingerprint.set_text("")
         self.signature_image.set_from_file(icon_path("sign-unknown.png"))
         self.signature_label.set_text("This revision has not been signed.")
 
     def show_signature(self, text):
         (cleartext, signer) = crypt.verify(text)
 
+        key_id = signer.split(':')[1]
+        fingerprint = crypt.get_fingerprint(signer)
+
         self.signature_key_id_label.show()
-        self.signature_key_id.set_text(signer.split(':')[1])
+        self.signature_key_id.set_text(key_id)
+
+        self.signature_fingerprint_label.show()
+        self.signature_fingerprint.set_text(fingerprint)
 
         self.signature_image.set_from_file(icon_path("sign-ok.png"))
         self.signature_label.set_text("This revision has been signed.")
