@@ -24,6 +24,7 @@ import subprocess
 import dbus
 
 from bzrlib.plugins.gtk import icon_path
+from bzrlib.plugins.gtk import crypt
 from bzrlib.osutils import format_date
 from bzrlib.util.bencode import bdecode
 
@@ -60,9 +61,6 @@ class BugsTab(gtk.Table):
 class SignatureTab(gtk.VBox):
 
     def __init__(self):
-        bus = dbus.SessionBus()
-        seahorse_object = bus.get_object('org.gnome.seahorse', '/org/gnome/seahorse/crypto')
-        self.seahorse = dbus.Interface(seahorse_object, 'org.gnome.seahorse.CryptoService')
         super(SignatureTab, self).__init__(False, 6)
         signature_box = gtk.Table(rows=2, columns=3)
         signature_box.set_col_spacing(0, 12)
@@ -99,7 +97,7 @@ class SignatureTab(gtk.VBox):
         self.signature_label.set_text("This revision has not been signed.")
 
     def show_signature(self, text):
-        (cleartext, signer) = self.seahorse.VerifyText('openpgp', 0x00000001, text)
+        (cleartext, signer) = crypt.verify(text)
 
         self.signature_key_id_label.show()
         self.signature_key_id.set_text(signer.split(':')[1])
