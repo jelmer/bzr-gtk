@@ -61,6 +61,8 @@ class BugsTab(gtk.Table):
 class SignatureTab(gtk.VBox):
 
     def __init__(self):
+        self.key = None
+
         super(SignatureTab, self).__init__(False, 6)
         signature_box = gtk.Table(rows=3, columns=3)
         signature_box.set_col_spacing(0, 12)
@@ -127,13 +129,10 @@ class SignatureTab(gtk.VBox):
         self.signature_image.set_from_file(icon_path("sign-unknown.png"))
         self.signature_label.set_text("This revision has not been signed.")
 
-    def show_signature(self, text):
-        (cleartext, signer) = crypt.verify(text)
+    def show_signature(self, crypttext):
+        key = crypt.verify(crypttext)
 
-        key_id = crypt.get_key_id(signer)
-        crypt.discover(key_id)
-        fingerprint = crypt.get_fingerprint(signer)
-        trust = crypt.get_trust(signer)
+        trust = key.get_trust()
 
         if trust <= crypt.TRUST_NEVER:
             trust_text = 'never trusted'
@@ -147,15 +146,15 @@ class SignatureTab(gtk.VBox):
             trust_text = 'ultimately trusted'
 
         self.signature_key_id_label.show()
-        self.signature_key_id.set_text(key_id)
+        self.signature_key_id.set_text(key.get_id())
 
         self.signature_fingerprint_label.show()
-        self.signature_fingerprint.set_text(fingerprint)
+        self.signature_fingerprint.set_text(key.get_fingerprint())
 
         self.signature_trust_label.show()
         self.signature_trust.set_text('This key is ' + trust_text)
 
-        if crypt.is_trusted(signer):
+        if key.is_trusted():
             self.signature_image.set_from_file(icon_path("sign-ok.png"))
             self.signature_label.set_text("This revision has been signed by " +
                                           "a trusted party.")

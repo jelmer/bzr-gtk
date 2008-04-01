@@ -36,30 +36,51 @@ def discover(*key_ids):
     return openpgp.DiscoverKeys(key_ids, 0)
 
 def verify(crypttext):
-    return crypto.VerifyText(KEY_TYPE_OPENPGP, 1, crypttext)
+    (cleartext, key) = crypto.VerifyText(KEY_TYPE_OPENPGP, 1, crypttext)
 
-def is_valid(signer):
-    (v, field) = openpgp.GetKeyField(signer, 'flags')
+    return Key(key)
 
-    return v and field & FLAG_VALID
+class Key:
 
-def is_trusted(signer):
-    (v, field) = openpgp.GetKeyField(signer, 'flags')
+    def __init__(self, key):
+        self.key = key
+        self.fingerprint = None
+        self.trust = None
+        self.flags = None
 
-    return v and field & FLAG_TRUSTED
+        discover(key)
 
-def get_key_id(signer):
-    return signer.split(':')[1]
+    def get_field(self, field, default=None):
+        (valid, value) = openpgp.GetKeyField(self.key, field)
 
-def get_fingerprint(signer):
-    (v, field) = openpgp.GetKeyField(signer, 'fingerprint')
+        if valid:
+            return value
+        else:
+            return default
+    
+    def get_flags(self):
+        if self.flags is None:
+            self.flags = self.get_field('flags', 0)
 
-    return v and field
+        return self.flags
 
-def get_trust(signer):
-    (v, field) = openpgp.GetKeyField(signer, 'trust')
+    def get_id(self):
+        return self.key.split(':')[1][8:]
 
-    if v is None:
-        return 0
+    def get_fingerprint(self):
+        if self.fingerprint is None:
+            self.fingerprint = self.get_field('fingerprint')
 
-    return field
+        return self.fingerprint
+
+    def get_trust(self):
+        if self.trust is None:
+            self.trust = self.get_field('trust', TRUST_UNKNOWN)
+
+        return self.trust
+
+    def is_valid(self):
+        return self.get_flags() & FLAG_VALID
+
+    def is_trusted(self):
+        return self.get_flags() & FLAG_TRUSTED
