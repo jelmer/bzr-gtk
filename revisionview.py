@@ -46,7 +46,8 @@ class BugsTab(gtk.VBox):
 
         align = gtk.Alignment(0.0, 0.1)
         label = gtk.Label()
-        label.set_markup("<b>Bugs</b>\nThis revision has one or more bug associations.")
+        label.set_markup("<b>Bug associations</b>\n" +
+                         "This revision has one or more bug associations.")
         align.add(label)
         table.attach(align, 1, 2, 0, 1, gtk.FILL)
 
