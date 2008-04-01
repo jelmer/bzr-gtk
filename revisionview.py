@@ -63,9 +63,8 @@ class BugsTab(gtk.VBox):
             return
 
         self.clear()
-        bugs_text = revision.properties.get('bugs', None)
-        if bugs_text:
-            for bugline in bugs_text.splitlines():
+        bugs_text = revision.properties.get('bugs', '')
+        for bugline in bugs_text.splitlines():
                 (url, status) = bugline.split(" ")
                 self.add_bug(url, status)
 
