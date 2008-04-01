@@ -31,27 +31,55 @@ def _open_link(widget, uri):
 
 gtk.link_button_set_uri_hook(_open_link)
 
-class BugsTab(gtk.Table):
+class BugsTab(gtk.VBox):
     def __init__(self):
-        super(BugsTab, self).__init__(rows=5, columns=2)
-        self.set_row_spacings(6)
-        self.set_col_spacings(6)
-        self.clear()
+        super(BugsTab, self).__init__(False, 6)
+
+        table = gtk.Table(rows=2, columns=2)
+
+        table.set_row_spacings(6)
+
+        image = gtk.Image()
+        image.set_from_file(icon_path("bug.png"))
+        table.attach(image, 0, 1, 0, 1, gtk.FILL)
+
+        align = gtk.Alignment(0.0, 0.5)
+        label = gtk.Label()
+        label.set_markup("<b>Bugs</b>\nThis revision has one or more bug associations.")
+        align.add(label)
+        table.attach(align, 1, 2, 0, 1, gtk.FILL)
+
+        treeview = self.construct_treeview()
+        table.attach(treeview, 1, 2, 1, 2, gtk.FILL | gtk.EXPAND)
+
+        self.set_border_width(6)
+        self.pack_start(table, expand=False)
+
+        self.hide_all()
+
+    def construct_treeview(self):
+        self.bugs = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
+        self.treeview = gtk.TreeView(self.bugs)
+
+        uri_column = gtk.TreeViewColumn('Bug URI', gtk.CellRendererText(), text=0)
+        status_column = gtk.TreeViewColumn('Status', gtk.CellRendererText(), text=1)
+
+        self.treeview.append_column(uri_column)
+        self.treeview.append_column(status_column)
+
+        win = gtk.ScrolledWindow()
+        win.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        win.set_shadow_type(gtk.SHADOW_IN)
+        win.add(self.treeview)
+
+        return win
 
     def clear(self):
-        for c in self.get_children():
-            self.remove(c)
-        self.count = 0
+        self.bugs.clear()
         self.hide_all() # Only shown when there are bugs
 
     def add_bug(self, url, status):
-        button = gtk.LinkButton(url, url)
-        self.attach(button, 0, 1, self.count, self.count + 1,
-                              gtk.EXPAND | gtk.FILL, gtk.FILL)
-        status_label = gtk.Label(status)
-        self.attach(status_label, 1, 2, self.count, self.count + 1,
-                              gtk.EXPAND | gtk.FILL, gtk.FILL)
-        self.count += 1
+        self.bugs.append([url, status])
         self.show_all()
 
 
