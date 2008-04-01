@@ -58,6 +58,17 @@ class BugsTab(gtk.VBox):
 
         self.hide_all()
 
+    def set_revision(self, revision):
+        if revision is None:
+            return
+
+        self.clear()
+        bugs_text = revision.properties.get('bugs', None)
+        if bugs_text:
+            for bugline in bugs_text.splitlines():
+                (url, status) = bugline.split(" ")
+                self.add_bug(url, status)
+
     def construct_treeview(self):
         self.bugs = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
         self.treeview = gtk.TreeView(self.bugs)
@@ -293,13 +304,6 @@ class RevisionView(gtk.Notebook):
         else:
             self.file_info_box.hide()
 
-        self.bugs_table.clear()
-        bugs_text = revision.properties.get('bugs', None)
-        if bugs_text:
-            for bugline in bugs_text.splitlines():
-                (url, status) = bugline.split(" ")
-                self.bugs_table.add_bug(url, status)
-
     def update_tags(self):
         if self._branch is not None and self._branch.supports_tags():
             self._tagdict = self._branch.tags.get_reverse_tag_dict()
@@ -316,6 +320,9 @@ class RevisionView(gtk.Notebook):
             self.signature_table.show_signature(signature_text)
         else:
             self.signature_table.show_no_signature()
+
+    def _update_bugs(self, widget, param):
+        self.bugs_page.set_revision(self._revision)
 
     def set_children(self, children):
         self._add_parents_or_children(children,
@@ -573,8 +580,9 @@ class RevisionView(gtk.Notebook):
         return window
 
     def _create_bugs(self):
-        self.bugs_table = BugsTab()
-        self.append_page(self.bugs_table, tab_label=gtk.Label('Bugs'))
+        self.bugs_page = BugsTab()
+        self.connect_after('notify::revision', self._update_bugs) 
+        self.append_page(self.bugs_page, tab_label=gtk.Label('Bugs'))
 
     def _create_file_info_view(self):
         self.file_info_box = gtk.VBox(False, 6)
