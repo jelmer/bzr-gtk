@@ -72,12 +72,10 @@ class BugsTab(gtk.VBox):
     def construct_treeview(self):
         self.bugs = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
         self.treeview = gtk.TreeView(self.bugs)
+        self.treeview.set_headers_visible(False)
 
         uri_column = gtk.TreeViewColumn('Bug URI', gtk.CellRendererText(), text=0)
-        status_column = gtk.TreeViewColumn('Status', gtk.CellRendererText(), text=1)
-
         self.treeview.append_column(uri_column)
-        self.treeview.append_column(status_column)
 
         win = gtk.ScrolledWindow()
         win.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
