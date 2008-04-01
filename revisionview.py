@@ -22,6 +22,7 @@ import pango
 import gobject
 import subprocess
 
+from bzrlib.plugins.gtk import icon_path
 from bzrlib.osutils import format_date
 from bzrlib.util.bencode import bdecode
 
@@ -52,6 +53,61 @@ class BugsTab(gtk.Table):
                               gtk.EXPAND | gtk.FILL, gtk.FILL)
         self.count += 1
         self.show_all()
+
+
+class SignatureTab(gtk.VBox):
+    def __init__(self):
+        from gpg import GPGSubprocess
+        self.gpg = GPGSubprocess()
+        super(SignatureTab, self).__init__(False, 6)
+        signature_box = gtk.Table(rows=1, columns=2)
+        signature_box.set_col_spacing(0, 12)
+
+        self.signature_image = gtk.Image()
+        signature_box.attach(self.signature_image, 0, 1, 0, 1, gtk.FILL)
+
+        self.signature_label = gtk.Label()
+        signature_box.attach(self.signature_label, 1, 2, 0, 1, gtk.FILL)
+
+        signature_info = gtk.Table(rows=1, columns=2)
+        signature_info.set_row_spacings(6)
+        signature_info.set_col_spacings(6)
+
+        align = gtk.Alignment(1.0, 0.5)
+        label = gtk.Label()
+        label.set_markup("<b>Key Id:</b>")
+        align.add(label)
+        signature_info.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.signature_key_id = gtk.Label()
+        self.signature_key_id.set_selectable(True)
+        align.add(self.signature_key_id)
+        signature_info.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
+
+        self.set_border_width(6)
+        self.pack_start(signature_box, expand=False)
+        self.pack_start(signature_info, expand=False)
+        self.show_all()
+
+    def show_no_signature(self):
+        self.signature_key_id.set_text("")
+        self.signature_image.set_from_file(icon_path("sign-unknown.png"))
+        self.signature_label.set_text("This revision has not been signed.")
+
+    def show_signature(self, text):
+        signature = self.gpg.verify(text)
+
+        if signature.key_id is not None:
+            self.signature_key_id.set_text(signature.key_id)
+
+        if signature.is_valid():
+            self.signature_image.set_from_file(icon_path("sign-ok.png"))
+            self.signature_label.set_text("This revision has been signed.")
+        else:
+            self.signature_image.set_from_file(icon_path("sign-bad.png"))
+            self.signature_label.set_text("This revision has been signed, " + 
+                    "but the authenticity of the signature cannot be verified.")
 
 
 class RevisionView(gtk.Notebook):
@@ -97,6 +153,7 @@ class RevisionView(gtk.Notebook):
 
         self._create_general()
         self._create_relations()
+        self._create_signature()
         self._create_file_info_view()
         self._create_bugs()
 
@@ -222,6 +279,15 @@ class RevisionView(gtk.Notebook):
 
         self._add_tags()
 
+    def _update_signature(self, widget, param):
+        revid = self._revision.revision_id
+
+        if self._branch.repository.has_signature_for_revision_id(revid):
+            signature_text = self._branch.repository.get_signature_text(revid)
+            self.signature_table.show_signature(signature_text)
+        else:
+            self.signature_table.show_no_signature()
+
     def set_children(self, children):
         self._add_parents_or_children(children,
                                       self.children_widgets,
@@ -235,7 +301,8 @@ class RevisionView(gtk.Notebook):
         """Callback for when the go button for a parent is clicked."""
 
     def _add_tags(self, *args):
-        if self._revision is None: return
+        if self._revision is None:
+            return
 
         if self._tagdict.has_key(self._revision.revision_id):
             tags = self._tagdict[self._revision.revision_id]
@@ -305,6 +372,15 @@ class RevisionView(gtk.Notebook):
         vbox.pack_start(self._create_children(), expand=False, fill=True)
         self.append_page(vbox, tab_label=gtk.Label("Relations"))
         vbox.show()
+
+    def _create_signature(self):
+        try:
+            self.signature_table = SignatureTab()
+        except ValueError: # No GPG found
+            self.signature_table = None
+            return
+        self.append_page(self.signature_table, tab_label=gtk.Label('Signature'))
+        self.connect_after('notify::revision', self._update_signature)
 
     def _create_headers(self):
         self.table = gtk.Table(rows=5, columns=2)
@@ -413,7 +489,6 @@ class RevisionView(gtk.Notebook):
         self.connect('notify::revision', self._add_tags)
 
         return self.table
-
     
     def _create_parents(self):
         hbox = gtk.HBox(True, 3)
@@ -461,6 +536,7 @@ class RevisionView(gtk.Notebook):
         tv = gtk.TextView(msg_buffer)
         tv.set_editable(False)
         tv.set_wrap_mode(gtk.WRAP_WORD)
+
         tv.modify_font(pango.FontDescription("Monospace"))
         tv.show()
         window.add(tv)

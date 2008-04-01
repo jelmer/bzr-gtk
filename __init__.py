@@ -110,7 +110,14 @@ def data_path():
 
 
 def icon_path(*args):
-    return os.path.join(data_path(), *args)
+    basedirs = [os.path.join(data_path()),
+             "/usr/share/bzr-gtk", 
+             "/usr/local/share/bzr-gtk"]
+    for basedir in basedirs:
+        path = os.path.join(basedir, 'icons', *args)
+        if os.path.exists(path):
+            return path
+    return None
 
 
 class GTKCommand(Command):
