@@ -4,6 +4,8 @@
 
   * Removed tortoise-bzr, which now has its own project (http://launchpad.net/tortoisebzr)
 
+  * Use new D-Bus revision signal. (James Henstridge, #206443)
+
  UI
 
   * Made the tags associated with a revision render next to the revision
