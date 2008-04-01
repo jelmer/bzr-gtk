@@ -50,6 +50,8 @@
 
   * It is now possible to use the diff view as a widget. (Jelmer Vernooij)
 
+  * Preferences dialog has been split up. (Jelmer Vernooij)
+
 0.93.0  2007-12-10
 
  UI
