@@ -181,10 +181,10 @@ class SignatureTab(gtk.VBox):
 
         fingerprint = key.get_fingerprint()
         if fingerprint == "":
-            fingerprint = "N/A"
+            fingerprint = '<span foreground="dim grey">N/A</span>'
 
         self.signature_fingerprint_label.show()
-        self.signature_fingerprint.set_text(fingerprint)
+        self.signature_fingerprint.set_markup(fingerprint)
 
         self.signature_trust_label.show()
         self.signature_trust.set_text('This key is ' + trust_text)
