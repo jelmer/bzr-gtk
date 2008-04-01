@@ -143,13 +143,14 @@ class SignatureTab(gtk.VBox):
         if key.is_trusted():
             self.signature_image.set_from_file(icon_path("sign-ok.png"))
             self.signature_label.set_markup("<b>Authenticity confirmed</b>\n" +
-                                            "This revision has been signed by " +
-                                            "a trusted party.")
+                                            "This revision has been signed with " +
+                                            "a trusted key.")
         else:
             self.signature_image.set_from_file(icon_path("sign-bad.png"))
             self.signature_label.set_markup("<b>Authenticity cannot be confirmed</b>\n" +
-                                            "This revision has been signed by " +
-                                            "an untrusted party.")
+                                            "This revision has been signed, but the " +
+                                            "authenticity of the signature cannot be " +
+                                            "established.")
 
         trust = key.get_trust()
 
