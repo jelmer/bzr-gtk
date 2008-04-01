@@ -149,8 +149,7 @@ class SignatureTab(gtk.VBox):
             self.signature_image.set_from_file(icon_path("sign-bad.png"))
             self.signature_label.set_markup("<b>Authenticity cannot be confirmed</b>\n" +
                                             "This revision has been signed, but the " +
-                                            "authenticity of the signature cannot be " +
-                                            "established.")
+                                            "key is not trusted.")
 
         trust = key.get_trust()
 
