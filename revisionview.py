@@ -127,7 +127,8 @@ class SignatureTab(gtk.VBox):
         self.signature_trust.set_text("")
 
         self.signature_image.set_from_file(icon_path("sign-unknown.png"))
-        self.signature_label.set_text("This revision has not been signed.")
+        self.signature_label.set_markup("<b>Authenticity unknown</b>\n" +
+                                        "This revision has not been signed.")
 
     def show_signature(self, crypttext):
         key = crypt.verify(crypttext)
@@ -156,12 +157,14 @@ class SignatureTab(gtk.VBox):
 
         if key.is_trusted():
             self.signature_image.set_from_file(icon_path("sign-ok.png"))
-            self.signature_label.set_text("This revision has been signed by " +
-                                          "a trusted party.")
+            self.signature_label.set_markup("<b>Authenticity confirmed</b>\n" +
+                                            "This revision has been signed by " +
+                                            "a trusted party.")
         else:
             self.signature_image.set_from_file(icon_path("sign-bad.png"))
-            self.signature_label.set_text("This revision has been signed by " +
-                                          "an untrusted party.")
+            self.signature_label.set_markup("<b>Authenticity cannot be confirmed</b>\n" +
+                                            "This revision has been signed by " +
+                                            "an untrusted party.")
 
 
 class RevisionView(gtk.Notebook):
