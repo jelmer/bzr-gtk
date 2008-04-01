@@ -177,7 +177,6 @@ class BranchDialog(gtk.Dialog):
         finally:
             br_from.unlock()
                 
-        self._history.add_entry(location)
         info_dialog(_('Branching successful'),
                     _('%d revision(s) branched.') % revs)
         

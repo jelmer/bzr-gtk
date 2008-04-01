@@ -4,6 +4,8 @@
 
   * Removed tortoise-bzr, which now has its own project (http://launchpad.net/tortoisebzr)
 
+  * Use new D-Bus revision signal. (James Henstridge, #206443)
+
  UI
 
   * Made the tags associated with a revision render next to the revision
@@ -47,6 +49,8 @@
   * Refactored the revisionview. (Daniel Schierbeck)
 
   * It is now possible to use the diff view as a widget. (Jelmer Vernooij)
+
+  * Preferences dialog has been split up. (Jelmer Vernooij)
 
 0.93.0  2007-12-10
 

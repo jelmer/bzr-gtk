@@ -540,12 +540,8 @@ class cmd_commit_notify(GTKCommand):
         from bzrlib.transport import get_transport
         if getattr(dbus, 'version', (0,0,0)) >= (0,41,0):
             import dbus.glib
-        from bzrlib.plugins.dbus import activity
+        BROADCAST_INTERFACE = "org.bazaarvcs.plugins.dbus.Broadcast"
         bus = dbus.SessionBus()
-        # get the object so we can subscribe to callbacks from it.
-        broadcast_service = bus.get_object(
-            activity.Broadcast.DBUS_NAME,
-            activity.Broadcast.DBUS_PATH)
 
         def catch_branch(revision_id, urls):
             # TODO: show all the urls, or perhaps choose the 'best'.
@@ -582,8 +578,9 @@ class cmd_commit_notify(GTKCommand):
             except Exception, e:
                 print e
                 raise
-        broadcast_service.connect_to_signal("Revision", catch_branch,
-            dbus_interface=activity.Broadcast.DBUS_INTERFACE)
+        bus.add_signal_receiver(catch_branch,
+                                dbus_interface=BROADCAST_INTERFACE,
+                                signal_name="Revision")
         pynotify.init("bzr commit-notify")
         gtk.main()
 

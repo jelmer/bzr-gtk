@@ -106,6 +106,7 @@ class OliveGtk:
         # Get some important menu items
         self.menuitem_add_files = self.toplevel.get_widget('menuitem_add_files')
         self.menuitem_remove_files = self.toplevel.get_widget('menuitem_remove_file')
+        self.menuitem_file_bookmark = self.toplevel.get_widget('menuitem_file_bookmark')
         self.menuitem_file_make_directory = self.toplevel.get_widget('menuitem_file_make_directory')
         self.menuitem_file_rename = self.toplevel.get_widget('menuitem_file_rename')
         self.menuitem_file_move = self.toplevel.get_widget('menuitem_file_move')
@@ -162,6 +163,7 @@ class OliveGtk:
                 "on_about_activate": self.on_about_activate,
                 "on_menuitem_add_files_activate": self.on_menuitem_add_files_activate,
                 "on_menuitem_remove_file_activate": self.on_menuitem_remove_file_activate,
+                "on_menuitem_file_bookmark_activate": self.on_menuitem_file_bookmark_activate,
                 "on_menuitem_file_make_directory_activate": self.on_menuitem_file_make_directory_activate,
                 "on_menuitem_file_move_activate": self.on_menuitem_file_move_activate,
                 "on_menuitem_file_rename_activate": self.on_menuitem_file_rename_activate,
@@ -196,6 +198,7 @@ class OliveGtk:
                 "on_treeview_right_button_press_event": self.on_treeview_right_button_press_event,
                 "on_treeview_right_row_activated": self.on_treeview_right_row_activated,
                 "on_treeview_left_button_press_event": self.on_treeview_left_button_press_event,
+                "on_treeview_left_button_release_event": self.on_treeview_left_button_release_event,
                 "on_treeview_left_row_activated": self.on_treeview_left_row_activated,
                 "on_button_location_up_clicked": self.on_button_location_up_clicked,
                 "on_button_location_jump_clicked": self.on_button_location_jump_clicked,
@@ -699,6 +702,18 @@ class OliveGtk:
         finally:
             branch.unlock()
     
+    def on_menuitem_file_bookmark_activate(self, widget):
+        """ File/Bookmark current directory menu handler. """
+        if self.pref.add_bookmark(self.path):
+            info_dialog(_('Bookmark successfully added'),
+                        _('The current directory was bookmarked. You can reach\nit by selecting it from the left panel.'))
+            self.pref.write()
+        else:
+            warning_dialog(_('Location already bookmarked'),
+                           _('The current directory is already bookmarked.\nSee the left panel for reference.'))
+        
+        self.refresh_left()
+    
     def on_menuitem_file_make_directory_activate(self, widget):
         """ File/Make directory... menu handler. """
         from mkdir import OliveMkdir
@@ -795,6 +810,20 @@ class OliveGtk:
             
             menu.left_context_menu().popup(None, None, None, 0,
                                            event.time)
+
+    def on_treeview_left_button_release_event(self, widget, event):
+        """ Occurs when somebody just clicks a bookmark. """
+        if event.button != 3:
+            # Allow one-click bookmark opening
+            if self.get_selected_left() == None:
+                return
+            
+            newdir = self.get_selected_left()
+            if newdir == None:
+                return
+
+            if self.set_path(newdir):
+                self.refresh_right()
 
     def on_treeview_left_row_activated(self, treeview, path, view_column):
         """ Occurs when somebody double-clicks or enters an item in the

@@ -245,6 +245,9 @@ class RevisionView(gtk.Notebook):
         self._show_callback = None
         self._clicked_callback = None
 
+        self._revision = None
+        self._branch = branch
+
         self.update_tags()
 
         self.set_file_id(None)
