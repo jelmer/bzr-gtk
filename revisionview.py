@@ -73,8 +73,8 @@ class SignatureTab(gtk.VBox):
         self.signature_image = gtk.Image()
         signature_box.attach(self.signature_image, 0, 1, 0, 1, gtk.FILL)
 
+        align = gtk.Alignment(0.0, 0.0)
         self.signature_label = gtk.Label()
-        align = gtk.Alignment(0.0, 0.5)
         align.add(self.signature_label)
         signature_box.attach(align, 1, 3, 0, 1, gtk.FILL)
 
