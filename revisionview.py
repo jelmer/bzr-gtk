@@ -168,8 +168,12 @@ class SignatureTab(gtk.VBox):
         self.signature_key_id_label.show()
         self.signature_key_id.set_text(key.get_id())
 
+        fingerprint = key.get_fingerprint()
+        if fingerprint == "":
+            fingerprint = "N/A"
+
         self.signature_fingerprint_label.show()
-        self.signature_fingerprint.set_text(key.get_fingerprint())
+        self.signature_fingerprint.set_text(fingerprint)
 
         self.signature_trust_label.show()
         self.signature_trust.set_text('This key is ' + trust_text)
