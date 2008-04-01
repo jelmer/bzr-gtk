@@ -133,6 +133,24 @@ class SignatureTab(gtk.VBox):
     def show_signature(self, crypttext):
         key = crypt.verify(crypttext)
 
+        if not key.is_available():
+            self.show_no_signature()
+            self.signature_image.set_from_file(icon_path("sign-bad.png"))
+            self.signature_label.set_markup("<b>Authentication error</b>\n" +
+                                            "Signature key not available")
+            return
+
+        if key.is_trusted():
+            self.signature_image.set_from_file(icon_path("sign-ok.png"))
+            self.signature_label.set_markup("<b>Authenticity confirmed</b>\n" +
+                                            "This revision has been signed by " +
+                                            "a trusted party.")
+        else:
+            self.signature_image.set_from_file(icon_path("sign-bad.png"))
+            self.signature_label.set_markup("<b>Authenticity cannot be confirmed</b>\n" +
+                                            "This revision has been signed by " +
+                                            "an untrusted party.")
+
         trust = key.get_trust()
 
         if trust <= crypt.TRUST_NEVER:
@@ -154,18 +172,7 @@ class SignatureTab(gtk.VBox):
 
         self.signature_trust_label.show()
         self.signature_trust.set_text('This key is ' + trust_text)
-
-        if key.is_trusted():
-            self.signature_image.set_from_file(icon_path("sign-ok.png"))
-            self.signature_label.set_markup("<b>Authenticity confirmed</b>\n" +
-                                            "This revision has been signed by " +
-                                            "a trusted party.")
-        else:
-            self.signature_image.set_from_file(icon_path("sign-bad.png"))
-            self.signature_label.set_markup("<b>Authenticity cannot be confirmed</b>\n" +
-                                            "This revision has been signed by " +
-                                            "an untrusted party.")
-
+        
 
 class RevisionView(gtk.Notebook):
     """ Custom widget for commit log details.

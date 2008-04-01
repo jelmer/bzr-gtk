@@ -49,8 +49,6 @@ class Key:
         self.flags = None
         self.display_name = None
 
-        discover(key)
-
     def get_field(self, field, default=None):
         (valid, value) = openpgp.GetKeyField(self.key, field)
 
@@ -86,8 +84,8 @@ class Key:
 
         return self.trust
 
-    def is_valid(self):
-        return self.get_flags() & FLAG_VALID
+    def is_available(self):
+        return self.key != ""
 
     def is_trusted(self):
         return self.get_flags() & FLAG_TRUSTED
