@@ -38,12 +38,13 @@ class BugsTab(gtk.VBox):
         table = gtk.Table(rows=2, columns=2)
 
         table.set_row_spacings(6)
+        table.set_col_spacings(12)
 
         image = gtk.Image()
         image.set_from_file(icon_path("bug.png"))
         table.attach(image, 0, 1, 0, 1, gtk.FILL)
 
-        align = gtk.Alignment(0.0, 0.5)
+        align = gtk.Alignment(0.0, 0.1)
         label = gtk.Label()
         label.set_markup("<b>Bugs</b>\nThis revision has one or more bug associations.")
         align.add(label)
