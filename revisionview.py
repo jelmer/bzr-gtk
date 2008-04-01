@@ -66,19 +66,19 @@ class SignatureTab(gtk.VBox):
 
         super(SignatureTab, self).__init__(False, 6)
         signature_box = gtk.Table(rows=3, columns=3)
-        signature_box.set_col_spacing(0, 12)
-        signature_box.set_col_spacing(1, 6)
+        signature_box.set_col_spacing(0, 16)
+        signature_box.set_col_spacing(1, 12)
         signature_box.set_row_spacings(6)
 
         self.signature_image = gtk.Image()
         signature_box.attach(self.signature_image, 0, 1, 0, 1, gtk.FILL)
 
-        align = gtk.Alignment(0.0, 0.0)
+        align = gtk.Alignment(0.0, 0.1)
         self.signature_label = gtk.Label()
         align.add(self.signature_label)
         signature_box.attach(align, 1, 3, 0, 1, gtk.FILL)
 
-        align = gtk.Alignment(1.0, 0.5)
+        align = gtk.Alignment(0.0, 0.5)
         self.signature_key_id_label = gtk.Label()
         self.signature_key_id_label.set_markup("<b>Key Id:</b>")
         align.add(self.signature_key_id_label)
@@ -90,7 +90,7 @@ class SignatureTab(gtk.VBox):
         align.add(self.signature_key_id)
         signature_box.attach(align, 2, 3, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
-        align = gtk.Alignment(1.0, 0.5)
+        align = gtk.Alignment(0.0, 0.5)
         self.signature_fingerprint_label = gtk.Label()
         self.signature_fingerprint_label.set_markup("<b>Fingerprint:</b>")
         align.add(self.signature_fingerprint_label)
@@ -103,16 +103,16 @@ class SignatureTab(gtk.VBox):
         signature_box.attach(align, 2, 3, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
         align = gtk.Alignment(0.0, 0.5)
-        self.signature_trust = gtk.Label()
-        self.signature_trust.set_selectable(True)
-        align.add(self.signature_trust)
-        signature_box.attach(align, 2, 3, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
-
-        align = gtk.Alignment(1.0, 0.5)
         self.signature_trust_label = gtk.Label()
         self.signature_trust_label.set_markup("<b>Trust:</b>")
         align.add(self.signature_trust_label)
         signature_box.attach(align, 1, 2, 3, 4, gtk.FILL, gtk.FILL)
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.signature_trust = gtk.Label()
+        self.signature_trust.set_selectable(True)
+        align.add(self.signature_trust)
+        signature_box.attach(align, 2, 3, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
         self.set_border_width(6)
         self.pack_start(signature_box, expand=False)
