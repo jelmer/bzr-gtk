@@ -98,6 +98,18 @@ class SignatureTab(gtk.VBox):
         align.add(self.signature_fingerprint)
         signature_box.attach(align, 2, 3, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
+        align = gtk.Alignment(0.0, 0.5)
+        self.signature_trust = gtk.Label()
+        self.signature_trust.set_selectable(True)
+        align.add(self.signature_trust)
+        signature_box.attach(align, 2, 3, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
+
+        align = gtk.Alignment(1.0, 0.5)
+        self.signature_trust_label = gtk.Label()
+        self.signature_trust_label.set_markup("<b>Trust:</b>")
+        align.add(self.signature_trust_label)
+        signature_box.attach(align, 1, 2, 3, 4, gtk.FILL, gtk.FILL)
+
         self.set_border_width(6)
         self.pack_start(signature_box, expand=False)
         self.show_all()
@@ -105,8 +117,13 @@ class SignatureTab(gtk.VBox):
     def show_no_signature(self):
         self.signature_key_id_label.hide()
         self.signature_key_id.set_text("")
+
         self.signature_fingerprint_label.hide()
         self.signature_fingerprint.set_text("")
+
+        self.signature_trust_label.hide()
+        self.signature_trust.set_text("")
+
         self.signature_image.set_from_file(icon_path("sign-unknown.png"))
         self.signature_label.set_text("This revision has not been signed.")
 
@@ -115,12 +132,27 @@ class SignatureTab(gtk.VBox):
 
         key_id = signer.split(':')[1]
         fingerprint = crypt.get_fingerprint(signer)
+        trust = crypt.get_trust(signer)
+
+        if trust <= crypt.TRUST_NEVER:
+            trust_text = 'never trusted'
+        elif trust == crypt.TRUST_UNKNOWN:
+            trust_text = 'not trusted'
+        elif trust == crypt.TRUST_MARGINAL:
+            trust_text = 'marginally trusted'
+        elif trust == crypt.TRUST_FULL:
+            trust_text = 'fully trusted'
+        elif trust == crypt.TRUST_ULTIMATE:
+            trust_text = 'ultimately trusted'
 
         self.signature_key_id_label.show()
         self.signature_key_id.set_text(key_id)
 
         self.signature_fingerprint_label.show()
         self.signature_fingerprint.set_text(fingerprint)
+
+        self.signature_trust_label.show()
+        self.signature_trust.set_text('This key is ' + trust_text)
 
         self.signature_image.set_from_file(icon_path("sign-ok.png"))
         self.signature_label.set_text("This revision has been signed.")
