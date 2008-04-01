@@ -136,7 +136,7 @@ class SignatureTab(gtk.VBox):
         if not key.is_available():
             self.show_no_signature()
             self.signature_image.set_from_file(icon_path("sign-bad.png"))
-            self.signature_label.set_markup("<b>Authentication error</b>\n" +
+            self.signature_label.set_markup("<b>Authenticity cannot be confirmed</b>\n" +
                                             "Signature key not available.")
             return
 
