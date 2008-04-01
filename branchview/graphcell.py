@@ -155,13 +155,13 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         for start, end, colour in self.in_lines:
             self.render_line (ctx, cell_area, box_size,
                          bg_area.y, bg_area.height,
-                         start, end, colour)
+                         start, end, colour, flags)
 
         # Draw lines out of the cell
         for start, end, colour in self.out_lines:
             self.render_line (ctx, cell_area, box_size,
                          bg_area.y + bg_area.height, bg_area.height,
-                         start, end, colour)
+                         start, end, colour, flags)
 
         # Draw the revision node in the right column
         (column, colour) = self.node
@@ -169,15 +169,21 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                 cell_area.y + cell_area.height / 2,
                 box_size / 4, 0, 2 * math.pi)
 
-        self.set_colour(ctx, colour, 0.0, 0.5)
+        if flags & gtk.CELL_RENDERER_SELECTED:
+            ctx.set_source_rgb(1.0, 1.0, 1.0)
+        else:
+            self.set_colour(ctx, colour, 0.0, 0.5)
         ctx.stroke_preserve()
 
-        self.set_colour(ctx, colour, 0.5, 1.0)
+        if flags & gtk.CELL_RENDERER_SELECTED:
+            ctx.set_source_rgb(0.8, 0.8, 0.8)
+        else:
+            self.set_colour(ctx, colour, 0.5, 1.0)
         ctx.fill()
 
         self.render_tags(ctx, widget.create_pango_context(), cell_area, box_size)
     
-    def render_line(self, ctx, cell_area, box_size, mid, height, start, end, colour):
+    def render_line(self, ctx, cell_area, box_size, mid, height, start, end, colour, flags):
         if start is None:
             x = cell_area.x + box_size * end + box_size / 2
             ctx.move_to(x, mid + height / 3)
@@ -208,7 +214,10 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                              endx, mid + height / 5 ,
                              endx, mid + height / 2)
                 
-        self.set_colour(ctx, colour, 0.0, 0.65)
+        if flags & gtk.CELL_RENDERER_SELECTED:
+            ctx.set_source_rgb(1.0, 1.0, 1.0)
+        else:
+            self.set_colour(ctx, colour, 0.0, 0.65)
         ctx.stroke()
 
     def render_tags(self, ctx, pango_ctx, cell_area, box_size):
