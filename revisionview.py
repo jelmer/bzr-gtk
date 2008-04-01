@@ -60,8 +60,9 @@ class BugsTab(gtk.Table):
 
 class SignatureTab(gtk.VBox):
 
-    def __init__(self):
+    def __init__(self, repository):
         self.key = None
+        self.repository = repository
 
         super(SignatureTab, self).__init__(False, 6)
         signature_box = gtk.Table(rows=3, columns=3)
@@ -115,6 +116,17 @@ class SignatureTab(gtk.VBox):
         self.set_border_width(6)
         self.pack_start(signature_box, expand=False)
         self.show_all()
+
+    def set_revision(self, revision):
+        self.revision = revision
+        revid = revision.revision_id
+
+        if self.repository.has_signature_for_revision_id(revid):
+            signature_text = self.repository.get_signature_text(revid)
+            self.show_signature(signature_text)
+        else:
+            self.show_no_signature()
+
 
     def show_no_signature(self):
         self.signature_key_id_label.hide()
@@ -176,7 +188,7 @@ class SignatureTab(gtk.VBox):
 
         self.signature_trust_label.show()
         self.signature_trust.set_text('This key is ' + trust_text)
-        
+
 
 class RevisionView(gtk.Notebook):
     """ Custom widget for commit log details.
@@ -219,6 +231,9 @@ class RevisionView(gtk.Notebook):
     def __init__(self, branch=None):
         gtk.Notebook.__init__(self)
 
+        self._revision = None
+        self._branch = branch
+
         self._create_general()
         self._create_relations()
         self._create_signature()
@@ -229,9 +244,6 @@ class RevisionView(gtk.Notebook):
         
         self._show_callback = None
         self._clicked_callback = None
-
-        self._revision = None
-        self._branch = branch
 
         self.update_tags()
 
@@ -348,13 +360,7 @@ class RevisionView(gtk.Notebook):
         self._add_tags()
 
     def _update_signature(self, widget, param):
-        revid = self._revision.revision_id
-
-        if self._branch.repository.has_signature_for_revision_id(revid):
-            signature_text = self._branch.repository.get_signature_text(revid)
-            self.signature_table.show_signature(signature_text)
-        else:
-            self.signature_table.show_no_signature()
+        self.signature_table.set_revision(self._revision)
 
     def set_children(self, children):
         self._add_parents_or_children(children,
@@ -442,7 +448,7 @@ class RevisionView(gtk.Notebook):
         vbox.show()
 
     def _create_signature(self):
-        self.signature_table = SignatureTab()
+        self.signature_table = SignatureTab(self._branch.repository)
         self.append_page(self.signature_table, tab_label=gtk.Label('Signature'))
         self.connect_after('notify::revision', self._update_signature)
 
