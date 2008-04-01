@@ -47,6 +47,7 @@ class Key:
         self.fingerprint = None
         self.trust = None
         self.flags = None
+        self.display_name = None
 
         discover(key)
 
@@ -63,6 +64,12 @@ class Key:
             self.flags = self.get_field('flags', 0)
 
         return self.flags
+
+    def get_display_name(self):
+        if self.display_name is None:
+            self.display_name = self.get_field('display-name')
+
+        return self.display_name
 
     def get_id(self):
         return self.key.split(':')[1][8:]
