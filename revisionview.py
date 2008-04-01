@@ -68,6 +68,7 @@ class SignatureTab(gtk.VBox):
         signature_box = gtk.Table(rows=3, columns=3)
         signature_box.set_col_spacing(0, 12)
         signature_box.set_col_spacing(1, 6)
+        signature_box.set_row_spacings(6)
 
         self.signature_image = gtk.Image()
         signature_box.attach(self.signature_image, 0, 1, 0, 1, gtk.FILL)
@@ -126,7 +127,6 @@ class SignatureTab(gtk.VBox):
             self.show_signature(signature_text)
         else:
             self.show_no_signature()
-
 
     def show_no_signature(self):
         self.signature_key_id_label.hide()
