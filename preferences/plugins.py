@@ -27,17 +27,17 @@ class PluginsPage(gtk.VPaned):
         gtk.VPaned.__init__(self)
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        model = gtk.ListStore(str, str)
+        self.model = gtk.ListStore(str, str)
         treeview = gtk.TreeView()
         scrolledwindow.add(treeview)
         self.pack1(scrolledwindow, resize=True, shrink=False)
 
-        table = gtk.Table(columns=2)
-        table.set_row_spacings(6)
-        table.set_col_spacings(6)
+        self.table = gtk.Table(columns=2)
+        self.table.set_row_spacings(6)
+        self.table.set_col_spacings(6)
 
         treeview.set_headers_visible(False)
-        treeview.set_model(model)
+        treeview.set_model(self.model)
         treeview.connect("row-activated", self.row_selected)
 
         cell = gtk.CellRendererText()
@@ -57,27 +57,28 @@ class PluginsPage(gtk.VPaned):
         plugin_names = plugins.keys()
         plugin_names.sort()
         for name in plugin_names:
-            model.append([name, getattr(plugins[name], '__file__', None)])
+            self.model.append([name, getattr(plugins[name], '__file__', None)])
                  
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        scrolledwindow.add_with_viewport(table)
+        scrolledwindow.add_with_viewport(self.table)
         self.pack2(scrolledwindow, resize=False, shrink=True)
         self.show()
 
     def row_selected(self, tv, path, tvc):
-        p = bzrlib.plugin.plugins()[model[path][0]]
+        import bzrlib
+        p = bzrlib.plugin.plugins()[self.model[path][0]]
         from inspect import getdoc
 
-        for w in table.get_children():
-            table.remove(w)
+        for w in self.table.get_children():
+            self.table.remove(w)
 
         if getattr(p, '__author__', None) is not None:
             align = gtk.Alignment(1.0, 0.5)
             label = gtk.Label()
             label.set_markup("<b>Author:</b>")
             align.add(label)
-            table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
+            self.table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
             align.show()
             label.show()
 
@@ -86,14 +87,14 @@ class PluginsPage(gtk.VPaned):
             author.set_text(p.__author__)
             author.set_selectable(True)
             align.add(author)
-            table.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
+            self.table.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
         if getattr(p, '__version__', None) is not None:
             align = gtk.Alignment(1.0, 0.5)
             label = gtk.Label()
             label.set_markup("<b>Version:</b>")
             align.add(label)
-            table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
+            self.table.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
             align.show()
             label.show()
 
@@ -102,7 +103,7 @@ class PluginsPage(gtk.VPaned):
             author.set_text(p.__version__)
             author.set_selectable(True)
             align.add(author)
-            table.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
+            self.table.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
         if getdoc(p) is not None:
             align = gtk.Alignment(0.0, 0.5)
@@ -110,8 +111,8 @@ class PluginsPage(gtk.VPaned):
             description.set_text(getdoc(p))
             description.set_selectable(True)
             align.add(description)
-            table.attach(align, 0, 2, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
+            self.table.attach(align, 0, 2, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
-        table.show_all()
+        self.table.show_all()
 
 
