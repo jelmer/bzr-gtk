@@ -21,7 +21,6 @@ import gtk
 import pango
 import gobject
 import subprocess
-import dbus
 
 from bzrlib.plugins.gtk import icon_path
 from bzrlib.osutils import format_date
