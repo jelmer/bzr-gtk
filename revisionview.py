@@ -32,8 +32,11 @@ def _open_link(widget, uri):
 gtk.link_button_set_uri_hook(_open_link)
 
 class BugsTab(gtk.VBox):
+
     def __init__(self):
         super(BugsTab, self).__init__(False, 6)
+    
+        self.num_bugs = 0
 
         table = gtk.Table(rows=2, columns=2)
 
@@ -57,7 +60,8 @@ class BugsTab(gtk.VBox):
         self.set_border_width(6)
         self.pack_start(table, expand=False)
 
-        self.hide_all()
+        self.set_sensitive(False)
+        self.show_all()
 
     def set_revision(self, revision):
         if revision is None:
@@ -88,12 +92,17 @@ class BugsTab(gtk.VBox):
         return win
 
     def clear(self):
+        self.num_bugs = 0
         self.bugs.clear()
-        self.hide_all() # Only shown when there are bugs
+        self.set_sensitive(False)
 
     def add_bug(self, url, status):
+        self.num_bugs += 1
         self.bugs.append([url, status])
-        self.show_all()
+        self.set_sensitive(True)
+
+    def get_num_bugs(self):
+        return self.num_bugs
 
     def on_row_activated(self, treeview, path, column):
         uri = self.bugs.get_value(self.bugs.get_iter(path), 0)
@@ -328,6 +337,8 @@ class RevisionView(gtk.Notebook):
 
     def _update_bugs(self, widget, param):
         self.bugs_page.set_revision(self._revision)
+        label = self.get_tab_label(self.bugs_page)
+        label.set_sensitive(self.bugs_page.get_num_bugs() > 0)
 
     def set_children(self, children):
         self._add_parents_or_children(children,
