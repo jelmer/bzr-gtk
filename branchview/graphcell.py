@@ -171,14 +171,14 @@ class CellRendererGraph(gtk.GenericCellRenderer):
 
         if flags & gtk.CELL_RENDERER_SELECTED:
             ctx.set_source_rgb(1.0, 1.0, 1.0)
-        else:
-            self.set_colour(ctx, colour, 0.0, 0.5)
+            ctx.set_line_width(box_size / 4)
+            ctx.stroke_preserve()
+            ctx.set_line_width(box_size / 8)
+
+        self.set_colour(ctx, colour, 0.0, 0.5)
         ctx.stroke_preserve()
 
-        if flags & gtk.CELL_RENDERER_SELECTED:
-            ctx.set_source_rgb(0.8, 0.8, 0.8)
-        else:
-            self.set_colour(ctx, colour, 0.5, 1.0)
+        self.set_colour(ctx, colour, 0.5, 1.0)
         ctx.fill()
 
         self.render_tags(ctx, widget.create_pango_context(), cell_area, box_size)
@@ -209,15 +209,19 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                 ctx.curve_to(startx, mid - height / 5,
                              startx, mid - height / 5,
                              startx + (endx - startx) / 2, mid)
-                
+                 
                 ctx.curve_to(endx, mid + height / 5,
                              endx, mid + height / 5 ,
                              endx, mid + height / 2)
-                
+
         if flags & gtk.CELL_RENDERER_SELECTED:
             ctx.set_source_rgb(1.0, 1.0, 1.0)
-        else:
-            self.set_colour(ctx, colour, 0.0, 0.65)
+            ctx.set_line_width(box_size / 5)
+            ctx.stroke_preserve()
+            ctx.set_line_width(box_size / 8)
+
+        self.set_colour(ctx, colour, 0.0, 0.65)
+
         ctx.stroke()
 
     def render_tags(self, ctx, pango_ctx, cell_area, box_size):
