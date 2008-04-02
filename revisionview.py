@@ -24,9 +24,15 @@ import subprocess
 import dbus
 
 from bzrlib.plugins.gtk import icon_path
-from bzrlib.plugins.gtk import crypt
 from bzrlib.osutils import format_date
 from bzrlib.util.bencode import bdecode
+
+try:
+    from bzrlib.plugins.gtk import crypt
+except ImportError:
+    has_crypt = False
+else:
+    has_crypt = True
 
 def _open_link(widget, uri):
     subprocess.Popen(['sensible-browser', uri], close_fds=True)
@@ -242,7 +248,8 @@ class RevisionView(gtk.Notebook):
 
         self._create_general()
         self._create_relations()
-        self._create_signature()
+        if has_crypt:
+            self._create_signature()
         self._create_file_info_view()
         self._create_bugs()
 

@@ -13,6 +13,10 @@ KEY_TYPE_OPENPGP = 'openpgp'
 KEY_TYPE_SSH = 'ssh'
 
 bus = dbus.SessionBus()
+
+if not bus.name_has_owner(BUS_NAME):
+    raise ImportError
+
 crypto = dbus.Interface(bus.get_object(BUS_NAME, CRYPTO_PATH), 
                         CRYPTO_INTERFACE)
 openpgp = dbus.Interface(bus.get_object(BUS_NAME, OPENPGP_PATH),
