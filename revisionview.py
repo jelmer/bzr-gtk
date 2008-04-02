@@ -130,8 +130,8 @@ class SignatureTab(gtk.VBox):
         revid = revision.revision_id
 
         if self.repository.has_signature_for_revision_id(revid):
-            signature_text = self.repository.get_signature_text(revid)
-            self.show_signature(signature_text)
+            crypttext = self.repository.get_signature_text(revid)
+            self.show_signature(crypttext)
         else:
             self.show_no_signature()
 
@@ -149,8 +149,8 @@ class SignatureTab(gtk.VBox):
         self.signature_label.set_markup("<b>Authenticity unknown</b>\n" +
                                         "This revision has not been signed.")
 
-    def show_signature(self, seahorsetext):
-        key = seahorse.verify(seahorsetext)
+    def show_signature(self, crypttext):
+        key = seahorse.verify(crypttext)
 
         if key.is_available():
             if key.is_trusted():
