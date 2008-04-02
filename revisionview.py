@@ -36,8 +36,6 @@ class BugsTab(gtk.VBox):
     def __init__(self):
         super(BugsTab, self).__init__(False, 6)
     
-        self.num_bugs = 0
-
         table = gtk.Table(rows=2, columns=2)
 
         table.set_row_spacings(6)
@@ -48,10 +46,8 @@ class BugsTab(gtk.VBox):
         table.attach(image, 0, 1, 0, 1, gtk.FILL)
 
         align = gtk.Alignment(0.0, 0.1)
-        label = gtk.Label()
-        label.set_markup("<b>Bug associations</b>\n" +
-                         "This revision has one or more bug associations.")
-        align.add(label)
+        self.label = gtk.Label()
+        align.add(self.label)
         table.attach(align, 1, 2, 0, 1, gtk.FILL)
 
         treeview = self.construct_treeview()
@@ -60,7 +56,7 @@ class BugsTab(gtk.VBox):
         self.set_border_width(6)
         self.pack_start(table, expand=False)
 
-        self.set_sensitive(False)
+        self.clear()
         self.show_all()
 
     def set_revision(self, revision):
@@ -73,6 +69,17 @@ class BugsTab(gtk.VBox):
                 (url, status) = bugline.split(" ")
                 if status == "fixed":
                     self.add_bug(url, status)
+        
+        if self.num_bugs == 0:
+            return
+        elif self.num_bugs == 1:
+            label = "bug"
+        else:
+            label = "bugs"
+
+        self.label.set_markup("<b>Bugs fixed</b>\n" +
+                              "This revision claims to fix " +
+                              "%d %s." % (self.num_bugs, label))
 
     def construct_treeview(self):
         self.bugs = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
@@ -95,6 +102,8 @@ class BugsTab(gtk.VBox):
         self.num_bugs = 0
         self.bugs.clear()
         self.set_sensitive(False)
+        self.label.set_markup("<b>No bugs fixed</b>\n" +
+                              "This revision does not claim to fix any bugs.")
 
     def add_bug(self, url, status):
         self.num_bugs += 1
