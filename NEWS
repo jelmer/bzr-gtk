@@ -6,6 +6,8 @@
 
   * Use new D-Bus revision signal. (James Henstridge, #206443)
 
+  * Switched to using Seahorse to verify signatures. (Daniel Schierbeck)
+
  UI
 
   * Made the tags associated with a revision render next to the revision
