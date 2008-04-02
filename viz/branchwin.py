@@ -14,6 +14,7 @@ import gobject
 import pango
 
 from bzrlib.plugins.gtk.window import Window
+from bzrlib.plugins.gtk import icon_path
 from bzrlib.plugins.gtk.tags import AddTagDialog
 from bzrlib.plugins.gtk.preferences import PreferencesWindow
 from bzrlib.plugins.gtk.branchview import TreeView, treemodel
@@ -177,7 +178,10 @@ class BranchWindow(Window):
         go_menu_next = self.next_rev_action.create_menu_item()
         go_menu_prev = self.prev_rev_action.create_menu_item()
 
-        self.go_menu_tags = gtk.MenuItem("_Tags")
+        tag_image = gtk.Image()
+        tag_image.set_from_file(icon_path("tag-16.png"))
+        self.go_menu_tags = gtk.ImageMenuItem("_Tags")
+        self.go_menu_tags.set_image(tag_image)
         self._update_tags()
 
         go_menu.add(go_menu_next)
@@ -435,7 +439,10 @@ class BranchWindow(Window):
             tags.sort()
             tags.reverse()
             for tag, revid in tags:
-                tag_item = gtk.MenuItem(tag, use_underline=False)
+                tag_image = gtk.Image()
+                tag_image.set_from_file(icon_path('tag-16.png'))
+                tag_item = gtk.ImageMenuItem(tag.replace('_', '__'))
+                tag_item.set_image(tag_image)
                 tag_item.connect('activate', self._tag_selected_cb, revid)
                 menu.add(tag_item)
             self.go_menu_tags.set_submenu(menu)
