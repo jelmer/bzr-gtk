@@ -16,7 +16,7 @@ bus = dbus.SessionBus()
 crypto = dbus.Interface(bus.get_object(BUS_NAME, CRYPTO_PATH), 
                         CRYPTO_INTERFACE)
 openpgp = dbus.Interface(bus.get_object(BUS_NAME, OPENPGP_PATH),
-                      OPENPGP_INTERFACE)
+                         OPENPGP_INTERFACE)
 
 FLAG_VALID = 0x0001
 FLAG_CAN_ENCRYPT = 0x0002
@@ -54,6 +54,8 @@ class Key:
         self.flags = None
         self.display_name = None
         self.location = None
+
+        discover(key)
 
     def get_field(self, field, default=None):
         (valid, value) = openpgp.GetKeyField(self.key, field)
