@@ -67,7 +67,8 @@ class BugsTab(gtk.VBox):
         bugs_text = revision.properties.get('bugs', '')
         for bugline in bugs_text.splitlines():
                 (url, status) = bugline.split(" ")
-                self.add_bug(url, status)
+                if status == "fixed":
+                    self.add_bug(url, status)
 
     def construct_treeview(self):
         self.bugs = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
