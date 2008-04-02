@@ -149,7 +149,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         box_size = self.box_size(widget)
 
         ctx.set_line_width(box_size / 8)
-        ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+        ctx.set_line_cap(cairo.LINE_CAP_BUTT)
 
         # Draw lines into the cell
         for start, end, colour in self.in_lines:
@@ -197,6 +197,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             ctx.line_to(x, mid - height / 3)
             ctx.move_to(x, mid - height / 6)
             ctx.line_to(x, mid - height / 6)
+
         else:
             startx = cell_area.x + box_size * start + box_size / 2
             endx = cell_area.x + box_size * end + box_size / 2
@@ -204,7 +205,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             ctx.move_to(startx, mid - height / 2)
             
             if start - end == 0 :
-                ctx.line_to(endx, mid + height / 2)
+                ctx.line_to(endx, mid + height / 2 + 1)
             else:
                 ctx.curve_to(startx, mid - height / 5,
                              startx, mid - height / 5,
