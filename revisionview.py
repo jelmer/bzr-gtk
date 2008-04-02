@@ -28,11 +28,11 @@ from bzrlib.osutils import format_date
 from bzrlib.util.bencode import bdecode
 
 try:
-    from bzrlib.plugins.gtk import crypt
+    from bzrlib.plugins.gtk import seahorse
 except ImportError:
-    has_crypt = False
+    has_seahorse = False
 else:
-    has_crypt = True
+    has_seahorse = True
 
 def _open_link(widget, uri):
     subprocess.Popen(['sensible-browser', uri], close_fds=True)
@@ -149,8 +149,8 @@ class SignatureTab(gtk.VBox):
         self.signature_label.set_markup("<b>Authenticity unknown</b>\n" +
                                         "This revision has not been signed.")
 
-    def show_signature(self, crypttext):
-        key = crypt.verify(crypttext)
+    def show_signature(self, seahorsetext):
+        key = seahorse.verify(seahorsetext)
 
         if key.is_available():
             if key.is_trusted():
@@ -177,15 +177,15 @@ class SignatureTab(gtk.VBox):
 
         trust = key.get_trust()
 
-        if trust <= crypt.TRUST_NEVER:
+        if trust <= seahorse.TRUST_NEVER:
             trust_text = 'never trusted'
-        elif trust == crypt.TRUST_UNKNOWN:
+        elif trust == seahorse.TRUST_UNKNOWN:
             trust_text = 'not trusted'
-        elif trust == crypt.TRUST_MARGINAL:
+        elif trust == seahorse.TRUST_MARGINAL:
             trust_text = 'marginally trusted'
-        elif trust == crypt.TRUST_FULL:
+        elif trust == seahorse.TRUST_FULL:
             trust_text = 'fully trusted'
-        elif trust == crypt.TRUST_ULTIMATE:
+        elif trust == seahorse.TRUST_ULTIMATE:
             trust_text = 'ultimately trusted'
 
         self.signature_key_id_label.show()
@@ -248,7 +248,7 @@ class RevisionView(gtk.Notebook):
 
         self._create_general()
         self._create_relations()
-        if has_crypt:
+        if has_seahorse:
             self._create_signature()
         self._create_file_info_view()
         self._create_bugs()
