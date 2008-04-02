@@ -77,6 +77,8 @@ class BugsTab(gtk.VBox):
         uri_column = gtk.TreeViewColumn('Bug URI', gtk.CellRendererText(), text=0)
         self.treeview.append_column(uri_column)
 
+        self.treeview.connect('row-activated', self.on_row_activated)
+
         win = gtk.ScrolledWindow()
         win.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         win.set_shadow_type(gtk.SHADOW_IN)
@@ -91,6 +93,10 @@ class BugsTab(gtk.VBox):
     def add_bug(self, url, status):
         self.bugs.append([url, status])
         self.show_all()
+
+    def on_row_activated(self, treeview, path, column):
+        uri = self.bugs.get_value(self.bugs.get_iter(path), 0)
+        _open_link(self, uri)
 
 
 class SignatureTab(gtk.VBox):
