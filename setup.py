@@ -137,6 +137,7 @@ setup(
                 ('share/applications', ['olive-gtk.desktop',
                                         'bazaar-properties.desktop',
                                         'bzr-notify.desktop']),
+                ('share/application-registry', ['bzr-gtk.applications']),
                 ('share/pixmaps', ['icons/olive-gtk.png', 'icons/bzr-icon-64.png']),
                 ('share/icons/hicolor/scalable/emblems', 
                     ['icons/emblem-bzr-added.svg', 
