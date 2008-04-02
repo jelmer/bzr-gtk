@@ -62,6 +62,7 @@ class SignatureTab(gtk.VBox):
 
     def __init__(self, repository):
         self.key = None
+        self.revision = None
         self.repository = repository
 
         super(SignatureTab, self).__init__(False, 6)
@@ -145,23 +146,28 @@ class SignatureTab(gtk.VBox):
     def show_signature(self, crypttext):
         key = crypt.verify(crypttext)
 
-        if not key.is_available():
+        if key.is_available():
+            if key.is_trusted():
+                if key.get_display_name() == self.revision.committer:
+                    self.signature_image.set_from_file(icon_path("sign-ok.png"))
+                    self.signature_label.set_markup("<b>Authenticity confirmed</b>\n" +
+                                                    "This revision has been signed with " +
+                                                    "a trusted key.")
+                else:
+                    self.signature_image.set_from_file(icon_path("sign-bad.png"))
+                    self.signature_label.set_markup("<b>Authenticity cannot be confirmed</b>\n" +
+                                                    "Revision committer is not the same as signer.")
+            else:
+                self.signature_image.set_from_file(icon_path("sign-bad.png"))
+                self.signature_label.set_markup("<b>Authenticity cannot be confirmed</b>\n" +
+                                                "This revision has been signed, but the " +
+                                                "key is not trusted.")
+        else:
             self.show_no_signature()
             self.signature_image.set_from_file(icon_path("sign-bad.png"))
             self.signature_label.set_markup("<b>Authenticity cannot be confirmed</b>\n" +
                                             "Signature key not available.")
             return
-
-        if key.is_trusted():
-            self.signature_image.set_from_file(icon_path("sign-ok.png"))
-            self.signature_label.set_markup("<b>Authenticity confirmed</b>\n" +
-                                            "This revision has been signed with " +
-                                            "a trusted key.")
-        else:
-            self.signature_image.set_from_file(icon_path("sign-bad.png"))
-            self.signature_label.set_markup("<b>Authenticity cannot be confirmed</b>\n" +
-                                            "This revision has been signed, but the " +
-                                            "key is not trusted.")
 
         trust = key.get_trust()
 
