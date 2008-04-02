@@ -32,6 +32,11 @@ TRUST_MARGINAL = 1
 TRUST_FULL = 5
 TRUST_ULTIMATE = 10
 
+LOCATION_MISSING = 10
+LOCATION_SEARCHING = 20
+LOCATION_REMOTE = 50
+LOCATION_LOCAL = 100
+
 def discover(*key_ids):
     return openpgp.DiscoverKeys(key_ids, 0)
 
@@ -48,6 +53,7 @@ class Key:
         self.trust = None
         self.flags = None
         self.display_name = None
+        self.location = None
 
     def get_field(self, field, default=None):
         (valid, value) = openpgp.GetKeyField(self.key, field)
@@ -83,6 +89,12 @@ class Key:
             self.trust = self.get_field('trust', TRUST_UNKNOWN)
 
         return self.trust
+
+    def get_location(self):
+        if self.location is None:
+            self.location = self.get_field('location', LOCATION_MISSING)
+
+        return self.location
 
     def is_available(self):
         return self.key != ""
