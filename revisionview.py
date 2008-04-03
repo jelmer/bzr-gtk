@@ -33,6 +33,11 @@ except ImportError:
 else:
     has_seahorse = True
 
+PAGE_GENERAL = 0
+PAGE_RELATIONS = 1
+PAGE_SIGNATURE = 2
+PAGE_BUGS = 3
+
 def _open_link(widget, uri):
     subprocess.Popen(['sensible-browser', uri], close_fds=True)
 
@@ -238,7 +243,6 @@ class RevisionView(gtk.Notebook):
         )
     }
 
-
     def __init__(self, branch=None):
         gtk.Notebook.__init__(self)
 
@@ -252,7 +256,8 @@ class RevisionView(gtk.Notebook):
         self._create_file_info_view()
         self._create_bugs()
 
-        self.set_current_page(0)
+        self.set_current_page(PAGE_GENERAL)
+        self.connect_after('switch-page', lambda *a: self._update_signature())
         
         self._show_callback = None
         self._clicked_callback = None
@@ -374,8 +379,9 @@ class RevisionView(gtk.Notebook):
 
         self._add_tags()
 
-    def _update_signature(self, widget, param):
-        self.signature_table.set_revision(self._revision)
+    def _update_signature(self):
+        if self.get_current_page() == PAGE_SIGNATURE:
+            self.signature_table.set_revision(self._revision)
 
     def set_children(self, children):
         self._add_parents_or_children(children,
@@ -465,7 +471,7 @@ class RevisionView(gtk.Notebook):
     def _create_signature(self):
         self.signature_table = SignatureTab(self._branch.repository)
         self.append_page(self.signature_table, tab_label=gtk.Label('Signature'))
-        self.connect_after('notify::revision', self._update_signature)
+        self.connect_after('notify::revision', lambda *a: self._update_signature())
 
     def _create_headers(self):
         self.table = gtk.Table(rows=5, columns=2)
