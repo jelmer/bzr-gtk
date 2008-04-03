@@ -59,13 +59,16 @@ LOCATION_SEARCHING = 20
 LOCATION_REMOTE = 50
 LOCATION_LOCAL = 100
 
-def discover(*key_ids):
-    return openpgp.DiscoverKeys(key_ids, 0)
+keyset = dict()
 
 def verify(crypttext):
     (cleartext, key) = crypto.VerifyText(KEY_TYPE_OPENPGP, 1, crypttext)
 
-    return Key(key)
+    if key != "":
+        if key not in keyset:
+            keyset[key] = Key(key)
+
+        return keyset[key]
 
 class Key:
 
@@ -76,9 +79,9 @@ class Key:
         self.flags = None
         self.display_name = None
         self.location = None
-
-        if self.is_available():
-            discover(key)
+        
+        (keys, unmatched) = openpgp.MatchKeys([self.get_id()], 0x00000010)
+        self.available = (key in keys)
 
     def get_field(self, field, default=None):
         (valid, value) = openpgp.GetKeyField(self.key, field)
@@ -122,7 +125,7 @@ class Key:
         return self.location
 
     def is_available(self):
-        return self.key != ""
+        return self.available
 
     def is_trusted(self):
         return self.get_flags() & FLAG_TRUSTED

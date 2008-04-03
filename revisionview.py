@@ -151,7 +151,7 @@ class SignatureTab(gtk.VBox):
     def show_signature(self, crypttext):
         key = seahorse.verify(crypttext)
 
-        if key.is_available():
+        if key and key.is_available():
             if key.is_trusted():
                 if key.get_display_name() == self.revision.committer:
                     self.signature_image.set_from_file(icon_path("sign-ok.png"))
