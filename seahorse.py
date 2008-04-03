@@ -77,7 +77,8 @@ class Key:
         self.display_name = None
         self.location = None
 
-        discover(key)
+        if self.is_available():
+            discover(key)
 
     def get_field(self, field, default=None):
         (valid, value) = openpgp.GetKeyField(self.key, field)
