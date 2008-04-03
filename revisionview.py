@@ -22,8 +22,16 @@ import pango
 import gobject
 import subprocess
 
+from bzrlib.plugins.gtk import icon_path
 from bzrlib.osutils import format_date
 from bzrlib.util.bencode import bdecode
+
+try:
+    from bzrlib.plugins.gtk import seahorse
+except ImportError:
+    has_seahorse = False
+else:
+    has_seahorse = True
 
 def _open_link(widget, uri):
     subprocess.Popen(['sensible-browser', uri], close_fds=True)
@@ -31,6 +39,7 @@ def _open_link(widget, uri):
 gtk.link_button_set_uri_hook(_open_link)
 
 class BugsTab(gtk.Table):
+
     def __init__(self):
         super(BugsTab, self).__init__(rows=5, columns=2)
         self.set_row_spacings(6)
@@ -52,6 +61,144 @@ class BugsTab(gtk.Table):
                               gtk.EXPAND | gtk.FILL, gtk.FILL)
         self.count += 1
         self.show_all()
+
+
+class SignatureTab(gtk.VBox):
+
+    def __init__(self, repository):
+        self.key = None
+        self.revision = None
+        self.repository = repository
+
+        super(SignatureTab, self).__init__(False, 6)
+        signature_box = gtk.Table(rows=3, columns=3)
+        signature_box.set_col_spacing(0, 16)
+        signature_box.set_col_spacing(1, 12)
+        signature_box.set_row_spacings(6)
+
+        self.signature_image = gtk.Image()
+        signature_box.attach(self.signature_image, 0, 1, 0, 1, gtk.FILL)
+
+        align = gtk.Alignment(0.0, 0.1)
+        self.signature_label = gtk.Label()
+        align.add(self.signature_label)
+        signature_box.attach(align, 1, 3, 0, 1, gtk.FILL)
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.signature_key_id_label = gtk.Label()
+        self.signature_key_id_label.set_markup("<b>Key Id:</b>")
+        align.add(self.signature_key_id_label)
+        signature_box.attach(align, 1, 2, 1, 2, gtk.FILL, gtk.FILL)
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.signature_key_id = gtk.Label()
+        self.signature_key_id.set_selectable(True)
+        align.add(self.signature_key_id)
+        signature_box.attach(align, 2, 3, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.signature_fingerprint_label = gtk.Label()
+        self.signature_fingerprint_label.set_markup("<b>Fingerprint:</b>")
+        align.add(self.signature_fingerprint_label)
+        signature_box.attach(align, 1, 2, 2, 3, gtk.FILL, gtk.FILL)
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.signature_fingerprint = gtk.Label()
+        self.signature_fingerprint.set_selectable(True)
+        align.add(self.signature_fingerprint)
+        signature_box.attach(align, 2, 3, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.signature_trust_label = gtk.Label()
+        self.signature_trust_label.set_markup("<b>Trust:</b>")
+        align.add(self.signature_trust_label)
+        signature_box.attach(align, 1, 2, 3, 4, gtk.FILL, gtk.FILL)
+
+        align = gtk.Alignment(0.0, 0.5)
+        self.signature_trust = gtk.Label()
+        self.signature_trust.set_selectable(True)
+        align.add(self.signature_trust)
+        signature_box.attach(align, 2, 3, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
+
+        self.set_border_width(6)
+        self.pack_start(signature_box, expand=False)
+        self.show_all()
+
+    def set_revision(self, revision):
+        self.revision = revision
+        revid = revision.revision_id
+
+        if self.repository.has_signature_for_revision_id(revid):
+            crypttext = self.repository.get_signature_text(revid)
+            self.show_signature(crypttext)
+        else:
+            self.show_no_signature()
+
+    def show_no_signature(self):
+        self.signature_key_id_label.hide()
+        self.signature_key_id.set_text("")
+
+        self.signature_fingerprint_label.hide()
+        self.signature_fingerprint.set_text("")
+
+        self.signature_trust_label.hide()
+        self.signature_trust.set_text("")
+
+        self.signature_image.set_from_file(icon_path("sign-unknown.png"))
+        self.signature_label.set_markup("<b>Authenticity unknown</b>\n" +
+                                        "This revision has not been signed.")
+
+    def show_signature(self, crypttext):
+        key = seahorse.verify(crypttext)
+
+        if key and key.is_available():
+            if key.is_trusted():
+                if key.get_display_name() == self.revision.committer:
+                    self.signature_image.set_from_file(icon_path("sign-ok.png"))
+                    self.signature_label.set_markup("<b>Authenticity confirmed</b>\n" +
+                                                    "This revision has been signed with " +
+                                                    "a trusted key.")
+                else:
+                    self.signature_image.set_from_file(icon_path("sign-bad.png"))
+                    self.signature_label.set_markup("<b>Authenticity cannot be confirmed</b>\n" +
+                                                    "Revision committer is not the same as signer.")
+            else:
+                self.signature_image.set_from_file(icon_path("sign-bad.png"))
+                self.signature_label.set_markup("<b>Authenticity cannot be confirmed</b>\n" +
+                                                "This revision has been signed, but the " +
+                                                "key is not trusted.")
+        else:
+            self.show_no_signature()
+            self.signature_image.set_from_file(icon_path("sign-bad.png"))
+            self.signature_label.set_markup("<b>Authenticity cannot be confirmed</b>\n" +
+                                            "Signature key not available.")
+            return
+
+        trust = key.get_trust()
+
+        if trust <= seahorse.TRUST_NEVER:
+            trust_text = 'never trusted'
+        elif trust == seahorse.TRUST_UNKNOWN:
+            trust_text = 'not trusted'
+        elif trust == seahorse.TRUST_MARGINAL:
+            trust_text = 'marginally trusted'
+        elif trust == seahorse.TRUST_FULL:
+            trust_text = 'fully trusted'
+        elif trust == seahorse.TRUST_ULTIMATE:
+            trust_text = 'ultimately trusted'
+
+        self.signature_key_id_label.show()
+        self.signature_key_id.set_text(key.get_id())
+
+        fingerprint = key.get_fingerprint()
+        if fingerprint == "":
+            fingerprint = '<span foreground="dim grey">N/A</span>'
+
+        self.signature_fingerprint_label.show()
+        self.signature_fingerprint.set_markup(fingerprint)
+
+        self.signature_trust_label.show()
+        self.signature_trust.set_text('This key is ' + trust_text)
 
 
 class RevisionView(gtk.Notebook):
@@ -95,8 +242,13 @@ class RevisionView(gtk.Notebook):
     def __init__(self, branch=None):
         gtk.Notebook.__init__(self)
 
+        self._revision = None
+        self._branch = branch
+
         self._create_general()
         self._create_relations()
+        if has_seahorse:
+            self._create_signature()
         self._create_file_info_view()
         self._create_bugs()
 
@@ -222,6 +374,9 @@ class RevisionView(gtk.Notebook):
 
         self._add_tags()
 
+    def _update_signature(self, widget, param):
+        self.signature_table.set_revision(self._revision)
+
     def set_children(self, children):
         self._add_parents_or_children(children,
                                       self.children_widgets,
@@ -235,7 +390,8 @@ class RevisionView(gtk.Notebook):
         """Callback for when the go button for a parent is clicked."""
 
     def _add_tags(self, *args):
-        if self._revision is None: return
+        if self._revision is None:
+            return
 
         if self._tagdict.has_key(self._revision.revision_id):
             tags = self._tagdict[self._revision.revision_id]
@@ -305,6 +461,11 @@ class RevisionView(gtk.Notebook):
         vbox.pack_start(self._create_children(), expand=False, fill=True)
         self.append_page(vbox, tab_label=gtk.Label("Relations"))
         vbox.show()
+
+    def _create_signature(self):
+        self.signature_table = SignatureTab(self._branch.repository)
+        self.append_page(self.signature_table, tab_label=gtk.Label('Signature'))
+        self.connect_after('notify::revision', self._update_signature)
 
     def _create_headers(self):
         self.table = gtk.Table(rows=5, columns=2)
@@ -413,7 +574,6 @@ class RevisionView(gtk.Notebook):
         self.connect('notify::revision', self._add_tags)
 
         return self.table
-
     
     def _create_parents(self):
         hbox = gtk.HBox(True, 3)
@@ -461,6 +621,7 @@ class RevisionView(gtk.Notebook):
         tv = gtk.TextView(msg_buffer)
         tv.set_editable(False)
         tv.set_wrap_mode(gtk.WRAP_WORD)
+
         tv.modify_font(pango.FontDescription("Monospace"))
         tv.show()
         window.add(tv)

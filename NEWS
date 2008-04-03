@@ -4,6 +4,10 @@
 
   * Removed tortoise-bzr, which now has its own project (http://launchpad.net/tortoisebzr)
 
+  * Use new D-Bus revision signal. (James Henstridge, #206443)
+
+  * Switched to using Seahorse to verify signatures. (Daniel Schierbeck)
+
  UI
 
   * Made the tags associated with a revision render next to the revision
@@ -40,11 +44,15 @@
 
   * Support child_submit_to setting in gsend. (Jelmer Vernooij)
 
+  * Add tab if revision view showing the signature status. (Daniel Schierbeck, Jelmer Vernooij)
+
  INTERNALS
 
   * Refactored the revisionview. (Daniel Schierbeck)
 
   * It is now possible to use the diff view as a widget. (Jelmer Vernooij)
+
+  * Preferences dialog has been split up. (Jelmer Vernooij)
 
 0.93.0  2007-12-10
 
