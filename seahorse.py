@@ -74,58 +74,41 @@ class Key:
 
     def __init__(self, key):
         self.key = key
-        self.fingerprint = None
-        self.trust = None
-        self.flags = None
-        self.display_name = None
-        self.location = None
-        
+
         (keys, unmatched) = openpgp.MatchKeys([self.get_id()], 0x00000010)
         self.available = (key in keys)
 
-    def get_field(self, field, default=None):
-        (valid, value) = openpgp.GetKeyField(self.key, field)
-
-        if valid:
-            return value
+        if self.available:
+            fields = openpgp.GetKeyFields(key, ['fingerprint', 'trust', 'flags', 'display-name', 'location'])
         else:
-            return default
+            fields = dict()
+
+        self.fingerprint = fields.get('fingerprint', 'N/A')
+        self.trust = fields.get('trust', TRUST_UNKNOWN)
+        self.flags = fields.get('flags', 0)
+        self.display_name = fields.get('display-name', '')
+        self.location = fields.get('location', LOCATION_MISSING)
     
     def get_flags(self):
-        if self.flags is None:
-            self.flags = self.get_field('flags', 0)
-
         return self.flags
 
     def get_display_name(self):
-        if self.display_name is None:
-            self.display_name = self.get_field('display-name')
-
         return self.display_name
 
     def get_id(self):
         return self.key.split(':')[1][8:]
 
     def get_fingerprint(self):
-        if self.fingerprint is None:
-            self.fingerprint = self.get_field('fingerprint')
-
         return self.fingerprint
 
     def get_trust(self):
-        if self.trust is None:
-            self.trust = self.get_field('trust', TRUST_UNKNOWN)
-
         return self.trust
 
     def get_location(self):
-        if self.location is None:
-            self.location = self.get_field('location', LOCATION_MISSING)
-
         return self.location
 
     def is_available(self):
         return self.available
 
     def is_trusted(self):
-        return self.get_flags() & FLAG_TRUSTED
+        return self.flags & FLAG_TRUSTED != 0
