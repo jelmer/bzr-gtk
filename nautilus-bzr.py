@@ -15,8 +15,6 @@ from bzrlib.errors import NotBranchError, NoWorkingTree, UnsupportedProtocol
 from bzrlib.tree import file_status
 from bzrlib.workingtree import WorkingTree
 from bzrlib.config import GlobalConfig
-config = GlobalConfig()
-disabled_flag = config.get_user_option('nautilus_integration')
 
 from bzrlib.plugin import load_plugins
 load_plugins()
@@ -222,27 +220,16 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         gtk.main()
 
     def get_background_items(self, window, vfs_file):
-        if disabled_flag == 'False':
-            item = nautilus.MenuItem('BzrNautilus::enable',
-                                     'Enable Bazaar Plugin',
-                                     'Enable Bazaar plugin for nautilus')
-            item.connect('activate', self.enable_integration, vfs_file)
-            return item,
-
         items = []
         file = vfs_file.get_uri()
- 
-        item = nautilus.MenuItem('BzrNautilus::disable',
-                                  'Disable Bazaar Plugin',
-                                  'Disable Bazaar plugin for nautilus')
-        item.connect('activate', self.disable_integration, vfs_file)
-        items.append(item)
 
         try:
             tree, path = WorkingTree.open_containing(file)
+            disabled_flag = self.check_branch_enabled(tree.branch)
         except UnsupportedProtocol:
             return
         except NotBranchError:
+            disabled_flag = self.check_branch_enabled()
             item = nautilus.MenuItem('BzrNautilus::newtree',
                                  'Make directory versioned',
                                  'Create new Bazaar tree in this folder')
@@ -258,6 +245,19 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
             return items
         except NoWorkingTree:
             return
+        
+        if disabled_flag == 'False':
+            item = nautilus.MenuItem('BzrNautilus::enable',
+                                     'Enable Bazaar Plugin for this Branch',
+                                     'Enable Bazaar plugin for nautilus')
+            item.connect('activate', self.enable_integration, vfs_file)
+            return item,
+        else:
+            item = nautilus.MenuItem('BzrNautilus::disable',
+                                      'Disable Bazaar Plugin for the Branch',
+                                      'Disable Bazaar plugin for nautilus')
+            item.connect('activate', self.disable_integration, vfs_file)
+            items.append(item)
 
         item = nautilus.MenuItem('BzrNautilus::log',
                              'Log',
@@ -286,10 +286,8 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         return items
 
     def get_file_items(self, window, files):
-        if disabled_flag == 'False':
-            return
-
         items = []
+        
         wtfiles = {}
         for vfs_file in files:
             # We can only cope with local files
@@ -299,9 +297,15 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
             file = vfs_file.get_uri()
             try:
                 tree, path = WorkingTree.open_containing(file)
+                disabled_flag = self.check_branch_enabled(tree.branch)
             except NotBranchError:
+                disabled_flag = self.check_branch_enabled()
                 if not vfs_file.is_directory():
                     continue
+
+                if disabled_flag == 'False':
+                    return
+
                 item = nautilus.MenuItem('BzrNautilus::newtree',
                                      'Make directory versioned',
                                      'Create new Bazaar tree in %s' % vfs_file.get_name())
@@ -375,8 +379,6 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
                                "Version control status"),
 
     def update_file_info(self, file):
-        if disabled_flag == 'False':
-            return
 
         if file.get_uri_scheme() != 'file':
             return
@@ -386,6 +388,10 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         except NotBranchError:
             return
         except NoWorkingTree:
+            return   
+
+        disabled_flag = self.check_branch_enabled(tree.branch)
+        if disabled_flag == 'False':
             return
 
         emblem = None
@@ -420,8 +426,40 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
             file.add_emblem(emblem)
         file.add_string_attribute('bzr_status', status)
 
+    def check_branch_enabled(self, branch=None):
+        # Supports global disable, but there is currently no UI to do this
+        config = GlobalConfig()
+        disabled_flag = config.get_user_option('nautilus_integration')
+        if disabled_flag != 'False':
+            if branch is not None:
+                config = branch.get_config()
+                disabled_flag = config.get_user_option('nautilus_integration')
+        return disabled_flag
+
     def enable_integration(self, menu, vfs_file=None):
+        try:
+            tree, path = WorkingTree.open_containing(vfs_file.get_uri())
+        except NotBranchError:
+            return
+        except NoWorkingTree:
+            return
+        branch = tree.branch
+        if branch is None:
+            config = GlobalConfig()
+        else:
+            config = branch.get_config()
         config.set_user_option('nautilus_integration','True')
 
     def disable_integration(self, menu, vfs_file=None):
+        try:
+            tree, path = WorkingTree.open_containing(vfs_file.get_uri())
+        except NotBranchError:
+            return
+        except NoWorkingTree:
+            return   
+        branch = tree.branch
+        if branch is None:
+            config = GlobalConfig()
+        else:
+            config = branch.get_config()
         config.set_user_option('nautilus_integration','False')
