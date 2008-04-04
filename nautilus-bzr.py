@@ -250,13 +250,13 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
             item = nautilus.MenuItem('BzrNautilus::enable',
                                      'Enable Bazaar Plugin for this Branch',
                                      'Enable Bazaar plugin for nautilus')
-            item.connect('activate', self.enable_integration, vfs_file)
+            item.connect('activate', self.toggle_integration, 'True', vfs_file)
             return item,
         else:
             item = nautilus.MenuItem('BzrNautilus::disable',
                                       'Disable Bazaar Plugin for the Branch',
                                       'Disable Bazaar plugin for nautilus')
-            item.connect('activate', self.disable_integration, vfs_file)
+            item.connect('activate', self.toggle_integration, 'False', vfs_file)
             items.append(item)
 
         item = nautilus.MenuItem('BzrNautilus::log',
@@ -436,7 +436,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
                 disabled_flag = config.get_user_option('nautilus_integration')
         return disabled_flag
 
-    def enable_integration(self, menu, vfs_file=None):
+    def toggle_integration(self, menu, action, vfs_file=None):
         try:
             tree, path = WorkingTree.open_containing(vfs_file.get_uri())
         except NotBranchError:
@@ -448,18 +448,5 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
             config = GlobalConfig()
         else:
             config = branch.get_config()
-        config.set_user_option('nautilus_integration','True')
+        config.set_user_option('nautilus_integration', action)
 
-    def disable_integration(self, menu, vfs_file=None):
-        try:
-            tree, path = WorkingTree.open_containing(vfs_file.get_uri())
-        except NotBranchError:
-            return
-        except NoWorkingTree:
-            return   
-        branch = tree.branch
-        if branch is None:
-            config = GlobalConfig()
-        else:
-            config = branch.get_config()
-        config.set_user_option('nautilus_integration','False')
