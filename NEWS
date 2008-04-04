@@ -20,7 +20,11 @@
   * New Tango-styled icons. This time properly licensed under the GPL.
     (Simon Pascal Klein)
 
-  * Support showing multiple branches in "bzr viz". (Jelmer Vernooij)
+  * Support showing multiple branches in "bzr viz". (Jelmer Vernooij
+
+  * Added new icons for nautilus overlay (Martin Albisetti)
+
+  * Added enable/disable per-branch option (Martin Albisetti)
 
  BUG FIXES
 
