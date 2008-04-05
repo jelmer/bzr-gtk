@@ -9,6 +9,7 @@ window.
 __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
+from bzrlib.revision import NULL_REVISION
 from bzrlib.tsort import merge_sort
 
 def linegraph(repository, start_revs, maxnum, broken_line_length = None,
@@ -46,7 +47,10 @@ def linegraph(repository, start_revs, maxnum, broken_line_length = None,
     graph_parents = {}
     graph_children = {}
     for (revid, parent_revids) in graph.iter_ancestry(start_revs):
-        graph_parents[revid] = parent_revids
+        if parent_revids == (NULL_REVISION,):
+            graph_parents[revid] = ()
+        else:
+            graph_parents[revid] = parent_revids
         graph_children[revid] = []
 
     graph_parents["top:"] = start_revs
