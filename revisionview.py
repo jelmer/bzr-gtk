@@ -257,7 +257,7 @@ class RevisionView(gtk.Notebook):
         self._create_bugs()
 
         self.set_current_page(PAGE_GENERAL)
-        self.connect_after('switch-page', lambda *a: self._update_signature())
+        self.connect_after('switch-page', self._switch_page_cb)
         
         self._show_callback = None
         self._clicked_callback = None
@@ -379,7 +379,7 @@ class RevisionView(gtk.Notebook):
 
         self._add_tags()
 
-    def _update_signature(self):
+    def _update_signature(self, widget, param):
         if self.get_current_page() == PAGE_SIGNATURE:
             self.signature_table.set_revision(self._revision)
 
@@ -387,6 +387,12 @@ class RevisionView(gtk.Notebook):
         self._add_parents_or_children(children,
                                       self.children_widgets,
                                       self.children_table)
+
+    def _switch_page_cb(self, notebook, page, page_num):
+        if page_num == PAGE_SIGNATURE:
+            self.signature_table.set_revision(self._revision)
+
+
 
     def _show_clicked_cb(self, widget, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
@@ -471,7 +477,7 @@ class RevisionView(gtk.Notebook):
     def _create_signature(self):
         self.signature_table = SignatureTab(self._branch.repository)
         self.append_page(self.signature_table, tab_label=gtk.Label('Signature'))
-        self.connect_after('notify::revision', lambda *a: self._update_signature())
+        self.connect_after('notify::revision', self._update_signature)
 
     def _create_headers(self):
         self.table = gtk.Table(rows=5, columns=2)
