@@ -38,29 +38,91 @@ def _open_link(widget, uri):
 
 gtk.link_button_set_uri_hook(_open_link)
 
-class BugsTab(gtk.Table):
+class BugsTab(gtk.VBox):
 
     def __init__(self):
-        super(BugsTab, self).__init__(rows=5, columns=2)
-        self.set_row_spacings(6)
-        self.set_col_spacings(6)
+        super(BugsTab, self).__init__(False, 6)
+    
+        table = gtk.Table(rows=2, columns=2)
+
+        table.set_row_spacings(6)
+        table.set_col_spacing(0, 16)
+
+        image = gtk.Image()
+        image.set_from_file(icon_path("bug.png"))
+        table.attach(image, 0, 1, 0, 1, gtk.FILL)
+
+        align = gtk.Alignment(0.0, 0.1)
+        self.label = gtk.Label()
+        align.add(self.label)
+        table.attach(align, 1, 2, 0, 1, gtk.FILL)
+
+        treeview = self.construct_treeview()
+        table.attach(treeview, 1, 2, 1, 2, gtk.FILL | gtk.EXPAND)
+
+        self.set_border_width(6)
+        self.pack_start(table, expand=False)
+
         self.clear()
+        self.show_all()
+
+    def set_revision(self, revision):
+        if revision is None:
+            return
+
+        self.clear()
+        bugs_text = revision.properties.get('bugs', '')
+        for bugline in bugs_text.splitlines():
+                (url, status) = bugline.split(" ")
+                if status == "fixed":
+                    self.add_bug(url, status)
+        
+        if self.num_bugs == 0:
+            return
+        elif self.num_bugs == 1:
+            label = "bug"
+        else:
+            label = "bugs"
+
+        self.label.set_markup("<b>Bugs fixed</b>\n" +
+                              "This revision claims to fix " +
+                              "%d %s." % (self.num_bugs, label))
+
+    def construct_treeview(self):
+        self.bugs = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
+        self.treeview = gtk.TreeView(self.bugs)
+        self.treeview.set_headers_visible(False)
+
+        uri_column = gtk.TreeViewColumn('Bug URI', gtk.CellRendererText(), text=0)
+        self.treeview.append_column(uri_column)
+
+        self.treeview.connect('row-activated', self.on_row_activated)
+
+        win = gtk.ScrolledWindow()
+        win.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        win.set_shadow_type(gtk.SHADOW_IN)
+        win.add(self.treeview)
+
+        return win
 
     def clear(self):
-        for c in self.get_children():
-            self.remove(c)
-        self.count = 0
-        self.hide_all() # Only shown when there are bugs
+        self.num_bugs = 0
+        self.bugs.clear()
+        self.set_sensitive(False)
+        self.label.set_markup("<b>No bugs fixed</b>\n" +
+                              "This revision does not claim to fix any bugs.")
 
     def add_bug(self, url, status):
-        button = gtk.LinkButton(url, url)
-        self.attach(button, 0, 1, self.count, self.count + 1,
-                              gtk.EXPAND | gtk.FILL, gtk.FILL)
-        status_label = gtk.Label(status)
-        self.attach(status_label, 1, 2, self.count, self.count + 1,
-                              gtk.EXPAND | gtk.FILL, gtk.FILL)
-        self.count += 1
-        self.show_all()
+        self.num_bugs += 1
+        self.bugs.append([url, status])
+        self.set_sensitive(True)
+
+    def get_num_bugs(self):
+        return self.num_bugs
+
+    def on_row_activated(self, treeview, path, column):
+        uri = self.bugs.get_value(self.bugs.get_iter(path), 0)
+        _open_link(self, uri)
 
 
 class SignatureTab(gtk.VBox):
@@ -359,13 +421,6 @@ class RevisionView(gtk.Notebook):
         else:
             self.file_info_box.hide()
 
-        self.bugs_table.clear()
-        bugs_text = revision.properties.get('bugs', None)
-        if bugs_text:
-            for bugline in bugs_text.splitlines():
-                (url, status) = bugline.split(" ")
-                self.bugs_table.add_bug(url, status)
-
     def update_tags(self):
         if self._branch is not None and self._branch.supports_tags():
             self._tagdict = self._branch.tags.get_reverse_tag_dict()
@@ -376,6 +431,11 @@ class RevisionView(gtk.Notebook):
 
     def _update_signature(self, widget, param):
         self.signature_table.set_revision(self._revision)
+
+    def _update_bugs(self, widget, param):
+        self.bugs_page.set_revision(self._revision)
+        label = self.get_tab_label(self.bugs_page)
+        label.set_sensitive(self.bugs_page.get_num_bugs() != 0)
 
     def set_children(self, children):
         self._add_parents_or_children(children,
@@ -629,8 +689,9 @@ class RevisionView(gtk.Notebook):
         return window
 
     def _create_bugs(self):
-        self.bugs_table = BugsTab()
-        self.append_page(self.bugs_table, tab_label=gtk.Label('Bugs'))
+        self.bugs_page = BugsTab()
+        self.connect_after('notify::revision', self._update_bugs) 
+        self.append_page(self.bugs_page, tab_label=gtk.Label('Bugs'))
 
     def _create_file_info_view(self):
         self.file_info_box = gtk.VBox(False, 6)
