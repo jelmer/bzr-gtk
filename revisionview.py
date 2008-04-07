@@ -33,6 +33,11 @@ except ImportError:
 else:
     has_seahorse = True
 
+PAGE_GENERAL = 0
+PAGE_RELATIONS = 1
+PAGE_SIGNATURE = 2
+PAGE_BUGS = 3
+
 def _open_link(widget, uri):
     subprocess.Popen(['sensible-browser', uri], close_fds=True)
 
@@ -300,7 +305,6 @@ class RevisionView(gtk.Notebook):
         )
     }
 
-
     def __init__(self, branch=None):
         gtk.Notebook.__init__(self)
 
@@ -314,7 +318,8 @@ class RevisionView(gtk.Notebook):
         self._create_file_info_view()
         self._create_bugs()
 
-        self.set_current_page(0)
+        self.set_current_page(PAGE_GENERAL)
+        self.connect_after('switch-page', self._switch_page_cb)
         
         self._show_callback = None
         self._clicked_callback = None
@@ -430,7 +435,8 @@ class RevisionView(gtk.Notebook):
         self._add_tags()
 
     def _update_signature(self, widget, param):
-        self.signature_table.set_revision(self._revision)
+        if self.get_current_page() == PAGE_SIGNATURE:
+            self.signature_table.set_revision(self._revision)
 
     def _update_bugs(self, widget, param):
         self.bugs_page.set_revision(self._revision)
@@ -441,6 +447,12 @@ class RevisionView(gtk.Notebook):
         self._add_parents_or_children(children,
                                       self.children_widgets,
                                       self.children_table)
+
+    def _switch_page_cb(self, notebook, page, page_num):
+        if page_num == PAGE_SIGNATURE:
+            self.signature_table.set_revision(self._revision)
+
+
 
     def _show_clicked_cb(self, widget, revid, parentid):
         """Callback for when the show button for a parent is clicked."""
