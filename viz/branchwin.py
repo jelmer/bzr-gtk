@@ -18,9 +18,11 @@ from bzrlib.plugins.gtk import icon_path
 from bzrlib.plugins.gtk.tags import AddTagDialog
 from bzrlib.plugins.gtk.preferences import PreferencesWindow
 from bzrlib.plugins.gtk.branchview import TreeView, treemodel
+from bzrlib.plugins.gtk.dialog import _chooserevison_dialog
 from bzrlib.revision import Revision, NULL_REVISION
 from bzrlib.config import BranchConfig
 from bzrlib.config import GlobalConfig
+from bzrlib.tsort import merge_sort
 
 class BranchWindow(Window):
     """Branch window.
@@ -196,12 +198,17 @@ class BranchWindow(Window):
         revision_menu_diff = gtk.MenuItem("View Changes")
         revision_menu_diff.connect('activate', 
                 lambda w: self.treeview.show_diff())
-
+        
+        revision_menu_compare = gtk.MenuItem("Compare with...")
+        revision_menu_compare.connect('activate',
+                self._compare_with_cb)
+        
         revision_menu_tag = gtk.MenuItem("Tag Revision")
         revision_menu_tag.connect('activate', self._tag_revision_cb)
 
         revision_menu.add(revision_menu_tag)
         revision_menu.add(revision_menu_diff)
+        revision_menu.add(revision_menu_compare)
 
         branch_menu = gtk.Menu()
         branch_menuitem = gtk.MenuItem("_Branch")
@@ -377,6 +384,45 @@ class BranchWindow(Window):
         self.show_diff(revid, parentid)
         self.treeview.grab_focus()
 
+    def _compare_with_cb(self,w):
+        """Callback for revision 'compare with' menu. Will show a small
+            dialog with branch revisions to compare with selected revision in TreeView"""
+        
+        start_revs = (self.branch.last_revision(),) #create touple with only last revision
+        graph = self.branch.repository.get_graph()
+
+        graph_parents = {} # this code is copied from "branchview/linegraph.linegraph()" and is the
+                           # only way I found to generate a list of revision numbers...
+                           
+        for (revid, parent_revids) in graph.iter_ancestry(start_revs):
+            graph_parents[revid] = parent_revids
+
+        graph_parents["top:"] = start_revs
+
+        if len(graph_parents)>0:
+            merge_sorted_revisions = merge_sort(
+                graph_parents,
+                "top:",
+                generate_revno=True)
+        else:
+            merge_sorted_revisions = ()
+
+        response, revid2 = _chooserevison_dialog(merge_sorted_revisions) # show dialog passing revisions
+
+        if response == gtk.RESPONSE_OK and revid2 != '':
+            (path, focus) = self.treeview.treeview.get_cursor()
+            revid = self.treeview.model[path][treemodel.REVID]
+
+            from bzrlib.plugins.gtk.diff import DiffWindow
+            window = DiffWindow(parent=self)
+            rev_tree = self.branch.repository.revision_tree(revid)
+            parent_tree = self.branch.repository.revision_tree(revid2)
+            window.set_diff(revid, rev_tree, parent_tree)
+            window.show()
+
+        elif response == gtk.RESPONSE_OK and revid2 == '':
+            error_dialog("Bad revision","You must select a revision")
+            
     def _set_revision_cb(self, w, revision_id):
         self.treeview.set_revision_id(revision_id)
 
