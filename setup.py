@@ -36,8 +36,7 @@ class Check(Command):
 class InstallData(install_data):
     def run(self):
         self.data_files.extend(self._compile_po_files())
-        # Disable for now - performance issues
-        #self.data_files.extend(self._nautilus_plugin())
+        self.data_files.extend(self._nautilus_plugin())
         install_data.run(self)
 
         try:
