@@ -54,3 +54,54 @@ def warning_dialog(primary, secondary):
 def question_dialog(primary, secondary):
     """ Display a dialog with the given question. """
     return _message_dialog(gtk.MESSAGE_QUESTION, primary, secondary, gtk.BUTTONS_YES_NO)
+
+def _chooserevison_dialog(history):
+    """ Display a dialog with list of revisions. """
+    dialog = gtk.Dialog()
+    hbox = gtk.HBox()
+    dialog.vbox.pack_start(hbox)
+    dialog.vbox.set_spacing(2)
+    
+    img = gtk.Image()
+    img.set_from_stock(gtk.STOCK_DIALOG_QUESTION,gtk.ICON_SIZE_DIALOG)
+    hbox.pack_start(img)
+    
+    hbox.set_spacing(10)
+    vbox = gtk.VBox()
+    vbox.set_spacing(10)
+    hbox.pack_start(vbox)
+    
+    lbl = gtk.Label("<b>Select a revision</b>")
+    lbl.set_use_markup(True)
+    lbl.set_alignment(0,0)
+    vbox.pack_start(lbl)
+    
+    revisioncombo = gtk.ComboBox()
+    model = gtk.ListStore(str,str)
+    revisioncombo.set_model(model)
+    
+    for item in history:
+        numver = ""
+        for ver in item[3]: # item 3 contains a list with revision number and subnumbers
+            numver = numver + str(ver) + "." # here we make a 'readable' version number (IE: 30.1.5)
+        numver = numver[0:-1]
+        model.append((item[1],numver))
+    
+    cell = gtk.CellRendererText()
+    revisioncombo.pack_start(cell, True)
+    revisioncombo.add_attribute(cell, 'text', 1)
+    
+    vbox.pack_start(revisioncombo)
+    
+    dialog.vbox.show_all()
+    dialog.add_buttons(gtk.STOCK_CANCEL,gtk.RESPONSE_REJECT,gtk.STOCK_OK,gtk.RESPONSE_OK)
+    returncode = dialog.run()
+    active_iter = revisioncombo.get_active_iter()
+    if active_iter != None:
+        val = model.get_value(active_iter,0) # get selected revision id from model
+    else:
+        val = ''
+        
+    dialog.destroy()
+    
+    return (returncode, val) #return dialog return code and selected revision ID
