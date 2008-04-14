@@ -41,7 +41,8 @@ def linegraph(repository, start_revs, maxnum, broken_line_length = None,
     It's up to you how to actually draw the nodes and lines (straight,
     curved, kinked, etc.) and to pick the actual colours for each index.
     """
-        
+    
+    
     graph = repository.get_graph()
     graph_parents = {}
     graph_children = {}
