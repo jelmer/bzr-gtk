@@ -24,15 +24,19 @@ import gtk
 
 class StatusDialog(gtk.Dialog):
     """ Display Status window and perform the needed actions. """
-    def __init__(self, wt, wtpath):
+    def __init__(self, wt, wtpath, revision=None):
         """ Initialize the Status window. """
         super(StatusDialog, self).__init__(flags=gtk.DIALOG_MODAL, buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
         self.set_title("Working tree changes")
         self._create()
         self.wt = wt
         self.wtpath = wtpath
+        
+        if revision is None:
+            revision = self.wt.branch.last_revision()
+            
         # Set the old working tree
-        self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
+        self.old_tree = self.wt.branch.repository.revision_tree(revision)
         # Generate status output
         self._generate_status()
 
