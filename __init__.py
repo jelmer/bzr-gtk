@@ -392,7 +392,11 @@ class cmd_gstatus(GTKCommand):
         (wt, wt_path) = workingtree.WorkingTree.open_containing(path)
         
         if revision is not None:
-            revision_id = revision[0].in_history(wt.branch).rev_id
+            try:
+                revision_id = revision[0].in_history(wt.branch).rev_id
+            except:
+                from bzrlib.errors import BzrError
+                raise BzrError('Revision %r doesn\'t exist' % revision[0].user_spec )
         else:
             revision_id = None
 
