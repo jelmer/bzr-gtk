@@ -383,14 +383,24 @@ class cmd_gstatus(GTKCommand):
     
     aliases = [ "gst" ]
     takes_args = ['PATH?']
-    takes_options = []
+    takes_options = ['revision']
 
-    def run(self, path='.'):
+    def run(self, path='.', revision=None):
         import os
         gtk = self.open_display()
         from status import StatusDialog
         (wt, wt_path) = workingtree.WorkingTree.open_containing(path)
-        status = StatusDialog(wt, wt_path)
+        
+        if revision is not None:
+            try:
+                revision_id = revision[0].in_history(wt.branch).rev_id
+            except:
+                from bzrlib.errors import BzrError
+                raise BzrError('Revision %r doesn\'t exist' % revision[0].user_spec )
+        else:
+            revision_id = None
+
+        status = StatusDialog(wt, wt_path, revision_id)
         status.connect("destroy", gtk.main_quit)
         status.run()
 
