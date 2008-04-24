@@ -301,7 +301,7 @@ class TreeView(gtk.VBox):
         self.index = index
         self.treeview.set_model(self.model)
 
-        if revision is None:
+        if not revision or revision == NULL_REVISION:
             self.treeview.set_cursor(0)
         else:
             self.set_revision(revision)

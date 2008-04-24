@@ -12,6 +12,7 @@ import gobject
 import pango
 import re
 from xml.sax.saxutils import escape
+from bzrlib.revision import NULL_REVISION
 
 from time import (strftime, localtime)
 
@@ -100,7 +101,7 @@ class TreeModel(gtk.GenericTreeModel):
 
         if column == TAGS: return self.tags.get(revid, [])
 
-        if revid is None:
+        if not revid or revid == NULL_REVISION:
             return None
         if revid not in self.revisions:
             revision = self.repository.get_revisions([revid])[0]

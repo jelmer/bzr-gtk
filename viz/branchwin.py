@@ -300,20 +300,21 @@ class BranchWindow(Window):
         parents  = self.treeview.get_parents()
         children = self.treeview.get_children()
 
-        if revision is not None:
+        if revision and revision != NULL_REVISION:
             prev_menu = gtk.Menu()
             if len(parents) > 0:
                 self.prev_rev_action.set_sensitive(True)
                 for parent_id in parents:
-                    parent = self.branch.repository.get_revision(parent_id)
-                    try:
-                        str = ' (' + parent.properties['branch-nick'] + ')'
-                    except KeyError:
-                        str = ""
+                    if parent_id and parent_id != NULL_REVISION:
+                        parent = self.branch.repository.get_revision(parent_id)
+                        try:
+                            str = ' (' + parent.properties['branch-nick'] + ')'
+                        except KeyError:
+                            str = ""
 
-                    item = gtk.MenuItem(parent.message.split("\n")[0] + str)
-                    item.connect('activate', self._set_revision_cb, parent_id)
-                    prev_menu.add(item)
+                        item = gtk.MenuItem(parent.message.split("\n")[0] + str)
+                        item.connect('activate', self._set_revision_cb, parent_id)
+                        prev_menu.add(item)
                 prev_menu.show_all()
             else:
                 self.prev_rev_action.set_sensitive(False)

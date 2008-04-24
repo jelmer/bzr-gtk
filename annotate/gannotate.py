@@ -177,7 +177,7 @@ class GAnnotateWindow(Window):
 
     def _activate_selected_revision(self, w):
         rev_id = self._selected_revision()
-        if rev_id is None:
+        if not rev_id or rev_id == NULL_REVISION:
             return
         selected = self.revisions[rev_id]
         self.revisionview.set_revision(selected)
