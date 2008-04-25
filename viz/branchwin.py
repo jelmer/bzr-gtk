@@ -247,8 +247,9 @@ class BranchWindow(Window):
             option = self.config.get_user_option(col + '-column-visible')
             if option is not None:
                 self.treeview.set_property(col + '-column-visible', option == 'True')
+            else:
+                self.treeview.set_property(col + '-column-visible', False)
 
-        self.treeview.set_property(col + '-column-visible', False)
         self.treeview.show()
 
         align = gtk.Alignment(0.0, 0.0, 1.0, 1.0)
