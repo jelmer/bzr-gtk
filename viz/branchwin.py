@@ -195,12 +195,12 @@ class BranchWindow(Window):
 
         revision_menu_diff = gtk.MenuItem("View Changes")
         revision_menu_diff.connect('activate', 
-                lambda w: self.treeview.show_diff())
+                self._menu_diff_cb)
         
         revision_menu_compare = gtk.MenuItem("Compare with...")
         revision_menu_compare.connect('activate',
                 self._compare_with_cb)
-        
+
         revision_menu_tag = gtk.MenuItem("Tag Revision")
         revision_menu_tag.connect('activate', self._tag_revision_cb)
 
@@ -363,7 +363,19 @@ class BranchWindow(Window):
 
         self.show_diff(revision.revision_id, parent_id)
         self.treeview.grab_focus()
-    
+        
+    def _menu_diff_cb(self,w):
+        (path, focus) = self.treeview.treeview.get_cursor()
+        revid = self.treeview.model[path][treemodel.REVID]
+        
+        parentids = self.branch.repository.revision_parents(revid)
+
+        if len(parentids) == 0:
+            parentid = NULL_REVISION
+        else:
+            parentid = parentids[0]
+        
+        self.show_diff(revid,parentid)    
 
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""

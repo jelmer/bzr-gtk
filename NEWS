@@ -45,6 +45,8 @@
   * Fixed underscores in tags being interpreted as mnemonics in the viz. (#201733, 
     Daniel Schierbeck)
 
+  * Fixed change view menu in viz. (Javier Derderian, #215350)
+
  FEATURES
  
   * Only check for old Bazaar versions that are known to be incompatible and 
