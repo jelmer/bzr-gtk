@@ -196,12 +196,17 @@ class BranchWindow(Window):
         revision_menu_diff = gtk.MenuItem("View Changes")
         revision_menu_diff.connect('activate', 
                 lambda w: self.treeview.show_diff())
-
+        
+        revision_menu_compare = gtk.MenuItem("Compare with...")
+        revision_menu_compare.connect('activate',
+                self._compare_with_cb)
+        
         revision_menu_tag = gtk.MenuItem("Tag Revision")
         revision_menu_tag.connect('activate', self._tag_revision_cb)
 
         revision_menu.add(revision_menu_tag)
         revision_menu.add(revision_menu_diff)
+        revision_menu.add(revision_menu_compare)
 
         branch_menu = gtk.Menu()
         branch_menuitem = gtk.MenuItem("_Branch")
@@ -378,6 +383,22 @@ class BranchWindow(Window):
         self.show_diff(revid, parentid)
         self.treeview.grab_focus()
 
+    def _compare_with_cb(self,w):
+        """Callback for revision 'compare with' menu. Will show a small
+            dialog with branch revisions to compare with selected revision in TreeView"""
+        
+        from bzrlib.plugins.gtk.revbrowser import RevisionBrowser
+        
+        rb = RevisionBrowser(self.branch,self)
+        ret = rb.run()
+        
+        if ret == gtk.RESPONSE_OK:          
+            (path, focus) = self.treeview.treeview.get_cursor()
+            revid = self.treeview.model[path][treemodel.REVID]
+            self.show_diff(revid, rb.selected_revid)
+            
+        rb.destroy()
+            
     def _set_revision_cb(self, w, revision_id):
         self.treeview.set_revision_id(revision_id)
 
