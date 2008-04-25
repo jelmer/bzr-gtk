@@ -305,11 +305,15 @@ class RevisionView(gtk.Notebook):
         )
     }
 
-    def __init__(self, branch=None):
+    def __init__(self, branch=None, repository=None):
         gtk.Notebook.__init__(self)
 
         self._revision = None
         self._branch = branch
+        if branch is not None:
+            self._repository = branch.repository
+        else:
+            self._repository = repository
 
         self._create_general()
         self._create_relations()
@@ -513,7 +517,7 @@ class RevisionView(gtk.Notebook):
 
             button = gtk.Button(revid)
             button.connect("clicked",
-                    lambda w, r: self.set_revision(self._branch.repository.get_revision(r)), revid)
+                    lambda w, r: self.set_revision(self._repository.get_revision(r)), revid)
             button.set_use_underline(False)
             hbox.pack_start(button, expand=False, fill=True)
             button.show()
@@ -535,7 +539,7 @@ class RevisionView(gtk.Notebook):
         vbox.show()
 
     def _create_signature(self):
-        self.signature_table = SignatureTab(self._branch.repository)
+        self.signature_table = SignatureTab(self._repository)
         self.append_page(self.signature_table, tab_label=gtk.Label('Signature'))
         self.connect_after('notify::revision', self._update_signature)
 
