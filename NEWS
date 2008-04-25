@@ -28,6 +28,9 @@
 
   * Add compare with option to revisions menu. (Javier Derderian)
 
+  * Register file handler for applying patches/bundles to Bazaar branches.
+    (Jelmer Vernooij)
+
  BUG FIXES
 
   * Make adding tags from the viz work again. (Daniel Schierbeck)
