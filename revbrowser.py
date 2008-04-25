@@ -42,7 +42,8 @@ class RevisionBrowser(gtk.Dialog):
         
         # Create the widgets
         self._button_select = gtk.Button(_("_Select"), use_underline=True)
-        self.treeview = TreeView(branch,branch.last_revision(), None)
+        start_revs = [branch.last_revision(),]
+        self.treeview = TreeView(branch, start_revs, None)
         
         # Set callbacks
         self._button_select.connect('clicked', self._on_select_clicked)

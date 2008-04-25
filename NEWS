@@ -26,6 +26,8 @@
 
   * Added enable/disable per-branch option (Martin Albisetti)
 
+  * Add compare with option to revisions menu. (Javier Derderian)
+
  BUG FIXES
 
   * Make adding tags from the viz work again. (Daniel Schierbeck)
