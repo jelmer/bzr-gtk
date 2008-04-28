@@ -45,14 +45,24 @@ def linegraph(repository, start_revs, maxnum, broken_line_length = None,
     
     graph = repository.get_graph()
     graph_parents = {}
+    ghosts = set()
+    graph_children = {}
     graph_children = {}
     for (revid, parent_revids) in graph.iter_ancestry(start_revs):
+        if parent_revids is None:
+            ghosts.add(revid)
+            continue
         if parent_revids == (NULL_REVISION,):
             graph_parents[revid] = ()
         else:
             graph_parents[revid] = parent_revids
+        for parent in parent_revids:
+            graph_children.setdefault(parent, []).append(revid)
         graph_children[revid] = []
-
+    for ghost in ghosts:
+        for ghost_child in graph_children[ghost]:
+            graph_parents[ghost_child] = [p for p in graph_parents[ghost_child]
+                                          if p not in ghosts]
     graph_parents["top:"] = start_revs
 
     if len(graph_parents)>0:
@@ -94,9 +104,6 @@ def linegraph(repository, start_revs, maxnum, broken_line_length = None,
         revid_index[revid] = rev_index
         
         parents = graph_parents[revid]
-        for parent_revid in parents:
-            graph_children[parent_revid].append(revid)
-        
         linegraph.append([revid,
                           None,
                           [],
