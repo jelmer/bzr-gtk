@@ -47,7 +47,6 @@ def linegraph(repository, start_revs, maxnum, broken_line_length = None,
     graph_parents = {}
     ghosts = set()
     graph_children = {}
-    graph_children = {}
     for (revid, parent_revids) in graph.iter_ancestry(start_revs):
         if parent_revids is None:
             ghosts.add(revid)
