@@ -317,7 +317,7 @@ class cmd_gannotate(GTKCommand):
         else:
             revision_id = getattr(tree, 'get_revision_id', lambda: None)()
 
-        window = GAnnotateWindow(all, plain)
+        window = GAnnotateWindow(all, plain, branch=br)
         window.connect("destroy", lambda w: gtk.main_quit())
         config = GAnnotateConfig(window)
         window.show()
