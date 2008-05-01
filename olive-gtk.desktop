@@ -9,4 +9,4 @@ Comment=Graphical User Interface for the Bazaar Version Control System
 Comment[pl]=Graficzny interfejs dla systemu kontroli wersji Bazaar
 Icon=olive-gtk.png
 Exec=olive-gtk
-Categories=Application;Development;Qt;KDE;RevisionControl;
+Categories=Application;Development;RevisionControl;

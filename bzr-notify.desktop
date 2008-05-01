@@ -7,5 +7,5 @@ GenericName=
 Comment=Notification Area Icon for Bazaar
 Icon=bzr-icon-64.png
 Exec=bzr commit-notify
-Categories=Application;Development;
+Categories=Application;Development;RevisionControl;
 Terminal=false
