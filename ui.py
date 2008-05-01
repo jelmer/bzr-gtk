@@ -86,6 +86,8 @@ class GtkProgressBarStack(gtk.Window):
 
     def remove(self, pb):
         self.vbox.remove(pb)
+        if len(self.vbox.get_children()) == 0: # If there is nothing to show, don't leave a ghost window here
+             self.destroy()
 
 
 class PasswordDialog(gtk.Dialog):
