@@ -31,6 +31,10 @@ KEY_TYPE_SSH = 'ssh'
 try:
     dbus.validate_bus_name(BUS_NAME)
 except ValueError:
+    # Seahorse isn't installed
+    raise ImportError
+except AttributeError:
+    # Outdated version of DBus that doesn't have validate_bus_name
     raise ImportError
 
 bus = dbus.SessionBus()
