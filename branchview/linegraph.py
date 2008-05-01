@@ -11,9 +11,12 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 from bzrlib.revision import NULL_REVISION
 from bzrlib.tsort import merge_sort
+from bzrlib import ui
 
-def linegraph(repository, start_revs, maxnum, broken_line_length = None,
-              graph_data = True, mainline_only = False):
+
+def linegraph(repository, start_revs, maxnum, root_progress, 
+              broken_line_length = None, graph_data = True,
+              mainline_only = False):
     """Produce a directed graph of a bzr repository.
 
     Returns a tuple of (line_graph, revid_index, columns_len) where
@@ -47,7 +50,13 @@ def linegraph(repository, start_revs, maxnum, broken_line_length = None,
     graph_parents = {}
     ghosts = set()
     graph_children = {}
-    for (revid, parent_revids) in graph.iter_ancestry(start_revs):
+    root_progress.update(current=1)
+    progress_bar = ui.ui_factory.nested_progress_bar()
+    progress_bar.update(msg="Arranging tree fragments")
+    for i, (revid, parent_revids) in enumerate(graph.iter_ancestry(start_revs)):
+        if i % 25 == 0:
+            progress_bar.tick()
+
         if parent_revids is None:
             ghosts.add(revid)
             continue
@@ -58,10 +67,18 @@ def linegraph(repository, start_revs, maxnum, broken_line_length = None,
         for parent in parent_revids:
             graph_children.setdefault(parent, []).append(revid)
         graph_children[revid] = []
-    for ghost in ghosts:
+    progress_bar.finished()
+
+    root_progress.update(current=2)
+    progress_bar = ui.ui_factory.nested_progress_bar()
+    progress_bar.update(msg="Removing ghosts", total=len(ghosts))
+    for i, ghost in enumerate(ghosts):
+        if i % 25 == 0:
+            progress_bar.update(current=i)
         for ghost_child in graph_children[ghost]:
             graph_parents[ghost_child] = [p for p in graph_parents[ghost_child]
                                           if p not in ghosts]
+    progress_bar.finished()
     graph_parents["top:"] = start_revs
 
     if len(graph_parents)>0:
@@ -93,11 +110,17 @@ def linegraph(repository, start_revs, maxnum, broken_line_length = None,
     
     linegraph = []    
     
+    root_progress.update(current=3)
+    progress_bar = ui.ui_factory.nested_progress_bar()
+    progress_bar.update(msg="Finding nodes", total=len(merge_sorted_revisions))
     for (rev_index, (sequence_number,
                      revid,
                      merge_depth,
                      revno_sequence,
                      end_of_merge)) in enumerate(merge_sorted_revisions):
+
+        if rev_index % 25 == 0:
+            progress_bar.update(current=rev_index)
         if maxnum and rev_index >= maxnum:
             break
         revid_index[revid] = rev_index
@@ -123,6 +146,7 @@ def linegraph(repository, start_revs, maxnum, broken_line_length = None,
                 branch_line = branch_lines[branch_id]
             
             branch_line.append(rev_index)        
+    progress_bar.finished()
 
     if graph_data:
         branch_ids = branch_lines.keys()
@@ -150,7 +174,12 @@ def linegraph(repository, start_revs, maxnum, broken_line_length = None,
         columns = [list(empty_column)]
         
         
-        for branch_id in branch_ids:
+        root_progress.update(current=4)
+        progress_bar = ui.ui_factory.nested_progress_bar()
+        progress_bar.update(msg="Organizing edges", total=len(branch_ids))
+        for i, branch_id in enumerate(branch_ids):
+            if i % 25 == 0:
+                progress_bar.update(current=i)
             branch_line = branch_lines[branch_id]
             
             # Find the col_index for the direct parent branch. This will be the
@@ -271,8 +300,14 @@ def linegraph(repository, start_revs, maxnum, broken_line_length = None,
                             lines.append((rev_index,
                                           parent_index,
                                           (line_col_index,)))
+        progress_bar.finished()
         
-        for (child_index, parent_index, line_col_indexes) in lines:
+        root_progress.update(current=5)
+        progress_bar = ui.ui_factory.nested_progress_bar()
+        progress_bar.update(msg="Pretifying graph", total=len(lines))
+        for i, (child_index, parent_index, line_col_indexes) in enumerate(lines):
+            if i % 25 == 0:
+                progress_bar.update(current=i)
             (child_col_index, child_color) = linegraph[child_index][1]
             (parent_col_index, parent_color) = linegraph[parent_index][1]
             
@@ -322,6 +357,7 @@ def linegraph(repository, start_revs, maxnum, broken_line_length = None,
                     (line_col_indexes[1],
                      parent_col_index,
                      parent_color))
+        progress_bar.finished()
         return (linegraph, revid_index, len(columns))
     else:
         return (linegraph, revid_index, 0)
