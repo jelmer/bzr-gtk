@@ -283,10 +283,10 @@ class TreeView(gtk.VBox):
             (linegraphdata, index, columns_len) = linegraph(self.branch.repository,
                                                             self.start,
                                                             self.maxnum, 
-                                                            loading_progress,
                                                             broken_line_length,
                                                             show_graph,
-                                                            self.mainline_only)
+                                                            self.mainline_only,
+                                                            loading_progress)
 
             self.model = TreeModel(self.branch, linegraphdata)
             self.graph_cell.columns_len = columns_len
