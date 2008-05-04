@@ -47,6 +47,8 @@
 
   * Fixed change view menu in viz. (Javier Derderian, #215350)
 
+  * Fix display of children in branchview. (Jelmer Vernooij, #224914)
+
  FEATURES
  
   * Only check for old Bazaar versions that are known to be incompatible and 

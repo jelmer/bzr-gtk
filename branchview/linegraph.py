@@ -57,7 +57,7 @@ def linegraph(repository, start_revs, maxnum, broken_line_length = None,
             graph_parents[revid] = parent_revids
         for parent in parent_revids:
             graph_children.setdefault(parent, []).append(revid)
-        graph_children[revid] = []
+        graph_children.setdefault(revid, [])
     for ghost in ghosts:
         for ghost_child in graph_children[ghost]:
             graph_parents[ghost_child] = [p for p in graph_parents[ghost_child]
