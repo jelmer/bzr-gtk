@@ -1,3 +1,14 @@
+0.94.0    2008-05-04
+
+ CHANGES
+
+  * Disabled signature tab until we start verifying testaments. 
+    (Jelmer Vernooij)
+
+ BUG FIXES
+
+  * Fix display of children in branchview. (Jelmer Vernooij, #224914)
+
 0.94.0rc1  2008-04-25
 
  CHANGES
@@ -45,17 +56,17 @@
 
   * Fixed change view menu in viz. (Javier Derderian, #215350)
 
-  * Fix display of children in branchview. (Jelmer Vernooij, #224914)
-
  FEATURES
  
   * Only check for old Bazaar versions that are known to be incompatible and 
     no longer warn about newer (unknown) versions of Bazaar, on the assumption
-	the API is sufficiently stable now. (Jelmer Vernooij)
+    the API is sufficiently stable now. (Jelmer Vernooij)
 
   * Support child_submit_to setting in gsend. (Jelmer Vernooij)
 
-  * Add tab to revision view showing the signature status (not yet enabled). (Daniel Schierbeck, Jelmer Vernooij)
+  * Add tab to revision view showing the signature status. (Daniel Schierbeck, Jelmer Vernooij)
+
+  * Use seahorse to verify signatures. (Daniel Schierbeck)
 
  INTERNALS
 
@@ -87,7 +98,7 @@
  
   * Fixed logview bug in gannotate. (Daniel Schierbeck)
 
-0.92.0	2007-11-07
+0.92.0    2007-11-07
 
  UI
 
@@ -140,7 +151,7 @@
 
   * Avoid deprecation warning for all_plugins() in gpreferences. (Jelmer)
 
-0.91.0	2007-09-24
+0.91.0    2007-09-24
 
  UI
 
@@ -179,7 +190,7 @@
   * Added default_branch_path to MergeDialog and use it from olive-gtk.
     (Mateusz Korniak)
 
-0.90.0	2007-08-27
+0.90.0    2007-08-27
 
  FEATURES
 
@@ -280,7 +291,7 @@
 
   * Fixed 'bzr gcommit' if command not issued in a branch (#113394, Szilveszter)
 
-0.16.0	2007-05-05
+0.16.0    2007-05-05
 
  FEATURES
  
@@ -308,7 +319,7 @@
   
   * Recommend installation as 'gtk' not 'bzr-gtk'. (#104110, Szilveszter)
 
-0.15.2	2007-04-03
+0.15.2    2007-04-03
 
  BUG FIXES
 
@@ -325,7 +336,7 @@
 
   * Display remote locations in commit-notify (Robert)
 
-0.15.1	2007-03-25
+0.15.1    2007-03-25
 
  BUG FIXES
  
@@ -363,7 +374,7 @@
 
   * Strict commits are now a dialog, not a check box (Jelmer)
 
-0.15.0	2007-03-09
+0.15.0    2007-03-09
 
 BUG FIXES
 
@@ -407,14 +418,14 @@ INTERNAL
 
   * Add initial testsuite (Jelmer)
 
-0.14.0	2007-01-30
+0.14.0    2007-01-30
 
   * Add revert functionality (Szilvester)
 
   * Rewritten CommitDialog without glade (Szilvester)
 
   * Allow to commit single files from the context menu (Fixes #54983,
-													   Szilvester)
+                                                       Szilvester)
 
   * Warn about incompatible Bazaar versions (Jelmer)
 
@@ -427,7 +438,7 @@ INTERNAL
   * Set default drive letter (#67924, Szilvester)
 
   * Show error if no diff available for the selected file (#76536,
-														  Szilvester)
+                                                          Szilvester)
 
   * Handle current revision in annotate better (Aaron)
 
@@ -455,7 +466,7 @@ INTERNAL
 
   * Several other small regression fixes (Szilvester)
 
-0.13.0	2006-12-13
+0.13.0    2006-12-13
 
   * Don't show pending merge list when there are no pending merges
     (Alexander Belchenko)
@@ -478,7 +489,7 @@ INTERNAL
 
   * Use dotted revnos in gannotate (Aaron Bentley)
 
-0.12.0	2006-11-04
+0.12.0    2006-11-04
 
   * #68127: gcommit is broken
 
