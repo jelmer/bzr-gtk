@@ -37,7 +37,7 @@ from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
 from bzrlib.plugins.gtk.annotate.config import GAnnotateConfig
 from bzrlib.plugins.gtk.diff import DiffWindow
 from launch import launch
-from olive import Preferences
+from bzrlib.plugins.gtk.olive import Preferences
 
 class OliveMenu:
     """ This class is responsible for building the context menus. """

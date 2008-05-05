@@ -6,5 +6,5 @@ Exec=bzr ghandle-patch %f
 NoDisplay=true
 Terminal=false
 Type=Application
-Categories=
+Categories=Application;Development;RevisionControl;
 MimeType=text/x-diff;text/x-patch;application/x-bazaar-merge-directive;

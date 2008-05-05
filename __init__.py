@@ -37,7 +37,7 @@ import sys
 
 import bzrlib
 
-version_info = (0, 94, 0, 'rc', 1)
+version_info = (0, 95, 0, 'dev', 1)
 
 if version_info[3] == 'final':
     version_string = '%d.%d.%d' % version_info[:3]
@@ -317,7 +317,7 @@ class cmd_gannotate(GTKCommand):
         else:
             revision_id = getattr(tree, 'get_revision_id', lambda: None)()
 
-        window = GAnnotateWindow(all, plain)
+        window = GAnnotateWindow(all, plain, branch=br)
         window.connect("destroy", lambda w: gtk.main_quit())
         config = GAnnotateConfig(window)
         window.show()

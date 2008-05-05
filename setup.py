@@ -91,11 +91,11 @@ class InstallData(install_data):
 
 setup(
     name = "bzr-gtk",
-    version = "0.94.0rc1",
+    version = "0.95.0",
     maintainer = "Jelmer Vernooij",
     maintainer_email = "jelmer@samba.org",
     description = "GTK+ Frontends for various Bazaar commands",
-    license = "GNU GPL v2",
+    license = "GNU GPL v2 or later",
     scripts=['olive-gtk'],
     package_dir = {
         "bzrlib.plugins.gtk": ".",
@@ -104,6 +104,7 @@ setup(
         "bzrlib.plugins.gtk.olive": "olive",
         "bzrlib.plugins.gtk.tests": "tests",
         "bzrlib.plugins.gtk.branchview": "branchview",
+        "bzrlib.plugins.gtk.preferences": "preferences",
         },
     packages = [
         "bzrlib.plugins.gtk",
@@ -112,6 +113,7 @@ setup(
         "bzrlib.plugins.gtk.olive",
         "bzrlib.plugins.gtk.tests",
         "bzrlib.plugins.gtk.branchview",
+        "bzrlib.plugins.gtk.preferences",
         ],
     data_files=[('share/olive', ['olive.glade',
                                  'cmenu.ui',

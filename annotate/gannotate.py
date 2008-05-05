@@ -45,9 +45,10 @@ from bzrlib.plugins.gtk.window import Window
 class GAnnotateWindow(Window):
     """Annotate window."""
 
-    def __init__(self, all=False, plain=False, parent=None):
+    def __init__(self, all=False, plain=False, parent=None, branch=None):
         self.all = all
         self.plain = plain
+        self._branch = branch
         
         Window.__init__(self, parent)
         
@@ -320,7 +321,7 @@ class GAnnotateWindow(Window):
         return tv
 
     def _create_log_view(self):
-        lv = RevisionView()
+        lv = RevisionView(self._branch)
         lv.show()
         return lv
 
