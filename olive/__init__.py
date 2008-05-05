@@ -1,5 +1,4 @@
-﻿#!/usr/bin/python
-# -*- coding: UTF-8 -*-
+ #!/usr/bin/python
 
 # Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
 #

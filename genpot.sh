@@ -24,10 +24,10 @@ if [ -x po/olive-gtk.pot ]; then
 else
     touch po/olive-gtk.pot
 fi
-xgettext -L python -o po/olive-gtk.pot olive-gtk
+xgettext -L python --from-code=ASCII -o po/olive-gtk.pot olive-gtk
 xgettext -j -o po/olive-gtk.pot olive.glade
-xgettext -j -o po/olive-gtk.pot *.py
-cd olive/
-xgettext -j -o ../po/olive-gtk.pot *.py
-#cd viz
-#xgettext -j -o ../../../../po/olive-gtk.pot *.py
+
+for d in . annotate branchview olive preferences viz ;
+do
+   xgettext -L python --from-code=ASCII -j -o po/olive-gtk.pot $d/*.py
+done
