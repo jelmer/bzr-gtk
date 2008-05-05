@@ -21,6 +21,8 @@ except:
     pass
 
 import gtk
+from bzrlib.plugins.gtk import _i18n
+
 
 class StatusDialog(gtk.Dialog):
     """ Display Status window and perform the needed actions. """
@@ -79,26 +81,26 @@ class StatusDialog(gtk.Dialog):
         
         if len(delta.added):
             changes = True
-            titer = self.model.append(None, [ _('Added'), None ])
+            titer = self.model.append(None, [ _i18n('Added'), None ])
             for path, id, kind in delta.added:
                 self.model.append(titer, [ path, path ])
 
         if len(delta.removed):
             changes = True
-            titer = self.model.append(None, [ _('Removed'), None ])
+            titer = self.model.append(None, [ _i18n('Removed'), None ])
             for path, id, kind in delta.removed:
                 self.model.append(titer, [ path, path ])
 
         if len(delta.renamed):
             changes = True
-            titer = self.model.append(None, [ _('Renamed'), None ])
+            titer = self.model.append(None, [ _i18n('Renamed'), None ])
             for oldpath, newpath, id, kind, text_modified, meta_modified \
                     in delta.renamed:
                 self.model.append(titer, [ oldpath, newpath ])
 
         if len(delta.modified):
             changes = True
-            titer = self.model.append(None, [ _('Modified'), None ])
+            titer = self.model.append(None, [ _i18n('Modified'), None ])
             for path, id, kind, text_modified, meta_modified in delta.modified:
                 self.model.append(titer, [ path, path ])
         
@@ -106,12 +108,12 @@ class StatusDialog(gtk.Dialog):
         for path in self.wt.unknowns():
             changes = True
             if not done_unknown:
-                titer = self.model.append(None, [ _('Unknown'), None ])
+                titer = self.model.append(None, [ _i18n('Unknown'), None ])
                 done_unknown = True
             self.model.append(titer, [ path, path ])
 
         if not changes:
-            self.model.append(None, [ _('No changes.'), None ])
+            self.model.append(None, [ _i18n('No changes.'), None ])
 
         self.treeview.expand_all()
     

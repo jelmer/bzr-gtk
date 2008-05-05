@@ -26,6 +26,7 @@ import gobject
 import gtk
 
 from bzrlib.osutils import format_date
+from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.branchview.treeview import TreeView
 
 
@@ -41,7 +42,7 @@ class RevisionBrowser(gtk.Dialog):
         self.branch = branch
         
         # Create the widgets
-        self._button_select = gtk.Button(_("_Select"), use_underline=True)
+        self._button_select = gtk.Button(_i18n("_Select"), use_underline=True)
         start_revs = [branch.last_revision(),]
         self.treeview = TreeView(branch, start_revs, None)
         

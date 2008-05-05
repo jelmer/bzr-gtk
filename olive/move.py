@@ -29,6 +29,7 @@ import gtk.glade
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
+from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import error_dialog
 from errors import show_bzr_error
 from guifiles import GLADEFILENAME
@@ -76,8 +77,8 @@ class OliveMove:
         filename = self.selected
             
         if filename is None:
-            error_dialog(_('No file was selected'),
-                         _('Please select a file from the list to proceed.'))
+            error_dialog(_i18n('No file was selected'),
+                         _i18n('Please select a file from the list to proceed.'))
             return
         
         source = os.path.join(self.wtpath, filename)
@@ -86,8 +87,8 @@ class OliveMove:
         wt1, path1 = WorkingTree.open_containing(self.wt.abspath(source))
         wt2, path2 = WorkingTree.open_containing(destination)
         if wt1.basedir != wt2.basedir:
-            error_dialog(_('Not the same branch'),
-                         _('The destination is not in the same branch.'))
+            error_dialog(_i18n('Not the same branch'),
+                         _i18n('The destination is not in the same branch.'))
             return
 
         wt1.move([source], wt1.relpath(destination))

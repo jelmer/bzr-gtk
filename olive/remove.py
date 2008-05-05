@@ -27,6 +27,7 @@ import gtk.glade
 
 import bzrlib.errors as errors
 
+from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import error_dialog, warning_dialog
 from guifiles import GLADEFILENAME
 
@@ -64,8 +65,8 @@ class OliveRemove:
             filename = self.selected
             
             if filename is None:
-                error_dialog(_('No file was selected'),
-                             _('Please select a file from the list,\nor choose the other option.'))
+                error_dialog(_i18n('No file was selected'),
+                             _i18n('Please select a file from the list,\nor choose the other option.'))
                 return
             
             fullpath = self.wt.abspath(os.path.join(self.wtpath, filename))
@@ -76,8 +77,8 @@ class OliveRemove:
             added = self.wt.changes_from(self.wt.basis_tree()).added
             file_list = sorted([f[0] for f in added], reverse=True)
             if len(file_list) == 0:
-                warning_dialog(_('No matching files'),
-                               _('No added files were found in the working tree.'))
+                warning_dialog(_i18n('No matching files'),
+                               _i18n('No added files were found in the working tree.'))
                 return
             self.wt.remove(file_list)
         
@@ -102,10 +103,10 @@ class OliveRemoveDialog(gtk.Dialog):
         self.selected = selected
         
         # Create widgets
-        self._label = gtk.Label(_("Which file(s) do you want to remove?"))
-        self._radio_selected = gtk.RadioButton(None, _("Selected only"), False)
-        self._radio_added = gtk.RadioButton(self._radio_selected, _("All files with status 'added'"), False)
-        self._button_remove = gtk.Button(_("_Remove"), use_underline=True)
+        self._label = gtk.Label(_i18n("Which file(s) do you want to remove?"))
+        self._radio_selected = gtk.RadioButton(None, _i18n("Selected only"), False)
+        self._radio_added = gtk.RadioButton(self._radio_selected, _i18n("All files with status 'added'"), False)
+        self._button_remove = gtk.Button(_i18n("_Remove"), use_underline=True)
         
         self._button_remove.connect('clicked', self._on_remove_clicked)
         
@@ -126,8 +127,8 @@ class OliveRemoveDialog(gtk.Dialog):
             filename = self.selected
             
             if filename is None:
-                error_dialog(_('No file was selected'),
-                             _('Please select a file from the list,\nor choose the other option.'))
+                error_dialog(_i18n('No file was selected'),
+                             _i18n('Please select a file from the list,\nor choose the other option.'))
                 return
             
             self.wt.remove(os.path.join(self.wtpath, filename))
@@ -136,8 +137,8 @@ class OliveRemoveDialog(gtk.Dialog):
             added = self.wt.changes_from(self.wt.basis_tree()).added
             file_list = sorted([f[0] for f in added], reverse=True)
             if len(file_list) == 0:
-                warning_dialog(_('No matching files'),
-                               _('No added files were found in the working tree.'))
+                warning_dialog(_i18n('No matching files'),
+                               _i18n('No added files were found in the working tree.'))
                 return
             self.wt.remove(file_list)
         

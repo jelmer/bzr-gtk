@@ -359,8 +359,8 @@ class cmd_gcommit(GTKCommand):
             br = wt.branch
         except NoWorkingTree, e:
             from dialog import error_dialog
-            error_dialog(_('Directory does not have a working tree'),
-                         _('Operation aborted.'))
+            error_dialog(_i18n('Directory does not have a working tree'),
+                         _i18n('Operation aborted.'))
             return 1 # should this be retval=3?
 
         # It is a good habit to keep things locked for the duration, but it
@@ -733,6 +733,9 @@ register_command(cmd_ghandle_patch)
 import gettext
 gettext.install('olive-gtk')
 
+# Let's create a specialized alias to protect '_' from being erased by other
+# uses of '_' as an anonymous variable (think pdb for one).
+_i18n = gettext.gettext
 
 class NoDisplayError(BzrCommandError):
     """gtk could not find a proper display"""

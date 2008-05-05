@@ -27,6 +27,7 @@ import gtk.glade
 
 from bzrlib.branch import Branch
 import bzrlib.errors as errors
+from bzrlib.plugins.gtk import _i18n
 
 from dialog import error_dialog, info_dialog, warning_dialog
 from errors import show_bzr_error
@@ -65,8 +66,8 @@ class MergeDialog:
     def merge(self, widget):
         branch = self.entry.get_text()
         if branch == "":
-            error_dialog(_('Branch not given'),
-                         _('Please specify a branch to merge from.'))
+            error_dialog(_i18n('Branch not given'),
+                         _i18n('Please specify a branch to merge from.'))
             return
 
         other_branch = Branch.open_containing(branch)[0]
@@ -74,18 +75,18 @@ class MergeDialog:
         try:
             conflicts = self.wt.merge_from_branch(other_branch)
         except errors.BzrCommandError, errmsg:
-            error_dialog(_('Bazaar command error'), str(errmsg))
+            error_dialog(_i18n('Bazaar command error'), str(errmsg))
             return
         
         self.close()
         if conflicts == 0:
             # No conflicts found.
-            info_dialog(_('Merge successful'),
-                        _('All changes applied successfully.'))
+            info_dialog(_i18n('Merge successful'),
+                        _i18n('All changes applied successfully.'))
         else:
             # There are conflicts to be resolved.
-            warning_dialog(_('Conflicts encountered'),
-                           _('Please resolve the conflicts manually before committing.'))
+            warning_dialog(_i18n('Conflicts encountered'),
+                           _i18n('Please resolve the conflicts manually before committing.'))
     
     def open(self, widget):
         fcd = gtk.FileChooserDialog(title="Please select a folder",

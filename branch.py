@@ -29,6 +29,8 @@ from errors import show_bzr_error
 from bzrlib.branch import Branch
 import bzrlib.errors as errors
 
+from bzrlib.plugins.gtk import _i18n
+
 from dialog import error_dialog, info_dialog
 
 from branchbox import BranchSelectionBox
@@ -47,15 +49,15 @@ class BranchDialog(gtk.Dialog):
         self.path = path
         
         # Create the widgets
-        self._button_branch = gtk.Button(_("_Branch"), use_underline=True)
+        self._button_branch = gtk.Button(_i18n("_Branch"), use_underline=True)
         self._remote_branch = BranchSelectionBox()
         self._button_revision = gtk.Button('')
-        self._label_location = gtk.Label(_("Branch location:"))
+        self._label_location = gtk.Label(_i18n("Branch location:"))
         self._label_location.set_alignment(0, 0.5)
-        self._label_destination = gtk.Label(_("Destination:"))
-        self._label_nick = gtk.Label(_("Branck nick:"))
-        self._label_revision = gtk.Label(_("Revision:"))
-        self._filechooser = gtk.FileChooserButton(_("Please select a folder"))
+        self._label_destination = gtk.Label(_i18n("Destination:"))
+        self._label_nick = gtk.Label(_i18n("Branck nick:"))
+        self._label_revision = gtk.Label(_i18n("Revision:"))
+        self._filechooser = gtk.FileChooserButton(_i18n("Please select a folder"))
         self._filechooser.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
         self._hbox_revision = gtk.HBox()
         self._entry_revision = gtk.Entry()
@@ -135,8 +137,8 @@ class BranchDialog(gtk.Dialog):
         """ Branch button clicked handler. """
         location = self._remote_branch.get_url()
         if location is '':
-            error_dialog(_('Missing branch location'),
-                         _('You must specify a branch location.'))
+            error_dialog(_i18n('Missing branch location'),
+                         _i18n('You must specify a branch location.'))
             return
         
         destination = self._filechooser.get_filename()
@@ -177,8 +179,8 @@ class BranchDialog(gtk.Dialog):
         finally:
             br_from.unlock()
                 
-        info_dialog(_('Branching successful'),
-                    _('%d revision(s) branched.') % revs)
+        info_dialog(_i18n('Branching successful'),
+                    _i18n('%d revision(s) branched.') % revs)
         
         self.response(gtk.RESPONSE_OK)
     
@@ -186,7 +188,7 @@ class BranchDialog(gtk.Dialog):
         """ We try to get the last revision if focus lost. """
         rev = self._get_last_revno()
         if rev is None:
-            self._entry_revision.set_text(_('N/A'))
+            self._entry_revision.set_text(_i18n('N/A'))
             self._button_revision.set_sensitive(False)
         else:
             self._entry_revision.set_text(str(rev))

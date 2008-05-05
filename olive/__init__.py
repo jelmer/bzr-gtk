@@ -41,6 +41,7 @@ from bzrlib.lazy_import import lazy_import
 from bzrlib.ui import ui_factory
 from bzrlib.workingtree import WorkingTree
 
+from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import error_dialog, info_dialog, warning_dialog
 from bzrlib.plugins.gtk.errors import show_bzr_error
 from guifiles import GLADEFILENAME
@@ -68,9 +69,9 @@ def about():
 
     # Set version
     dialog.set_version(__version__)
-    dialog.set_authors([ _("Lead Developer:"),
+    dialog.set_authors([ _i18n("Lead Developer:"),
 			 "Szilveszter Farkas <szilveszter.farkas@gmail.com>",
-			 _("Contributors:"),
+			 _i18n("Contributors:"),
 			 "Jelmer Vernooij <jelmer@samba.org>",
 			 "Mateusz Korniak <mateusz.korniak@ant.gliwice.pl>",
 			 "Gary van der Merwe <garyvdm@gmail.com>" ])
@@ -536,8 +537,8 @@ class OliveGtk:
         from bzrlib.plugins.gtk.merge import MergeDialog
         
         if self.check_for_changes():
-            error_dialog(_('There are local changes in the branch'),
-                         _('Please commit or revert the changes before merging.'))
+            error_dialog(_i18n('There are local changes in the branch'),
+                         _i18n('Please commit or revert the changes before merging.'))
         else:
             parent_branch_path = self.wt.branch.get_parent()
             merge = MergeDialog(self.wt, self.wtpath,default_branch_path=parent_branch_path )
@@ -552,8 +553,8 @@ class OliveGtk:
         local_branch = self.wt.branch
         parent_branch_path = local_branch.get_parent()
         if parent_branch_path is None:
-            error_dialog(_('Parent location is unknown'),
-                         _('Cannot determine missing revisions if no parent location is known.'))
+            error_dialog(_i18n('Parent location is unknown'),
+                         _i18n('Cannot determine missing revisions if no parent location is known.'))
             return
         
         parent_branch = Branch.open(parent_branch_path)
@@ -575,32 +576,32 @@ class OliveGtk:
             
             dlg_txt = ""
             if local_extra:
-                dlg_txt += _('%d local extra revision(s). \n') % (len(local_extra),) 
+                dlg_txt += _i18n('%d local extra revision(s). \n') % (len(local_extra),) 
                 ## NOTE: We do not want such ugly info about missing revisions
                 ##       Revision Browser should be used there
                 ## max_revisions = 10
                 ## for log_revision in iter_log_revisions(local_extra, local_branch.repository, verbose=1):
                 ##    dlg_txt += log_revision_one_line_text(log_revision)
                 ##    if max_revisions <= 0:
-                ##        dlg_txt += _("more ... \n")
+                ##        dlg_txt += _i18n("more ... \n")
                 ##        break
                 ## max_revisions -= 1
             ## dlg_txt += "\n"
             if remote_extra:
-                dlg_txt += _('%d local missing revision(s).\n') % (len(remote_extra),) 
+                dlg_txt += _i18n('%d local missing revision(s).\n') % (len(remote_extra),) 
                 ## max_revisions = 10
                 ## for log_revision in iter_log_revisions(remote_extra, parent_branch.repository, verbose=1):
                 ##    dlg_txt += log_revision_one_line_text(log_revision)
                 ##    if max_revisions <= 0:
-                ##        dlg_txt += _("more ... \n")
+                ##        dlg_txt += _i18n("more ... \n")
                 ##        break
                 ##    max_revisions -= 1
                 
-            info_dialog(_('There are missing revisions'),
+            info_dialog(_i18n('There are missing revisions'),
                         dlg_txt)
         else:
-            info_dialog(_('Local branch up to date'),
-                        _('There are no missing revisions.'))
+            info_dialog(_i18n('Local branch up to date'),
+                        _i18n('There are no missing revisions.'))
 
     @show_bzr_error
     def on_menuitem_branch_pull_activate(self, widget):
@@ -609,8 +610,8 @@ class OliveGtk:
 
         location = branch_to.get_parent()
         if location is None:
-            error_dialog(_('Parent location is unknown'),
-                                     _('Pulling is not possible until there is a parent location.'))
+            error_dialog(_i18n('Parent location is unknown'),
+                                     _i18n('Pulling is not possible until there is a parent location.'))
             return
 
         branch_from = Branch.open(location)
@@ -620,7 +621,7 @@ class OliveGtk:
 
         ret = branch_to.pull(branch_from)
         
-        info_dialog(_('Pull successful'), _('%d revision(s) pulled.') % ret)
+        info_dialog(_i18n('Pull successful'), _i18n('%d revision(s) pulled.') % ret)
         
     @show_bzr_error
     def on_menuitem_branch_update_activate(self, widget):
@@ -629,9 +630,9 @@ class OliveGtk:
         ret = self.wt.update()
         conflicts = self.wt.conflicts()
         if conflicts:
-            info_dialog(_('Update successful but conflicts generated'), _('Number of conflicts generated: %d.') % (len(conflicts),) )
+            info_dialog(_i18n('Update successful but conflicts generated'), _i18n('Number of conflicts generated: %d.') % (len(conflicts),) )
         else:
-            info_dialog(_('Update successful'), _('No conflicts generated.') )
+            info_dialog(_i18n('Update successful'), _i18n('No conflicts generated.') )
     
     def on_menuitem_branch_push_activate(self, widget):
         """ Branch/Push... menu handler. """
@@ -645,11 +646,11 @@ class OliveGtk:
         """ Branch/Revert all changes menu handler. """
         ret = self.wt.revert([])
         if ret:
-            warning_dialog(_('Conflicts detected'),
-                           _('Please have a look at the working tree before continuing.'))
+            warning_dialog(_i18n('Conflicts detected'),
+                           _i18n('Please have a look at the working tree before continuing.'))
         else:
-            info_dialog(_('Revert successful'),
-                        _('All files reverted to last revision.'))
+            info_dialog(_i18n('Revert successful'),
+                        _i18n('All files reverted to last revision.'))
         self.refresh_right()
     
     def on_menuitem_branch_status_activate(self, widget):
@@ -684,8 +685,8 @@ class OliveGtk:
     def on_menuitem_file_annotate_activate(self, widget):
         """ File/Annotate... menu handler. """
         if self.get_selected_right() is None:
-            error_dialog(_('No file was selected'),
-                         _('Please select a file from the list.'))
+            error_dialog(_i18n('No file was selected'),
+                         _i18n('Please select a file from the list.'))
             return
         
         branch = self.wt.branch
@@ -704,12 +705,12 @@ class OliveGtk:
     def on_menuitem_file_bookmark_activate(self, widget):
         """ File/Bookmark current directory menu handler. """
         if self.pref.add_bookmark(self.path):
-            info_dialog(_('Bookmark successfully added'),
-                        _('The current directory was bookmarked. You can reach\nit by selecting it from the left panel.'))
+            info_dialog(_i18n('Bookmark successfully added'),
+                        _i18n('The current directory was bookmarked. You can reach\nit by selecting it from the left panel.'))
             self.pref.write()
         else:
-            warning_dialog(_('Location already bookmarked'),
-                           _('The current directory is already bookmarked.\nSee the left panel for reference.'))
+            warning_dialog(_i18n('Location already bookmarked'),
+                           _i18n('The current directory is already bookmarked.\nSee the left panel for reference.'))
         
         self.refresh_left()
     
@@ -939,14 +940,14 @@ class OliveGtk:
         bookmarks = self.pref.get_bookmarks()
         
         # Add them to the TreeStore
-        titer = treestore.append(None, [_('Bookmarks'), None])
+        titer = treestore.append(None, [_i18n('Bookmarks'), None])
         for item in bookmarks:
             title = self.pref.get_bookmark_title(item)
             treestore.append(titer, [title, item])
         
         # Create the column and add it to the TreeView
         self.treeview_left.set_model(treestore)
-        tvcolumn_bookmark = gtk.TreeViewColumn(_('Bookmark'))
+        tvcolumn_bookmark = gtk.TreeViewColumn(_i18n('Bookmark'))
         self.treeview_left.append_column(tvcolumn_bookmark)
         
         # Set up the cells
@@ -1046,19 +1047,19 @@ class OliveGtk:
                     self.wt.unlock()
             
             if status == 'renamed':
-                st = _('renamed')
+                st = _i18n('renamed')
             elif status == 'removed':
-                st = _('removed')
+                st = _i18n('removed')
             elif status == 'added':
-                st = _('added')
+                st = _i18n('added')
             elif status == 'modified':
-                st = _('modified')
+                st = _i18n('modified')
             elif status == 'unchanged':
-                st = _('unchanged')
+                st = _i18n('unchanged')
             elif status == 'ignored':
-                st = _('ignored')
+                st = _i18n('ignored')
             else:
-                st = _('unknown')
+                st = _i18n('unknown')
             
             try:
                 statinfo = os.stat(self.path + os.sep + item)
@@ -1080,10 +1081,10 @@ class OliveGtk:
         
         # Create the columns and add them to the TreeView
         self.treeview_right.set_model(liststore)
-        self._tvcolumn_filename = gtk.TreeViewColumn(_('Filename'))
-        self._tvcolumn_status = gtk.TreeViewColumn(_('Status'))
-        self._tvcolumn_size = gtk.TreeViewColumn(_('Size'))
-        self._tvcolumn_mtime = gtk.TreeViewColumn(_('Last modified'))
+        self._tvcolumn_filename = gtk.TreeViewColumn(_i18n('Filename'))
+        self._tvcolumn_status = gtk.TreeViewColumn(_i18n('Status'))
+        self._tvcolumn_size = gtk.TreeViewColumn(_i18n('Size'))
+        self._tvcolumn_mtime = gtk.TreeViewColumn(_i18n('Last modified'))
         self.treeview_right.append_column(self._tvcolumn_filename)
         self.treeview_right.append_column(self._tvcolumn_status)
         self.treeview_right.append_column(self._tvcolumn_size)
@@ -1237,7 +1238,7 @@ class OliveGtk:
         bookmarks = self.pref.get_bookmarks()
 
         # Add them to the TreeStore
-        titer = treestore.append(None, [_('Bookmarks'), None])
+        titer = treestore.append(None, [_i18n('Bookmarks'), None])
         for item in bookmarks:
             title = self.pref.get_bookmark_title(item)
             treestore.append(titer, [title, item])
@@ -1351,21 +1352,21 @@ class OliveGtk:
                         self.wt.unlock()
                 
                 if status == 'renamed':
-                    st = _('renamed')
+                    st = _i18n('renamed')
                 elif status == 'removed':
-                    st = _('removed')
+                    st = _i18n('removed')
                 elif status == 'added':
-                    st = _('added')
+                    st = _i18n('added')
                 elif status == 'modified':
-                    st = _('modified')
+                    st = _i18n('modified')
                 elif status == 'unchanged':
-                    st = _('unchanged')
+                    st = _i18n('unchanged')
                 elif status == 'ignored':
-                    st = _('ignored')
+                    st = _i18n('ignored')
                     if not ignored_files:
                         continue
                 else:
-                    st = _('unknown')
+                    st = _i18n('unknown')
                 
                 try:
                     statinfo = os.stat(self.path + os.sep + item)

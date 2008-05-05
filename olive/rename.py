@@ -31,6 +31,7 @@ from bzrlib.workingtree import WorkingTree
 from errors import show_bzr_error
 from bzrlib.plugins.gtk.dialog import error_dialog
 from guifiles import GLADEFILENAME
+from bzrlib.plugins.gtk import _i18n
 
 
 class OliveRename:
@@ -67,13 +68,13 @@ class OliveRename:
         new_filename = self.entry.get_text()
             
         if old_filename is None:
-            error_dialog(_('No file was selected'),
-                         _('Please select a file from the list to proceed.'))
+            error_dialog(_i18n('No file was selected'),
+                         _i18n('Please select a file from the list to proceed.'))
             return
         
         if new_filename == "":
-            error_dialog(_('Filename not given'),
-                         _('Please specify a new name for the file.'))
+            error_dialog(_i18n('Filename not given'),
+                         _i18n('Please specify a new name for the file.'))
             return
         
         source = os.path.join(self.wtpath, old_filename)
@@ -84,8 +85,8 @@ class OliveRename:
         wt2, path2 = WorkingTree.open_containing(self.wt.abspath(source))
 
         if wt1.basedir != wt2.basedir:
-            error_dialog(_('Not the same branch'),
-                         _('The destination is not in the same branch.'))
+            error_dialog(_i18n('Not the same branch'),
+                         _i18n('The destination is not in the same branch.'))
             return
         wt1.rename_one(source, destination)
         self.close()

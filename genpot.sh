@@ -18,16 +18,26 @@
 
 # Generate translation template
 
-if [ -x po/olive-gtk.pot ]; then
-    rm po/olive-gtk.pot
-    touch po/olive-gtk.pot
+if [ "$1" = "" ]; then
+    POT=po/olive-gtk.pot
 else
-    touch po/olive-gtk.pot
+    # Used for debugging
+    POT=$1 
 fi
-xgettext -L python --from-code=ASCII -o po/olive-gtk.pot olive-gtk
-xgettext -j -o po/olive-gtk.pot olive.glade
+
+XGETTEXT="xgettext -o $POT"
+PY_XGETTEXT="$XGETTEXT -L python --from-code=ASCII --keyword=_i18n"
+
+if [ -x $POT ]; then
+    rm $POT
+    touch $POT
+else
+    touch $POT
+fi
+$PY_XGETTEXT olive-gtk
+$XGETTEXT -j olive.glade
 
 for d in . annotate branchview olive preferences viz ;
 do
-   xgettext -L python --from-code=ASCII -j -o po/olive-gtk.pot $d/*.py
+   $PY_XGETTEXT -j $d/*.py
 done

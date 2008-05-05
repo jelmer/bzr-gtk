@@ -30,6 +30,7 @@ from errors import show_bzr_error
 from bzrlib import bzrdir
 from bzrlib import transport
 import bzrlib.errors as errors
+from bzrlib.plugins.gtk import _i18n
 
 class InitDialog(gtk.Dialog):
     """ Initialize dialog. """
@@ -44,10 +45,10 @@ class InitDialog(gtk.Dialog):
         self.path = path
         
         # Create the widgets
-        self._button_init = gtk.Button(_("_Initialize"), use_underline=True)
-        self._label_question = gtk.Label(_("Which directory do you want to initialize?"))
-        self._radio_current = gtk.RadioButton(None, _("Current directory"))
-        self._radio_custom = gtk.RadioButton(self._radio_current, _("Create a new directory with the name:"))
+        self._button_init = gtk.Button(_i18n("_Initialize"), use_underline=True)
+        self._label_question = gtk.Label(_i18n("Which directory do you want to initialize?"))
+        self._radio_current = gtk.RadioButton(None, _i18n("Current directory"))
+        self._radio_custom = gtk.RadioButton(self._radio_current, _i18n("Create a new directory with the name:"))
         self._entry_custom = gtk.Entry()
         self._hbox_custom = gtk.HBox()
         
@@ -82,8 +83,8 @@ class InitDialog(gtk.Dialog):
     @show_bzr_error
     def _on_init_clicked(self, widget):
         if self._radio_custom.get_active() and len(self._entry_custom.get_text()) == 0:
-            error_dialog(_("Directory name not specified"),
-                         _("You should specify a new directory name."))
+            error_dialog(_i18n("Directory name not specified"),
+                         _i18n("You should specify a new directory name."))
             return
         
         if self._radio_current.get_active():
