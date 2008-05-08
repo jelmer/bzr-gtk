@@ -20,8 +20,29 @@ import os
 
 from bzrlib import tests
 
-from bzrlib.plugins.gtk.diff import DiffView, iter_changes_to_status
-
+from bzrlib.plugins.gtk.diff import (
+    DiffController,
+    DiffView,
+    iter_changes_to_status,
+    )
+eg_diff = """\
+=== modified file 'tests/test_diff.py'
+--- tests/test_diff.py	2008-03-11 13:18:28 +0000
++++ tests/test_diff.py	2008-05-08 22:44:02 +0000
+@@ -20,7 +20,11 @@
+ 
+ from bzrlib import tests
+ 
+-from bzrlib.plugins.gtk.diff import DiffView, iter_changes_to_status
++from bzrlib.plugins.gtk.diff import (
++    DiffController,
++    DiffView,
++    iter_changes_to_status,
++    )
+ 
+ 
+ class TestDiffViewSimple(tests.TestCase):
+"""
 
 class TestDiffViewSimple(tests.TestCase):
 
@@ -67,6 +88,56 @@ class TestDiffView(tests.TestCaseWithTransport):
             '\\+contents of tree/\xce\xa9\n'
             '\n'
             )
+
+
+class MockDiffWidget(object):
+
+    def set_diff_text_sections(self, sections):
+        self.sections = list(sections)
+
+
+class MockWindow(object):
+    def __init__(self):
+        self.diff = MockDiffWidget()
+
+    def set_title(self, title):
+        self.title = title
+
+    def _get_save_path(self, basename):
+        return 'save-path'
+
+
+class TestDiffController(tests.TestCaseWithTransport):
+
+    def get_controller(self):
+        window = MockWindow()
+        return DiffController('load-path', eg_diff.splitlines(True), window)
+
+    def test_get_diff_sections(self):
+        controller = self.get_controller()
+        controller = DiffController('.', eg_diff.splitlines(True),
+                                    controller.window)
+        sections = list(controller.get_diff_sections())
+        self.assertEqual('Complete Diff', sections[0][0])
+        self.assertIs(None, sections[0][1])
+        self.assertEqual(eg_diff, sections[0][2])
+
+        self.assertEqual('tests/test_diff.py', sections[1][0])
+        self.assertEqual('tests/test_diff.py', sections[1][1])
+        self.assertEqual(''.join(eg_diff.splitlines(True)[1:]),
+                         sections[1][2])
+
+    def test_initialize_window(self):
+        controller = self.get_controller()
+        controller.initialize_window(controller.window)
+        self.assertEqual(2, len(controller.window.diff.sections))
+        self.assertEqual('load-path - diff', controller.window.title)
+
+    def test_perform_save(self):
+        self.build_tree_contents([('load-path', 'foo')])
+        controller = self.get_controller()
+        controller.perform_save(None)
+        self.assertFileEqual('foo', 'save-path')
 
 
 class Test_IterChangesToStatus(tests.TestCaseWithTransport):
