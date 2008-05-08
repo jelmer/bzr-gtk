@@ -467,38 +467,32 @@ class DiffWindow(Window):
         self.diff.set_file(file_path)
 
 
-class MergeDirectiveWindow(DiffWindow):
+class MergeDirectiveController(object):
 
     def __init__(self, directive, path):
-        DiffWindow.__init__(self, None)
-        self._merge_target = None
         self.directive = directive
         self.path = path
+        self.merge_target = None
+        self.window = None
 
-    def _get_button_bar(self):
-        """The button bar has only the Merge button"""
-        merge_button = gtk.Button('Merge')
-        merge_button.show()
-        merge_button.set_relief(gtk.RELIEF_NONE)
-        merge_button.connect("clicked", self.perform_merge)
+    @staticmethod
+    def for_gtk(directive, path):
+        controller = MergeDirectiveController(directive, path)
+        window = MergeDirectiveWindow(controller._provide_operations())
+        controller.window = window
+        window.set_diff_text(path, directive.patch.splitlines(True))
+        return controller
 
-        save_button = gtk.Button('Save')
-        save_button.show()
-        save_button.set_relief(gtk.RELIEF_NONE)
-        save_button.connect("clicked", self.perform_save)
-
-        hbox = gtk.HButtonBox()
-        hbox.set_layout(gtk.BUTTONBOX_START)
-        hbox.pack_start(merge_button, expand=False, fill=True)
-        hbox.pack_start(save_button, expand=False, fill=True)
-        hbox.show()
-        return hbox
+    def _provide_operations(self):
+        return [('Merge', self.perform_merge), ('Save', self.perform_save)]
 
     def perform_merge(self, window):
-        try:
-            tree = self._get_merge_target()
-        except SelectCancelled:
-            return
+        if self.merge_target is None:
+            try:
+                self.merge_target = self.window._get_merge_target()
+            except SelectCancelled:
+                return
+        tree = workingtree.WorkingTree.open(self.merge_target)
         tree.lock_write()
         try:
             try:
@@ -517,15 +511,48 @@ class MergeDirectiveWindow(DiffWindow):
                     warning_dialog(_('Conflicts encountered'),
                                    _('Please resolve the conflicts manually'
                                      ' before committing.'))
-                self.destroy()
+                self.window.destroy()
             except Exception, e:
                 error_dialog('Error', str(e))
         finally:
             tree.unlock()
 
+    def perform_save(self, window):
+        try:
+            save_path = self.window._get_save_path(osutils.basename(self.path))
+        except SelectCancelled:
+            return
+        source = open(self.path, 'rb')
+        try:
+            target = open(save_path, 'wb')
+            try:
+                osutils.pumpfile(source, target)
+            finally:
+                target.close()
+        finally:
+            source.close()
+
+
+class MergeDirectiveWindow(DiffWindow):
+
+    def __init__(self, operations):
+        self.operations = operations
+        DiffWindow.__init__(self, None)
+
+    def _get_button_bar(self):
+        """The button bar has only the Merge button"""
+        hbox = gtk.HButtonBox()
+        hbox.set_layout(gtk.BUTTONBOX_START)
+        for title, method in self.operations:
+            merge_button = gtk.Button(title)
+            merge_button.show()
+            merge_button.set_relief(gtk.RELIEF_NONE)
+            merge_button.connect("clicked", method)
+            hbox.pack_start(merge_button, expand=False, fill=True)
+        hbox.show()
+        return hbox
+
     def _get_merge_target(self):
-        if self._merge_target is not None:
-            return self._merge_target
         d = gtk.FileChooserDialog('Merge branch', self,
                                   gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
                                   buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
@@ -535,37 +562,24 @@ class MergeDirectiveWindow(DiffWindow):
             result = d.run()
             if result != gtk.RESPONSE_OK:
                 raise SelectCancelled()
-            uri = d.get_current_folder_uri()
+            return d.get_current_folder_uri()
         finally:
             d.destroy()
-        return workingtree.WorkingTree.open(uri)
 
-    def perform_save(self, window):
+    def _get_save_path(self, basename):
         d = gtk.FileChooserDialog('Save As', self,
                                   gtk.FILE_CHOOSER_ACTION_SAVE,
                                   buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
                                            gtk.STOCK_CANCEL,
                                            gtk.RESPONSE_CANCEL,))
-        d.set_current_name(osutils.basename(self.path))
+        d.set_current_name(basename)
         try:
-            try:
-                result = d.run()
-                if result != gtk.RESPONSE_OK:
-                    raise SelectCancelled()
-                uri = d.get_uri()
-            finally:
-                d.destroy()
-        except SelectCancelled:
-            return
-        source = open(self.path, 'rb')
-        try:
-            target = open(urlutils.local_path_from_url(uri), 'wb')
-            try:
-                target.write(source.read())
-            finally:
-                target.close()
+            result = d.run()
+            if result != gtk.RESPONSE_OK:
+                raise SelectCancelled()
+            return urlutils.local_path_from_url(d.get_uri())
         finally:
-            source.close()
+            d.destroy()
 
 
 def iter_changes_to_status(source, target):
