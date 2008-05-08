@@ -327,16 +327,16 @@ class DiffWidget(gtk.HPaned):
         """
         # The diffs of the  selected file: a scrollable source or
         # text view
+
+    def set_diff_text_sections(self, sections):
         self.diff_view = DiffFileView()
         self.diff_view.show()
         self.pack2(self.diff_view)
-        self.model.append(None, [ "Complete Diff", "" ])
-        self.diff_view._diffs[None] = ''.join(lines)
-        for patch in parse_patches(lines):
-            oldname = patch.oldname.split('\t')[0]
-            newname = patch.newname.split('\t')[0]
-            self.model.append(None, [oldname, newname])
+        for oldname, newname, patch in sections:
             self.diff_view._diffs[newname] = str(patch)
+            if newname is None:
+                newname = ''
+            self.model.append(None, [oldname, newname])
         self.diff_view.show_diff(None)
 
     def set_diff(self, rev_tree, parent_tree):
@@ -423,31 +423,30 @@ class DiffWindow(Window):
         width = int(monitor.width * 0.66)
         height = int(monitor.height * 0.66)
         self.set_default_size(width, height)
-        self.operations = operations
-        self.construct()
+        self.construct(operations)
 
-    def construct(self):
+    def construct(self, operations):
         """Construct the window contents."""
         self.vbox = gtk.VBox()
         self.add(self.vbox)
         self.vbox.show()
-        hbox = self._get_button_bar()
+        hbox = self._get_button_bar(operations)
         if hbox is not None:
             self.vbox.pack_start(hbox, expand=False, fill=True)
         self.diff = DiffWidget()
         self.vbox.add(self.diff)
         self.diff.show_all()
 
-    def _get_button_bar(self):
+    def _get_button_bar(self, operations):
         """Return a button bar to use.
 
         :return: None, meaning that no button bar will be used.
         """
-        if self.operations is None:
+        if operations is None:
             return None
         hbox = gtk.HButtonBox()
         hbox.set_layout(gtk.BUTTONBOX_START)
-        for title, method in self.operations:
+        for title, method in operations:
             merge_button = gtk.Button(title)
             merge_button.show()
             merge_button.set_relief(gtk.RELIEF_NONE)
@@ -485,15 +484,6 @@ class DiffWindow(Window):
         finally:
             d.destroy()
 
-    def set_diff_text(self, description, lines):
-        """Set the diff from a text.
-
-        The diff must be in unified diff format, and will be parsed to
-        determine filenames.
-        """
-        self.diff.set_diff_text(lines)
-        self.set_title(description + " - bzrk diff")
-
     def set_diff(self, description, rev_tree, parent_tree):
         """Set the differences showed by this window.
 
@@ -511,15 +501,22 @@ class DiffController(object):
 
     def __init__(self, path, patch, window=None):
         self.path = path
-        self.window = None
         self.patch = patch
         if window is None:
             window = DiffWindow(operations=self._provide_operations())
             self.initialize_window(window)
+        self.window = window
 
     def initialize_window(self, window):
-        self.window = window
-        window.set_diff_text(self.path, self.patch)
+        window.diff.set_diff_text_sections(self.get_diff_sections())
+        window.set_title(self.path + " - diff")
+
+    def get_diff_sections(self):
+        yield "Complete Diff", None, ''.join(self.patch)
+        for patch in parse_patches(self.patch):
+            oldname = patch.oldname.split('\t')[0]
+            newname = patch.newname.split('\t')[0]
+            yield oldname, newname, str(patch)
 
     def perform_save(self, window):
         try:
