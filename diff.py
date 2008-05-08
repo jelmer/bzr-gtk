@@ -412,7 +412,7 @@ class DiffWindow(Window):
     differences between two revisions on a branch.
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, operations=None):
         Window.__init__(self, parent)
         self.set_border_width(0)
         self.set_title("bzrk diff")
@@ -423,7 +423,7 @@ class DiffWindow(Window):
         width = int(monitor.width * 0.66)
         height = int(monitor.height * 0.66)
         self.set_default_size(width, height)
-
+        self.operations = operations
         self.construct()
 
     def construct(self):
@@ -443,104 +443,8 @@ class DiffWindow(Window):
 
         :return: None, meaning that no button bar will be used.
         """
-        return None
-
-    def set_diff_text(self, description, lines):
-        """Set the diff from a text.
-
-        The diff must be in unified diff format, and will be parsed to
-        determine filenames.
-        """
-        self.diff.set_diff_text(lines)
-        self.set_title(description + " - bzrk diff")
-
-    def set_diff(self, description, rev_tree, parent_tree):
-        """Set the differences showed by this window.
-
-        Compares the two trees and populates the window with the
-        differences.
-        """
-        self.diff.set_diff(rev_tree, parent_tree)
-        self.set_title(description + " - bzrk diff")
-
-    def set_file(self, file_path):
-        self.diff.set_file(file_path)
-
-
-class MergeDirectiveController(object):
-
-    def __init__(self, directive, path):
-        self.directive = directive
-        self.path = path
-        self.merge_target = None
-        self.window = None
-
-    @staticmethod
-    def for_gtk(directive, path):
-        controller = MergeDirectiveController(directive, path)
-        window = MergeDirectiveWindow(controller._provide_operations())
-        controller.window = window
-        window.set_diff_text(path, directive.patch.splitlines(True))
-        return controller
-
-    def _provide_operations(self):
-        return [('Merge', self.perform_merge), ('Save', self.perform_save)]
-
-    def perform_merge(self, window):
-        if self.merge_target is None:
-            try:
-                self.merge_target = self.window._get_merge_target()
-            except SelectCancelled:
-                return
-        tree = workingtree.WorkingTree.open(self.merge_target)
-        tree.lock_write()
-        try:
-            try:
-                merger, verified = _mod_merge.Merger.from_mergeable(tree,
-                    self.directive, progress.DummyProgress())
-                merger.check_basis(True)
-                merger.merge_type = _mod_merge.Merge3Merger
-                conflict_count = merger.do_merge()
-                merger.set_pending()
-                if conflict_count == 0:
-                    # No conflicts found.
-                    info_dialog(_('Merge successful'),
-                                _('All changes applied successfully.'))
-                else:
-                    # There are conflicts to be resolved.
-                    warning_dialog(_('Conflicts encountered'),
-                                   _('Please resolve the conflicts manually'
-                                     ' before committing.'))
-                self.window.destroy()
-            except Exception, e:
-                error_dialog('Error', str(e))
-        finally:
-            tree.unlock()
-
-    def perform_save(self, window):
-        try:
-            save_path = self.window._get_save_path(osutils.basename(self.path))
-        except SelectCancelled:
-            return
-        source = open(self.path, 'rb')
-        try:
-            target = open(save_path, 'wb')
-            try:
-                osutils.pumpfile(source, target)
-            finally:
-                target.close()
-        finally:
-            source.close()
-
-
-class MergeDirectiveWindow(DiffWindow):
-
-    def __init__(self, operations):
-        self.operations = operations
-        DiffWindow.__init__(self, None)
-
-    def _get_button_bar(self):
-        """The button bar has only the Merge button"""
+        if self.operations is None:
+            return None
         hbox = gtk.HButtonBox()
         hbox.set_layout(gtk.BUTTONBOX_START)
         for title, method in self.operations:
@@ -580,6 +484,102 @@ class MergeDirectiveWindow(DiffWindow):
             return urlutils.local_path_from_url(d.get_uri())
         finally:
             d.destroy()
+
+    def set_diff_text(self, description, lines):
+        """Set the diff from a text.
+
+        The diff must be in unified diff format, and will be parsed to
+        determine filenames.
+        """
+        self.diff.set_diff_text(lines)
+        self.set_title(description + " - bzrk diff")
+
+    def set_diff(self, description, rev_tree, parent_tree):
+        """Set the differences showed by this window.
+
+        Compares the two trees and populates the window with the
+        differences.
+        """
+        self.diff.set_diff(rev_tree, parent_tree)
+        self.set_title(description + " - bzrk diff")
+
+    def set_file(self, file_path):
+        self.diff.set_file(file_path)
+
+
+class DiffController(object):
+
+    def __init__(self, path, patch, window=None):
+        self.path = path
+        self.window = None
+        self.patch = patch
+        if window is None:
+            window = DiffWindow(operations=self._provide_operations())
+            self.initialize_window(window)
+
+    def initialize_window(self, window):
+        self.window = window
+        window.set_diff_text(self.path, self.patch)
+
+    def perform_save(self, window):
+        try:
+            save_path = self.window._get_save_path(osutils.basename(self.path))
+        except SelectCancelled:
+            return
+        source = open(self.path, 'rb')
+        try:
+            target = open(save_path, 'wb')
+            try:
+                osutils.pumpfile(source, target)
+            finally:
+                target.close()
+        finally:
+            source.close()
+
+    def _provide_operations(self):
+        return [('Save', self.perform_save)]
+
+
+class MergeDirectiveController(DiffController):
+
+    def __init__(self, path, directive):
+        DiffController.__init__(self, path, directive.patch.splitlines(True))
+        self.directive = directive
+        self.merge_target = None
+
+    def _provide_operations(self):
+        return [('Merge', self.perform_merge), ('Save', self.perform_save)]
+
+    def perform_merge(self, window):
+        if self.merge_target is None:
+            try:
+                self.merge_target = self.window._get_merge_target()
+            except SelectCancelled:
+                return
+        tree = workingtree.WorkingTree.open(self.merge_target)
+        tree.lock_write()
+        try:
+            try:
+                merger, verified = _mod_merge.Merger.from_mergeable(tree,
+                    self.directive, progress.DummyProgress())
+                merger.check_basis(True)
+                merger.merge_type = _mod_merge.Merge3Merger
+                conflict_count = merger.do_merge()
+                merger.set_pending()
+                if conflict_count == 0:
+                    # No conflicts found.
+                    info_dialog(_('Merge successful'),
+                                _('All changes applied successfully.'))
+                else:
+                    # There are conflicts to be resolved.
+                    warning_dialog(_('Conflicts encountered'),
+                                   _('Please resolve the conflicts manually'
+                                     ' before committing.'))
+                self.window.destroy()
+            except Exception, e:
+                error_dialog('Error', str(e))
+        finally:
+            tree.unlock()
 
 
 def iter_changes_to_status(source, target):
