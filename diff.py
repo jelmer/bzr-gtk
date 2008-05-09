@@ -469,6 +469,11 @@ class DiffWindow(Window):
         finally:
             d.destroy()
 
+    def _merge_successful(self):
+        # No conflicts found.
+        info_dialog(_('Merge successful'),
+                    _('All changes applied successfully.'))
+
     def _get_save_path(self, basename):
         d = gtk.FileChooserDialog('Save As', self,
                                   gtk.FILE_CHOOSER_ACTION_SAVE,
@@ -539,8 +544,9 @@ class DiffController(object):
 
 class MergeDirectiveController(DiffController):
 
-    def __init__(self, path, directive):
-        DiffController.__init__(self, path, directive.patch.splitlines(True))
+    def __init__(self, path, directive, window):
+        DiffController.__init__(self, path, directive.patch.splitlines(True),
+                                window)
         self.directive = directive
         self.merge_target = None
 
@@ -564,9 +570,7 @@ class MergeDirectiveController(DiffController):
                 conflict_count = merger.do_merge()
                 merger.set_pending()
                 if conflict_count == 0:
-                    # No conflicts found.
-                    info_dialog(_('Merge successful'),
-                                _('All changes applied successfully.'))
+                    self.window._merge_successful()
                 else:
                     # There are conflicts to be resolved.
                     warning_dialog(_('Conflicts encountered'),

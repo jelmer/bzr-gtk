@@ -19,11 +19,13 @@ from cStringIO import StringIO
 import os
 
 from bzrlib import tests
+from bzrlib.merge_directive import MergeDirective
 
 from bzrlib.plugins.gtk.diff import (
     DiffController,
     DiffView,
     iter_changes_to_status,
+    MergeDirectiveController,
     )
 eg_diff = """\
 === modified file 'tests/test_diff.py'
@@ -106,6 +108,15 @@ class MockWindow(object):
     def _get_save_path(self, basename):
         return 'save-path'
 
+    def _get_merge_target(self):
+        return 'other'
+
+    def destroy(self):
+        pass
+
+    def _merge_successful(self):
+        self.merge_successful = True
+
 
 class TestDiffController(tests.TestCaseWithTransport):
 
@@ -138,6 +149,26 @@ class TestDiffController(tests.TestCaseWithTransport):
         controller = self.get_controller()
         controller.perform_save(None)
         self.assertFileEqual('foo', 'save-path')
+
+
+class TestMergeDirectiveController(tests.TestCaseWithTransport):
+
+    def test_perform_merge(self):
+        this = self.make_branch_and_tree('this')
+        this.commit('first commit')
+        other = this.bzrdir.sprout('other').open_workingtree()
+        other.commit('second commit')
+        other.lock_write()
+        try:
+            directive = MergeDirective.from_objects(other.branch.repository,
+                                                    other.last_revision(), 0,
+                                                    0, 'this')
+        finally:
+            other.unlock()
+        window = MockWindow()
+        controller = MergeDirectiveController('directive', directive, window)
+        controller.perform_merge(window)
+        self.assertTrue(window.merge_successful)
 
 
 class Test_IterChangesToStatus(tests.TestCaseWithTransport):
