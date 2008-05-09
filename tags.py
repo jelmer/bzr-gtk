@@ -326,7 +326,7 @@ class AddTagDialog(gtk.Dialog):
             if self._hbox_revid.get_revision_id() is None:
                 self._revid = self._branch.last_revision()
             else:
-                self._revid = self.hbox_revid.get_revision_id()
+                self._revid = self._hbox_revid.get_revision_id()
             
         self.tagname = self._entry_name.get_text()
         
