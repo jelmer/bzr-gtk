@@ -109,7 +109,7 @@ class MockWindow(object):
         return 'save-path'
 
     def _get_merge_target(self):
-        return 'other'
+        return 'this'
 
     def destroy(self):
         pass
@@ -157,6 +157,7 @@ class TestMergeDirectiveController(tests.TestCaseWithTransport):
         this = self.make_branch_and_tree('this')
         this.commit('first commit')
         other = this.bzrdir.sprout('other').open_workingtree()
+        self.build_tree_contents([('foo', 'bar')])
         other.commit('second commit')
         other.lock_write()
         try:
@@ -169,6 +170,8 @@ class TestMergeDirectiveController(tests.TestCaseWithTransport):
         controller = MergeDirectiveController('directive', directive, window)
         controller.perform_merge(window)
         self.assertTrue(window.merge_successful)
+        self.assertEqual(other.last_revision(), this.get_parent_ids()[1])
+        self.assertFileEqual('bar', 'foo')
 
 
 class Test_IterChangesToStatus(tests.TestCaseWithTransport):
