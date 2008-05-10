@@ -474,6 +474,12 @@ class DiffWindow(Window):
         info_dialog(_('Merge successful'),
                     _('All changes applied successfully.'))
 
+    def _conflicts(self):
+        warning_dialog(_('Conflicts encountered'),
+                       _('Please resolve the conflicts manually'
+                         ' before committing.'))
+
+
     def _get_save_path(self, basename):
         d = gtk.FileChooserDialog('Save As', self,
                                   gtk.FILE_CHOOSER_ACTION_SAVE,
@@ -572,10 +578,8 @@ class MergeDirectiveController(DiffController):
                 if conflict_count == 0:
                     self.window._merge_successful()
                 else:
+                    self.window._conflicts()
                     # There are conflicts to be resolved.
-                    warning_dialog(_('Conflicts encountered'),
-                                   _('Please resolve the conflicts manually'
-                                     ' before committing.'))
                 self.window.destroy()
             except Exception, e:
                 error_dialog('Error', str(e))

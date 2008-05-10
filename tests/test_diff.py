@@ -101,6 +101,7 @@ class MockDiffWidget(object):
 class MockWindow(object):
     def __init__(self):
         self.diff = MockDiffWidget()
+        self.merge_successful = False
 
     def set_title(self, title):
         self.title = title
@@ -116,6 +117,9 @@ class MockWindow(object):
 
     def _merge_successful(self):
         self.merge_successful = True
+
+    def _conflicts(self):
+        self.conflicts = True
 
 
 class TestDiffController(tests.TestCaseWithTransport):
@@ -153,11 +157,12 @@ class TestDiffController(tests.TestCaseWithTransport):
 
 class TestMergeDirectiveController(tests.TestCaseWithTransport):
 
-    def test_perform_merge(self):
+    def make_this_other_directive(self):
         this = self.make_branch_and_tree('this')
         this.commit('first commit')
         other = this.bzrdir.sprout('other').open_workingtree()
-        self.build_tree_contents([('foo', 'bar')])
+        self.build_tree_contents([('other/foo', 'bar')])
+        other.add('foo')
         other.commit('second commit')
         other.lock_write()
         try:
@@ -166,12 +171,31 @@ class TestMergeDirectiveController(tests.TestCaseWithTransport):
                                                     0, 'this')
         finally:
             other.unlock()
+        return this, other, directive
+
+    def make_merged_window(self, directive):
         window = MockWindow()
         controller = MergeDirectiveController('directive', directive, window)
         controller.perform_merge(window)
+        return window
+
+    def test_perform_merge_success(self):
+        this, other, directive = self.make_this_other_directive()
+        window = self.make_merged_window(directive)
         self.assertTrue(window.merge_successful)
         self.assertEqual(other.last_revision(), this.get_parent_ids()[1])
-        self.assertFileEqual('bar', 'foo')
+        self.assertFileEqual('bar', 'this/foo')
+
+    def test_perform_merge_conflicts(self):
+        this, other, directive = self.make_this_other_directive()
+        self.build_tree_contents([('this/foo', 'bar')])
+        this.add('foo')
+        this.commit('message')
+        window = self.make_merged_window(directive)
+        self.assertFalse(window.merge_successful)
+        self.assertTrue(window.conflicts)
+        self.assertEqual(other.last_revision(), this.get_parent_ids()[1])
+        self.assertFileEqual('bar', 'this/foo')
 
 
 class Test_IterChangesToStatus(tests.TestCaseWithTransport):
