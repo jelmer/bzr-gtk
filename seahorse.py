@@ -28,21 +28,16 @@ OPENPGP_PATH = '/org/gnome/seahorse/keys/openpgp'
 KEY_TYPE_OPENPGP = 'openpgp'
 KEY_TYPE_SSH = 'ssh'
 
-try:
-    dbus.validate_bus_name(BUS_NAME)
-except ValueError:
-    # Seahorse isn't installed
-    raise ImportError
-except AttributeError:
-    # Outdated version of DBus that doesn't have validate_bus_name
-    raise ImportError
-
 bus = dbus.SessionBus()
 
-crypto = dbus.Interface(bus.get_object(BUS_NAME, CRYPTO_PATH), 
-                        CRYPTO_INTERFACE)
-openpgp = dbus.Interface(bus.get_object(BUS_NAME, OPENPGP_PATH),
-                         OPENPGP_INTERFACE)
+try: 
+    crypto = dbus.Interface(bus.get_object(BUS_NAME, CRYPTO_PATH), 
+                            CRYPTO_INTERFACE)
+    openpgp = dbus.Interface(bus.get_object(BUS_NAME, OPENPGP_PATH),
+                             OPENPGP_INTERFACE)
+except dbus.exceptions.DBusException, e:
+    if e.get_dbus_name() == 'org.freedesktop.DBus.Error.ServiceUnknown':
+        raise ImportError
 
 FLAG_VALID = 0x0001
 FLAG_CAN_ENCRYPT = 0x0002
