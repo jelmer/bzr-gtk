@@ -479,6 +479,8 @@ class DiffWindow(Window):
                        _('Please resolve the conflicts manually'
                          ' before committing.'))
 
+    def _handle_error(self, e):
+        error_dialog('Error', str(e))
 
     def _get_save_path(self, basename):
         d = gtk.FileChooserDialog('Save As', self,
@@ -550,7 +552,7 @@ class DiffController(object):
 
 class MergeDirectiveController(DiffController):
 
-    def __init__(self, path, directive, window):
+    def __init__(self, path, directive, window=None):
         DiffController.__init__(self, path, directive.patch.splitlines(True),
                                 window)
         self.directive = directive
@@ -582,7 +584,7 @@ class MergeDirectiveController(DiffController):
                     # There are conflicts to be resolved.
                 self.window.destroy()
             except Exception, e:
-                error_dialog('Error', str(e))
+                self.window._handle_error(e)
         finally:
             tree.unlock()
 

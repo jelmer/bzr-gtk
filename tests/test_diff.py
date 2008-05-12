@@ -18,7 +18,7 @@
 from cStringIO import StringIO
 import os
 
-from bzrlib import tests
+from bzrlib import errors, tests
 from bzrlib.merge_directive import MergeDirective
 
 from bzrlib.plugins.gtk.diff import (
@@ -121,6 +121,9 @@ class MockWindow(object):
     def _conflicts(self):
         self.conflicts = True
 
+    def _handle_error(self, e):
+        self.handled_error = e
+
 
 class TestDiffController(tests.TestCaseWithTransport):
 
@@ -196,6 +199,13 @@ class TestMergeDirectiveController(tests.TestCaseWithTransport):
         self.assertTrue(window.conflicts)
         self.assertEqual(other.last_revision(), this.get_parent_ids()[1])
         self.assertFileEqual('bar', 'this/foo')
+
+    def test_perform_merge_uncommitted_changes(self):
+        this, other, directive = self.make_this_other_directive()
+        self.build_tree_contents([('this/foo', 'bar')])
+        this.add('foo')
+        window = self.make_merged_window(directive)
+        self.assertIsInstance(window.handled_error, errors.UncommittedChanges)
 
 
 class Test_IterChangesToStatus(tests.TestCaseWithTransport):
