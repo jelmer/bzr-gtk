@@ -28,6 +28,7 @@ import gtk.glade
 import bzrlib.add
 import bzrlib.errors as errors
 
+from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import error_dialog
 from guifiles import GLADEFILENAME
 
@@ -64,8 +65,8 @@ class OliveAdd:
             filename = self.selected
             
             if filename is None:
-                error_dialog(_('No file was selected'),
-                             _('Please select a file from the list,\nor choose the other option.'))
+                error_dialog(_i18n('No file was selected'),
+                             _i18n('Please select a file from the list,\nor choose the other option.'))
                 return
             
             fullpath = self.wt.abspath(os.path.join(self.wtpath, filename))
@@ -73,8 +74,8 @@ class OliveAdd:
             try:
                 bzrlib.add.smart_add([fullpath])
             except errors.NotBranchError:
-                error_dialog(_('Directory is not a branch'),
-                             _('You can perform this action only in a branch.'))
+                error_dialog(_i18n('Directory is not a branch'),
+                             _i18n('You can perform this action only in a branch.'))
                 return
         elif radio_unknown.get_active():
             # Add unknown files recursively
@@ -83,8 +84,8 @@ class OliveAdd:
             try:
                 bzrlib.add.smart_add([fullpath], True)
             except errors.NotBranchError:
-                error_dialog(_('Directory is not a branch'),
-                             _('You can perform this action only in a branch.'))
+                error_dialog(_i18n('Directory is not a branch'),
+                             _i18n('You can perform this action only in a branch.'))
                 return
         
         self.close()

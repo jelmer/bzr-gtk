@@ -24,6 +24,7 @@ except:
 
 import gtk
 
+from bzrlib.plugins.gtk import _i18n
 from errors import show_bzr_error
 
 from bzrlib.branch import Branch
@@ -47,19 +48,19 @@ class CheckoutDialog(gtk.Dialog):
         self.path = path
         
         # Create the widgets
-        self._button_checkout = gtk.Button(_("Check_out"), use_underline=True)
+        self._button_checkout = gtk.Button(_i18n("Check_out"), use_underline=True)
         self._button_revision = gtk.Button('')
         self._image_browse = gtk.Image()
-        self._filechooser = gtk.FileChooserButton(_("Please select a folder"))
+        self._filechooser = gtk.FileChooserButton(_i18n("Please select a folder"))
         self._combo = gtk.ComboBoxEntry()
-        self._label_location = gtk.Label(_("Branch location:"))
-        self._label_destination = gtk.Label(_("Destination:"))
-        self._label_nick = gtk.Label(_("Branck nick:"))
-        self._label_revision = gtk.Label(_("Revision:"))
+        self._label_location = gtk.Label(_i18n("Branch location:"))
+        self._label_destination = gtk.Label(_i18n("Destination:"))
+        self._label_nick = gtk.Label(_i18n("Branck nick:"))
+        self._label_revision = gtk.Label(_i18n("Revision:"))
         self._hbox_revision = gtk.HBox()
         self._entry_revision = gtk.Entry()
         self._entry_nick = gtk.Entry()
-        self._check_lightweight = gtk.CheckButton(_("_Lightweight checkout"),
+        self._check_lightweight = gtk.CheckButton(_i18n("_Lightweight checkout"),
                                                   use_underline=True)
         
         # Set callbacks
@@ -160,8 +161,8 @@ class CheckoutDialog(gtk.Dialog):
         """ Checkout button clicked handler. """
         location = self._combo.get_child().get_text()
         if location is '':
-            error_dialog(_('Missing branch location'),
-                         _('You must specify a branch location.'))
+            error_dialog(_i18n('Missing branch location'),
+                         _i18n('You must specify a branch location.'))
             return
         
         destination = self._filechooser.get_filename()
@@ -192,7 +193,7 @@ class CheckoutDialog(gtk.Dialog):
         """ We try to get the last revision if focus lost. """
         rev = self._get_last_revno()
         if rev is None:
-            self._entry_revision.set_text(_('N/A'))
+            self._entry_revision.set_text(_i18n('N/A'))
             self._button_revision.set_sensitive(False)
         else:
             self._entry_revision.set_text(str(rev))

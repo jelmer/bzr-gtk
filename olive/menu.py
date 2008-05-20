@@ -30,6 +30,7 @@ import gtk
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
+from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import error_dialog, info_dialog, question_dialog, warning_dialog
 from bzrlib.plugins.gtk.errors import show_bzr_error
 from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
@@ -59,76 +60,76 @@ class OliveMenu:
         
         self.actiongroup = gtk.ActionGroup('context')
         self.actiongroup.add_actions([('add', gtk.STOCK_ADD,
-                                       _('Add'), None,
-                                       _('Add the selected file'),
+                                       _i18n('Add'), None,
+                                       _i18n('Add the selected file'),
                                        self.add_file),
                                       ('remove', gtk.STOCK_REMOVE,
-                                       _('Remove'), None,
-                                       _('Remove the selected file'),
+                                       _i18n('Remove'), None,
+                                       _i18n('Remove the selected file'),
                                        self.remove_file),
                                       ('remove_and_delete', gtk.STOCK_REMOVE,
-                                       _('Remove and delete'), None,
-                                       _('Remove the selected file/dir and delete from disk'),
+                                       _i18n('Remove and delete'), None,
+                                       _i18n('Remove the selected file/dir and delete from disk'),
                                        self.remove_and_delete_file),
                                       ('rename', None,
-                                       _('Rename'), None,
-                                       _('Rename the selected file'),
+                                       _i18n('Rename'), None,
+                                       _i18n('Rename the selected file'),
                                        self.rename_file),
                                       ('open', gtk.STOCK_OPEN,
-                                       _('Open'), None,
-                                       _('Open the selected file'),
+                                       _i18n('Open'), None,
+                                       _i18n('Open the selected file'),
                                        self.open_file),
                                       ('revert', None,
-                                       _('Revert'), None,
-                                       _('Revert the changes'),
+                                       _i18n('Revert'), None,
+                                       _i18n('Revert the changes'),
                                        self.revert),
                                       ('commit', None,
-                                       _('Commit'), None,
-                                       _('Commit the changes'),
+                                       _i18n('Commit'), None,
+                                       _i18n('Commit the changes'),
                                        self.commit),
                                       ('annotate', None,
-                                       _('Annotate'), None,
-                                       _('Annotate the selected file'),
+                                       _i18n('Annotate'), None,
+                                       _i18n('Annotate the selected file'),
                                        self.annotate),
                                       ('diff', None,
-                                       _('Diff'), None,
-                                       _('Show the diff of the file'),
+                                       _i18n('Diff'), None,
+                                       _i18n('Show the diff of the file'),
                                        self.diff),
                                       ('bookmark', None,
-                                       _('Bookmark'), None,
-                                       _('Bookmark current location'),
+                                       _i18n('Bookmark'), None,
+                                       _i18n('Bookmark current location'),
                                        self.bookmark),
                                       ('edit_bookmark', gtk.STOCK_EDIT,
-                                       _('Edit'), None,
-                                       _('Edit the selected bookmark'),
+                                       _i18n('Edit'), None,
+                                       _i18n('Edit the selected bookmark'),
                                        self.edit_bookmark),
                                       ('remove_bookmark', gtk.STOCK_REMOVE,
-                                       _('Remove'), None,
-                                       _('Remove the selected bookmark'),
+                                       _i18n('Remove'), None,
+                                       _i18n('Remove the selected bookmark'),
                                        self.remove_bookmark),
                                       ('open_folder', gtk.STOCK_OPEN,
-                                       _('Open Folder'), None,
-                                       _('Open bookmark folder in Nautilus'),
+                                       _i18n('Open Folder'), None,
+                                       _i18n('Open bookmark folder in Nautilus'),
                                        self.open_folder),
                                       ('diff_selected', None,
-                                       _('Selected...'), None,
-                                       _('Show the differences of the selected file'),
+                                       _i18n('Selected...'), None,
+                                       _i18n('Show the differences of the selected file'),
                                        self.diff_selected),
                                       ('diff_all', None,
-                                       _('All...'), None,
-                                       _('Show the differences of all files'),
+                                       _i18n('All...'), None,
+                                       _i18n('Show the differences of all files'),
                                        self.diff_all),
                                       ('view_remote', None,
-                                       _('View contents'), None,
-                                       _('View the contents of the file in a builtin viewer'),
+                                       _i18n('View contents'), None,
+                                       _i18n('View the contents of the file in a builtin viewer'),
                                        self.view_remote),
                                       ('diff_remote', None,
-                                       _('Show differences'), None,
-                                       _('Show the differences between two revisions of the file'),
+                                       _i18n('Show differences'), None,
+                                       _i18n('Show the differences between two revisions of the file'),
                                        self.diff_remote),
                                       ('revert_remote', None,
-                                       _('Revert to this revision'), None,
-                                       _('Revert the selected file to the selected revision'),
+                                       _i18n('Revert to this revision'), None,
+                                       _i18n('Revert the selected file to the selected revision'),
                                        self.revert_remote)
                                      ])
         
@@ -174,8 +175,8 @@ class OliveMenu:
         filename = self.selected
             
         if filename is None:
-            error_dialog(_('No file was selected'),
-                         _('Please select a file from the list,\nor choose the other option.'))
+            error_dialog(_i18n('No file was selected'),
+                         _i18n('Please select a file from the list,\nor choose the other option.'))
             return
         
         bzrlib.add.smart_add([os.path.join(directory, filename)])
@@ -187,8 +188,8 @@ class OliveMenu:
         filename = self.selected
         
         if filename is None:
-            error_dialog(_('No file was selected'),
-                         _('Please select a file from the list.'))
+            error_dialog(_i18n('No file was selected'),
+                         _i18n('Please select a file from the list.'))
             return
         
         wt, path = WorkingTree.open_containing(os.path.join(directory, filename))
@@ -214,8 +215,8 @@ class OliveMenu:
         filename = self.selected
         
         if filename is None:
-            error_dialog(_('No file was selected'),
-                         _('Please select a file from the list,\nor choose the other option.'))
+            error_dialog(_i18n('No file was selected'),
+                         _i18n('Please select a file from the list,\nor choose the other option.'))
             return
         
         wt, path = WorkingTree.open_containing(os.path.join(directory, filename))
@@ -224,7 +225,7 @@ class OliveMenu:
         if delete_on_disk:
             abs_filename = os.path.join(directory,filename)
             if os.path.isdir(abs_filename):
-                response = question_dialog(_('Delete directory with all directories below ?'), abs_filename )
+                response = question_dialog(_i18n('Delete directory with all directories below ?'), abs_filename )
                 if response == gtk.RESPONSE_YES:
                     shutil.rmtree(abs_filename)
             else:
@@ -250,8 +251,8 @@ class OliveMenu:
         filename = self.selected
         
         if filename is None:
-            error_dialog(_('No file was selected'),
-                         _('Please select a file from the list,\nor choose the other option.'))
+            error_dialog(_i18n('No file was selected'),
+                         _i18n('Please select a file from the list,\nor choose the other option.'))
             return
 
         if filename == '..':
@@ -271,11 +272,11 @@ class OliveMenu:
         wt, path = WorkingTree.open_containing(self.path)
         ret = wt.revert([os.path.join(path, self.selected)])
         if ret:
-            warning_dialog(_('Conflicts detected'),
-                           _('Please have a look at the working tree before continuing.'))
+            warning_dialog(_i18n('Conflicts detected'),
+                           _i18n('Please have a look at the working tree before continuing.'))
         else:
-            info_dialog(_('Revert successful'),
-                        _('All files reverted to last revision.'))
+            info_dialog(_i18n('Revert successful'),
+                        _i18n('All files reverted to last revision.'))
         self.app.refresh_right()       
     
     def commit(self, action):
@@ -315,12 +316,12 @@ class OliveMenu:
     def bookmark(self, action):
         """ Right context menu -> Bookmark """
         if self.pref.add_bookmark(self.path):
-            info_dialog(_('Bookmark successfully added'),
-                        _('The current directory was bookmarked. You can reach\nit by selecting it from the left panel.'))
+            info_dialog(_i18n('Bookmark successfully added'),
+                        _i18n('The current directory was bookmarked. You can reach\nit by selecting it from the left panel.'))
             self.pref.write()
         else:
-            warning_dialog(_('Location already bookmarked'),
-                           _('The current directory is already bookmarked.\nSee the left panel for reference.'))
+            warning_dialog(_i18n('Location already bookmarked'),
+                           _i18n('The current directory is already bookmarked.\nSee the left panel for reference.'))
         
         self.app.refresh_left()
 

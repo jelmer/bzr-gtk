@@ -1,5 +1,15 @@
 0.95.0	UNRELEASED
 
+ BUG FIXES
+
+  * Replace _() calls by _i18n() calls. (Vincent Ladeuil, #187283)
+
+ INTERNALS
+
+  * All i18n calls should now go through _i18n which must be imported from
+    bzrlib.plugins.gtk. This addresses the occasional collisions with '_' used
+    as an anonymous variable. (Vincent Ladeuil)
+
 
 0.94.0    2008-05-04
 

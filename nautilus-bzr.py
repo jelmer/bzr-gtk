@@ -19,7 +19,7 @@ from bzrlib.config import GlobalConfig
 from bzrlib.plugin import load_plugins
 load_plugins()
 
-from bzrlib.plugins.gtk import cmd_visualise, cmd_gannotate
+from bzrlib.plugins.gtk import _i18n, cmd_visualise, cmd_gannotate
 
 class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.InfoProvider):
     def __init__(self):

@@ -27,6 +27,7 @@ import gtk.glade
 
 import bzrlib.errors as errors
 
+from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import error_dialog, warning_dialog
 from guifiles import GLADEFILENAME
 
@@ -64,8 +65,8 @@ class OliveMkdir:
         dirname = entry.get_text()
         
         if dirname == "":
-            error_dialog(_('No directory name given'),
-                         _('Please specify a desired name for the new directory.'))
+            error_dialog(_i18n('No directory name given'),
+                         _i18n('Please specify a desired name for the new directory.'))
             return
         
         if checkbox.get_active():
@@ -76,8 +77,8 @@ class OliveMkdir:
                 self.wt.add([os.path.join(self.wtpath, dirname)])
             except OSError, e:
                 if e.errno == 17:
-                    error_dialog(_('Directory already exists'),
-                                 _('Please specify another name to continue.'))
+                    error_dialog(_i18n('Directory already exists'),
+                                 _i18n('Please specify another name to continue.'))
                 else:
                     raise
         else:
@@ -86,8 +87,8 @@ class OliveMkdir:
                 os.mkdir(os.path.join(self.wt.basedir, self.wtpath, dirname))
             except OSError, e:
                 if e.errno == 17:
-                    error_dialog(_('Directory already exists'),
-                                 _('Please specify another name to continue.'))
+                    error_dialog(_i18n('Directory already exists'),
+                                 _i18n('Please specify another name to continue.'))
                     return
 
         self.close()

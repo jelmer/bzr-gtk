@@ -25,6 +25,7 @@ import gtk.glade
 
 import bzrlib.errors as errors
 
+from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import error_dialog
 from guifiles import GLADEFILENAME
 
@@ -553,8 +554,8 @@ class OliveInfo:
     def display(self):
         """ Display the Informations window. """
         if self.notbranch:
-            error_dialog(_('Directory is not a branch'),
-                         _('You can perform this action only in a branch.'))
+            error_dialog(_i18n('Directory is not a branch'),
+                         _i18n('You can perform this action only in a branch.'))
             self.close()
         else:
             self.window.show()

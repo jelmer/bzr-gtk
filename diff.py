@@ -41,6 +41,7 @@ from bzrlib.diff import show_diff_trees, internal_diff
 from bzrlib.errors import NoSuchFile
 from bzrlib.patches import parse_patches
 from bzrlib.trace import warning
+from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.window import Window
 from dialog import error_dialog, info_dialog, warning_dialog
 
@@ -510,13 +511,13 @@ class MergeDirectiveWindow(DiffWindow):
                 merger.set_pending()
                 if conflict_count == 0:
                     # No conflicts found.
-                    info_dialog(_('Merge successful'),
-                                _('All changes applied successfully.'))
+                    info_dialog(_i18n('Merge successful'),
+                                _i18n('All changes applied successfully.'))
                 else:
                     # There are conflicts to be resolved.
-                    warning_dialog(_('Conflicts encountered'),
-                                   _('Please resolve the conflicts manually'
-                                     ' before committing.'))
+                    warning_dialog(_i18n('Conflicts encountered'),
+                                   _i18n('Please resolve the conflicts manually'
+                                         ' before committing.'))
                 self.destroy()
             except Exception, e:
                 error_dialog('Error', str(e))

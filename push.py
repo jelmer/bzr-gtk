@@ -30,6 +30,7 @@ from bzrlib.builtins import _create_prefix
 from bzrlib.config import LocationConfig
 import bzrlib.errors as errors
 
+from bzrlib.plugins.gtk import _i18n
 from dialog import error_dialog, info_dialog, question_dialog
 
 from history import UrlHistory
@@ -49,9 +50,9 @@ class PushDialog(gtk.Dialog):
         self.branch = branch
         
         # Create the widgets
-        self._label_location = gtk.Label(_("Location:"))
+        self._label_location = gtk.Label(_i18n("Location:"))
         self._combo = gtk.ComboBoxEntry()
-        self._button_push = gtk.Button(_("_Push"), use_underline=True)
+        self._button_push = gtk.Button(_i18n("_Push"), use_underline=True)
         self._hbox_location = gtk.HBox()
         
         # Set callbacks
@@ -94,22 +95,22 @@ class PushDialog(gtk.Dialog):
         location = self._combo.get_child().get_text()
         revs = 0
         if self.branch is not None and self.branch.get_push_location() is None:
-            response = question_dialog(_('Set default push location'),
-                                       _('There is no default push location set.\nSet %r as default now?') % location)
+            response = question_dialog(_i18n('Set default push location'),
+                                       _i18n('There is no default push location set.\nSet %r as default now?') % location)
             if response == gtk.RESPONSE_OK:
                 self.branch.set_push_location(location)
 
         try:
             revs = do_push(self.branch, location=location, overwrite=False)
         except errors.DivergedBranches:
-            response = question_dialog(_('Branches have been diverged'),
-                                       _('You cannot push if branches have diverged.\nOverwrite?'))
+            response = question_dialog(_i18n('Branches have been diverged'),
+                                       _i18n('You cannot push if branches have diverged.\nOverwrite?'))
             if response == gtk.RESPONSE_YES:
                 revs = do_push(self.branch, location=location, overwrite=True)
         
         self._history.add_entry(location)
-        info_dialog(_('Push successful'),
-                    _("%d revision(s) pushed.") % revs)
+        info_dialog(_i18n('Push successful'),
+                    _i18n("%d revision(s) pushed.") % revs)
         
         self.response(gtk.RESPONSE_OK)
 
@@ -142,8 +143,8 @@ def do_push(br_from, location, overwrite):
             relurl = transport.relpath(location_url)
             transport.mkdir(relurl)
         except errors.NoSuchFile:
-            response = question_dialog(_('Non existing parent directory'),
-                         _("The parent directory (%s)\ndoesn't exist. Create?") % location)
+            response = question_dialog(_i18n('Non existing parent directory'),
+                         _i18n("The parent directory (%s)\ndoesn't exist. Create?") % location)
             if response == gtk.RESPONSE_OK:
                 _create_prefix(transport)
             else:
