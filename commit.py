@@ -31,6 +31,7 @@ from bzrlib import errors, osutils
 from bzrlib.trace import mutter
 from bzrlib.util import bencode
 
+from bzrlib.plugins.gtk import _i18n
 from dialog import error_dialog, question_dialog
 from errors import show_bzr_error
 
@@ -164,12 +165,12 @@ class CommitDialog(gtk.Dialog):
         store = self._files_store
         self._treeview_files.set_model(None)
 
-        added = _('added')
-        removed = _('removed')
-        renamed = _('renamed')
-        renamed_and_modified = _('renamed and modified')
-        modified = _('modified')
-        kind_changed = _('kind changed')
+        added = _i18n('added')
+        removed = _i18n('removed')
+        renamed = _i18n('renamed')
+        renamed_and_modified = _i18n('renamed and modified')
+        modified = _i18n('modified')
+        kind_changed = _i18n('kind changed')
 
         # The store holds:
         # [file_id, real path, checkbox, display path, changes type, message]
@@ -257,7 +258,7 @@ class CommitDialog(gtk.Dialog):
             self._enable_per_file_commits = True
         if not self._enable_per_file_commits:
             self._file_message_expander.hide()
-            self._global_message_label.set_markup(_('<b>Commit Message</b>'))
+            self._global_message_label.set_markup(_i18n('<b>Commit Message</b>'))
 
     def _compute_delta(self):
         self._delta = self._wt.changes_from(self._basis_tree)
@@ -307,7 +308,7 @@ class CommitDialog(gtk.Dialog):
         self._construct_file_list()
         self._construct_pending_list()
 
-        self._check_local = gtk.CheckButton(_("_Only commit locally"),
+        self._check_local = gtk.CheckButton(_i18n("_Only commit locally"),
                                             use_underline=True)
         self._left_pane_box.pack_end(self._check_local, False, False)
         self._check_local.set_active(False)
@@ -334,7 +335,7 @@ class CommitDialog(gtk.Dialog):
         self._hpane.pack2(self._right_pane_table, resize=True, shrink=True)
 
     def _construct_action_pane(self):
-        self._button_commit = gtk.Button(_("Comm_it"), use_underline=True)
+        self._button_commit = gtk.Button(_i18n("Comm_it"), use_underline=True)
         self._button_commit.connect('clicked', self._on_commit_clicked)
         self._button_commit.set_flags(gtk.CAN_DEFAULT)
         self._button_commit.show()
@@ -360,24 +361,24 @@ class CommitDialog(gtk.Dialog):
 
     def _construct_file_list(self):
         self._files_box = gtk.VBox(homogeneous=False, spacing=0)
-        file_label = gtk.Label(_('Files'))
+        file_label = gtk.Label(_i18n('Files'))
         # file_label.show()
         self._files_box.pack_start(file_label, expand=False)
 
         self._commit_all_files_radio = gtk.RadioButton(
-            None, _("Commit all changes"))
+            None, _i18n("Commit all changes"))
         self._files_box.pack_start(self._commit_all_files_radio, expand=False)
         self._commit_all_files_radio.show()
         self._commit_all_files_radio.connect('toggled',
             self._toggle_commit_selection)
         self._commit_selected_radio = gtk.RadioButton(
-            self._commit_all_files_radio, _("Only commit selected changes"))
+            self._commit_all_files_radio, _i18n("Only commit selected changes"))
         self._files_box.pack_start(self._commit_selected_radio, expand=False)
         self._commit_selected_radio.show()
         self._commit_selected_radio.connect('toggled',
             self._toggle_commit_selection)
         if self._pending:
-            self._commit_all_files_radio.set_label(_('Commit all changes*'))
+            self._commit_all_files_radio.set_label(_i18n('Commit all changes*'))
             self._commit_all_files_radio.set_sensitive(False)
             self._commit_selected_radio.set_sensitive(False)
 
@@ -410,15 +411,15 @@ class CommitDialog(gtk.Dialog):
         crt.set_property('activatable', not bool(self._pending))
         crt.connect("toggled", self._toggle_commit, self._files_store)
         if self._pending:
-            name = _('Commit*')
+            name = _i18n('Commit*')
         else:
-            name = _('Commit')
+            name = _i18n('Commit')
         commit_col = gtk.TreeViewColumn(name, crt, active=2)
         commit_col.set_visible(False)
         self._treeview_files.append_column(commit_col)
-        self._treeview_files.append_column(gtk.TreeViewColumn(_('Path'),
+        self._treeview_files.append_column(gtk.TreeViewColumn(_i18n('Path'),
                                            gtk.CellRendererText(), text=3))
-        self._treeview_files.append_column(gtk.TreeViewColumn(_('Type'),
+        self._treeview_files.append_column(gtk.TreeViewColumn(_i18n('Type'),
                                            gtk.CellRendererText(), text=4))
         self._treeview_files.connect('cursor-changed',
                                      self._on_treeview_files_cursor_changed)
@@ -451,11 +452,11 @@ class CommitDialog(gtk.Dialog):
 
         pending_message = gtk.Label()
         pending_message.set_markup(
-            _('<i>* Cannot select specific files when merging</i>'))
+            _i18n('<i>* Cannot select specific files when merging</i>'))
         self._pending_box.pack_start(pending_message, expand=False, padding=5)
         pending_message.show()
 
-        pending_label = gtk.Label(_('Pending Revisions'))
+        pending_label = gtk.Label(_i18n('Pending Revisions'))
         self._pending_box.pack_start(pending_label, expand=False, padding=0)
         pending_label.show()
 
@@ -477,11 +478,11 @@ class CommitDialog(gtk.Dialog):
                                  )
         self._pending_store = liststore
         self._treeview_pending.set_model(liststore)
-        self._treeview_pending.append_column(gtk.TreeViewColumn(_('Date'),
+        self._treeview_pending.append_column(gtk.TreeViewColumn(_i18n('Date'),
                                              gtk.CellRendererText(), text=1))
-        self._treeview_pending.append_column(gtk.TreeViewColumn(_('Committer'),
+        self._treeview_pending.append_column(gtk.TreeViewColumn(_i18n('Committer'),
                                              gtk.CellRendererText(), text=2))
-        self._treeview_pending.append_column(gtk.TreeViewColumn(_('Summary'),
+        self._treeview_pending.append_column(gtk.TreeViewColumn(_i18n('Summary'),
                                              gtk.CellRendererText(), text=3))
 
     def _construct_diff_view(self):
@@ -491,7 +492,7 @@ class CommitDialog(gtk.Dialog):
         #       decide that we really don't ever want to display it, we should
         #       actually remove it, and other references to it, along with the
         #       tests that it is set properly.
-        self._diff_label = gtk.Label(_('Diff for whole tree'))
+        self._diff_label = gtk.Label(_i18n('Diff for whole tree'))
         self._diff_label.set_alignment(0, 0)
         self._right_pane_table.set_row_spacing(self._right_pane_table_row, 0)
         self._add_to_right_table(self._diff_label, 1, False)
@@ -515,15 +516,16 @@ class CommitDialog(gtk.Dialog):
         self._file_message_text_view.set_accepts_tab(False)
         self._file_message_text_view.show()
 
-        self._file_message_expander = gtk.Expander(_('File commit message'))
+        self._file_message_expander = gtk.Expander(_i18n('File commit message'))
         self._file_message_expander.set_expanded(True)
         self._file_message_expander.add(scroller)
         self._add_to_right_table(self._file_message_expander, 1, False)
         self._file_message_expander.show()
 
     def _construct_global_message(self):
-        self._global_message_label = gtk.Label(_('Global Commit Message'))
-        self._global_message_label.set_markup(_('<b>Global Commit Message</b>'))
+        self._global_message_label = gtk.Label(_i18n('Global Commit Message'))
+        self._global_message_label.set_markup(
+            _i18n('<b>Global Commit Message</b>'))
         self._global_message_label.set_alignment(0, 0)
         self._right_pane_table.set_row_spacing(self._right_pane_table_row, 0)
         self._add_to_right_table(self._global_message_label, 1, False)
@@ -549,7 +551,7 @@ class CommitDialog(gtk.Dialog):
 
         if selection is not None:
             path, display_path = model.get(selection, 1, 3)
-            self._diff_label.set_text(_('Diff for ') + display_path)
+            self._diff_label.set_text(_i18n('Diff for ') + display_path)
             if path is None:
                 self._diff_view.show_diff(None)
             else:
@@ -596,13 +598,13 @@ class CommitDialog(gtk.Dialog):
         text_buffer = self._file_message_text_view.get_buffer()
         file_id, display_path, message = self._files_store.get(selection, 0, 3, 5)
         if file_id is None: # Whole tree
-            self._file_message_expander.set_label(_('File commit message'))
+            self._file_message_expander.set_label(_i18n('File commit message'))
             self._file_message_expander.set_expanded(False)
             self._file_message_expander.set_sensitive(False)
             text_buffer.set_text('')
             self._last_selected_file = None
         else:
-            self._file_message_expander.set_label(_('Commit message for ')
+            self._file_message_expander.set_label(_i18n('Commit message for ')
                                                   + display_path)
             self._file_message_expander.set_expanded(True)
             self._file_message_expander.set_sensitive(True)
@@ -647,8 +649,8 @@ class CommitDialog(gtk.Dialog):
 
         if message == '':
             response = self._question_dialog(
-                            _('Commit with an empty message?'),
-                            _('You can describe your commit intent in the message.'))
+                _i18n('Commit with an empty message?'),
+                _i18n('You can describe your commit intent in the message.'))
             if response == gtk.RESPONSE_NO:
                 # Kindly give focus to message area
                 self._global_message_text_view.grab_focus()
@@ -667,8 +669,8 @@ class CommitDialog(gtk.Dialog):
         #       files at this point.
         for path in self._wt.unknowns():
             response = self._question_dialog(
-                _("Commit with unknowns?"),
-                _("Unknown files exist in the working tree. Commit anyway?"))
+                _i18n("Commit with unknowns?"),
+                _i18n("Unknown files exist in the working tree. Commit anyway?"))
             if response == gtk.RESPONSE_NO:
                 return
             break
@@ -686,9 +688,9 @@ class CommitDialog(gtk.Dialog):
                        revprops=revprops)
         except errors.PointlessCommit:
             response = self._question_dialog(
-                                _('Commit with no changes?'),
-                                _('There are no changes in the working tree.'
-                                  ' Do you want to commit anyway?'))
+                _i18n('Commit with no changes?'),
+                _i18n('There are no changes in the working tree.'
+                      ' Do you want to commit anyway?'))
             if response == gtk.RESPONSE_YES:
                 rev_id = self._wt.commit(message,
                                allow_pointless=True,

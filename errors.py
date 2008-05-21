@@ -15,7 +15,9 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import bzrlib.errors as errors
+from bzrlib.plugins.gtk import _i18n
 from dialog import error_dialog
+
 
 def show_bzr_error(unbound):
     """Decorator that shows bazaar exceptions. """
@@ -23,50 +25,51 @@ def show_bzr_error(unbound):
         try:
             unbound(*args, **kwargs)
         except errors.NotBranchError:
-            error_dialog(_('Directory is not a branch'),
-                         _('You can perform this action only in a branch.'))
+            error_dialog(_i18n('Directory is not a branch'),
+                         _i18n('You can perform this action only in a branch.'))
         except errors.LocalRequiresBoundBranch:
-            error_dialog(_('Directory is not a checkout'),
-                         _('You can perform local commit only on checkouts.'))
+            error_dialog(_i18n('Directory is not a checkout'),
+                         _i18n('You can perform local commit only on checkouts.'))
         except errors.PointlessCommit:
-            error_dialog(_('No changes to commit'),
-                         _('Try force commit if you want to commit anyway.'))
+            error_dialog(_i18n('No changes to commit'),
+                         _i18n('Try force commit if you want to commit anyway.'))
         except errors.ConflictsInTree:
-            error_dialog(_('Conflicts in tree'),
-                         _('You need to resolve the conflicts before committing.'))
+            error_dialog(_i18n('Conflicts in tree'),
+                         _i18n('You need to resolve the conflicts before committing.'))
         except errors.StrictCommitFailed:
-            error_dialog(_('Strict commit failed'),
-                         _('There are unknown files in the working tree.\nPlease add or delete them.'))
+            error_dialog(_i18n('Strict commit failed'),
+                         _i18n('There are unknown files in the working tree.\nPlease add or delete them.'))
         except errors.BoundBranchOutOfDate, errmsg:
-            error_dialog(_('Bound branch is out of date'),
-                         _('%s') % errmsg)
+            error_dialog(_i18n('Bound branch is out of date'),
+                         # FIXME: Really ? Internationalizing %s ?? --vila080505
+                         _i18n('%s') % errmsg)
         except errors.NotVersionedError:
-            error_dialog(_('File not versioned'),
-                         _('The selected file is not versioned.'))
+            error_dialog(_i18n('File not versioned'),
+                         _i18n('The selected file is not versioned.'))
         except errors.DivergedBranches:
-            error_dialog(_('Branches have been diverged'),
-                         _('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
+            error_dialog(_i18n('Branches have been diverged'),
+                         _i18n('You cannot push if branches have diverged. Use the\noverwrite option if you want to push anyway.'))
         except errors.NoSuchFile:
-            error_dialog(_("No diff output"),
-                         _("The selected file hasn't changed."))
+            error_dialog(_i18n("No diff output"),
+                         _i18n("The selected file hasn't changed."))
         except errors.NoSuchRevision:
-                error_dialog(_('No such revision'),
-                             _("The revision you specified doesn't exist."))
+                error_dialog(_i18n('No such revision'),
+                             _i18n("The revision you specified doesn't exist."))
         except errors.FileExists:
-                error_dialog(_('Target already exists'),
-                             _("Target directory already exists. Please select another target."))
+                error_dialog(_i18n('Target already exists'),
+                             _i18n("Target directory already exists. Please select another target."))
         except errors.AlreadyBranchError, errmsg:
-            error_dialog(_('Directory is already a branch'),
-                         _('The current directory (%s) is already a branch.\nYou can start using it, or initialize another directory.') % errmsg)
+            error_dialog(_i18n('Directory is already a branch'),
+                         _i18n('The current directory (%s) is already a branch.\nYou can start using it, or initialize another directory.') % errmsg)
         except errors.BranchExistsWithoutWorkingTree, errmsg:
-            error_dialog(_('Branch without a working tree'),
-                         _('The current directory (%s)\nis a branch without a working tree.') % errmsg)
+            error_dialog(_i18n('Branch without a working tree'),
+                         _i18n('The current directory (%s)\nis a branch without a working tree.') % errmsg)
         except errors.BzrError, msg:
-            error_dialog(_('Unknown bzr error'), str(msg))
+            error_dialog(_i18n('Unknown bzr error'), str(msg))
         except errors.PermissionDenied:
-            error_dialog(_("Permission denied"), _("permission denied."))
+            error_dialog(_i18n("Permission denied"), _i18n("permission denied."))
         except Exception, msg:
-            error_dialog(_('Unknown error'), str(msg))
+            error_dialog(_i18n('Unknown error'), str(msg))
 
     convert.__doc__ = unbound.__doc__
     convert.__name__ = unbound.__name__

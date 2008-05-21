@@ -14,6 +14,7 @@ import pango
 import re
 import treemodel
 
+from bzrlib.plugins.gtk import _i18n
 from linegraph import linegraph, same_branch
 from graphcell import CellRendererGraph
 from treemodel import TreeModel
@@ -397,7 +398,8 @@ class TreeView(gtk.VBox):
                                                  gtk.ICON_SIZE_BUTTON)
         image_loading.show()
         
-        label_loading = gtk.Label(_("Please wait, loading ancestral graph..."))
+        label_loading = gtk.Label(
+            _i18n("Please wait, loading ancestral graph..."))
         label_loading.set_alignment(0.0, 0.5)
         label_loading.show()
         
