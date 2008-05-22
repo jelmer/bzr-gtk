@@ -193,12 +193,12 @@ class cmd_gdiff(GTKCommand):
             if revision is not None:
                 if len(revision) == 1:
                     tree1 = wt
-                    revision_id = revision[0].in_history(branch).rev_id
+                    revision_id = revision[0].as_revision_id(tree1.branch)
                     tree2 = branch.repository.revision_tree(revision_id)
                 elif len(revision) == 2:
-                    revision_id_0 = revision[0].in_history(branch).rev_id
+                    revision_id_0 = revision[0].as_revision_id(branch)
                     tree2 = branch.repository.revision_tree(revision_id_0)
-                    revision_id_1 = revision[1].in_history(branch).rev_id
+                    revision_id_1 = revision[1].as_revision_id(branch)
                     tree1 = branch.repository.revision_tree(revision_id_1)
             else:
                 tree1 = wt
@@ -261,8 +261,7 @@ class cmd_visualise(Command):
             if revision is None:
                 revids.append(br.last_revision())
             else:
-                (revno, revid) = revision[0].in_history(br)
-                revids.append(revid)
+                revids.append(revision[0].as_revision_id(br))
         import gtk
         pp = start_viz_window(br, revids, limit)
         pp.connect("destroy", lambda w: gtk.main_quit())
@@ -312,7 +311,7 @@ class cmd_gannotate(GTKCommand):
         if revision is not None:
             if len(revision) != 1:
                 raise BzrCommandError("Only 1 revion may be specified.")
-            revision_id = revision[0].in_history(br).rev_id
+            revision_id = revision[0].as_revision_id(br)
             tree = br.repository.revision_tree(revision_id)
         else:
             revision_id = getattr(tree, 'get_revision_id', lambda: None)()
@@ -393,7 +392,7 @@ class cmd_gstatus(GTKCommand):
         
         if revision is not None:
             try:
-                revision_id = revision[0].in_history(wt.branch).rev_id
+                revision_id = revision[0].as_revision_id(wt.branch)
             except:
                 from bzrlib.errors import BzrError
                 raise BzrError('Revision %r doesn\'t exist' % revision[0].user_spec )
