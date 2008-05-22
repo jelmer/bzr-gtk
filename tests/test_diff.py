@@ -19,7 +19,7 @@ from cStringIO import StringIO
 import os
 
 from bzrlib import errors, tests
-from bzrlib.merge_directive import MergeDirective
+from bzrlib.merge_directive import MergeDirective2
 
 from bzrlib.plugins.gtk.diff import (
     DiffController,
@@ -169,9 +169,9 @@ class TestMergeDirectiveController(tests.TestCaseWithTransport):
         other.commit('second commit')
         other.lock_write()
         try:
-            directive = MergeDirective.from_objects(other.branch.repository,
-                                                    other.last_revision(), 0,
-                                                    0, 'this')
+            directive = MergeDirective2.from_objects(other.branch.repository,
+                                                     other.last_revision(), 0,
+                                                     0, 'this')
         finally:
             other.unlock()
         return this, other, directive
