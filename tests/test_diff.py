@@ -18,10 +18,33 @@
 from cStringIO import StringIO
 import os
 
-from bzrlib import tests
+from bzrlib import errors, tests
+from bzrlib.merge_directive import MergeDirective
 
-from bzrlib.plugins.gtk.diff import DiffView, iter_changes_to_status
-
+from bzrlib.plugins.gtk.diff import (
+    DiffController,
+    DiffView,
+    iter_changes_to_status,
+    MergeDirectiveController,
+    )
+eg_diff = """\
+=== modified file 'tests/test_diff.py'
+--- tests/test_diff.py	2008-03-11 13:18:28 +0000
++++ tests/test_diff.py	2008-05-08 22:44:02 +0000
+@@ -20,7 +20,11 @@
+ 
+ from bzrlib import tests
+ 
+-from bzrlib.plugins.gtk.diff import DiffView, iter_changes_to_status
++from bzrlib.plugins.gtk.diff import (
++    DiffController,
++    DiffView,
++    iter_changes_to_status,
++    )
+ 
+ 
+ class TestDiffViewSimple(tests.TestCase):
+"""
 
 class TestDiffViewSimple(tests.TestCase):
 
@@ -67,6 +90,122 @@ class TestDiffView(tests.TestCaseWithTransport):
             '\\+contents of tree/\xce\xa9\n'
             '\n'
             )
+
+
+class MockDiffWidget(object):
+
+    def set_diff_text_sections(self, sections):
+        self.sections = list(sections)
+
+
+class MockWindow(object):
+    def __init__(self):
+        self.diff = MockDiffWidget()
+        self.merge_successful = False
+
+    def set_title(self, title):
+        self.title = title
+
+    def _get_save_path(self, basename):
+        return 'save-path'
+
+    def _get_merge_target(self):
+        return 'this'
+
+    def destroy(self):
+        pass
+
+    def _merge_successful(self):
+        self.merge_successful = True
+
+    def _conflicts(self):
+        self.conflicts = True
+
+    def _handle_error(self, e):
+        self.handled_error = e
+
+
+class TestDiffController(tests.TestCaseWithTransport):
+
+    def get_controller(self):
+        window = MockWindow()
+        return DiffController('load-path', eg_diff.splitlines(True), window)
+
+    def test_get_diff_sections(self):
+        controller = self.get_controller()
+        controller = DiffController('.', eg_diff.splitlines(True),
+                                    controller.window)
+        sections = list(controller.get_diff_sections())
+        self.assertEqual('Complete Diff', sections[0][0])
+        self.assertIs(None, sections[0][1])
+        self.assertEqual(eg_diff, sections[0][2])
+
+        self.assertEqual('tests/test_diff.py', sections[1][0])
+        self.assertEqual('tests/test_diff.py', sections[1][1])
+        self.assertEqual(''.join(eg_diff.splitlines(True)[1:]),
+                         sections[1][2])
+
+    def test_initialize_window(self):
+        controller = self.get_controller()
+        controller.initialize_window(controller.window)
+        self.assertEqual(2, len(controller.window.diff.sections))
+        self.assertEqual('load-path - diff', controller.window.title)
+
+    def test_perform_save(self):
+        self.build_tree_contents([('load-path', 'foo')])
+        controller = self.get_controller()
+        controller.perform_save(None)
+        self.assertFileEqual('foo', 'save-path')
+
+
+class TestMergeDirectiveController(tests.TestCaseWithTransport):
+
+    def make_this_other_directive(self):
+        this = self.make_branch_and_tree('this')
+        this.commit('first commit')
+        other = this.bzrdir.sprout('other').open_workingtree()
+        self.build_tree_contents([('other/foo', 'bar')])
+        other.add('foo')
+        other.commit('second commit')
+        other.lock_write()
+        try:
+            directive = MergeDirective.from_objects(other.branch.repository,
+                                                    other.last_revision(), 0,
+                                                    0, 'this')
+        finally:
+            other.unlock()
+        return this, other, directive
+
+    def make_merged_window(self, directive):
+        window = MockWindow()
+        controller = MergeDirectiveController('directive', directive, window)
+        controller.perform_merge(window)
+        return window
+
+    def test_perform_merge_success(self):
+        this, other, directive = self.make_this_other_directive()
+        window = self.make_merged_window(directive)
+        self.assertTrue(window.merge_successful)
+        self.assertEqual(other.last_revision(), this.get_parent_ids()[1])
+        self.assertFileEqual('bar', 'this/foo')
+
+    def test_perform_merge_conflicts(self):
+        this, other, directive = self.make_this_other_directive()
+        self.build_tree_contents([('this/foo', 'bar')])
+        this.add('foo')
+        this.commit('message')
+        window = self.make_merged_window(directive)
+        self.assertFalse(window.merge_successful)
+        self.assertTrue(window.conflicts)
+        self.assertEqual(other.last_revision(), this.get_parent_ids()[1])
+        self.assertFileEqual('bar', 'this/foo')
+
+    def test_perform_merge_uncommitted_changes(self):
+        this, other, directive = self.make_this_other_directive()
+        self.build_tree_contents([('this/foo', 'bar')])
+        this.add('foo')
+        window = self.make_merged_window(directive)
+        self.assertIsInstance(window.handled_error, errors.UncommittedChanges)
 
 
 class Test_IterChangesToStatus(tests.TestCaseWithTransport):

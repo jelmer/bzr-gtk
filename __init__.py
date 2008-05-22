@@ -705,8 +705,8 @@ class cmd_ghandle_patch(GTKCommand):
 
     def run(self, path):
         try:
-            from bzrlib.plugins.gtk.diff import (DiffWindow,
-                                                 MergeDirectiveWindow)
+            from bzrlib.plugins.gtk.diff import (DiffController,
+                                                 MergeDirectiveController)
             if path == '-':
                 lines = sys.stdin.readlines()
             else:
@@ -715,11 +715,10 @@ class cmd_ghandle_patch(GTKCommand):
             try:
                 directive = merge_directive.MergeDirective.from_lines(lines)
             except errors.NotAMergeDirective:
-                window = DiffWindow()
-                window.set_diff_text(path, lines)
+                controller = DiffController(path, lines)
             else:
-                window = MergeDirectiveWindow(directive, path)
-                window.set_diff_text(path, directive.patch.splitlines(True))
+                controller = MergeDirectiveController(path, directive)
+            window = controller.window
             window.show()
             gtk = self.open_display()
             window.connect("destroy", gtk.main_quit)
