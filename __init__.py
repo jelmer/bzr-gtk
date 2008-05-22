@@ -707,7 +707,10 @@ class cmd_ghandle_patch(GTKCommand):
         try:
             from bzrlib.plugins.gtk.diff import (DiffWindow,
                                                  MergeDirectiveWindow)
-            lines = open(path, 'rb').readlines()
+            if path == '-':
+                lines = sys.stdin.readlines()
+            else:
+                lines = open(path, 'rb').readlines()
             lines = [l.replace('\r\n', '\n') for l in lines]
             try:
                 directive = merge_directive.MergeDirective.from_lines(lines)
