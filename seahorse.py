@@ -38,6 +38,7 @@ try:
 except dbus.exceptions.DBusException, e:
     if e.get_dbus_name() == 'org.freedesktop.DBus.Error.ServiceUnknown':
         raise ImportError
+    raise
 
 FLAG_VALID = 0x0001
 FLAG_CAN_ENCRYPT = 0x0002
