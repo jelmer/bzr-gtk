@@ -3,6 +3,8 @@
  BUG FIXES
 
   * Replace _() calls by _i18n() calls. (Vincent Ladeuil, #187283)
+  
+  * Fixed adding tags. (Javier Derderian, #228709)
 
  INTERNALS
 
