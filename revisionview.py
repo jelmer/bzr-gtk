@@ -38,6 +38,9 @@ PAGE_RELATIONS = 1
 PAGE_SIGNATURE = 2
 PAGE_BUGS = 3
 
+webbrowser.register('sensible-browser', None, webbrowser.GenericBrowser('sensible-browser'), -1)
+webbrowser.register('xdg-open', None, webbrowser.GenericBrowser('xdg-open'), -1)
+
 def _open_link(widget, uri):
     webbrowser.open(uri)
 
