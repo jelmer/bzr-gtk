@@ -193,12 +193,12 @@ class cmd_gdiff(GTKCommand):
             if revision is not None:
                 if len(revision) == 1:
                     tree1 = wt
-                    revision_id = revision[0].in_history(branch).rev_id
+                    revision_id = revision[0].as_revision_id(tree1.branch)
                     tree2 = branch.repository.revision_tree(revision_id)
                 elif len(revision) == 2:
-                    revision_id_0 = revision[0].in_history(branch).rev_id
+                    revision_id_0 = revision[0].as_revision_id(branch)
                     tree2 = branch.repository.revision_tree(revision_id_0)
-                    revision_id_1 = revision[1].in_history(branch).rev_id
+                    revision_id_1 = revision[1].as_revision_id(branch)
                     tree1 = branch.repository.revision_tree(revision_id_1)
             else:
                 tree1 = wt
@@ -261,8 +261,7 @@ class cmd_visualise(Command):
             if revision is None:
                 revids.append(br.last_revision())
             else:
-                (revno, revid) = revision[0].in_history(br)
-                revids.append(revid)
+                revids.append(revision[0].as_revision_id(br))
         import gtk
         pp = start_viz_window(br, revids, limit)
         pp.connect("destroy", lambda w: gtk.main_quit())
@@ -312,7 +311,7 @@ class cmd_gannotate(GTKCommand):
         if revision is not None:
             if len(revision) != 1:
                 raise BzrCommandError("Only 1 revion may be specified.")
-            revision_id = revision[0].in_history(br).rev_id
+            revision_id = revision[0].as_revision_id(br)
             tree = br.repository.revision_tree(revision_id)
         else:
             revision_id = getattr(tree, 'get_revision_id', lambda: None)()
@@ -359,8 +358,8 @@ class cmd_gcommit(GTKCommand):
             br = wt.branch
         except NoWorkingTree, e:
             from dialog import error_dialog
-            error_dialog(_('Directory does not have a working tree'),
-                         _('Operation aborted.'))
+            error_dialog(_i18n('Directory does not have a working tree'),
+                         _i18n('Operation aborted.'))
             return 1 # should this be retval=3?
 
         # It is a good habit to keep things locked for the duration, but it
@@ -393,7 +392,7 @@ class cmd_gstatus(GTKCommand):
         
         if revision is not None:
             try:
-                revision_id = revision[0].in_history(wt.branch).rev_id
+                revision_id = revision[0].as_revision_id(wt.branch)
             except:
                 from bzrlib.errors import BzrError
                 raise BzrError('Revision %r doesn\'t exist' % revision[0].user_spec )
@@ -705,18 +704,20 @@ class cmd_ghandle_patch(GTKCommand):
 
     def run(self, path):
         try:
-            from bzrlib.plugins.gtk.diff import (DiffWindow,
-                                                 MergeDirectiveWindow)
-            lines = open(path, 'rb').readlines()
+            from bzrlib.plugins.gtk.diff import (DiffController,
+                                                 MergeDirectiveController)
+            if path == '-':
+                lines = sys.stdin.readlines()
+            else:
+                lines = open(path, 'rb').readlines()
             lines = [l.replace('\r\n', '\n') for l in lines]
             try:
                 directive = merge_directive.MergeDirective.from_lines(lines)
             except errors.NotAMergeDirective:
-                window = DiffWindow()
-                window.set_diff_text(path, lines)
+                controller = DiffController(path, lines)
             else:
-                window = MergeDirectiveWindow(directive, path)
-                window.set_diff_text(path, directive.patch.splitlines(True))
+                controller = MergeDirectiveController(path, directive)
+            window = controller.window
             window.show()
             gtk = self.open_display()
             window.connect("destroy", gtk.main_quit)
@@ -733,6 +734,9 @@ register_command(cmd_ghandle_patch)
 import gettext
 gettext.install('olive-gtk')
 
+# Let's create a specialized alias to protect '_' from being erased by other
+# uses of '_' as an anonymous variable (think pdb for one).
+_i18n = gettext.gettext
 
 class NoDisplayError(BzrCommandError):
     """gtk could not find a proper display"""

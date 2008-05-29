@@ -23,6 +23,7 @@ except:
 
 import gtk
 
+from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.revisionview import RevisionView
 from bzrlib.plugins.gtk.window import Window
 
@@ -62,7 +63,7 @@ class TagsWindow(Window):
         self._treeview_tags.connect('cursor-changed', self._on_treeview_changed)
         
         # Set properties
-        self.set_title(_("Tags"))
+        self.set_title(_i18n("Tags"))
         self.set_default_size(600, 400)
         
         self._scrolledwindow_tags.set_policy(gtk.POLICY_AUTOMATIC,
@@ -106,12 +107,12 @@ class TagsWindow(Window):
     
     def _load_tags(self):
         """ Load the tags into the TreeView. """
-        tvcol_name = gtk.TreeViewColumn(_("Tag Name"),
+        tvcol_name = gtk.TreeViewColumn(_i18n("Tag Name"),
                                         gtk.CellRendererText(),
                                         text=0)
         tvcol_name.set_resizable(True)
         
-        tvcol_revid = gtk.TreeViewColumn(_("Revision ID"),
+        tvcol_revid = gtk.TreeViewColumn(_i18n("Revision ID"),
                                          gtk.CellRendererText(),
                                          text=1)
         tvcol_revid.set_resizable(True)
@@ -146,13 +147,13 @@ class TagsWindow(Window):
     
     def _tags_not_supported(self):
         """ Tags are not supported. """
-        self._model.append([_("Tags are not supported by this branch format. Please upgrade."), ""])
+        self._model.append([_i18n("Tags are not supported by this branch format. Please upgrade."), ""])
         self._button_add.set_sensitive(False)
         self._button_remove.set_sensitive(False)
     
     def _no_tags_available(self):
         """ No tags in the branch. """
-        self._model.append([_("No tagged revisions in the branch."), ""])
+        self._model.append([_i18n("No tagged revisions in the branch."), ""])
         self._button_add.set_sensitive(True)
         self._button_remove.set_sensitive(False)
     
@@ -227,7 +228,7 @@ class RemoveTagDialog(gtk.Dialog):
                                                         gtk.ICON_SIZE_DIALOG)
         self._label_title = gtk.Label()
         self._label_question = gtk.Label()
-        self._button_remove = gtk.Button(_("_Remove tag"), use_underline=True)
+        self._button_remove = gtk.Button(_i18n("_Remove tag"), use_underline=True)
         
         # Set callbacks
         self._button_remove.connect('clicked', self._on_remove_clicked)
@@ -237,9 +238,9 @@ class RemoveTagDialog(gtk.Dialog):
         self._hbox.set_spacing(5)
         self._vbox_question.set_spacing(3)
         
-        self._label_title.set_markup(_("<b><big>Remove tag?</big></b>"))
+        self._label_title.set_markup(_i18n("<b><big>Remove tag?</big></b>"))
         self._label_title.set_alignment(0.0, 0.5)
-        self._label_question.set_markup(_("Are you sure you want to remove the tag: <b>%s</b>?") % self.tag)
+        self._label_question.set_markup(_i18n("Are you sure you want to remove the tag: <b>%s</b>?") % self.tag)
         self._label_question.set_alignment(0.0, 0.5)
         
         self._button_remove.set_image(gtk.image_new_from_stock(gtk.STOCK_REMOVE,
@@ -284,10 +285,10 @@ class AddTagDialog(gtk.Dialog):
         self._branch = branch
         
         # Create the widgets
-        self._button_add = gtk.Button(_("_Add tag"), use_underline=True)
+        self._button_add = gtk.Button(_i18n("_Add tag"), use_underline=True)
         self._table = gtk.Table(2, 2)
-        self._label_name = gtk.Label(_("Tag Name:"))
-        self._label_revid = gtk.Label(_("Revision ID:"))
+        self._label_name = gtk.Label(_i18n("Tag Name:"))
+        self._label_revid = gtk.Label(_i18n("Revision ID:"))
         self._entry_name = gtk.Entry()
         if self._revid is not None:
             self._hbox_revid = gtk.Label(self._revid)
@@ -318,15 +319,15 @@ class AddTagDialog(gtk.Dialog):
     def _on_add_clicked(self, widget):
         """ Add button clicked handler. """
         if len(self._entry_name.get_text()) == 0:
-            error_dialog(_("No tag name specified"),
-                         _("You have to specify the tag's desired name."))
+            error_dialog(_i18n("No tag name specified"),
+                         _i18n("You have to specify the tag's desired name."))
             return
         
         if self._revid is None:
             if self._hbox_revid.get_revision_id() is None:
                 self._revid = self._branch.last_revision()
             else:
-                self._revid = self.hbox_revid.get_revision_id()
+                self._revid = self._hbox_revid.get_revision_id()
             
         self.tagname = self._entry_name.get_text()
         

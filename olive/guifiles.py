@@ -17,6 +17,7 @@
 import os
 import sys
 
+from bzrlib.plugins.gtk import _i18n
 
 GLADEFILENAMES = ["/usr/share/olive/olive.glade",
                   "/usr/local/share/olive/olive.glade",
@@ -44,7 +45,7 @@ for path in GLADEFILENAMES:
 
 if GLADEFILENAME is None:
     # Fail
-    print _('Glade file cannot be found.')
+    print _i18n('Glade file cannot be found.')
     sys.exit(1)
 
 UIFILEDIR = os.path.dirname(GLADEFILENAME)
@@ -54,7 +55,7 @@ UIFILENAME = os.path.join(UIFILEDIR, 'cmenu.ui')
 
 if not os.path.isfile(UIFILENAME):
     # Fail
-    print _('UI description file cannot be found.')
+    print _i18n('UI description file cannot be found.')
     sys.exit(1)
 
 

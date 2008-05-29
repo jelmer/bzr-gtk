@@ -23,6 +23,7 @@ except:
 import gtk
 
 from olive import Preferences
+from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import error_dialog
 
 
@@ -42,8 +43,8 @@ class BookmarkDialog(gtk.Dialog):
         self.selected = selected
         
         # Create widgets
-        self._label_location = gtk.Label(_("Location:"))
-        self._label_title = gtk.Label(_("Title:"))
+        self._label_location = gtk.Label(_i18n("Location:"))
+        self._label_title = gtk.Label(_i18n("Title:"))
         self._entry_location = gtk.Entry()
         self._entry_title = gtk.Entry()
         self._button_save = gtk.Button(stock=gtk.STOCK_SAVE)
@@ -78,8 +79,8 @@ class BookmarkDialog(gtk.Dialog):
     def _on_save_clicked(self, button):
         """ Save button clicked handler. """
         if self._entry_title.get_text() == '':
-            error_dialog(_('No title given'),
-                         _('Please specify a title to continue.'))
+            error_dialog(_i18n('No title given'),
+                         _i18n('Please specify a title to continue.'))
             return
         
         self.pref.set_bookmark_title(self._entry_location.get_text(),

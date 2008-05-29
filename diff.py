@@ -41,6 +41,7 @@ from bzrlib.diff import show_diff_trees, internal_diff
 from bzrlib.errors import NoSuchFile
 from bzrlib.patches import parse_patches
 from bzrlib.trace import warning
+from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.window import Window
 from dialog import error_dialog, info_dialog, warning_dialog
 
@@ -327,16 +328,16 @@ class DiffWidget(gtk.HPaned):
         """
         # The diffs of the  selected file: a scrollable source or
         # text view
+
+    def set_diff_text_sections(self, sections):
         self.diff_view = DiffFileView()
         self.diff_view.show()
         self.pack2(self.diff_view)
-        self.model.append(None, [ "Complete Diff", "" ])
-        self.diff_view._diffs[None] = ''.join(lines)
-        for patch in parse_patches(lines):
-            oldname = patch.oldname.split('\t')[0]
-            newname = patch.newname.split('\t')[0]
-            self.model.append(None, [oldname, newname])
+        for oldname, newname, patch in sections:
             self.diff_view._diffs[newname] = str(patch)
+            if newname is None:
+                newname = ''
+            self.model.append(None, [oldname, newname])
         self.diff_view.show_diff(None)
 
     def set_diff(self, rev_tree, parent_tree):
@@ -412,7 +413,7 @@ class DiffWindow(Window):
     differences between two revisions on a branch.
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, operations=None):
         Window.__init__(self, parent)
         self.set_border_width(0)
         self.set_title("bzrk diff")
@@ -423,36 +424,79 @@ class DiffWindow(Window):
         width = int(monitor.width * 0.66)
         height = int(monitor.height * 0.66)
         self.set_default_size(width, height)
+        self.construct(operations)
 
-        self.construct()
-
-    def construct(self):
+    def construct(self, operations):
         """Construct the window contents."""
         self.vbox = gtk.VBox()
         self.add(self.vbox)
         self.vbox.show()
-        hbox = self._get_button_bar()
+        hbox = self._get_button_bar(operations)
         if hbox is not None:
             self.vbox.pack_start(hbox, expand=False, fill=True)
         self.diff = DiffWidget()
         self.vbox.add(self.diff)
         self.diff.show_all()
 
-    def _get_button_bar(self):
+    def _get_button_bar(self, operations):
         """Return a button bar to use.
 
         :return: None, meaning that no button bar will be used.
         """
-        return None
+        if operations is None:
+            return None
+        hbox = gtk.HButtonBox()
+        hbox.set_layout(gtk.BUTTONBOX_START)
+        for title, method in operations:
+            merge_button = gtk.Button(title)
+            merge_button.show()
+            merge_button.set_relief(gtk.RELIEF_NONE)
+            merge_button.connect("clicked", method)
+            hbox.pack_start(merge_button, expand=False, fill=True)
+        hbox.show()
+        return hbox
 
-    def set_diff_text(self, description, lines):
-        """Set the diff from a text.
+    def _get_merge_target(self):
+        d = gtk.FileChooserDialog('Merge branch', self,
+                                  gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                  buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
+                                           gtk.STOCK_CANCEL,
+                                           gtk.RESPONSE_CANCEL,))
+        try:
+            result = d.run()
+            if result != gtk.RESPONSE_OK:
+                raise SelectCancelled()
+            return d.get_current_folder_uri()
+        finally:
+            d.destroy()
 
-        The diff must be in unified diff format, and will be parsed to
-        determine filenames.
-        """
-        self.diff.set_diff_text(lines)
-        self.set_title(description + " - bzrk diff")
+    def _merge_successful(self):
+        # No conflicts found.
+        info_dialog(_i18n('Merge successful'),
+                    _i18n('All changes applied successfully.'))
+
+    def _conflicts(self):
+        warning_dialog(_i18n('Conflicts encountered'),
+                       _i18n('Please resolve the conflicts manually'
+                             ' before committing.'))
+
+    def _handle_error(self, e):
+        error_dialog('Error', str(e))
+
+    def _get_save_path(self, basename):
+        d = gtk.FileChooserDialog('Save As', self,
+                                  gtk.FILE_CHOOSER_ACTION_SAVE,
+                                  buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
+                                           gtk.STOCK_CANCEL,
+                                           gtk.RESPONSE_CANCEL,))
+        d.set_current_name(basename)
+        try:
+            result = d.run()
+            if result != gtk.RESPONSE_OK:
+                raise SelectCancelled()
+            return urlutils.local_path_from_url(d.get_uri())
+        finally:
+            d.destroy()
 
     def set_diff(self, description, rev_tree, parent_tree):
         """Set the differences showed by this window.
@@ -467,38 +511,64 @@ class DiffWindow(Window):
         self.diff.set_file(file_path)
 
 
-class MergeDirectiveWindow(DiffWindow):
+class DiffController(object):
 
-    def __init__(self, directive, path):
-        DiffWindow.__init__(self, None)
-        self._merge_target = None
-        self.directive = directive
+    def __init__(self, path, patch, window=None):
         self.path = path
+        self.patch = patch
+        if window is None:
+            window = DiffWindow(operations=self._provide_operations())
+            self.initialize_window(window)
+        self.window = window
 
-    def _get_button_bar(self):
-        """The button bar has only the Merge button"""
-        merge_button = gtk.Button('Merge')
-        merge_button.show()
-        merge_button.set_relief(gtk.RELIEF_NONE)
-        merge_button.connect("clicked", self.perform_merge)
+    def initialize_window(self, window):
+        window.diff.set_diff_text_sections(self.get_diff_sections())
+        window.set_title(self.path + " - diff")
 
-        save_button = gtk.Button('Save')
-        save_button.show()
-        save_button.set_relief(gtk.RELIEF_NONE)
-        save_button.connect("clicked", self.perform_save)
+    def get_diff_sections(self):
+        yield "Complete Diff", None, ''.join(self.patch)
+        for patch in parse_patches(self.patch):
+            oldname = patch.oldname.split('\t')[0]
+            newname = patch.newname.split('\t')[0]
+            yield oldname, newname, str(patch)
 
-        hbox = gtk.HButtonBox()
-        hbox.set_layout(gtk.BUTTONBOX_START)
-        hbox.pack_start(merge_button, expand=False, fill=True)
-        hbox.pack_start(save_button, expand=False, fill=True)
-        hbox.show()
-        return hbox
-
-    def perform_merge(self, window):
+    def perform_save(self, window):
         try:
-            tree = self._get_merge_target()
+            save_path = self.window._get_save_path(osutils.basename(self.path))
         except SelectCancelled:
             return
+        source = open(self.path, 'rb')
+        try:
+            target = open(save_path, 'wb')
+            try:
+                osutils.pumpfile(source, target)
+            finally:
+                target.close()
+        finally:
+            source.close()
+
+    def _provide_operations(self):
+        return [('Save', self.perform_save)]
+
+
+class MergeDirectiveController(DiffController):
+
+    def __init__(self, path, directive, window=None):
+        DiffController.__init__(self, path, directive.patch.splitlines(True),
+                                window)
+        self.directive = directive
+        self.merge_target = None
+
+    def _provide_operations(self):
+        return [('Merge', self.perform_merge), ('Save', self.perform_save)]
+
+    def perform_merge(self, window):
+        if self.merge_target is None:
+            try:
+                self.merge_target = self.window._get_merge_target()
+            except SelectCancelled:
+                return
+        tree = workingtree.WorkingTree.open(self.merge_target)
         tree.lock_write()
         try:
             try:
@@ -509,63 +579,15 @@ class MergeDirectiveWindow(DiffWindow):
                 conflict_count = merger.do_merge()
                 merger.set_pending()
                 if conflict_count == 0:
-                    # No conflicts found.
-                    info_dialog(_('Merge successful'),
-                                _('All changes applied successfully.'))
+                    self.window._merge_successful()
                 else:
+                    self.window._conflicts()
                     # There are conflicts to be resolved.
-                    warning_dialog(_('Conflicts encountered'),
-                                   _('Please resolve the conflicts manually'
-                                     ' before committing.'))
-                self.destroy()
+                self.window.destroy()
             except Exception, e:
-                error_dialog('Error', str(e))
+                self.window._handle_error(e)
         finally:
             tree.unlock()
-
-    def _get_merge_target(self):
-        if self._merge_target is not None:
-            return self._merge_target
-        d = gtk.FileChooserDialog('Merge branch', self,
-                                  gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                                  buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
-                                           gtk.STOCK_CANCEL,
-                                           gtk.RESPONSE_CANCEL,))
-        try:
-            result = d.run()
-            if result != gtk.RESPONSE_OK:
-                raise SelectCancelled()
-            uri = d.get_current_folder_uri()
-        finally:
-            d.destroy()
-        return workingtree.WorkingTree.open(uri)
-
-    def perform_save(self, window):
-        d = gtk.FileChooserDialog('Save As', self,
-                                  gtk.FILE_CHOOSER_ACTION_SAVE,
-                                  buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
-                                           gtk.STOCK_CANCEL,
-                                           gtk.RESPONSE_CANCEL,))
-        d.set_current_name(osutils.basename(self.path))
-        try:
-            try:
-                result = d.run()
-                if result != gtk.RESPONSE_OK:
-                    raise SelectCancelled()
-                uri = d.get_uri()
-            finally:
-                d.destroy()
-        except SelectCancelled:
-            return
-        source = open(self.path, 'rb')
-        try:
-            target = open(urlutils.local_path_from_url(uri), 'wb')
-            try:
-                target.write(source.read())
-            finally:
-                target.close()
-        finally:
-            source.close()
 
 
 def iter_changes_to_status(source, target):
