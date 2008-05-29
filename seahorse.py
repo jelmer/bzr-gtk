@@ -30,15 +30,19 @@ KEY_TYPE_SSH = 'ssh'
 
 bus = dbus.SessionBus()
 
-try: 
-    crypto = dbus.Interface(bus.get_object(BUS_NAME, CRYPTO_PATH), 
-                            CRYPTO_INTERFACE)
-    openpgp = dbus.Interface(bus.get_object(BUS_NAME, OPENPGP_PATH),
-                             OPENPGP_INTERFACE)
-except dbus.exceptions.DBusException, e:
-    if e.get_dbus_name() == 'org.freedesktop.DBus.Error.ServiceUnknown':
-        raise ImportError
-    raise
+if hasattr(bus, 'list_activatable_names'):
+    bus_names = bus.list_activatable_names()
+else:
+    bus_object = bus.get_object('org.freedesktop.DBus', '/org/freedesktop/DBus')
+    bus_names = bus_object.ListNames(dbus_interface='org.freedesktop.DBus')
+
+if BUS_NAME not in bus_names:
+    raise ImportError
+
+crypto = dbus.Interface(bus.get_object(BUS_NAME, CRYPTO_PATH), 
+                        CRYPTO_INTERFACE)
+openpgp = dbus.Interface(bus.get_object(BUS_NAME, OPENPGP_PATH),
+                         OPENPGP_INTERFACE)
 
 FLAG_VALID = 0x0001
 FLAG_CAN_ENCRYPT = 0x0002
