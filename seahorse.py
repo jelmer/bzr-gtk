@@ -31,7 +31,10 @@ KEY_TYPE_SSH = 'ssh'
 try:
     bus = dbus.SessionBus()
 except dbus.exceptions.DBusException, e:
-    raise ImportError
+    if e.get_dbus_name() == "org.freedesktop.DBus.Error.Spawn.ExecFailed":
+        raise ImportError
+    else
+        raise
 
 try: 
     crypto = dbus.Interface(bus.get_object(BUS_NAME, CRYPTO_PATH), 
