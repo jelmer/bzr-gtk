@@ -42,7 +42,6 @@ PAGE_BUGS = 3
 def _open_link(widget, uri):
     for cmd in ['sensible-browser', 'xdg-open']:
         if webbrowser._iscommand(cmd):
-            webbrowser.register(cmd, None, webbrowser.GenericBrowser(cmd))
             webbrowser._tryorder.insert(cmd, 0)
     webbrowser.open(uri)
 
