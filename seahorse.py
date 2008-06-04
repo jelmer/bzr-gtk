@@ -33,7 +33,7 @@ try:
 except dbus.exceptions.DBusException, e:
     if e.get_dbus_name() == "org.freedesktop.DBus.Error.Spawn.ExecFailed":
         raise ImportError
-    else
+    else:
         raise
 
 try: 
