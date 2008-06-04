@@ -28,7 +28,10 @@ OPENPGP_PATH = '/org/gnome/seahorse/keys/openpgp'
 KEY_TYPE_OPENPGP = 'openpgp'
 KEY_TYPE_SSH = 'ssh'
 
-bus = dbus.SessionBus()
+try:
+    bus = dbus.SessionBus()
+except dbus.exceptions.DBusException, e:
+    raise ImportError
 
 try: 
     crypto = dbus.Interface(bus.get_object(BUS_NAME, CRYPTO_PATH), 
