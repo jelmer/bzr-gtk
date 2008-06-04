@@ -38,10 +38,12 @@ PAGE_RELATIONS = 1
 PAGE_SIGNATURE = 2
 PAGE_BUGS = 3
 
-webbrowser.register('sensible-browser', None, webbrowser.GenericBrowser('sensible-browser'), -1)
-webbrowser.register('xdg-open', None, webbrowser.GenericBrowser('xdg-open'), -1)
 
 def _open_link(widget, uri):
+    for cmd in ['sensible-browser', 'xdg-open']:
+        if webbrowser._iscommand(cmd):
+            webbrowser.register(cmd, None, webbrowser.GenericBrowser(cmd))
+            webbrowser._tryorder.insert(cmd, 0)
     webbrowser.open(uri)
 
 gtk.link_button_set_uri_hook(_open_link)
