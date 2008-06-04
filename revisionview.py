@@ -42,7 +42,7 @@ PAGE_BUGS = 3
 def _open_link(widget, uri):
     for cmd in ['sensible-browser', 'xdg-open']:
         if webbrowser._iscommand(cmd):
-            webbrowser._tryorder.insert(cmd, 0)
+            webbrowser._tryorder.insert(0, '%s "%%s"' % cmd)
     webbrowser.open(uri)
 
 gtk.link_button_set_uri_hook(_open_link)
