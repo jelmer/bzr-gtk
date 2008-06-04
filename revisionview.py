@@ -28,7 +28,7 @@ from bzrlib.util.bencode import bdecode
 
 try:
     from bzrlib.plugins.gtk import seahorse
-except ImportError:
+except:
     has_seahorse = False
 else:
     has_seahorse = True
