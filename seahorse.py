@@ -31,7 +31,13 @@ KEY_TYPE_SSH = 'ssh'
 try:
     bus = dbus.SessionBus()
 except dbus.exceptions.DBusException, e:
-    name = hasattr(e, _dbus_error_name, None)
+    get_name = getattr(e, 'get_dbus_name', None)
+    if get_name is not None:
+        name = get_name()
+    else:
+        name = getattr(e, '_dbus_error_name', None)
+    # DBus sometimes fails like this, just treat it as if seahorse is not
+    # available rather than crashing.
     if name == "org.freedesktop.DBus.Error.Spawn.ExecFailed":
         raise ImportError
     else:
