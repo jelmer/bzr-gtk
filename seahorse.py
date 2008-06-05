@@ -31,7 +31,8 @@ KEY_TYPE_SSH = 'ssh'
 try:
     bus = dbus.SessionBus()
 except dbus.exceptions.DBusException, e:
-    if e.get_dbus_name() == "org.freedesktop.DBus.Error.Spawn.ExecFailed":
+    name = hasattr(e, _dbus_error_name, None)
+    if name == "org.freedesktop.DBus.Error.Spawn.ExecFailed":
         raise ImportError
     else:
         raise
