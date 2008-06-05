@@ -20,7 +20,7 @@ pygtk.require("2.0")
 import gtk
 import pango
 import gobject
-import subprocess
+import webbrowser
 
 from bzrlib.plugins.gtk import icon_path
 from bzrlib.osutils import format_date
@@ -38,8 +38,11 @@ PAGE_RELATIONS = 1
 PAGE_SIGNATURE = 2
 PAGE_BUGS = 3
 
+webbrowser.register('sensible-browser', None, webbrowser.GenericBrowser('sensible-browser'), -1)
+webbrowser.register('xdg-open', None, webbrowser.GenericBrowser('xdg-open'), -1)
+
 def _open_link(widget, uri):
-    subprocess.Popen(['sensible-browser', uri], close_fds=True)
+    webbrowser.open(uri)
 
 gtk.link_button_set_uri_hook(_open_link)
 
