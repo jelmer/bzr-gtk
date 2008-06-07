@@ -304,7 +304,7 @@ class CommitDialog(gtk.Dialog):
         self.add_accel_group(group)
 
         # ignore the escape key (avoid closing the window)
-        self.connect('close', lambda self, *x: self.emit_stop_by_name('close'))
+        self.connect_object('close', self.emit_stop_by_name, 'close')
 
     def _construct_left_pane(self):
         self._left_pane_box = gtk.VBox(homogeneous=False, spacing=5)
