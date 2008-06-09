@@ -69,8 +69,7 @@ diffstuff = #ffff00
 class TestDiffView(tests.TestCaseWithTransport):
 
     def test_unicode(self):
-        from bzrlib.tests.test_diff import UnicodeFilename
-        self.requireFeature(UnicodeFilename)
+        self.requireFeature(tests.UnicodeFilenameFeature)
 
         tree = self.make_branch_and_tree('tree')
         self.build_tree([u'tree/\u03a9'])
