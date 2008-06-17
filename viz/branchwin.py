@@ -302,15 +302,25 @@ class BranchWindow(Window):
 
     def construct_bottom(self):
         """Construct the bottom half of the window."""
+        self.bottom_hpaned = gtk.HPaned()
+        (width, height) = self.get_size()
+        self.bottom_hpaned.set_size_request(width, int(height / 2.5))
+
         from bzrlib.plugins.gtk.revisionview import RevisionView
         self.revisionview = RevisionView(branch=self.branch)
-        (width, height) = self.get_size()
-        self.revisionview.set_size_request(width, int(height / 2.5))
+        self.revisionview.set_size_request(width/3, int(height / 2.5))
         self.revisionview.show()
         self.revisionview.set_show_callback(self._show_clicked_cb)
         self.revisionview.connect('notify::revision', self._go_clicked_cb)
         self.treeview.connect('tag-added', lambda w, t, r: self.revisionview.update_tags())
-        return self.revisionview
+        self.bottom_hpaned.pack1(self.revisionview)
+
+        from bzrlib.plugins.gtk.diff import DiffWidget
+        self.diff = DiffWidget()
+        self.bottom_hpaned.pack2(self.diff)
+
+        self.bottom_hpaned.show_all()
+        return self.bottom_hpaned
 
     def _tag_selected_cb(self, menuitem, revid):
         self.treeview.set_revision_id(revid)
@@ -367,7 +377,26 @@ class BranchWindow(Window):
 
             self.revisionview.set_revision(revision)
             self.revisionview.set_children(children)
-    
+
+            # update the diff panel
+            if len(parents) == 0:
+                parent_id = None
+            else:
+                parent_id = parents[0]
+
+            rev_tree    = self.branch.repository.revision_tree(revision.revision_id)
+            parent_tree = self.branch.repository.revision_tree(parent_id)
+            # FIXME: for some reason, an existing DiffWidget refuses to show 
+            # diffs, but a new one works fine
+            self.bottom_hpaned.remove(self.diff)
+            from bzrlib.plugins.gtk.diff import DiffWidget
+            self.diff = DiffWidget()
+            self.bottom_hpaned.pack2(self.diff)
+            # end FIXME; below is fine
+            self.diff.set_diff(rev_tree, parent_tree)
+            self.diff.diff_view.show_diff(None) # show all changes
+            self.diff.show_all()
+
     def _tree_revision_activated(self, widget, path, col):
         # TODO: more than one parent
         """Callback for when a treeview row gets activated."""
