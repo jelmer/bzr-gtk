@@ -28,7 +28,20 @@ OPENPGP_PATH = '/org/gnome/seahorse/keys/openpgp'
 KEY_TYPE_OPENPGP = 'openpgp'
 KEY_TYPE_SSH = 'ssh'
 
-bus = dbus.SessionBus()
+try:
+    bus = dbus.SessionBus()
+except dbus.exceptions.DBusException, e:
+    get_name = getattr(e, 'get_dbus_name', None)
+    if get_name is not None:
+        name = get_name()
+    else:
+        name = getattr(e, '_dbus_error_name', None)
+    # DBus sometimes fails like this, just treat it as if seahorse is not
+    # available rather than crashing.
+    if name == "org.freedesktop.DBus.Error.Spawn.ExecFailed":
+        raise ImportError
+    else:
+        raise
 
 if hasattr(bus, 'list_activatable_names'):
     bus_names = bus.list_activatable_names()
