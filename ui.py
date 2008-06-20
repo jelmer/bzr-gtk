@@ -58,7 +58,7 @@ class GtkProgressBar(gtk.ProgressBar):
     def update(self, msg=None, current=None, total=None):
         if msg is not None:
             self.set_text(msg)
-        if None not in (current, total):
+        if None not in (current, total) and total > 0:
             self.set_fraction(1.0 * current / total)
         while gtk.events_pending():
             gtk.main_iteration()
