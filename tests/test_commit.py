@@ -985,8 +985,7 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
                          ], bencode.bdecode(file_info))
 
     def test_commit_unicode_messages(self):
-        from bzrlib.tests.test_diff import UnicodeFilename
-        self.requireFeature(UnicodeFilename)
+        self.requireFeature(tests.UnicodeFilenameFeature)
 
         tree = self.make_branch_and_tree('tree')
         tree.branch.get_config().set_user_option('per_file_commits', 'true')
