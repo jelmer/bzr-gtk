@@ -446,7 +446,7 @@ class OliveGtk:
     @show_bzr_error
     def on_entry_history_revno_key_press_event(self, widget, event):
         """ Key pressed handler for the history entry. """
-        if event.keyval == 65293:
+        if event.keyval == gtk.gdk.keyval_from_name('Return') or event.keyval == gtk.gdk.keyval_from_name('KP_Enter'):
             # Return was hit, so we have to load that specific revision
             # Emulate being remote, so inventory should be used
             path = self.get_path()
@@ -461,7 +461,7 @@ class OliveGtk:
     
     def on_entry_location_key_press_event(self, widget, event):
         """ Key pressed handler for the location entry. """
-        if event.keyval == 65293:
+        if event.keyval == gtk.gdk.keyval_from_name('Return') or event.keyval == gtk.gdk.keyval_from_name('KP_Enter'):
             # Return was hit, so we have to jump
             self.on_button_location_jump_clicked(widget)
     
