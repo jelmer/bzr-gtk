@@ -6,6 +6,12 @@
   
   * Fixed adding tags. (Javier Derderian, #228709)
 
+  * Fixed handle-patch script. (Jelmer Vernooij)
+
+ CHANGES
+
+  * Moved notify icon code to separate script. (Jelmer Vernooij)
+
  INTERNALS
 
   * All i18n calls should now go through _i18n which must be imported from
