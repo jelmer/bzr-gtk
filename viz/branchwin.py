@@ -66,6 +66,7 @@ class BranchWindow(Window):
 
         gtk.accel_map_add_entry("<viz>/Go/Next Revision", gtk.keysyms.Up, gtk.gdk.MOD1_MASK)
         gtk.accel_map_add_entry("<viz>/Go/Previous Revision", gtk.keysyms.Down, gtk.gdk.MOD1_MASK)
+        gtk.accel_map_add_entry("<viz>/View/Refresh", gtk.keysyms.F5, 0)
 
         self.accel_group = gtk.AccelGroup()
         self.add_accel_group(self.accel_group)
@@ -83,6 +84,12 @@ class BranchWindow(Window):
         self.next_rev_action.set_accel_group(self.accel_group)
         self.next_rev_action.connect("activate", self._fwd_clicked_cb)
         self.next_rev_action.connect_accelerator()
+
+        self.refresh_action = gtk.Action("refresh", "_Refresh", "Refresh view", gtk.STOCK_REFRESH)
+        self.refresh_action.set_accel_path("<viz>/View/Refresh")
+        self.refresh_action.set_accel_group(self.accel_group)
+        self.refresh_action.connect("activate", self._refresh_clicked)
+        self.refresh_action.connect_accelerator()
 
         self.construct()
 
@@ -143,6 +150,12 @@ class BranchWindow(Window):
         view_menu = gtk.Menu()
         view_menuitem = gtk.MenuItem("_View")
         view_menuitem.set_submenu(view_menu)
+
+        view_menu_refresh = self.refresh_action.create_menu_item()
+        view_menu_refresh.connect('activate', self._refresh_clicked)
+
+        view_menu.add(view_menu_refresh)
+        view_menu.add(gtk.SeparatorMenuItem())
 
         view_menu_toolbar = gtk.CheckMenuItem("Show Toolbar")
         view_menu_toolbar.set_active(True)

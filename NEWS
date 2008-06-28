@@ -1,5 +1,9 @@
 0.95.0	UNRELEASED
 
+ UI
+
+  * Added Refresh menu option with F5 keyboard shortcut (Russ Brown)
+
  BUG FIXES
 
   * Replace _() calls by _i18n() calls. (Vincent Ladeuil, #187283)
