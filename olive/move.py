@@ -31,7 +31,7 @@ from bzrlib.workingtree import WorkingTree
 
 from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import error_dialog
-from errors import show_bzr_error
+from bzrlib.plugins.gtk.errors import show_bzr_error
 from guifiles import GLADEFILENAME
 
 
