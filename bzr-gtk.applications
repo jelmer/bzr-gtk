@@ -1,5 +1,5 @@
 bzr-gtk-patch
-	command="bzr handle-patch"
+	command=bzr-handle-patch
 	name=Bazaar
 	can_open_multiple_files=false
 	expects_uris=false

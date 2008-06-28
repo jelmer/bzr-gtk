@@ -22,7 +22,6 @@ gcheckout         GTK+ checkout.
 gcommit           GTK+ commit dialog.
 gconflicts        GTK+ conflicts. 
 gdiff             Show differences in working tree in a GTK+ Window. 
-ghandle-patch     Display and optionally merge a merge directive or patch.
 ginit             Initialise a new branch.
 gmissing          GTK+ missing revisions dialog. 
 gpreferences      GTK+ preferences dialog. 
@@ -120,21 +119,22 @@ def icon_path(*args):
     return None
 
 
+def open_display():
+    pygtk = import_pygtk()
+    try:
+        import gtk
+    except RuntimeError, e:
+        if str(e) == "could not open display":
+            raise NoDisplayError
+    set_ui_factory()
+    return gtk
+ 
+
 class GTKCommand(Command):
     """Abstract class providing GTK specific run commands."""
 
-    def open_display(self):
-        pygtk = import_pygtk()
-        try:
-            import gtk
-        except RuntimeError, e:
-            if str(e) == "could not open display":
-                raise NoDisplayError
-        set_ui_factory()
-        return gtk
-
     def run(self):
-        self.open_display()
+        open_display()
         dialog = self.get_gtk_dialog(os.path.abspath('.'))
         dialog.run()
 
@@ -168,7 +168,7 @@ class cmd_gpush(GTKCommand):
 
     def run(self, location="."):
         (br, path) = branch.Branch.open_containing(location)
-        self.open_display()
+        open_display()
         from push import PushDialog
         dialog = PushDialog(br.repository, br.last_revision(), br)
         dialog.run()
@@ -286,7 +286,7 @@ class cmd_gannotate(GTKCommand):
     aliases = ["gblame", "gpraise"]
     
     def run(self, filename, all=False, plain=False, line='1', revision=None):
-        gtk = self.open_display()
+        gtk = open_display()
 
         try:
             line = int(line)
@@ -345,7 +345,7 @@ class cmd_gcommit(GTKCommand):
 
     def run(self, filename=None):
         import os
-        self.open_display()
+        open_display()
         from commit import CommitDialog
         from bzrlib.errors import (BzrCommandError,
                                    NotBranchError,
@@ -386,7 +386,7 @@ class cmd_gstatus(GTKCommand):
 
     def run(self, path='.', revision=None):
         import os
-        gtk = self.open_display()
+        gtk = open_display()
         from status import StatusDialog
         (wt, wt_path) = workingtree.WorkingTree.open_containing(path)
         
@@ -410,7 +410,7 @@ class cmd_gsend(GTKCommand):
     """
     def run(self):
         (br, path) = branch.Branch.open_containing(".")
-        gtk = self.open_display()
+        gtk = open_display()
         from bzrlib.plugins.gtk.mergedirective import SendMergeDirectiveDialog
         from StringIO import StringIO
         dialog = SendMergeDirectiveDialog(br)
@@ -432,7 +432,7 @@ class cmd_gconflicts(GTKCommand):
     """
     def run(self):
         (wt, path) = workingtree.WorkingTree.open_containing('.')
-        self.open_display()
+        open_display()
         from bzrlib.plugins.gtk.conflicts import ConflictsDialog
         dialog = ConflictsDialog(wt)
         dialog.run()
@@ -443,7 +443,7 @@ class cmd_gpreferences(GTKCommand):
 
     """
     def run(self):
-        self.open_display()
+        open_display()
         from bzrlib.plugins.gtk.preferences import PreferencesWindow
         dialog = PreferencesWindow()
         dialog.run()
@@ -487,7 +487,7 @@ class cmd_gmissing(Command):
 
 class cmd_ginit(GTKCommand):
     def run(self):
-        self.open_display()
+        open_display()
         from initialize import InitDialog
         dialog = InitDialog(os.path.abspath(os.path.curdir))
         dialog.run()
@@ -497,7 +497,7 @@ class cmd_gtags(GTKCommand):
     def run(self):
         br = branch.Branch.open_containing('.')[0]
         
-        gtk = self.open_display()
+        gtk = open_display()
         from tags import TagsWindow
         window = TagsWindow(br)
         window.show()
@@ -534,7 +534,7 @@ class cmd_commit_notify(GTKCommand):
 
     def run(self):
         from notify import NotifyPopupMenu
-        gtk = self.open_display()
+        gtk = open_display()
         menu = NotifyPopupMenu()
         icon = gtk.status_icon_new_from_file(icon_path("bzr-icon-64.png"))
         icon.connect('popup-menu', menu.display)
@@ -691,44 +691,6 @@ class cmd_test_gtk(GTKCommand):
 
 register_command(cmd_test_gtk)
 
-
-class cmd_ghandle_patch(GTKCommand):
-    """Display a patch or merge directive, possibly merging.
-
-    This is a helper, meant to be launched from other programs like browsers
-    or email clients.  Since these programs often do not allow parameters to
-    be provided, a "handle-patch" script is included.
-    """
-
-    takes_args = ['path']
-
-    def run(self, path):
-        try:
-            from bzrlib.plugins.gtk.diff import (DiffController,
-                                                 MergeDirectiveController)
-            if path == '-':
-                lines = sys.stdin.readlines()
-            else:
-                lines = open(path, 'rb').readlines()
-            lines = [l.replace('\r\n', '\n') for l in lines]
-            try:
-                directive = merge_directive.MergeDirective.from_lines(lines)
-            except errors.NotAMergeDirective:
-                controller = DiffController(path, lines)
-            else:
-                controller = MergeDirectiveController(path, directive)
-            window = controller.window
-            window.show()
-            gtk = self.open_display()
-            window.connect("destroy", gtk.main_quit)
-        except Exception, e:
-            from dialog import error_dialog
-            error_dialog('Error', str(e))
-            raise
-        gtk.main()
-
-
-register_command(cmd_ghandle_patch)
 
 
 import gettext
