@@ -31,9 +31,6 @@ def test_suite():
         'test_history',
         ]
 
-    if os.name == 'nt':
-        testmod_names.append("test_tortoise_bzr")
-
     result.addTest(loader.loadTestsFromModuleNames(["%s.%s" % (__name__, i) for i in testmod_names]))
     return result
 
