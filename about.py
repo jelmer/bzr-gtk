@@ -23,6 +23,10 @@ except:
 import bzrlib
 import gtk
 import os
+from bzrlib.branch import Branch
+from bzrlib.errors import NotBranchError, NoRepositoryPresent
+from bzrlib.trace import mutter
+
 from bzrlib.plugins.gtk import icon_path
 
 
@@ -34,6 +38,15 @@ def read_license():
     return "GPLv2 or later"
 
 
+def load_credits():
+    import pickle
+    try:
+        credits = pickle.load(file("credits.pickle"))
+    except IOError:
+        credits = None
+    return credits
+
+
 class AboutDialog(gtk.AboutDialog):
     def __init__(self):
         super(AboutDialog, self).__init__()
@@ -42,6 +55,13 @@ class AboutDialog(gtk.AboutDialog):
         self.set_website("http://bazaar-vcs.org/BzrGtk")
         self.set_license(read_license())
         self.set_logo(gtk.gdk.pixbuf_new_from_file(icon_path("bzr-icon-64.png")))
+        credits = load_credits()
+        if credits is not None:
+            (authors, documenters, artists, translators) = credits
+            self.set_authors(authors)
+            self.set_documenters(documenters)
+            self.set_artists(artists)
+            self.set_translator_credits("\n".join(translators))
         self.connect ("response", lambda d, r: d.destroy())
 
 
