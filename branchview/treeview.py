@@ -3,7 +3,7 @@
 
 """
 
-__copyright__ = "Copyright © 2005 Canonical Ltd."
+__copyright__ = "Copyright Â© 2005 Canonical Ltd."
 __author__    = "Daniel Schierbeck <daniel.schierbeck@gmail.com>"
 
 import sys
@@ -286,7 +286,7 @@ class TreeView(gtk.VBox):
 
         self.branch.lock_read()
         (linegraphdata, index, columns_len) = linegraph(self.branch.repository,
-                                                        self.start,
+                                                        (self.start,) , # Sequence of start revisions
                                                         self.maxnum, 
                                                         broken_line_length,
                                                         show_graph,
