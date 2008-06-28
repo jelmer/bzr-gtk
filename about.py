@@ -25,13 +25,23 @@ import gtk
 import os
 from bzrlib.plugins.gtk import icon_path
 
+
+def read_license():
+    license_file = os.path.join(os.path.dirname(__file__), "COPYING")
+    if os.path.exists(license_file):
+        return file(license_file).read()
+    # Fall back to just license name if we can't find the file
+    return "GPLv2 or later"
+
+
 class AboutDialog(gtk.AboutDialog):
     def __init__(self):
         super(AboutDialog, self).__init__()
         self.set_name("Bazaar GTK")
         self.set_version(bzrlib.plugins.gtk.version_string)
         self.set_website("http://bazaar-vcs.org/BzrGtk")
-        self.set_license("GNU GPL v2 or later")
-        self.set_icon(gtk.gdk.pixbuf_new_from_file(icon_path("bzr-icon-64.png")))
+        self.set_license(read_license())
+        self.set_logo(gtk.gdk.pixbuf_new_from_file(icon_path("bzr-icon-64.png")))
         self.connect ("response", lambda d, r: d.destroy())
+
 
