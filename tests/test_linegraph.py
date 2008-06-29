@@ -1,4 +1,4 @@
-# Copyright (C) 2007 Jelmer Vernooij <jelmer@samba.org>
+# Copyright (C) 2008 Jelmer Vernooij <jelmer@samba.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,27 +14,32 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from unittest import TestLoader, TestSuite
-from bzrlib.tests import TestUtil
+"""Test the linegraph functionality."""
 
 import os
 
-def test_suite():
-    result = TestSuite()
+import gtk
 
-    loader = TestUtil.TestLoader()
+from bzrlib import (
+	graph,
+    tests,
+    )
+from bzrlib.util import bencode
 
-    testmod_names = [
-        'test_commit',
-        'test_diff',
-        'test_linegraph',
-        'test_preferences',
-        'test_history',
-        ]
+from bzrlib.plugins.gtk.branchview.linegraph import linegraph
 
-    if os.name == 'nt':
-        testmod_names.append("test_tortoise_bzr")
 
-    result.addTest(loader.loadTestsFromModuleNames(["%s.%s" % (__name__, i) for i in testmod_names]))
-    return result
+class TestLinegraph(tests.TestCase):
+	def get_graph(self, dict):
+		return graph.Graph(graph.DictParentsProvider(dict))
+
+	def test_simple(self):
+		lg = linegraph(self.get_graph({"A": ("B", "C"), "B": ()}), ["A"])
+		self.assertEquals(lg,  
+            ([
+               ['A', (0, 0), [(0, 0, 0)], ['B'], [], (2,)],
+               ['B', (0, 0), [], (), ['A'], (1,)]
+             ],
+             {'A': 0, 'B': 1},
+             1))
 

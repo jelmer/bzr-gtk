@@ -12,8 +12,8 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 from bzrlib.revision import NULL_REVISION
 from bzrlib.tsort import merge_sort
 
-def linegraph(graph, start_revs, maxnum, broken_line_length = None,
-              graph_data = True, mainline_only = False):
+def linegraph(graph, start_revs, maxnum=None, broken_line_length=None,
+              graph_data=True, mainline_only=False):
     """Produce a directed graph of a bzr repository.
 
     Returns a tuple of (line_graph, revid_index, columns_len) where
