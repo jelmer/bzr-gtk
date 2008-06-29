@@ -16,10 +16,12 @@ import treemodel
 from bzrlib import ui
 
 from bzrlib.plugins.gtk import _i18n
+from bzrlib.plugins.gtk.ui import GtkProgressBar, ProgressPanel
 from linegraph import linegraph, same_branch
 from graphcell import CellRendererGraph
 from treemodel import TreeModel
 from bzrlib.revision import NULL_REVISION
+
 
 class TreeView(gtk.VBox):
 
@@ -105,6 +107,10 @@ class TreeView(gtk.VBox):
                                    branches.
         """
         gtk.VBox.__init__(self, spacing=0)
+
+        loading_msg_widget = ProgressPanel()
+        ui.ui_factory.set_nested_progress_bar_widget(loading_msg_widget.get_progress_bar)
+        self.pack_start(loading_msg_widget, expand=False, fill=True)
 
         self.scrolled_window = gtk.ScrolledWindow()
         self.scrolled_window.set_policy(gtk.POLICY_AUTOMATIC,
@@ -269,8 +275,8 @@ class TreeView(gtk.VBox):
                        should be broken.
         """
 
-        loading_progress = ui.ui_factory.nested_progress_bar()
-        loading_progress.update(msg="Loading ancestry graph", total=5)
+        self.progress_bar = ui.ui_factory.nested_progress_bar()
+        self.progress_bar.update(msg="Loading ancestry graph", total_cnt=5)
 
         try:
             if self.compact:
@@ -287,7 +293,7 @@ class TreeView(gtk.VBox):
                                                             broken_line_length,
                                                             show_graph,
                                                             self.mainline_only,
-                                                            loading_progress)
+                                                            self.progress_bar)
 
             self.model = TreeModel(self.branch, linegraphdata)
             self.graph_cell.columns_len = columns_len
@@ -306,7 +312,7 @@ class TreeView(gtk.VBox):
 
             return False
         finally:
-            loading_progress.finished()
+            self.progress_bar.finished()
 
     def construct_treeview(self):
         self.treeview = gtk.TreeView()
@@ -390,7 +396,7 @@ class TreeView(gtk.VBox):
         self.treeview.append_column(self.date_column)
         
         return self.treeview
-
+    
     def _on_selection_changed(self, treeview):
         """callback for when the treeview changes."""
         (path, focus) = treeview.get_cursor()
