@@ -304,8 +304,6 @@ class TreeView(gtk.VBox):
             else:
                 self.set_revision(revision)
 
-            self.emit('revisions-loaded')
-
             return False
         finally:
             loading_progress.finished()
