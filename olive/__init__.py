@@ -442,6 +442,9 @@ class OliveGtk:
             # History Mode deactivated
             self.entry_history.set_sensitive(False)
             self.button_history.set_sensitive(False)
+            
+            # Return right window to normal view by acting like we jump to it
+            self.on_button_location_jump_clicked(widget)
     
     @show_bzr_error
     def on_entry_history_revno_key_press_event(self, widget, event):
