@@ -45,6 +45,8 @@ class GtkProgressBar(gtk.ProgressBar):
         super(GtkProgressBar, self).__init__()
         self.set_fraction(0.0)
         self._stack = stack
+        self.current = None
+        self.total = None
 
     def finished(self):
         self._stack.remove(self)
@@ -56,10 +58,14 @@ class GtkProgressBar(gtk.ProgressBar):
         self.pulse()
 
     def update(self, msg=None, current=None, total=None):
+        if current:
+            self.current = current
+        if total:
+            self.total = total
         if msg is not None:
             self.set_text(msg)
-        if None not in (current, total) and total > 0:
-            self.set_fraction(1.0 * current / total)
+        if None not in (self.current, self.total):
+            self.set_fraction(1.0 * self.current / self.total)
         while gtk.events_pending():
             gtk.main_iteration()
 

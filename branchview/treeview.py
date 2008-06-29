@@ -13,6 +13,7 @@ import gobject
 import pango
 import re
 import treemodel
+from bzrlib import ui
 
 from bzrlib.plugins.gtk import _i18n
 from linegraph import linegraph, same_branch
@@ -82,9 +83,6 @@ class TreeView(gtk.VBox):
     }
 
     __gsignals__ = {
-        'revisions-loaded': (gobject.SIGNAL_RUN_FIRST, 
-                             gobject.TYPE_NONE,
-                             ()),
         'revision-selected': (gobject.SIGNAL_RUN_FIRST,
                               gobject.TYPE_NONE,
                               ()),
@@ -108,10 +106,6 @@ class TreeView(gtk.VBox):
         """
         gtk.VBox.__init__(self, spacing=0)
 
-        self.pack_start(self.construct_loading_msg(), expand=False, fill=True)
-        self.connect('revisions-loaded', 
-                lambda x: self.loading_msg_box.hide())
-
         self.scrolled_window = gtk.ScrolledWindow()
         self.scrolled_window.set_policy(gtk.POLICY_AUTOMATIC,
                                         gtk.POLICY_AUTOMATIC)
@@ -120,7 +114,6 @@ class TreeView(gtk.VBox):
         self.pack_start(self.scrolled_window, expand=True, fill=True)
 
         self.scrolled_window.add(self.construct_treeview())
-        
 
         self.iter = None
         self.branch = branch
@@ -223,7 +216,6 @@ class TreeView(gtk.VBox):
         self.emit('tag-added', tag, revid)
         
     def refresh(self):
-        self.loading_msg_box.show()
         gobject.idle_add(self.populate, self.get_revision())
 
     def update(self):
@@ -277,39 +269,46 @@ class TreeView(gtk.VBox):
                        should be broken.
         """
 
-        if self.compact:
-            broken_line_length = 32
-        else:
-            broken_line_length = None
-        
-        show_graph = self.graph_column.get_visible()
+        loading_progress = ui.ui_factory.nested_progress_bar()
+        loading_progress.update(msg="Loading ancestry graph", total=5)
 
-        self.branch.lock_read()
-        (linegraphdata, index, columns_len) = linegraph(self.branch.repository.get_graph(),
-                                                        (self.start,) , # Sequence of start revisions
-                                                        self.maxnum, 
-                                                        broken_line_length,
-                                                        show_graph,
-                                                        self.mainline_only)
+        try:
+            if self.compact:
+                broken_line_length = 32
+            else:
+                broken_line_length = None
+            
+            show_graph = self.graph_column.get_visible()
 
-        self.model = TreeModel(self.branch, linegraphdata)
-        self.graph_cell.columns_len = columns_len
-        width = self.graph_cell.get_size(self.treeview)[2]
-        if width > 500:
-            width = 500
-        self.graph_column.set_fixed_width(width)
-        self.graph_column.set_max_width(width)
-        self.index = index
-        self.treeview.set_model(self.model)
+            self.branch.lock_read()
+            (linegraphdata, index, columns_len) = linegraph(self.branch.repository.get_graph(),
+                                                            self.start,
+                                                            self.maxnum, 
+                                                            broken_line_length,
+                                                            show_graph,
+                                                            self.mainline_only,
+                                                            loading_progress)
 
-        if not revision or revision == NULL_REVISION:
-            self.treeview.set_cursor(0)
-        else:
-            self.set_revision(revision)
+            self.model = TreeModel(self.branch, linegraphdata)
+            self.graph_cell.columns_len = columns_len
+            width = self.graph_cell.get_size(self.treeview)[2]
+            if width > 500:
+                width = 500
+            self.graph_column.set_fixed_width(width)
+            self.graph_column.set_max_width(width)
+            self.index = index
+            self.treeview.set_model(self.model)
 
-        self.emit('revisions-loaded')
+            if not revision or revision == NULL_REVISION:
+                self.treeview.set_cursor(0)
+            else:
+                self.set_revision(revision)
 
-        return False
+            self.emit('revisions-loaded')
+
+            return False
+        finally:
+            loading_progress.finished()
 
     def construct_treeview(self):
         self.treeview = gtk.TreeView()
@@ -393,25 +392,6 @@ class TreeView(gtk.VBox):
         self.treeview.append_column(self.date_column)
         
         return self.treeview
-    
-    def construct_loading_msg(self):
-        image_loading = gtk.image_new_from_stock(gtk.STOCK_REFRESH,
-                                                 gtk.ICON_SIZE_BUTTON)
-        image_loading.show()
-        
-        label_loading = gtk.Label(
-            _i18n("Please wait, loading ancestral graph..."))
-        label_loading.set_alignment(0.0, 0.5)
-        label_loading.show()
-        
-        self.loading_msg_box = gtk.HBox()
-        self.loading_msg_box.set_spacing(5)
-        self.loading_msg_box.set_border_width(5)        
-        self.loading_msg_box.pack_start(image_loading, False, False)
-        self.loading_msg_box.pack_start(label_loading, True, True)
-        self.loading_msg_box.show()
-        
-        return self.loading_msg_box
 
     def _on_selection_changed(self, treeview):
         """callback for when the treeview changes."""
