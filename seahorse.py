@@ -85,7 +85,10 @@ def verify(crypttext):
         if key not in keyset:
             keyset[key] = Key(key)
 
-        return keyset[key]
+        return (cleartext, keyset[key])
+
+    return (cleartext, None)
+
 
 class Key:
 

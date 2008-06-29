@@ -18,6 +18,9 @@
 
   * Moved notify icon code to separate script. (Jelmer Vernooij)
 
+  * Verify testaments when showing signatures on revisions and
+    re-enable signature display. (Jelmer Vernooij)
+
  INTERNALS
 
   * All i18n calls should now go through _i18n which must be imported from
