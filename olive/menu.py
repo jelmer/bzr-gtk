@@ -179,7 +179,8 @@ class OliveMenu:
                          _i18n('Please select a file from the list,\nor choose the other option.'))
             return
         
-        bzrlib.add.smart_add([os.path.join(directory, filename)])
+        wt, path = WorkingTree.open_containing(os.path.join(directory, filename))
+        wt.add([path])
     
     @show_bzr_error
     def annotate(self, action):

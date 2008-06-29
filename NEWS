@@ -10,6 +10,8 @@
   
   * Fixed adding tags. (Javier Derderian, #228709)
 
+  * Avoid use of removed smart_add. (Jelmer Vernooij, #244025)
+
  INTERNALS
 
   * All i18n calls should now go through _i18n which must be imported from
