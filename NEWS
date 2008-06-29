@@ -4,6 +4,8 @@
 
   * Added Refresh menu option with F5 keyboard shortcut (Russ Brown)
 
+  * Show progress bars in bzr viz window (Chad Miller, Jelmer Vernooij)
+
  BUG FIXES
 
   * Replace _() calls by _i18n() calls. (Vincent Ladeuil, #187283)
@@ -33,6 +35,7 @@
     bzrlib.plugins.gtk. This addresses the occasional collisions with '_' used
     as an anonymous variable. (Vincent Ladeuil)
 
+  * Add test for linegraph code. (Jelmer Vernooij)
 
 0.94.0    2008-05-04
 
