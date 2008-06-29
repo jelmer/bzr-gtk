@@ -22,9 +22,11 @@ import pango
 import gobject
 import webbrowser
 
-from bzrlib.plugins.gtk import icon_path
 from bzrlib.osutils import format_date
 from bzrlib.util.bencode import bdecode
+from bzrlib.testament import Testament
+
+from bzrlib.plugins.gtk import icon_path
 
 try:
     from bzrlib.plugins.gtk import seahorse
@@ -221,6 +223,16 @@ class SignatureTab(gtk.VBox):
 
     def show_signature(self, crypttext):
         (cleartext, key) = seahorse.verify(crypttext)
+
+        assert cleartext is not None
+
+        inv = self.repository.get_inventory(self.revision.revision_id)
+        expected_testament = Testament(self.revision, inv).as_short_text()
+        if expected_testament != cleartext:
+            self.signature_image.set_from_file(icon_path("sign-bad.png"))
+            self.signature_label.set_markup("<b>Signature does not match repository data</b>\n" +
+                        "The signature plaintext is different from the expected testament plaintext.")
+            return
 
         if key and key.is_available():
             if key.is_trusted():
