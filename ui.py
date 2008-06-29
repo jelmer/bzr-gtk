@@ -70,9 +70,9 @@ class GtkProgressBar(gtk.ProgressBar):
             gtk.main_iteration()
 
 
-class GtkProgressBarStack(gtk.Window):
+class GtkWindowProgressBarStack(gtk.Window):
     def __init__(self):
-        super(GtkProgressBarStack, self).__init__(type=gtk.WINDOW_TOPLEVEL)
+        super(GtkWindowProgressBarStack, self).__init__(type=gtk.WINDOW_TOPLEVEL)
         self.set_border_width(0)
         self.set_title("Progress")
         self.set_position(gtk.WIN_POS_CENTER_ALWAYS)
@@ -160,7 +160,7 @@ class GtkUIFactory(UIFactory):
         """Return a nested progress bar.
         """
         if self._progress_bar_stack is None:
-            self._progress_bar_stack = GtkProgressBarStack()
+            self._progress_bar_stack = GtkWindowProgressBarStack()
         return self._progress_bar_stack.get_nested()
 
     def set_progress_bar_vbox(self, vbox):
