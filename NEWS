@@ -23,6 +23,9 @@
 
   * Avoid use of removed smart_add. (Jelmer Vernooij, #244025, #244027)
 
+  * Remove use of upstream removed Repository.revision_parents() 
+    (Jelmer Vernooij)
+
  CHANGES
 
   * Moved notify icon code to separate script. (Jelmer Vernooij)
