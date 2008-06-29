@@ -23,6 +23,8 @@
   * Verify testaments when showing signatures on revisions and
     re-enable signature display. (Jelmer Vernooij)
 
+  * Show credits for bzr-gtk in the about dialog. (Jelmer Vernooij)
+
  INTERNALS
 
   * All i18n calls should now go through _i18n which must be imported from

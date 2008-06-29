@@ -23,7 +23,29 @@ except:
 import bzrlib
 import gtk
 import os
+from bzrlib.branch import Branch
+from bzrlib.errors import NotBranchError, NoRepositoryPresent
+from bzrlib.trace import mutter
+
 from bzrlib.plugins.gtk import icon_path
+
+
+def read_license():
+    license_file = os.path.join(os.path.dirname(__file__), "COPYING")
+    if os.path.exists(license_file):
+        return file(license_file).read()
+    # Fall back to just license name if we can't find the file
+    return "GPLv2 or later"
+
+
+def load_credits():
+    import pickle
+    try:
+        credits = pickle.load(file("credits.pickle"))
+    except IOError:
+        credits = None
+    return credits
+
 
 class AboutDialog(gtk.AboutDialog):
     def __init__(self):
@@ -31,7 +53,15 @@ class AboutDialog(gtk.AboutDialog):
         self.set_name("Bazaar GTK")
         self.set_version(bzrlib.plugins.gtk.version_string)
         self.set_website("http://bazaar-vcs.org/BzrGtk")
-        self.set_license("GNU GPL v2 or later")
-        self.set_icon(gtk.gdk.pixbuf_new_from_file(icon_path("bzr-icon-64.png")))
+        self.set_license(read_license())
+        self.set_logo(gtk.gdk.pixbuf_new_from_file(icon_path("bzr-icon-64.png")))
+        credits = load_credits()
+        if credits is not None:
+            (authors, documenters, artists, translators) = credits
+            self.set_authors(authors)
+            self.set_documenters(documenters)
+            self.set_artists(artists)
+            self.set_translator_credits("\n".join(translators))
         self.connect ("response", lambda d, r: d.destroy())
+
 
