@@ -322,8 +322,8 @@ class RevisionView(gtk.Notebook):
         self._create_general()
         self._create_relations()
         # Disabled because testaments aren't verified yet:
-        # if has_seahorse:
-        #    self._create_signature()
+        if has_seahorse:
+            self._create_signature()
         self._create_file_info_view()
         self._create_bugs()
 
