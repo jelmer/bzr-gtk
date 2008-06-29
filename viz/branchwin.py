@@ -18,9 +18,10 @@ from bzrlib.plugins.gtk import icon_path
 from bzrlib.plugins.gtk.tags import AddTagDialog
 from bzrlib.plugins.gtk.preferences import PreferencesWindow
 from bzrlib.plugins.gtk.branchview import TreeView, treemodel
+
+from bzrlib.config import BranchConfig, GlobalConfig
 from bzrlib.revision import Revision, NULL_REVISION
-from bzrlib.config import BranchConfig
-from bzrlib.config import GlobalConfig
+from bzrlib.trace import mutter
 
 class BranchWindow(Window):
     """Branch window.
@@ -227,6 +228,15 @@ class BranchWindow(Window):
 
         branch_menu.add(gtk.MenuItem("Pu_ll Revisions"))
         branch_menu.add(gtk.MenuItem("Pu_sh Revisions"))
+
+        try:
+            from bzrlib.plugins import search
+        except ImportError:
+            mutter("Didn't find search plugin")
+        else:
+            branch_index_menuitem = gtk.MenuItem("_Index")
+            branch_index_menuitem.connect('activate', self._branch_index_cb)
+            branch_menu.add(branch_index_menuitem)
 
         help_menu = gtk.Menu()
         help_menuitem = gtk.MenuItem("_Help")
@@ -455,6 +465,10 @@ class BranchWindow(Window):
 
         finally:
             self.treeview.set_sensitive(True)
+
+    def _branch_index_cb(self, w):
+        from bzrlib.plugins.search import index as _mod_index
+        _mod_index.index_url(self.branch.base)
 
     def _about_dialog_cb(self, w):
         from bzrlib.plugins.gtk.about import AboutDialog

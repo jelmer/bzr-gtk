@@ -6,6 +6,9 @@
 
   * Show progress bars in bzr viz window (Chad Miller, Jelmer Vernooij)
 
+  * Added menu option for indexing branches if bzr-search is present.
+    (Jelmer Vernooij)
+
  BUG FIXES
 
   * Replace _() calls by _i18n() calls. (Vincent Ladeuil, #187283)
