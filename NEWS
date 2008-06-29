@@ -14,6 +14,8 @@
 
   * Fixed handle-patch script. (Jelmer Vernooij)
 
+  * Fix import in olive. (Jelmer Vernooij, #223935)
+
  CHANGES
 
   * Moved notify icon code to separate script. (Jelmer Vernooij)
