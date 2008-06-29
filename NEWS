@@ -40,6 +40,8 @@
 
   * Add test for linegraph code. (Jelmer Vernooij)
 
+  * Remove obsolete tortoisebzr tests. (Jelmer Vernooij)
+
 0.94.0    2008-05-04
 
  CHANGES
