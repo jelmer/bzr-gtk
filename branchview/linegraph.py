@@ -12,7 +12,7 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 from bzrlib.revision import NULL_REVISION
 from bzrlib.tsort import merge_sort
 
-def linegraph(repository, start_revs, maxnum, broken_line_length = None,
+def linegraph(graph, start_revs, maxnum, broken_line_length = None,
               graph_data = True, mainline_only = False):
     """Produce a directed graph of a bzr repository.
 
@@ -43,7 +43,6 @@ def linegraph(repository, start_revs, maxnum, broken_line_length = None,
     curved, kinked, etc.) and to pick the actual colours for each index.
     """
     
-    graph = repository.get_graph()
     graph_parents = {}
     ghosts = set()
     graph_children = {}

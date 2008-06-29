@@ -285,7 +285,7 @@ class TreeView(gtk.VBox):
         show_graph = self.graph_column.get_visible()
 
         self.branch.lock_read()
-        (linegraphdata, index, columns_len) = linegraph(self.branch.repository,
+        (linegraphdata, index, columns_len) = linegraph(self.branch.repository.get_graph(),
                                                         (self.start,) , # Sequence of start revisions
                                                         self.maxnum, 
                                                         broken_line_length,
