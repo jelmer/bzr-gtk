@@ -220,7 +220,7 @@ class SignatureTab(gtk.VBox):
                                         "This revision has not been signed.")
 
     def show_signature(self, crypttext):
-        key = seahorse.verify(crypttext)
+        (cleartext, key) = seahorse.verify(crypttext)
 
         if key and key.is_available():
             if key.is_trusted():
