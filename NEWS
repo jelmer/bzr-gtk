@@ -10,7 +10,7 @@
   
   * Fixed adding tags. (Javier Derderian, #228709)
 
-  * Avoid use of removed smart_add. (Jelmer Vernooij, #244025)
+  * Avoid use of removed smart_add. (Jelmer Vernooij, #244025, #244027)
 
  INTERNALS
 

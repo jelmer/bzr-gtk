@@ -69,20 +69,16 @@ class OliveAdd:
                              _i18n('Please select a file from the list,\nor choose the other option.'))
                 return
             
-            fullpath = self.wt.abspath(os.path.join(self.wtpath, filename))
-            
             try:
-                bzrlib.add.smart_add([fullpath])
+                self.wt.add([filename])
             except errors.NotBranchError:
                 error_dialog(_i18n('Directory is not a branch'),
                              _i18n('You can perform this action only in a branch.'))
                 return
         elif radio_unknown.get_active():
             # Add unknown files recursively
-            fullpath = self.wt.abspath(self.wtpath)
-            
             try:
-                bzrlib.add.smart_add([fullpath], True)
+                self.wt.add(self.wt.unknowns())
             except errors.NotBranchError:
                 error_dialog(_i18n('Directory is not a branch'),
                              _i18n('You can perform this action only in a branch.'))
