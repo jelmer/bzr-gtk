@@ -16,6 +16,8 @@
 
   * Fix import in olive. (Jelmer Vernooij, #223935)
 
+  * Avoid use of removed smart_add. (Jelmer Vernooij, #244025, #244027)
+
  CHANGES
 
   * Moved notify icon code to separate script. (Jelmer Vernooij)
