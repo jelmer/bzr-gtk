@@ -96,7 +96,7 @@ setup(
     maintainer_email = "jelmer@samba.org",
     description = "GTK+ Frontends for various Bazaar commands",
     license = "GNU GPL v2 or later",
-    scripts=['olive-gtk', 'bzr-handle-patch'],
+    scripts=['olive-gtk', 'bzr-handle-patch', 'bzr-notify'],
     package_dir = {
         "bzrlib.plugins.gtk": ".",
         "bzrlib.plugins.gtk.viz": "viz", 

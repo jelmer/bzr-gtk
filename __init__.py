@@ -15,7 +15,6 @@
 """Graphical support for Bazaar using GTK.
 
 This plugin includes:
-commit-notify     Start the graphical notifier of commits.
 gannotate         GTK+ annotate. 
 gbranch           GTK+ branching. 
 gcheckout         GTK+ checkout. 
@@ -523,77 +522,6 @@ commands = [
 
 for cmd in commands:
     register_command(cmd)
-
-
-class cmd_commit_notify(GTKCommand):
-    """Run the bzr commit notifier.
-
-    This is a background program which will pop up a notification on the users
-    screen when a commit occurs.
-    """
-
-    def run(self):
-        from notify import NotifyPopupMenu
-        gtk = open_display()
-        menu = NotifyPopupMenu()
-        icon = gtk.status_icon_new_from_file(icon_path("bzr-icon-64.png"))
-        icon.connect('popup-menu', menu.display)
-
-        import cgi
-        import dbus
-        import dbus.service
-        import pynotify
-        from bzrlib.bzrdir import BzrDir
-        from bzrlib import errors
-        from bzrlib.osutils import format_date
-        from bzrlib.transport import get_transport
-        if getattr(dbus, 'version', (0,0,0)) >= (0,41,0):
-            import dbus.glib
-        BROADCAST_INTERFACE = "org.bazaarvcs.plugins.dbus.Broadcast"
-        bus = dbus.SessionBus()
-
-        def catch_branch(revision_id, urls):
-            # TODO: show all the urls, or perhaps choose the 'best'.
-            url = urls[0]
-            try:
-                if isinstance(revision_id, unicode):
-                    revision_id = revision_id.encode('utf8')
-                transport = get_transport(url)
-                a_dir = BzrDir.open_from_transport(transport)
-                branch = a_dir.open_branch()
-                revno = branch.revision_id_to_revno(revision_id)
-                revision = branch.repository.get_revision(revision_id)
-                summary = 'New revision %d in %s' % (revno, url)
-                body  = 'Committer: %s\n' % revision.committer
-                body += 'Date: %s\n' % format_date(revision.timestamp,
-                    revision.timezone)
-                body += '\n'
-                body += revision.message
-                body = cgi.escape(body)
-                nw = pynotify.Notification(summary, body)
-                def start_viz(notification=None, action=None, data=None):
-                    """Start the viz program."""
-                    pp = start_viz_window(branch, revision_id)
-                    pp.show()
-                def start_branch(notification=None, action=None, data=None):
-                    """Start a Branch dialog"""
-                    from bzrlib.plugins.gtk.branch import BranchDialog
-                    bd = BranchDialog(remote_path=url)
-                    bd.run()
-                nw.add_action("inspect", "Inspect", start_viz, None)
-                nw.add_action("branch", "Branch", start_branch, None)
-                nw.set_timeout(5000)
-                nw.show()
-            except Exception, e:
-                print e
-                raise
-        bus.add_signal_receiver(catch_branch,
-                                dbus_interface=BROADCAST_INTERFACE,
-                                signal_name="Revision")
-        pynotify.init("bzr commit-notify")
-        gtk.main()
-
-register_command(cmd_commit_notify)
 
 
 class cmd_gselftest(GTKCommand):
