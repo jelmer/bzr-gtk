@@ -85,7 +85,7 @@ class RevisionPopupMenu(gtk.Menu):
         window = SendMergeDirectiveDialog(self.branch, self.revids[0])
         if window.run() == gtk.RESPONSE_OK:
             outf = StringIO()
-            outf.writelines(window.get_merge_directive.to_lines())
+            outf.writelines(window.get_merge_directive().to_lines())
             mail_client = self.branch.get_config().get_mail_client()
             mail_client.compose_merge_request(window.get_mail_to(), "[MERGE]",
                                               outf.getvalue())
