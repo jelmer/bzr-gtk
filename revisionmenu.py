@@ -27,7 +27,7 @@ import gobject
 from bzrlib import (errors, ui)
 from bzrlib.revision import NULL_REVISION
 
-class RevisionPopupMenu(gtk.Menu):
+class RevisionMenu(gtk.Menu):
 
     __gsignals__ = {
             'tag-added': (
@@ -38,10 +38,15 @@ class RevisionPopupMenu(gtk.Menu):
     }
 
     def __init__(self, repository, revids, branch=None, wt=None):
-        super(RevisionPopupMenu, self).__init__()
+        super(RevisionMenu, self).__init__()
         self.branch = branch
         self.repository = repository
         self.wt = wt
+        self.set_revision_ids(revids)
+
+    def set_revision_ids(self, revids):
+        for c in self.get_children():
+            self.remove(c)
         self.revids = revids
         self.create_items()
 
