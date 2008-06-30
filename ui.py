@@ -72,8 +72,10 @@ class GtkProgressBar(gtk.ProgressBar,progress._BaseProgressBar):
 
 
 class ProgressBarWindow(gtk.Window):
-    def __init__(self):
+    def __init__(self, to_file=None, show_pct=None, show_spinner=None, show_eta=None, 
+                 show_bar=None, show_count=None, to_messages_file=None, _stack=None):
         super(ProgressBarWindow, self).__init__(type=gtk.WINDOW_TOPLEVEL)
+        self._stack = _stack
         self.set_border_width(0)
         self.set_title("Progress")
         self.set_position(gtk.WIN_POS_CENTER_ALWAYS)
@@ -83,9 +85,29 @@ class ProgressBarWindow(gtk.Window):
         self.set_resizable(False)
         self.show_all()
 
+    def return_pb(self, pb):
+        self._stack.return_pb(self)
+    
+    def update(self, *args, **kwargs):
+        self.pb.update(*args, **kwargs)
+
+    def finished(self):
+        self.pb.finished()
+        self.hide_all()
+ 
     def clear(self):
         self.pb.clear()
         self.destroy()
+
+    def child_progress(self, *args, **kwargs):
+        return self.pb.child_progress(*args, **kwargs)
+
+    def child_update(self, *args, **kwargs):
+        return self.pb.child_update(*args, **kwargs)
+
+    def get_progress_bar(self):
+        self.show_all()
+        return self
 
 
 class ProgressPanel(gtk.HBox):
