@@ -776,7 +776,8 @@ class OliveGtk:
         else:
             branch = self.remote_branch
 
-        window = branchwin.BranchWindow(branch, branch.last_revision(), None, parent=self.window)
+        window = branchwin.BranchWindow(branch, [branch.last_revision()], None, 
+                                        parent=self.window)
         window.show()
     
     def on_menuitem_view_refresh_activate(self, widget):
