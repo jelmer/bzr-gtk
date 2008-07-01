@@ -47,6 +47,8 @@
 
   * Remove obsolete tortoisebzr tests. (Jelmer Vernooij)
 
+  * Share revision context menu and main revision menu in bzr viz. (Jelmer Vernooij)
+
 0.94.0    2008-05-04
 
  CHANGES

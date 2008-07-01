@@ -27,7 +27,7 @@ import gobject
 from bzrlib import (errors, ui)
 from bzrlib.revision import NULL_REVISION
 
-class RevisionPopupMenu(gtk.Menu):
+class RevisionMenu(gtk.Menu):
 
     __gsignals__ = {
             'tag-added': (
@@ -37,11 +37,18 @@ class RevisionPopupMenu(gtk.Menu):
             )
     }
 
-    def __init__(self, repository, revids, branch=None, wt=None):
-        super(RevisionPopupMenu, self).__init__()
+    def __init__(self, repository, revids, branch=None, wt=None, parent=None):
+        super(RevisionMenu, self).__init__()
+        self._parent = parent
         self.branch = branch
         self.repository = repository
         self.wt = wt
+        self.set_revision_ids(revids)
+
+    def set_revision_ids(self, revids):
+        assert isinstance(revids, list)
+        for c in self.get_children():
+            self.remove(c)
         self.revids = revids
         self.create_items()
 
@@ -93,7 +100,7 @@ class RevisionPopupMenu(gtk.Menu):
 
     def show_diff(self, item):
         from bzrlib.plugins.gtk.diff import DiffWindow
-        window = DiffWindow(parent=self.parent)
+        window = DiffWindow(parent=self._parent)
         parentids = self.repository.get_revision(self.revids[0]).parent_ids
         if len(parentids) == 0:
             parentid = NULL_REVISION

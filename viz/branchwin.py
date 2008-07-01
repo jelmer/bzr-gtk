@@ -13,11 +13,12 @@ import gtk
 import gobject
 import pango
 
-from bzrlib.plugins.gtk.window import Window
 from bzrlib.plugins.gtk import icon_path
+from bzrlib.plugins.gtk.branchview import TreeView, treemodel
 from bzrlib.plugins.gtk.tags import AddTagDialog
 from bzrlib.plugins.gtk.preferences import PreferencesWindow
-from bzrlib.plugins.gtk.branchview import TreeView, treemodel
+from bzrlib.plugins.gtk.revisionmenu import RevisionMenu
+from bzrlib.plugins.gtk.window import Window
 
 from bzrlib.config import BranchConfig, GlobalConfig
 from bzrlib.revision import Revision, NULL_REVISION
@@ -203,24 +204,9 @@ class BranchWindow(Window):
         go_menu.add(gtk.SeparatorMenuItem())
         go_menu.add(self.go_menu_tags)
 
-        revision_menu = gtk.Menu()
+        self.revision_menu = RevisionMenu(self.branch.repository, [], self.branch, parent=self)
         revision_menuitem = gtk.MenuItem("_Revision")
-        revision_menuitem.set_submenu(revision_menu)
-
-        revision_menu_diff = gtk.MenuItem("View Changes")
-        revision_menu_diff.connect('activate', 
-                self._menu_diff_cb)
-        
-        revision_menu_compare = gtk.MenuItem("Compare with...")
-        revision_menu_compare.connect('activate',
-                self._compare_with_cb)
-
-        revision_menu_tag = gtk.MenuItem("Tag Revision")
-        revision_menu_tag.connect('activate', self._tag_revision_cb)
-
-        revision_menu.add(revision_menu_tag)
-        revision_menu.add(revision_menu_diff)
-        revision_menu.add(revision_menu_compare)
+        revision_menuitem.set_submenu(self.revision_menu)
 
         branch_menu = gtk.Menu()
         branch_menuitem = gtk.MenuItem("_Branch")
@@ -335,6 +321,8 @@ class BranchWindow(Window):
         parents  = self.treeview.get_parents()
         children = self.treeview.get_children()
 
+        self.revision_menu.set_revision_ids([revision.revision_id])
+
         if revision and revision != NULL_REVISION:
             prev_menu = gtk.Menu()
             if len(parents) > 0:
@@ -394,19 +382,6 @@ class BranchWindow(Window):
         self.show_diff(revision.revision_id, parent_id)
         self.treeview.grab_focus()
         
-    def _menu_diff_cb(self,w):
-        (path, focus) = self.treeview.treeview.get_cursor()
-        revid = self.treeview.model[path][treemodel.REVID]
-        
-        parentids = self.branch.repository.revision_parents(revid)
-
-        if len(parentids) == 0:
-            parentid = NULL_REVISION
-        else:
-            parentid = parentids[0]
-        
-        self.show_diff(revid,parentid)    
-
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
         self.treeview.back()
@@ -425,22 +400,6 @@ class BranchWindow(Window):
         self.show_diff(revid, parentid)
         self.treeview.grab_focus()
 
-    def _compare_with_cb(self,w):
-        """Callback for revision 'compare with' menu. Will show a small
-            dialog with branch revisions to compare with selected revision in TreeView"""
-        
-        from bzrlib.plugins.gtk.revbrowser import RevisionBrowser
-        
-        rb = RevisionBrowser(self.branch,self)
-        ret = rb.run()
-        
-        if ret == gtk.RESPONSE_OK:          
-            (path, focus) = self.treeview.treeview.get_cursor()
-            revid = self.treeview.model[path][treemodel.REVID]
-            self.show_diff(revid, rb.selected_revid)
-            
-        rb.destroy()
-            
     def _set_revision_cb(self, w, revision_id):
         self.treeview.set_revision_id(revision_id)
 
@@ -455,22 +414,6 @@ class BranchWindow(Window):
         self.config.set_user_option('viz-compact-view', option)
         self.treeview.set_property('compact', self.compact_view)
         self.treeview.refresh()
-
-    def _tag_revision_cb(self, w):
-        try:
-            self.treeview.set_sensitive(False)
-            dialog = AddTagDialog(self.branch.repository, self.treeview.get_revision().revision_id, self.branch)
-            response = dialog.run()
-            if response != gtk.RESPONSE_NONE:
-                dialog.hide()
-            
-                if response == gtk.RESPONSE_OK:
-                    self.treeview.add_tag(dialog.tagname, dialog._revid)
-                
-                dialog.destroy()
-
-        finally:
-            self.treeview.set_sensitive(True)
 
     def _branch_index_cb(self, w):
         from bzrlib.plugins.search import index as _mod_index

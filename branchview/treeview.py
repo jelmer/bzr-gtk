@@ -405,9 +405,9 @@ class TreeView(gtk.VBox):
             self.emit('revision-selected')
 
     def _on_revision_selected(self, widget, event):
-        from bzrlib.plugins.gtk.revisionmenu import RevisionPopupMenu
+        from bzrlib.plugins.gtk.revisionmenu import RevisionMenu
         if event.button == 3:
-            menu = RevisionPopupMenu(self.branch.repository, 
+            menu = RevisionMenu(self.branch.repository, 
                 [self.get_revision().revision_id],
                 self.branch)
             menu.connect('tag-added', lambda w, t, r: self.add_tag(t, r))
