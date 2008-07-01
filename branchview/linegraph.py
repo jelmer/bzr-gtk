@@ -47,7 +47,7 @@ def linegraph(graph, start_revs, maxnum=None, broken_line_length=None,
     def update_root_progress(step_number):
         """IFF our container received a root progress bar, then update it."""
         if root_progress is not None:
-            root_progress.update(current_cnt=step_number)
+            root_progress.update(None, current_cnt=step_number)
 
     graph_parents = {}
     ghosts = set()

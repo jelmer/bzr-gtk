@@ -9,6 +9,8 @@
   * Added menu option for indexing branches if bzr-search is present.
     (Jelmer Vernooij)
 
+  * Add "Send Merge Directive" button in bzr viz. (Jelmer Vernooij)
+
  BUG FIXES
 
   * Replace _() calls by _i18n() calls. (Vincent Ladeuil, #187283)

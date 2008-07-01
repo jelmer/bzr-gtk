@@ -50,33 +50,46 @@ class RevisionPopupMenu(gtk.Menu):
             item = gtk.MenuItem("View _Changes")
             item.connect('activate', self.show_diff)
             self.append(item)
-            self.show_all()
 
             item = gtk.MenuItem("_Push")
             item.connect('activate', self.show_push)
             self.append(item)
-            self.show_all()
 
             item = gtk.MenuItem("_Tag Revision")
             item.connect('activate', self.show_tag)
             self.append(item)
-            self.show_all()
 
             item = gtk.MenuItem("_Merge Directive")
             item.connect('activate', self.store_merge_directive)
             # FIXME: self.append(item)
-            self.show_all()
+
+            item = gtk.MenuItem("_Send Merge Directive")
+            item.connect('activate', self.send_merge_directive)
+            self.append(item)
             
             if self.wt:
                 item = gtk.MenuItem("_Revert to this revision")
                 item.connect('activate', self.revert)
                 self.append(item)
-                self.show_all()
+
+        self.show_all()
 
     def store_merge_directive(self, item):
         from bzrlib.plugins.gtk.mergedirective import CreateMergeDirectiveDialog
         window = CreateMergeDirectiveDialog(self.branch, self.revids[0])
         window.show()
+
+    def send_merge_directive(self, item):
+        from bzrlib.plugins.gtk.mergedirective import SendMergeDirectiveDialog
+        from cStringIO import StringIO
+        window = SendMergeDirectiveDialog(self.branch, self.revids[0])
+        if window.run() == gtk.RESPONSE_OK:
+            outf = StringIO()
+            outf.writelines(window.get_merge_directive().to_lines())
+            mail_client = self.branch.get_config().get_mail_client()
+            mail_client.compose_merge_request(window.get_mail_to(), "[MERGE]",
+                                              outf.getvalue())
+        window.destroy()
 
     def show_diff(self, item):
         from bzrlib.plugins.gtk.diff import DiffWindow
