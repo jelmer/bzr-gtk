@@ -35,7 +35,8 @@ class SearchDialog(gtk.Dialog):
         gtk.Dialog.__init__(self, title="Search Revisions",
                                   parent=parent,
                                   flags=gtk.DIALOG_MODAL,
-                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+                                  buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
+                                           gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
     
         # Get arguments
         self.branch = branch
@@ -49,7 +50,7 @@ class SearchDialog(gtk.Dialog):
         self.searchbar.add(self.searchentry)
         self.vbox.pack_start(self.searchbar, expand=False, fill=False)
 
-        self.results_model = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
+        self.results_model = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)
         self.results_treeview = gtk.TreeView(self.results_model)
 
         documentname_column = gtk.TreeViewColumn("Document", gtk.CellRendererText(), text=0)
@@ -68,12 +69,25 @@ class SearchDialog(gtk.Dialog):
         # Show the dialog
         self.show_all()
 
+    def get_revision(self):
+        (path, focus) = self.results_treeview.get_cursor()
+        if path is None:
+            return None
+        iter = self.results_model.get_iter(path)
+        return self.results_model.get_value(iter, 2)
+
     def _searchentry_activate(self, entry):
         self.results_model.clear()
         self.index._branch.lock_read()
         try:
             query = [(query_item,) for query_item in self.searchentry.get_text().split(" ")]
             for result in self.index.search(query):
-                self.results_model.append([result.document_name(), result.summary()])
+                if isinstance(result, _mod_index.FileTextHit):
+                    revid = result.text_key[-1]
+                elif isinstance(result, _mod_index.RevisionHit):
+                    revid = result.revision_key[0]
+                else:
+                    raise AssertionError()
+                self.results_model.append([result.document_name(), result.summary(), revid])
         finally:
             self.index._branch.unlock()

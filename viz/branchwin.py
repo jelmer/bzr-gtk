@@ -234,6 +234,8 @@ class BranchWindow(Window):
         except ImportError:
             mutter("Didn't find search plugin")
         else:
+            branch_menu.add(gtk.SeparatorMenuItem())
+
             branch_index_menuitem = gtk.MenuItem("_Index")
             branch_index_menuitem.connect('activate', self._branch_index_cb)
             branch_menu.add(branch_index_menuitem)
@@ -476,7 +478,12 @@ class BranchWindow(Window):
 
     def _branch_search_cb(self, w):
         from bzrlib.plugins.gtk.search import SearchDialog
-        SearchDialog(self.branch).run()
+        dialog = SearchDialog(self.branch)
+        
+        if dialog.run() == gtk.RESPONSE_OK:
+            self.set_revision(dialog.get_revision())
+
+        dialog.destroy()
 
     def _about_dialog_cb(self, w):
         from bzrlib.plugins.gtk.about import AboutDialog
