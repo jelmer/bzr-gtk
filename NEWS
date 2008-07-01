@@ -28,6 +28,8 @@
   * Remove use of upstream removed Repository.revision_parents() 
     (Jelmer Vernooij)
 
+  * List network drives in Olive. (Kevin Light, #244308)
+
  CHANGES
 
   * Moved notify icon code to separate script. (Jelmer Vernooij)
