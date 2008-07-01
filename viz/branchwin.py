@@ -476,7 +476,7 @@ class BranchWindow(Window):
 
     def _branch_search_cb(self, w):
         from bzrlib.plugins.gtk.search import SearchDialog
-        SearchDialog(self).run()
+        SearchDialog(self.branch).run()
 
     def _about_dialog_cb(self, w):
         from bzrlib.plugins.gtk.about import AboutDialog

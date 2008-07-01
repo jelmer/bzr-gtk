@@ -20,8 +20,14 @@ try:
 except:
     pass
 
-import gtk
+import gobject, gtk
 from bzrlib.plugins.search import index as _mod_index
+
+
+class SearchCompletion(gtk.EntryCompletion):
+    def __init__(self, index):
+        super(SearchCompletion, self).__init__()
+
 
 class SearchDialog(gtk.Dialog):
     """Search dialog."""
@@ -33,6 +39,41 @@ class SearchDialog(gtk.Dialog):
     
         # Get arguments
         self.branch = branch
-        
+
+        self.index = _mod_index.open_index_url(branch.base)
+
+        self.searchbar = gtk.HBox()
+        self.searchentry = gtk.Entry()
+        self.searchentry.connect('activate', self._searchentry_activate)
+        self.searchentry.set_completion(SearchCompletion(self.index))
+        self.searchbar.add(self.searchentry)
+        self.vbox.pack_start(self.searchbar, expand=False, fill=False)
+
+        self.results_model = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING)
+        self.results_treeview = gtk.TreeView(self.results_model)
+
+        documentname_column = gtk.TreeViewColumn("Document", gtk.CellRendererText(), text=0)
+        self.results_treeview.append_column(documentname_column)
+
+        summary_column = gtk.TreeViewColumn("Summary", gtk.CellRendererText(), text=1)
+        self.results_treeview.append_column(summary_column)
+
+        results_scrolledwindow = gtk.ScrolledWindow()
+        results_scrolledwindow.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        results_scrolledwindow.add(self.results_treeview)
+
+        self.vbox.pack_start(results_scrolledwindow, expand=True, fill=True)
+
+        self.set_default_size(600, 400)
         # Show the dialog
         self.show_all()
+
+    def _searchentry_activate(self, entry):
+        self.results_model.clear()
+        self.index._branch.lock_read()
+        try:
+            query = [(query_item,) for query_item in self.searchentry.get_text().split(" ")]
+            for result in self.index.search(query):
+                self.results_model.append([result.document_name(), result.summary()])
+        finally:
+            self.index._branch.unlock()
