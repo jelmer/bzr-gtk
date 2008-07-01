@@ -24,11 +24,6 @@ import gobject, gtk
 from bzrlib.plugins.search import index as _mod_index
 
 
-class SearchCompletion(gtk.EntryCompletion):
-    def __init__(self, index):
-        super(SearchCompletion, self).__init__()
-
-
 class SearchDialog(gtk.Dialog):
     """Search dialog."""
     def __init__(self, branch, parent=None):
@@ -46,7 +41,7 @@ class SearchDialog(gtk.Dialog):
         self.searchbar = gtk.HBox()
         self.searchentry = gtk.Entry()
         self.searchentry.connect('activate', self._searchentry_activate)
-        self.searchentry.set_completion(SearchCompletion(self.index))
+        # TODO: Completion using the bzr-search suggests functionality
         self.searchbar.add(self.searchentry)
         self.vbox.pack_start(self.searchbar, expand=False, fill=False)
 
