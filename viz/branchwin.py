@@ -238,6 +238,10 @@ class BranchWindow(Window):
             branch_index_menuitem.connect('activate', self._branch_index_cb)
             branch_menu.add(branch_index_menuitem)
 
+            branch_search_menuitem = gtk.MenuItem("_Search")
+            branch_search_menuitem.connect('activate', self._branch_search_cb)
+            branch_menu.add(branch_search_menuitem)
+
         help_menu = gtk.Menu()
         help_menuitem = gtk.MenuItem("_Help")
         help_menuitem.set_submenu(help_menu)
@@ -469,6 +473,10 @@ class BranchWindow(Window):
     def _branch_index_cb(self, w):
         from bzrlib.plugins.search import index as _mod_index
         _mod_index.index_url(self.branch.base)
+
+    def _branch_search_cb(self, w):
+        from bzrlib.plugins.gtk.search import SearchDialog
+        SearchDialog(self).run()
 
     def _about_dialog_cb(self, w):
         from bzrlib.plugins.gtk.about import AboutDialog
