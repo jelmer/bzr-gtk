@@ -103,19 +103,22 @@ def set_ui_factory():
     bzrlib.ui.ui_factory = GtkUIFactory()
 
 
-def data_path():
-    return os.path.dirname(__file__)
-
-
-def icon_path(*args):
-    basedirs = [os.path.join(data_path()),
+def data_basedirs():
+    return [os.path.dirname(__file__),
              "/usr/share/bzr-gtk", 
              "/usr/local/share/bzr-gtk"]
-    for basedir in basedirs:
-        path = os.path.join(basedir, 'icons', *args)
+
+
+def data_path(*args):
+    for basedir in data_basedirs():
+        path = os.path.join(basedir, *args)
         if os.path.exists(path):
             return path
     return None
+
+
+def icon_path(*args):
+    return data_path(os.path.join('icons', *args))
 
 
 def open_display():
