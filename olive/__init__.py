@@ -966,7 +966,7 @@ class OliveGtk:
         # Add'em to the ListStore
         for item in dirs:
             try:
-                statinfo = os.stat(os.path.join(self.path, item))
+                statinfo = os.lstat(os.path.join(self.path, item))
             except OSError, e:
                 if e.errno == 40:
                     continue
@@ -1033,7 +1033,7 @@ class OliveGtk:
                 st = _('unknown')
             
             try:
-                statinfo = os.stat(os.path.join(self.path, item))
+                statinfo = os.lstat(os.path.join(self.path, item))
             except OSError, e:
                 if e.errno == 40:
                     continue
@@ -1271,7 +1271,7 @@ class OliveGtk:
             # Add'em to the ListStore
             for item in dirs:
                 try:
-                    statinfo = os.stat(os.path.join(self.path, item))
+                    statinfo = os.lstat(os.path.join(self.path, item))
                 except OSError, e:
                     if e.errno == 40:
                         continue
@@ -1340,7 +1340,7 @@ class OliveGtk:
                     st = _('unknown')
                 
                 try:
-                    statinfo = os.stat(os.path.join(self.path, item))
+                    statinfo = os.lstat(os.path.join(self.path, item))
                 except OSError, e:
                     if e.errno == 40:
                         continue
