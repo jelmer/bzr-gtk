@@ -952,7 +952,7 @@ class OliveGtk:
         for item in os.listdir(self.path):
             if not dotted_files and item[0] == '.':
                 continue
-            if os.path.isdir(self.path + os.sep + item):
+            if os.path.isdir(os.path.join(self.path, item)):
                 dirs.append(item)
             else:
                 files.append(item)
@@ -966,7 +966,7 @@ class OliveGtk:
         # Add'em to the ListStore
         for item in dirs:
             try:
-                statinfo = os.stat(self.path + os.sep + item)
+                statinfo = os.stat(os.path.join(self.path, item))
             except OSError, e:
                 if e.errno == 40:
                     continue
@@ -986,7 +986,7 @@ class OliveGtk:
             status = 'unknown'
             fileid = ''
             if not self.notbranch:
-                filename = self.wt.relpath(self.path + os.sep + item)
+                filename = self.wt.relpath(os.path.join(self.path, item))
                 
                 try:
                     self.wt.lock_read()
@@ -1033,7 +1033,7 @@ class OliveGtk:
                 st = _('unknown')
             
             try:
-                statinfo = os.stat(self.path + os.sep + item)
+                statinfo = os.stat(os.path.join(self.path, item))
             except OSError, e:
                 if e.errno == 40:
                     continue
@@ -1250,7 +1250,7 @@ class OliveGtk:
             for item in os.listdir(path):
                 if not dotted_files and item[0] == '.':
                     continue
-                if os.path.isdir(path + os.sep + item):
+                if os.path.isdir(os.path.join(path, item)):
                     dirs.append(item)
                 else:
                     files.append(item)
@@ -1271,7 +1271,7 @@ class OliveGtk:
             # Add'em to the ListStore
             for item in dirs:
                 try:
-                    statinfo = os.stat(self.path + os.sep + item)
+                    statinfo = os.stat(os.path.join(self.path, item))
                 except OSError, e:
                     if e.errno == 40:
                         continue
@@ -1291,7 +1291,7 @@ class OliveGtk:
                 status = 'unknown'
                 fileid = ''
                 if not notbranch:
-                    filename = tree1.relpath(path + os.sep + item)
+                    filename = tree1.relpath(os.path.join(path, item))
                     
                     try:
                         self.wt.lock_read()
@@ -1340,7 +1340,7 @@ class OliveGtk:
                     st = _('unknown')
                 
                 try:
-                    statinfo = os.stat(self.path + os.sep + item)
+                    statinfo = os.stat(os.path.join(self.path, item))
                 except OSError, e:
                     if e.errno == 40:
                         continue
