@@ -11,6 +11,10 @@
 
   * Add "Send Merge Directive" button in bzr viz. (Jelmer Vernooij)
 
+  * Added an optional diff panel to bzr vis.  (Scott Scriven)
+
+  * Made bzr vis remember whether the toolbar is visible.  (Scott Scriven)
+
  BUG FIXES
 
   * Replace _() calls by _i18n() calls. (Vincent Ladeuil, #187283)
@@ -29,6 +33,8 @@
     (Jelmer Vernooij)
 
   * List network drives in Olive. (Kevin Light, #244308)
+
+  * Removed some redundant screen redrawing in bzr vis.  (Scott Scriven)
 
  CHANGES
 
