@@ -30,13 +30,13 @@ import gtk
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
-from bzrlib.plugins.gtk import _i18n, launch
+from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import error_dialog, info_dialog, question_dialog, warning_dialog
 from bzrlib.plugins.gtk.errors import show_bzr_error
 from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
 from bzrlib.plugins.gtk.annotate.config import GAnnotateConfig
 from bzrlib.plugins.gtk.diff import DiffWindow
-from bzrlib.plugins.gtk.olive import Preferences
+from bzrlib.plugins.gtk.olive import Preferences, launch
 
 class OliveMenu:
     """ This class is responsible for building the context menus. """
