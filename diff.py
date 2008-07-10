@@ -330,9 +330,10 @@ class DiffWidget(gtk.HPaned):
         # text view
 
     def set_diff_text_sections(self, sections):
-        self.diff_view = DiffFileView()
+        if not hasattr(self, 'diff_view'):
+            self.diff_view = DiffFileView()
+            self.pack2(self.diff_view)
         self.diff_view.show()
-        self.pack2(self.diff_view)
         for oldname, newname, patch in sections:
             self.diff_view._diffs[newname] = str(patch)
             if newname is None:
@@ -346,8 +347,9 @@ class DiffWidget(gtk.HPaned):
         Compares the two trees and populates the window with the
         differences.
         """
-        self.diff_view = DiffView()
-        self.pack2(self.diff_view)
+        if not hasattr(self, 'diff_view'):
+            self.diff_view = DiffView()
+            self.pack2(self.diff_view)
         self.diff_view.show()
         self.diff_view.set_trees(rev_tree, parent_tree)
         self.rev_tree = rev_tree
@@ -380,6 +382,7 @@ class DiffWidget(gtk.HPaned):
                 self.model.append(titer, [ path, path ])
 
         self.treeview.expand_all()
+        self.diff_view.show_diff(None)
 
     def set_file(self, file_path):
         """Select the current file to display"""

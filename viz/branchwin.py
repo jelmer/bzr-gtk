@@ -544,13 +544,6 @@ class BranchWindow(Window):
 
         rev_tree    = self.branch.repository.revision_tree(revision.revision_id)
         parent_tree = self.branch.repository.revision_tree(parent_id)
-        # FIXME: for some reason, an existing DiffWidget refuses to show 
-        # diffs, but a new one works fine
-        self.bottom_hpaned.remove(self.diff)
-        from bzrlib.plugins.gtk.diff import DiffWidget
-        self.diff = DiffWidget()
-        self.bottom_hpaned.pack2(self.diff)
-        # end FIXME; below is fine
+
         self.diff.set_diff(rev_tree, parent_tree)
-        self.diff.diff_view.show_diff(None) # show all changes
         self.diff.show_all()
