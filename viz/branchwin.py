@@ -108,9 +108,11 @@ class BranchWindow(Window):
         self.paned.pack2(self.construct_bottom(), resize=False, shrink=True)
         self.paned.show()
 
-        vbox.pack_start(self.construct_menubar(), expand=False, fill=True)
-        vbox.pack_start(self.construct_navigation(), expand=False, fill=True)
-        
+        nav = self.construct_navigation()
+        menubar = self.construct_menubar()
+        vbox.pack_start(menubar, expand=False, fill=True)
+        vbox.pack_start(nav, expand=False, fill=True)
+
         vbox.pack_start(self.paned, expand=True, fill=True)
         vbox.set_focus_child(self.paned)
 
@@ -161,6 +163,9 @@ class BranchWindow(Window):
 
         view_menu_toolbar = gtk.CheckMenuItem("Show Toolbar")
         view_menu_toolbar.set_active(True)
+        if self.config.get_user_option('viz-toolbar-visible') == 'False':
+            view_menu_toolbar.set_active(False)
+            self.toolbar.hide()
         view_menu_toolbar.connect('toggled', self._toolbar_visibility_changed)
 
         view_menu_compact = gtk.CheckMenuItem("Show Compact Graph")
@@ -468,9 +473,10 @@ class BranchWindow(Window):
 
     def _toolbar_visibility_changed(self, col):
         if col.get_active():
-            self.toolbar.show() 
+            self.toolbar.show()
         else:
             self.toolbar.hide()
+        self.config.set_user_option('viz-toolbar-visible', col.get_active())
 
     def _show_about_cb(self, w):
         dialog = AboutDialog()
