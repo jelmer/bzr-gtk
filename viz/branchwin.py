@@ -172,8 +172,15 @@ class BranchWindow(Window):
         view_menu_compact.set_active(self.compact_view)
         view_menu_compact.connect('activate', self._brokenlines_toggled_cb)
 
+        view_menu_diffs = gtk.CheckMenuItem("Show Diffs")
+        view_menu_diffs.set_active(True)
+        if self.config.get_user_option('viz-show-diffs') == 'False':
+            view_menu_diffs.set_active(False)
+        view_menu_diffs.connect('toggled', self._diff_visibility_changed)
+
         view_menu.add(view_menu_toolbar)
         view_menu.add(view_menu_compact)
+        view_menu.add(view_menu_diffs)
         view_menu.add(gtk.SeparatorMenuItem())
 
         self.mnu_show_revno_column = gtk.CheckMenuItem("Show Revision _Number Column")
@@ -325,6 +332,9 @@ class BranchWindow(Window):
         self.bottom_hpaned.pack2(self.diff)
 
         self.bottom_hpaned.show_all()
+        if self.config.get_user_option('viz-show-diffs') == 'False':
+            self.diff.hide()
+
         return self.bottom_hpaned
 
     def _tag_selected_cb(self, menuitem, revid):
@@ -383,24 +393,7 @@ class BranchWindow(Window):
             self.revisionview.set_revision(revision)
             self.revisionview.set_children(children)
 
-            # update the diff panel
-            if len(parents) == 0:
-                parent_id = None
-            else:
-                parent_id = parents[0]
-
-            rev_tree    = self.branch.repository.revision_tree(revision.revision_id)
-            parent_tree = self.branch.repository.revision_tree(parent_id)
-            # FIXME: for some reason, an existing DiffWidget refuses to show 
-            # diffs, but a new one works fine
-            self.bottom_hpaned.remove(self.diff)
-            from bzrlib.plugins.gtk.diff import DiffWidget
-            self.diff = DiffWidget()
-            self.bottom_hpaned.pack2(self.diff)
-            # end FIXME; below is fine
-            self.diff.set_diff(rev_tree, parent_tree)
-            self.diff.diff_view.show_diff(None) # show all changes
-            self.diff.show_all()
+            self.update_diff_panel(revision, parents)
 
     def _tree_revision_activated(self, widget, path, col):
         # TODO: more than one parent
@@ -478,6 +471,14 @@ class BranchWindow(Window):
             self.toolbar.hide()
         self.config.set_user_option('viz-toolbar-visible', col.get_active())
 
+    def _diff_visibility_changed(self, col):
+        if col.get_active():
+            self.diff.show()
+        else:
+            self.diff.hide()
+        self.config.set_user_option('viz-show-diffs', str(col.get_active()))
+        self.update_diff_panel()
+
     def _show_about_cb(self, w):
         dialog = AboutDialog()
         dialog.connect('response', lambda d,r: d.destroy())
@@ -524,3 +525,32 @@ class BranchWindow(Window):
         window.show()
 
 
+    def update_diff_panel(self, revision=None, parents=None):
+        """Show the current revision in the diff panel."""
+        if self.config.get_user_option('viz-show-diffs') == 'False':
+            return
+
+        if not revision: # default to selected row
+            revision = self.treeview.get_revision()
+        if (not revision) or (revision == NULL_REVISION):
+            return
+
+        if not parents: # default to selected row's parents
+            parents  = self.treeview.get_parents()
+        if len(parents) == 0:
+            parent_id = None
+        else:
+            parent_id = parents[0]
+
+        rev_tree    = self.branch.repository.revision_tree(revision.revision_id)
+        parent_tree = self.branch.repository.revision_tree(parent_id)
+        # FIXME: for some reason, an existing DiffWidget refuses to show 
+        # diffs, but a new one works fine
+        self.bottom_hpaned.remove(self.diff)
+        from bzrlib.plugins.gtk.diff import DiffWidget
+        self.diff = DiffWidget()
+        self.bottom_hpaned.pack2(self.diff)
+        # end FIXME; below is fine
+        self.diff.set_diff(rev_tree, parent_tree)
+        self.diff.diff_view.show_diff(None) # show all changes
+        self.diff.show_all()
