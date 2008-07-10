@@ -1246,10 +1246,13 @@ class OliveGtk:
 
         # Add them to the TreeStore
         titer = treestore.append(None, [_i18n('Bookmarks'), None])
-        for item in bookmarks:
-            title = self.pref.get_bookmark_title(item)
-            treestore.append(titer, [title, item])
 
+        # Get titles and sort by title
+        bookmarks = [[self.pref.get_bookmark_title(item), item] for item in bookmarks]
+        bookmarks.sort()
+        for title_item in bookmarks:
+            treestore.append(titer, title_item)
+        
         # Add the TreeStore to the TreeView
         self.treeview_left.set_model(treestore)
 
