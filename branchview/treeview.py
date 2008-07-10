@@ -325,6 +325,7 @@ class TreeView(gtk.VBox):
         if set_tooltip is not None:
             set_tooltip(treemodel.MESSAGE)
 
+        self._prev_cursor_path = None
         self.treeview.connect("cursor-changed",
                 self._on_selection_changed)
 
@@ -400,7 +401,8 @@ class TreeView(gtk.VBox):
     def _on_selection_changed(self, treeview):
         """callback for when the treeview changes."""
         (path, focus) = treeview.get_cursor()
-        if path is not None:
+        if (path is not None) and (path != self._prev_cursor_path):
+            self._prev_cursor_path = path # avoid emitting twice per click
             self.iter = self.model.get_iter(path)
             self.emit('revision-selected')
 
