@@ -48,6 +48,8 @@ class BranchWindow(Window):
         self.maxnum      = maxnum
         self.config      = GlobalConfig()
 
+        self._sizes      = {} # window and widget sizes
+
         if self.config.get_user_option('viz-compact-view') == 'yes':
             self.compact_view = True
         else:
@@ -60,8 +62,13 @@ class BranchWindow(Window):
         monitor = screen.get_monitor_geometry(0)
         width = int(monitor.width * 0.75)
         height = int(monitor.height * 0.75)
+        # user-configured window size
+        size = self.config.get_user_option('viz-window-size')
+        if size: # string, "1234x567"
+            width, height = [int(num) for num in size.split('x')]
         self.set_default_size(width, height)
         self.set_size_request(width/3, height/3)
+        self.connect("size-allocate", self._on_size_allocate, 'viz-window-size')
 
         # FIXME AndyFitz!
         icon = self.render_icon(gtk.STOCK_INDEX, gtk.ICON_SIZE_BUTTON)
@@ -105,8 +112,8 @@ class BranchWindow(Window):
         self.add(vbox)
 
         self.paned = gtk.VPaned()
-        self.paned.pack1(self.construct_top(), resize=True, shrink=False)
-        self.paned.pack2(self.construct_bottom(), resize=False, shrink=True)
+        self.paned.pack1(self.construct_top(), resize=False, shrink=True)
+        self.paned.pack2(self.construct_bottom(), resize=True, shrink=False)
         self.paned.show()
 
         nav = self.construct_navigation()
@@ -288,6 +295,15 @@ class BranchWindow(Window):
         align = gtk.Alignment(0.0, 0.0, 1.0, 1.0)
         align.set_padding(5, 0, 0, 0)
         align.add(self.treeview)
+        # user-configured size
+        size = self.config.get_user_option('viz-graph-size')
+        if size: # string, "1234x567"
+            width, height = [int(num) for num in size.split('x')]
+            align.set_size_request(width, height)
+        else:
+            (width, height) = self.get_size()
+            align.set_size_request(width, int(height / 2.5))
+        align.connect('size-allocate', self._on_size_allocate, 'viz-graph-size')
         align.show()
 
         return align
@@ -317,11 +333,17 @@ class BranchWindow(Window):
         """Construct the bottom half of the window."""
         self.bottom_hpaned = gtk.HPaned()
         (width, height) = self.get_size()
-        self.bottom_hpaned.set_size_request(width, int(height / 2.5))
+        self.bottom_hpaned.set_size_request(20, 20) # shrinkable
 
         from bzrlib.plugins.gtk.revisionview import RevisionView
         self.revisionview = RevisionView(branch=self.branch)
         self.revisionview.set_size_request(width/3, int(height / 2.5))
+        # user-configured size
+        size = self.config.get_user_option('viz-revisionview-size')
+        if size: # string, "1234x567"
+            width, height = [int(num) for num in size.split('x')]
+            self.revisionview.set_size_request(width, height)
+        self.revisionview.connect('size-allocate', self._on_size_allocate, 'viz-revisionview-size')
         self.revisionview.show()
         self.revisionview.set_show_callback(self._show_clicked_cb)
         self.revisionview.connect('notify::revision', self._go_clicked_cb)
@@ -475,6 +497,11 @@ class BranchWindow(Window):
     def _diff_visibility_changed(self, col):
         if col.get_active():
             self.diff.show()
+            # make sure the diff isn't zero-width
+            alloc = self.diff.get_allocation()
+            if alloc.width < 10:
+                width, height = self.get_size()
+                self.revisionview.set_size_request(width/3, int(height / 2.5))
         else:
             self.diff.hide()
         self.config.set_user_option('viz-show-diffs', str(col.get_active()))
@@ -509,6 +536,21 @@ class BranchWindow(Window):
             self.go_menu_tags.set_sensitive(False)
 
         self.go_menu_tags.show_all()
+
+    def _on_size_allocate(self, widget, allocation, name):
+        """When window has been resized, save the new size."""
+        width, height = 0, 0
+        if name in self._sizes:
+            width, height = self._sizes[name]
+
+        size_changed = (width != allocation.width) or \
+                (height != allocation.height)
+
+        if size_changed:
+            width, height = allocation.width, allocation.height
+            self._sizes[name] = (width, height)
+            value = '%sx%s' % (width, height)
+            self.config.set_user_option(name, value)
 
     def show_diff(self, revid=None, parentid=None):
         """Open a new window to show a diff between the given revisions."""
