@@ -61,6 +61,7 @@ class BranchWindow(Window):
         width = int(monitor.width * 0.75)
         height = int(monitor.height * 0.75)
         self.set_default_size(width, height)
+        self.set_size_request(width/3, height/3)
 
         # FIXME AndyFitz!
         icon = self.render_icon(gtk.STOCK_INDEX, gtk.ICON_SIZE_BUTTON)
