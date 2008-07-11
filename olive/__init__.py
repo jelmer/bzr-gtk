@@ -965,13 +965,7 @@ class OliveGtk:
         
         # Add'em to the ListStore
         for item in dirs:
-            try:
-                statinfo = os.lstat(os.path.join(self.path, item))
-            except OSError, e:
-                if e.errno == 40:
-                    continue
-                else:
-                    raise
+            statinfo = os.lstat(os.path.join(self.path, item))
             liststore.append([ gtk.STOCK_DIRECTORY,
                                True,
                                item,
@@ -1032,13 +1026,7 @@ class OliveGtk:
             else:
                 st = _('unknown')
             
-            try:
-                statinfo = os.lstat(os.path.join(self.path, item))
-            except OSError, e:
-                if e.errno == 40:
-                    continue
-                else:
-                    raise
+            statinfo = os.lstat(os.path.join(self.path, item))
             liststore.append([gtk.STOCK_FILE,
                               False,
                               item,
@@ -1270,13 +1258,7 @@ class OliveGtk:
                 
             # Add'em to the ListStore
             for item in dirs:
-                try:
-                    statinfo = os.lstat(os.path.join(self.path, item))
-                except OSError, e:
-                    if e.errno == 40:
-                        continue
-                    else:
-                        raise
+                statinfo = os.lstat(os.path.join(self.path, item))
                 liststore.append([gtk.STOCK_DIRECTORY,
                                   True,
                                   item,
@@ -1339,13 +1321,7 @@ class OliveGtk:
                 else:
                     st = _('unknown')
                 
-                try:
-                    statinfo = os.lstat(os.path.join(self.path, item))
-                except OSError, e:
-                    if e.errno == 40:
-                        continue
-                    else:
-                        raise
+                statinfo = os.lstat(os.path.join(self.path, item))
                 liststore.append([gtk.STOCK_FILE,
                                   False,
                                   item,
