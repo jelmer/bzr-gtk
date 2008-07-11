@@ -63,9 +63,9 @@ class BranchWindow(Window):
         width = int(monitor.width * 0.75)
         height = int(monitor.height * 0.75)
         # user-configured window size
-        size = self.config.get_user_option('viz-window-size')
-        if size: # string, "1234x567"
-            width, height = [int(num) for num in size.split('x')]
+        size = self._load_size('viz-window-size')
+        if size:
+            width, height = size
         self.set_default_size(width, height)
         self.set_size_request(width/3, height/3)
         self.connect("size-allocate", self._on_size_allocate, 'viz-window-size')
@@ -296,9 +296,9 @@ class BranchWindow(Window):
         align.set_padding(5, 0, 0, 0)
         align.add(self.treeview)
         # user-configured size
-        size = self.config.get_user_option('viz-graph-size')
-        if size: # string, "1234x567"
-            width, height = [int(num) for num in size.split('x')]
+        size = self._load_size('viz-graph-size')
+        if size:
+            width, height = size
             align.set_size_request(width, height)
         else:
             (width, height) = self.get_size()
@@ -339,9 +339,9 @@ class BranchWindow(Window):
         self.revisionview = RevisionView(branch=self.branch)
         self.revisionview.set_size_request(width/3, int(height / 2.5))
         # user-configured size
-        size = self.config.get_user_option('viz-revisionview-size')
-        if size: # string, "1234x567"
-            width, height = [int(num) for num in size.split('x')]
+        size = self._load_size('viz-revisionview-size')
+        if size:
+            width, height = size
             self.revisionview.set_size_request(width, height)
         self.revisionview.connect('size-allocate', self._on_size_allocate, 'viz-revisionview-size')
         self.revisionview.show()
@@ -536,6 +536,19 @@ class BranchWindow(Window):
             self.go_menu_tags.set_sensitive(False)
 
         self.go_menu_tags.show_all()
+
+    def _load_size(self, name):
+        """Read and parse 'name' from self.config.
+        The value is a string, formatted as WIDTHxHEIGHT
+        Returns None, or (width, height)
+        """
+        size = self.config.get_user_option(name)
+        if size:
+            width, height = [int(num) for num in size.split('x')]
+            # avoid writing config every time we start
+            self._sizes[name] = (width, height)
+            return width, height
+        return None
 
     def _on_size_allocate(self, widget, allocation, name):
         """When window has been resized, save the new size."""
