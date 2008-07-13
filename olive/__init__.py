@@ -1003,6 +1003,8 @@ class OliveGtk:
             except OSError, e:
                 if e.errno == 40:
                     continue
+                elif e.errno == 2:
+                    continue
                 else:
                     raise
             liststore.append([ gtk.STOCK_DIRECTORY,
@@ -1069,6 +1071,8 @@ class OliveGtk:
                 statinfo = os.stat(self.path + os.sep + item)
             except OSError, e:
                 if e.errno == 40:
+                    continue
+                elif e.errno == 2:
                     continue
                 else:
                     raise
@@ -1308,6 +1312,8 @@ class OliveGtk:
                 except OSError, e:
                     if e.errno == 40:
                         continue
+                    elif e.errno == 2:
+                        continue
                     else:
                         raise
                 liststore.append([gtk.STOCK_DIRECTORY,
@@ -1376,6 +1382,8 @@ class OliveGtk:
                     statinfo = os.stat(self.path + os.sep + item)
                 except OSError, e:
                     if e.errno == 40:
+                        continue
+                    elif e.errno == 2:
                         continue
                     else:
                         raise
