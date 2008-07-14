@@ -28,7 +28,7 @@ import gtk.glade
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
-from errors import show_bzr_error
+from bzrlib.plugins.gtk.errors import show_bzr_error
 from bzrlib.plugins.gtk.dialog import error_dialog
 from guifiles import GLADEFILENAME
 from bzrlib.plugins.gtk import _i18n
