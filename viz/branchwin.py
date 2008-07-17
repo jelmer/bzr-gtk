@@ -186,9 +186,16 @@ class BranchWindow(Window):
             view_menu_diffs.set_active(True)
         view_menu_diffs.connect('toggled', self._diff_visibility_changed)
 
+        view_menu_wide_diffs = gtk.CheckMenuItem("Wide Diffs")
+        view_menu_wide_diffs.set_active(False)
+        if self.config.get_user_option('viz-wide-diffs') == 'True':
+            view_menu_wide_diffs.set_active(True)
+        view_menu_wide_diffs.connect('toggled', self._diff_placement_changed)
+
         view_menu.add(view_menu_toolbar)
         view_menu.add(view_menu_compact)
         view_menu.add(view_menu_diffs)
+        view_menu.add(view_menu_wide_diffs)
         view_menu.add(gtk.SeparatorMenuItem())
 
         self.mnu_show_revno_column = gtk.CheckMenuItem("Show Revision _Number Column")
@@ -331,9 +338,12 @@ class BranchWindow(Window):
 
     def construct_bottom(self):
         """Construct the bottom half of the window."""
-        self.bottom_hpaned = gtk.HPaned()
+        if self.config.get_user_option('viz-wide-diffs') == 'True':
+            self.diff_paned = gtk.VPaned()
+        else:
+            self.diff_paned = gtk.HPaned()
         (width, height) = self.get_size()
-        self.bottom_hpaned.set_size_request(20, 20) # shrinkable
+        self.diff_paned.set_size_request(20, 20) # shrinkable
 
         from bzrlib.plugins.gtk.revisionview import RevisionView
         self.revisionview = RevisionView(branch=self.branch)
@@ -348,17 +358,17 @@ class BranchWindow(Window):
         self.revisionview.set_show_callback(self._show_clicked_cb)
         self.revisionview.connect('notify::revision', self._go_clicked_cb)
         self.treeview.connect('tag-added', lambda w, t, r: self.revisionview.update_tags())
-        self.bottom_hpaned.pack1(self.revisionview)
+        self.diff_paned.pack1(self.revisionview)
 
         from bzrlib.plugins.gtk.diff import DiffWidget
         self.diff = DiffWidget()
-        self.bottom_hpaned.pack2(self.diff)
+        self.diff_paned.pack2(self.diff)
 
-        self.bottom_hpaned.show_all()
+        self.diff_paned.show_all()
         if self.config.get_user_option('viz-show-diffs') != 'True':
             self.diff.hide()
 
-        return self.bottom_hpaned
+        return self.diff_paned
 
     def _tag_selected_cb(self, menuitem, revid):
         self.treeview.set_revision_id(revid)
@@ -494,18 +504,33 @@ class BranchWindow(Window):
             self.toolbar.hide()
         self.config.set_user_option('viz-toolbar-visible', col.get_active())
 
+    def _make_diff_nonzero_size(self):
+        """make sure the diff isn't zero-width or zero-height"""
+        alloc = self.diff.get_allocation()
+        if (alloc.width < 10) or (alloc.height < 10):
+            width, height = self.get_size()
+            self.revisionview.set_size_request(width/3, int(height / 2.5))
+
     def _diff_visibility_changed(self, col):
+        """Hide or show the diff panel."""
         if col.get_active():
             self.diff.show()
-            # make sure the diff isn't zero-width
-            alloc = self.diff.get_allocation()
-            if alloc.width < 10:
-                width, height = self.get_size()
-                self.revisionview.set_size_request(width/3, int(height / 2.5))
+            self._make_diff_nonzero_size()
         else:
             self.diff.hide()
         self.config.set_user_option('viz-show-diffs', str(col.get_active()))
         self.update_diff_panel()
+
+    def _diff_placement_changed(self, col):
+        """Toggle the diff panel's position."""
+        self.config.set_user_option('viz-wide-diffs', str(col.get_active()))
+
+        old = self.paned.get_child2()
+        self.paned.remove(old)
+        self.paned.pack2(self.construct_bottom(), resize=True, shrink=False)
+        self._make_diff_nonzero_size()
+
+        self.treeview.emit('revision-selected')
 
     def _show_about_cb(self, w):
         dialog = AboutDialog()
@@ -579,7 +604,6 @@ class BranchWindow(Window):
         description = revid + " - " + self.branch.nick
         window.set_diff(description, rev_tree, parent_tree)
         window.show()
-
 
     def update_diff_panel(self, revision=None, parents=None):
         """Show the current revision in the diff panel."""
