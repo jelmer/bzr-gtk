@@ -181,9 +181,9 @@ class BranchWindow(Window):
         view_menu_compact.connect('activate', self._brokenlines_toggled_cb)
 
         view_menu_diffs = gtk.CheckMenuItem("Show Diffs")
-        view_menu_diffs.set_active(True)
-        if self.config.get_user_option('viz-show-diffs') == 'False':
-            view_menu_diffs.set_active(False)
+        view_menu_diffs.set_active(False)
+        if self.config.get_user_option('viz-show-diffs') == 'True':
+            view_menu_diffs.set_active(True)
         view_menu_diffs.connect('toggled', self._diff_visibility_changed)
 
         view_menu.add(view_menu_toolbar)
@@ -355,7 +355,7 @@ class BranchWindow(Window):
         self.bottom_hpaned.pack2(self.diff)
 
         self.bottom_hpaned.show_all()
-        if self.config.get_user_option('viz-show-diffs') == 'False':
+        if self.config.get_user_option('viz-show-diffs') != 'True':
             self.diff.hide()
 
         return self.bottom_hpaned
@@ -583,7 +583,7 @@ class BranchWindow(Window):
 
     def update_diff_panel(self, revision=None, parents=None):
         """Show the current revision in the diff panel."""
-        if self.config.get_user_option('viz-show-diffs') == 'False':
+        if self.config.get_user_option('viz-show-diffs') != 'True':
             return
 
         if not revision: # default to selected row
