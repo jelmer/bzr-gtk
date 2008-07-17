@@ -737,8 +737,8 @@ class OliveGtk:
 
     def on_menuitem_remove_file_activate(self, widget):
         """ Remove (unversion) selected file. """
-        from remove import OliveRemoveDialog
-        remove = OliveRemoveDialog(self.wt, self.wtpath,
+        from bzrlib.plugins.gtk.olive.remove import RemoveDialog
+        remove = RemoveDialog(self.wt, self.wtpath,
                                    selected=self.get_selected_right(),
                                    parent=self.window)
         response = remove.run()
