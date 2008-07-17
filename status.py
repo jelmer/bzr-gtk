@@ -28,12 +28,13 @@ class StatusDialog(gtk.Dialog):
     """ Display Status window and perform the needed actions. """
     def __init__(self, wt, wtpath, revision=None):
         """ Initialize the Status window. """
-        super(StatusDialog, self).__init__(flags=gtk.DIALOG_MODAL, buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        super(StatusDialog, self).__init__(flags=gtk.DIALOG_MODAL, buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
         self.set_title("Working tree changes")
+        self.set_default_response(gtk.RESPONSE_CLOSE)
         self._create()
         self.wt = wt
         self.wtpath = wtpath
-        
+
         if revision is None:
             revision = self.wt.branch.last_revision()
             
@@ -44,12 +45,21 @@ class StatusDialog(gtk.Dialog):
 
     def _create(self):
         self.set_default_size(400, 300)
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self.set_has_separator(False)
+        sw = gtk.ScrolledWindow()
+        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        sw.set_shadow_type(gtk.SHADOW_IN)
         self.treeview = gtk.TreeView()
-        scrolledwindow.add(self.treeview)
-        self.vbox.pack_start(scrolledwindow, True, True)
+        sw.add(self.treeview)
+        self.vbox.pack_start(sw, True, True)
         self.vbox.show_all()
+
+        # sane border and spacing widths (as recommended by GNOME HIG) 
+        self.set_border_width(5)
+        sw.set_border_width(5)
+        self.vbox.set_spacing(2)
+        self.action_area.set_border_width(5)
+
 
     def row_diff(self, tv, path, tvc):
         file = self.model[path][1]
@@ -60,6 +70,7 @@ class StatusDialog(gtk.Dialog):
         window.set_diff("Working tree changes", self.old_tree, self.wt)
         window.set_file(file)
         window.show()
+
 
     def _generate_status(self):
         """ Generate 'bzr status' output. """
