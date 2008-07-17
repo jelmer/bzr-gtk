@@ -537,15 +537,17 @@ class OliveGtk:
     
     def on_menuitem_branch_merge_activate(self, widget):
         """ Branch/Merge... menu handler. """
-        from bzrlib.plugins.gtk.merge import MergeDialog
+        from bzrlib.plugins.gtk.olive.merge import MergeDialog
         
         if self.check_for_changes():
             error_dialog(_i18n('There are local changes in the branch'),
                          _i18n('Please commit or revert the changes before merging.'))
         else:
-            parent_branch_path = self.wt.branch.get_parent()
-            merge = MergeDialog(self.wt, self.wtpath,default_branch_path=parent_branch_path )
-            merge.display()
+            merge = MergeDialog(self.wt, self.wtpath, parent_branch_path, self.window)
+            response = merge.run()
+            merge.destroy()
+            if response == gtk.RESPONSE_OK:
+                self.refresh_right()
 
     @show_bzr_error
     def on_menuitem_branch_missing_revisions_activate(self, widget):
