@@ -23,49 +23,60 @@ except:
     pass
 
 import gtk
-import gtk.glade
 
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
 
-from errors import show_bzr_error
-from bzrlib.plugins.gtk.dialog import error_dialog
-from guifiles import GLADEFILENAME
 from bzrlib.plugins.gtk import _i18n
+from bzrlib.plugins.gtk.dialog import error_dialog
+from bzrlib.plugins.gtk.errors import show_bzr_error
 
 
-class OliveRename:
+class RenameDialog(gtk.Dialog):
     """ Display the Rename dialog and perform the needed actions. """
-    def __init__(self, wt, wtpath, selected=[]):
-        """ Initialize the Rename dialog. """
-        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_rename')
+    
+    def __init__(self, wt, wtpath, selected=None, parent=None):
+        """ Initialize the Rename file dialog. """
+        gtk.Dialog.__init__(self, title="Olive - Rename files",
+                                  parent=parent,
+                                  flags=0,
+                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         
-        self.window = self.glade.get_widget('window_rename')
-        self.entry = self.glade.get_widget('entry_rename')
-        
-        # Dictionary for signal_autoconnect
-        dic = { "on_button_rename_rename_clicked": self.rename,
-                "on_button_rename_cancel_clicked": self.close }
-        
-        # Connect the signals to the handlers
-        self.glade.signal_autoconnect(dic)
-        
+        # Get arguments
         self.wt = wt
         self.wtpath = wtpath
         self.selected = selected
         
-    def display(self):
-        """ Display the Rename dialog. """
-        if self.selected is not None:
-            self.entry.set_text(self.selected)
+        # Create widgets
+        self._hbox = gtk.HBox()
+        self._label_rename_to = gtk.Label(_i18n("Rename to"))
+        self._entry = gtk.Entry()
+        self._button_rename = gtk.Button(_i18n("_Rename"))
+        self._button_rename_icon = gtk.Image()
+        self._button_rename_icon.set_from_stock(gtk.STOCK_APPLY, gtk.ICON_SIZE_BUTTON)
+        self._button_rename.set_image(self._button_rename_icon)
         
-        self.window.show_all()
-
+        self._entry.connect('activate', self._on_rename_clicked)
+        self._button_rename.connect('clicked', self._on_rename_clicked)
+        
+        # Set text
+        if self.selected is not None:
+            self._entry.set_text(self.selected)
+        
+        # Add widgets to dialog
+        self.vbox.add(self._hbox)
+        self._hbox.add(self._label_rename_to)
+        self._hbox.add(self._entry)
+        self._hbox.set_spacing(5)
+        self.action_area.pack_end(self._button_rename)
+        
+        self.vbox.show_all()
+        
     @show_bzr_error
-    def rename(self, widget):
+    def _on_rename_clicked(self, widget):
         # Get entry
         old_filename = self.selected
-        new_filename = self.entry.get_text()
+        new_filename = self._entry.get_text()
             
         if old_filename is None:
             error_dialog(_i18n('No file was selected'),
@@ -89,7 +100,5 @@ class OliveRename:
                          _i18n('The destination is not in the same branch.'))
             return
         wt1.rename_one(source, destination)
-        self.close()
-    
-    def close(self, widget=None):
-        self.window.destroy()
+        
+        self.response(gtk.RESPONSE_OK)
