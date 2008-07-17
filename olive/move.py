@@ -15,7 +15,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import os
-from os.path import dirname
 
 try:
     import pygtk
@@ -24,7 +23,6 @@ except:
     pass
 
 import gtk
-import gtk.glade
 
 import bzrlib.errors as errors
 from bzrlib.workingtree import WorkingTree
@@ -32,24 +30,19 @@ from bzrlib.workingtree import WorkingTree
 from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import error_dialog
 from bzrlib.plugins.gtk.errors import show_bzr_error
-from guifiles import GLADEFILENAME
 
 
-class OliveMove:
+class MoveDialog(gtk.Dialog):
     """ Display the Move dialog and perform the needed actions. """
-    def __init__(self, wt, wtpath, selected=[]):
+    
+    def __init__(self, wt, wtpath, selected, parent=None):
         """ Initialize the Move dialog. """
-        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_move', 'olive-gtk')
+        gtk.Dialog.__init__(self, title="Olive - Move",
+                                  parent=parent,
+                                  flags=0,
+                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         
-        self.window = self.glade.get_widget('window_move')
-        
-        # Dictionary for signal_autoconnect
-        dic = { "on_button_move_move_clicked": self.move,
-                "on_button_move_cancel_clicked": self.close }
-        
-        # Connect the signals to the handlers
-        self.glade.signal_autoconnect(dic)
-        
+        # Get arguments
         self.wt = wt
         self.wtpath = wtpath
         self.selected = selected
@@ -58,22 +51,48 @@ class OliveMove:
             self.selected = ""
         
         if self.wtpath == "":
-            directory = dirname(self.wt.abspath(self.selected))
+            directory = os.path.dirname(self.wt.abspath(self.selected))
         else:
-            directory = dirname(self.wt.abspath(self.wtpath + os.sep + self.selected))
+            directory = os.path.dirname(self.wt.abspath(self.wtpath + os.sep + self.selected))
         
-        # Set FileChooser directory
-        self.filechooser = self.glade.get_widget('filechooserbutton_move')
-        self.filechooser.set_filename(directory)
-
-    def display(self):
-        """ Display the Move dialog. """
-        self.window.show_all()
+        # Create widgets
+        self._hbox = gtk.HBox()
+        self._label_move_to = gtk.Label(_i18n("Move to"))
+        self._filechooser_dialog = gtk.FileChooserDialog(title="Please select a folder",
+                                    parent=self.window,
+                                    action=gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
+                                    buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
+                                             gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+        self._filechooser_dialog.set_default_response(gtk.RESPONSE_OK)
+        self.filechooser = gtk.FileChooserButton(self._filechooser_dialog)
+        self._button_move = gtk.Button(_i18n("_Move"))
+        self._button_move_icon = gtk.Image()
+        self._button_move_icon.set_from_stock(gtk.STOCK_APPLY, gtk.ICON_SIZE_BUTTON)
+        self._button_move.set_image(self._button_move_icon)
+        
+        self._button_move.connect('clicked', self._on_move_clicked)
+        
+        # Set location
+        self._filechooser_dialog.set_current_folder(directory)
+        
+        # Add widgets to dialog
+        self.vbox.add(self._hbox)
+        self._hbox.add(self._label_move_to)
+        self._hbox.add(self.filechooser)
+        self._hbox.set_spacing(5)
+        self.action_area.pack_end(self._button_move)
+        
+        self.vbox.show_all()
 
     @show_bzr_error
-    def move(self, widget):
+    def _on_move_clicked(self, widget):
         destination = self.filechooser.get_filename()
-
+        
+        if destination == None:
+            error_dialog(_i18n('No folder was selected'),
+                         _i18n('Please select a folder to move the selected file to'))
+            return
+        
         filename = self.selected
             
         if filename is None:
@@ -92,7 +111,5 @@ class OliveMove:
             return
 
         wt1.move([source], wt1.relpath(destination))
-        self.close()
-    
-    def close(self, widget=None):
-        self.window.destroy()
+        
+        self.response(gtk.RESPONSE_OK)

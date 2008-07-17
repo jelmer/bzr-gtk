@@ -725,9 +725,12 @@ class OliveGtk:
     
     def on_menuitem_file_move_activate(self, widget):
         """ File/Move... menu handler. """
-        from move import OliveMove
-        move = OliveMove(self.wt, self.wtpath, self.get_selected_right())
-        move.display()
+        from bzrlib.plugins.gtk.olive.move import MoveDialog
+        move = MoveDialog(self.wt, self.wtpath, self.get_selected_right(), self.window)
+        response = move.run()
+        move.destroy()
+        if response == gtk.RESPONSE_OK:
+            self.refresh_right()
     
     def on_menuitem_file_rename_activate(self, widget):
         """ File/Rename... menu handler. """
