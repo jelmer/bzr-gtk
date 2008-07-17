@@ -470,10 +470,13 @@ class OliveGtk:
     
     def on_menuitem_add_files_activate(self, widget):
         """ Add file(s)... menu handler. """
-        from add import OliveAdd
-        add = OliveAdd(self.wt, self.wtpath, self.get_selected_right())
-        add.display()
-    
+        from bzrlib.plugins.gtk.olive.add import AddDialog
+        add = AddDialog(self.wt, self.wtpath, self.get_selected_right(), self.window)
+        response = add.run()
+        add.destroy()
+        if response == gtk.RESPONSE_OK:
+            self.refresh_right()
+
     def on_menuitem_branch_get_activate(self, widget):
         """ Branch/Get... menu handler. """
         from bzrlib.plugins.gtk.branch import BranchDialog
