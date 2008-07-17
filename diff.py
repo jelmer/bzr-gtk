@@ -330,7 +330,7 @@ class DiffWidget(gtk.HPaned):
         # text view
 
     def set_diff_text_sections(self, sections):
-        if not hasattr(self, 'diff_view'):
+        if getattr(self, 'diff_view', None) is None:
             self.diff_view = DiffFileView()
             self.pack2(self.diff_view)
         self.diff_view.show()
@@ -347,7 +347,7 @@ class DiffWidget(gtk.HPaned):
         Compares the two trees and populates the window with the
         differences.
         """
-        if not hasattr(self, 'diff_view'):
+        if getattr(self, 'diff_view', None) is None:
             self.diff_view = DiffView()
             self.pack2(self.diff_view)
         self.diff_view.show()
