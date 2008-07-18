@@ -724,9 +724,12 @@ class OliveGtk:
     
     def on_menuitem_file_make_directory_activate(self, widget):
         """ File/Make directory... menu handler. """
-        from mkdir import OliveMkdir
-        mkdir = OliveMkdir(self.wt, self.wtpath)
-        mkdir.display()
+        from bzrlib.plugins.gtk.olive.mkdir import MkdirDialog
+        mkdir = MkdirDialog(self.wt, self.wtpath, self.window)
+        response = mkdir.run()
+        mkdir.destroy()
+        if response == gtk.RESPONSE_OK:
+            self.refresh_right()
     
     def on_menuitem_file_move_activate(self, widget):
         """ File/Move... menu handler. """
