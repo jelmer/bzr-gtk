@@ -51,6 +51,8 @@
 
   * Share revision context menu and main revision menu in bzr viz. (Jelmer Vernooij)
 
+  * Remove glade from merge dialog. (Jasper Groenewegen)
+
 0.94.0    2008-05-04
 
  CHANGES
