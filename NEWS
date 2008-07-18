@@ -19,6 +19,8 @@
 
   * Made bzr vis remember window and panel sizes.  (Scott Scriven)
 
+  * Sort Olive bookmarks by title (Jasper Groenewegen)
+
  BUG FIXES
 
   * Replace _() calls by _i18n() calls. (Vincent Ladeuil, #187283)
