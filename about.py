@@ -27,13 +27,14 @@ from bzrlib.branch import Branch
 from bzrlib.errors import NotBranchError, NoRepositoryPresent
 from bzrlib.trace import mutter
 
-from bzrlib.plugins.gtk import icon_path
+from bzrlib.plugins.gtk import data_path, icon_path
 
 
 def read_license():
-    license_file = os.path.join(os.path.dirname(__file__), "COPYING")
-    if os.path.exists(license_file):
-        return file(license_file).read()
+    license_paths = [data_path("COPYING"), "/usr/share/common-licenses/GPL-2"]
+    for license_file in license_paths:
+        if os.path.exists(license_file):
+            return file(license_file).read()
     # Fall back to just license name if we can't find the file
     return "GPLv2 or later"
 
@@ -41,7 +42,7 @@ def read_license():
 def load_credits():
     import pickle
     try:
-        credits = pickle.load(file("credits.pickle"))
+        credits = pickle.load(file(data_path("credits.pickle")))
     except IOError:
         credits = None
     return credits
