@@ -11,6 +11,8 @@
 
   * Add "Send Merge Directive" button in bzr viz. (Jelmer Vernooij)
 
+  * Remove dummy "Edit->Find" option. (Jelmer Vernooij)
+
  BUG FIXES
 
   * Replace _() calls by _i18n() calls. (Vincent Ladeuil, #187283)
