@@ -537,7 +537,7 @@ class OliveGtk:
     
     def on_menuitem_branch_merge_activate(self, widget):
         """ Branch/Merge... menu handler. """
-        from bzrlib.plugins.gtk.olive.merge import MergeDialog
+        from bzrlib.plugins.gtk.merge import MergeDialog
         
         if self.check_for_changes():
             error_dialog(_i18n('There are local changes in the branch'),
