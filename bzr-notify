@@ -11,7 +11,7 @@ load_plugins()
 
 from bzrlib.plugins.gtk import open_display, icon_path
 
-from notify import NotifyPopupMenu
+from bzrlib.plugins.gtk.notify import NotifyPopupMenu
 gtk = open_display()
 menu = NotifyPopupMenu()
 icon = gtk.status_icon_new_from_file(icon_path("bzr-icon-64.png"))
