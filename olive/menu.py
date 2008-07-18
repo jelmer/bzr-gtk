@@ -180,6 +180,8 @@ class OliveMenu:
         
         wt, path = WorkingTree.open_containing(os.path.join(directory, filename))
         wt.add([path])
+        
+        self.app.refresh_right()
     
     @show_bzr_error
     def annotate(self, action):
