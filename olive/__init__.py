@@ -60,15 +60,18 @@ from bzrlib.plugins.gtk.revbrowser import RevisionBrowser
 
 def about():
     """ Display the AboutDialog. """
-    from bzrlib.plugins.gtk import __version__
-    from bzrlib.plugins.gtk.olive.guifiles import GLADEFILENAME
-
-    # Load AboutDialog description
-    dglade = gtk.glade.XML(GLADEFILENAME, 'aboutdialog')
-    dialog = dglade.get_widget('aboutdialog')
-
-    # Set version
+    from bzrlib.plugins.gtk import __version__, icon_path
+    
+    iconpath = icon_path() + os.sep
+    
+    dialog = gtk.AboutDialog()
+    dialog.set_name("Olive")
     dialog.set_version(__version__)
+    dialog.set_copyright("Copyright (C) 2006 Szilveszter Farkas (Phanatic)")
+    dialog.set_website("https://launchpad.net/products/olive")
+    dialog.set_website_label("https://launchpad.net/products/olive")
+    dialog.set_icon_from_file(iconpath+"oliveicon2.png")
+    dialog.set_logo(gtk.gdk.pixbuf_new_from_file(iconpath+"oliveicon2.png"))
     dialog.set_authors([ _i18n("Lead Developer:"),
 			 "Szilveszter Farkas <szilveszter.farkas@gmail.com>",
 			 _i18n("Contributors:"),
