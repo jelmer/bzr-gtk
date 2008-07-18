@@ -32,6 +32,8 @@
 
   * List network drives in Olive. (Kevin Light, #244308)
 
+  * Fix progress bar handling. (Jelmer Vernooij)
+
  CHANGES
 
   * Moved notify icon code to separate script. (Jelmer Vernooij)
