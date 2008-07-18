@@ -48,6 +48,8 @@ class BranchWindow(Window):
         self.maxnum      = maxnum
         self.config      = GlobalConfig()
 
+        self._sizes      = {} # window and widget sizes
+
         if self.config.get_user_option('viz-compact-view') == 'yes':
             self.compact_view = True
         else:
@@ -60,7 +62,13 @@ class BranchWindow(Window):
         monitor = screen.get_monitor_geometry(0)
         width = int(monitor.width * 0.75)
         height = int(monitor.height * 0.75)
+        # user-configured window size
+        size = self._load_size('viz-window-size')
+        if size:
+            width, height = size
         self.set_default_size(width, height)
+        self.set_size_request(width/3, height/3)
+        self.connect("size-allocate", self._on_size_allocate, 'viz-window-size')
 
         # FIXME AndyFitz!
         icon = self.render_icon(gtk.STOCK_INDEX, gtk.ICON_SIZE_BUTTON)
@@ -104,13 +112,15 @@ class BranchWindow(Window):
         self.add(vbox)
 
         self.paned = gtk.VPaned()
-        self.paned.pack1(self.construct_top(), resize=True, shrink=False)
-        self.paned.pack2(self.construct_bottom(), resize=False, shrink=True)
+        self.paned.pack1(self.construct_top(), resize=False, shrink=True)
+        self.paned.pack2(self.construct_bottom(), resize=True, shrink=False)
         self.paned.show()
 
-        vbox.pack_start(self.construct_menubar(), expand=False, fill=True)
-        vbox.pack_start(self.construct_navigation(), expand=False, fill=True)
-        
+        nav = self.construct_navigation()
+        menubar = self.construct_menubar()
+        vbox.pack_start(menubar, expand=False, fill=True)
+        vbox.pack_start(nav, expand=False, fill=True)
+
         vbox.pack_start(self.paned, expand=True, fill=True)
         vbox.set_focus_child(self.paned)
 
@@ -161,14 +171,31 @@ class BranchWindow(Window):
 
         view_menu_toolbar = gtk.CheckMenuItem("Show Toolbar")
         view_menu_toolbar.set_active(True)
+        if self.config.get_user_option('viz-toolbar-visible') == 'False':
+            view_menu_toolbar.set_active(False)
+            self.toolbar.hide()
         view_menu_toolbar.connect('toggled', self._toolbar_visibility_changed)
 
         view_menu_compact = gtk.CheckMenuItem("Show Compact Graph")
         view_menu_compact.set_active(self.compact_view)
         view_menu_compact.connect('activate', self._brokenlines_toggled_cb)
 
+        view_menu_diffs = gtk.CheckMenuItem("Show Diffs")
+        view_menu_diffs.set_active(False)
+        if self.config.get_user_option('viz-show-diffs') == 'True':
+            view_menu_diffs.set_active(True)
+        view_menu_diffs.connect('toggled', self._diff_visibility_changed)
+
+        view_menu_wide_diffs = gtk.CheckMenuItem("Wide Diffs")
+        view_menu_wide_diffs.set_active(False)
+        if self.config.get_user_option('viz-wide-diffs') == 'True':
+            view_menu_wide_diffs.set_active(True)
+        view_menu_wide_diffs.connect('toggled', self._diff_placement_changed)
+
         view_menu.add(view_menu_toolbar)
         view_menu.add(view_menu_compact)
+        view_menu.add(view_menu_diffs)
+        view_menu.add(view_menu_wide_diffs)
         view_menu.add(gtk.SeparatorMenuItem())
 
         self.mnu_show_revno_column = gtk.CheckMenuItem("Show Revision _Number Column")
@@ -275,6 +302,15 @@ class BranchWindow(Window):
         align = gtk.Alignment(0.0, 0.0, 1.0, 1.0)
         align.set_padding(5, 0, 0, 0)
         align.add(self.treeview)
+        # user-configured size
+        size = self._load_size('viz-graph-size')
+        if size:
+            width, height = size
+            align.set_size_request(width, height)
+        else:
+            (width, height) = self.get_size()
+            align.set_size_request(width, int(height / 2.5))
+        align.connect('size-allocate', self._on_size_allocate, 'viz-graph-size')
         align.show()
 
         return align
@@ -302,15 +338,37 @@ class BranchWindow(Window):
 
     def construct_bottom(self):
         """Construct the bottom half of the window."""
+        if self.config.get_user_option('viz-wide-diffs') == 'True':
+            self.diff_paned = gtk.VPaned()
+        else:
+            self.diff_paned = gtk.HPaned()
+        (width, height) = self.get_size()
+        self.diff_paned.set_size_request(20, 20) # shrinkable
+
         from bzrlib.plugins.gtk.revisionview import RevisionView
         self.revisionview = RevisionView(branch=self.branch)
-        (width, height) = self.get_size()
-        self.revisionview.set_size_request(width, int(height / 2.5))
+        self.revisionview.set_size_request(width/3, int(height / 2.5))
+        # user-configured size
+        size = self._load_size('viz-revisionview-size')
+        if size:
+            width, height = size
+            self.revisionview.set_size_request(width, height)
+        self.revisionview.connect('size-allocate', self._on_size_allocate, 'viz-revisionview-size')
         self.revisionview.show()
         self.revisionview.set_show_callback(self._show_clicked_cb)
         self.revisionview.connect('notify::revision', self._go_clicked_cb)
         self.treeview.connect('tag-added', lambda w, t, r: self.revisionview.update_tags())
-        return self.revisionview
+        self.diff_paned.pack1(self.revisionview)
+
+        from bzrlib.plugins.gtk.diff import DiffWidget
+        self.diff = DiffWidget()
+        self.diff_paned.pack2(self.diff)
+
+        self.diff_paned.show_all()
+        if self.config.get_user_option('viz-show-diffs') != 'True':
+            self.diff.hide()
+
+        return self.diff_paned
 
     def _tag_selected_cb(self, menuitem, revid):
         self.treeview.set_revision_id(revid)
@@ -367,7 +425,9 @@ class BranchWindow(Window):
 
             self.revisionview.set_revision(revision)
             self.revisionview.set_children(children)
-    
+
+            self.update_diff_panel(revision, parents)
+
     def _tree_revision_activated(self, widget, path, col):
         # TODO: more than one parent
         """Callback for when a treeview row gets activated."""
@@ -439,9 +499,38 @@ class BranchWindow(Window):
 
     def _toolbar_visibility_changed(self, col):
         if col.get_active():
-            self.toolbar.show() 
+            self.toolbar.show()
         else:
             self.toolbar.hide()
+        self.config.set_user_option('viz-toolbar-visible', col.get_active())
+
+    def _make_diff_nonzero_size(self):
+        """make sure the diff isn't zero-width or zero-height"""
+        alloc = self.diff.get_allocation()
+        if (alloc.width < 10) or (alloc.height < 10):
+            width, height = self.get_size()
+            self.revisionview.set_size_request(width/3, int(height / 2.5))
+
+    def _diff_visibility_changed(self, col):
+        """Hide or show the diff panel."""
+        if col.get_active():
+            self.diff.show()
+            self._make_diff_nonzero_size()
+        else:
+            self.diff.hide()
+        self.config.set_user_option('viz-show-diffs', str(col.get_active()))
+        self.update_diff_panel()
+
+    def _diff_placement_changed(self, col):
+        """Toggle the diff panel's position."""
+        self.config.set_user_option('viz-wide-diffs', str(col.get_active()))
+
+        old = self.paned.get_child2()
+        self.paned.remove(old)
+        self.paned.pack2(self.construct_bottom(), resize=True, shrink=False)
+        self._make_diff_nonzero_size()
+
+        self.treeview.emit('revision-selected')
 
     def _show_about_cb(self, w):
         dialog = AboutDialog()
@@ -473,6 +562,34 @@ class BranchWindow(Window):
 
         self.go_menu_tags.show_all()
 
+    def _load_size(self, name):
+        """Read and parse 'name' from self.config.
+        The value is a string, formatted as WIDTHxHEIGHT
+        Returns None, or (width, height)
+        """
+        size = self.config.get_user_option(name)
+        if size:
+            width, height = [int(num) for num in size.split('x')]
+            # avoid writing config every time we start
+            self._sizes[name] = (width, height)
+            return width, height
+        return None
+
+    def _on_size_allocate(self, widget, allocation, name):
+        """When window has been resized, save the new size."""
+        width, height = 0, 0
+        if name in self._sizes:
+            width, height = self._sizes[name]
+
+        size_changed = (width != allocation.width) or \
+                (height != allocation.height)
+
+        if size_changed:
+            width, height = allocation.width, allocation.height
+            self._sizes[name] = (width, height)
+            value = '%sx%s' % (width, height)
+            self.config.set_user_option(name, value)
+
     def show_diff(self, revid=None, parentid=None):
         """Open a new window to show a diff between the given revisions."""
         from bzrlib.plugins.gtk.diff import DiffWindow
@@ -488,4 +605,25 @@ class BranchWindow(Window):
         window.set_diff(description, rev_tree, parent_tree)
         window.show()
 
+    def update_diff_panel(self, revision=None, parents=None):
+        """Show the current revision in the diff panel."""
+        if self.config.get_user_option('viz-show-diffs') != 'True':
+            return
 
+        if not revision: # default to selected row
+            revision = self.treeview.get_revision()
+        if (not revision) or (revision == NULL_REVISION):
+            return
+
+        if not parents: # default to selected row's parents
+            parents  = self.treeview.get_parents()
+        if len(parents) == 0:
+            parent_id = None
+        else:
+            parent_id = parents[0]
+
+        rev_tree    = self.branch.repository.revision_tree(revision.revision_id)
+        parent_tree = self.branch.repository.revision_tree(parent_id)
+
+        self.diff.set_diff(rev_tree, parent_tree)
+        self.diff.show_all()
