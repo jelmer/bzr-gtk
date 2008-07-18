@@ -19,6 +19,7 @@
 import os
 import sys
 import time
+import errno
 
 # gettext support
 import gettext
@@ -240,6 +241,9 @@ class OliveGtk:
             self.hbox_location.reorder_child(self.combobox_drive, 1)
             self.combobox_drive.show()
             self.gen_hard_selector()
+        
+        # Acceptable errors when loading files/folders in the treeviews
+        self.acceptable_errors = (errno.ENOENT, errno.ELOOP)
         
         self._load_left()
 
@@ -1018,7 +1022,7 @@ class OliveGtk:
             try:
                 statinfo = os.stat(self.path + os.sep + item)
             except OSError, e:
-                if e.errno == 40:
+                if e.errno in self.acceptable_errors:
                     continue
                 else:
                     raise
@@ -1085,7 +1089,7 @@ class OliveGtk:
             try:
                 statinfo = os.stat(self.path + os.sep + item)
             except OSError, e:
-                if e.errno == 40:
+                if e.errno in self.acceptable_errors:
                     continue
                 else:
                     raise
@@ -1323,7 +1327,7 @@ class OliveGtk:
                 try:
                     statinfo = os.stat(self.path + os.sep + item)
                 except OSError, e:
-                    if e.errno == 40:
+                    if e.errno in self.acceptable_errors:
                         continue
                     else:
                         raise
@@ -1392,7 +1396,7 @@ class OliveGtk:
                 try:
                     statinfo = os.stat(self.path + os.sep + item)
                 except OSError, e:
-                    if e.errno == 40:
+                    if e.errno in self.acceptable_errors:
                         continue
                     else:
                         raise

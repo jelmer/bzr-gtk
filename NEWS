@@ -34,6 +34,8 @@
 
   * Fix progress bar handling. (Jelmer Vernooij)
 
+  * Fix broken symlink handling. (Jasper Groenewegen)
+
  CHANGES
 
   * Moved notify icon code to separate script. (Jelmer Vernooij)
