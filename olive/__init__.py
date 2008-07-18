@@ -736,9 +736,12 @@ class OliveGtk:
     
     def on_menuitem_file_rename_activate(self, widget):
         """ File/Rename... menu handler. """
-        from rename import OliveRename
-        rename = OliveRename(self.wt, self.wtpath, self.get_selected_right())
-        rename.display()
+        from bzrlib.plugins.gtk.olive.rename import RenameDialog
+        rename = RenameDialog(self.wt, self.wtpath, self.get_selected_right(), self.window)
+        response = rename.run()
+        rename.destroy()
+        if response == gtk.RESPONSE_OK:
+            self.refresh_right()
 
     def on_menuitem_remove_file_activate(self, widget):
         """ Remove (unversion) selected file. """
