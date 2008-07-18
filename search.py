@@ -26,7 +26,7 @@ from bzrlib.plugins.search import index as _mod_index
 
 class SearchDialog(gtk.Dialog):
     """Search dialog."""
-    def __init__(self, branch, parent=None):
+    def __init__(self, index, parent=None):
         gtk.Dialog.__init__(self, title="Search Revisions",
                                   parent=parent,
                                   flags=gtk.DIALOG_MODAL,
@@ -34,9 +34,7 @@ class SearchDialog(gtk.Dialog):
                                            gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
     
         # Get arguments
-        self.branch = branch
-
-        self.index = _mod_index.open_index_url(branch.base)
+        self.index = index
 
         self.searchbar = gtk.HBox()
         self.searchentry = gtk.Entry()

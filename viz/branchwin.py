@@ -477,8 +477,25 @@ class BranchWindow(Window):
         _mod_index.index_url(self.branch.base)
 
     def _branch_search_cb(self, w):
+        from bzrlib.plugins.search import index as _mod_index
         from bzrlib.plugins.gtk.search import SearchDialog
-        dialog = SearchDialog(self.branch)
+        from bzrlib.plugins.search import errors as search_errors
+
+        try:
+            index = _mod_index.open_index_url(self.branch.base)
+        except search_errors.NoSearchIndex:
+            dialog = gtk.MessageDialog(self, type=gtk.MESSAGE_QUESTION, 
+                buttons=gtk.BUTTONS_OK_CANCEL, 
+                message_format="This branch has not been indexed yet. "
+                               "Index now?")
+            if dialog.run() == gtk.RESPONSE_OK:
+                dialog.destroy()
+                index = _mod_index.index_url(self.branch.base)
+            else:
+                dialog.destroy()
+                return
+
+        dialog = SearchDialog(index)
         
         if dialog.run() == gtk.RESPONSE_OK:
             self.set_revision(dialog.get_revision())
