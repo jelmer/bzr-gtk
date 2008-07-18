@@ -53,7 +53,7 @@
 
   * Remove glade from merge dialog. (Jasper Groenewegen)
 
-  * Remove glade from olive about, rename dialogs. (Jasper Groenewegen)
+  * Remove glade from olive about, rename, remove dialogs. (Jasper Groenewegen)
 
 0.94.0    2008-05-04
 
