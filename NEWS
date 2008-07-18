@@ -36,6 +36,8 @@
 
   * Fix broken symlink handling. (Jasper Groenewegen)
 
+  * Fix import in Olive rename dialog. (Kevin Light)
+
  CHANGES
 
   * Moved notify icon code to separate script. (Jelmer Vernooij)
