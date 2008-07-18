@@ -58,14 +58,16 @@ class GtkProgressBar(gtk.ProgressBar,progress._BaseProgressBar):
         pass
 
     def update(self, msg=None, current_cnt=None, total_cnt=None):
-        if current_cnt:
+        if current_cnt is not None:
             self.current = current_cnt
-        if total_cnt:
+        if total_cnt is not None:
             self.total = total_cnt
         if msg is not None:
             self.set_text(msg)
         if None not in (self.current, self.total):
             self.fraction = float(self.current) / self.total
+            if self.fraction < 0.0 or self.fraction > 1.0:
+                raise AssertionError
             self.set_fraction(self.fraction)
         while gtk.events_pending():
             gtk.main_iteration()
