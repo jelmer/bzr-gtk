@@ -71,7 +71,7 @@ class MergeDialog(gtk.Dialog):
         # Add widgets to dialog
         self.vbox.add(self._hbox)
         self._hbox.add(self._label_merge_from)
-        self._hbox.add(self.filechooser)
+        self._hbox.add(self._filechooser)
         self._hbox.set_spacing(5)
         self.action_area.pack_end(self._button_merge)
         
