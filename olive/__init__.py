@@ -783,11 +783,11 @@ class OliveGtk:
     
     def on_menuitem_stats_infos_activate(self, widget):
         """ Statistics/Informations... menu handler. """
-        from info import OliveInfo
+        from bzrlib.plugins.gtk.olive.info import InfoDialog
         if self.remote:
-            info = OliveInfo(self.remote_branch)
+            info = InfoDialog(self.remote_branch)
         else:
-            info = OliveInfo(self.wt.branch)
+            info = InfoDialog(self.wt.branch)
         info.display()
     
     def on_menuitem_stats_log_activate(self, widget):

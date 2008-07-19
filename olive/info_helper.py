@@ -17,6 +17,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import time
+import sys
 
 import bzrlib
 
@@ -28,8 +29,9 @@ from bzrlib import (
     urlutils,
     )
 
+from bzrlib.diff import show_diff_trees
 from bzrlib.missing import find_unmerged
-
+    
 def _repo_rel_url(repo_url, inner_url):
     """Return path with common prefix of repository path removed.
 
@@ -260,7 +262,7 @@ def get_branch_stats(branch):
     if revno > 0:
         firstrev = repository.get_revision(history[0])
         age = int((time.time() - firstrev.timestamp) / 3600 / 24)
-        ret['age'] = age
+        ret['age'] = '%d days'%age
         ret['firstrev'] = osutils.format_date(firstrev.timestamp,
                                               firstrev.timezone)
 
@@ -279,7 +281,7 @@ def get_repository_stats(repository):
     if repository.bzrdir.root_transport.listable():
         c, t = repository._revision_store.total_size(repository.get_transaction())
         ret['revisions'] = c
-        ret['size'] = t
+        ret['size'] = '%d KiB'%t
 
     return ret
 
@@ -298,16 +300,9 @@ def diff_helper(tree, specific_files, external_diff_options,
 
     :param new_revision_spec:  if None, use working tree as new revision, otherwise use the tree for the specified revision.
     """
-    import sys
-    
-    from bzrlib.diff import show_diff_trees
     
     if output == None:
         output = sys.stdout
-    
-    def spec_tree(spec):
-        revision_id = spec.in_store(tree.branch).rev_id
-        return tree.branch.repository.revision_tree(revision_id)
     
     if old_revision_spec is None:
         old_tree = tree.basis_tree()
@@ -322,3 +317,7 @@ def diff_helper(tree, specific_files, external_diff_options,
     return show_diff_trees(old_tree, new_tree, output, specific_files,
                            external_diff_options,
                            old_label=old_label, new_label=new_label)
+
+def spec_tree(spec):
+        revision_id = spec.in_store(tree.branch).rev_id
+        return tree.branch.repository.revision_tree(revision_id)

@@ -14,6 +14,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import os
+
 try:
     import pygtk
     pygtk.require("2.0")
@@ -21,13 +23,11 @@ except:
     pass
 
 import gtk
-import gtk.glade
 
 import bzrlib.errors as errors
 
-from bzrlib.plugins.gtk import _i18n
+from bzrlib.plugins.gtk import _i18n, icon_path
 from bzrlib.plugins.gtk.dialog import error_dialog
-from guifiles import GLADEFILENAME
 
 
 def info(location):
@@ -137,21 +137,16 @@ def info(location):
             ret['repstats'] = info_helper.get_repository_stats(repository)
         finally:
             repository.unlock()
-            return ret
-        return
+        return ret
     except errors.NoRepositoryPresent:
         pass
 
 
-class OliveInfo:
+class InfoDialog(object):
     """ Display Informations window and perform the needed actions. """
+    
     def __init__(self, branch):
         """ Initialize the Informations window. """
-        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_info', 'olive-gtk')
-        
-        # Get the Informations window widget
-        self.window = self.glade.get_widget('window_info')
-        
         # Check if current location is a branch
         self.notbranch = False
         try:
@@ -160,391 +155,113 @@ class OliveInfo:
             self.notbranch = True
             return
         
-        # Dictionary for signal_autoconnect
-        dic = { "on_button_info_close_clicked": self.close,
-                "on_expander_info_location_activate": self.activate,
-                "on_expander_info_related_activate": self.activate,
-                "on_expander_info_format_activate": self.activate,
-                "on_expander_info_locking_activate": self.activate,
-                "on_expander_info_missing_activate": self.activate,
-                "on_expander_info_wtstats_activate": self.activate,
-                "on_expander_info_brstats_activate": self.activate,
-                "on_expander_info_repstats_activate": self.activate }
+        iconpath = icon_path() + os.sep
         
-        # Connect the signals to the handlers
-        self.glade.signal_autoconnect(dic)
+        # Create the window
+        self.window = gtk.Dialog(title="Olive - Information",
+                                  parent = None,
+                                  flags=0,
+                                  buttons=None)
+        self.window.set_icon_list(gtk.gdk.pixbuf_new_from_file(iconpath+"oliveicon2.png"),
+                                  gtk.gdk.pixbuf_new_from_file(iconpath+"olive-gtk.png"))
+        self.window.vbox.set_spacing(3)
+        self.window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
         
+        infokeylist = ( ('location', _i18n("Location"), (
+                            ('lightcoroot', _i18n("Light checkout root")),
+                            ('sharedrepo', _i18n("Shared repository")),
+                            ('repobranch', _i18n("Repository branch")),
+                            ('cobranch', _i18n("Checkout of branch")),
+                            ('repoco', _i18n("Repository checkout")),
+                            ('coroot', _i18n("Checkout root")),
+                            ('branchroot', _i18n("Branch root")),
+                            )),
+                        ('related', _i18n("Related branches"), (
+                            ('parentbranch', _i18n("Parent branch")),
+                            ('publishbranch', _i18n("Publish to branch")),
+                            )),
+                        ('format', _i18n("Format"), (
+                            ('control', _i18n("Control format")),
+                            ('workingtree', _i18n("Working tree format")),
+                            ('branch', _i18n("Branch format")),
+                            ('repository', _i18n("Repository format")),
+                            )),
+                        ('locking', _i18n("Lock status"), (
+                            ('workingtree', _i18n("Working tree lock status")),
+                            ('branch', _i18n("Branch lock status")),
+                            ('repository', _i18n("Repository lock status")),
+                            )),
+                        #('missing', _i18n("Missing revisions"), (
+                        #    ('branch', _i18n("Missing revisions in branch")),
+                        #    ('workingtree', _i18n("Missing revisions in working tree")),
+                        #    )), # Missing is 'temporary' disabled
+                        ('wtstats', _i18n("In the working tree"), (
+                            ('unchanged', _i18n("Unchanged files")),
+                            ('modified', _i18n("Modified files")),
+                            ('added', _i18n("Added files")),
+                            ('removed', _i18n("Removed files")),
+                            ('renamed', _i18n("Renamed files")),
+                            ('unknown', _i18n("Unknown files")),
+                            ('ignored', _i18n("Ignored files")),
+                            ('subdirs', _i18n("Versioned subdirectories")),
+                            )),
+                        ('brstats', _i18n("Branch history"), (
+                            ('revno', _i18n("Revisions in branch")),
+                            ('commiters', _i18n("Number of commiters")),
+                            ('age', _i18n("Age of branch in days")),
+                            ('firstrev', _i18n("Time of first revision")),
+                            ('lastrev', _i18n("Time of last revision")),
+                            )),
+                        ('repstats', _i18n("Revision store"), (
+                            ('revisions', _i18n("Revisions in repository")),
+                            ('size', _i18n("Size of repository in bytes")),
+                            )),
+                        )
+               
         # Generate status output
-        self._generate_info()
-
-    def _generate_info(self):
+        self._generate_info(infokeylist)
+        
+        button_close = gtk.Button(stock=gtk.STOCK_CLOSE)        
+        button_close.connect('clicked', self.close)
+        self.window.action_area.pack_end(button_close)
+        self.window.set_focus(button_close)
+    
+    def _generate_info(self, infokeylist):
         """ Generate 'bzr info' output. """
-        # location
-        if self.ret.has_key('location'):
-            display = False
-            e = self.glade.get_widget('expander_info_location')
-            if self.ret['location'].has_key('lightcoroot'):
-                ll = self.glade.get_widget('label_info_location_lightcoroot_label')
-                l = self.glade.get_widget('label_info_location_lightcoroot')
-                l.set_text(self.ret['location']['lightcoroot'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['location'].has_key('sharedrepo'):
-                ll = self.glade.get_widget('label_info_location_sharedrepo_label')
-                l = self.glade.get_widget('label_info_location_sharedrepo')
-                l.set_text(self.ret['location']['sharedrepo'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['location'].has_key('repobranch'):
-                ll = self.glade.get_widget('label_info_location_repobranch_label')
-                l = self.glade.get_widget('label_info_location_repobranch')
-                l.set_text(self.ret['location']['repobranch'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['location'].has_key('cobranch'):
-                ll = self.glade.get_widget('label_info_location_cobranch_label')
-                l = self.glade.get_widget('label_info_location_cobranch')
-                l.set_text(self.ret['location']['cobranch'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['location'].has_key('repoco'):
-                ll = self.glade.get_widget('label_info_location_repoco_label')
-                l = self.glade.get_widget('label_info_location_repoco')
-                l.set_text(self.ret['location']['repoco'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['location'].has_key('coroot'):
-                ll = self.glade.get_widget('label_info_location_coroot_label')
-                l = self.glade.get_widget('label_info_location_coroot')
-                l.set_text(self.ret['location']['coroot'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['location'].has_key('branchroot'):
-                ll = self.glade.get_widget('label_info_location_branchroot_label')
-                l = self.glade.get_widget('label_info_location_branchroot')
-                l.set_text(self.ret['location']['branchroot'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-        # related
-        if self.ret.has_key('related'):
-            display = False
-            e = self.glade.get_widget('expander_info_related')
-            if self.ret['related'].has_key('parentbranch'):
-                ll = self.glade.get_widget('label_info_related_parentbranch_label')
-                l = self.glade.get_widget('label_info_related_parentbranch')
-                l.set_text(self.ret['related']['parentbranch'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['related'].has_key('publishbranch'):
-                ll = self.glade.get_widget('label_info_related_publishbranch_label')
-                l = self.glade.get_widget('label_info_related_publishbranch')
-                l.set_text(self.ret['related']['publishbranch'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-        # format
-        if self.ret.has_key('format'):
-            display = False
-            e = self.glade.get_widget('expander_info_format')
-            if self.ret['format'].has_key('control'):
-                ll = self.glade.get_widget('label_info_format_control_label')
-                l = self.glade.get_widget('label_info_format_control')
-                l.set_text(self.ret['format']['control'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['format'].has_key('workingtree'):
-                ll = self.glade.get_widget('label_info_format_workingtree_label')
-                l = self.glade.get_widget('label_info_format_workingtree')
-                l.set_text(self.ret['format']['workingtree'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['format'].has_key('branch'):
-                ll = self.glade.get_widget('label_info_format_branch_label')
-                l = self.glade.get_widget('label_info_format_branch')
-                l.set_text(self.ret['format']['branch'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['format'].has_key('repository'):
-                ll = self.glade.get_widget('label_info_format_repository_label')
-                l = self.glade.get_widget('label_info_format_repository')
-                l.set_text(self.ret['format']['repository'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-        # locking
-        if self.ret.has_key('locking'):
-            display = False
-            e = self.glade.get_widget('expander_info_locking')
-            if self.ret['locking'].has_key('workingtree'):
-                ll = self.glade.get_widget('label_info_locking_workingtree_label')
-                l = self.glade.get_widget('label_info_locking_workingtree')
-                l.set_text(self.ret['locking']['workingtree'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['locking'].has_key('branch'):
-                ll = self.glade.get_widget('label_info_locking_branch_label')
-                l = self.glade.get_widget('label_info_locking_branch')
-                l.set_text(self.ret['locking']['branch'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['locking'].has_key('repository'):
-                ll = self.glade.get_widget('label_info_locking_repository_label')
-                l = self.glade.get_widget('label_info_locking_repository')
-                l.set_text(self.ret['locking']['repository'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-        # missing - temporary disabled
-        """
-        if self.ret.has_key('missing'):
-            display = False
-            e = self.glade.get_widget('expander_info_missing')
-            if self.ret['missing'].has_key('branch'):
-                ll = self.glade.get_widget('label_info_missing_branch_label')
-                l = self.glade.get_widget('label_info_missing_branch')
-                l.set_text(self.ret['missing']['branch'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['missing'].has_key('workingtree'):
-                ll = self.glade.get_widget('label_info_missing_workingtree_label')
-                l = self.glade.get_widget('label_info_missing_workingtree')
-                l.set_text(self.ret['missing']['branch'])
-                ll.set_markup('<b>' + ll.get_text() + '</b>')
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-        """
-        # working tree stats
-        if self.ret.has_key('wtstats'):
-            display = False
-            e = self.glade.get_widget('expander_info_wtstats')
-            if self.ret['wtstats'].has_key('unchanged'):
-                ll = self.glade.get_widget('label_info_wtstats_unchanged_label')
-                l = self.glade.get_widget('label_info_wtstats_unchanged')
-                l.set_text(str(self.ret['wtstats']['unchanged']))
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['wtstats'].has_key('modified'):
-                ll = self.glade.get_widget('label_info_wtstats_modified_label')
-                l = self.glade.get_widget('label_info_wtstats_modified')
-                l.set_text(str(self.ret['wtstats']['modified']))
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['wtstats'].has_key('added'):
-                ll = self.glade.get_widget('label_info_wtstats_added_label')
-                l = self.glade.get_widget('label_info_wtstats_added')
-                l.set_text(str(self.ret['wtstats']['added']))
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['wtstats'].has_key('removed'):
-                ll = self.glade.get_widget('label_info_wtstats_removed_label')
-                l = self.glade.get_widget('label_info_wtstats_removed')
-                l.set_text(str(self.ret['wtstats']['removed']))
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['wtstats'].has_key('renamed'):
-                ll = self.glade.get_widget('label_info_wtstats_renamed_label')
-                l = self.glade.get_widget('label_info_wtstats_renamed')
-                l.set_text(str(self.ret['wtstats']['renamed']))
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['wtstats'].has_key('unknown'):
-                ll = self.glade.get_widget('label_info_wtstats_unknown_label')
-                l = self.glade.get_widget('label_info_wtstats_unknown')
-                l.set_text(str(self.ret['wtstats']['unknown']))
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['wtstats'].has_key('ignored'):
-                ll = self.glade.get_widget('label_info_wtstats_ignored_label')
-                l = self.glade.get_widget('label_info_wtstats_ignored')
-                l.set_text(str(self.ret['wtstats']['ignored']))
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['wtstats'].has_key('subdirs'):
-                ll = self.glade.get_widget('label_info_wtstats_subdirs_label')
-                l = self.glade.get_widget('label_info_wtstats_subdirs')
-                l.set_text(str(self.ret['wtstats']['subdirs']))
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-        # branch stats
-        if self.ret.has_key('brstats'):
-            display = False
-            e = self.glade.get_widget('expander_info_brstats')
-            if self.ret['brstats'].has_key('revno'):
-                ll = self.glade.get_widget('label_info_brstats_revno_label')
-                l = self.glade.get_widget('label_info_brstats_revno')
-                l.set_text(str(self.ret['brstats']['revno']))
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['brstats'].has_key('commiters'):
-                ll = self.glade.get_widget('label_info_brstats_commiters_label')
-                l = self.glade.get_widget('label_info_brstats_commiters')
-                l.set_text(str(self.ret['brstats']['commiters']))
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['brstats'].has_key('age'):
-                ll = self.glade.get_widget('label_info_brstats_age_label')
-                l = self.glade.get_widget('label_info_brstats_age')
-                l.set_text('%d days' % self.ret['brstats']['age'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['brstats'].has_key('firstrev'):
-                ll = self.glade.get_widget('label_info_brstats_firstrev_label')
-                l = self.glade.get_widget('label_info_brstats_firstrev')
-                l.set_text(self.ret['brstats']['firstrev'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['brstats'].has_key('lastrev'):
-                ll = self.glade.get_widget('label_info_brstats_lastrev_label')
-                l = self.glade.get_widget('label_info_brstats_lastrev')
-                l.set_text(self.ret['brstats']['lastrev'])
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-        # repository stats
-        if self.ret.has_key('repstats'):
-            display = False
-            e = self.glade.get_widget('expander_info_repstats')
-            if self.ret['repstats'].has_key('revisions'):
-                ll = self.glade.get_widget('label_info_repstats_revisions_label')
-                l = self.glade.get_widget('label_info_repstats_revisions')
-                l.set_text(str(self.ret['repstats']['revisions']))
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
-            if self.ret['repstats'].has_key('size'):
-                ll = self.glade.get_widget('label_info_repstats_size_label')
-                l = self.glade.get_widget('label_info_repstats_size')
-                l.set_text('%d KiB' % (self.ret['repstats']['size'] / 1024))
-                ll.show()
-                l.show()
-                if not display:
-                    e.set_expanded(True)
-                    e.show()
-                    display = True
+        for key, keystring, subkeylist in infokeylist:
+            if self.ret.has_key(key):
+                tablelength = 0
+                for subkey, subkeystring in subkeylist:
+                    if self.ret[key].has_key(subkey):
+                        tablelength += 1
+                if tablelength == 0:
+                    pass
+                else:
+                    exec "exp_%s = gtk.Expander('<b>%s</b>')"%(key, keystring)
+                    eval("exp_%s.set_use_markup(True)"%key)
+                    eval("exp_%s.connect('activate', self.activate)"%key)
+                    
+                    exec "alignment_%s = gtk.Alignment()"%key
+                    eval("alignment_%s.set_padding(0, 0, 24, 0)"%key)
+                    eval("exp_%s.add(alignment_%s)"%(key, key))
+                    
+                    exec "table_%s = gtk.Table(tablelength, 2)"%key
+                    eval("table_%s.set_col_spacings(12)"%key)
+                    eval("alignment_%s.add(table_%s)"%(key, key))
+                    
+                    tablepos = 0
+                    for subkey, subkeystring in subkeylist:
+                        if self.ret[key].has_key(subkey):
+                            exec "%s_%s_label = gtk.Label('%s:')"%(key,subkey, subkeystring)
+                            eval("table_%s.attach(%s_%s_label, 0, 1, %i, %i, gtk.FILL)"%(key, key, subkey, tablepos, tablepos + 1))
+                            eval("%s_%s_label.set_alignment(0, 0.5)"%(key, subkey))
+                            
+                            exec "%s_%s = gtk.Label('%s')"%(key, subkey, str(self.ret[key][subkey]))
+                            eval("table_%s.attach(%s_%s, 1, 2, %i, %i, gtk.FILL)"%(key, key, subkey, tablepos, tablepos + 1))
+                            eval("%s_%s.set_alignment(0, 0.5)"%(key, subkey))
+                            tablepos += 1
+                    eval("exp_%s.set_expanded(True)"%key)
+                    eval("self.window.vbox.pack_start(exp_%s, False, True, 0)"%key)
     
     def activate(self, expander):
         """ Redraw the window. """
@@ -558,7 +275,7 @@ class OliveInfo:
                          _i18n('You can perform this action only in a branch.'))
             self.close()
         else:
-            self.window.show()
-
+            self.window.show_all()
+    
     def close(self, widget=None):
         self.window.destroy()
