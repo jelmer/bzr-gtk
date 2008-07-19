@@ -202,7 +202,6 @@ class OliveGtk:
                 "on_treeview_right_button_press_event": self.on_treeview_right_button_press_event,
                 "on_treeview_right_row_activated": self.on_treeview_right_row_activated,
                 "on_treeview_left_button_press_event": self.on_treeview_left_button_press_event,
-                "on_treeview_left_button_release_event": self.on_treeview_left_button_release_event,
                 "on_treeview_left_row_activated": self.on_treeview_left_row_activated,
                 "on_button_location_up_clicked": self.on_button_location_up_clicked,
                 "on_button_location_jump_clicked": self.on_button_location_jump_clicked,
@@ -822,34 +821,34 @@ class OliveGtk:
             self.refresh_right()
             
     def on_treeview_left_button_press_event(self, widget, event):
-        """ Occurs when somebody right-clicks in the bookmark list. """
-        if event.button == 3:
-            # Don't show context with nothing selected
-            if self.get_selected_left() == None:
-                return
+        """ Occurs when somebody clicks in the bookmark list. """
+        treepathpos = widget.get_path_at_pos(int(event.x), int(event.y))
+        treeselection = widget.get_selection()
+        if treepathpos is not None:
+            treeselection.select_path(treepathpos[0])
+            if event.button == 1:
+                newdir = self.get_selected_left()
+                if newdir == None:
+                    return
 
-            # Create a menu
-            from menu import OliveMenu
-            menu = OliveMenu(path=self.get_path(),
-                             selected=self.get_selected_left(),
-                             app=self)
-            
-            menu.left_context_menu().popup(None, None, None, 0,
-                                           event.time)
+                if self.set_path(newdir):
+                    self.refresh_right()
+            elif event.button == 3:
+                # Don't show context with nothing selected
+                if self.get_selected_left() == None:
+                    return
 
-    def on_treeview_left_button_release_event(self, widget, event):
-        """ Occurs when somebody just clicks a bookmark. """
-        if event.button != 3:
-            # Allow one-click bookmark opening
-            if self.get_selected_left() == None:
-                return
-            
-            newdir = self.get_selected_left()
-            if newdir == None:
-                return
-
-            if self.set_path(newdir):
-                self.refresh_right()
+                # Create a menu
+                from menu import OliveMenu
+                menu = OliveMenu(path=self.get_path(),
+                                 selected=self.get_selected_left(),
+                                 app=self)
+                
+                menu.left_context_menu().popup(None, None, None, 0,
+                                               event.time)
+        else:
+            if treeselection is not None:
+                treeselection.unselect_all()
 
     def on_treeview_left_row_activated(self, treeview, path, view_column):
         """ Occurs when somebody double-clicks or enters an item in the
@@ -863,8 +862,19 @@ class OliveGtk:
             self.refresh_right()
 
     def on_treeview_right_button_press_event(self, widget, event):
-        """ Occurs when somebody right-clicks in the file list. """
-        if event.button == 3:
+        """ Occurs when somebody clicks in the file list. """
+        treepathpos = widget.get_path_at_pos(int(event.x), int(event.y))
+        if event.button == 1:
+            if treepathpos is None and widget.get_selection is not None:
+                treeselection = widget.get_selection()
+                treeselection.unselect_all()
+        elif event.button == 3:
+            treeselection = widget.get_selection()
+            if treepathpos is not None:
+                treeselection.select_path(treepathpos[0])
+            else:
+                if treeselection is not None:
+                    treeselection.unselect_all()
             # Create a menu
             from menu import OliveMenu
             menu = OliveMenu(path=self.get_path(),
@@ -874,6 +884,7 @@ class OliveGtk:
             m_open = menu.ui.get_widget('/context_right/open')
             m_add = menu.ui.get_widget('/context_right/add')
             m_remove = menu.ui.get_widget('/context_right/remove')
+            m_remove_and_delete = menu.ui.get_widget('/context_right/remove_and_delete')
             m_rename = menu.ui.get_widget('/context_right/rename')
             m_revert = menu.ui.get_widget('/context_right/revert')
             m_commit = menu.ui.get_widget('/context_right/commit')
@@ -887,24 +898,40 @@ class OliveGtk:
                     m_open.set_sensitive(False)
                     m_add.set_sensitive(False)
                     m_remove.set_sensitive(False)
+                    m_remove_and_delete.set_sensitive(False)
                     m_rename.set_sensitive(False)
                     m_revert.set_sensitive(False)
                     m_commit.set_sensitive(False)
                     m_annotate.set_sensitive(False)
                     m_diff.set_sensitive(False)
                 else:
-                    m_open.set_sensitive(True)
-                    m_add.set_sensitive(True)
-                    m_remove.set_sensitive(True)
-                    m_rename.set_sensitive(True)
-                    m_revert.set_sensitive(True)
+                    if treepathpos is None:
+                        m_open.set_sensitive(False)
+                        m_add.set_sensitive(False)
+                        m_remove.set_sensitive(False)
+                        m_remove_and_delete.set_sensitive(False)
+                        m_rename.set_sensitive(False)
+                        m_annotate.set_sensitive(False)
+                        m_diff.set_sensitive(False)
+                        m_revert.set_sensitive(False)
+                    else:
+                        m_open.set_sensitive(True)
+                        m_add.set_sensitive(True)
+                        m_remove.set_sensitive(True)
+                        m_remove_and_delete.set_sensitive(True)
+                        m_rename.set_sensitive(True)
+                        m_annotate.set_sensitive(True)
+                        m_diff.set_sensitive(True)
+                        m_revert.set_sensitive(True)
                     m_commit.set_sensitive(True)
-                    m_annotate.set_sensitive(True)
-                    m_diff.set_sensitive(True)
             except bzrerrors.NotBranchError:
-                m_open.set_sensitive(True)
+                if treepathpos is None:
+                    m_open.set_sensitive(False)
+                else:
+                    m_open.set_sensitive(True)
                 m_add.set_sensitive(False)
                 m_remove.set_sensitive(False)
+                m_remove_and_delete.set_sensitive(False)
                 m_rename.set_sensitive(False)
                 m_revert.set_sensitive(False)
                 m_commit.set_sensitive(False)
