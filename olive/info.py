@@ -155,15 +155,13 @@ class InfoDialog(object):
             self.notbranch = True
             return
         
-        iconpath = icon_path() + os.sep
-        
         # Create the window
         self.window = gtk.Dialog(title="Olive - Information",
                                   parent = None,
                                   flags=0,
                                   buttons=None)
-        self.window.set_icon_list(gtk.gdk.pixbuf_new_from_file(iconpath+"oliveicon2.png"),
-                                  gtk.gdk.pixbuf_new_from_file(iconpath+"olive-gtk.png"))
+        self.window.set_icon_list(gtk.gdk.pixbuf_new_from_file(icon_path("oliveicon2.png")),
+                                  gtk.gdk.pixbuf_new_from_file(icon_path("olive-gtk.png")))
         self.window.vbox.set_spacing(3)
         self.window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
         
