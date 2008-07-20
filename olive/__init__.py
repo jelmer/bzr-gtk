@@ -96,8 +96,6 @@ class OliveGtk:
         # Initialize the statusbar
         self.context_id = self.window.statusbar.get_context_id('olive')
         
-		# Get the TreeViews
-        self.treeview_left = self.window.treeview_left
         self.treeview_right = self.window.treeview_right
         
         # Get the drive selector
@@ -1040,7 +1038,7 @@ class OliveGtk:
     
     def get_selected_left(self):
         """ Get the selected bookmark. """
-        treeselection = self.treeview_left.get_selection()
+        treeselection = self.window.treeview_left.get_selection()
         (model, iter) = treeselection.get_selected()
         
         if iter is None:
