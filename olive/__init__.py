@@ -1,5 +1,3 @@
- #!/usr/bin/python
-
 # Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
@@ -660,7 +658,7 @@ class OliveGtk:
     @show_bzr_error
     def on_menuitem_branch_revert_activate(self, widget):
         """ Branch/Revert all changes menu handler. """
-        ret = self.wt.revert([])
+        ret = self.wt.revert(None)
         if ret:
             warning_dialog(_i18n('Conflicts detected'),
                            _i18n('Please have a look at the working tree before continuing.'))
@@ -1512,8 +1510,6 @@ class OliveGtk:
             if sys.platform == 'win32':
                 print "pyWin32 modules needed to run Olive on Win32."
                 sys.exit(1)
-            else:
-                pass
         
         driveletters = []
         for drive in string.ascii_uppercase:
@@ -1757,4 +1753,3 @@ class Preferences:
                 return self._get_default(option)
             except KeyError:
                 return None
- 
