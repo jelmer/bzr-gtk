@@ -75,6 +75,8 @@
 
   * Remove glade from olive about, rename, remove, move, mkdir, add dialogs. (Jasper Groenewegen)
 
+  * Remove glade from olive main window (Jasper Groenewegen)
+  
 0.94.0    2008-05-04
 
  CHANGES
