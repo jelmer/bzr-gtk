@@ -20,9 +20,11 @@ try:
 except:
     pass
 
-import gobject, gtk
-from bzrlib.plugins.search import index as _mod_index
+import gobject
+import gtk
 
+from bzrlib.plugins.search import index as _mod_index
+from bzrlib.plugins.gtk import _i18n
 
 class SearchDialog(gtk.Dialog):
     """Search dialog."""
@@ -32,11 +34,15 @@ class SearchDialog(gtk.Dialog):
                                   flags=gtk.DIALOG_MODAL,
                                   buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
                                            gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
-    
+        pixbuf = self.render_icon(gtk.STOCK_FIND, gtk.ICON_SIZE_MENU)
+        self.set_icon(pixbuf)
+        
         # Get arguments
         self.index = index
 
         self.searchbar = gtk.HBox()
+        searchbar_label = gtk.Label(_i18n("Search for:"))
+        self.searchbar.pack_start(searchbar_label, False, False, 0)
         self.searchentry = gtk.Entry()
         self.searchentry.connect('activate', self._searchentry_activate)
         # TODO: Completion using the bzr-search suggests functionality
@@ -45,11 +51,12 @@ class SearchDialog(gtk.Dialog):
 
         self.results_model = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)
         self.results_treeview = gtk.TreeView(self.results_model)
+        self.results_treeview.connect("row-activated", self._searchresult_row_activated)
 
-        documentname_column = gtk.TreeViewColumn("Document", gtk.CellRendererText(), text=0)
+        documentname_column = gtk.TreeViewColumn(_i18n("Document"), gtk.CellRendererText(), text=0)
         self.results_treeview.append_column(documentname_column)
 
-        summary_column = gtk.TreeViewColumn("Summary", gtk.CellRendererText(), text=1)
+        summary_column = gtk.TreeViewColumn(_i18n("Summary"), gtk.CellRendererText(), text=1)
         self.results_treeview.append_column(summary_column)
 
         results_scrolledwindow = gtk.ScrolledWindow()
@@ -84,3 +91,6 @@ class SearchDialog(gtk.Dialog):
                 self.results_model.append([result.document_name(), result.summary(), revid])
         finally:
             self.index._branch.unlock()
+    
+    def _searchresult_row_activated(self, treeview, path, view_column):
+        self.response(gtk.RESPONSE_OK)
