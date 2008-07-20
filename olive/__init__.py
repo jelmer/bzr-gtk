@@ -884,7 +884,7 @@ class OliveGtk:
        
     def get_selected_fileid(self):
         """ Get the file_id of the selected file. """
-        treeselection = self.treeview_right.get_selection()
+        treeselection = self.window.treeview_right.get_selection()
         (model, iter) = treeselection.get_selected()
         
         if iter is None:
@@ -894,7 +894,7 @@ class OliveGtk:
     
     def get_selected_right(self):
         """ Get the selected filename. """
-        treeselection = self.treeview_right.get_selection()
+        treeselection = self.window.treeview_right.get_selection()
         (model, iter) = treeselection.get_selected()
         
         if iter is None:
@@ -1141,7 +1141,7 @@ class OliveGtk:
             self.image_location_error.destroy()
 
         # Columns should auto-size
-        self.treeview_right.columns_autosize()
+        self.window.treeview_right.columns_autosize()
         
         # Set sensitivity
         self.set_sensitivity()
