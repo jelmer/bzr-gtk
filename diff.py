@@ -73,15 +73,15 @@ class DiffFileView(gtk.ScrolledWindow):
             self.buffer.set_language(gsl)
             self.buffer.set_highlight(True)
 
-            sourceview = gtksourceview.SourceView(self.buffer)
+            self.sourceview = gtksourceview.SourceView(self.buffer)
         else:
             self.buffer = gtk.TextBuffer()
-            sourceview = gtk.TextView(self.buffer)
+            self.sourceview = gtk.TextView(self.buffer)
 
-        sourceview.set_editable(False)
-        sourceview.modify_font(pango.FontDescription("Monospace"))
-        self.add(sourceview)
-        sourceview.show()
+        self.sourceview.set_editable(False)
+        self.sourceview.modify_font(pango.FontDescription("Monospace"))
+        self.add(self.sourceview)
+        self.sourceview.show()
 
     @staticmethod
     def apply_gedit_colors(lang):
@@ -300,12 +300,19 @@ class DiffWidget(gtk.HPaned):
         super(DiffWidget, self).__init__()
 
         # The file hierarchy: a scrollable treeview
+        vbox = gtk.VBox()
+        self.checkbox_wraplines = gtk.CheckButton(_i18n("W_rap long lines"), True)
+        self.checkbox_wraplines.set_active(False) # TO DO: Read from config
+        self.checkbox_wraplines.connect("toggled", self._on_wraplines_toggled)
+        self.checkbox_wraplines.show()
         scrollwin = gtk.ScrolledWindow()
         scrollwin.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
         scrollwin.set_shadow_type(gtk.SHADOW_IN)
-        self.pack1(scrollwin)
         scrollwin.show()
-
+        vbox.pack_start(scrollwin, True, True, 0)
+        vbox.pack_end(self.checkbox_wraplines, False, False, 5)
+        self.pack1(vbox)
+        
         self.model = gtk.TreeStore(str, str)
         self.treeview = gtk.TreeView(self.model)
         self.treeview.set_headers_visible(False)
@@ -405,9 +412,15 @@ class DiffWidget(gtk.HPaned):
             return
         elif specific_files == [ "" ]:
             specific_files = None
-
+        
         self.diff_view.show_diff(specific_files)
-
+    
+    def _on_wraplines_toggled(self, widget):
+        """Callback for when the wrap lines checkbutton is toggled"""
+        if self.checkbox_wraplines.get_active():
+            self.diff_view.sourceview.set_wrap_mode(gtk.WRAP_WORD)
+        else:
+            self.diff_view.sourceview.set_wrap_mode(gtk.WRAP_NONE)
 
 class DiffWindow(Window):
     """Diff window.

@@ -57,15 +57,16 @@ class BranchWindow(Window):
 
         self.set_title(branch.nick + " - revision history")
 
-        # Use three-quarters of the screen by default
-        screen = self.get_screen()
-        monitor = screen.get_monitor_geometry(0)
-        width = int(monitor.width * 0.75)
-        height = int(monitor.height * 0.75)
         # user-configured window size
         size = self._load_size('viz-window-size')
         if size:
             width, height = size
+        else:
+            # Use three-quarters of the screen by default
+            screen = self.get_screen()
+            monitor = screen.get_monitor_geometry(0)
+            width = int(monitor.width * 0.75)
+            height = int(monitor.height * 0.75)
         self.set_default_size(width, height)
         self.set_size_request(width/3, height/3)
         self.connect("size-allocate", self._on_size_allocate, 'viz-window-size')
