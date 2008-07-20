@@ -29,15 +29,14 @@ class OliveGui(gtk.Window):
     def __init__(self, calling_app):
         # Pointer to calling instance for signal connection
         self.signal = calling_app
-        self.iconpath = icon_path()+os.sep
         
         # Initialise window
         gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
         self.set_title(_i18n("Olive - Bazaar GUI"))
-        self.set_icon_list(gtk.gdk.pixbuf_new_from_file(self.iconpath+"oliveicon2.png"),
-                           gtk.gdk.pixbuf_new_from_file(self.iconpath+"olive-gtk.png"),
+        self.set_icon_list(gtk.gdk.pixbuf_new_from_file(icon_path("oliveicon2.png")),
+                           gtk.gdk.pixbuf_new_from_file(icon_path("olive-gtk.png")),
                            # Who has the svg version of the icon? Would be nice to include
-                           #gtk.gdk.pixbuf_new_from_file(self.iconpath+"olive.svg")
+                           #gtk.gdk.pixbuf_new_from_file(icon_path("olive.svg"))
                            )
         self.set_property("width-request", 700)
         self.set_property("height-request", 400)
@@ -178,14 +177,14 @@ class OliveGui(gtk.Window):
         
         self.mb_branch_pull = gtk.ImageMenuItem(_i18n("Pu_ll"))
         pullimage = gtk.Image()
-        pullimage.set_from_file(self.iconpath+"pull16.png")
+        pullimage.set_from_file(icon_path("pull16.png"))
         self.mb_branch_pull.set_image(pullimage)
         self.mb_branch_pull.connect('activate', self.signal.on_menuitem_branch_pull_activate)
         self.mb_branch_menu.append(self.mb_branch_pull)
         
         self.mb_branch_push = gtk.ImageMenuItem(_i18n("Pu_sh"))
         pushimage = gtk.Image()
-        pushimage.set_from_file(self.iconpath+"push16.png")
+        pushimage.set_from_file(icon_path("push16.png"))
         self.mb_branch_push.set_image(pushimage)
         self.mb_branch_push.connect('activate', self.signal.on_menuitem_branch_push_activate)
         self.mb_branch_menu.append(self.mb_branch_push)
@@ -209,7 +208,7 @@ class OliveGui(gtk.Window):
         
         self.mb_branch_commit = gtk.ImageMenuItem(_i18n("_Commit"))
         commitimage = gtk.Image()
-        commitimage.set_from_file(self.iconpath+"commit16.png")
+        commitimage.set_from_file(icon_path("commit16.png"))
         self.mb_branch_commit.set_image(commitimage)
         self.mb_branch_commit.connect('activate', self.signal.on_menuitem_branch_commit_activate)
         self.mb_branch_menu.append(self.mb_branch_commit)
@@ -218,7 +217,7 @@ class OliveGui(gtk.Window):
         
         self.mb_branch_tags = gtk.ImageMenuItem(_i18n("Ta_gs"))
         tagsimage = gtk.Image()
-        tagsimage.set_from_file(self.iconpath+"tag-16.png")
+        tagsimage.set_from_file(icon_path("tag-16.png"))
         self.mb_branch_tags.set_image(tagsimage)
         self.mb_branch_tags.connect('activate', self.signal.on_menuitem_branch_tags_activate)
         self.mb_branch_menu.append(self.mb_branch_tags)
@@ -244,14 +243,14 @@ class OliveGui(gtk.Window):
         
         self.mb_statistics_differences = gtk.ImageMenuItem(_i18n("_Differences"))
         diffimage = gtk.Image()
-        diffimage.set_from_file(self.iconpath+"diff16.png")
+        diffimage.set_from_file(icon_path("diff16.png"))
         self.mb_statistics_differences.set_image(diffimage)
         self.mb_statistics_differences.connect('activate', self.signal.on_menuitem_stats_diff_activate)
         self.mb_statistics_menu.append(self.mb_statistics_differences)
         
         self.mb_statistics_log = gtk.ImageMenuItem(_i18n("_Log"))
         logimage = gtk.Image()
-        logimage.set_from_file(self.iconpath+"log16.png")
+        logimage.set_from_file(icon_path("log16.png"))
         self.mb_statistics_log.set_image(logimage)
         self.mb_statistics_log.connect('activate', self.signal.on_menuitem_stats_log_activate)
         self.mb_statistics_menu.append(self.mb_statistics_log)
@@ -278,43 +277,47 @@ class OliveGui(gtk.Window):
         self.tb = gtk.Toolbar()
         
         self.tb_refresh_icon = gtk.Image()
-        self.tb_refresh_icon.set_from_file(self.iconpath+"refresh.png")
+        self.tb_refresh_icon.set_from_file(icon_path("refresh.png"))
         self.tb_refresh = gtk.ToolButton(self.tb_refresh_icon, _i18n("Refresh"))
         self.tb_refresh.connect('clicked', self.signal.on_menuitem_view_refresh_activate)
         self.tb.add(self.tb_refresh)
         
         self.tb_diff_icon = gtk.Image()
-        self.tb_diff_icon.set_from_file(self.iconpath+"diff.png")
+        self.tb_diff_icon.set_from_file(icon_path("diff.png"))
         self.tb_diff = gtk.ToolButton(self.tb_diff_icon, _i18n("Diff"))
         self.tb_diff.connect('clicked', self.signal.on_menuitem_stats_diff_activate)
         self.tb.add(self.tb_diff)
         
         self.tb_log_icon = gtk.Image()
-        self.tb_log_icon.set_from_file(self.iconpath+"log.png")
+        self.tb_log_icon.set_from_file(icon_path("log.png"))
         self.tb_log = gtk.ToolButton(self.tb_log_icon, _i18n("Log"))
         self.tb_log.connect('clicked', self.signal.on_menuitem_stats_log_activate)
         self.tb.add(self.tb_log)
         
+        self.tb.add(gtk.SeparatorToolItem())
+        
         self.tb_commit_icon = gtk.Image()
-        self.tb_commit_icon.set_from_file(self.iconpath+"commit.png")
+        self.tb_commit_icon.set_from_file(icon_path("commit.png"))
         self.tb_commit = gtk.ToolButton(self.tb_commit_icon, _i18n("Commit"))
         self.tb_commit.connect('clicked', self.signal.on_menuitem_branch_commit_activate)
         self.tb.add(self.tb_commit)
         
+        self.tb.add(gtk.SeparatorToolItem())
+        
         self.tb_pull_icon = gtk.Image()
-        self.tb_pull_icon.set_from_file(self.iconpath+"pull.png")
+        self.tb_pull_icon.set_from_file(icon_path("pull.png"))
         self.tb_pull = gtk.ToolButton(self.tb_pull_icon, _i18n("Pull"))
         self.tb_pull.connect('clicked', self.signal.on_menuitem_branch_pull_activate)
         self.tb.add(self.tb_pull)
         
         self.tb_push_icon = gtk.Image()
-        self.tb_push_icon.set_from_file(self.iconpath+"push.png")
+        self.tb_push_icon.set_from_file(icon_path("push.png"))
         self.tb_push = gtk.ToolButton(self.tb_push_icon, _i18n("Push"))
         self.tb_push.connect('clicked', self.signal.on_menuitem_branch_push_activate)
         self.tb.add(self.tb_push)
         
         self.tb_update_icon = gtk.Image()
-        self.tb_update_icon.set_from_file(self.iconpath+"pull.png")
+        self.tb_update_icon.set_from_file(icon_path("pull.png"))
         self.tb_update = gtk.ToolButton(self.tb_update_icon, _i18n("Update"))
         self.tb_update.connect('clicked', self.signal.on_menuitem_branch_update_activate)
         self.tb.add(self.tb_update)
