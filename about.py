@@ -33,7 +33,7 @@ from bzrlib.plugins.gtk import data_path, icon_path
 def read_license():
     license_paths = [data_path("COPYING"), "/usr/share/common-licenses/GPL-2"]
     for license_file in license_paths:
-        if os.path.exists(license_file):
+        if license_file is not None and os.path.exists(license_file):
             return file(license_file).read()
     # Fall back to just license name if we can't find the file
     return "GPLv2 or later"

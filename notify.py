@@ -74,12 +74,12 @@ class NotifyPopupMenu(gtk.Menu):
             self.zeroconfserver.close()
 
     def show_about(self, item):
-        from about import AboutDialog
+        from bzrlib.plugins.gtk.about import AboutDialog
         dialog = AboutDialog()
         dialog.run()
 
     def show_preferences(self, item):
-        from preferences import PreferencesWindow
+        from bzrlib.plugins.gtk.preferences import PreferencesWindow
         prefs = PreferencesWindow()
         prefs.run()
 
