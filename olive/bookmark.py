@@ -57,6 +57,8 @@ class BookmarkDialog(gtk.Dialog):
         self._entry_title.set_text(self.pref.get_bookmark_title(self.selected))
         self._entry_title.set_flags(gtk.CAN_FOCUS | gtk.HAS_FOCUS)
         
+        self._entry_title.connect('activate', self._on_save_clicked)
+        
         # Create a table and put widgets into it
         self._table = gtk.Table(rows=2, columns=2)
         self._table.attach(self._label_location, 0, 1, 0, 1)
