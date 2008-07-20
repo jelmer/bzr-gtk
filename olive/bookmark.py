@@ -22,7 +22,7 @@ except:
 
 import gtk
 
-from olive import Preferences
+from bzrlib.plugins.gtk.olive import Preferences
 from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import error_dialog
 

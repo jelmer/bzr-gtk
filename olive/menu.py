@@ -261,13 +261,16 @@ class OliveMenu:
             # TODO: how to enter a directory?
             return
         else:
-            fullpath = self.path + os.sep + filename
+            fullpath = os.path.join(self.path, filename)
             if os.path.isdir(fullpath):
                 # selected item is an existant directory
                 # TODO: how to enter a directory?
-                return
+                # Jasper, 21-7-08: Let's just open the folder in a file browser
+                # instead of ignoring the explicit open (when double
+                # clicking suffices for browsing)
+                launch.launch(fullpath)
             else:
-                launch(fullpath) 
+                launch.launch(fullpath) 
 
     def revert(self, action):
         """ Right context menu -> Revert """
@@ -357,7 +360,7 @@ class OliveMenu:
         path = self.selected
 
         if path != None:
-            launch(path)
+            launch.launch(path)
     
     def diff_selected(self, action):
         """ Diff toolbutton -> Selected... """
