@@ -33,7 +33,6 @@ except:
 import gobject
 import gtk
 import gtk.gdk
-import gtk.glade
 
 from bzrlib.branch import Branch
 import bzrlib.errors as bzrerrors
@@ -44,7 +43,6 @@ from bzrlib.workingtree import WorkingTree
 from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import error_dialog, info_dialog, warning_dialog
 from bzrlib.plugins.gtk.errors import show_bzr_error
-from guifiles import GLADEFILENAME
 from bzrlib.plugins.gtk.olive.window import OliveGui
 
 from bzrlib.plugins.gtk.diff import DiffWindow
