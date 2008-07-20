@@ -142,7 +142,7 @@ class OliveGtk:
         # Acceptable errors when loading files/folders in the treeviews
         self.acceptable_errors = (errno.ENOENT, errno.ELOOP)
         
-        self._load_left()
+        self.refresh_left()
 
         # Apply menu state
         self.window.mb_view_showhidden.set_active(self.pref.get_preference('dotted_files', 'bool'))
@@ -852,37 +852,7 @@ class OliveGtk:
         
         self.pref.write()
         self.window.destroy()
-        
-    def _load_left(self):
-        """ Load data into the left panel. (Bookmarks) """
-        # Create TreeStore
-        treestore = gtk.TreeStore(str, str)
-        
-        # Get bookmarks
-        bookmarks = self.pref.get_bookmarks()
-        
-        # Add them to the TreeStore
-        titer = treestore.append(None, [_i18n('Bookmarks'), None])
-
-        # Get titles and sort by title
-        bookmarks = [[self.pref.get_bookmark_title(item), item] for item in bookmarks]
-        bookmarks.sort()
-        for title_item in bookmarks:
-            treestore.append(titer, title_item)
-        
-        # Create the column and add it to the TreeView
-        self.treeview_left.set_model(treestore)
-        tvcolumn_bookmark = gtk.TreeViewColumn(_i18n('Bookmark'))
-        self.treeview_left.append_column(tvcolumn_bookmark)
-        
-        # Set up the cells
-        cell = gtk.CellRendererText()
-        tvcolumn_bookmark.pack_start(cell, True)
-        tvcolumn_bookmark.add_attribute(cell, 'text', 0)
-        
-        # Expand the tree
-        self.treeview_left.expand_all()
-
+    
     def _load_right(self):
         """ Load data into the right panel. (Filelist) """
         # Create ListStore
@@ -1096,9 +1066,9 @@ class OliveGtk:
     def refresh_left(self):
         """ Refresh the bookmark list. """
         
-        # Get TreeStore and clear it
-        treestore = self.treeview_left.get_model()
-        treestore.clear()
+        # Get ListStore and clear it
+        liststore = self.window.bookmarklist
+        liststore.clear()
 
         # Re-read preferences
         self.pref.read()
@@ -1106,20 +1076,14 @@ class OliveGtk:
         # Get bookmarks
         bookmarks = self.pref.get_bookmarks()
 
-        # Add them to the TreeStore
-        titer = treestore.append(None, [_i18n('Bookmarks'), None])
-
         # Get titles and sort by title
-        bookmarks = [[self.pref.get_bookmark_title(item), item] for item in bookmarks]
+        bookmarks = [[self.pref.get_bookmark_title(item), item, gtk.STOCK_DIRECTORY] for item in bookmarks]
         bookmarks.sort()
         for title_item in bookmarks:
-            treestore.append(titer, title_item)
+            liststore.append(title_item)
         
-        # Add the TreeStore to the TreeView
-        self.treeview_left.set_model(treestore)
-
-        # Expand the tree
-        self.treeview_left.expand_all()
+        # Add the ListStore to the TreeView
+        self.window.treeview_left.set_model(liststore)
 
     def refresh_right(self, path=None):
         """ Refresh the file list. """

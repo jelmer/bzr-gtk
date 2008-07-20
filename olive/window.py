@@ -373,14 +373,26 @@ class OliveGui(gtk.Window):
         self.scrolledwindow_left.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
         self.treeview_left = gtk.TreeView()
-        self.treeview_left.set_headers_visible(False)
         self.treeview_left.connect("button-press-event", self.signal.on_treeview_left_button_press_event)
         self.treeview_left.connect("button-release-event", self.signal.on_treeview_left_button_release_event)
         self.treeview_left.connect("row-activated", self.signal.on_treeview_left_row_activated)
         self.scrolledwindow_left.add(self.treeview_left)
 
-        # Move olive/__init__.py _load_left List creation here
-            
+        self.bookmarklist = gtk.ListStore(gobject.TYPE_STRING, 
+                                          gobject.TYPE_STRING, 
+                                          gobject.TYPE_STRING)
+        self.treeview_left.set_model(self.bookmarklist)
+        
+        icon = gtk.CellRendererPixbuf()
+        cell = gtk.CellRendererText()
+        
+        col_bookmark = gtk.TreeViewColumn(_i18n('Bookmarks'))
+        col_bookmark.pack_start(icon, False)
+        col_bookmark.pack_start(cell, False)
+        col_bookmark.set_attributes(icon, stock_id=2)
+        col_bookmark.add_attribute(cell, 'text', 0)
+        self.treeview_left.append_column(col_bookmark)
+    
     def _create_filelist(self):
         """ Creates the file list (a ListStore in a TreeView in a ScrolledWindow)"""
         # Model: [ icon, dir, name, status text, status, size (int), size (human), mtime (int), mtime (local), fileid ]
