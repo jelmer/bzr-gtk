@@ -93,4 +93,4 @@ class SearchDialog(gtk.Dialog):
             self.index._branch.unlock()
     
     def _searchresult_row_activated(self, treeview, path, view_column):
-        self.emit("response", gtk.RESPONSE_OK)
+        self.response(gtk.RESPONSE_OK)
