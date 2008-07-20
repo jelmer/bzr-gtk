@@ -77,6 +77,8 @@
 
   * Remove glade from olive main window (Jasper Groenewegen)
   
+  * Remove glade from olive info dialog (Jasper Groenewegen)
+  
 0.94.0    2008-05-04
 
  CHANGES
