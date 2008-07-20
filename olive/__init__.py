@@ -312,6 +312,7 @@ class OliveGtk:
             if response == gtk.RESPONSE_OK:
                 if revb.selected_revno is not None:
                     self.entry_history.set_text(revb.selected_revno)
+                    self.on_entry_history_revno_activate()
             
             revb.destroy()
     
@@ -342,6 +343,8 @@ class OliveGtk:
             # History Mode activated
             self.entry_history.set_sensitive(True)
             self.button_history.set_sensitive(True)
+            if self.entry_history.get_text() != "":
+                self.on_entry_history_revno_activate()
         else:
             # History Mode deactivated
             self.entry_history.set_sensitive(False)
@@ -351,27 +354,18 @@ class OliveGtk:
             self.on_button_location_jump_clicked(widget)
     
     @show_bzr_error
-    def on_entry_history_revno_key_press_event(self, widget, event):
+    def on_entry_history_revno_activate(self, widget=None):
         """ Key pressed handler for the history entry. """
-        if event.keyval == gtk.gdk.keyval_from_name('Return') or event.keyval == gtk.gdk.keyval_from_name('KP_Enter'):
-            # Return was hit, so we have to load that specific revision
-            # Emulate being remote, so inventory should be used
-            path = self.get_path()
-            if not self.remote:
-                self.remote = True
-                self.remote_branch = self.wt.branch
-            
-            revno = int(self.entry_history.get_text())
-            self.remote_revision = self.remote_branch.get_rev_id(revno)
-            if self.set_path(path, True):
-                self.refresh_right()
-    
-    def on_entry_location_key_press_event(self, widget, event):
-        """ Key pressed handler for the location entry. """
-        if event.keyval == gtk.gdk.keyval_from_name('Return') or event.keyval == gtk.gdk.keyval_from_name('KP_Enter'):
-            # Return was hit, so we have to jump
-            self.on_button_location_jump_clicked(widget)
-    
+        path = self.get_path()
+        if not self.remote:
+            self.remote = True
+            self.remote_branch = self.wt.branch
+        
+        revno = int(self.entry_history.get_text())
+        self.remote_revision = self.remote_branch.get_rev_id(revno)
+        if self.set_path(path, True):
+            self.refresh_right()
+
     def on_menuitem_add_files_activate(self, widget):
         """ Add file(s)... menu handler. """
         from bzrlib.plugins.gtk.olive.add import AddDialog

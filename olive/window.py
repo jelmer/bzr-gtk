@@ -335,7 +335,7 @@ class OliveGui(gtk.Window):
         self.locationbar.pack_start(self.button_location_up, False, False, 0)
         
         self.entry_location = gtk.Entry()
-        self.entry_location.connect("key-press-event", self.signal.on_entry_location_key_press_event)
+        self.entry_location.connect("activate", self.signal.on_button_location_jump_clicked)
         self.locationbar.pack_start(self.entry_location, True, True, 0)
         
         self.image_location_error = gtk.Image()
@@ -356,7 +356,7 @@ class OliveGui(gtk.Window):
         self.entry_history_revno = gtk.Entry()
         self.entry_history_revno.set_property("width-request", 75)
         self.entry_history_revno.set_sensitive(False)
-        self.entry_history_revno.connect("key-press-event", self.signal.on_entry_history_revno_key_press_event)
+        self.entry_history_revno.connect("activate", self.signal.on_entry_history_revno_activate)
         self.locationbar.pack_start(self.entry_history_revno, False, False, 0)
         
         self.button_history_browse = gtk.Button()
