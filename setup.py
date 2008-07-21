@@ -134,7 +134,7 @@ setup(
                                  'icons/sign-ok.png',
                                  'icons/sign.png',
                                  'icons/sign-unknown.png',
-                                 'icons/tag-16.png'
+                                 'icons/tag-16.png',
                                  'icons/bug.png',
                                  'icons/bzr-icon-64.png']),
                 ('share/applications', ['olive-gtk.desktop',
