@@ -134,6 +134,9 @@ class ProgressPanel(gtk.HBox):
         self._stack = _stack
         self.show_all()
         return self
+
+    def tick(self, *args, **kwargs):
+        self.pb.tick(*args, **kwargs)
     
     def update(self, *args, **kwargs):
         self.pb.update(*args, **kwargs)
