@@ -79,7 +79,7 @@ class InstallData(install_data):
         files = []
         if sys.platform[:5] == 'linux':
             cmd = os.popen('pkg-config --variable=pythondir nautilus-python', 'r')
-            res = cmd.readline()
+            res = cmd.readline().strip()
             ret = cmd.close()
             
             if ret is None:
