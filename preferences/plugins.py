@@ -67,7 +67,7 @@ class PluginsPage(gtk.VPaned):
 
     def row_selected(self, tv, path, tvc):
         import bzrlib
-        p = bzrlib.plugin.plugins()[self.model[path][0]]
+        p = bzrlib.plugin.plugins()[self.model[path][0]].module
         from inspect import getdoc
 
         for w in self.table.get_children():

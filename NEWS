@@ -50,6 +50,8 @@
 
   * Fixed overflowing labels in bzr vis.  (Scott Scriven)
 
+  * Fix plugin description in gpreferences. (Jasper Groenewegen, #232191)
+
  CHANGES
 
   * Moved notify icon code to separate script. (Jelmer Vernooij)
