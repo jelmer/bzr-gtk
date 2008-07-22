@@ -198,7 +198,8 @@ class OliveMenu:
         
         branch = wt.branch
         file_id = wt.path2id(wt.relpath(os.path.join(directory, filename)))
-        
+        if file_id is None:
+            raise errors.NotVersionedError(filename)
         window = GAnnotateWindow(all=False, plain=False, parent=self.app)
         window.set_title(os.path.join(directory, filename) + " - Annotate")
         config = GAnnotateConfig(window)
