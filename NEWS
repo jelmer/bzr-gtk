@@ -52,6 +52,8 @@
 
   * Fix plugin description in gpreferences. (Jasper Groenewegen, #232191)
 
+  * Remove question for setting default push location. (Jasper Groenewegen, #151818)
+
  CHANGES
 
   * Moved notify icon code to separate script. (Jelmer Vernooij)

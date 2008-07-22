@@ -94,12 +94,7 @@ class PushDialog(gtk.Dialog):
         """ Push button clicked handler. """
         location = self._combo.get_child().get_text()
         revs = 0
-        if self.branch is not None and self.branch.get_push_location() is None:
-            response = question_dialog(_i18n('Set default push location'),
-                                       _i18n('There is no default push location set.\nSet %r as default now?') % location)
-            if response == gtk.RESPONSE_OK:
-                self.branch.set_push_location(location)
-
+        
         try:
             revs = do_push(self.branch, location=location, overwrite=False)
         except errors.DivergedBranches:
@@ -107,6 +102,9 @@ class PushDialog(gtk.Dialog):
                                        _i18n('You cannot push if branches have diverged.\nOverwrite?'))
             if response == gtk.RESPONSE_YES:
                 revs = do_push(self.branch, location=location, overwrite=True)
+        
+        if self.branch is not None and self.branch.get_push_location() is None:
+            self.branch.set_push_location(location)
         
         self._history.add_entry(location)
         info_dialog(_i18n('Push successful'),
