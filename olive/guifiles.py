@@ -12,50 +12,38 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-"""Glade file name"""
+"""cmenu.ui path"""
 
 import os
 import sys
 
 from bzrlib.plugins.gtk import _i18n
 
-GLADEFILENAMES = ["/usr/share/olive/olive.glade",
-                  "/usr/local/share/olive/olive.glade",
-                  "/opt/share/olive/olive.glade",
-                  "/opt/local/share/olive/olive.glade",
-                  "~/share/olive/olive.glade",
+UIFILENAMES = ["/usr/share/olive/cmenu.ui",
+                  "/usr/local/share/olive/cmenu.ui",
+                  "/opt/share/olive/cmenu.ui",
+                  "/opt/local/share/olive/cmenu.ui",
+                  "~/share/olive/cmenu.ui",
                  ]
 
 # Get the glade file name
 if sys.platform == 'win32':
-    GLADEFILENAMES = [os.path.join(os.path.dirname(sys.executable),
-                                   "share/olive/olive.glade")]
+    UIFILENAMES = [os.path.join(os.path.dirname(sys.executable),
+                                   "share/olive/cmenu.ui")]
 
 dir_ = os.path.split(os.path.dirname(__file__))[0]
 # Check first if we are running from source
-GLADEFILENAMES.insert(0, os.path.join(dir_, "olive.glade"))
+UIFILENAMES.insert(0, os.path.join(dir_, "cmenu.ui"))
 
-GLADEFILENAME = None
+UIFILENAME = None
 
-for path in GLADEFILENAMES:
+for path in UIFILENAMES:
     path = os.path.expanduser(path)
     if os.path.isfile(path):
-        GLADEFILENAME = path
+        UIFILENAME = path
         break
 
-if GLADEFILENAME is None:
+if UIFILENAME is None:
     # Fail
-    print _i18n('Glade file cannot be found.')
+    print _i18n('Context menu file (cmenu.ui) cannot be found.')
     sys.exit(1)
-
-UIFILEDIR = os.path.dirname(GLADEFILENAME)
-
-# Get the cmenu.ui file name
-UIFILENAME = os.path.join(UIFILEDIR, 'cmenu.ui')
-
-if not os.path.isfile(UIFILENAME):
-    # Fail
-    print _i18n('UI description file cannot be found.')
-    sys.exit(1)
-
-
