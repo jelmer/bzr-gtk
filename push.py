@@ -95,10 +95,7 @@ class PushDialog(gtk.Dialog):
         location = self._combo.get_child().get_text()
         revs = 0
         if self.branch is not None and self.branch.get_push_location() is None:
-            response = question_dialog(_i18n('Set default push location'),
-                                       _i18n('There is no default push location set.\nSet %r as default now?') % location)
-            if response == gtk.RESPONSE_OK:
-                self.branch.set_push_location(location)
+            self.branch.set_push_location(location)
 
         try:
             revs = do_push(self.branch, location=location, overwrite=False)
