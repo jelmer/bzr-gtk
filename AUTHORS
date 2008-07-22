@@ -1,6 +1,8 @@
 bzr-gtk is a plugin that is based on a collection of earlier plugins for 
-Bazaar. It is currently maintained by Jelmer Vernooij <jelmer@samba.org> and 
-Szilveszter Farkas <Szilveszter.Farkas@gmail.com>.
+Bazaar. It was originally developed by Jelmer Vernooij <jelmer@samba.org> and 
+Szilveszter Farkas <Szilveszter.Farkas@gmail.com> but is now maintained 
+by a team of developers; see https://launchpad.net/~bzr-gtk/+members for 
+a list
 
 bzrk was written by Scott James Remnant <scott@ubuntu.com>. 
 It's vaguely based on a screenshot of gitk (the equivalent tool for git)
