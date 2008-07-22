@@ -56,6 +56,8 @@
 
   * Automatically change to history mode on selecting a revision from the list. (Jasper Groenewegen, #144963)
 
+  * Check if file is versioned before opening gannotate window from olive. (Jasper Groenewegen, #115358)
+
  CHANGES
 
   * Moved notify icon code to separate script. (Jelmer Vernooij)
