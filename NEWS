@@ -54,6 +54,8 @@
 
   * Remove question for setting default push location. (Jasper Groenewegen, #151818)
 
+  * Automatically change to history mode on selecting a revision from the list. (Jasper Groenewegen, #144963)
+
  CHANGES
 
   * Moved notify icon code to separate script. (Jelmer Vernooij)
