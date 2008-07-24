@@ -211,7 +211,7 @@ class OliveMenu:
             branch.unlock()
     
     @show_bzr_error
-    def remove_file(self, action,delete_on_disk=0):
+    def remove_file(self, action, delete_on_disk=False):
         """ Right context menu -> Remove """
         # Remove only the selected file
         directory = self.path
@@ -239,14 +239,17 @@ class OliveMenu:
         
     def remove_and_delete_file(self, action):
         """ Right context menu -> Remove and delete"""
-        self.remove_file(action,delete_on_disk=1)
+        self.remove_file(action, delete_on_disk=True)
 
     def rename_file(self, action):
         """ Right context menu -> Rename """
-        from rename import OliveRename
-        wt = WorkingTree.open_containing(self.path + os.sep + self.selected)[0]
-        rename = OliveRename(wt, wt.relpath(self.path), self.selected)
-        rename.display()
+        from bzrlib.plugins.gtk.olive.rename import RenameDialog
+        wt = WorkingTree.open_containing(os.path.join(self.path, self.selected))[0]
+        rename = RenameDialog(wt, wt.relpath(self.path), self.selected)
+        response = rename.run()
+        rename.destroy()
+        if response == gtk.RESPONSE_OK:
+            self.app.refresh_right()
     
     def open_file(self, action):
         """ Right context menu -> Open """
@@ -274,7 +277,7 @@ class OliveMenu:
                            _i18n('Please have a look at the working tree before continuing.'))
         else:
             info_dialog(_i18n('Revert successful'),
-                        _i18n('All files reverted to last revision.'))
+                        _i18n('Selected file reverted to last revision.'))
         self.app.refresh_right()       
     
     def commit(self, action):
@@ -361,9 +364,11 @@ class OliveMenu:
     
     def diff_all(self, action):
         """ Diff toolbutton -> All... """
-        from diff import OliveDiff
-        diff = OliveDiff(self.comm)
-        diff.display()
+        wt = WorkingTree.open_containing(self.path)[0]
+        window = DiffWindow(self.app)
+        parent_tree = wt.branch.repository.revision_tree(wt.branch.last_revision())
+        window.set_diff(wt.branch.nick, wt, parent_tree)
+        window.show()
     
     def view_remote(self, action):
         """ Remote context menu -> View contents """
