@@ -128,6 +128,7 @@ setup(
                                  'icons/push.png',
                                  'icons/push16.png',
                                  'icons/refresh.png',
+                                 'icons/olive-gtk.png',
                                  'icons/oliveicon2.png',
                                  'icons/sign-bad.png',
                                  'icons/sign-ok.png',
