@@ -22,6 +22,7 @@ gcommit           GTK+ commit dialog.
 gconflicts        GTK+ conflicts. 
 gdiff             Show differences in working tree in a GTK+ Window. 
 ginit             Initialise a new branch.
+gmerge            GTK+ merge dialog
 gmissing          GTK+ missing revisions dialog. 
 gpreferences      GTK+ preferences dialog. 
 gpush             GTK+ push.
@@ -451,6 +452,29 @@ class cmd_gpreferences(GTKCommand):
         dialog.run()
 
 
+class cmd_gmerge(Command):
+    """ GTK+ merge dialog
+    
+    """
+    takes_args = ["merge_from_path?"]
+    def run(self, merge_from_path=None):
+        from bzrlib import workingtree
+        from bzrlib.plugins.gtk.dialog import error_dialog
+        from bzrlib.plugins.gtk.merge import MergeDialog
+        
+        (wt, path) = workingtree.WorkingTree.open_containing('.')
+        old_tree = wt.branch.repository.revision_tree(wt.branch.last_revision())
+        delta = wt.changes_from(old_tree)
+        if len(delta.added) or len(delta.removed) or len(delta.renamed) or len(delta.modified):
+            error_dialog(_i18n('There are local changes in the branch'),
+                         _i18n('Please commit or revert the changes before merging.'))
+        else:
+            parent_branch_path = wt.branch.get_parent()
+            merge = MergeDialog(wt, path, parent_branch_path)
+            response = merge.run()
+            merge.destroy()
+
+
 class cmd_gmissing(Command):
     """ GTK+ missing revisions dialog.
 
@@ -514,6 +538,7 @@ commands = [
     cmd_gconflicts, 
     cmd_gdiff,
     cmd_ginit,
+    cmd_gmerge,
     cmd_gmissing, 
     cmd_gpreferences, 
     cmd_gpush, 
