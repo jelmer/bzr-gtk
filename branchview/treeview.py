@@ -109,7 +109,8 @@ class TreeView(gtk.VBox):
         gtk.VBox.__init__(self, spacing=0)
 
         loading_msg_widget = ProgressPanel()
-        ui.ui_factory.set_nested_progress_bar_widget(loading_msg_widget.get_progress_bar)
+        if getattr(ui.ui_factory, "set_nested_progress_bar_widget", None) is not None:
+            ui.ui_factory.set_nested_progress_bar_widget(loading_msg_widget.get_progress_bar)
         self.pack_start(loading_msg_widget, expand=False, fill=True)
 
         self.scrolled_window = gtk.ScrolledWindow()
@@ -276,7 +277,7 @@ class TreeView(gtk.VBox):
         """
 
         self.progress_bar = ui.ui_factory.nested_progress_bar()
-        self.progress_bar.update(msg="Loading ancestry graph", total_cnt=5)
+        self.progress_bar.update("Loading ancestry graph", 0, 5)
 
         try:
             if self.compact:
