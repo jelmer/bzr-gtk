@@ -19,7 +19,10 @@ from bzrlib.config import GlobalConfig
 from bzrlib.plugin import load_plugins
 load_plugins()
 
-from bzrlib.plugins.gtk import _i18n, cmd_visualise, cmd_gannotate
+from bzrlib.plugins.gtk import _i18n, cmd_gannotate, start_viz_window
+
+print "Bazaar nautilus module initialized"
+
 
 class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.InfoProvider):
     def __init__(self):
@@ -174,14 +177,13 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
 
         # We only want to continue here if we get a NotBranchError
         try:
-            tree, path = WorkingTree.open_containing(file)
+            branch, path = Branch.open_containing(file)
         except NotBranchError:
             return
 
-        vis = cmd_visualise()
-        vis.run(file)
-
-        return
+        pp = start_viz_window(branch, [branch.last_revision()])
+        pp.show()
+        gtk.main()
 
     def pull_cb(self, menu, vfs_file):
         # We can only cope with local files
@@ -216,8 +218,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
 
         from bzrlib.plugins.gtk.merge import MergeDialog
         dialog = MergeDialog(tree, path)
-        dialog.display()
-        gtk.main()
+        dialog.run()
 
     def get_background_items(self, window, vfs_file):
         items = []
@@ -237,7 +238,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
             items.append(item)
 
             item = nautilus.MenuItem('BzrNautilus::clone',
-                                 'Checkout Bazaar branch',
+                                 'Checkout Bazaar branch ...',
                                  'Checkout Existing Bazaar Branch')
             item.connect('activate', self.clone_cb, vfs_file)
             items.append(item)
@@ -254,31 +255,31 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
             return item,
         else:
             item = nautilus.MenuItem('BzrNautilus::disable',
-                                      'Disable Bazaar Plugin for the Branch',
+                                      'Disable Bazaar Plugin this Branch',
                                       'Disable Bazaar plugin for nautilus')
             item.connect('activate', self.toggle_integration, 'False', vfs_file)
             items.append(item)
 
         item = nautilus.MenuItem('BzrNautilus::log',
-                             'Log',
+                             'History ...',
                              'Show Bazaar history')
         item.connect('activate', self.log_cb, vfs_file)
         items.append(item)
 
         item = nautilus.MenuItem('BzrNautilus::pull',
-                             'Pull',
+                             'Pull ...',
                              'Pull from another branch')
         item.connect('activate', self.pull_cb, vfs_file)
         items.append(item)
 
         item = nautilus.MenuItem('BzrNautilus::merge',
-                             'Merge',
+                             'Merge ...',
                              'Merge from another branch')
         item.connect('activate', self.merge_cb, vfs_file)
         items.append(item)
 
         item = nautilus.MenuItem('BzrNautilus::commit',
-                             'Commit',
+                             'Commit ...',
                              'Commit Changes')
         item.connect('activate', self.commit_cb, vfs_file)
         items.append(item)
@@ -341,13 +342,13 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
                 items.append(item)
             elif wtfiles[path] == 'V':
                 item = nautilus.MenuItem('BzrNautilus::log',
-                                 'Log',
+                                 'History ...',
                                  'List changes')
                 item.connect('activate', self.log_cb, vfs_file)
                 items.append(item)
 
                 item = nautilus.MenuItem('BzrNautilus::diff',
-                                 'Diff',
+                                 'View Changes ...',
                                  'Show differences')
                 item.connect('activate', self.diff_cb, vfs_file)
                 items.append(item)
@@ -359,13 +360,13 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
                 items.append(item)
 
                 item = nautilus.MenuItem('BzrNautilus::annotate',
-                             'Annotate',
+                             'Annotate ...',
                              'Annotate File Data')
                 item.connect('activate', self.annotate_cb, vfs_file)
                 items.append(item)
 
                 item = nautilus.MenuItem('BzrNautilus::commit',
-                             'Commit',
+                             'Commit ...',
                              'Commit Changes')
                 item.connect('activate', self.commit_cb, vfs_file)
                 items.append(item)
