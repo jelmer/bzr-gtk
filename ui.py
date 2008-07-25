@@ -93,6 +93,9 @@ class ProgressBarWindow(gtk.Window):
     def update(self, *args, **kwargs):
         self.pb.update(*args, **kwargs)
 
+    def tick(self, *args, **kwargs):
+        self.pb.tick(*args, **kwargs)
+
     def finished(self):
         self.pb.finished()
         self.hide_all()
