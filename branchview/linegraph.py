@@ -184,7 +184,7 @@ def linegraph(graph, start_revs, maxnum=None, broken_line_length=None,
         update_root_progress(4)
         progress_bar = ui.ui_factory.nested_progress_bar()
         try:
-            progress_bar.update("Organizing edges", len(branch_ids))
+            progress_bar.update("Organizing edges", 0, len(branch_ids))
             for i, branch_id in enumerate(branch_ids):
                 if i % 25 == 0:
                     progress_bar.update(None, i)
