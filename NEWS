@@ -90,6 +90,8 @@
   * Remove glade from olive main window (Jasper Groenewegen)
   
   * Remove glade from olive info dialog (Jasper Groenewegen)
+
+  * Rewrite Olive mouse button event handling (Kevin Light)
   
 0.94.0    2008-05-04
 

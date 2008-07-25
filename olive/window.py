@@ -375,7 +375,6 @@ class OliveGui(gtk.Window):
         self.treeview_left = gtk.TreeView()
         self.treeview_left.set_headers_visible(False)
         self.treeview_left.connect("button-press-event", self.signal.on_treeview_left_button_press_event)
-        self.treeview_left.connect("button-release-event", self.signal.on_treeview_left_button_release_event)
         self.treeview_left.connect("row-activated", self.signal.on_treeview_left_row_activated)
         self.scrolledwindow_left.add(self.treeview_left)
 
