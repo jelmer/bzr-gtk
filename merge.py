@@ -46,7 +46,10 @@ class MergeDialog(gtk.Dialog):
         self.wt = wt
         self.wtpath = wtpath
         
-        directory = os.path.dirname(self.wt.abspath(self.wtpath))
+        if default_branch_path and os.path.isdir(default_branch_path.partition('file://')[2]):
+            directory = default_branch_path.partition('file://')[2]
+        else:
+            directory = os.path.dirname(self.wt.abspath(self.wtpath))
         
         # Create widgets
         self._hbox = gtk.HBox()

@@ -68,6 +68,8 @@
     re-enable signature display. (Jelmer Vernooij)
 
   * Show credits for bzr-gtk in the about dialog. (Jelmer Vernooij)
+  
+  * Add gmerge command line option (Jasper Groenewegen, #124760)
 
  INTERNALS
 
