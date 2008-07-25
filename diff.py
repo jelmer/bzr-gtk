@@ -73,15 +73,15 @@ class DiffFileView(gtk.ScrolledWindow):
             self.buffer.set_language(gsl)
             self.buffer.set_highlight(True)
 
-            sourceview = gtksourceview.SourceView(self.buffer)
+            self.sourceview = gtksourceview.SourceView(self.buffer)
         else:
             self.buffer = gtk.TextBuffer()
-            sourceview = gtk.TextView(self.buffer)
+            self.sourceview = gtk.TextView(self.buffer)
 
-        sourceview.set_editable(False)
-        sourceview.modify_font(pango.FontDescription("Monospace"))
-        self.add(sourceview)
-        sourceview.show()
+        self.sourceview.set_editable(False)
+        self.sourceview.modify_font(pango.FontDescription("Monospace"))
+        self.add(self.sourceview)
+        self.sourceview.show()
 
     @staticmethod
     def apply_gedit_colors(lang):
@@ -305,7 +305,7 @@ class DiffWidget(gtk.HPaned):
         scrollwin.set_shadow_type(gtk.SHADOW_IN)
         self.pack1(scrollwin)
         scrollwin.show()
-
+        
         self.model = gtk.TreeStore(str, str)
         self.treeview = gtk.TreeView(self.model)
         self.treeview.set_headers_visible(False)
@@ -405,9 +405,15 @@ class DiffWidget(gtk.HPaned):
             return
         elif specific_files == [ "" ]:
             specific_files = None
-
+        
         self.diff_view.show_diff(specific_files)
-
+    
+    def _on_wraplines_toggled(self, widget=None, wrap=False):
+        """Callback for when the wrap lines checkbutton is toggled"""
+        if wrap or widget.get_active():
+            self.diff_view.sourceview.set_wrap_mode(gtk.WRAP_WORD)
+        else:
+            self.diff_view.sourceview.set_wrap_mode(gtk.WRAP_NONE)
 
 class DiffWindow(Window):
     """Diff window.
@@ -434,13 +440,33 @@ class DiffWindow(Window):
         self.vbox = gtk.VBox()
         self.add(self.vbox)
         self.vbox.show()
+        self.diff = DiffWidget()
+        self.vbox.pack_end(self.diff, True, True, 0)
+        self.diff.show_all()
+        # Build after DiffWidget to connect signals
+        menubar = self._get_menu_bar()
+        self.vbox.pack_start(menubar, False, False, 0)
         hbox = self._get_button_bar(operations)
         if hbox is not None:
-            self.vbox.pack_start(hbox, expand=False, fill=True)
-        self.diff = DiffWidget()
-        self.vbox.add(self.diff)
-        self.diff.show_all()
-
+            self.vbox.pack_start(hbox, False, True, 0)
+        
+    
+    def _get_menu_bar(self):
+        menubar = gtk.MenuBar()
+        # View menu
+        mb_view = gtk.MenuItem(_i18n("_View"))
+        mb_view_menu = gtk.Menu()
+        mb_view_wrapsource = gtk.CheckMenuItem(_i18n("Wrap _Long Lines"))
+        mb_view_wrapsource.connect('activate', self.diff._on_wraplines_toggled)
+        mb_view_wrapsource.show()
+        mb_view_menu.append(mb_view_wrapsource)
+        mb_view.show()
+        mb_view.set_submenu(mb_view_menu)
+        mb_view.show()
+        menubar.append(mb_view)
+        menubar.show()
+        return menubar
+    
     def _get_button_bar(self, operations):
         """Return a button bar to use.
 

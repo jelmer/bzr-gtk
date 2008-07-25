@@ -20,6 +20,8 @@
   * Made bzr vis remember window and panel sizes.  (Scott Scriven)
 
   * Sort Olive bookmarks by title (Jasper Groenewegen)
+  
+  * Add controls to wrap long lines in gdiff and diff in visualise. (Jasper Groenewegen, #229789)
 
  BUG FIXES
 

@@ -57,15 +57,16 @@ class BranchWindow(Window):
 
         self.set_title(branch.nick + " - revision history")
 
-        # Use three-quarters of the screen by default
-        screen = self.get_screen()
-        monitor = screen.get_monitor_geometry(0)
-        width = int(monitor.width * 0.75)
-        height = int(monitor.height * 0.75)
         # user-configured window size
         size = self._load_size('viz-window-size')
         if size:
             width, height = size
+        else:
+            # Use three-quarters of the screen by default
+            screen = self.get_screen()
+            monitor = screen.get_monitor_geometry(0)
+            width = int(monitor.width * 0.75)
+            height = int(monitor.height * 0.75)
         self.set_default_size(width, height)
         self.set_size_request(width/3, height/3)
         self.connect("size-allocate", self._on_size_allocate, 'viz-window-size')
@@ -125,7 +126,7 @@ class BranchWindow(Window):
         vbox.set_focus_child(self.paned)
 
         vbox.show()
-
+    
     def construct_menubar(self):
         menubar = gtk.MenuBar()
 
@@ -176,23 +177,31 @@ class BranchWindow(Window):
         view_menu_compact = gtk.CheckMenuItem("Show Compact Graph")
         view_menu_compact.set_active(self.compact_view)
         view_menu_compact.connect('activate', self._brokenlines_toggled_cb)
-
+        
         view_menu_diffs = gtk.CheckMenuItem("Show Diffs")
         view_menu_diffs.set_active(False)
         if self.config.get_user_option('viz-show-diffs') == 'True':
             view_menu_diffs.set_active(True)
         view_menu_diffs.connect('toggled', self._diff_visibility_changed)
-
+        
         view_menu_wide_diffs = gtk.CheckMenuItem("Wide Diffs")
         view_menu_wide_diffs.set_active(False)
         if self.config.get_user_option('viz-wide-diffs') == 'True':
             view_menu_wide_diffs.set_active(True)
         view_menu_wide_diffs.connect('toggled', self._diff_placement_changed)
-
+        
+        view_menu_wrap_diffs = gtk.CheckMenuItem("Wrap _Long Lines in Diffs")
+        view_menu_wrap_diffs.set_active(False)
+        if self.config.get_user_option('viz-wrap-diffs') == 'True':
+            view_menu_wrap_diffs.set_active(True)
+        view_menu_wrap_diffs.connect('toggled', self._diff_wrap_changed)
+                
         view_menu.add(view_menu_toolbar)
         view_menu.add(view_menu_compact)
+        view_menu.add(gtk.SeparatorMenuItem())
         view_menu.add(view_menu_diffs)
         view_menu.add(view_menu_wide_diffs)
+        view_menu.add(view_menu_wrap_diffs)
         view_menu.add(gtk.SeparatorMenuItem())
 
         self.mnu_show_revno_column = gtk.CheckMenuItem("Show Revision _Number Column")
@@ -422,7 +431,6 @@ class BranchWindow(Window):
 
             self.revisionview.set_revision(revision)
             self.revisionview.set_children(children)
-
             self.update_diff_panel(revision, parents)
 
     def _tree_revision_activated(self, widget, path, col):
@@ -545,7 +553,12 @@ class BranchWindow(Window):
         self._make_diff_nonzero_size()
 
         self.treeview.emit('revision-selected')
-
+    
+    def _diff_wrap_changed(self, widget):
+        """Toggle word wrap in the diff widget."""
+        self.config.set_user_option('viz-wrap-diffs', widget.get_active())
+        self.diff._on_wraplines_toggled(widget)
+    
     def _show_about_cb(self, w):
         dialog = AboutDialog()
         dialog.connect('response', lambda d,r: d.destroy())
@@ -640,4 +653,6 @@ class BranchWindow(Window):
         parent_tree = self.branch.repository.revision_tree(parent_id)
 
         self.diff.set_diff(rev_tree, parent_tree)
+        if self.config.get_user_option('viz-wrap-diffs') == 'True':
+            self.diff._on_wraplines_toggled(wrap=True)
         self.diff.show_all()
