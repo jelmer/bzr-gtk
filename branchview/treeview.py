@@ -93,7 +93,9 @@ class TreeView(gtk.VBox):
                               (gobject.TYPE_PYOBJECT, gobject.TYPE_PYOBJECT)),
         'tag-added': (gobject.SIGNAL_RUN_FIRST,
                               gobject.TYPE_NONE,
-                              (gobject.TYPE_STRING, gobject.TYPE_STRING))
+                              (gobject.TYPE_STRING, gobject.TYPE_STRING)),
+        'refreshed': (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
+                              ())
     }
 
     def __init__(self, branch, start, maxnum, compact=True):
@@ -124,6 +126,7 @@ class TreeView(gtk.VBox):
         self.iter = None
         self.branch = branch
         self.revision = None
+        self.index = {}
 
         self.start = start
         self.maxnum = maxnum
@@ -178,6 +181,9 @@ class TreeView(gtk.VBox):
     def get_revision(self):
         """Return revision id of currently selected revision, or None."""
         return self.get_property('revision')
+
+    def has_revision_id(self, revision_id):
+        return (revision_id in self.index)
 
     def set_revision(self, revision):
         self.set_property('revision', revision)
@@ -310,6 +316,7 @@ class TreeView(gtk.VBox):
             else:
                 self.set_revision(revision)
 
+            self.emit('refreshed')
             return False
         finally:
             self.progress_bar.finished()
