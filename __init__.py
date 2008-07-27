@@ -234,7 +234,7 @@ def start_viz_window(branch, revisions, limit=None):
     
     :return: The viz window object.
     """
-    from viz import BranchWindow
+    from bzrlib.plugins.gtk.viz import BranchWindow
     return BranchWindow(branch, revisions, limit)
 
 
