@@ -14,6 +14,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import os.path
+import re
+
 try:
     import pygtk
     pygtk.require("2.0")
@@ -24,16 +27,13 @@ import gtk
 import gobject
 import pango
 
-import os.path
-import re
-
 from bzrlib import errors, osutils
 from bzrlib.trace import mutter
 from bzrlib.util import bencode
 
 from bzrlib.plugins.gtk import _i18n
-from dialog import error_dialog, question_dialog
-from errors import show_bzr_error
+from bzrlib.plugins.gtk.dialog import question_dialog
+from bzrlib.plugins.gtk.errors import show_bzr_error
 
 try:
     import dbus
@@ -105,7 +105,6 @@ class CommitDialog(gtk.Dialog):
                                   parent=parent,
                                   flags=0,
                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
-        self._question_dialog = question_dialog
 
         self._wt = wt
         # TODO: Do something with this value, it is used by Olive
@@ -651,9 +650,10 @@ class CommitDialog(gtk.Dialog):
         message = self._get_global_commit_message()
 
         if message == '':
-            response = self._question_dialog(
+            response = question_dialog(
                 _i18n('Commit with an empty message?'),
-                _i18n('You can describe your commit intent in the message.'))
+                _i18n('You can describe your commit intent in the message.'),
+                parent=self)
             if response == gtk.RESPONSE_NO:
                 # Kindly give focus to message area
                 self._global_message_text_view.grab_focus()
@@ -671,9 +671,11 @@ class CommitDialog(gtk.Dialog):
         #       entirely, since there isn't a way for them to add the unknown
         #       files at this point.
         for path in self._wt.unknowns():
-            response = self._question_dialog(
+            response = question_dialog(
                 _i18n("Commit with unknowns?"),
-                _i18n("Unknown files exist in the working tree. Commit anyway?"))
+                _i18n("Unknown files exist in the working tree. Commit anyway?"),
+                parent=self)
+                # Doesn't set a parent for the dialog..
             if response == gtk.RESPONSE_NO:
                 return
             break
@@ -690,10 +692,11 @@ class CommitDialog(gtk.Dialog):
                        specific_files=specific_files,
                        revprops=revprops)
         except errors.PointlessCommit:
-            response = self._question_dialog(
+            response = question_dialog(
                 _i18n('Commit with no changes?'),
                 _i18n('There are no changes in the working tree.'
-                      ' Do you want to commit anyway?'))
+                      ' Do you want to commit anyway?'),
+                parent=self)
             if response == gtk.RESPONSE_YES:
                 rev_id = self._wt.commit(message,
                                allow_pointless=True,

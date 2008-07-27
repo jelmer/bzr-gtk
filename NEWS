@@ -59,6 +59,8 @@
   * Automatically change to history mode on selecting a revision from the list. (Jasper Groenewegen, #144963)
 
   * Check if file is versioned before opening gannotate window from olive. (Jasper Groenewegen, #115358)
+  
+  * Make sure error/info/warning dialogs know their parent window. (Jasper Groenewegen, #252208)
 
  CHANGES
 
