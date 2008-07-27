@@ -22,6 +22,8 @@
   * Sort Olive bookmarks by title (Jasper Groenewegen)
   
   * Add controls to wrap long lines in gdiff and diff in visualise. (Jasper Groenewegen, #229789)
+  
+  * Made merge dialog to give choice between folder and custom location (Jasper Groenewegen)
 
  BUG FIXES
 

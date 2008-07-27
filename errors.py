@@ -16,7 +16,7 @@
 
 import bzrlib.errors as errors
 from bzrlib.plugins.gtk import _i18n
-from dialog import error_dialog
+from dialog import error_dialog, info_dialog, warning_dialog
 
 
 def show_bzr_error(unbound):
@@ -33,6 +33,9 @@ def show_bzr_error(unbound):
         except errors.PointlessCommit:
             error_dialog(_i18n('No changes to commit'),
                          _i18n('Try force commit if you want to commit anyway.'))
+        except errors.PointlessMerge:
+            info_dialog(_i18n('No changes to merge'),
+                         _i18n('Merge location is already fully merged in working tree.'))
         except errors.ConflictsInTree:
             error_dialog(_i18n('Conflicts in tree'),
                          _i18n('You need to resolve the conflicts before committing.'))
