@@ -27,7 +27,7 @@ import gtk
 from bzrlib.branch import Branch
 import bzrlib.errors as errors
 
-from bzrlib.plugins.gtk import _i18n
+from bzrlib.plugins.gtk import _i18n, icon_path
 from bzrlib.plugins.gtk.dialog import error_dialog, info_dialog, warning_dialog
 from bzrlib.plugins.gtk.errors import show_bzr_error
 
@@ -37,11 +37,11 @@ class MergeDialog(gtk.Dialog):
     
     def __init__(self, wt, wtpath, default_branch_path=None, parent=None):
         """ Initialize the Merge dialog. """
-        gtk.Dialog.__init__(self, title="Olive - Merge",
+        gtk.Dialog.__init__(self, title="Merge changes",
                                   parent=parent,
                                   flags=0,
                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
-        
+        self.set_icon_from_file(icon_path("bzr-icon-64.png"))
         # Get arguments
         self.wt = wt
         self.wtpath = wtpath
@@ -69,11 +69,15 @@ class MergeDialog(gtk.Dialog):
         self._hbox.set_spacing(5)
         self.action_area.pack_end(self._button_merge)
         
-        if self.default_branch_path and os.path.isdir(self.default_branch_path.partition('file://')[2]):
+        if self.default_branch_path and os.path.isdir(
+                            self.default_branch_path.partition('file://')[2]):
             self.directory = self.default_branch_path.partition('file://')[2]
             self._combo_source.set_active(0)
+        elif self.default_branch_path:
+            self._combo_source.set_active(1)
         else:
-            self._on_custom_source()
+            # If no default_branch_path give, default to folder source with current folder
+            self._combo_source.set_active(0)
         self.vbox.show_all()
     
     def _on_folder_source(self):
@@ -99,7 +103,9 @@ class MergeDialog(gtk.Dialog):
         """ Merge from a custom source (can be folder, remote, etc), create entry """
         self._source = gtk.HBox()
         self._custom_entry = gtk.Entry()
-        self._custom_entry.set_text(self.default_branch_path)
+        if self.default_branch_path:
+            self._custom_entry.set_text(self.default_branch_path)
+        self._custom_entry.connect("activate", self._on_merge_clicked)
         self._custom_entry.show()
         self._source.pack_start(self._custom_entry, True, True, 0)
         self.vbox.pack_start(self._source, True, True, 5)
