@@ -22,6 +22,7 @@ gcommit           GTK+ commit dialog.
 gconflicts        GTK+ conflicts. 
 gdiff             Show differences in working tree in a GTK+ Window. 
 ginit             Initialise a new branch.
+gloom             GTK+ loom browse dialog
 gmerge            GTK+ merge dialog
 gmissing          GTK+ missing revisions dialog. 
 gpreferences      GTK+ preferences dialog. 
@@ -172,10 +173,23 @@ class cmd_gpush(GTKCommand):
     def run(self, location="."):
         (br, path) = branch.Branch.open_containing(location)
         open_display()
-        from push import PushDialog
+        from bzrlib.plugins.gtk.push import PushDialog
         dialog = PushDialog(br.repository, br.last_revision(), br)
         dialog.run()
 
+
+class cmd_gloom(GTKCommand):
+    """ GTK+ loom.
+    
+    """
+    takes_args = [ "location?" ]
+
+    def run(self, location="."):
+        (br, path) = branch.Branch.open_containing(location)
+        open_display()
+        from bzrlib.plugins.gtk.loom import LoomDialog
+        dialog = LoomDialog(br)
+        dialog.run()
 
 
 class cmd_gdiff(GTKCommand):
@@ -547,6 +561,9 @@ commands = [
     cmd_gtags,
     cmd_visualise
     ]
+
+if getattr(bzrlib.plugins, "loom", None) is not None:
+    commands.append(cmd_gloom)
 
 for cmd in commands:
     register_command(cmd)
