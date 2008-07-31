@@ -25,6 +25,8 @@
   
   * Made merge dialog to give choice between folder and custom location (Jasper Groenewegen)
 
+  * Ad new dialog to browse looms and switch to threads in loom branches. (Jelmer Vernooij)
+
  BUG FIXES
 
   * Replace _() calls by _i18n() calls. (Vincent Ladeuil, #187283)

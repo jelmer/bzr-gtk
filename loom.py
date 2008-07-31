@@ -86,7 +86,7 @@ class LoomDialog(gtk.Dialog):
         hbox.show_all()
         self.vbox.pack_start(hbox)
 
-        # Buttons: combine-thread, export-loom, revert-loom, up-thread
+        # FIXME: Buttons: combine-thread, revert-loom, record
         self.set_default_size(500, 350)
 
     def _on_view_thread(self, treeview):
