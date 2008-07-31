@@ -50,13 +50,37 @@ class LoomDialog(gtk.Dialog):
                 # Doesn't set a parent for the dialog..
             if response == gtk.RESPONSE_NO:
                 return
+            assert self.branch.nick is not None
             loom_branch.loomify(self.branch)
         return super(LoomDialog, self).run()
 
     def _construct(self):
+        self._threads_scroller = gtk.ScrolledWindow()
+        self._threads_scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         self._threads_view = gtk.TreeView()
         self._threads_view.show()
-        self.vbox.pack_start(self._threads_view)
+        self._threads_scroller.add(self._threads_view)
+        self._threads_scroller.set_shadow_type(gtk.SHADOW_IN)
+        self._threads_scroller.show()
+        self.vbox.pack_start(self._threads_scroller)
+
+        self._threads_store = gtk.ListStore(
+                gobject.TYPE_STRING, gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)
+        self._threads_view.set_model(self._threads_store)
+        self._threads_view.append_column(gtk.TreeViewColumn("Name", gtk.CellRendererText(), text=0))
 
         # Buttons: combine-thread, export-loom, revert-loom, up-thread
+        self.set_default_size(200, 350)
 
+        self._load_threads()
+
+    def _load_threads(self):
+        self._threads_store.clear()
+        
+        self.branch.lock_read()
+        try:
+            threads = self.branch.get_loom_state().get_threads()
+            for thread in reversed(threads):
+                self._threads_store.append(thread)
+        finally:
+            self.branch.unlock()
