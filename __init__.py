@@ -567,7 +567,11 @@ commands = [
     cmd_visualise
     ]
 
-if getattr(bzrlib.plugins, "loom", None) is not None:
+try:
+    from bzrlib.plugins import loom
+except ImportError:
+    pass # Loom plugin doesn't appear to be present
+else:
     commands.append(cmd_gloom)
 
 for cmd in commands:
