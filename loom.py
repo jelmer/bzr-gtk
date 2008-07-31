@@ -44,7 +44,6 @@ class LoomDialog(gtk.Dialog):
             self.tree = None
 
         self._construct()
-        self._load_threads()
 
     def run(self):
         try:
@@ -59,6 +58,7 @@ class LoomDialog(gtk.Dialog):
                 return
             assert self.branch.nick is not None
             loom_branch.loomify(self.branch)
+        self._load_threads()
         return super(LoomDialog, self).run()
 
     def _construct(self):
