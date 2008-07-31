@@ -185,10 +185,15 @@ class cmd_gloom(GTKCommand):
     takes_args = [ "location?" ]
 
     def run(self, location="."):
-        (br, path) = branch.Branch.open_containing(location)
+        try:
+            (tree, path) = workingtree.WorkingTree.open_containing(location)
+            br = tree.branch
+        except NoWorkingTree, e:
+            (br, path) = branch.Branch.open_containing(location)
+            tree = None
         open_display()
         from bzrlib.plugins.gtk.loom import LoomDialog
-        dialog = LoomDialog(br)
+        dialog = LoomDialog(br, tree)
         dialog.run()
 
 
