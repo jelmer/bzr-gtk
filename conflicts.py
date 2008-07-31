@@ -26,6 +26,7 @@ import gtk
 import gobject
 
 from bzrlib.config import GlobalConfig
+from bzrlib.plugins.gtk import _i18n
 
 from dialog import error_dialog, warning_dialog
 from errors import show_bzr_error
@@ -45,7 +46,7 @@ class ConflictsDialog(gtk.Dialog):
         # Create the widgets
         self._scrolledwindow = gtk.ScrolledWindow()
         self._treeview = gtk.TreeView()
-        self._label_diff3 = gtk.Label(_("External utility:"))
+        self._label_diff3 = gtk.Label(_i18n("External utility:"))
         self._entry_diff3 = gtk.Entry()
         self._image_diff3 = gtk.Image()
         self._button_diff3 = gtk.Button()
@@ -96,41 +97,42 @@ class ConflictsDialog(gtk.Dialog):
         if len(self.wt.conflicts()) == 0:
             self.model = gtk.ListStore(gobject.TYPE_STRING)
             self._treeview.set_model(self.model)
-            self._treeview.append_column(gtk.TreeViewColumn(_('Conflicts'),
+            self._treeview.append_column(gtk.TreeViewColumn(_i18n('Conflicts'),
                                          gtk.CellRendererText(), text=0))
             self._treeview.set_headers_visible(False)            
-            self.model.append([ _("No conflicts in working tree.") ])
+            self.model.append([ _i18n("No conflicts in working tree.") ])
+            self._button_diff3.set_sensitive(False)
         else:
             self.model = gtk.ListStore(gobject.TYPE_STRING,
                                        gobject.TYPE_STRING,
                                        gobject.TYPE_STRING)
             self._treeview.set_model(self.model)
-            self._treeview.append_column(gtk.TreeViewColumn(_('Path'),
+            self._treeview.append_column(gtk.TreeViewColumn(_i18n('Path'),
                                          gtk.CellRendererText(), text=0))
-            self._treeview.append_column(gtk.TreeViewColumn(_('Type'),
+            self._treeview.append_column(gtk.TreeViewColumn(_i18n('Type'),
                                          gtk.CellRendererText(), text=1))
             self._treeview.set_search_column(0)
             for conflict in self.wt.conflicts():
                 if conflict.typestring == 'path conflict':
-                    t = _("path conflict")
+                    t = _i18n("path conflict")
                 elif conflict.typestring == 'contents conflict':
-                    t = _("contents conflict")
+                    t = _i18n("contents conflict")
                 elif conflict.typestring == 'text conflict':
-                    t = _("text conflict")
+                    t = _i18n("text conflict")
                 elif conflict.typestring == 'duplicate id':
-                    t = _("duplicate id")
+                    t = _i18n("duplicate id")
                 elif conflict.typestring == 'duplicate':
-                    t = _("duplicate")
+                    t = _i18n("duplicate")
                 elif conflict.typestring == 'parent loop':
-                    t = _("parent loop")
+                    t = _i18n("parent loop")
                 elif conflict.typestring == 'unversioned parent':
-                    t = _("unversioned parent")
+                    t = _i18n("unversioned parent")
                 elif conflict.typestring == 'missing parent':
-                    t = _("missing parent")
+                    t = _i18n("missing parent")
                 elif conflict.typestring == 'deleting parent':
-                    t = _("deleting parent")
+                    t = _i18n("deleting parent")
                 else:
-                    t = _("unknown type of conflict")
+                    t = _i18n("unknown type of conflict")
                 
                 self.model.append([ conflict.path, t, conflict.typestring ]) 
     
@@ -159,8 +161,8 @@ class ConflictsDialog(gtk.Dialog):
         self._set_diff3(self._entry_diff3.get_text())
         selected = self._get_selected_file()
         if selected is None:
-            error_dialog(_('No file was selected'),
-                         _('Please select a file from the list.'))
+            error_dialog(_i18n('No file was selected'),
+                         _i18n('Please select a file from the list.'))
             return
         elif self._get_selected_type() == 'text conflict':
             base = self.wt.abspath(selected) + '.BASE'
@@ -170,8 +172,8 @@ class ConflictsDialog(gtk.Dialog):
                 p = subprocess.Popen([ self._entry_diff3.get_text(), base, this, other ])
                 p.wait()
             except OSError, e:
-                warning_dialog(_('Call to external utility failed'), str(e))
+                warning_dialog(_i18n('Call to external utility failed'), str(e))
         else:
-            warning_dialog(_('Cannot resolve conflict'),
-                           _('Only conflicts on the text of files can be resolved with Olive at the moment. Content conflicts, on the structure of the tree, need to be resolved using the command line.'))
+            warning_dialog(_i18n('Cannot resolve conflict'),
+                           _i18n('Only conflicts on the text of files can be resolved with Olive at the moment. Content conflicts, on the structure of the tree, need to be resolved using the command line.'))
             return

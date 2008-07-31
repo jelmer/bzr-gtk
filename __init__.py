@@ -15,14 +15,12 @@
 """Graphical support for Bazaar using GTK.
 
 This plugin includes:
-commit-notify     Start the graphical notifier of commits.
 gannotate         GTK+ annotate. 
 gbranch           GTK+ branching. 
 gcheckout         GTK+ checkout. 
 gcommit           GTK+ commit dialog.
 gconflicts        GTK+ conflicts. 
 gdiff             Show differences in working tree in a GTK+ Window. 
-ghandle-patch     Display and optionally merge a merge directive or patch.
 ginit             Initialise a new branch.
 gmissing          GTK+ missing revisions dialog. 
 gpreferences      GTK+ preferences dialog. 
@@ -37,7 +35,7 @@ import sys
 
 import bzrlib
 
-version_info = (0, 94, 0, 'dev', 0)
+version_info = (0, 95, 0, 'dev', 1)
 
 if version_info[3] == 'final':
     version_string = '%d.%d.%d' % version_info[:3]
@@ -45,7 +43,7 @@ else:
     version_string = '%d.%d.%d%s%d' % version_info
 __version__ = version_string
 
-required_bzrlib = (1, 0)
+required_bzrlib = (1, 3)
 
 def check_bzrlib_version(desired):
     """Check that bzrlib is compatible.
@@ -109,21 +107,33 @@ def data_path():
     return os.path.dirname(__file__)
 
 
+def icon_path(*args):
+    basedirs = [os.path.join(data_path()),
+             "/usr/share/bzr-gtk", 
+             "/usr/local/share/bzr-gtk"]
+    for basedir in basedirs:
+        path = os.path.join(basedir, 'icons', *args)
+        if os.path.exists(path):
+            return path
+    return None
+
+
+def open_display():
+    pygtk = import_pygtk()
+    try:
+        import gtk
+    except RuntimeError, e:
+        if str(e) == "could not open display":
+            raise NoDisplayError
+    set_ui_factory()
+    return gtk
+ 
+
 class GTKCommand(Command):
     """Abstract class providing GTK specific run commands."""
 
-    def open_display(self):
-        pygtk = import_pygtk()
-        try:
-            import gtk
-        except RuntimeError, e:
-            if str(e) == "could not open display":
-                raise NoDisplayError
-        set_ui_factory()
-        return gtk
-
     def run(self):
-        self.open_display()
+        open_display()
         dialog = self.get_gtk_dialog(os.path.abspath('.'))
         dialog.run()
 
@@ -157,7 +167,7 @@ class cmd_gpush(GTKCommand):
 
     def run(self, location="."):
         (br, path) = branch.Branch.open_containing(location)
-        self.open_display()
+        open_display()
         from push import PushDialog
         dialog = PushDialog(br.repository, br.last_revision(), br)
         dialog.run()
@@ -182,12 +192,12 @@ class cmd_gdiff(GTKCommand):
             if revision is not None:
                 if len(revision) == 1:
                     tree1 = wt
-                    revision_id = revision[0].in_history(branch).rev_id
+                    revision_id = revision[0].as_revision_id(tree1.branch)
                     tree2 = branch.repository.revision_tree(revision_id)
                 elif len(revision) == 2:
-                    revision_id_0 = revision[0].in_history(branch).rev_id
+                    revision_id_0 = revision[0].as_revision_id(branch)
                     tree2 = branch.repository.revision_tree(revision_id_0)
-                    revision_id_1 = revision[1].in_history(branch).rev_id
+                    revision_id_1 = revision[1].as_revision_id(branch)
                     tree1 = branch.repository.revision_tree(revision_id_1)
             else:
                 tree1 = wt
@@ -215,13 +225,13 @@ class cmd_gdiff(GTKCommand):
             wt.unlock()
 
 
-def start_viz_window(branch, revision, limit=None):
+def start_viz_window(branch, revisions, limit=None):
     """Start viz on branch with revision revision.
     
     :return: The viz window object.
     """
     from viz import BranchWindow
-    return BranchWindow(branch, revision, limit)
+    return BranchWindow(branch, revisions, limit)
 
 
 class cmd_visualise(Command):
@@ -237,21 +247,22 @@ class cmd_visualise(Command):
         "revision",
         Option('limit', "Maximum number of revisions to display.",
                int, 'count')]
-    takes_args = [ "location?" ]
+    takes_args = [ "locations*" ]
     aliases = [ "visualize", "vis", "viz" ]
 
-    def run(self, location=".", revision=None, limit=None):
+    def run(self, locations_list, revision=None, limit=None):
         set_ui_factory()
-        (br, path) = branch.Branch.open_containing(location)
-        if revision is None:
-            revid = br.last_revision()
-            if revid is None:
-                return
-        else:
-            (revno, revid) = revision[0].in_history(br)
-
+        if locations_list is None:
+            locations_list = ["."]
+        revids = []
+        for location in locations_list:
+            (br, path) = branch.Branch.open_containing(location)
+            if revision is None:
+                revids.append(br.last_revision())
+            else:
+                revids.append(revision[0].as_revision_id(br))
         import gtk
-        pp = start_viz_window(br, revid, limit)
+        pp = start_viz_window(br, revids, limit)
         pp.connect("destroy", lambda w: gtk.main_quit())
         pp.show()
         gtk.main()
@@ -274,7 +285,7 @@ class cmd_gannotate(GTKCommand):
     aliases = ["gblame", "gpraise"]
     
     def run(self, filename, all=False, plain=False, line='1', revision=None):
-        gtk = self.open_display()
+        gtk = open_display()
 
         try:
             line = int(line)
@@ -299,14 +310,13 @@ class cmd_gannotate(GTKCommand):
         if revision is not None:
             if len(revision) != 1:
                 raise BzrCommandError("Only 1 revion may be specified.")
-            revision_id = revision[0].in_history(br).rev_id
+            revision_id = revision[0].as_revision_id(br)
             tree = br.repository.revision_tree(revision_id)
         else:
             revision_id = getattr(tree, 'get_revision_id', lambda: None)()
 
-        window = GAnnotateWindow(all, plain)
+        window = GAnnotateWindow(all, plain, branch=br)
         window.connect("destroy", lambda w: gtk.main_quit())
-        window.set_title(path + " - gannotate")
         config = GAnnotateConfig(window)
         window.show()
         br.lock_read()
@@ -334,7 +344,7 @@ class cmd_gcommit(GTKCommand):
 
     def run(self, filename=None):
         import os
-        self.open_display()
+        open_display()
         from commit import CommitDialog
         from bzrlib.errors import (BzrCommandError,
                                    NotBranchError,
@@ -347,8 +357,8 @@ class cmd_gcommit(GTKCommand):
             br = wt.branch
         except NoWorkingTree, e:
             from dialog import error_dialog
-            error_dialog(_('Directory does not have a working tree'),
-                         _('Operation aborted.'))
+            error_dialog(_i18n('Directory does not have a working tree'),
+                         _i18n('Operation aborted.'))
             return 1 # should this be retval=3?
 
         # It is a good habit to keep things locked for the duration, but it
@@ -371,14 +381,24 @@ class cmd_gstatus(GTKCommand):
     
     aliases = [ "gst" ]
     takes_args = ['PATH?']
-    takes_options = []
+    takes_options = ['revision']
 
-    def run(self, path='.'):
+    def run(self, path='.', revision=None):
         import os
-        gtk = self.open_display()
+        gtk = open_display()
         from status import StatusDialog
         (wt, wt_path) = workingtree.WorkingTree.open_containing(path)
-        status = StatusDialog(wt, wt_path)
+        
+        if revision is not None:
+            try:
+                revision_id = revision[0].as_revision_id(wt.branch)
+            except:
+                from bzrlib.errors import BzrError
+                raise BzrError('Revision %r doesn\'t exist' % revision[0].user_spec )
+        else:
+            revision_id = None
+
+        status = StatusDialog(wt, wt_path, revision_id)
         status.connect("destroy", gtk.main_quit)
         status.run()
 
@@ -389,7 +409,7 @@ class cmd_gsend(GTKCommand):
     """
     def run(self):
         (br, path) = branch.Branch.open_containing(".")
-        gtk = self.open_display()
+        gtk = open_display()
         from bzrlib.plugins.gtk.mergedirective import SendMergeDirectiveDialog
         from StringIO import StringIO
         dialog = SendMergeDirectiveDialog(br)
@@ -411,7 +431,7 @@ class cmd_gconflicts(GTKCommand):
     """
     def run(self):
         (wt, path) = workingtree.WorkingTree.open_containing('.')
-        self.open_display()
+        open_display()
         from bzrlib.plugins.gtk.conflicts import ConflictsDialog
         dialog = ConflictsDialog(wt)
         dialog.run()
@@ -422,7 +442,7 @@ class cmd_gpreferences(GTKCommand):
 
     """
     def run(self):
-        self.open_display()
+        open_display()
         from bzrlib.plugins.gtk.preferences import PreferencesWindow
         dialog = PreferencesWindow()
         dialog.run()
@@ -466,7 +486,7 @@ class cmd_gmissing(Command):
 
 class cmd_ginit(GTKCommand):
     def run(self):
-        self.open_display()
+        open_display()
         from initialize import InitDialog
         dialog = InitDialog(os.path.abspath(os.path.curdir))
         dialog.run()
@@ -476,7 +496,7 @@ class cmd_gtags(GTKCommand):
     def run(self):
         br = branch.Branch.open_containing('.')[0]
         
-        gtk = self.open_display()
+        gtk = open_display()
         from tags import TagsWindow
         window = TagsWindow(br)
         window.show()
@@ -502,80 +522,6 @@ commands = [
 
 for cmd in commands:
     register_command(cmd)
-
-
-class cmd_commit_notify(GTKCommand):
-    """Run the bzr commit notifier.
-
-    This is a background program which will pop up a notification on the users
-    screen when a commit occurs.
-    """
-
-    def run(self):
-        from notify import NotifyPopupMenu
-        gtk = self.open_display()
-        menu = NotifyPopupMenu()
-        icon = gtk.status_icon_new_from_file(os.path.join(data_path(), "bzr-icon-64.png"))
-        icon.connect('popup-menu', menu.display)
-
-        import cgi
-        import dbus
-        import dbus.service
-        import pynotify
-        from bzrlib.bzrdir import BzrDir
-        from bzrlib import errors
-        from bzrlib.osutils import format_date
-        from bzrlib.transport import get_transport
-        if getattr(dbus, 'version', (0,0,0)) >= (0,41,0):
-            import dbus.glib
-        from bzrlib.plugins.dbus import activity
-        bus = dbus.SessionBus()
-        # get the object so we can subscribe to callbacks from it.
-        broadcast_service = bus.get_object(
-            activity.Broadcast.DBUS_NAME,
-            activity.Broadcast.DBUS_PATH)
-
-        def catch_branch(revision_id, urls):
-            # TODO: show all the urls, or perhaps choose the 'best'.
-            url = urls[0]
-            try:
-                if isinstance(revision_id, unicode):
-                    revision_id = revision_id.encode('utf8')
-                transport = get_transport(url)
-                a_dir = BzrDir.open_from_transport(transport)
-                branch = a_dir.open_branch()
-                revno = branch.revision_id_to_revno(revision_id)
-                revision = branch.repository.get_revision(revision_id)
-                summary = 'New revision %d in %s' % (revno, url)
-                body  = 'Committer: %s\n' % revision.committer
-                body += 'Date: %s\n' % format_date(revision.timestamp,
-                    revision.timezone)
-                body += '\n'
-                body += revision.message
-                body = cgi.escape(body)
-                nw = pynotify.Notification(summary, body)
-                def start_viz(notification=None, action=None, data=None):
-                    """Start the viz program."""
-                    pp = start_viz_window(branch, revision_id)
-                    pp.show()
-                def start_branch(notification=None, action=None, data=None):
-                    """Start a Branch dialog"""
-                    from bzrlib.plugins.gtk.branch import BranchDialog
-                    bd = BranchDialog(remote_path=url)
-                    bd.run()
-                nw.add_action("inspect", "Inspect", start_viz, None)
-                nw.add_action("branch", "Branch", start_branch, None)
-                nw.set_timeout(5000)
-                nw.show()
-            except Exception, e:
-                print e
-                raise
-        broadcast_service.connect_to_signal("Revision", catch_branch,
-            dbus_interface=activity.Broadcast.DBUS_INTERFACE)
-        pynotify.init("bzr commit-notify")
-        gtk.main()
-
-register_command(cmd_commit_notify)
 
 
 class cmd_gselftest(GTKCommand):
@@ -674,46 +620,13 @@ class cmd_test_gtk(GTKCommand):
 register_command(cmd_test_gtk)
 
 
-class cmd_ghandle_patch(GTKCommand):
-    """Display a patch or merge directive, possibly merging.
-
-    This is a helper, meant to be launched from other programs like browsers
-    or email clients.  Since these programs often do not allow parameters to
-    be provided, a "handle-patch" script is included.
-    """
-
-    takes_args = ['path']
-
-    def run(self, path):
-        try:
-            from bzrlib.plugins.gtk.diff import (DiffWindow,
-                                                 MergeDirectiveWindow)
-            lines = open(path, 'rb').readlines()
-            lines = [l.replace('\r\n', '\n') for l in lines]
-            try:
-                directive = merge_directive.MergeDirective.from_lines(lines)
-            except errors.NotAMergeDirective:
-                window = DiffWindow()
-                window.set_diff_text(path, lines)
-            else:
-                window = MergeDirectiveWindow(directive, path)
-                window.set_diff_text(path, directive.patch.splitlines(True))
-            window.show()
-            gtk = self.open_display()
-            window.connect("destroy", gtk.main_quit)
-        except Exception, e:
-            from dialog import error_dialog
-            error_dialog('Error', str(e))
-            raise
-        gtk.main()
-
-
-register_command(cmd_ghandle_patch)
-
 
 import gettext
 gettext.install('olive-gtk')
 
+# Let's create a specialized alias to protect '_' from being erased by other
+# uses of '_' as an anonymous variable (think pdb for one).
+_i18n = gettext.gettext
 
 class NoDisplayError(BzrCommandError):
     """gtk could not find a proper display"""

@@ -36,10 +36,14 @@ class Check(Command):
 class InstallData(install_data):
     def run(self):
         self.data_files.extend(self._compile_po_files())
-        # Disable for now - performance issues
-        #self.data_files.extend(self._nautilus_plugin())
+        self.data_files.extend(self._nautilus_plugin())
         install_data.run(self)
-    
+
+        try:
+            subprocess.check_call('gtk-update-icon-cache -f -t /usr/share/icons/hicolor')
+        except:
+            pass
+
     def _compile_po_files(self):
         data_files = []
         
@@ -87,12 +91,12 @@ class InstallData(install_data):
 
 setup(
     name = "bzr-gtk",
-    version = "0.94.0",
+    version = "0.95.0",
     maintainer = "Jelmer Vernooij",
     maintainer_email = "jelmer@samba.org",
     description = "GTK+ Frontends for various Bazaar commands",
-    license = "GNU GPL v2",
-    scripts=['olive-gtk'],
+    license = "GNU GPL v2 or later",
+    scripts=['olive-gtk', 'bzr-handle-patch', 'bzr-notify'],
     package_dir = {
         "bzrlib.plugins.gtk": ".",
         "bzrlib.plugins.gtk.viz": "viz", 
@@ -100,6 +104,7 @@ setup(
         "bzrlib.plugins.gtk.olive": "olive",
         "bzrlib.plugins.gtk.tests": "tests",
         "bzrlib.plugins.gtk.branchview": "branchview",
+        "bzrlib.plugins.gtk.preferences": "preferences",
         },
     packages = [
         "bzrlib.plugins.gtk",
@@ -108,6 +113,7 @@ setup(
         "bzrlib.plugins.gtk.olive",
         "bzrlib.plugins.gtk.tests",
         "bzrlib.plugins.gtk.branchview",
+        "bzrlib.plugins.gtk.preferences",
         ],
     data_files=[('share/olive', ['olive.glade',
                                  'cmenu.ui',
@@ -124,10 +130,24 @@ setup(
                                  'icons/push16.png',
                                  'icons/refresh.png',
                                  'icons/oliveicon2.png']),
+                ('share/bzr-gtk/icons', ['icons/sign-bad.png',
+                                 'icons/sign-ok.png',
+                                 'icons/sign.png',
+                                 'icons/sign-unknown.png',
+                                 'icons/bug.png',
+                                 'icons/bzr-icon-64.png']),
                 ('share/applications', ['olive-gtk.desktop',
                                         'bazaar-properties.desktop',
+                                        'bzr-handle-patch.desktop',
                                         'bzr-notify.desktop']),
-                ('share/pixmaps', ['icons/olive-gtk.png'])
+                ('share/application-registry', ['bzr-gtk.applications']),
+                ('share/pixmaps', ['icons/olive-gtk.png', 'icons/bzr-icon-64.png']),
+                ('share/icons/hicolor/scalable/emblems', 
+                    ['icons/emblem-bzr-added.svg', 
+                        'icons/emblem-bzr-conflict.svg', 
+                        'icons/emblem-bzr-controlled.svg', 
+                        'icons/emblem-bzr-modified.svg',
+                        'icons/emblem-bzr-removed.svg'])
                ],
     cmdclass={'install_data': InstallData,
               'check': Check}

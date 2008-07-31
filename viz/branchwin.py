@@ -13,13 +13,16 @@ import gtk
 import gobject
 import pango
 
-from bzrlib.plugins.gtk.window import Window
+from bzrlib.plugins.gtk import icon_path
+from bzrlib.plugins.gtk.branchview import TreeView, treemodel
 from bzrlib.plugins.gtk.tags import AddTagDialog
 from bzrlib.plugins.gtk.preferences import PreferencesWindow
-from bzrlib.plugins.gtk.branchview import TreeView, treemodel
-from bzrlib.revision import Revision
-from bzrlib.config import BranchConfig
-from bzrlib.config import GlobalConfig
+from bzrlib.plugins.gtk.revisionmenu import RevisionMenu
+from bzrlib.plugins.gtk.window import Window
+
+from bzrlib.config import BranchConfig, GlobalConfig
+from bzrlib.revision import Revision, NULL_REVISION
+from bzrlib.trace import mutter
 
 class BranchWindow(Window):
     """Branch window.
@@ -28,11 +31,11 @@ class BranchWindow(Window):
     for a particular branch.
     """
 
-    def __init__(self, branch, start, maxnum, parent=None):
+    def __init__(self, branch, start_revs, maxnum, parent=None):
         """Create a new BranchWindow.
 
         :param branch: Branch object for branch to show.
-        :param start: Revision id of top revision.
+        :param start_revs: Revision ids of top revisions.
         :param maxnum: Maximum number of revisions to display, 
                        None for no limit.
         """
@@ -41,7 +44,7 @@ class BranchWindow(Window):
         self.set_border_width(0)
 
         self.branch      = branch
-        self.start       = start
+        self.start_revs  = start_revs
         self.maxnum      = maxnum
         self.config      = GlobalConfig()
 
@@ -65,6 +68,7 @@ class BranchWindow(Window):
 
         gtk.accel_map_add_entry("<viz>/Go/Next Revision", gtk.keysyms.Up, gtk.gdk.MOD1_MASK)
         gtk.accel_map_add_entry("<viz>/Go/Previous Revision", gtk.keysyms.Down, gtk.gdk.MOD1_MASK)
+        gtk.accel_map_add_entry("<viz>/View/Refresh", gtk.keysyms.F5, 0)
 
         self.accel_group = gtk.AccelGroup()
         self.add_accel_group(self.accel_group)
@@ -82,6 +86,12 @@ class BranchWindow(Window):
         self.next_rev_action.set_accel_group(self.accel_group)
         self.next_rev_action.connect("activate", self._fwd_clicked_cb)
         self.next_rev_action.connect_accelerator()
+
+        self.refresh_action = gtk.Action("refresh", "_Refresh", "Refresh view", gtk.STOCK_REFRESH)
+        self.refresh_action.set_accel_path("<viz>/View/Refresh")
+        self.refresh_action.set_accel_group(self.accel_group)
+        self.refresh_action.connect("activate", self._refresh_clicked)
+        self.refresh_action.connect_accelerator()
 
         self.construct()
 
@@ -143,6 +153,12 @@ class BranchWindow(Window):
         view_menuitem = gtk.MenuItem("_View")
         view_menuitem.set_submenu(view_menu)
 
+        view_menu_refresh = self.refresh_action.create_menu_item()
+        view_menu_refresh.connect('activate', self._refresh_clicked)
+
+        view_menu.add(view_menu_refresh)
+        view_menu.add(gtk.SeparatorMenuItem())
+
         view_menu_toolbar = gtk.CheckMenuItem("Show Toolbar")
         view_menu_toolbar.set_active(True)
         view_menu_toolbar.connect('toggled', self._toolbar_visibility_changed)
@@ -155,8 +171,16 @@ class BranchWindow(Window):
         view_menu.add(view_menu_compact)
         view_menu.add(gtk.SeparatorMenuItem())
 
-        for (label, name) in [("Revision _Number", "revno"), ("_Date", "date")]:
-            col = gtk.CheckMenuItem("Show " + label + " Column")
+        self.mnu_show_revno_column = gtk.CheckMenuItem("Show Revision _Number Column")
+        self.mnu_show_date_column = gtk.CheckMenuItem("Show _Date Column")
+
+        # Revision numbers are pointless if there are multiple branches
+        if len(self.start_revs) > 1:
+            self.mnu_show_revno_column.set_sensitive(False)
+            self.treeview.set_property('revno-column-visible', False)
+
+        for (col, name) in [(self.mnu_show_revno_column, "revno"), 
+                            (self.mnu_show_date_column, "date")]:
             col.set_active(self.treeview.get_property(name + "-column-visible"))
             col.connect('toggled', self._col_visibility_changed, name)
             view_menu.add(col)
@@ -169,7 +193,10 @@ class BranchWindow(Window):
         go_menu_next = self.next_rev_action.create_menu_item()
         go_menu_prev = self.prev_rev_action.create_menu_item()
 
-        self.go_menu_tags = gtk.MenuItem("_Tags")
+        tag_image = gtk.Image()
+        tag_image.set_from_file(icon_path("tag-16.png"))
+        self.go_menu_tags = gtk.ImageMenuItem("_Tags")
+        self.go_menu_tags.set_image(tag_image)
         self._update_tags()
 
         go_menu.add(go_menu_next)
@@ -177,19 +204,9 @@ class BranchWindow(Window):
         go_menu.add(gtk.SeparatorMenuItem())
         go_menu.add(self.go_menu_tags)
 
-        revision_menu = gtk.Menu()
+        self.revision_menu = RevisionMenu(self.branch.repository, [], self.branch, parent=self)
         revision_menuitem = gtk.MenuItem("_Revision")
-        revision_menuitem.set_submenu(revision_menu)
-
-        revision_menu_diff = gtk.MenuItem("View Changes")
-        revision_menu_diff.connect('activate', 
-                lambda w: self.treeview.show_diff())
-
-        revision_menu_tag = gtk.MenuItem("Tag Revision")
-        revision_menu_tag.connect('activate', self._tag_revision_cb)
-
-        revision_menu.add(revision_menu_tag)
-        revision_menu.add(revision_menu_diff)
+        revision_menuitem.set_submenu(self.revision_menu)
 
         branch_menu = gtk.Menu()
         branch_menuitem = gtk.MenuItem("_Branch")
@@ -197,6 +214,21 @@ class BranchWindow(Window):
 
         branch_menu.add(gtk.MenuItem("Pu_ll Revisions"))
         branch_menu.add(gtk.MenuItem("Pu_sh Revisions"))
+
+        try:
+            from bzrlib.plugins import search
+        except ImportError:
+            mutter("Didn't find search plugin")
+        else:
+            branch_menu.add(gtk.SeparatorMenuItem())
+
+            branch_index_menuitem = gtk.MenuItem("_Index")
+            branch_index_menuitem.connect('activate', self._branch_index_cb)
+            branch_menu.add(branch_index_menuitem)
+
+            branch_search_menuitem = gtk.MenuItem("_Search")
+            branch_search_menuitem.connect('activate', self._branch_search_cb)
+            branch_menu.add(branch_search_menuitem)
 
         help_menu = gtk.Menu()
         help_menuitem = gtk.MenuItem("_Help")
@@ -222,7 +254,7 @@ class BranchWindow(Window):
         """Construct the top-half of the window."""
         # FIXME: Make broken_line_length configurable
 
-        self.treeview = TreeView(self.branch, self.start, self.maxnum, self.compact_view)
+        self.treeview = TreeView(self.branch, self.start_revs, self.maxnum, self.compact_view)
 
         self.treeview.connect('revision-selected',
                 self._treeselection_changed_cb)
@@ -235,6 +267,8 @@ class BranchWindow(Window):
             option = self.config.get_user_option(col + '-column-visible')
             if option is not None:
                 self.treeview.set_property(col + '-column-visible', option == 'True')
+            else:
+                self.treeview.set_property(col + '-column-visible', False)
 
         self.treeview.show()
 
@@ -287,20 +321,23 @@ class BranchWindow(Window):
         parents  = self.treeview.get_parents()
         children = self.treeview.get_children()
 
-        if revision is not None:
+        self.revision_menu.set_revision_ids([revision.revision_id])
+
+        if revision and revision != NULL_REVISION:
             prev_menu = gtk.Menu()
             if len(parents) > 0:
                 self.prev_rev_action.set_sensitive(True)
                 for parent_id in parents:
-                    parent = self.branch.repository.get_revision(parent_id)
-                    try:
-                        str = ' (' + parent.properties['branch-nick'] + ')'
-                    except KeyError:
-                        str = ""
+                    if parent_id and parent_id != NULL_REVISION:
+                        parent = self.branch.repository.get_revision(parent_id)
+                        try:
+                            str = ' (' + parent.properties['branch-nick'] + ')'
+                        except KeyError:
+                            str = ""
 
-                    item = gtk.MenuItem(parent.message.split("\n")[0] + str)
-                    item.connect('activate', self._set_revision_cb, parent_id)
-                    prev_menu.add(item)
+                        item = gtk.MenuItem(parent.message.split("\n")[0] + str)
+                        item.connect('activate', self._set_revision_cb, parent_id)
+                        prev_menu.add(item)
                 prev_menu.show_all()
             else:
                 self.prev_rev_action.set_sensitive(False)
@@ -344,8 +381,7 @@ class BranchWindow(Window):
 
         self.show_diff(revision.revision_id, parent_id)
         self.treeview.grab_focus()
-    
-
+        
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
         self.treeview.back()
@@ -379,21 +415,18 @@ class BranchWindow(Window):
         self.treeview.set_property('compact', self.compact_view)
         self.treeview.refresh()
 
-    def _tag_revision_cb(self, w):
-        try:
-            self.treeview.set_sensitive(False)
-            dialog = AddTagDialog(self.branch.repository, self.treeview.get_revision().revision_id, self.branch)
-            response = dialog.run()
-            if response != gtk.RESPONSE_NONE:
-                dialog.hide()
-            
-                if response == gtk.RESPONSE_OK:
-                    self.treeview.add_tag(dialog.tagname, dialog._revid)
-                
-                dialog.destroy()
+    def _branch_index_cb(self, w):
+        from bzrlib.plugins.search import index as _mod_index
+        _mod_index.index_url(self.branch.base)
 
-        finally:
-            self.treeview.set_sensitive(True)
+    def _branch_search_cb(self, w):
+        from bzrlib.plugins.gtk.search import SearchDialog
+        dialog = SearchDialog(self.branch)
+        
+        if dialog.run() == gtk.RESPONSE_OK:
+            self.set_revision(dialog.get_revision())
+
+        dialog.destroy()
 
     def _about_dialog_cb(self, w):
         from bzrlib.plugins.gtk.about import AboutDialog
@@ -426,7 +459,10 @@ class BranchWindow(Window):
             tags.sort()
             tags.reverse()
             for tag, revid in tags:
-                tag_item = gtk.MenuItem(tag)
+                tag_image = gtk.Image()
+                tag_image.set_from_file(icon_path('tag-16.png'))
+                tag_item = gtk.ImageMenuItem(tag.replace('_', '__'))
+                tag_item.set_image(tag_image)
                 tag_item.connect('activate', self._tag_selected_cb, revid)
                 menu.add(tag_item)
             self.go_menu_tags.set_submenu(menu)

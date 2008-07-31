@@ -27,7 +27,7 @@ import gobject
 from bzrlib import (errors, ui)
 from bzrlib.revision import NULL_REVISION
 
-class RevisionPopupMenu(gtk.Menu):
+class RevisionMenu(gtk.Menu):
 
     __gsignals__ = {
             'tag-added': (
@@ -37,11 +37,18 @@ class RevisionPopupMenu(gtk.Menu):
             )
     }
 
-    def __init__(self, repository, revids, branch=None, wt=None):
-        super(RevisionPopupMenu, self).__init__()
+    def __init__(self, repository, revids, branch=None, wt=None, parent=None):
+        super(RevisionMenu, self).__init__()
+        self._parent = parent
         self.branch = branch
         self.repository = repository
         self.wt = wt
+        self.set_revision_ids(revids)
+
+    def set_revision_ids(self, revids):
+        assert isinstance(revids, list)
+        for c in self.get_children():
+            self.remove(c)
         self.revids = revids
         self.create_items()
 
@@ -50,44 +57,55 @@ class RevisionPopupMenu(gtk.Menu):
             item = gtk.MenuItem("View _Changes")
             item.connect('activate', self.show_diff)
             self.append(item)
-            self.show_all()
 
             item = gtk.MenuItem("_Push")
             item.connect('activate', self.show_push)
             self.append(item)
-            self.show_all()
 
             item = gtk.MenuItem("_Tag Revision")
             item.connect('activate', self.show_tag)
             self.append(item)
-            self.show_all()
 
             item = gtk.MenuItem("_Merge Directive")
             item.connect('activate', self.store_merge_directive)
             # FIXME: self.append(item)
-            self.show_all()
+
+            item = gtk.MenuItem("_Send Merge Directive")
+            item.connect('activate', self.send_merge_directive)
+            self.append(item)
             
             if self.wt:
                 item = gtk.MenuItem("_Revert to this revision")
                 item.connect('activate', self.revert)
                 self.append(item)
-                self.show_all()
+
+        self.show_all()
 
     def store_merge_directive(self, item):
         from bzrlib.plugins.gtk.mergedirective import CreateMergeDirectiveDialog
         window = CreateMergeDirectiveDialog(self.branch, self.revids[0])
         window.show()
 
+    def send_merge_directive(self, item):
+        from bzrlib.plugins.gtk.mergedirective import SendMergeDirectiveDialog
+        from cStringIO import StringIO
+        window = SendMergeDirectiveDialog(self.branch, self.revids[0])
+        if window.run() == gtk.RESPONSE_OK:
+            outf = StringIO()
+            outf.writelines(window.get_merge_directive().to_lines())
+            mail_client = self.branch.get_config().get_mail_client()
+            mail_client.compose_merge_request(window.get_mail_to(), "[MERGE]",
+                                              outf.getvalue())
+        window.destroy()
+
     def show_diff(self, item):
         from bzrlib.plugins.gtk.diff import DiffWindow
-        window = DiffWindow(parent=self.parent)
-        parentids = self.repository.revision_parents(self.revids[0])
-
+        window = DiffWindow(parent=self._parent)
+        parentids = self.repository.get_revision(self.revids[0]).parent_ids
         if len(parentids) == 0:
             parentid = NULL_REVISION
         else:
             parentid = parentids[0]
-
         rev_tree    = self.repository.revision_tree(self.revids[0])
         parent_tree = self.repository.revision_tree(parentid)
         window.set_diff(self.revids[0], rev_tree, parent_tree)

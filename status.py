@@ -21,29 +21,45 @@ except:
     pass
 
 import gtk
+from bzrlib.plugins.gtk import _i18n
+
 
 class StatusDialog(gtk.Dialog):
     """ Display Status window and perform the needed actions. """
-    def __init__(self, wt, wtpath):
+    def __init__(self, wt, wtpath, revision=None):
         """ Initialize the Status window. """
-        super(StatusDialog, self).__init__(flags=gtk.DIALOG_MODAL, buttons=(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        super(StatusDialog, self).__init__(flags=gtk.DIALOG_MODAL, buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
         self.set_title("Working tree changes")
+        self.set_default_response(gtk.RESPONSE_CLOSE)
         self._create()
         self.wt = wt
         self.wtpath = wtpath
+
+        if revision is None:
+            revision = self.wt.branch.last_revision()
+            
         # Set the old working tree
-        self.old_tree = self.wt.branch.repository.revision_tree(self.wt.branch.last_revision())
+        self.old_tree = self.wt.branch.repository.revision_tree(revision)
         # Generate status output
         self._generate_status()
 
     def _create(self):
         self.set_default_size(400, 300)
-        scrolledwindow = gtk.ScrolledWindow()
-        scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        self.set_has_separator(False)
+        sw = gtk.ScrolledWindow()
+        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        sw.set_shadow_type(gtk.SHADOW_IN)
         self.treeview = gtk.TreeView()
-        scrolledwindow.add(self.treeview)
-        self.vbox.pack_start(scrolledwindow, True, True)
+        sw.add(self.treeview)
+        self.vbox.pack_start(sw, True, True)
         self.vbox.show_all()
+
+        # sane border and spacing widths (as recommended by GNOME HIG) 
+        self.set_border_width(5)
+        sw.set_border_width(5)
+        self.vbox.set_spacing(2)
+        self.action_area.set_border_width(5)
+
 
     def row_diff(self, tv, path, tvc):
         file = self.model[path][1]
@@ -54,6 +70,7 @@ class StatusDialog(gtk.Dialog):
         window.set_diff("Working tree changes", self.old_tree, self.wt)
         window.set_file(file)
         window.show()
+
 
     def _generate_status(self):
         """ Generate 'bzr status' output. """
@@ -75,26 +92,26 @@ class StatusDialog(gtk.Dialog):
         
         if len(delta.added):
             changes = True
-            titer = self.model.append(None, [ _('Added'), None ])
+            titer = self.model.append(None, [ _i18n('Added'), None ])
             for path, id, kind in delta.added:
                 self.model.append(titer, [ path, path ])
 
         if len(delta.removed):
             changes = True
-            titer = self.model.append(None, [ _('Removed'), None ])
+            titer = self.model.append(None, [ _i18n('Removed'), None ])
             for path, id, kind in delta.removed:
                 self.model.append(titer, [ path, path ])
 
         if len(delta.renamed):
             changes = True
-            titer = self.model.append(None, [ _('Renamed'), None ])
+            titer = self.model.append(None, [ _i18n('Renamed'), None ])
             for oldpath, newpath, id, kind, text_modified, meta_modified \
                     in delta.renamed:
                 self.model.append(titer, [ oldpath, newpath ])
 
         if len(delta.modified):
             changes = True
-            titer = self.model.append(None, [ _('Modified'), None ])
+            titer = self.model.append(None, [ _i18n('Modified'), None ])
             for path, id, kind, text_modified, meta_modified in delta.modified:
                 self.model.append(titer, [ path, path ])
         
@@ -102,12 +119,12 @@ class StatusDialog(gtk.Dialog):
         for path in self.wt.unknowns():
             changes = True
             if not done_unknown:
-                titer = self.model.append(None, [ _('Unknown'), None ])
+                titer = self.model.append(None, [ _i18n('Unknown'), None ])
                 done_unknown = True
             self.model.append(titer, [ path, path ])
 
         if not changes:
-            self.model.append(None, [ _('No changes.'), None ])
+            self.model.append(None, [ _i18n('No changes.'), None ])
 
         self.treeview.expand_all()
     

@@ -81,8 +81,8 @@ class TestPendingRevisions(tests.TestCaseWithTransport):
         rev_id1 = tree.commit('one')
         tree2 = tree.bzrdir.sprout('tree2').open_workingtree()
         rev_id2 = tree2.commit('two')
-        rev_id3 = tree2.commit('three')
         tree3 = tree2.bzrdir.sprout('tree3').open_workingtree()
+        rev_id3 = tree2.commit('three')
         rev_id4 = tree3.commit('four')
         rev_id5 = tree3.commit('five')
         tree.merge_from_branch(tree2.branch)
@@ -411,22 +411,22 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         text = diff_buffer.get_text(diff_buffer.get_start_iter(),
                                     diff_buffer.get_end_iter()).splitlines(True)
 
-        self.assertEqual("=== removed file 'b'\n", text[0])
+        self.assertEqual("=== modified file 'a'\n", text[0])
         self.assertContainsRe(text[1],
-            r"--- b\t\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d\d\d")
-        self.assertEqual('+++ b\t1970-01-01 00:00:00 +0000\n', text[2])
-        self.assertEqual('@@ -1,1 +0,0 @@\n', text[3])
-        self.assertEqual('-contents of tree/b\n', text[4])
-        self.assertEqual('\n', text[5])
-
-        self.assertEqual("=== modified file 'a'\n", text[6])
-        self.assertContainsRe(text[7],
             r"--- a\t\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d\d\d")
-        self.assertContainsRe(text[8],
+        self.assertContainsRe(text[2],
             r"\+\+\+ a\t\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d\d\d")
-        self.assertEqual('@@ -1,1 +1,1 @@\n', text[9])
-        self.assertEqual('-contents of tree/a\n', text[10])
-        self.assertEqual('+new contents for a\n', text[11])
+        self.assertEqual('@@ -1,1 +1,1 @@\n', text[3])
+        self.assertEqual('-contents of tree/a\n', text[4])
+        self.assertEqual('+new contents for a\n', text[5])
+        self.assertEqual('\n', text[6])
+
+        self.assertEqual("=== removed file 'b'\n", text[7])
+        self.assertContainsRe(text[8],
+            r"--- b\t\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d\d\d")
+        self.assertEqual('+++ b\t1970-01-01 00:00:00 +0000\n', text[9])
+        self.assertEqual('@@ -1,1 +0,0 @@\n', text[10])
+        self.assertEqual('-contents of tree/b\n', text[11])
         self.assertEqual('\n', text[12])
 
         self.assertEqual('Diff for All Files', dlg._diff_label.get_text())
@@ -985,8 +985,7 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
                          ], bencode.bdecode(file_info))
 
     def test_commit_unicode_messages(self):
-        from bzrlib.tests.test_diff import UnicodeFilename
-        self.requireFeature(UnicodeFilename)
+        self.requireFeature(tests.UnicodeFilenameFeature)
 
         tree = self.make_branch_and_tree('tree')
         tree.branch.get_config().set_user_option('per_file_commits', 'true')

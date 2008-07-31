@@ -1,4 +1,84 @@
-0.94.0  UNRELEASED
+0.95.0	UNRELEASED
+
+ UI
+
+  * Added Refresh menu option with F5 keyboard shortcut (Russ Brown)
+
+  * Show progress bars in bzr viz window (Chad Miller, Jelmer Vernooij)
+
+  * Added menu option for indexing branches if bzr-search is present.
+    (Jelmer Vernooij)
+
+  * Add "Send Merge Directive" button in bzr viz. (Jelmer Vernooij)
+
+  * Remove dummy "Edit->Find" option. (Jelmer Vernooij)
+
+ BUG FIXES
+
+  * Replace _() calls by _i18n() calls. (Vincent Ladeuil, #187283)
+  
+  * Fixed adding tags. (Javier Derderian, #228709)
+
+  * Fix history mode button. (Jasper Groenewegen, #144962)
+
+  * Fixed handle-patch script. (Jelmer Vernooij)
+
+  * Fix import in olive. (Jelmer Vernooij, #223935)
+
+  * Avoid use of removed smart_add. (Jelmer Vernooij, #244025, #244027)
+
+  * Remove use of upstream removed Repository.revision_parents() 
+    (Jelmer Vernooij)
+
+  * List network drives in Olive. (Kevin Light, #244308)
+
+  * Fix progress bar handling. (Jelmer Vernooij)
+
+  * Fix broken symlink handling. (Jasper Groenewegen)
+
+ CHANGES
+
+  * Moved notify icon code to separate script. (Jelmer Vernooij)
+
+  * Verify testaments when showing signatures on revisions and
+    re-enable signature display. (Jelmer Vernooij)
+
+  * Show credits for bzr-gtk in the about dialog. (Jelmer Vernooij)
+
+ INTERNALS
+
+  * All i18n calls should now go through _i18n which must be imported from
+    bzrlib.plugins.gtk. This addresses the occasional collisions with '_' used
+    as an anonymous variable. (Vincent Ladeuil)
+
+  * Add test for linegraph code. (Jelmer Vernooij)
+
+  * Remove obsolete tortoisebzr tests. (Jelmer Vernooij)
+
+  * Share revision context menu and main revision menu in bzr viz. (Jelmer Vernooij)
+
+  * Remove glade from merge dialog. (Jasper Groenewegen)
+
+  * Remove glade from olive about, rename, remove, move, mkdir, add dialogs. (Jasper Groenewegen)
+
+0.94.0    2008-05-04
+
+ CHANGES
+
+  * Disabled signature tab until we start verifying testaments. 
+    (Jelmer Vernooij)
+
+ BUG FIXES
+
+  * Fix display of children in branchview. (Jelmer Vernooij, #224914)
+
+0.94.0rc1  2008-04-25
+
+ CHANGES
+
+  * Removed tortoise-bzr, which now has its own project (http://launchpad.net/tortoisebzr)
+
+  * Use new D-Bus revision signal. (James Henstridge, #206443)
 
  UI
 
@@ -7,26 +87,57 @@
 
   * Made the tag list in the revision view be comma-separated. (Daniel Schierbeck)
 
+  * Add bugs tab in the branch view. (Jelmer Vernooij)
+  
+  * New Tango-styled icons. This time properly licensed under the GPL.
+    (Simon Pascal Klein)
+
+  * Support showing multiple branches in "bzr viz". (Jelmer Vernooij
+
+  * Added new icons for nautilus overlay (Martin Albisetti)
+
+  * Added enable/disable per-branch option (Martin Albisetti)
+
+  * Add compare with option to revisions menu. (Javier Derderian)
+
+  * Register file handler for applying patches/bundles to Bazaar branches.
+    (Jelmer Vernooij)
+
  BUG FIXES
 
   * Make adding tags from the viz work again. (Daniel Schierbeck)
  
   * Catch UnsupportedProtocol exception in the Nautilus extension. (#77965)
   
-  * Make Nautilus extension work again. (#111826, Toshio Kuratomi)
+  * Make Nautilus extension work again. (#111826, Toshio Kuratomi, Jelmer Vernooij)
   
   * Make viz not throw errors when there are 0 commits. (#173698, Gary van der
     Merwe)
+
+  * Fixed underscores in tags being interpreted as mnemonics in the viz. (#201733, 
+    Daniel Schierbeck)
+
+  * Fixed change view menu in viz. (Javier Derderian, #215350)
 
  FEATURES
  
   * Only check for old Bazaar versions that are known to be incompatible and 
     no longer warn about newer (unknown) versions of Bazaar, on the assumption
-	the API is sufficiently stable now. (Jelmer Vernooij)
+    the API is sufficiently stable now. (Jelmer Vernooij)
+
+  * Support child_submit_to setting in gsend. (Jelmer Vernooij)
+
+  * Add tab to revision view showing the signature status. (Daniel Schierbeck, Jelmer Vernooij)
+
+  * Use seahorse to verify signatures. (Daniel Schierbeck)
 
  INTERNALS
 
   * Refactored the revisionview. (Daniel Schierbeck)
+
+  * It is now possible to use the diff view as a widget. (Jelmer Vernooij)
+
+  * Preferences dialog has been split up. (Jelmer Vernooij)
 
 0.93.0  2007-12-10
 
@@ -50,7 +161,7 @@
  
   * Fixed logview bug in gannotate. (Daniel Schierbeck)
 
-0.92.0	2007-11-07
+0.92.0    2007-11-07
 
  UI
 
@@ -103,7 +214,7 @@
 
   * Avoid deprecation warning for all_plugins() in gpreferences. (Jelmer)
 
-0.91.0	2007-09-24
+0.91.0    2007-09-24
 
  UI
 
@@ -142,7 +253,7 @@
   * Added default_branch_path to MergeDialog and use it from olive-gtk.
     (Mateusz Korniak)
 
-0.90.0	2007-08-27
+0.90.0    2007-08-27
 
  FEATURES
 
@@ -243,7 +354,7 @@
 
   * Fixed 'bzr gcommit' if command not issued in a branch (#113394, Szilveszter)
 
-0.16.0	2007-05-05
+0.16.0    2007-05-05
 
  FEATURES
  
@@ -271,7 +382,7 @@
   
   * Recommend installation as 'gtk' not 'bzr-gtk'. (#104110, Szilveszter)
 
-0.15.2	2007-04-03
+0.15.2    2007-04-03
 
  BUG FIXES
 
@@ -288,7 +399,7 @@
 
   * Display remote locations in commit-notify (Robert)
 
-0.15.1	2007-03-25
+0.15.1    2007-03-25
 
  BUG FIXES
  
@@ -326,7 +437,7 @@
 
   * Strict commits are now a dialog, not a check box (Jelmer)
 
-0.15.0	2007-03-09
+0.15.0    2007-03-09
 
 BUG FIXES
 
@@ -370,14 +481,14 @@ INTERNAL
 
   * Add initial testsuite (Jelmer)
 
-0.14.0	2007-01-30
+0.14.0    2007-01-30
 
   * Add revert functionality (Szilvester)
 
   * Rewritten CommitDialog without glade (Szilvester)
 
   * Allow to commit single files from the context menu (Fixes #54983,
-													   Szilvester)
+                                                       Szilvester)
 
   * Warn about incompatible Bazaar versions (Jelmer)
 
@@ -390,7 +501,7 @@ INTERNAL
   * Set default drive letter (#67924, Szilvester)
 
   * Show error if no diff available for the selected file (#76536,
-														  Szilvester)
+                                                          Szilvester)
 
   * Handle current revision in annotate better (Aaron)
 
@@ -418,7 +529,7 @@ INTERNAL
 
   * Several other small regression fixes (Szilvester)
 
-0.13.0	2006-12-13
+0.13.0    2006-12-13
 
   * Don't show pending merge list when there are no pending merges
     (Alexander Belchenko)
@@ -441,7 +552,7 @@ INTERNAL
 
   * Use dotted revnos in gannotate (Aaron Bentley)
 
-0.12.0	2006-11-04
+0.12.0    2006-11-04
 
   * #68127: gcommit is broken
 

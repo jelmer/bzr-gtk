@@ -23,71 +23,73 @@ except:
     pass
 
 import gtk
-import gtk.glade
 
 import bzrlib.add
 import bzrlib.errors as errors
 
+from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import error_dialog
-from guifiles import GLADEFILENAME
+from bzrlib.plugins.gtk.errors import show_bzr_error
 
 
-class OliveAdd:
-    """ Display the Add file(s) dialog and perform the needed actions. """
-    def __init__(self, wt, wtpath, selected=[]):
-        """ Initialize the Add file(s) dialog. """
-        self.glade = gtk.glade.XML(GLADEFILENAME, 'window_add', 'olive-gtk')
+class AddDialog(gtk.Dialog):
+    """ Dialog for adding selected file or recursively all unknown files/folders in branch """
+    
+    def __init__(self, wt, wtpath, selected, parent=None):
+        """ Initialize the Add dialog. """
+        gtk.Dialog.__init__(self, title="Olive - Add file(s)",
+                                  parent=parent,
+                                  flags=0,
+                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
         
-        self.window = self.glade.get_widget('window_add')
-        
-        # Dictionary for signal_autoconnect
-        dic = { "on_button_add_add_clicked": self.add,
-                "on_button_add_cancel_clicked": self.close }
-        
-        # Connect the signals to the handlers
-        self.glade.signal_autoconnect(dic)
-
+        # Get arguments
         self.wt = wt
         self.wtpath = wtpath
         self.selected = selected
-
-    def display(self):
-        """ Display the Add file(s) dialog. """
-        self.window.show_all()
         
-    def add(self, widget):
-        radio_selected = self.glade.get_widget('radiobutton_add_selected')
-        radio_unknown = self.glade.get_widget('radiobutton_add_unknown')
+        # Create widgets
+        self._label_add_question = gtk.Label(_i18n("Which file(s) do you want to add?"))
+        self._radiobutton_add_selected = gtk.RadioButton(None,_i18n("Selected: %s"%self.selected))
+        self._radiobutton_add_unknown = gtk.RadioButton(self._radiobutton_add_selected, 
+                                                        _i18n("All unknowns recursively"))
+        self._button_add = gtk.Button(stock=gtk.STOCK_ADD)        
         
-        if radio_selected.get_active():
+        self._button_add.connect('clicked', self._on_add_clicked)
+        
+        # Add widgets to dialog window and decorate
+        self.vbox.add(self._label_add_question)
+        self.vbox.add(self._radiobutton_add_selected)
+        self.vbox.add(self._radiobutton_add_unknown)
+        self.vbox.set_spacing(3)
+        self.action_area.pack_end(self._button_add)
+        
+        self.vbox.show_all()
+        
+    @show_bzr_error
+    def _on_add_clicked(self, button):
+        """ """
+        if self._radiobutton_add_selected.get_active():
             # Add only the selected file
             filename = self.selected
             
             if filename is None:
-                error_dialog(_('No file was selected'),
-                             _('Please select a file from the list,\nor choose the other option.'))
+                error_dialog(_i18n('No file was selected'),
+                             _i18n('Please select a file from the list,\nor choose the other option.'))
                 return
-            
-            fullpath = self.wt.abspath(os.path.join(self.wtpath, filename))
             
             try:
-                bzrlib.add.smart_add([fullpath])
+                self.wt.add([filename])
             except errors.NotBranchError:
-                error_dialog(_('Directory is not a branch'),
-                             _('You can perform this action only in a branch.'))
+                error_dialog(_i18n('Directory is not a branch'),
+                             _i18n('You can perform this action only in a branch.'))
                 return
-        elif radio_unknown.get_active():
+        elif self._radiobutton_add_unknown.get_active():
             # Add unknown files recursively
-            fullpath = self.wt.abspath(self.wtpath)
-            
             try:
-                bzrlib.add.smart_add([fullpath], True)
+                self.wt.add(self.wt.unknowns())
             except errors.NotBranchError:
-                error_dialog(_('Directory is not a branch'),
-                             _('You can perform this action only in a branch.'))
+                error_dialog(_i18n('Directory is not a branch'),
+                             _i18n('You can perform this action only in a branch.'))
                 return
         
-        self.close()
-    
-    def close(self, widget=None):
-        self.window.destroy()
+        self.response(gtk.RESPONSE_OK)
