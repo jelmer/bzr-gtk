@@ -101,7 +101,7 @@ class CommitDialog(gtk.Dialog):
     """Implementation of Commit."""
 
     def __init__(self, wt, selected=None, parent=None):
-        gtk.Dialog.__init__(self, title="Commit - Olive",
+        gtk.Dialog.__init__(self, title="Commit",
                                   parent=parent,
                                   flags=0,
                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
