@@ -30,6 +30,8 @@
   * Show status for folders in Olive file list (Jasper Groenewegen)
   
   * Change appearance Olive bookmarks (Jasper Groenewegen)
+  
+  * Add ability to have dialog popup from Olive location bar. (Jasper Groenewegen)
 
  BUG FIXES
 
@@ -69,6 +71,8 @@
   * Check if file is versioned before opening gannotate window from olive. (Jasper Groenewegen, #115358)
   
   * Make sure error/info/warning dialogs know their parent window. (Jasper Groenewegen, #252208)
+  
+  * Handle unreadable .bzr subfolder in Olive. (Jasper Groenewegen, #229044)
 
  CHANGES
 

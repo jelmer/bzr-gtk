@@ -17,6 +17,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import os
+import sys
 import gtk
 import gobject
 
@@ -338,9 +339,9 @@ class OliveGui(gtk.Window):
         self.entry_location.connect("activate", self.signal.on_button_location_jump_clicked)
         self.locationbar.pack_start(self.entry_location, True, True, 0)
         
-        self.image_location_error = gtk.Image()
-        self.image_location_error.set_from_stock(gtk.STOCK_DIALOG_ERROR, gtk.ICON_SIZE_BUTTON)
-        self.locationbar.pack_start(self.image_location_error, False, False, 0)
+        self.location_status = gtk.Image()
+        self.location_status.set_from_stock(gtk.STOCK_DIALOG_ERROR, gtk.ICON_SIZE_BUTTON)
+        self.locationbar.pack_start(self.location_status, False, False, 0)
         
         self.button_location_jump = gtk.Button(stock=gtk.STOCK_JUMP_TO)
         self.button_location_jump.set_relief(gtk.RELIEF_NONE)
@@ -517,3 +518,20 @@ class OliveGui(gtk.Window):
         self.tb_pull.set_sensitive(False)
         self.tb_push.set_sensitive(False)
         self.tb_update.set_sensitive(False)
+    
+    def set_location_status(self, stock_id, allowPopup=False):
+        self.location_status.destroy()
+        if allowPopup:
+            self.location_status = gtk.Button()
+            self.location_status.set_relief(gtk.RELIEF_NONE)
+            image = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_BUTTON)
+            image.show()
+            self.location_status.add(image)
+        else:
+            self.location_status = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_BUTTON)
+        self.locationbar.pack_start(self.location_status, False, False, 0)
+        if sys.platform == 'win32':
+            self.locationbar.reorder_child(self.location_status, 2)
+        else:
+            self.locationbar.reorder_child(self.location_status, 1)
+        self.location_status.show()
