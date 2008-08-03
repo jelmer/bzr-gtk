@@ -105,7 +105,6 @@ class OliveGtk:
         self.button_location_up = self.window.button_location_up
         self.button_location_jump = self.window.button_location_jump
         self.entry_location = self.window.entry_location
-        self.image_location_error = self.window.image_location_error
         
         # Get the History widgets
         self.check_history = self.window.checkbutton_history
@@ -156,25 +155,26 @@ class OliveGtk:
         self._just_started = False
 
     def set_path(self, path, force_remote=False):
+        self.window.location_status.destroy()
         self.notbranch = False
         
         if force_remote:
             # Forcing remote mode (reading data from inventory)
-            self._show_stock_image(gtk.STOCK_DISCONNECT)
+            self.window.set_location_status(gtk.STOCK_DISCONNECT)
             try:
                 br = Branch.open_containing(path)[0]
             except bzrerrors.NotBranchError:
-                self._show_stock_image(gtk.STOCK_DIALOG_ERROR)
+                self.window.set_location_status(gtk.STOCK_DIALOG_ERROR)
                 self.check_history.set_active(False)
                 self.check_history.set_sensitive(False)
                 return False
             except bzrerrors.UnsupportedProtocol:
-                self._show_stock_image(gtk.STOCK_DIALOG_ERROR)
+                self.window.set_location_status(gtk.STOCK_DIALOG_ERROR)
                 self.check_history.set_active(False)
                 self.check_history.set_sensitive(False)
                 return False
             
-            self._show_stock_image(gtk.STOCK_CONNECT)
+            self.window.set_location_status(gtk.STOCK_CONNECT)
             
             self.remote = True
            
@@ -203,13 +203,18 @@ class OliveGtk:
                 self.button_location_up.set_sensitive(True)
         else:
             if os.path.isdir(path):
-                self.image_location_error.destroy()
                 self.remote = False
                 
                 # We're local
                 try:
                     self.wt, self.wtpath = WorkingTree.open_containing(os.path.realpath(path))
                 except (bzrerrors.NotBranchError, bzrerrors.NoWorkingTree):
+                    self.notbranch = True
+                except bzrerrors.PermissionDenied:
+                    self.window.set_location_status(gtk.STOCK_DIALOG_WARNING, allowPopup=True)
+                    self.window.location_status.connect_object('clicked', warning_dialog, 
+                                       *(_i18n('Branch information unreadable'),
+                                		_i18n('The current folder is a branch but the .bzr folder is not readable')))
                     self.notbranch = True
                 
                 # If we're in the root, we cannot go up anymore
@@ -227,21 +232,21 @@ class OliveGtk:
             elif not os.path.isfile(path):
                 # Doesn't seem to be a file nor a directory, trying to open a
                 # remote location
-                self._show_stock_image(gtk.STOCK_DISCONNECT)
+                self.window.set_location_status(gtk.STOCK_DISCONNECT)
                 try:
                     br = Branch.open_containing(path)[0]
                 except bzrerrors.NotBranchError:
-                    self._show_stock_image(gtk.STOCK_DIALOG_ERROR)
+                    self.window.set_location_status(gtk.STOCK_DIALOG_ERROR)
                     self.check_history.set_active(False)
                     self.check_history.set_sensitive(False)
                     return False
                 except bzrerrors.UnsupportedProtocol:
-                    self._show_stock_image(gtk.STOCK_DIALOG_ERROR)
+                    self.window.set_location_status(gtk.STOCK_DIALOG_ERROR)
                     self.check_history.set_active(False)
                     self.check_history.set_sensitive(False)
                     return False
                 
-                self._show_stock_image(gtk.STOCK_CONNECT)
+                self.window.set_location_status(gtk.STOCK_CONNECT)
                 
                 self.remote = True
                
@@ -938,19 +943,14 @@ class OliveGtk:
         # Add the ListStore to the TreeView
         self.window.treeview_left.set_model(liststore)
 
-    def refresh_right(self, path=None):
+    def refresh_right(self):
         """ Refresh the file list. """
         if not self.remote:
             # We're local
             from bzrlib.workingtree import WorkingTree
     
-            if path is None:
-                path = self.get_path()
-    
-            # A workaround for double-clicking Bookmarks
-            if not os.path.exists(path):
-                return
-    
+            path = self.get_path()
+            
             # Get ListStore and clear it
             liststore = self.window.filelist
             liststore.clear()
@@ -970,31 +970,31 @@ class OliveGtk:
                 else:
                     files.append(item)
             
-            # Try to open the working tree
-            notbranch = False
-            try:
-                tree1 = WorkingTree.open_containing(os.path.realpath(path))[0]
-            except (bzrerrors.NotBranchError, bzrerrors.NoWorkingTree):
-                notbranch = True
-            
-            if not notbranch:
-                branch = tree1.branch
-                tree2 = tree1.branch.repository.revision_tree(branch.last_revision())
-            
-                delta = tree1.changes_from(tree2, want_unchanged=True)
+            self.window.col_status.set_visible(False)
+            if not self.notbranch:
+                try:
+                    tree1 = WorkingTree.open_containing(os.path.realpath(path))[0]
+                    branch = tree1.branch
+                    tree2 = tree1.branch.repository.revision_tree(branch.last_revision())
                 
-                # Show Status column
-            	self.window.col_status.set_visible(True)
-            else:
-                # Don't show Status column
-            	self.window.col_status.set_visible(False)
-                
+                    delta = tree1.changes_from(tree2, want_unchanged=True)
+                    
+                    # Show Status column
+                    self.window.col_status.set_visible(True)
+                except bzrerrors.LockContention:
+                    self.window.set_location_status(gtk.STOCK_DIALOG_ERROR, allowPopup=True)
+                    self.window.location_status.connect_object('clicked', error_dialog, 
+                                       *(_i18n('Branch is locked'),
+                                		_i18n('The branch in the current folder is locked by another Bazaar program')))
+                    self.notbranch = True
+                    self.window.set_view_to_localbranch(False) 
+            
             # Add'em to the ListStore
             for item in dirs:
                 status = ''
                 st = ''
                 fileid = ''
-                if not notbranch:
+                if not self.notbranch:
                     filename = tree1.relpath(os.path.join(os.path.realpath(path), item))
                     
                     st, status = self.statusmapper(filename, delta)
@@ -1022,7 +1022,7 @@ class OliveGtk:
                 status = ''
                 st = ''
                 fileid = ''
-                if not notbranch:
+                if not self.notbranch:
                     filename = tree1.relpath(os.path.join(os.path.realpath(path), item))
                     
                     st, status = self.statusmapper(filename, delta)
@@ -1059,7 +1059,7 @@ class OliveGtk:
             dirs = []
             files = []
             
-            self._show_stock_image(gtk.STOCK_REFRESH)
+            self.window.set_location_status(gtk.STOCK_REFRESH)
             
             for (name, type) in self.remote_entries:
                 if type.kind == 'directory':
@@ -1124,7 +1124,7 @@ class OliveGtk:
                 while gtk.events_pending():
                     gtk.main_iteration()
             
-            self.image_location_error.destroy()
+            self.window.location_status.destroy()
 
         # Columns should auto-size
         self.window.treeview_right.columns_autosize()
@@ -1212,7 +1212,7 @@ class OliveGtk:
         if active >= 0:
             drive = model[active][0]
             self.set_path(drive + '\\')
-            self.refresh_right(drive + '\\')
+            self.refresh_right()
     
     def check_for_changes(self):
         """ Check whether there were changes in the current working tree. """
@@ -1291,19 +1291,6 @@ class OliveGtk:
                     return True
             # Either it's not a directory or not in the inventory
             return False
-    
-    def _show_stock_image(self, stock_id):
-        """ Show a stock image next to the location entry. """
-        self.image_location_error.destroy()
-        self.image_location_error = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_BUTTON)
-        self.hbox_location.pack_start(self.image_location_error, False, False, 0)
-        if sys.platform == 'win32':
-            self.hbox_location.reorder_child(self.image_location_error, 2)
-        else:
-            self.hbox_location.reorder_child(self.image_location_error, 1)
-        self.image_location_error.show()
-        while gtk.events_pending():
-            gtk.main_iteration()
 
 import ConfigParser
 
