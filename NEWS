@@ -26,6 +26,8 @@
   * Made merge dialog to give choice between folder and custom location (Jasper Groenewegen)
 
   * Add new dialog to browse looms and switch to threads in loom branches. (Jelmer Vernooij)
+  
+  * Show status for folders in Olive file list (Jasper Groenewegen)
 
  BUG FIXES
 

@@ -382,7 +382,6 @@ class OliveGui(gtk.Window):
             
     def _create_filelist(self):
         """ Creates the file list (a ListStore in a TreeView in a ScrolledWindow)"""
-        # Model: [ icon, dir, name, status text, status, size (int), size (human), mtime (int), mtime (local), fileid ]
         self.scrolledwindow_right = gtk.ScrolledWindow()
         self.scrolledwindow_right.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
@@ -390,8 +389,62 @@ class OliveGui(gtk.Window):
         self.treeview_right.connect("button-press-event", self.signal.on_treeview_right_button_press_event)
         self.treeview_right.connect("row-activated", self.signal.on_treeview_right_row_activated)
         self.scrolledwindow_right.add(self.treeview_right)
-
-        # Move olive/__init__.py _load_right List creation here
+        
+        # Model: [ icon, dir, name, status text, status, size (int), size (human), mtime (int), mtime (local), fileid ]
+        self.filelist = gtk.ListStore(gobject.TYPE_STRING,
+                                      gobject.TYPE_BOOLEAN,
+                                      gobject.TYPE_STRING,
+                                      gobject.TYPE_STRING,
+                                      gobject.TYPE_STRING,
+                                      gobject.TYPE_STRING,
+                                      gobject.TYPE_STRING,
+                                      gobject.TYPE_INT,
+                                      gobject.TYPE_STRING,
+                                      gobject.TYPE_STRING)
+        self.treeview_right.set_model(self.filelist)
+        
+        # Set up the cells
+        cellpb = gtk.CellRendererPixbuf()
+        cell = gtk.CellRendererText()
+        
+        self.col_filename = gtk.TreeViewColumn(_i18n('Filename'))
+        self.col_filename.pack_start(cellpb, False)
+        self.col_filename.pack_start(cell, True)
+        self.col_filename.set_attributes(cellpb, stock_id=0)
+        self.col_filename.add_attribute(cell, 'text', 2)
+        self.col_filename.set_resizable(True)
+        self.treeview_right.append_column(self.col_filename)
+        
+        self.col_status = gtk.TreeViewColumn(_i18n('Status'))
+        self.col_status.pack_start(cell, True)
+        self.col_status.add_attribute(cell, 'text', 3)
+        self.col_status.set_resizable(True)
+        self.treeview_right.append_column(self.col_status)
+        
+        self.col_size = gtk.TreeViewColumn(_i18n('Size'))
+        self.col_size.pack_start(cell, True)
+        self.col_size.add_attribute(cell, 'text', 6)
+        self.col_size.set_resizable(True)
+        self.treeview_right.append_column(self.col_size)
+        
+        self.col_mtime = gtk.TreeViewColumn(_i18n('Last modified'))
+        self.col_mtime.pack_start(cell, True)
+        self.col_mtime.add_attribute(cell, 'text', 8)
+        self.col_mtime.set_resizable(True)
+        self.treeview_right.append_column(self.col_mtime)
+        
+        # Set up the properties of the TreeView
+        self.treeview_right.set_headers_visible(True)
+        self.treeview_right.set_headers_clickable(True)
+        self.treeview_right.set_search_column(1)
+        
+        # Set up sorting
+        self.filelist.set_sort_func(13, self.signal._sort_filelist_callback, None)
+        self.filelist.set_sort_column_id(13, gtk.SORT_ASCENDING)
+        self.col_filename.set_sort_column_id(13)
+        self.col_status.set_sort_column_id(3)
+        self.col_size.set_sort_column_id(5)
+        self.col_mtime.set_sort_column_id(7)
     
     def set_view_to_localbranch(self, notbranch=False):
         """ Change the sensitivity of gui items to reflect the fact that the path is a branch or not"""
