@@ -1378,7 +1378,8 @@ class OliveGtk:
         driveletters = []
         for drive in string.ascii_uppercase:
             if win32file.GetDriveType(drive+':') == win32file.DRIVE_FIXED or\
-                win32file.GetDriveType(drive+':') == win32file.DRIVE_REMOTE:
+                win32file.GetDriveType(drive+':') == win32file.DRIVE_REMOTE or\
+                win32file.GetDriveType(drive+':') == win32file.DRIVE_REMOVABLE:
                 driveletters.append(drive+':')
         return driveletters
     
