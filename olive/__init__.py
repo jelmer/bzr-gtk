@@ -532,7 +532,7 @@ class OliveGtk:
         
     @show_bzr_error
     def on_menuitem_branch_update_activate(self, widget):
-        """ Brranch/checkout update menu handler. """
+        """ Branch/checkout update menu handler. """
         
         ret = self.wt.update()
         conflicts = self.wt.conflicts()
@@ -540,6 +540,7 @@ class OliveGtk:
             info_dialog(_i18n('Update successful but conflicts generated'), _i18n('Number of conflicts generated: %d.') % (len(conflicts),) )
         else:
             info_dialog(_i18n('Update successful'), _i18n('No conflicts generated.') )
+        self.refresh_right()
     
     def on_menuitem_branch_push_activate(self, widget):
         """ Branch/Push... menu handler. """
