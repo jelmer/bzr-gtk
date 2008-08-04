@@ -941,8 +941,9 @@ class OliveGtk:
         for title_item in bookmarks:
             liststore.append(title_item)
         
-        # Add the ListStore to the TreeView
+        # Add the ListStore to the TreeView and refresh column width
         self.window.treeview_left.set_model(liststore)
+        self.window.treeview_left.columns_autosize()
 
     def refresh_right(self):
         """ Refresh the file list. """
