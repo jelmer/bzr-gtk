@@ -226,6 +226,11 @@ class InfoDialog(object):
     
     def _generate_info(self, infokeylist):
         """ Generate 'bzr info' output. """
+        expander={}
+        alignment={}
+        table={}
+        label = {}
+        description = {}
         for key, keystring, subkeylist in infokeylist:
             if self.ret.has_key(key):
                 tablelength = 0
@@ -235,31 +240,34 @@ class InfoDialog(object):
                 if tablelength == 0:
                     pass
                 else:
-                    exec "exp_%s = gtk.Expander('<b>%s</b>')"%(key, keystring)
-                    eval("exp_%s.set_use_markup(True)"%key)
-                    eval("exp_%s.connect('activate', self.activate)"%key)
+                    expander[key] = gtk.Expander(keystring)
+                    expander[key].set_use_markup(True)
+                    expander[key].connect('activate', self.activate)
                     
-                    exec "alignment_%s = gtk.Alignment()"%key
-                    eval("alignment_%s.set_padding(0, 0, 24, 0)"%key)
-                    eval("exp_%s.add(alignment_%s)"%(key, key))
+                    alignment[key]= gtk.Alignment()
+                    alignment[key].set_padding(0, 0, 24, 0)
+                    expander[key].add(alignment[key])
                     
-                    exec "table_%s = gtk.Table(tablelength, 2)"%key
-                    eval("table_%s.set_col_spacings(12)"%key)
-                    eval("alignment_%s.add(table_%s)"%(key, key))
+                    table[key] = gtk.Table(tablelength, 2)
+                    table[key].set_col_spacings(12)
+                    alignment[key].add(table[key])
+                    
+                    label[key] = {}
+                    description[key] = {}
                     
                     tablepos = 0
                     for subkey, subkeystring in subkeylist:
                         if self.ret[key].has_key(subkey):
-                            exec "%s_%s_label = gtk.Label('%s:')"%(key,subkey, subkeystring)
-                            eval("table_%s.attach(%s_%s_label, 0, 1, %i, %i, gtk.FILL)"%(key, key, subkey, tablepos, tablepos + 1))
-                            eval("%s_%s_label.set_alignment(0, 0.5)"%(key, subkey))
+                            label[key][subkey] = gtk.Label(subkeystring)
+                            table[key].attach(label[key][subkey], 0, 1, tablepos, tablepos + 1, gtk.FILL)
+                            label[key][subkey].set_alignment(0, 0.5)
                             
-                            exec "%s_%s = gtk.Label('%s')"%(key, subkey, str(self.ret[key][subkey]))
-                            eval("table_%s.attach(%s_%s, 1, 2, %i, %i, gtk.FILL)"%(key, key, subkey, tablepos, tablepos + 1))
-                            eval("%s_%s.set_alignment(0, 0.5)"%(key, subkey))
+                            description[key][subkey] = gtk.Label(str(self.ret[key][subkey]))
+                            table[key].attach(description[key][subkey], 1, 2, tablepos, tablepos + 1, gtk.FILL)
+                            description[key][subkey].set_alignment(0, 0.5)
                             tablepos += 1
-                    eval("exp_%s.set_expanded(True)"%key)
-                    eval("self.window.vbox.pack_start(exp_%s, False, True, 0)"%key)
+                    expander[key].set_expanded(True)
+                    self.window.vbox.pack_start(expander[key], False, True, 0)
     
     def activate(self, expander):
         """ Redraw the window. """
