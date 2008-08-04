@@ -230,6 +230,7 @@ class BranchWindow(Window):
         tag_image.set_from_file(icon_path("tag-16.png"))
         self.go_menu_tags = gtk.ImageMenuItem("_Tags")
         self.go_menu_tags.set_image(tag_image)
+        self.treeview.connect('refreshed', lambda w: self._update_tags())
 
         go_menu.add(go_menu_next)
         go_menu.add(go_menu_prev)
@@ -293,7 +294,6 @@ class BranchWindow(Window):
         self.treeview.connect('revision-activated',
                 self._tree_revision_activated)
 
-        self.treeview.connect('refreshed', lambda w: self._update_tags())
         self.treeview.connect('tag-added', lambda w, t, r: self._update_tags())
 
         for col in ["revno", "date"]:
