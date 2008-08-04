@@ -419,6 +419,8 @@ class OliveGui(gtk.Window):
         # Set up the cells
         cellpb = gtk.CellRendererPixbuf()
         cell = gtk.CellRendererText()
+        # For columns that get a different text color based on status (4)
+        cellstatus = gtk.CellRendererText()
         
         self.col_filename = gtk.TreeViewColumn(_i18n('Filename'))
         self.col_filename.pack_start(cellpb, False)
@@ -429,8 +431,9 @@ class OliveGui(gtk.Window):
         self.treeview_right.append_column(self.col_filename)
         
         self.col_status = gtk.TreeViewColumn(_i18n('Status'))
-        self.col_status.pack_start(cell, True)
-        self.col_status.add_attribute(cell, 'text', 3)
+        self.col_status.pack_start(cellstatus, True)
+        self.col_status.add_attribute(cellstatus, 'text', 3)
+        self.col_status.set_cell_data_func(cellstatus, self._map_status_color)
         self.col_status.set_resizable(True)
         self.treeview_right.append_column(self.col_status)
         
@@ -458,6 +461,32 @@ class OliveGui(gtk.Window):
         self.col_status.set_sort_column_id(3)
         self.col_size.set_sort_column_id(5)
         self.col_mtime.set_sort_column_id(7)
+    
+    def _map_status_color(self, column, cell, model, iter):
+        status = model.get_value(iter, 4)
+        if status == 'unchanged':
+            colorstatus = gtk.gdk.color_parse('black')
+            weight = 400 # standard value
+        elif status == 'removed':
+            colorstatus = gtk.gdk.color_parse('red')
+            weight = 800
+        elif status == 'added':
+            colorstatus = gtk.gdk.color_parse('green')
+            weight = 800
+        elif status == 'modified':
+            colorstatus = gtk.gdk.color_parse("#FD00D3")
+            weight = 800
+        elif status == 'renamed':
+            colorstatus = gtk.gdk.color_parse('blue')
+            weight = 800
+        elif status == 'ignored':
+            colorstatus = gtk.gdk.color_parse('grey')
+            weight = 600
+        else: # status == unknown
+            colorstatus = gtk.gdk.color_parse('orange')
+            weight = 800
+        cell.set_property('foreground-gdk', colorstatus)
+        cell.set_property('weight', weight)
     
     def set_view_to_localbranch(self, notbranch=False):
         """ Change the sensitivity of gui items to reflect the fact that the path is a branch or not"""
