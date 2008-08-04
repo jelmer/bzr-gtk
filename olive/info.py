@@ -156,7 +156,7 @@ class InfoDialog(object):
             return
         
         # Create the window
-        self.window = gtk.Dialog(title="Olive - Information",
+        self.window = gtk.Dialog(title="Branch Information",
                                   parent = None,
                                   flags=0,
                                   buttons=None)

@@ -4,6 +4,10 @@
  
   * Add colored status messages in Olive file list (Jasper Groenewegen)
 
+ CHANGES
+ 
+  * Add ginfo command line option (Jasper Groenewegen)
+
 0.95.0	2008-08-04
 
  UI

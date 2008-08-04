@@ -22,6 +22,7 @@ gcommit           GTK+ commit dialog.
 gconflicts        GTK+ conflicts. 
 gdiff             Show differences in working tree in a GTK+ Window. 
 ginit             Initialise a new branch.
+ginfo             GTK+ branch info dialog
 gloom             GTK+ loom browse dialog
 gmerge            GTK+ merge dialog
 gmissing          GTK+ missing revisions dialog. 
@@ -471,6 +472,19 @@ class cmd_gpreferences(GTKCommand):
         dialog.run()
 
 
+class cmd_ginfo(Command):
+    """ GTK+ info dialog
+    
+    """
+    def run(self):
+        from bzrlib import workingtree
+        from bzrlib.plugins.gtk.olive.info import InfoDialog
+        wt = workingtree.WorkingTree.open_containing('.')[0]
+        info = InfoDialog(wt.branch)
+        info.display()
+        info.window.run()
+
+
 class cmd_gmerge(Command):
     """ GTK+ merge dialog
     
@@ -557,6 +571,7 @@ commands = [
     cmd_gconflicts, 
     cmd_gdiff,
     cmd_ginit,
+    cmd_ginfo,
     cmd_gmerge,
     cmd_gmissing, 
     cmd_gpreferences, 
