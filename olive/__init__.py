@@ -60,16 +60,14 @@ def about():
     """ Display the AboutDialog. """
     from bzrlib.plugins.gtk import __version__, icon_path
     
-    iconpath = icon_path() + os.sep
-    
     dialog = gtk.AboutDialog()
     dialog.set_name("Olive")
     dialog.set_version(__version__)
-    dialog.set_copyright("Copyright (C) 2006 Szilveszter Farkas (Phanatic)")
-    dialog.set_website("https://launchpad.net/products/olive")
-    dialog.set_website_label("https://launchpad.net/products/olive")
-    dialog.set_icon_from_file(iconpath+"oliveicon2.png")
-    dialog.set_logo(gtk.gdk.pixbuf_new_from_file(iconpath+"oliveicon2.png"))
+    dialog.set_copyright("Copyright (C) 2006-2008 Szilveszter Farkas (Phanatic)")
+    dialog.set_website("https://launchpad.net/bzr-gtk")
+    dialog.set_website_label("https://launchpad.net/bzr-gtk")
+    dialog.set_icon_from_file(icon_path("oliveicon2.png"))
+    dialog.set_logo(gtk.gdk.pixbuf_new_from_file(icon_path("oliveicon2.png")))
     dialog.set_authors([ _i18n("Lead Developer:"),
 			 "Szilveszter Farkas <szilveszter.farkas@gmail.com>",
 			 _i18n("Contributors:"),
@@ -82,6 +80,7 @@ def about():
     dialog.run()
     # Destroy the dialog
     dialog.destroy()
+
 
 class OliveGtk:
     """ The main Olive GTK frontend class. This is called when launching the
