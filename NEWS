@@ -1,4 +1,14 @@
-0.95.0	UNRELEASED
+0.96.0	UNRELEASED
+
+ UI
+ 
+  * Add colored status messages in Olive file list (Jasper Groenewegen)
+
+ CHANGES
+ 
+  * Add ginfo command line option (Jasper Groenewegen)
+
+0.95.0	2008-08-04
 
  UI
 
@@ -24,6 +34,14 @@
   * Add controls to wrap long lines in gdiff and diff in visualise. (Jasper Groenewegen, #229789)
   
   * Made merge dialog to give choice between folder and custom location (Jasper Groenewegen)
+
+  * Add new dialog to browse looms and switch to threads in loom branches. (Jelmer Vernooij)
+  
+  * Show status for folders in Olive file list (Jasper Groenewegen)
+  
+  * Change appearance Olive bookmarks (Jasper Groenewegen)
+  
+  * Add ability to have dialog popup from Olive location bar. (Jasper Groenewegen)
 
  BUG FIXES
 
@@ -63,6 +81,8 @@
   * Check if file is versioned before opening gannotate window from olive. (Jasper Groenewegen, #115358)
   
   * Make sure error/info/warning dialogs know their parent window. (Jasper Groenewegen, #252208)
+  
+  * Handle unreadable .bzr subfolder in Olive. (Jasper Groenewegen, #229044)
 
  CHANGES
 

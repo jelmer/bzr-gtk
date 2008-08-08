@@ -22,6 +22,8 @@ gcommit           GTK+ commit dialog.
 gconflicts        GTK+ conflicts. 
 gdiff             Show differences in working tree in a GTK+ Window. 
 ginit             Initialise a new branch.
+ginfo             GTK+ branch info dialog
+gloom             GTK+ loom browse dialog
 gmerge            GTK+ merge dialog
 gmissing          GTK+ missing revisions dialog. 
 gpreferences      GTK+ preferences dialog. 
@@ -36,7 +38,7 @@ import sys
 
 import bzrlib
 
-version_info = (0, 95, 0, 'dev', 1)
+version_info = (0, 96, 0, 'dev', 1)
 
 if version_info[3] == 'final':
     version_string = '%d.%d.%d' % version_info[:3]
@@ -44,7 +46,7 @@ else:
     version_string = '%d.%d.%d%s%d' % version_info
 __version__ = version_string
 
-required_bzrlib = (1, 3)
+required_bzrlib = (1, 6)
 
 def check_bzrlib_version(desired):
     """Check that bzrlib is compatible.
@@ -172,10 +174,28 @@ class cmd_gpush(GTKCommand):
     def run(self, location="."):
         (br, path) = branch.Branch.open_containing(location)
         open_display()
-        from push import PushDialog
+        from bzrlib.plugins.gtk.push import PushDialog
         dialog = PushDialog(br.repository, br.last_revision(), br)
         dialog.run()
 
+
+class cmd_gloom(GTKCommand):
+    """ GTK+ loom.
+    
+    """
+    takes_args = [ "location?" ]
+
+    def run(self, location="."):
+        try:
+            (tree, path) = workingtree.WorkingTree.open_containing(location)
+            br = tree.branch
+        except NoWorkingTree, e:
+            (br, path) = branch.Branch.open_containing(location)
+            tree = None
+        open_display()
+        from bzrlib.plugins.gtk.loom import LoomDialog
+        dialog = LoomDialog(br, tree)
+        dialog.run()
 
 
 class cmd_gdiff(GTKCommand):
@@ -452,6 +472,19 @@ class cmd_gpreferences(GTKCommand):
         dialog.run()
 
 
+class cmd_ginfo(Command):
+    """ GTK+ info dialog
+    
+    """
+    def run(self):
+        from bzrlib import workingtree
+        from bzrlib.plugins.gtk.olive.info import InfoDialog
+        wt = workingtree.WorkingTree.open_containing('.')[0]
+        info = InfoDialog(wt.branch)
+        info.display()
+        info.window.run()
+
+
 class cmd_gmerge(Command):
     """ GTK+ merge dialog
     
@@ -538,6 +571,7 @@ commands = [
     cmd_gconflicts, 
     cmd_gdiff,
     cmd_ginit,
+    cmd_ginfo,
     cmd_gmerge,
     cmd_gmissing, 
     cmd_gpreferences, 
@@ -547,6 +581,13 @@ commands = [
     cmd_gtags,
     cmd_visualise
     ]
+
+try:
+    from bzrlib.plugins import loom
+except ImportError:
+    pass # Loom plugin doesn't appear to be present
+else:
+    commands.append(cmd_gloom)
 
 for cmd in commands:
     register_command(cmd)

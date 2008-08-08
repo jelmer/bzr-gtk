@@ -230,7 +230,7 @@ class BranchWindow(Window):
         tag_image.set_from_file(icon_path("tag-16.png"))
         self.go_menu_tags = gtk.ImageMenuItem("_Tags")
         self.go_menu_tags.set_image(tag_image)
-        self._update_tags()
+        self.treeview.connect('refreshed', lambda w: self._update_tags())
 
         go_menu.add(go_menu_next)
         go_menu.add(go_menu_prev)
@@ -572,14 +572,14 @@ class BranchWindow(Window):
 
         if self.branch.supports_tags():
             tags = self.branch.tags.get_tag_dict().items()
-            tags.sort()
-            tags.reverse()
+            tags.sort(reverse=True)
             for tag, revid in tags:
                 tag_image = gtk.Image()
                 tag_image.set_from_file(icon_path('tag-16.png'))
                 tag_item = gtk.ImageMenuItem(tag.replace('_', '__'))
                 tag_item.set_image(tag_image)
                 tag_item.connect('activate', self._tag_selected_cb, revid)
+                tag_item.set_sensitive(self.treeview.has_revision_id(revid))
                 menu.add(tag_item)
             self.go_menu_tags.set_submenu(menu)
 

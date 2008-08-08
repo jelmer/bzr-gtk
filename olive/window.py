@@ -17,6 +17,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import os
+import sys
 import gtk
 import gobject
 
@@ -338,9 +339,9 @@ class OliveGui(gtk.Window):
         self.entry_location.connect("activate", self.signal.on_button_location_jump_clicked)
         self.locationbar.pack_start(self.entry_location, True, True, 0)
         
-        self.image_location_error = gtk.Image()
-        self.image_location_error.set_from_stock(gtk.STOCK_DIALOG_ERROR, gtk.ICON_SIZE_BUTTON)
-        self.locationbar.pack_start(self.image_location_error, False, False, 0)
+        self.location_status = gtk.Image()
+        self.location_status.set_from_stock(gtk.STOCK_DIALOG_ERROR, gtk.ICON_SIZE_BUTTON)
+        self.locationbar.pack_start(self.location_status, False, False, 0)
         
         self.button_location_jump = gtk.Button(stock=gtk.STOCK_JUMP_TO)
         self.button_location_jump.set_relief(gtk.RELIEF_NONE)
@@ -373,16 +374,27 @@ class OliveGui(gtk.Window):
         self.scrolledwindow_left.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
         self.treeview_left = gtk.TreeView()
-        self.treeview_left.set_headers_visible(False)
         self.treeview_left.connect("button-press-event", self.signal.on_treeview_left_button_press_event)
         self.treeview_left.connect("row-activated", self.signal.on_treeview_left_row_activated)
         self.scrolledwindow_left.add(self.treeview_left)
 
-        # Move olive/__init__.py _load_left List creation here
-            
+        self.bookmarklist = gtk.ListStore(gobject.TYPE_STRING, 
+                                          gobject.TYPE_STRING, 
+                                          gobject.TYPE_STRING)
+        self.treeview_left.set_model(self.bookmarklist)
+        
+        icon = gtk.CellRendererPixbuf()
+        cell = gtk.CellRendererText()
+        
+        col_bookmark = gtk.TreeViewColumn(_i18n('Bookmarks'))
+        col_bookmark.pack_start(icon, False)
+        col_bookmark.pack_start(cell, False)
+        col_bookmark.set_attributes(icon, stock_id=2)
+        col_bookmark.add_attribute(cell, 'text', 0)
+        self.treeview_left.append_column(col_bookmark)
+    
     def _create_filelist(self):
         """ Creates the file list (a ListStore in a TreeView in a ScrolledWindow)"""
-        # Model: [ icon, dir, name, status text, status, size (int), size (human), mtime (int), mtime (local), fileid ]
         self.scrolledwindow_right = gtk.ScrolledWindow()
         self.scrolledwindow_right.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         
@@ -390,8 +402,91 @@ class OliveGui(gtk.Window):
         self.treeview_right.connect("button-press-event", self.signal.on_treeview_right_button_press_event)
         self.treeview_right.connect("row-activated", self.signal.on_treeview_right_row_activated)
         self.scrolledwindow_right.add(self.treeview_right)
-
-        # Move olive/__init__.py _load_right List creation here
+        
+        # Model: [ icon, dir, name, status text, status, size (int), size (human), mtime (int), mtime (local), fileid ]
+        self.filelist = gtk.ListStore(gobject.TYPE_STRING,
+                                      gobject.TYPE_BOOLEAN,
+                                      gobject.TYPE_STRING,
+                                      gobject.TYPE_STRING,
+                                      gobject.TYPE_STRING,
+                                      gobject.TYPE_STRING,
+                                      gobject.TYPE_STRING,
+                                      gobject.TYPE_INT,
+                                      gobject.TYPE_STRING,
+                                      gobject.TYPE_STRING)
+        self.treeview_right.set_model(self.filelist)
+        
+        # Set up the cells
+        cellpb = gtk.CellRendererPixbuf()
+        cell = gtk.CellRendererText()
+        # For columns that get a different text color based on status (4)
+        cellstatus = gtk.CellRendererText()
+        
+        self.col_filename = gtk.TreeViewColumn(_i18n('Filename'))
+        self.col_filename.pack_start(cellpb, False)
+        self.col_filename.pack_start(cell, True)
+        self.col_filename.set_attributes(cellpb, stock_id=0)
+        self.col_filename.add_attribute(cell, 'text', 2)
+        self.col_filename.set_resizable(True)
+        self.treeview_right.append_column(self.col_filename)
+        
+        self.col_status = gtk.TreeViewColumn(_i18n('Status'))
+        self.col_status.pack_start(cellstatus, True)
+        self.col_status.add_attribute(cellstatus, 'text', 3)
+        self.col_status.set_cell_data_func(cellstatus, self._map_status_color)
+        self.col_status.set_resizable(True)
+        self.treeview_right.append_column(self.col_status)
+        
+        self.col_size = gtk.TreeViewColumn(_i18n('Size'))
+        self.col_size.pack_start(cell, True)
+        self.col_size.add_attribute(cell, 'text', 6)
+        self.col_size.set_resizable(True)
+        self.treeview_right.append_column(self.col_size)
+        
+        self.col_mtime = gtk.TreeViewColumn(_i18n('Last modified'))
+        self.col_mtime.pack_start(cell, True)
+        self.col_mtime.add_attribute(cell, 'text', 8)
+        self.col_mtime.set_resizable(True)
+        self.treeview_right.append_column(self.col_mtime)
+        
+        # Set up the properties of the TreeView
+        self.treeview_right.set_headers_visible(True)
+        self.treeview_right.set_headers_clickable(True)
+        self.treeview_right.set_search_column(1)
+        
+        # Set up sorting
+        self.filelist.set_sort_func(13, self.signal._sort_filelist_callback, None)
+        self.filelist.set_sort_column_id(13, gtk.SORT_ASCENDING)
+        self.col_filename.set_sort_column_id(13)
+        self.col_status.set_sort_column_id(3)
+        self.col_size.set_sort_column_id(5)
+        self.col_mtime.set_sort_column_id(7)
+    
+    def _map_status_color(self, column, cell, model, iter):
+        status = model.get_value(iter, 4)
+        if status == 'unchanged':
+            colorstatus = gtk.gdk.color_parse('black')
+            weight = 400 # standard value
+        elif status == 'removed':
+            colorstatus = gtk.gdk.color_parse('red')
+            weight = 800
+        elif status == 'added':
+            colorstatus = gtk.gdk.color_parse('green')
+            weight = 800
+        elif status == 'modified':
+            colorstatus = gtk.gdk.color_parse("#FD00D3")
+            weight = 800
+        elif status == 'renamed':
+            colorstatus = gtk.gdk.color_parse('blue')
+            weight = 800
+        elif status == 'ignored':
+            colorstatus = gtk.gdk.color_parse('grey')
+            weight = 600
+        else: # status == unknown
+            colorstatus = gtk.gdk.color_parse('orange')
+            weight = 800
+        cell.set_property('foreground-gdk', colorstatus)
+        cell.set_property('weight', weight)
     
     def set_view_to_localbranch(self, notbranch=False):
         """ Change the sensitivity of gui items to reflect the fact that the path is a branch or not"""
@@ -452,3 +547,20 @@ class OliveGui(gtk.Window):
         self.tb_pull.set_sensitive(False)
         self.tb_push.set_sensitive(False)
         self.tb_update.set_sensitive(False)
+    
+    def set_location_status(self, stock_id, allowPopup=False):
+        self.location_status.destroy()
+        if allowPopup:
+            self.location_status = gtk.Button()
+            self.location_status.set_relief(gtk.RELIEF_NONE)
+            image = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_BUTTON)
+            image.show()
+            self.location_status.add(image)
+        else:
+            self.location_status = gtk.image_new_from_stock(stock_id, gtk.ICON_SIZE_BUTTON)
+        self.locationbar.pack_start(self.location_status, False, False, 0)
+        if sys.platform == 'win32':
+            self.locationbar.reorder_child(self.location_status, 2)
+        else:
+            self.locationbar.reorder_child(self.location_status, 1)
+        self.location_status.show()
