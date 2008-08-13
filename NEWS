@@ -8,6 +8,10 @@
  
   * Add ginfo command line option (Jasper Groenewegen)
 
+ BUG FIXES
+
+  * Fix Olive homepage URL. (#255152)
+
 0.95.0	2008-08-04
 
  UI
