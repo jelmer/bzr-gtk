@@ -660,7 +660,6 @@ class OliveGtk:
             remove.hide()
         
             if response == gtk.RESPONSE_OK:
-                self.set_path(self.path)
                 self.refresh_right()
             
             remove.destroy()
@@ -703,12 +702,14 @@ class OliveGtk:
     def on_menuitem_view_show_hidden_files_activate(self, widget):
         """ View/Show hidden files menu handler. """
         self.pref.set_preference('dotted_files', widget.get_active())
+        self.pref.write()
         if self.path is not None:
             self.refresh_right()
 
     def on_menuitem_view_show_ignored_files_activate(self, widget):
         """ Hide/Show ignored files menu handler. """
         self.pref.set_preference('ignored_files', widget.get_active())
+        self.pref.write()
         if self.path is not None:
             self.refresh_right()
             
@@ -949,20 +950,20 @@ class OliveGtk:
         if not self.remote:
             # We're local
             from bzrlib.workingtree import WorkingTree
-    
+            
             path = self.get_path()
             
             # Get ListStore and clear it
             liststore = self.window.filelist
             liststore.clear()
-    
+            
             dirs = []
             files = []
-    
+            
             # Fill the appropriate lists
             dotted_files = self.pref.get_preference('dotted_files', 'bool')
             ignored_files = self.pref.get_preference('ignored_files', 'bool')
-
+            
             for item in os.listdir(path):
                 if not dotted_files and item[0] == '.':
                     continue
@@ -977,7 +978,7 @@ class OliveGtk:
                     tree1 = WorkingTree.open_containing(os.path.realpath(path))[0]
                     branch = tree1.branch
                     tree2 = tree1.branch.repository.revision_tree(branch.last_revision())
-                
+                    
                     delta = tree1.changes_from(tree2, want_unchanged=True)
                     
                     # Show Status column
