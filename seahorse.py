@@ -40,6 +40,12 @@ except dbus.exceptions.DBusException, e:
         name = get_name()
     else:
         name = getattr(e, '_dbus_error_name', None)
+        
+    if name is None:
+        args = getattr(e, 'args', None) # This is case for old python-dbus-0.62
+        if args == ("Unable to determine the address of the message bus (try 'man dbus-launch' and 'man dbus-daemon' for help)",):
+            raise ImportError
+        
     # DBus sometimes fails like this, just treat it as if seahorse is not
     # available rather than crashing.
     if name in ("org.freedesktop.DBus.Error.Spawn.ExecFailed", 
