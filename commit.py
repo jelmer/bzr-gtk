@@ -101,7 +101,7 @@ class CommitDialog(gtk.Dialog):
     """Implementation of Commit."""
 
     def __init__(self, wt, selected=None, parent=None):
-        gtk.Dialog.__init__(self, title="Commit",
+        gtk.Dialog.__init__(self, title="Commit to %s" % wt.basedir,
                                   parent=parent,
                                   flags=0,
                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
