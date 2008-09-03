@@ -2,7 +2,7 @@
 Encoding=UTF-8
 Name=Bazaar Preferences
 Comment=Configure Bazaar settings
-Icon=bazaar
+Icon=bzr-icon-64
 Exec=bzr gpreferences
 Terminal=false
 Type=Application
