@@ -651,7 +651,7 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
     def _set_question_yes(self, dlg):
         """Set the dialog to answer YES to any questions."""
         self.questions = []
-        def _question_yes(*args):
+        def _question_yes(*args, **kwargs):
             self.questions.append(args)
             self.questions.append('YES')
             return gtk.RESPONSE_YES
@@ -660,7 +660,7 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
     def _set_question_no(self, dlg):
         """Set the dialog to answer NO to any questions."""
         self.questions = []
-        def _question_no(*args):
+        def _question_no(*args, **kwargs):
             self.questions.append(args)
             self.questions.append('NO')
             return gtk.RESPONSE_NO
@@ -708,7 +708,7 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
         self.assertEqual(last_rev, dlg.committed_revision_id)
         self.assertEqual(last_rev, tree.branch.last_revision())
 
-    def test_commit_no_message(self):
+    def test_commit_empty_message(self):
         tree = self.make_branch_and_tree('tree')
         self.build_tree(['tree/a', 'tree/b'])
         tree.add(['a'], ['a-id'])

@@ -104,7 +104,9 @@ class CommitDialog(gtk.Dialog):
         gtk.Dialog.__init__(self, title="Commit to %s" % wt.basedir,
                                   parent=parent,
                                   flags=0,
-                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+                                  buttons=(gtk.STOCK_CANCEL,
+                                           gtk.RESPONSE_CANCEL))
+        self._question_dialog = question_dialog
 
         self._wt = wt
         # TODO: Do something with this value, it is used by Olive
@@ -650,7 +652,7 @@ class CommitDialog(gtk.Dialog):
         message = self._get_global_commit_message()
 
         if message == '':
-            response = question_dialog(
+            response = self._question_dialog(
                 _i18n('Commit with an empty message?'),
                 _i18n('You can describe your commit intent in the message.'),
                 parent=self)
@@ -671,7 +673,7 @@ class CommitDialog(gtk.Dialog):
         #       entirely, since there isn't a way for them to add the unknown
         #       files at this point.
         for path in self._wt.unknowns():
-            response = question_dialog(
+            response = self._question_dialog(
                 _i18n("Commit with unknowns?"),
                 _i18n("Unknown files exist in the working tree. Commit anyway?"),
                 parent=self)
@@ -692,7 +694,7 @@ class CommitDialog(gtk.Dialog):
                        specific_files=specific_files,
                        revprops=revprops)
         except errors.PointlessCommit:
-            response = question_dialog(
+            response = self._question_dialog(
                 _i18n('Commit with no changes?'),
                 _i18n('There are no changes in the working tree.'
                       ' Do you want to commit anyway?'),
