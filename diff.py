@@ -689,7 +689,7 @@ def iter_changes_to_status(source, target):
                     change_type = kind_changed
                     display_path = (paths[0] + source_marker
                                     + ' => ' + paths[1] + marker)
-                elif changed_content is True or executables[0] != executables[1]:
+                elif changed_content or executables[0] != executables[1]:
                     change_type = modified
                 else:
                     assert False, "How did we get here?"
