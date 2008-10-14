@@ -64,6 +64,7 @@ class CreateCredits(Command):
 
 
 def is_versioned(cmd):
+    from bzrlib.errors import NotBranchError
     try:
         from bzrlib.branch import Branch
         Branch.open(".")
