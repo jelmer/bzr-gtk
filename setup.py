@@ -1,8 +1,10 @@
 #!/usr/bin/python
+
 """GTK+ Frontends for various Bazaar commands."""
 
 from distutils.core import setup, Command
 from distutils.command.install_data import install_data
+from distutils.command.build import build
 from distutils.dep_util import newer
 from distutils.log import info
 import glob
@@ -32,6 +34,40 @@ class Check(Command):
         suite.addTest(bzrgtk.test_suite())
         result = runner.run(suite)
         return result.wasSuccessful()
+
+
+class CreateCredits(Command):
+    description = "Create credits file"
+
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def get_command_name(self):
+        return 'test'
+
+    def run(self):
+        from bzrlib.branch import Branch
+        from bzrlib.plugins.stats import find_credits
+
+        import pickle
+
+        branch = Branch.open(".")
+        credits = find_credits(branch.repository, branch.last_revision())
+
+        pickle.dump(credits, file("credits.pickle", 'w'))
+        return True
+
+
+class BuildData(build):
+    def run(self):
+
+        return build.run(self)
+
 
 class InstallData(install_data):
     def run(self):
@@ -96,8 +132,7 @@ setup(
     maintainer_email = "jelmer@samba.org",
     description = "GTK+ Frontends for various Bazaar commands",
     license = "GNU GPL v2 or later",
-    scripts=['olive-gtk', 'bzr-handle-patch', 'bzr-notify'],
-    homepage = "http://bazaar-vcs.org/BzrGtk",
+    scripts = ['olive-gtk', 'bzr-handle-patch', 'bzr-notify'],
     package_dir = {
         "bzrlib.plugins.gtk": ".",
         "bzrlib.plugins.gtk.viz": "viz", 
@@ -153,5 +188,6 @@ setup(
                         'icons/emblem-bzr-removed.svg'])
                ],
     cmdclass={'install_data': InstallData,
+              'build_credits': CreateCredits,
               'check': Check}
 )
