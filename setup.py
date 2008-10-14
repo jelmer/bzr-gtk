@@ -63,10 +63,18 @@ class CreateCredits(Command):
         return True
 
 
-class BuildData(build):
-    def run(self):
+def is_versioned(cmd):
+    try:
+        from bzrlib.branch import Branch
+        Branch.open(".")
+        return True
+    except NotBranchError:
+        return False
 
-        return build.run(self)
+
+class BuildData(build):
+    sub_commands = build.sub_commands[:]
+    sub_commands.append(('build_credits', is_versioned))
 
 
 class InstallData(install_data):
@@ -189,5 +197,6 @@ setup(
                ],
     cmdclass={'install_data': InstallData,
               'build_credits': CreateCredits,
+              'build': BuildData,
               'check': Check}
 )
