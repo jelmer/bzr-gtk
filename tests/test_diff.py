@@ -18,7 +18,11 @@
 from cStringIO import StringIO
 import os
 
-from bzrlib import errors, tests
+from bzrlib import (
+    conflicts,
+    errors,
+    tests,
+    )
 from bzrlib.merge_directive import MergeDirective2
 
 from bzrlib.plugins.gtk.diff import (
@@ -303,3 +307,57 @@ class Test_IterChangesToStatus(tests.TestCaseWithTransport):
             [('a-id', 'a', 'removed', 'a'),
              ('b-id', 'b', 'removed', 'b/'),
             ], tree)
+
+    def test_status_missing_file(self):
+        this = self.make_branch_and_tree('this')
+        self.build_tree(['this/foo'])
+        this.add(['foo'], ['foo-id'])
+        this.commit('add')
+
+        other = this.bzrdir.sprout('other').open_workingtree()
+
+        os.remove('this/foo')
+        this.remove('foo', force=True)
+        this.commit('remove')
+
+        f = open('other/foo', 'wt')
+        try:
+            f.write('Modified\n')
+        finally:
+            f.close()
+        other.commit('modified')
+
+        this.merge_from_branch(other.branch)
+        conflicts.resolve(this)
+
+        self.assertStatusEqual(
+            [('foo-id', 'foo.OTHER', 'missing', 'foo.OTHER'),],
+            this)
+
+    def test_status_missing_directory(self):
+        this = self.make_branch_and_tree('this')
+        self.build_tree(['this/foo/', 'this/foo/bar'])
+        this.add(['foo', 'foo/bar'], ['foo-id', 'bar-id'])
+        this.commit('add')
+
+        other = this.bzrdir.sprout('other').open_workingtree()
+
+        os.remove('this/foo/bar')
+        os.rmdir('this/foo')
+        this.remove('foo', force=True)
+        this.commit('remove')
+
+        f = open('other/foo/bar', 'wt')
+        try:
+            f.write('Modified\n')
+        finally:
+            f.close()
+        other.commit('modified')
+
+        this.merge_from_branch(other.branch)
+        conflicts.resolve(this)
+
+        self.assertStatusEqual(
+            [('foo-id', u'foo', 'added', u'foo/'),
+             ('bar-id', u'foo/bar.OTHER', 'missing', u'foo/bar.OTHER'),],
+            this)

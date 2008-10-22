@@ -1,11 +1,10 @@
-# -*- coding: UTF-8 -*-
 """Difference window.
 
 This module contains the code to manage the diff window which shows
 the changes made between two revisions on a branch.
 """
 
-__copyright__ = "Copyright © 2005 Canonical Ltd."
+__copyright__ = "Copyright 2005 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 
@@ -635,6 +634,7 @@ def iter_changes_to_status(source, target):
     renamed_and_modified = 'renamed and modified'
     modified = 'modified'
     kind_changed = 'kind changed'
+    missing = 'missing'
 
     # TODO: Handle metadata changes
 
@@ -655,9 +655,15 @@ def iter_changes_to_status(source, target):
                     source_marker = ''
                 else:
                     source_marker = osutils.kind_marker(kinds[0])
+
                 if kinds[1] is None:
-                    assert kinds[0] is not None
-                    marker = osutils.kind_marker(kinds[0])
+                    if kinds[0] is None:
+                        # We assume bzr will flag only files in that case,
+                        # there may be a bzr bug there as only files seems to
+                        # not receive any kind.
+                        marker = osutils.kind_marker('file')
+                    else:
+                        marker = osutils.kind_marker(kinds[0])
                 else:
                     marker = osutils.kind_marker(kinds[1])
 
@@ -665,17 +671,20 @@ def iter_changes_to_status(source, target):
                 if real_path is None:
                     real_path = paths[0]
                 assert real_path is not None
-                display_path = real_path + marker
 
                 present_source = versioned[0] and kinds[0] is not None
                 present_target = versioned[1] and kinds[1] is not None
 
-                if present_source != present_target:
+                if kinds[0] is None and kinds[1] is None:
+                    change_type = missing
+                    display_path = real_path + marker
+                elif present_source != present_target:
                     if present_target:
                         change_type = added
                     else:
                         assert present_source
                         change_type = removed
+                    display_path = real_path + marker
                 elif names[0] != names[1] or parent_ids[0] != parent_ids[1]:
                     # Renamed
                     if changed_content or executables[0] != executables[1]:
@@ -691,6 +700,7 @@ def iter_changes_to_status(source, target):
                                     + ' => ' + paths[1] + marker)
                 elif changed_content or executables[0] != executables[1]:
                     change_type = modified
+                    display_path = real_path + marker
                 else:
                     assert False, "How did we get here?"
 
