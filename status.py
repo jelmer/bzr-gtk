@@ -21,23 +21,25 @@ except:
     pass
 
 import gtk
-from bzrlib.plugins.gtk import _i18n
+from bzrlib.plugins.gtk import (
+    _i18n,
+    window,
+    )
 
 
-class StatusDialog(gtk.Dialog):
+class StatusWindow(window.Window):
     """ Display Status window and perform the needed actions. """
     def __init__(self, wt, wtpath, revision=None):
         """ Initialize the Status window. """
-        super(StatusDialog, self).__init__(flags=gtk.DIALOG_MODAL, buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE))
+        super(StatusWindow, self).__init__()
         self.set_title("Working tree changes")
-        self.set_default_response(gtk.RESPONSE_CLOSE)
         self._create()
         self.wt = wt
         self.wtpath = wtpath
 
         if revision is None:
             revision = self.wt.branch.last_revision()
-            
+
         # Set the old working tree
         self.old_tree = self.wt.branch.repository.revision_tree(revision)
         # Generate status output
@@ -45,20 +47,17 @@ class StatusDialog(gtk.Dialog):
 
     def _create(self):
         self.set_default_size(400, 300)
-        self.set_has_separator(False)
         sw = gtk.ScrolledWindow()
         sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         sw.set_shadow_type(gtk.SHADOW_IN)
         self.treeview = gtk.TreeView()
         sw.add(self.treeview)
-        self.vbox.pack_start(sw, True, True)
-        self.vbox.show_all()
+        self.add(sw)
 
         # sane border and spacing widths (as recommended by GNOME HIG) 
         self.set_border_width(5)
         sw.set_border_width(5)
-        self.vbox.set_spacing(2)
-        self.action_area.set_border_width(5)
+        self.show_all()
 
 
     def row_diff(self, tv, path, tvc):
@@ -78,18 +77,18 @@ class StatusDialog(gtk.Dialog):
         self.treeview.set_headers_visible(False)
         self.treeview.set_model(self.model)
         self.treeview.connect("row-activated", self.row_diff)
-        
+
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 20)
         column = gtk.TreeViewColumn()
         column.pack_start(cell, expand=True)
         column.add_attribute(cell, "text", 0)
         self.treeview.append_column(column)
-        
+
         delta = self.wt.changes_from(self.old_tree)
 
         changes = False
-        
+
         if len(delta.added):
             changes = True
             titer = self.model.append(None, [ _i18n('Added'), None ])
@@ -114,7 +113,7 @@ class StatusDialog(gtk.Dialog):
             titer = self.model.append(None, [ _i18n('Modified'), None ])
             for path, id, kind, text_modified, meta_modified in delta.modified:
                 self.model.append(titer, [ path, path ])
-        
+
         done_unknown = False
         for path in self.wt.unknowns():
             changes = True
@@ -127,6 +126,6 @@ class StatusDialog(gtk.Dialog):
             self.model.append(None, [ _i18n('No changes.'), None ])
 
         self.treeview.expand_all()
-    
+
     def close(self, widget=None):
         self.window.destroy()
