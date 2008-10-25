@@ -25,14 +25,19 @@ import gtk
 class PluginsPage(gtk.VPaned):
     def __init__(self):
         gtk.VPaned.__init__(self)
+        self.set_border_width(12)
+        self.set_position(216)
+
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scrolledwindow.set_shadow_type(gtk.SHADOW_IN)
         self.model = gtk.ListStore(str, str)
         treeview = gtk.TreeView()
         scrolledwindow.add(treeview)
         self.pack1(scrolledwindow, resize=True, shrink=False)
 
         self.table = gtk.Table(columns=2)
+        self.table.set_border_width(12)
         self.table.set_row_spacings(6)
         self.table.set_col_spacings(6)
 
@@ -74,7 +79,7 @@ class PluginsPage(gtk.VPaned):
             self.table.remove(w)
 
         if getattr(p, '__author__', None) is not None:
-            align = gtk.Alignment(1.0, 0.5)
+            align = gtk.Alignment(0.0, 0.5)
             label = gtk.Label()
             label.set_markup("<b>Author:</b>")
             align.add(label)
@@ -90,7 +95,7 @@ class PluginsPage(gtk.VPaned):
             self.table.attach(align, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
 
         if getattr(p, '__version__', None) is not None:
-            align = gtk.Alignment(1.0, 0.5)
+            align = gtk.Alignment(0.0, 0.5)
             label = gtk.Label()
             label.set_markup("<b>Version:</b>")
             align.add(label)

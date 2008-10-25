@@ -37,20 +37,26 @@ class PreferencesWindow(gtk.Dialog):
         """ Initialize the Status window. """
         super(PreferencesWindow, self).__init__(flags=gtk.DIALOG_MODAL)
         self.set_title("Bazaar Preferences")
+        self.set_has_separator(False)
         self.config = config
         if self.config is None:
             self.config = GlobalConfig()
         self._create()
-        self._create_pages()
-
 
     def _create(self):
-        self.set_default_size(600, 600)
+        self.set_default_size(320, 480)
+        self.set_border_width(0)
+
         notebook = gtk.Notebook()
+        notebook.set_border_width(12)
         for (label, page) in self._create_pages():
-            notebook.insert_page(page, gtk.Label(label))
+            notebook.append_page(page, gtk.Label(label))
+
+        notebook.set_current_page(0)
+        self.vbox.set_border_width(0)
         self.vbox.pack_start(notebook, True, True)
         self.vbox.show_all()
+        self.action_area.set_border_width(12)
 
     def _create_pages(self):
         return [("Identity", IdentityPage(self.config)), 
