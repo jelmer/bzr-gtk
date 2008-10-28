@@ -402,7 +402,7 @@ class cmd_gstatus(GTKCommand):
 
     Graphical user interface for showing status 
     information."""
-    
+
     aliases = [ "gst" ]
     takes_args = ['PATH?']
     takes_options = ['revision']
@@ -410,21 +410,23 @@ class cmd_gstatus(GTKCommand):
     def run(self, path='.', revision=None):
         import os
         gtk = open_display()
-        from status import StatusDialog
+        from bzrlib.plugins.gtk.status import StatusWindow
         (wt, wt_path) = workingtree.WorkingTree.open_containing(path)
-        
+
         if revision is not None:
             try:
                 revision_id = revision[0].as_revision_id(wt.branch)
             except:
                 from bzrlib.errors import BzrError
-                raise BzrError('Revision %r doesn\'t exist' % revision[0].user_spec )
+                raise BzrError('Revision %r doesn\'t exist'
+                               % revision[0].user_spec )
         else:
             revision_id = None
 
-        status = StatusDialog(wt, wt_path, revision_id)
+        status = StatusWindow(wt, wt_path, revision_id)
         status.connect("destroy", gtk.main_quit)
-        status.run()
+        status.show()
+        gtk.main()
 
 
 class cmd_gsend(GTKCommand):
