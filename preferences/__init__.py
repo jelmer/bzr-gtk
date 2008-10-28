@@ -25,6 +25,7 @@ import gtk
 from bzrlib.config import GlobalConfig
 from identity import IdentityPage
 from plugins import PluginsPage
+from notifications import NotificationsPage
 
 class PreferencesWindow(gtk.Dialog):
     """Displays global preferences windows."""
@@ -60,7 +61,8 @@ class PreferencesWindow(gtk.Dialog):
 
     def _create_pages(self):
         return [("Identity", IdentityPage(self.config)), 
-                ("Plugins", PluginsPage())]
+                ("Plugins", PluginsPage()),
+                ("Notifications", NotificationsPage(self.config))]
 
     def display(self):
         self.window.show_all()

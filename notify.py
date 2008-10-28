@@ -17,6 +17,13 @@
 """Notification area icon and notification for Bazaar."""
 
 import gtk
+import bzrlib.plugins.dbus
+
+def has_dbus():
+    return (getattr(bzrlib.plugins, "dbus", None) is not None)
+
+def has_avahi():
+    return (getattr(bzrlib.plugins, "avahi", None) is not None)
 
 class NotifyPopupMenu(gtk.Menu):
     def __init__(self):
@@ -24,26 +31,26 @@ class NotifyPopupMenu(gtk.Menu):
         self.create_items()
 
     def create_items(self):
+        item = gtk.CheckMenuItem('_Gateway to LAN')
+        item.connect('toggled', self.toggle_lan_gateway)
+        self.append(item)
+        self.append(gtk.SeparatorMenuItem())
         try:
             from bzrlib.plugins.dbus.activity import LanGateway
             self.langateway = LanGateway()
-            item = gtk.CheckMenuItem('_Gateway to LAN')
-            item.connect('toggled', self.toggle_lan_gateway)
-            self.append(item)
-            self.append(gtk.SeparatorMenuItem())
         except ImportError:
-            pass
+            item.set_sensitive(False)
 
+        item = gtk.CheckMenuItem('Announce _branches on LAN')
+        item.connect('toggled', self.toggle_announce_branches)
+        self.append(item)
+        self.append(gtk.SeparatorMenuItem())
         try:
             from bzrlib.plugins.avahi.share import ZeroConfServer
             from bzrlib import urlutils
             self.zeroconfserver = ZeroConfServer(urlutils.normalize_url('.'))
-            item = gtk.CheckMenuItem('Announce _branches on LAN')
-            item.connect('toggled', self.toggle_announce_branches)
-            self.append(item)
-            self.append(gtk.SeparatorMenuItem())
         except ImportError:
-            pass
+            item.set_sensitive(False)
 
         item = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES, None)
         item.connect('activate', self.show_preferences)
