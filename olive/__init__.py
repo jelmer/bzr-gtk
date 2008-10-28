@@ -133,9 +133,6 @@ class OliveGtk:
             self.combobox_drive.show()
             self.gen_hard_selector()
         
-        # Acceptable errors when loading files/folders in the treeviews
-        self.acceptable_errors = (errno.ENOENT, errno.ELOOP)
-        
         self.refresh_left()
 
         # Apply menu state
@@ -876,7 +873,7 @@ class OliveGtk:
         
         self.pref.write()
         self.window.destroy()
-    
+
     def get_selected_fileid(self):
         """ Get the file_id of the selected file. """
         treeselection = self.window.treeview_right.get_selection()
@@ -967,7 +964,7 @@ class OliveGtk:
             for item in os.listdir(path):
                 if not dotted_files and item[0] == '.':
                     continue
-                if os.path.isdir(path + os.sep + item):
+                if os.path.isdir(os.path.join(path, item)):
                     dirs.append(item)
                 else:
                     files.append(item)
@@ -1003,13 +1000,7 @@ class OliveGtk:
                     if not ignored_files and status == 'ignored':
                         continue
                 
-                try:
-                    statinfo = os.stat(self.path + os.sep + item)
-                except OSError, e:
-                    if e.errno in self.acceptable_errors:
-                        continue
-                    else:
-                        raise
+                statinfo = os.lstat(os.path.join(self.path, item))
                 liststore.append([ gtk.STOCK_DIRECTORY,
                                    True,
                                    item,
@@ -1031,13 +1022,7 @@ class OliveGtk:
                     if not ignored_files and status == 'ignored':
                         continue
                 
-                try:
-                    statinfo = os.stat(self.path + os.sep + item)
-                except OSError, e:
-                    if e.errno in self.acceptable_errors:
-                        continue
-                    else:
-                        raise
+                statinfo = os.lstat(os.path.join(self.path, item))
                 liststore.append([gtk.STOCK_FILE,
                                   False,
                                   item,
