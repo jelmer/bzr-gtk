@@ -17,13 +17,16 @@
 """Notification area icon and notification for Bazaar."""
 
 import gtk
-import bzrlib.plugins.dbus
+import bzrlib
+
 
 def has_dbus():
     return (getattr(bzrlib.plugins, "dbus", None) is not None)
 
+
 def has_avahi():
     return (getattr(bzrlib.plugins, "avahi", None) is not None)
+
 
 class NotifyPopupMenu(gtk.Menu):
     def __init__(self):
