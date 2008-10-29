@@ -25,14 +25,15 @@ import gtk
 from bzrlib.plugins.gtk.notify import has_avahi, has_dbus
 
 class NotificationsPage(gtk.VBox):
-    def __init__(self, config):
+    def __init__(self, config, homogeneous=False, spacing=6):
         self.config = config
-        gtk.VBox.__init__(self)
+        gtk.VBox.__init__(self, homogeneous=homogeneous, spacing=spacing)
+        self.set_spacing(spacing) # The vertical one
 
         self.gateway_to_lan = gtk.CheckButton("_Gateway to LAN")
-        self.pack_start(self.gateway_to_lan)
+        self.pack_start(self.gateway_to_lan, expand=False)
         self.gateway_to_lan.set_sensitive(has_dbus())
 
         self.announce_on_lan = gtk.CheckButton("_Announce on LAN")
-        self.pack_start(self.announce_on_lan)
+        self.pack_start(self.announce_on_lan, expand=False)
         self.announce_on_lan.set_sensitive(has_avahi())
