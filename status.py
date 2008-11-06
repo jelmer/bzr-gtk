@@ -66,7 +66,7 @@ class StatusWindow(window.Window):
             return
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow()
-        window.set_diff("Working tree changes", self.old_tree, self.wt)
+        window.set_diff("Working tree changes", self.wt, self.old_tree)
         window.set_file(file)
         window.show()
 
