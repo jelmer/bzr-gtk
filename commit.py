@@ -97,6 +97,13 @@ def pending_revisions(wt):
     return pm
 
 
+_newline_variants_re = re.compile(r'\r\n?')
+def _sanitize_and_decode_message(utf8_message):
+    """Turn a utf-8 message into a sanitized Unicode message."""
+    fixed_newline = _newline_variants_re.sub('\n', utf8_message)
+    return fixed_newline.decode('utf-8')
+
+
 class CommitDialog(gtk.Dialog):
     """Implementation of Commit."""
 
@@ -631,10 +638,12 @@ class CommitDialog(gtk.Dialog):
             if self._commit_all_changes or record[2]:# [2] checkbox
                 file_id = record[0] # [0] file_id
                 path = record[1]    # [1] real path
-                file_message = record[5] # [5] commit message
+                # [5] commit message
+                file_message = _sanitize_and_decode_message(record[5])
                 files.append(path.decode('UTF-8'))
                 if self._enable_per_file_commits and file_message:
                     # All of this needs to be utf-8 information
+                    file_message = file_message.encode('UTF-8')
                     file_info.append({'path':path, 'file_id':file_id,
                                      'message':file_message})
         file_info.sort(key=lambda x:(x['path'], x['file_id']))
@@ -712,7 +721,8 @@ class CommitDialog(gtk.Dialog):
     def _get_global_commit_message(self):
         buf = self._global_message_text_view.get_buffer()
         start, end = buf.get_bounds()
-        return buf.get_text(start, end).decode('utf-8')
+        text = buf.get_text(start, end)
+        return _sanitize_and_decode_message(text)
 
     def _set_global_commit_message(self, message):
         """Just a helper for the test suite."""
