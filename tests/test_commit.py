@@ -1,4 +1,4 @@
-# Copyright (C) 2007 John Arbash Meinel <john@arbash-meinel.com>
+# Copyright (C) 2007, 2008 John Arbash Meinel <john@arbash-meinel.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
