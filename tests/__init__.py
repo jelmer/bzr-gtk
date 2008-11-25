@@ -1,4 +1,4 @@
-# Copyright (C) 2007 Jelmer Vernooij <jelmer@samba.org>
+# Copyright (C) 2007, 2008 Jelmer Vernooij <jelmer@samba.org>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,9 +27,10 @@ def test_suite():
     testmod_names = [
         'test_commit',
         'test_diff',
+        'test_history',
         'test_linegraph',
         'test_preferences',
-        'test_history',
+        'test_revisionview',
         ]
 
     result.addTest(loader.loadTestsFromModuleNames(["%s.%s" % (__name__, i) for i in testmod_names]))
