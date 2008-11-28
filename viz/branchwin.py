@@ -125,6 +125,12 @@ class BranchWindow(Window):
         vbox.pack_start(self.paned, expand=True, fill=True)
         vbox.set_focus_child(self.paned)
 
+        self.treeview.connect('revision-selected',
+                self._treeselection_changed_cb)
+        self.treeview.connect('revision-activated',
+                self._tree_revision_activated)
+
+        self.treeview.connect('tag-added', lambda w, t, r: self._update_tags())
         vbox.show()
     
     def construct_menubar(self):
@@ -288,13 +294,6 @@ class BranchWindow(Window):
         # FIXME: Make broken_line_length configurable
 
         self.treeview = TreeView(self.branch, self.start_revs, self.maxnum, self.compact_view)
-
-        self.treeview.connect('revision-selected',
-                self._treeselection_changed_cb)
-        self.treeview.connect('revision-activated',
-                self._tree_revision_activated)
-
-        self.treeview.connect('tag-added', lambda w, t, r: self._update_tags())
 
         for col in ["revno", "date"]:
             option = self.config.get_user_option(col + '-column-visible')
