@@ -22,6 +22,7 @@ import pango
 import gobject
 import webbrowser
 
+from bzrlib import trace
 from bzrlib.osutils import format_date
 from bzrlib.util.bencode import bdecode
 from bzrlib.testament import Testament
@@ -422,10 +423,15 @@ class RevisionView(gtk.Notebook):
         self._add_parents_or_children(revision.parent_ids,
                                       self.parents_widgets,
                                       self.parents_table)
-        
+
         file_info = revision.properties.get('file-info', None)
         if file_info is not None:
-            file_info = bdecode(file_info.encode('UTF-8'))
+            try:
+                file_info = bdecode(file_info.encode('UTF-8'))
+            except ValueError:
+                trace.note('Invalid per-file info for revision:%s, value: %r',
+                           revision.revision_id, file_info)
+                file_info = None
 
         if file_info:
             if self._file_id is None:

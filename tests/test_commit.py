@@ -1,4 +1,4 @@
-# Copyright (C) 2007 John Arbash Meinel <john@arbash-meinel.com>
+# Copyright (C) 2007, 2008 John Arbash Meinel <john@arbash-meinel.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -644,6 +644,28 @@ class TestCommitDialog(tests.TestCaseWithTransport):
                             'message':'message\nfor b_dir\n'},
                           ]), dlg._get_specific_files())
 
+    def test_specific_files_sanitizes_messages(self):
+        tree = self.make_branch_and_tree('tree')
+        tree.branch.get_config().set_user_option('per_file_commits', 'true')
+        self.build_tree(['tree/a_file', 'tree/b_dir/'])
+        tree.add(['a_file', 'b_dir'], ['1a-id', '0b-id'])
+
+        dlg = commit.CommitDialog(tree)
+        dlg._commit_selected_radio.set_active(True)
+        self.assertEqual((['a_file', 'b_dir'], []), dlg._get_specific_files())
+
+        dlg._treeview_files.set_cursor((1,))
+        dlg._set_file_commit_message('Test\r\nmessage\rfor a_file\n')
+        dlg._treeview_files.set_cursor((2,))
+        dlg._set_file_commit_message('message\r\nfor\nb_dir\r')
+
+        self.assertEqual((['a_file', 'b_dir'],
+                          [{'path':'a_file', 'file_id':'1a-id',
+                            'message':'Test\nmessage\nfor a_file\n'},
+                           {'path':'b_dir', 'file_id':'0b-id',
+                            'message':'message\nfor\nb_dir\n'},
+                          ]), dlg._get_specific_files())
+
 
 class TestCommitDialog_Commit(tests.TestCaseWithTransport):
     """Tests on the actual 'commit' button being pushed."""
@@ -686,6 +708,21 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
         last_rev = tree2.last_revision()
         self.assertEqual(last_rev, dlg.committed_revision_id)
         self.assertEqual(rev_id1, tree.branch.last_revision())
+
+    def test_commit_global_sanitizes_message(self):
+        tree = self.make_branch_and_tree('tree')
+        self.build_tree(['tree/a'])
+        tree.add(['a'], ['a-id'])
+        rev_id1 = tree.commit('one')
+
+        self.build_tree(['tree/b'])
+        tree.add(['b'], ['b-id'])
+        dlg = commit.CommitDialog(tree)
+        # With the check box set, it should only effect the local branch
+        dlg._set_global_commit_message('Commit\r\nmessage\rfoo\n')
+        dlg._do_commit()
+        rev = tree.branch.repository.get_revision(tree.last_revision())
+        self.assertEqual('Commit\nmessage\nfoo\n', rev.message)
 
     def test_bound_commit_both(self):
         tree = self.make_branch_and_tree('tree')
@@ -1030,3 +1067,22 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
                           {'path':u'\u03a9', 'file_id':'omega-id',
                            'message':u'\u03a9 is the end of all things.\n'},
                          ], file_info_decoded)
+
+
+class TestSanitizeMessage(tests.TestCase):
+
+    def assertSanitize(self, expected, original):
+        self.assertEqual(expected,
+                         commit._sanitize_and_decode_message(original))
+
+    def test_untouched(self):
+        self.assertSanitize('foo\nbar\nbaz\n', 'foo\nbar\nbaz\n')
+
+    def test_converts_cr_to_lf(self):
+        self.assertSanitize('foo\nbar\nbaz\n', 'foo\rbar\rbaz\r')
+
+    def test_converts_crlf_to_lf(self):
+        self.assertSanitize('foo\nbar\nbaz\n', 'foo\r\nbar\r\nbaz\r\n')
+
+    def test_converts_mixed_to_lf(self):
+        self.assertSanitize('foo\nbar\nbaz\n', 'foo\r\nbar\rbaz\n')

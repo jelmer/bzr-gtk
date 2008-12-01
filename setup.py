@@ -39,24 +39,25 @@ class Check(Command):
 class CreateCredits(Command):
     description = "Create credits file"
 
-    user_options = []
+    user_options = [("url=", None, "URL of branch")]
 
     def initialize_options(self):
-        pass
+        self.url = "."
 
     def finalize_options(self):
         pass
 
     def get_command_name(self):
-        return 'test'
+        return 'build_credits'
 
     def run(self):
+        from bzrlib.plugin import load_plugins; load_plugins()
         from bzrlib.branch import Branch
         from bzrlib.plugins.stats import find_credits
 
         import pickle
 
-        branch = Branch.open(".")
+        branch = Branch.open(self.url)
         credits = find_credits(branch.repository, branch.last_revision())
 
         pickle.dump(credits, file("credits.pickle", 'w'))
