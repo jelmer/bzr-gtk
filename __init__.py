@@ -37,6 +37,7 @@ visualise         Graphically visualise this branch.
 import sys
 
 import bzrlib
+import bzrlib.api
 
 version_info = (0, 96, 0, 'dev', 1)
 
@@ -46,28 +47,10 @@ else:
     version_string = '%d.%d.%d%s%d' % version_info
 __version__ = version_string
 
-required_bzrlib = (1, 6)
+COMPATIBLE_BZR_VERSIONS = [(1, 6, 0), (1, 7, 0), (1, 8, 0), (1, 9, 0),
+                           (1, 10, 0), (1, 11, 0), (1, 12, 0)]
 
-def check_bzrlib_version(desired):
-    """Check that bzrlib is compatible.
-
-    If version is < bzr-gtk version, assume incompatible.
-    """
-    bzrlib_version = bzrlib.version_info[:2]
-    try:
-        from bzrlib.trace import warning
-    except ImportError:
-        # get the message out any way we can
-        from warnings import warn as warning
-    if bzrlib_version < desired:
-        from bzrlib.errors import BzrError
-        warning('Installed Bazaar version %s is too old to be used with bzr-gtk'
-                ' %s.' % (bzrlib.__version__, __version__))
-        raise BzrError('Version mismatch: %r, %r' % (version_info, bzrlib.version_info) )
-
-
-if version_info[2] == "final":
-    check_bzrlib_version(required_bzrlib)
+bzrlib.api.require_any_api(bzrlib, COMPATIBLE_BZR_VERSIONS)
 
 from bzrlib.trace import warning
 if __name__ != 'bzrlib.plugins.gtk':
