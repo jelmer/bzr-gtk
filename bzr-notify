@@ -31,9 +31,6 @@ if getattr(dbus, 'version', (0,0,0)) >= (0,41,0):
 BROADCAST_INTERFACE = "org.bazaarvcs.plugins.dbus.Broadcast"
 bus = dbus.SessionBus()
 
-def hide_icon():
-	icon.set_visible(False)
-
 def catch_branch(revision_id, urls):
 	# TODO: show all the urls, or perhaps choose the 'best'.
 	url = urls[0]
@@ -53,20 +50,7 @@ def catch_branch(revision_id, urls):
 		body += revision.message
 		body = cgi.escape(body)
 		nw = pynotify.Notification(summary, body)
-		def start_viz(notification=None, action=None, data=None):
-			"""Start the viz program."""
-			pp = start_viz_window(branch, revision_id)
-			pp.show()
-		def start_branch(notification=None, action=None, data=None):
-			"""Start a Branch dialog"""
-			from bzrlib.plugins.gtk.branch import BranchDialog
-			bd = BranchDialog(remote_path=url)
-			bd.run()
-		nw.add_action("inspect", "Inspect", start_viz, None)
-		nw.add_action("branch", "Branch", start_branch, None)
 		icon.set_visible(True)
-		gobject.timeout_add(5000, hide_icon)
-		nw.set_timeout(5000)
 		nw.show()
 	except Exception, e:
 		print e
