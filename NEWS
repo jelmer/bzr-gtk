@@ -12,6 +12,8 @@
 
   * Fix Olive homepage URL. (#255152)
 
+  * Mark as compatible with bzr 1.13.
+
 0.95.0	2008-08-04
 
  UI
