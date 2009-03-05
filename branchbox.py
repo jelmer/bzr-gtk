@@ -29,7 +29,7 @@ import gobject
 
 class BranchSelectionBox(gtk.HBox):
     def __init__(self, path=None):
-        super(BranchSelectionBox, self).__init__()
+        gobject.GObject.__init__(self)
         self._combo = gtk.ComboBoxEntry()
         self._combo.child.connect('focus-out-event', self._on_combo_changed)
         
@@ -38,10 +38,6 @@ class BranchSelectionBox(gtk.HBox):
         self._build_history()
 
         self.add(self._combo)
-
-        gobject.signal_new('branch-changed', BranchSelectionBox, 
-                           gobject.SIGNAL_RUN_LAST,
-                           gobject.TYPE_NONE, (gobject.TYPE_OBJECT,))
 
         if path is not None:
             self.set_url(path)
@@ -71,4 +67,8 @@ class BranchSelectionBox(gtk.HBox):
 
     def _on_combo_changed(self, widget, event):
         self.emit('branch-changed', widget)
-    
+
+gobject.signal_new('branch-changed', BranchSelectionBox, 
+                   gobject.SIGNAL_RUN_LAST,
+                   gobject.TYPE_NONE, (gobject.TYPE_OBJECT,))
+gobject.type_register(BranchSelectionBox)
