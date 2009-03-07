@@ -21,6 +21,7 @@ icon.set_visible(False)
 import cgi
 import dbus
 import dbus.service
+import gobject
 import pynotify
 from bzrlib.bzrdir import BzrDir
 from bzrlib import errors

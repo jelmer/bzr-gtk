@@ -90,6 +90,8 @@
   
   * Handle unreadable .bzr subfolder in Olive. (Jasper Groenewegen, #229044)
 
+  * Import gobject in bzr-notify, as it is used there to set a timeout. (James Westby)
+
  CHANGES
 
   * Moved notify icon code to separate script. (Jelmer Vernooij)
