@@ -416,9 +416,12 @@ class RevisionView(gtk.Notebook):
             self.timestamp.set_text(format_date(revision.timestamp,
                                                 revision.timezone))
         try:
-            self.branchnick_label.set_text(revision.properties['branch-nick'])
+            self.branchnick.show()
+            self.branchnick_label.show()
+            self.branchnick.set_text(revision.properties['branch-nick'])
         except KeyError:
-            self.branchnick_label.set_text("")
+            self.branchnick.hide()
+            self.branchnick_label.hide()
 
         self._add_parents_or_children(revision.parent_ids,
                                       self.parents_widgets,
@@ -623,18 +626,18 @@ class RevisionView(gtk.Notebook):
         self.committer.show()
 
         row += 1
-        label = gtk.Label()
-        label.set_alignment(1.0, 0.5)
-        label.set_markup("<b>Branch nick:</b>")
-        self.table.attach(label, 0, 1, row, row+1, gtk.FILL, gtk.FILL)
-        label.show()
-
         self.branchnick_label = gtk.Label()
-        self.branchnick_label.set_ellipsize(pango.ELLIPSIZE_MIDDLE)
-        self.branchnick_label.set_alignment(0.0, 0.5)
-        self.branchnick_label.set_selectable(True)
-        self.table.attach(self.branchnick_label, 1, 2, row, row+1, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.branchnick_label.set_alignment(1.0, 0.5)
+        self.branchnick_label.set_markup("<b>Branch nick:</b>")
+        self.table.attach(self.branchnick_label, 0, 1, row, row+1, gtk.FILL, gtk.FILL)
         self.branchnick_label.show()
+
+        self.branchnick = gtk.Label()
+        self.branchnick.set_ellipsize(pango.ELLIPSIZE_MIDDLE)
+        self.branchnick.set_alignment(0.0, 0.5)
+        self.branchnick.set_selectable(True)
+        self.table.attach(self.branchnick, 1, 2, row, row+1, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.branchnick.show()
 
         row += 1
         label = gtk.Label()
