@@ -114,6 +114,8 @@ class CommitDialog(gtk.Dialog):
                                   buttons=(gtk.STOCK_CANCEL,
                                            gtk.RESPONSE_CANCEL))
         self._question_dialog = question_dialog
+        
+        self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
 
         self._wt = wt
         # TODO: Do something with this value, it is used by Olive
