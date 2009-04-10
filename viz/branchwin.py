@@ -439,7 +439,7 @@ class BranchWindow(Window):
         parents  = self.treeview.get_parents()
 
         if len(parents) == 0:
-            parent_id = None
+            parent_id = NULL_REVISION
         else:
             parent_id = parents[0]
 
@@ -616,13 +616,10 @@ class BranchWindow(Window):
             value = '%sx%s' % (width, height)
             self.config.set_user_option(name, value)
 
-    def show_diff(self, revid=None, parentid=None):
+    def show_diff(self, revid=None, parentid=NULL_REVISION):
         """Open a new window to show a diff between the given revisions."""
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow(parent=self)
-
-        if parentid is None:
-            parentid = NULL_REVISION
 
         rev_tree    = self.branch.repository.revision_tree(revid)
         parent_tree = self.branch.repository.revision_tree(parentid)
@@ -638,13 +635,13 @@ class BranchWindow(Window):
 
         if not revision: # default to selected row
             revision = self.treeview.get_revision()
-        if (not revision) or (revision == NULL_REVISION):
+        if revision == NULL_REVISION:
             return
 
         if not parents: # default to selected row's parents
             parents  = self.treeview.get_parents()
         if len(parents) == 0:
-            parent_id = None
+            parent_id = NULL_REVISION
         else:
             parent_id = parents[0]
 
