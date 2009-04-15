@@ -108,7 +108,6 @@ class BranchWindow(Window):
         def save_size(src):
             width, height = widget.allocation.width, widget.allocation.height
             value = '%sx%s' % (width, height)
-            print "%s -> %s" % (config_name, value)
             self.config.set_user_option(config_name, value)
         self.connect("destroy", save_size)
 
