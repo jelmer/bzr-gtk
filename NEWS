@@ -12,6 +12,8 @@
 
   * Fix Olive homepage URL. (#255152)
 
+  * Mark as compatible with bzr 1.13.
+
 0.95.0	2008-08-04
 
  UI
@@ -87,6 +89,8 @@
   * Make sure error/info/warning dialogs know their parent window. (Jasper Groenewegen, #252208)
   
   * Handle unreadable .bzr subfolder in Olive. (Jasper Groenewegen, #229044)
+
+  * Import gobject in bzr-notify, as it is used there to set a timeout. (James Westby)
 
  CHANGES
 

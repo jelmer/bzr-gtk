@@ -21,6 +21,7 @@ icon.set_visible(False)
 import cgi
 import dbus
 import dbus.service
+import gobject
 import pynotify
 from bzrlib.bzrdir import BzrDir
 from bzrlib import errors
@@ -62,8 +63,9 @@ def catch_branch(revision_id, urls):
 			from bzrlib.plugins.gtk.branch import BranchDialog
 			bd = BranchDialog(remote_path=url)
 			bd.run()
-		nw.add_action("inspect", "Inspect", start_viz, None)
-		nw.add_action("branch", "Branch", start_branch, None)
+		if "actions" in pynotify.get_server_caps():
+			nw.add_action("inspect", "Inspect", start_viz, None)
+			nw.add_action("branch", "Branch", start_branch, None)
 		icon.set_visible(True)
 		gobject.timeout_add(5000, hide_icon)
 		nw.set_timeout(5000)
