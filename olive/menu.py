@@ -310,7 +310,7 @@ class OliveMenu:
         wt = WorkingTree.open_containing(self.path)[0]
         window = DiffWindow(self.app)
         parent_tree = wt.branch.repository.revision_tree(wt.branch.last_revision())
-        window.set_diff(wt.branch.nick, wt, parent_tree)
+        window.set_diff(wt.branch._get_nick(local=True), wt, parent_tree)
         window.set_file(wt.relpath(self.path + os.sep + self.selected))
         window.show()
     
@@ -367,7 +367,7 @@ class OliveMenu:
         wt = WorkingTree.open_containing(self.path)[0]
         window = DiffWindow(self.app)
         parent_tree = wt.branch.repository.revision_tree(wt.branch.last_revision())
-        window.set_diff(wt.branch.nick, wt, parent_tree)
+        window.set_diff(wt.branch._get_nick(local=True), wt, parent_tree)
         window.show()
     
     def view_remote(self, action):

@@ -55,7 +55,7 @@ class BranchWindow(Window):
         else:
             self.compact_view = False
 
-        self.set_title(branch.nick + " - revision history")
+        self.set_title(branch._get_nick(local=True) + " - revision history")
 
         # user-configured window size
         size = self._load_size('viz-window-size')
@@ -624,7 +624,7 @@ class BranchWindow(Window):
         rev_tree    = self.branch.repository.revision_tree(revid)
         parent_tree = self.branch.repository.revision_tree(parentid)
 
-        description = revid + " - " + self.branch.nick
+        description = revid + " - " + self.branch._get_nick(local=True)
         window.set_diff(description, rev_tree, parent_tree)
         window.show()
 

@@ -86,7 +86,8 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
 
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow()
-        window.set_diff(tree.branch.nick, tree, tree.branch.basis_tree())
+        window.set_diff(tree.branch._get_nick(local=True), tree, 
+                        tree.branch.basis_tree())
         window.show()
 
         return

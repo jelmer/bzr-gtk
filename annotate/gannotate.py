@@ -139,7 +139,7 @@ class GAnnotateWindow(Window):
         current_revision.timestamp = time.time()
         current_revision.message = '[Not yet committed]'
         current_revision.parent_ids = tree.get_parent_ids()
-        current_revision.properties['branch-nick'] = self.branch.nick
+        current_revision.properties['branch-nick'] = self.branch._get_nick(local=True)
         current_revno = '%d?' % (self.branch.revno() + 1)
         repository = self.branch.repository
         if self.revision_id == CURRENT_REVISION:
