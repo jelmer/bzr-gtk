@@ -25,8 +25,6 @@ import gtk
 
 from errors import show_bzr_error
 
-# FIXME: This needs to be public JRV 20070714
-from bzrlib.builtins import _create_prefix
 from bzrlib.config import LocationConfig
 import bzrlib.errors as errors
 
@@ -144,7 +142,7 @@ def do_push(br_from, location, overwrite):
             response = question_dialog(_i18n('Non existing parent directory'),
                          _i18n("The parent directory (%s)\ndoesn't exist. Create?") % location)
             if response == gtk.RESPONSE_OK:
-                _create_prefix(transport)
+                transport.create_prefix()
             else:
                 return
         dir_to = br_from.bzrdir.clone(location_url,
