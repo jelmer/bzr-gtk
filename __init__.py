@@ -102,21 +102,21 @@ def open_display():
             raise NoDisplayError
     set_ui_factory()
     return gtk
- 
+
 
 commands = {
     "gannotate": ["gblame", "gpraise"],
     "gbranch": [],
-    "gcheckout": [], 
-    "gcommit": ["gci"], 
-    "gconflicts": [], 
+    "gcheckout": [],
+    "gcommit": ["gci"],
+    "gconflicts": [],
     "gdiff": [],
     "ginit": [],
     "ginfo": [],
     "gmerge": [],
-    "gmissing": [], 
-    "gpreferences": [], 
-    "gpush": [], 
+    "gmissing": [],
+    "gpreferences": [],
+    "gpush": [],
     "gselftest": [],
     "gsend": [],
     "gstatus": ["gst"],
@@ -132,7 +132,8 @@ else:
     commands["gloom"] = []
 
 for cmd, aliases in commands.iteritems():
-    plugin_cmds.register_lazy("cmd_%s" % cmd, aliases, "bzrlib.plugins.gtk.commands")
+    plugin_cmds.register_lazy("cmd_%s" % cmd, aliases,
+                              "bzrlib.plugins.gtk.commands")
 
 
 import gettext
@@ -149,20 +150,22 @@ class NoDisplayError(errors.BzrCommandError):
         return "No DISPLAY. Unable to run GTK+ application."
 
 
-def test_suite():
-    from unittest import TestSuite
-    import tests
+def load_tests(basic_tests, module, loader):
+    testmod_names = [
+        'tests',
+        ]
     import sys
     default_encoding = sys.getdefaultencoding()
     try:
-        result = TestSuite()
+        result = basic_tests
         try:
             import_pygtk()
         except errors.BzrCommandError:
-            return result
-        result.addTest(tests.test_suite())
+            return basic_tests
+        basic_tests.addTest(loader.loadTestsFromModuleNames(
+                ["%s.%s" % (__name__, tmn) for tmn in testmod_names]))
     finally:
         if sys.getdefaultencoding() != default_encoding:
             reload(sys)
             sys.setdefaultencoding(default_encoding)
-    return result
+    return basic_tests

@@ -14,16 +14,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from unittest import TestLoader, TestSuite
-from bzrlib.tests import TestUtil
+from bzrlib import tests
 
-import os
-
-def test_suite():
-    result = TestSuite()
-
-    loader = TestUtil.TestLoader()
-
+def load_tests(basic_tests, module, loader):
     testmod_names = [
         'test_commit',
         'test_diff',
@@ -33,6 +26,6 @@ def test_suite():
         'test_revisionview',
         ]
 
-    result.addTest(loader.loadTestsFromModuleNames(["%s.%s" % (__name__, i) for i in testmod_names]))
-    return result
-
+    basic_tests.addTest(loader.loadTestsFromModuleNames(
+            ["%s.%s" % (__name__, tmn) for tmn in testmod_names]))
+    return basic_tests
