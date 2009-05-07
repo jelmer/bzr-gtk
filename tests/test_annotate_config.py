@@ -34,7 +34,6 @@ class TestConfig(tests.TestCaseInTempDir):
     def test_create_initial_config(self):
         """We can create a config even without a prior conf file"""
         conf = config.GAnnotateConfig(self.window)
-        import pdb; pdb.set_trace()
         # We can access the default values (we just pick a random one)
         width = conf['window']['width']
         # configobj presents attributes as strings only
