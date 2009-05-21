@@ -37,18 +37,18 @@ class GnomeKeyringCredentialStore(CredentialStore):
     def decode_password(self, credentials):
         if gnomekeyring is None:
             return None
+        attrs = {}
+        if "scheme" in credentials:
+            attrs["protocol"] = credentials["scheme"].encode("utf-8")
+        if "host" in credentials:
+            attrs["server"] = credentials["host"].encode("utf-8")
+        if "user" in credentials:
+            attrs["user"] = credentials["user"].encode("utf-8")
+        if credentials.get("port") is not None:
+            attrs["port"] = credentials["port"]
         try:
-            attrs = {}
-            if "scheme" in credentials:
-                attrs["protocol"] = credentials["scheme"]
-            if "host" in credentials:
-                attrs["server"] = credentials["host"]
-            if "user" in credentials:
-                attrs["user"] = credentials["user"]
-            if "port" in credentials:
-                attrs["port"] = str(credentials["port"])
-            items = gnomekeyring.find_items_sync(gnomekeyring.ITEM_GENERIC_SECRET, 
-                                                 attrs)
+            items = gnomekeyring.find_items_sync(
+                gnomekeyring.ITEM_NETWORK_PASSWORD, attrs)
             return items[0].secret
         except (gnomekeyring.NoMatchError, gnomekeyring.DeniedError):
             return None
@@ -58,15 +58,14 @@ class GnomeKeyringCredentialStore(CredentialStore):
         if gnomekeyring is None:
             return None
         attrs = {
-            "protocol": scheme,
-            "server": host,
+            "protocol": scheme.encode("utf-8"),
+            "server": host.encode("utf-8"),
             }
-        if realm is not None:
-            attrs["realm"] = realm
+        # TODO: realm ?
         if port is not None:
-            attrs["port"] = str(port)
+            attrs["port"] = port
         if user is not None:
-            attrs["user"] = user
+            attrs["user"] = user.encode("utf-8")
         credentials = { "scheme": scheme, "host": host, "port": port, 
             "realm": realm, "user": user}
         try:
