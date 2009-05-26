@@ -67,10 +67,10 @@ class DiffFileView(gtk.ScrolledWindow):
             slm = gtksourceview2.LanguageManager()
             gsl = slm.guess_language(content_type="text/x-patch")
             if have_gconf:
-                self.apply_gedit_colors(gsl)
+                self.apply_gedit_colors(self.buffer)
             self.apply_colordiff_colors(gsl)
             self.buffer.set_language(gsl)
-            self.buffer.set_highlight(True)
+            self.buffer.set_highlight_syntax(True)
 
             self.sourceview = gtksourceview2.View(self.buffer)
         else:
@@ -83,67 +83,20 @@ class DiffFileView(gtk.ScrolledWindow):
         self.sourceview.show()
 
     @staticmethod
-    def apply_gedit_colors(lang):
-        """Set style for lang to that specified in gedit configuration.
+    def apply_gedit_colors(buf):
+        """Set style to that specified in gedit configuration.
 
         This method needs the gconf module.
 
-        :param lang: a gtksourceview2.Language object.
+        :param buf: a gtksourceview2.Buffer object.
         """
-        GEDIT_SYNTAX_PATH = '/apps/gedit-2/preferences/syntax_highlighting'
-        GEDIT_LANG_PATH = GEDIT_SYNTAX_PATH + '/' + lang.get_id()
+        GEDIT_SCHEME_PATH = '/apps/gedit-2/preferences/editor/colors/scheme'
 
         client = gconf.client_get_default()
-        client.add_dir(GEDIT_LANG_PATH, gconf.CLIENT_PRELOAD_NONE)
-
-        for tag in lang.get_tags():
-            tag_id = tag.get_id()
-            gconf_key = GEDIT_LANG_PATH + '/' + tag_id
-            style_string = client.get_string(gconf_key)
-
-            if style_string is None:
-                continue
-
-            # function to get a bool from a string that's either '0' or '1'
-            string_bool = lambda x: bool(int(x))
-
-            # style_string is a string like "2/#FFCCAA/#000000/0/1/0/0"
-            # values are: mask, fg, bg, italic, bold, underline, strike
-            # this packs them into (str_value, attr_name, conv_func) tuples
-            items = zip(style_string.split('/'), ['mask', 'foreground',
-                'background', 'italic', 'bold', 'underline', 'strikethrough' ],
-                [ int, gtk.gdk.color_parse, gtk.gdk.color_parse, string_bool,
-                    string_bool, string_bool, string_bool ]
-            )
-
-            style = gtksourceview2.Style()
-
-            # XXX The mask attribute controls whether the present values of
-            # foreground and background color should in fact be used. Ideally
-            # (and that's what gedit does), one could set all three attributes,
-            # and let the TagStyle object figure out which colors to use.
-            # However, in the GtkSourceview python bindings, the mask attribute
-            # is read-only, and it's derived instead from the colors being
-            # set or not. This means that we have to sometimes refrain from
-            # setting fg or bg colors, depending on the value of the mask.
-            # This code could go away if mask were writable.
-            mask = int(items[0][0])
-            if not (mask & 1): # GTK_SOURCE_TAG_STYLE_USE_BACKGROUND
-                items[2:3] = []
-            if not (mask & 2): # GTK_SOURCE_TAG_STYLE_USE_FOREGROUND
-                items[1:2] = []
-            items[0:1] = [] # skip the mask unconditionally
-
-            for value, attr, func in items:
-                try:
-                    value = func(value)
-                except ValueError:
-                    warning('gconf key %s contains an invalid value: %s'
-                            % gconf_key, value)
-                else:
-                    setattr(style, attr, value)
-
-            lang.set_tag_style(tag_id, style)
+        style_scheme_name = client.get_string(GEDIT_SCHEME_PATH)
+        style_scheme = gtksourceview2.StyleSchemeManager().get_scheme(style_scheme_name)
+        
+        buf.set_style_scheme(style_scheme)
 
     @classmethod
     def apply_colordiff_colors(klass, lang):
