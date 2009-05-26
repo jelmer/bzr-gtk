@@ -19,7 +19,7 @@ import re
 import sys
 
 try:
-    import gtksourceview
+    import gtksourceview2
     have_gtksourceview = True
 except ImportError:
     have_gtksourceview = False
@@ -63,16 +63,16 @@ class DiffFileView(gtk.ScrolledWindow):
         self.set_shadow_type(gtk.SHADOW_IN)
 
         if have_gtksourceview:
-            self.buffer = gtksourceview.SourceBuffer()
-            slm = gtksourceview.SourceLanguagesManager()
-            gsl = slm.get_language_from_mime_type("text/x-patch")
+            self.buffer = gtksourceview2.Buffer()
+            slm = gtksourceview2.LanguageManager()
+            gsl = slm.guess_language(content_type="text/x-patch")
             if have_gconf:
                 self.apply_gedit_colors(gsl)
             self.apply_colordiff_colors(gsl)
             self.buffer.set_language(gsl)
             self.buffer.set_highlight(True)
 
-            self.sourceview = gtksourceview.SourceView(self.buffer)
+            self.sourceview = gtksourceview2.View(self.buffer)
         else:
             self.buffer = gtk.TextBuffer()
             self.sourceview = gtk.TextView(self.buffer)
@@ -88,7 +88,7 @@ class DiffFileView(gtk.ScrolledWindow):
 
         This method needs the gconf module.
 
-        :param lang: a gtksourceview.SourceLanguage object.
+        :param lang: a gtksourceview2.Language object.
         """
         GEDIT_SYNTAX_PATH = '/apps/gedit-2/preferences/syntax_highlighting'
         GEDIT_LANG_PATH = GEDIT_SYNTAX_PATH + '/' + lang.get_id()
@@ -116,7 +116,7 @@ class DiffFileView(gtk.ScrolledWindow):
                     string_bool, string_bool, string_bool ]
             )
 
-            style = gtksourceview.SourceTagStyle()
+            style = gtksourceview2.Style()
 
             # XXX The mask attribute controls whether the present values of
             # foreground and background color should in fact be used. Ideally
@@ -151,7 +151,7 @@ class DiffFileView(gtk.ScrolledWindow):
 
         Both ~/.colordiffrc and ~/.colordiffrc.bzr-gtk are read.
 
-        :param lang: a "Diff" gtksourceview.SourceLanguage object.
+        :param lang: a "Diff" gtksourceview2.Language object.
         """
         colors = {}
 
@@ -194,7 +194,7 @@ class DiffFileView(gtk.ScrolledWindow):
             if color is None:
                 continue
 
-            style = gtksourceview.SourceTagStyle()
+            style = gtksourceview2.Style()
             try:
                 style.foreground = gtk.gdk.color_parse(color)
             except ValueError:
