@@ -17,6 +17,7 @@ import pango
 import os
 import re
 import sys
+from xml.etree.ElementTree import Element, SubElement, tostring
 
 try:
     import gtksourceview2
@@ -68,7 +69,7 @@ class DiffFileView(gtk.ScrolledWindow):
             gsl = slm.guess_language(content_type="text/x-patch")
             if have_gconf:
                 self.apply_gedit_colors(self.buffer)
-            self.apply_colordiff_colors(gsl)
+            self.apply_colordiff_colors(self.buffer)
             self.buffer.set_language(gsl)
             self.buffer.set_highlight_syntax(True)
 
@@ -99,61 +100,77 @@ class DiffFileView(gtk.ScrolledWindow):
         buf.set_style_scheme(style_scheme)
 
     @classmethod
-    def apply_colordiff_colors(klass, lang):
+    def apply_colordiff_colors(klass, buf):
         """Set style colors for lang using the colordiff configuration file.
 
         Both ~/.colordiffrc and ~/.colordiffrc.bzr-gtk are read.
 
-        :param lang: a "Diff" gtksourceview2.Language object.
+        :param buf: a "Diff" gtksourceview2.Buffer object.
         """
-        colors = {}
+        scheme_manager = gtksourceview2.StyleSchemeManager()
+        style_scheme = scheme_manager.get_scheme('colordiff')
+        
+        # if style scheme not found, we'll generate it from colordiffrc
+        # TODO: reload if colordiffrc has changed.
+        if style_scheme is None:
+            colors = {}
 
-        for f in ('~/.colordiffrc', '~/.colordiffrc.bzr-gtk'):
-            f = os.path.expanduser(f)
-            if os.path.exists(f):
-                try:
-                    f = file(f)
-                except IOError, e:
-                    warning('could not open file %s: %s' % (f, str(e)))
-                else:
-                    colors.update(klass.parse_colordiffrc(f))
-                    f.close()
+            for f in ('~/.colordiffrc', '~/.colordiffrc.bzr-gtk'):
+                f = os.path.expanduser(f)
+                if os.path.exists(f):
+                    try:
+                        f = file(f)
+                    except IOError, e:
+                        warning('could not open file %s: %s' % (f, str(e)))
+                    else:
+                        colors.update(klass.parse_colordiffrc(f))
+                        f.close()
 
-        if not colors:
-            # ~/.colordiffrc does not exist
-            return
-
-        mapping = {
-                # map GtkSourceView tags to colordiff names
+            if not colors:
+                # ~/.colordiffrc does not exist
+                return
+            
+            mapping = {
+                # map GtkSourceView2 scheme styles to colordiff names
                 # since GSV is richer, accept new names for extra bits,
                 # defaulting to old names if they're not present
-                'Added@32@line': ['newtext'],
-                'Removed@32@line': ['oldtext'],
-                'Location': ['location', 'diffstuff'],
-                'Diff@32@file': ['file', 'diffstuff'],
-                'Special@32@case': ['specialcase', 'diffstuff'],
-        }
-
-        for tag in lang.get_tags():
-            tag_id = tag.get_id()
-            keys = mapping.get(tag_id, [])
-            color = None
-
-            for key in keys:
-                color = colors.get(key, None)
-                if color is not None:
-                    break
-
-            if color is None:
-                continue
-
-            style = gtksourceview2.Style()
-            try:
-                style.foreground = gtk.gdk.color_parse(color)
-            except ValueError:
-                warning('not a valid color: %s' % color)
-            else:
-                lang.set_tag_style(tag_id, style)
+                'diff:added-line': ['newtext'],
+                'diff:removed-line': ['oldtext'],
+                'diff:location': ['location', 'diffstuff'],
+                'diff:file': ['file', 'diffstuff'],
+                'diff:special-case': ['specialcase', 'diffstuff'],
+            }
+            
+            converted_colors = {}
+            for name, values in mapping.items():
+                color = None
+                for value in values:
+                    color = colors.get(value, None)
+                    if color is not None:
+                        break
+                if color is None:
+                    continue
+                converted_colors[name] = color
+            
+            # some xml magic to produce needed style scheme description
+            e_style_scheme = Element('style-scheme')
+            e_style_scheme.set('id', 'colordiff')
+            e_style_scheme.set('_name', 'ColorDiff')
+            e_style_scheme.set('version', '1.0')
+            for name, color in converted_colors.items():
+                style = SubElement(e_style_scheme, 'style')
+                style.set('name', name)
+                style.set('foreground', '#%s' % color)
+            
+            scheme_xml = tostring(e_style_scheme, 'UTF-8')
+            if not os.path.exists(os.path.expanduser('~/.local/share/gtksourceview-2.0/styles')):
+                os.makedirs(os.path.expanduser('~/.local/share/gtksourceview-2.0/styles'))
+            file(os.path.expanduser('~/.local/share/gtksourceview-2.0/styles/colordiff.xml'), 'w').write(scheme_xml)
+            
+            scheme_manager.force_rescan()
+            style_scheme = scheme_manager.get_scheme('colordiff')
+        
+        buf.set_style_scheme(style_scheme)
 
     @staticmethod
     def parse_colordiffrc(fileobj):
