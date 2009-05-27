@@ -21,6 +21,8 @@
   * Support storing credentials in the GNOME Keyring if it is 
     available. (Jelmer Vernooij)
 
+  * Fix opening Status window in Olive (#316310)
+
 0.95.0	2008-08-04
 
  UI
