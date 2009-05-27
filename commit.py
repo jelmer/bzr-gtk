@@ -30,6 +30,12 @@ import pango
 from bzrlib import errors, osutils
 from bzrlib.trace import mutter
 from bzrlib.util import bencode
+try:
+    from bzrlib.uncommit import SavedCommitMessagesManager
+except ImportError: # old bzrlib
+    can_save_commit_messages = False
+else:
+    can_save_commit_messages = True
 
 from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import question_dialog
@@ -109,12 +115,10 @@ class CommitDialog(gtk.Dialog):
 
     def __init__(self, wt, selected=None, parent=None):
         gtk.Dialog.__init__(self, title="Commit to %s" % wt.basedir,
-                                  parent=parent,
-                                  flags=0,
-                                  buttons=(gtk.STOCK_CANCEL,
-                                           gtk.RESPONSE_CANCEL))
+                            parent=parent, flags=0,)
+        self.connect('delete-event', self._on_delete_window)
         self._question_dialog = question_dialog
-        
+
         self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
 
         self._wt = wt
@@ -124,6 +128,8 @@ class CommitDialog(gtk.Dialog):
         self._enable_per_file_commits = True
         self._commit_all_changes = True
         self.committed_revision_id = None # Nothing has been committed yet
+        if can_save_commit_messages:
+            self._saved_commit_messages_manager = SavedCommitMessagesManager(self._wt, self._wt.branch)
 
         self.setup_params()
         self.construct()
@@ -198,19 +204,27 @@ class CommitDialog(gtk.Dialog):
         self._basis_tree.lock_read()
         try:
             from diff import iter_changes_to_status
+            if can_save_commit_messages:
+                saved_file_messages = self._saved_commit_messages_manager.get()[1]
+            else:
+                saved_file_messages = {}
             for (file_id, real_path, change_type, display_path
                 ) in iter_changes_to_status(self._basis_tree, self._wt):
                 if self._selected and real_path != self._selected:
                     enabled = False
                 else:
                     enabled = True
+                try:
+                    default_message = saved_file_messages[file_id]
+                except KeyError:
+                    default_message = ''
                 item_iter = store.append([
                     file_id,
                     real_path.encode('UTF-8'),
                     enabled,
                     display_path.encode('UTF-8'),
                     change_type,
-                    '', # Initial comment
+                    default_message, # Initial comment
                     ])
                 if self._selected and enabled:
                     initial_cursor = store.get_path(item_iter)
@@ -348,6 +362,10 @@ class CommitDialog(gtk.Dialog):
         self._hpane.pack2(self._right_pane_table, resize=True, shrink=True)
 
     def _construct_action_pane(self):
+        self._button_cancel = gtk.Button(stock=gtk.STOCK_CANCEL)
+        self._button_cancel.connect('clicked', self._on_cancel_clicked)
+        self._button_cancel.show()
+        self.action_area.pack_end(self._button_cancel)
         self._button_commit = gtk.Button(_i18n("Comm_it"), use_underline=True)
         self._button_commit.connect('clicked', self._on_commit_clicked)
         self._button_commit.set_flags(gtk.CAN_DEFAULT)
@@ -549,6 +567,8 @@ class CommitDialog(gtk.Dialog):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 
         self._global_message_text_view = gtk.TextView()
+        if can_save_commit_messages:
+            self._set_global_commit_message(self._saved_commit_messages_manager.get()[0])
         self._global_message_text_view.modify_font(pango.FontDescription("Monospace"))
         scroller.add(self._global_message_text_view)
         scroller.set_shadow_type(gtk.SHADOW_IN)
@@ -655,6 +675,32 @@ class CommitDialog(gtk.Dialog):
             return files, []
 
     @show_bzr_error
+    def _on_cancel_clicked(self, button):
+        """ Cancel button clicked handler. """
+        self._do_cancel()
+
+    @show_bzr_error
+    def _on_delete_window(self, source, event):
+        """ Delete window handler. """
+        self._do_cancel()
+
+    def _do_cancel(self):
+        """If requested, saves commit messages when cancelling gcommit; they are re-used by a next gcommit"""
+        if can_save_commit_messages:
+            self._saved_commit_messages_manager = SavedCommitMessagesManager()
+            self._saved_commit_messages_manager.insert(self._get_global_commit_message(),
+                                                       self._get_specific_files()[1])
+            if self._saved_commit_messages_manager.is_not_empty(): # maybe worth saving
+                response = question_dialog(_i18n('Commit cancelled'),
+                                           _i18n('Do you want to save your commit messages ?'),
+                                           parent=self)
+                if response == gtk.RESPONSE_NO:
+                     # save nothing and destroy old comments if any
+                    self._saved_commit_messages_manager = SavedCommitMessagesManager()
+            self._saved_commit_messages_manager.save(self._wt, self._wt.branch)
+        self.response(gtk.RESPONSE_CANCEL) # close window
+
+    @show_bzr_error
     def _on_commit_clicked(self, button):
         """ Commit button clicked handler. """
         self._do_commit()
@@ -718,6 +764,9 @@ class CommitDialog(gtk.Dialog):
                                specific_files=specific_files,
                                revprops=revprops)
         self.committed_revision_id = rev_id
+        # destroy old comments if any
+        if can_save_commit_messages:
+            SavedCommitMessagesManager().save(self._wt, self._wt.branch)
         self.response(gtk.RESPONSE_OK)
 
     def _get_global_commit_message(self):
