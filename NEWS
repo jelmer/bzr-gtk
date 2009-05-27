@@ -16,6 +16,11 @@
 
   * Mark as compatible with bzr 1.13.
 
+ FEATURES
+
+  * Support storing credentials in the GNOME Keyring if it is 
+    available. (Jelmer Vernooij)
+
 0.95.0	2008-08-04
 
  UI

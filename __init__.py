@@ -36,7 +36,10 @@ visualise         Graphically visualise this branch.
 
 import bzrlib
 import bzrlib.api
-from bzrlib import errors
+from bzrlib import (
+    config,
+    errors,
+    )
 from bzrlib.commands import plugin_cmds
 
 import os.path
@@ -148,6 +151,19 @@ class NoDisplayError(errors.BzrCommandError):
 
     def __str__(self):
         return "No DISPLAY. Unable to run GTK+ application."
+
+
+credential_store_registry = getattr(config, "credential_store_registry", None)
+if credential_store_registry is not None:
+    try:
+        credential_store_registry.register_lazy(
+            "gnome-keyring", "bzrlib.plugins.gtk.keyring", "GnomeKeyringCredentialStore",
+            help="The GNOME Keyring.", fallback=True)
+    except TypeError:
+    # Fallback credentials stores were introduced in Bazaar 1.15
+        credential_store_registry.register_lazy(
+            "gnome-keyring", "bzrlib.plugins.gtk.keyring", "GnomeKeyringCredentialStore",
+            help="The GNOME Keyring.")
 
 
 def load_tests(basic_tests, module, loader):

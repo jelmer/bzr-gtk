@@ -48,8 +48,6 @@ class BranchWindow(Window):
         self.maxnum      = maxnum
         self.config      = GlobalConfig()
 
-        self._sizes      = {} # window and widget sizes
-
         if self.config.get_user_option('viz-compact-view') == 'yes':
             self.compact_view = True
         else:
@@ -69,7 +67,7 @@ class BranchWindow(Window):
             height = int(monitor.height * 0.75)
         self.set_default_size(width, height)
         self.set_size_request(width/3, height/3)
-        self.connect("size-allocate", self._on_size_allocate, 'viz-window-size')
+        self._save_size_on_destroy(self, 'viz-window-size')
 
         # FIXME AndyFitz!
         icon = self.render_icon(gtk.STOCK_INDEX, gtk.ICON_SIZE_BUTTON)
@@ -103,6 +101,15 @@ class BranchWindow(Window):
         self.refresh_action.connect_accelerator()
 
         self.construct()
+
+    def _save_size_on_destroy(self, widget, config_name):
+        """Creates a hook that saves the size of widget to config option 
+           config_name when the window is destroyed/closed."""
+        def save_size(src):
+            width, height = widget.allocation.width, widget.allocation.height
+            value = '%sx%s' % (width, height)
+            self.config.set_user_option(config_name, value)
+        self.connect("destroy", save_size)
 
     def set_revision(self, revid):
         self.treeview.set_revision_id(revid)
@@ -315,7 +322,7 @@ class BranchWindow(Window):
         else:
             (width, height) = self.get_size()
             align.set_size_request(width, int(height / 2.5))
-        align.connect('size-allocate', self._on_size_allocate, 'viz-graph-size')
+        self._save_size_on_destroy(align, 'viz-graph-size')
         align.show()
 
         return align
@@ -358,7 +365,7 @@ class BranchWindow(Window):
         if size:
             width, height = size
             self.revisionview.set_size_request(width, height)
-        self.revisionview.connect('size-allocate', self._on_size_allocate, 'viz-revisionview-size')
+        self._save_size_on_destroy(self.revisionview, 'viz-revisionview-size')
         self.revisionview.show()
         self.revisionview.set_show_callback(self._show_clicked_cb)
         self.revisionview.connect('notify::revision', self._go_clicked_cb)
@@ -597,24 +604,8 @@ class BranchWindow(Window):
         if size:
             width, height = [int(num) for num in size.split('x')]
             # avoid writing config every time we start
-            self._sizes[name] = (width, height)
             return width, height
         return None
-
-    def _on_size_allocate(self, widget, allocation, name):
-        """When window has been resized, save the new size."""
-        width, height = 0, 0
-        if name in self._sizes:
-            width, height = self._sizes[name]
-
-        size_changed = (width != allocation.width) or \
-                (height != allocation.height)
-
-        if size_changed:
-            width, height = allocation.width, allocation.height
-            self._sizes[name] = (width, height)
-            value = '%sx%s' % (width, height)
-            self.config.set_user_option(name, value)
 
     def show_diff(self, revid=None, parentid=NULL_REVISION):
         """Open a new window to show a diff between the given revisions."""
