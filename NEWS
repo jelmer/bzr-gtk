@@ -7,6 +7,8 @@
  CHANGES
  
   * Add ginfo command line option (Jasper Groenewegen)
+  
+  * Diff window uses GtkSourceView2 now. (Szilveszter Farkas)
 
  BUG FIXES
  
