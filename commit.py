@@ -687,17 +687,19 @@ class CommitDialog(gtk.Dialog):
     def _do_cancel(self):
         """If requested, saves commit messages when cancelling gcommit; they are re-used by a next gcommit"""
         if can_save_commit_messages:
-            self._saved_commit_messages_manager = SavedCommitMessagesManager()
-            self._saved_commit_messages_manager.insert(self._get_global_commit_message(),
-                                                       self._get_specific_files()[1])
-            if self._saved_commit_messages_manager.is_not_empty(): # maybe worth saving
-                response = question_dialog(_i18n('Commit cancelled'),
-                                           _i18n('Do you want to save your commit messages ?'),
-                                           parent=self)
+            mgr = SavedCommitMessagesManager()
+            self._saved_commit_messages_manager = mgr
+            mgr.insert(self._get_global_commit_message(),
+                       self._get_specific_files()[1])
+            if mgr.is_not_empty(): # maybe worth saving
+                response = question_dialog(
+                    _i18n('Commit cancelled'),
+                    _i18n('Do you want to save your commit messages ?'),
+                    parent=self)
                 if response == gtk.RESPONSE_NO:
                      # save nothing and destroy old comments if any
-                    self._saved_commit_messages_manager = SavedCommitMessagesManager()
-            self._saved_commit_messages_manager.save(self._wt, self._wt.branch)
+                    mgr = SavedCommitMessagesManager()
+            mgr.save(self._wt, self._wt.branch)
         self.response(gtk.RESPONSE_CANCEL) # close window
 
     @show_bzr_error

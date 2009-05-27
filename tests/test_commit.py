@@ -23,6 +23,7 @@ import gtk
 from bzrlib import (
     tests,
     revision,
+    uncommit,
     )
 from bzrlib.util import bencode
 
@@ -1086,3 +1087,36 @@ class TestSanitizeMessage(tests.TestCase):
 
     def test_converts_mixed_to_lf(self):
         self.assertSanitize('foo\nbar\nbaz\n', 'foo\r\nbar\rbaz\n')
+
+
+class TestUncommitHook(tests.TestCaseWithTransport):
+
+    def test_hook_fired_on_uncommit(self):
+        tree = self.make_branch_and_tree('tree')
+        config = tree.branch.get_config()
+        self.build_tree(['tree/a', 'tree/b'])
+        tree.add(['a'], ['a-id'])
+        tree.add(['b'], ['b-id'])
+        file_info1 = [dict(path='a', file_id='a-id', message='a msg 1'),
+                     dict(path='b', file_id='b-id', message='b msg 1')]
+        rev1 = tree.commit('one',
+                            revprops={'file-info':
+                                          bencode.bencode(file_info1).decode('UTF-8')})
+
+        file_info2 = [dict(path='a', file_id='a-id', message='a msg 2'),
+                      dict(path='b', file_id='b-id', message='b msg 2')]
+        revprops = {'file-info': bencode.bencode(file_info2).decode('UTF-8')}
+        rev2 = tree.commit ('two',
+                            revprops={'file-info': bencode.bencode(file_info2).decode('UTF-8')})
+        uncommit.uncommit(tree.branch, tree=tree)
+        self.assertEquals('two',
+                          config.get_user_option('gtk_global_commit_message'))
+        self.assertEquals(u'd4:a-id7:a msg 24:b-id7:b msg 2e',
+                          config.get_user_option('gtk_file_commit_messages'))
+        uncommit.uncommit(tree.branch, tree=tree)
+        self.assertEquals(u'one\n******\ntwo',
+                          config.get_user_option('gtk_global_commit_message'))
+        self.assertEquals(u'd4:a-id22:a msg 1'
+                          '\n******\n'
+                          'a msg 24:b-id22:b msg 1\n******\nb msg 2e',
+                          config.get_user_option('gtk_file_commit_messages'))
