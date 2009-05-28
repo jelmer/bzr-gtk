@@ -692,7 +692,7 @@ class CommitDialog(gtk.Dialog):
             mgr.insert(self._get_global_commit_message(),
                        self._get_specific_files()[1])
             if mgr.is_not_empty(): # maybe worth saving
-                response = question_dialog(
+                response = self._question_dialog(
                     _i18n('Commit cancelled'),
                     _i18n('Do you want to save your commit messages ?'),
                     parent=self)

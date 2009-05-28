@@ -668,8 +668,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
                           ]), dlg._get_specific_files())
 
 
-class TestCommitDialog_Commit(tests.TestCaseWithTransport):
-    """Tests on the actual 'commit' button being pushed."""
+class QuestionHelpers(object):
 
     def _set_question_yes(self, dlg):
         """Set the dialog to answer YES to any questions."""
@@ -688,6 +687,10 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport):
             self.questions.append('NO')
             return gtk.RESPONSE_NO
         dlg._question_dialog = _question_no
+
+
+class TestCommitDialog_Commit(tests.TestCaseWithTransport, QuestionHelpers):
+    """Tests on the actual 'commit' button being pushed."""
 
     def test_bound_commit_local(self):
         tree = self.make_branch_and_tree('tree')
@@ -1089,19 +1092,7 @@ class TestSanitizeMessage(tests.TestCase):
         self.assertSanitize('foo\nbar\nbaz\n', 'foo\r\nbar\rbaz\n')
 
 
-class TestUncommitHook(tests.TestCaseWithTransport):
-
-    def setUp(self):
-        super(TestUncommitHook, self).setUp()
-        self.tree = self.make_branch_and_tree('tree')
-        self.config = self.tree.branch.get_config()
-        self.build_tree(['tree/a', 'tree/b'])
-        self.tree.add(['a'], ['a-id'])
-        self.tree.add(['b'], ['b-id'])
-        rev1 = self.tree.commit('one', revprops=self._get_file_info_revprops(1))
-        rev2 = self.tree.commit('two', revprops=self._get_file_info_revprops(2))
-        rev3 = self.tree.commit('three',
-                                revprops=self._get_file_info_revprops(3))
+class TestSavedCommitMessages(tests.TestCaseWithTransport):
 
     def _get_file_info_dict(self, rank):
         file_info = [dict(path='a', file_id='a-id', message='a msg %d' % rank),
@@ -1117,6 +1108,21 @@ class TestUncommitHook(tests.TestCaseWithTransport):
 
     def _get_file_commit_messages(self):
         return self.config.get_user_option('gtk_file_commit_messages')
+
+
+class TestUncommitHook(TestSavedCommitMessages):
+
+    def setUp(self):
+        super(TestUncommitHook, self).setUp()
+        self.tree = self.make_branch_and_tree('tree')
+        self.config = self.tree.branch.get_config()
+        self.build_tree(['tree/a', 'tree/b'])
+        self.tree.add(['a'], ['a-id'])
+        self.tree.add(['b'], ['b-id'])
+        rev1 = self.tree.commit('one', revprops=self._get_file_info_revprops(1))
+        rev2 = self.tree.commit('two', revprops=self._get_file_info_revprops(2))
+        rev3 = self.tree.commit('three',
+                                revprops=self._get_file_info_revprops(3))
 
     def test_uncommit_one_by_one(self):
         uncommit.uncommit(self.tree.branch, tree=self.tree)
@@ -1143,4 +1149,59 @@ class TestUncommitHook(tests.TestCaseWithTransport):
                           self._get_commit_message())
         self.assertEquals(u'd4:a-id37:a msg 1\n******\na msg 2\n******\na msg 3'
                           '4:b-id37:b msg 1\n******\nb msg 2\n******\nb msg 3e',
+                          self._get_file_commit_messages())
+
+
+class TestReusingSavedCommitMessages(TestSavedCommitMessages, QuestionHelpers):
+
+    def setUp(self):
+        super(TestReusingSavedCommitMessages, self).setUp()
+        self.tree = self.make_branch_and_tree('tree')
+        self.config = self.tree.branch.get_config()
+        self.config.set_user_option('per_file_commits', 'true')
+        self.build_tree(['tree/a', 'tree/b'])
+        self.tree.add(['a'], ['a-id'])
+        self.tree.add(['b'], ['b-id'])
+        rev1 = self.tree.commit('one', revprops=self._get_file_info_revprops(1))
+        rev2 = self.tree.commit('two', revprops=self._get_file_info_revprops(2))
+        uncommit.uncommit(self.tree.branch, tree=self.tree)
+        self.build_tree_contents([('tree/a', 'new a content\n'),
+                                  ('tree/b', 'new b content'),])
+
+    def test_setup_saved_messages(self):
+        # Check the initial setup
+        self.assertEquals(u'two', self._get_commit_message())
+        self.assertEquals(u'd4:a-id7:a msg 24:b-id7:b msg 2e',
+                          self._get_file_commit_messages())
+
+    def test_messages_are_reloaded(self):
+        dlg = commit.CommitDialog(self.tree)
+        self.assertEquals(u'two', dlg._get_global_commit_message())
+        self.assertEquals(([u'a', u'b'],
+                           [{ 'path': 'a',
+                             'file_id': 'a-id', 'message': 'a msg 2',},
+                           {'path': 'b',
+                            'file_id': 'b-id', 'message': 'b msg 2',}],),
+                          dlg._get_specific_files())
+
+    def test_messages_are_consumed(self):
+        dlg = commit.CommitDialog(self.tree)
+        dlg._do_commit()
+        self.assertEquals(u'', self._get_commit_message())
+        self.assertEquals(u'de', self._get_file_commit_messages())
+
+    def test_messages_are_saved_on_cancel_if_required(self):
+        dlg = commit.CommitDialog(self.tree)
+        self._set_question_yes(dlg) # Save messages
+        dlg._do_cancel()
+        self.assertEquals(u'two', self._get_commit_message())
+        self.assertEquals(u'd4:a-id7:a msg 24:b-id7:b msg 2e',
+                          self._get_file_commit_messages())
+
+    def test_messages_are_cleared_on_cancel_if_required(self):
+        dlg = commit.CommitDialog(self.tree)
+        self._set_question_no(dlg) # Don't save messages
+        dlg._do_cancel()
+        self.assertEquals(u'', self._get_commit_message())
+        self.assertEquals(u'de',
                           self._get_file_commit_messages())
