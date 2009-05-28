@@ -1091,32 +1091,56 @@ class TestSanitizeMessage(tests.TestCase):
 
 class TestUncommitHook(tests.TestCaseWithTransport):
 
-    def test_hook_fired_on_uncommit(self):
-        tree = self.make_branch_and_tree('tree')
-        config = tree.branch.get_config()
+    def setUp(self):
+        super(TestUncommitHook, self).setUp()
+        self.tree = self.make_branch_and_tree('tree')
+        self.config = self.tree.branch.get_config()
         self.build_tree(['tree/a', 'tree/b'])
-        tree.add(['a'], ['a-id'])
-        tree.add(['b'], ['b-id'])
-        file_info1 = [dict(path='a', file_id='a-id', message='a msg 1'),
-                     dict(path='b', file_id='b-id', message='b msg 1')]
-        rev1 = tree.commit('one',
-                            revprops={'file-info':
-                                          bencode.bencode(file_info1).decode('UTF-8')})
+        self.tree.add(['a'], ['a-id'])
+        self.tree.add(['b'], ['b-id'])
+        rev1 = self.tree.commit('one', revprops=self._get_file_info_revprops(1))
+        rev2 = self.tree.commit('two', revprops=self._get_file_info_revprops(2))
+        rev3 = self.tree.commit('three',
+                                revprops=self._get_file_info_revprops(3))
 
-        file_info2 = [dict(path='a', file_id='a-id', message='a msg 2'),
-                      dict(path='b', file_id='b-id', message='b msg 2')]
-        revprops = {'file-info': bencode.bencode(file_info2).decode('UTF-8')}
-        rev2 = tree.commit ('two',
-                            revprops={'file-info': bencode.bencode(file_info2).decode('UTF-8')})
-        uncommit.uncommit(tree.branch, tree=tree)
-        self.assertEquals('two',
-                          config.get_user_option('gtk_global_commit_message'))
-        self.assertEquals(u'd4:a-id7:a msg 24:b-id7:b msg 2e',
-                          config.get_user_option('gtk_file_commit_messages'))
-        uncommit.uncommit(tree.branch, tree=tree)
-        self.assertEquals(u'one\n******\ntwo',
-                          config.get_user_option('gtk_global_commit_message'))
-        self.assertEquals(u'd4:a-id22:a msg 1'
-                          '\n******\n'
-                          'a msg 24:b-id22:b msg 1\n******\nb msg 2e',
-                          config.get_user_option('gtk_file_commit_messages'))
+    def _get_file_info_dict(self, rank):
+        file_info = [dict(path='a', file_id='a-id', message='a msg %d' % rank),
+                     dict(path='b', file_id='b-id', message='b msg %d' % rank)]
+        return file_info
+
+    def _get_file_info_revprops(self, rank):
+        file_info_prop = self._get_file_info_dict(rank)
+        return {'file-info': bencode.bencode(file_info_prop).decode('UTF-8')}
+
+    def _get_commit_message(self):
+        return self.config.get_user_option('gtk_global_commit_message')
+
+    def _get_file_commit_messages(self):
+        return self.config.get_user_option('gtk_file_commit_messages')
+
+    def test_uncommit_one_by_one(self):
+        uncommit.uncommit(self.tree.branch, tree=self.tree)
+        self.assertEquals(u'three', self._get_commit_message())
+        self.assertEquals(u'd4:a-id7:a msg 34:b-id7:b msg 3e',
+                          self._get_file_commit_messages())
+
+        uncommit.uncommit(self.tree.branch, tree=self.tree)
+        self.assertEquals(u'two\n******\nthree', self._get_commit_message())
+        self.assertEquals(u'd4:a-id22:a msg 2\n******\na msg 3'
+                          '4:b-id22:b msg 2\n******\nb msg 3e',
+                          self._get_file_commit_messages())
+
+        uncommit.uncommit(self.tree.branch, tree=self.tree)
+        self.assertEquals(u'one\n******\ntwo\n******\nthree',
+                          self._get_commit_message())
+        self.assertEquals(u'd4:a-id37:a msg 1\n******\na msg 2\n******\na msg 3'
+                          '4:b-id37:b msg 1\n******\nb msg 2\n******\nb msg 3e',
+                          self._get_file_commit_messages())
+
+    def test_uncommit_all_at_once(self):
+        uncommit.uncommit(self.tree.branch, tree=self.tree, revno=1)
+        self.assertEquals(u'one\n******\ntwo\n******\nthree',
+                          self._get_commit_message())
+        self.assertEquals(u'd4:a-id37:a msg 1\n******\na msg 2\n******\na msg 3'
+                          '4:b-id37:b msg 1\n******\nb msg 2\n******\nb msg 3e',
+                          self._get_file_commit_messages())
