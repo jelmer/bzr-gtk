@@ -1168,6 +1168,14 @@ class TestReusingSavedCommitMessages(TestSavedCommitMessages, QuestionHelpers):
         self.build_tree_contents([('tree/a', 'new a content\n'),
                                   ('tree/b', 'new b content'),])
 
+    def _get_commit_dialog(self, tree):
+        # Ensure we will never use a dialog that can actually prompt the user
+        # during the test suite. Test *can* and *should* override with the
+        # correct question dialog type.
+        dlg = commit.CommitDialog(tree)
+        self._set_question_no(dlg)
+        return dlg
+
     def test_setup_saved_messages(self):
         # Check the initial setup
         self.assertEquals(u'two', self._get_commit_message())
@@ -1175,7 +1183,7 @@ class TestReusingSavedCommitMessages(TestSavedCommitMessages, QuestionHelpers):
                           self._get_file_commit_messages())
 
     def test_messages_are_reloaded(self):
-        dlg = commit.CommitDialog(self.tree)
+        dlg = self._get_commit_dialog(self.tree)
         self.assertEquals(u'two', dlg._get_global_commit_message())
         self.assertEquals(([u'a', u'b'],
                            [{ 'path': 'a',
@@ -1185,13 +1193,13 @@ class TestReusingSavedCommitMessages(TestSavedCommitMessages, QuestionHelpers):
                           dlg._get_specific_files())
 
     def test_messages_are_consumed(self):
-        dlg = commit.CommitDialog(self.tree)
+        dlg = self._get_commit_dialog(self.tree)
         dlg._do_commit()
         self.assertEquals(u'', self._get_commit_message())
         self.assertEquals(u'de', self._get_file_commit_messages())
 
     def test_messages_are_saved_on_cancel_if_required(self):
-        dlg = commit.CommitDialog(self.tree)
+        dlg = self._get_commit_dialog(self.tree)
         self._set_question_yes(dlg) # Save messages
         dlg._do_cancel()
         self.assertEquals(u'two', self._get_commit_message())
@@ -1199,7 +1207,7 @@ class TestReusingSavedCommitMessages(TestSavedCommitMessages, QuestionHelpers):
                           self._get_file_commit_messages())
 
     def test_messages_are_cleared_on_cancel_if_required(self):
-        dlg = commit.CommitDialog(self.tree)
+        dlg = self._get_commit_dialog(self.tree)
         self._set_question_no(dlg) # Don't save messages
         dlg._do_cancel()
         self.assertEquals(u'', self._get_commit_message())
