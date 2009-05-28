@@ -796,8 +796,12 @@ class CommitDialog(gtk.Dialog):
 
 
 class SavedCommitMessagesManager:
-    """Saves global commit message and utf-8 file_id->message dictionary
-    of per-file commit messages on disk. Re-reads them later for re-using."""
+    """Save glogal and per-file commit messages.
+
+    Saves global commit message and utf-8 file_id->message dictionary
+    of per-file commit messages on disk. Re-reads them later for re-using.
+    """
+
     def __init__(self, tree=None, branch=None):
         """If branch is None, builds empty messages, otherwise reads them
         from branch's disk storage. 'tree' argument is for the future."""
@@ -806,18 +810,23 @@ class SavedCommitMessagesManager:
             self.file_messages = {}
         else:
             config = branch.get_config()._get_branch_data_config()
-            self.global_message = config.get_user_option('gtk_global_commit_message')
+            self.global_message = config.get_user_option(
+                'gtk_global_commit_message')
             if self.global_message is None:
                 self.global_message = u''
             file_messages = config.get_user_option('gtk_file_commit_messages')
             if file_messages: # unicode and B-encoded:
-                self.file_messages = bencode.bdecode(file_messages.encode('UTF-8'))
+                self.file_messages = bencode.bdecode(
+                    file_messages.encode('UTF-8'))
             else:
                 self.file_messages = {}
+
     def get(self):
         return self.global_message, self.file_messages
+
     def is_not_empty(self):
         return bool(self.global_message or self.file_messages)
+
     def insert(self, global_message, file_info):
         """Formats per-file commit messages (list of dictionaries, one per file)
         into one utf-8 file_id->message dictionary and merges this with
@@ -833,9 +842,11 @@ class SavedCommitMessagesManager:
             except KeyError:
                 self.file_messages[k] = v
         if self.global_message:
-            self.global_message = global_message + '\n******\n' + self.global_message
+            self.global_message = global_message + '\n******\n' \
+                + self.global_message
         else:
             self.global_message = global_message
+
     def save(self, tree, branch):
         # We store in branch's config, which can be a problem if two gcommit
         # are done in two checkouts of one single branch (comments overwrite
@@ -846,9 +857,11 @@ class SavedCommitMessagesManager:
         # should it be named "gtk_" or some more neutral name ("gui_" ?) to
         # be compatible with qbzr in the future?
         config.set_user_option('gtk_global_commit_message', self.global_message)
-        # bencode() does not know unicode objects but set_user_option() requires one:
-        config.set_user_option('gtk_file_commit_messages',
-                                bencode.bencode(self.file_messages).decode('UTF-8'))
+        # bencode() does not know unicode objects but set_user_option()
+        # requires one:
+        config.set_user_option(
+            'gtk_file_commit_messages',
+            bencode.bencode(self.file_messages).decode('UTF-8'))
 
 
 def save_commit_messages(local, master, old_revno, old_revid,

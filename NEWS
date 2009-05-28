@@ -19,6 +19,10 @@
 
   * Fix gannotate.conf handling. (Vincent Ladeuil, #373157)
 
+  * Save commit messages at uncommit time, restore them at
+    gcommit time. Also allow saving commit messages if the commit
+    is cancelled. (Anne Mohsen, Vincent Ladeuil, #215674)
+
   * Mark as compatible with bzr 1.13.
 
  FEATURES
