@@ -21,8 +21,9 @@ import os
 import gtk
 
 from bzrlib import (
-    tests,
+    branch,
     revision,
+    tests,
     uncommit,
     )
 from bzrlib.util import bencode
@@ -1094,6 +1095,12 @@ class TestSanitizeMessage(tests.TestCase):
 
 class TestSavedCommitMessages(tests.TestCaseWithTransport):
 
+    def setUp(self):
+        super(TestSavedCommitMessages, self).setUp()
+        # Install our hook
+        branch.Branch.hooks.install_named_hook(
+            'post_uncommit', commit.save_commit_messages, None)
+
     def _get_file_info_dict(self, rank):
         file_info = [dict(path='a', file_id='a-id', message='a msg %d' % rank),
                      dict(path='b', file_id='b-id', message='b msg %d' % rank)]
@@ -1119,9 +1126,11 @@ class TestUncommitHook(TestSavedCommitMessages):
         self.build_tree(['tree/a', 'tree/b'])
         self.tree.add(['a'], ['a-id'])
         self.tree.add(['b'], ['b-id'])
-        rev1 = self.tree.commit('one', revprops=self._get_file_info_revprops(1))
-        rev2 = self.tree.commit('two', revprops=self._get_file_info_revprops(2))
-        rev3 = self.tree.commit('three',
+        rev1 = self.tree.commit('one', rev_id='one-id',
+                                revprops=self._get_file_info_revprops(1))
+        rev2 = self.tree.commit('two', rev_id='two-id',
+                                revprops=self._get_file_info_revprops(2))
+        rev3 = self.tree.commit('three', rev_id='three-id',
                                 revprops=self._get_file_info_revprops(3))
 
     def test_uncommit_one_by_one(self):
