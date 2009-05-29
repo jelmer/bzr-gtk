@@ -559,11 +559,9 @@ class OliveGtk:
     
     def on_menuitem_branch_status_activate(self, widget):
         """ Branch/Status... menu handler. """
-        from bzrlib.plugins.gtk.status import StatusDialog
-        status = StatusDialog(self.wt, self.wtpath)
-        response = status.run()
-        if response != gtk.RESPONSE_NONE:
-            status.destroy()
+        from bzrlib.plugins.gtk.status import StatusWindow
+        status = StatusWindow(self.wt, self.wtpath)
+        status.show()
     
     def on_menuitem_branch_initialize_activate(self, widget):
         """ Initialize current directory. """

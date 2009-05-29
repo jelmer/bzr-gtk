@@ -23,8 +23,8 @@ In order to see graphs in the visualisation tool, you will also need:
 
 In order to see syntax highlighted diffs:
 
-  * gtksourceview python bindings (on Debian and Ubuntu systems, these
-    are in the python-gnome2-desktop package)
+  * GtkSourceView2 Python bindings (on Debian and Ubuntu systems, these
+    are in the python-gtksourceview2 package)
 
 In order to use the nautilus integration, you will need:
 

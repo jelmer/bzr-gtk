@@ -7,8 +7,13 @@
  CHANGES
  
   * Add ginfo command line option (Jasper Groenewegen)
+  
+  * Diff window uses GtkSourceView2 now. (Szilveszter Farkas)
 
  BUG FIXES
+ 
+  * Fix the Branch/Get dialog refusing to open after hitting Cancel. (Markus
+  Korn, #294396)
 
   * Fix Olive homepage URL. (#255152)
 
@@ -20,6 +25,8 @@
 
   * Support storing credentials in the GNOME Keyring if it is 
     available. (Jelmer Vernooij)
+
+  * Fix opening Status window in Olive (#316310)
 
 0.95.0	2008-08-04
 
