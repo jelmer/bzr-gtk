@@ -27,8 +27,12 @@ import gtk
 import gobject
 import pango
 
-from bzrlib import errors, osutils
-from bzrlib.trace import mutter
+from bzrlib import (
+    branch,
+    errors,
+    osutils,
+    trace,
+    )
 from bzrlib.util import bencode
 
 from bzrlib.plugins.gtk import _i18n
@@ -109,12 +113,10 @@ class CommitDialog(gtk.Dialog):
 
     def __init__(self, wt, selected=None, parent=None):
         gtk.Dialog.__init__(self, title="Commit to %s" % wt.basedir,
-                                  parent=parent,
-                                  flags=0,
-                                  buttons=(gtk.STOCK_CANCEL,
-                                           gtk.RESPONSE_CANCEL))
+                            parent=parent, flags=0,)
+        self.connect('delete-event', self._on_delete_window)
         self._question_dialog = question_dialog
-        
+
         self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
 
         self._wt = wt
@@ -124,6 +126,7 @@ class CommitDialog(gtk.Dialog):
         self._enable_per_file_commits = True
         self._commit_all_changes = True
         self.committed_revision_id = None # Nothing has been committed yet
+        self._saved_commit_messages_manager = SavedCommitMessagesManager(self._wt, self._wt.branch)
 
         self.setup_params()
         self.construct()
@@ -198,19 +201,24 @@ class CommitDialog(gtk.Dialog):
         self._basis_tree.lock_read()
         try:
             from diff import iter_changes_to_status
+            saved_file_messages = self._saved_commit_messages_manager.get()[1]
             for (file_id, real_path, change_type, display_path
                 ) in iter_changes_to_status(self._basis_tree, self._wt):
                 if self._selected and real_path != self._selected:
                     enabled = False
                 else:
                     enabled = True
+                try:
+                    default_message = saved_file_messages[file_id]
+                except KeyError:
+                    default_message = ''
                 item_iter = store.append([
                     file_id,
                     real_path.encode('UTF-8'),
                     enabled,
                     display_path.encode('UTF-8'),
                     change_type,
-                    '', # Initial comment
+                    default_message, # Initial comment
                     ])
                 if self._selected and enabled:
                     initial_cursor = store.get_path(item_iter)
@@ -242,7 +250,7 @@ class CommitDialog(gtk.Dialog):
                 proxy_obj = bus.get_object('org.freedesktop.NetworkManager',
                                            '/org/freedesktop/NetworkManager')
             except dbus.DBusException:
-                mutter("networkmanager not available.")
+                trace.mutter("networkmanager not available.")
                 self._check_local.show()
                 return
             
@@ -254,7 +262,7 @@ class CommitDialog(gtk.Dialog):
             except dbus.DBusException, e:
                 # Silently drop errors. While DBus may be
                 # available, NetworkManager doesn't necessarily have to be
-                mutter("unable to get networkmanager state: %r" % e)
+                trace.mutter("unable to get networkmanager state: %r" % e)
         self._check_local.show()
 
     def _fill_in_per_file_info(self):
@@ -348,6 +356,10 @@ class CommitDialog(gtk.Dialog):
         self._hpane.pack2(self._right_pane_table, resize=True, shrink=True)
 
     def _construct_action_pane(self):
+        self._button_cancel = gtk.Button(stock=gtk.STOCK_CANCEL)
+        self._button_cancel.connect('clicked', self._on_cancel_clicked)
+        self._button_cancel.show()
+        self.action_area.pack_end(self._button_cancel)
         self._button_commit = gtk.Button(_i18n("Comm_it"), use_underline=True)
         self._button_commit.connect('clicked', self._on_commit_clicked)
         self._button_commit.set_flags(gtk.CAN_DEFAULT)
@@ -549,6 +561,7 @@ class CommitDialog(gtk.Dialog):
         scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
 
         self._global_message_text_view = gtk.TextView()
+        self._set_global_commit_message(self._saved_commit_messages_manager.get()[0])
         self._global_message_text_view.modify_font(pango.FontDescription("Monospace"))
         scroller.add(self._global_message_text_view)
         scroller.set_shadow_type(gtk.SHADOW_IN)
@@ -655,6 +668,33 @@ class CommitDialog(gtk.Dialog):
             return files, []
 
     @show_bzr_error
+    def _on_cancel_clicked(self, button):
+        """ Cancel button clicked handler. """
+        self._do_cancel()
+
+    @show_bzr_error
+    def _on_delete_window(self, source, event):
+        """ Delete window handler. """
+        self._do_cancel()
+
+    def _do_cancel(self):
+        """If requested, saves commit messages when cancelling gcommit; they are re-used by a next gcommit"""
+        mgr = SavedCommitMessagesManager()
+        self._saved_commit_messages_manager = mgr
+        mgr.insert(self._get_global_commit_message(),
+                   self._get_specific_files()[1])
+        if mgr.is_not_empty(): # maybe worth saving
+            response = self._question_dialog(
+                _i18n('Commit cancelled'),
+                _i18n('Do you want to save your commit messages ?'),
+                parent=self)
+            if response == gtk.RESPONSE_NO:
+                 # save nothing and destroy old comments if any
+                mgr = SavedCommitMessagesManager()
+        mgr.save(self._wt, self._wt.branch)
+        self.response(gtk.RESPONSE_CANCEL) # close window
+
+    @show_bzr_error
     def _on_commit_clicked(self, button):
         """ Commit button clicked handler. """
         self._do_commit()
@@ -718,6 +758,8 @@ class CommitDialog(gtk.Dialog):
                                specific_files=specific_files,
                                revprops=revprops)
         self.committed_revision_id = rev_id
+        # destroy old comments if any
+        SavedCommitMessagesManager().save(self._wt, self._wt.branch)
         self.response(gtk.RESPONSE_OK)
 
     def _get_global_commit_message(self):
@@ -751,3 +793,102 @@ class CommitDialog(gtk.Dialog):
                                        show_offset=False)
         rev_dict['revision_id'] = rev.revision_id
         return rev_dict
+
+
+class SavedCommitMessagesManager:
+    """Save glogal and per-file commit messages.
+
+    Saves global commit message and utf-8 file_id->message dictionary
+    of per-file commit messages on disk. Re-reads them later for re-using.
+    """
+
+    def __init__(self, tree=None, branch=None):
+        """If branch is None, builds empty messages, otherwise reads them
+        from branch's disk storage. 'tree' argument is for the future."""
+        if branch is None:
+            self.global_message = u''
+            self.file_messages = {}
+        else:
+            config = branch.get_config()._get_branch_data_config()
+            self.global_message = config.get_user_option(
+                'gtk_global_commit_message')
+            if self.global_message is None:
+                self.global_message = u''
+            file_messages = config.get_user_option('gtk_file_commit_messages')
+            if file_messages: # unicode and B-encoded:
+                self.file_messages = bencode.bdecode(
+                    file_messages.encode('UTF-8'))
+            else:
+                self.file_messages = {}
+
+    def get(self):
+        return self.global_message, self.file_messages
+
+    def is_not_empty(self):
+        return bool(self.global_message or self.file_messages)
+
+    def insert(self, global_message, file_info):
+        """Formats per-file commit messages (list of dictionaries, one per file)
+        into one utf-8 file_id->message dictionary and merges this with
+        previously existing dictionary. Merges global commit message too."""
+        file_messages = {}
+        for fi in file_info:
+            file_message = fi['message']
+            if file_message:
+                file_messages[fi['file_id']] = file_message # utf-8 strings
+        for k,v in file_messages.iteritems():
+            try:
+                self.file_messages[k] = v + '\n******\n' + self.file_messages[k]
+            except KeyError:
+                self.file_messages[k] = v
+        if self.global_message:
+            self.global_message = global_message + '\n******\n' \
+                + self.global_message
+        else:
+            self.global_message = global_message
+
+    def save(self, tree, branch):
+        # We store in branch's config, which can be a problem if two gcommit
+        # are done in two checkouts of one single branch (comments overwrite
+        # each other). Ideally should be in working tree. But uncommit does
+        # not always have a working tree, though it always has a branch.
+        # 'tree' argument is for the future
+        config = branch.get_config()
+        # should it be named "gtk_" or some more neutral name ("gui_" ?) to
+        # be compatible with qbzr in the future?
+        config.set_user_option('gtk_global_commit_message', self.global_message)
+        # bencode() does not know unicode objects but set_user_option()
+        # requires one:
+        config.set_user_option(
+            'gtk_file_commit_messages',
+            bencode.bencode(self.file_messages).decode('UTF-8'))
+
+
+def save_commit_messages(local, master, old_revno, old_revid,
+                         new_revno, new_revid):
+    b = local
+    if b is None:
+        b = master
+    mgr = SavedCommitMessagesManager(None, b)
+    revid_iterator = b.repository.iter_reverse_revision_history(old_revid)
+    cur_revno = old_revno
+    new_revision_id = old_revid
+    graph = b.repository.get_graph()
+    for rev_id in revid_iterator:
+        if cur_revno == new_revno:
+            break
+        cur_revno -= 1
+        rev = b.repository.get_revision(rev_id)
+        file_info = rev.properties.get('file-info', None)
+        if file_info is None:
+            file_info = {}
+        else:
+            file_info = bencode.bdecode(file_info.encode('UTF-8'))
+        global_message = osutils.safe_unicode(rev.message)
+        # Concatenate comment of the uncommitted revision
+        mgr.insert(global_message, file_info)
+
+        parents = graph.get_parent_map([rev_id]).get(rev_id, None)
+        if not parents:
+            continue
+    mgr.save(None, b)

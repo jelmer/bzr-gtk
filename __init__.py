@@ -37,6 +37,7 @@ visualise         Graphically visualise this branch.
 import bzrlib
 import bzrlib.api
 from bzrlib import (
+    branch,
     config,
     errors,
     )
@@ -138,6 +139,13 @@ for cmd, aliases in commands.iteritems():
     plugin_cmds.register_lazy("cmd_%s" % cmd, aliases,
                               "bzrlib.plugins.gtk.commands")
 
+def save_commit_messages(*args):
+    from bzrlib.plugins.gtk import commit
+    commit.save_commit_messages(*args)
+
+branch.Branch.hooks.install_named_hook('post_uncommit',
+                                       save_commit_messages,
+                                       "Saving commit messages for gcommit")
 
 import gettext
 gettext.install('olive-gtk')
