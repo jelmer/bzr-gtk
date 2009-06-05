@@ -91,7 +91,7 @@ class GAnnotateWindow(Window):
                     revno = author = ""
                 else:
                     last_seen = revision.revision_id
-                    author = revision.get_apparent_author()
+                    author = ", ".join(revision.get_apparent_authors())
 
                 if revision.revision_id not in self.revisions:
                     self.revisions[revision.revision_id] = revision
@@ -389,7 +389,7 @@ class GAnnotateWindow(Window):
                 return j - i
 
 
-class FakeRevision:
+class FakeRevision(object):
     """ A fake revision.
 
     For when a revision is referenced but not present.
@@ -404,12 +404,13 @@ class FakeRevision:
         self.timezone = 0
         self.properties = {}
 
-    def get_apparent_author(self):
-        return self.committer
+    def get_apparent_authors(self):
+        return [self.committer]
 
 
 class RevisionCache(object):
     """A caching revision source"""
+
     def __init__(self, real_source, seed_cache=None):
         self.__real_source = real_source
         if seed_cache is None:
