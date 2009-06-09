@@ -33,7 +33,10 @@ from bzrlib import (
     osutils,
     trace,
     )
-from bzrlib.util import bencode
+try:
+    from bzrlib.util import bencode
+except ImportError:
+    from bzrlib import bencode
 
 from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import question_dialog
