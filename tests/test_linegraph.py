@@ -24,7 +24,6 @@ from bzrlib import (
 	graph,
     tests,
     )
-from bzrlib.util import bencode
 
 from bzrlib.plugins.gtk.branchview.linegraph import linegraph
 

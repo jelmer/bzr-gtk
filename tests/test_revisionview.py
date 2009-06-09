@@ -24,7 +24,10 @@ from bzrlib import (
     tests,
     revision,
     )
-from bzrlib.util import bencode
+try:
+    from bzrlib.util import bencode
+except ImportError:
+    from bzrlib import bencode
 
 from bzrlib.plugins.gtk import revisionview
 
