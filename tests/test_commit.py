@@ -27,9 +27,9 @@ from bzrlib import (
     uncommit,
     )
 try:
-    from bzrlib.util import bencode
-except ImportError:
     from bzrlib import bencode
+except ImportError:
+    from bzrlib.util import bencode
 
 from bzrlib.plugins.gtk import commit
 

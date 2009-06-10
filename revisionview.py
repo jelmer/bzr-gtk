@@ -25,9 +25,9 @@ import webbrowser
 from bzrlib import trace
 from bzrlib.osutils import format_date
 try:
-    from bzrlib.util.bencode import bdecode
-except ImportError:
     from bzrlib.bencode import bdecode
+except ImportError:
+    from bzrlib.util.bencode import bdecode
 from bzrlib.testament import Testament
 
 from bzrlib.plugins.gtk import icon_path
