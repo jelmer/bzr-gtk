@@ -30,34 +30,29 @@ class PromptDialog(gtk.Dialog):
     """ Prompt the user for a yes/no answer. """
     def __init__(self, prompt):
         gtk.Dialog.__init__(self)
-        
+
         label = gtk.Label(prompt)
         self.vbox.pack_start(label, padding=10)
-        
         self.vbox.show_all()
 
-        self.add_buttons(gtk.STOCK_YES, gtk.RESPONSE_YES, gtk.STOCK_NO, 
+        self.add_buttons(gtk.STOCK_YES, gtk.RESPONSE_YES, gtk.STOCK_NO,
                          gtk.RESPONSE_NO)
 
 
-class GtkProgressBar(gtk.ProgressBar,progress._BaseProgressBar):
-    def __init__(self, _stack=None):
+class GtkProgressBar(gtk.ProgressBar):
+
+    def __init__(self):
         gtk.ProgressBar.__init__(self)
         self.set_fraction(0.0)
-        progress._BaseProgressBar.__init__(self, _stack=_stack)
         self.current = None
         self.total = None
 
-    def clear(self):
-        self.hide()
-
     def tick(self):
+        self.show()
         self.pulse()
 
-    def child_update(self, message, current, total):
-        pass
-
     def update(self, msg=None, current_cnt=None, total_cnt=None):
+        self.show()
         if current_cnt is not None:
             self.current = current_cnt
         if total_cnt is not None:
@@ -72,76 +67,63 @@ class GtkProgressBar(gtk.ProgressBar,progress._BaseProgressBar):
         while gtk.events_pending():
             gtk.main_iteration()
 
+    def finished(self):
+        self.hide()
+
+    def clear(self):
+        self.hide()
+
 
 class ProgressBarWindow(gtk.Window):
-    def __init__(self, to_file=None, show_pct=None, show_spinner=None, show_eta=None, 
-                 show_bar=None, show_count=None, to_messages_file=None, _stack=None):
+
+    def __init__(self):
         super(ProgressBarWindow, self).__init__(type=gtk.WINDOW_TOPLEVEL)
-        self._stack = _stack
         self.set_border_width(0)
         self.set_title("Progress")
         self.set_position(gtk.WIN_POS_CENTER_ALWAYS)
-        self.pb = GtkProgressBar(self)
+        self.pb = GtkProgressBar()
         self.add(self.pb)
         self.resize(250, 15)
         self.set_resizable(False)
-        self.show_all()
-
-    def return_pb(self, pb):
-        self._stack.return_pb(self)
-    
-    def update(self, *args, **kwargs):
-        self.pb.update(*args, **kwargs)
 
     def tick(self, *args, **kwargs):
+        self.show_all()
         self.pb.tick(*args, **kwargs)
+
+    def update(self, *args, **kwargs):
+        self.show_all()
+        self.pb.update(*args, **kwargs)
 
     def finished(self):
         self.pb.finished()
         self.hide_all()
- 
-    def clear(self):
-        self.pb.clear()
         self.destroy()
 
-    def child_progress(self, *args, **kwargs):
-        return self.pb.child_progress(*args, **kwargs)
-
-    def child_update(self, *args, **kwargs):
-        return self.pb.child_update(*args, **kwargs)
-
-    def get_progress_bar(self):
-        self.show_all()
-        return self
+    def clear(self):
+        self.pb.clear()
+        self.hide_all()
 
 
 class ProgressPanel(gtk.HBox):
+
     def __init__(self):
         super(ProgressPanel, self).__init__()
         image_loading = gtk.image_new_from_stock(gtk.STOCK_REFRESH,
                                                  gtk.ICON_SIZE_BUTTON)
         image_loading.show()
-        
-        self.pb = GtkProgressBar(self)
+
+        self.pb = GtkProgressBar()
         self.set_spacing(5)
-        self.set_border_width(5)        
+        self.set_border_width(5)
         self.pack_start(image_loading, False, False)
         self.pack_start(self.pb, True, True)
 
-    def return_pb(self, pb):
-        self._stack.return_pb(self)
-
-    def get_progress_bar(self, to_file=None, show_pct=None, show_spinner=None, show_eta=None, 
-                         show_bar=None, show_count=None, to_messages_file=None, 
-                         _stack=None):
-        self._stack = _stack
-        self.show_all()
-        return self
-
     def tick(self, *args, **kwargs):
+        self.show_all()
         self.pb.tick(*args, **kwargs)
-    
+
     def update(self, *args, **kwargs):
+        self.show_all()
         self.pb.update(*args, **kwargs)
 
     def finished(self):
@@ -152,30 +134,25 @@ class ProgressPanel(gtk.HBox):
         self.pb.clear()
         self.hide_all()
 
-    def child_progress(self, *args, **kwargs):
-        return self.pb.child_progress(*args, **kwargs)
-
-    def child_update(self, *args, **kwargs):
-        return self.pb.child_update(*args, **kwargs)
-
-
 
 class PasswordDialog(gtk.Dialog):
     """ Prompt the user for a password. """
+
     def __init__(self, prompt):
         gtk.Dialog.__init__(self)
-        
+
         label = gtk.Label(prompt)
         self.vbox.pack_start(label, padding=10)
-        
+
         self.entry = gtk.Entry()
         self.entry.set_visibility(False)
         self.vbox.pack_end(self.entry, padding=10)
-        
+
         self.vbox.show_all()
-        
-        self.add_buttons(gtk.STOCK_OK, gtk.RESPONSE_OK, gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
-    
+
+        self.add_buttons(gtk.STOCK_OK, gtk.RESPONSE_OK,
+                         gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+
     def _get_passwd(self):
         return self.entry.get_text()
 
@@ -185,14 +162,13 @@ class PasswordDialog(gtk.Dialog):
 class GtkUIFactory(UIFactory):
     """A UI factory for GTK user interfaces."""
 
-    def __init__(self,
-                 stdout=None,
-                 stderr=None):
-        """Create a GtkUIFactory.
-
-        """
+    def __init__(self):
+        """Create a GtkUIFactory"""
         super(GtkUIFactory, self).__init__()
-        self.set_nested_progress_bar_widget(ProgressBarWindow)
+        self.set_progress_bar_widget(None)
+
+    def set_progress_bar_widget(self, widget):
+        self._progress_bar_widget = widget
 
     def get_boolean(self, prompt):
         """GtkDialog with yes/no answers"""
@@ -200,7 +176,7 @@ class GtkUIFactory(UIFactory):
         response = dialog.run()
         dialog.destroy()
         return (response == gtk.RESPONSE_YES)
-        
+
     def get_password(self, prompt='', **kwargs):
         """Prompt the user for a password.
 
@@ -220,21 +196,19 @@ class GtkUIFactory(UIFactory):
         else:
             return None
 
-    def set_nested_progress_bar_widget(self, widget):
-        self._progress_bar_stack = progress.ProgressBarStack(klass=widget)
+    def _progress_all_finished(self):
+        """See UIFactory._progress_all_finished"""
+        pbw = self._progress_bar_widget
+        if pbw:
+            pbw.finished()
+            self.set_progress_bar_widget(None)
 
-    def nested_progress_bar(self):
-        """Return a nested progress bar.
-        """
-        return self._progress_bar_stack.get_nested()
+    def _progress_updated(self, task):
+        """See UIFactory._progress_updated"""
+        if self._progress_bar_widget is None:
+            # Default to a window since nobody gave us a better mean to report
+            # progress.
+            self.set_progress_bar_widget(ProgressBarWindow())
+        self._progress_bar_widget.update(task.msg,
+                                         task.current_cnt, task.total_cnt)
 
-    def set_progress_bar_vbox(self, vbox):
-        """Change the vbox to put progress bars in.
-        """
-        self._progress_bar_stack = vbox
-
-    def clear_term(self):
-        """Prepare the terminal for output.
-
-        It has no sense when talking about GTK."""
-        pass

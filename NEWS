@@ -4,6 +4,9 @@
  
   * Add colored status messages in Olive file list (Jasper Groenewegen)
 
+  * Use the new progress bar implementation from bzrlib.
+   (Vincent Ladeuil, 385191)
+
  CHANGES
  
   * Add ginfo command line option (Jasper Groenewegen)

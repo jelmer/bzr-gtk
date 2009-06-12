@@ -111,8 +111,9 @@ class TreeView(gtk.VBox):
         gtk.VBox.__init__(self, spacing=0)
 
         loading_msg_widget = ProgressPanel()
-        if getattr(ui.ui_factory, "set_nested_progress_bar_widget", None) is not None:
-            ui.ui_factory.set_nested_progress_bar_widget(loading_msg_widget.get_progress_bar)
+        if getattr(ui.ui_factory, "set_progress_bar_widget", None) is not None:
+            # We'are using our own ui, let's tell it to use our widget.
+            ui.ui_factory.set_progress_bar_widget(loading_msg_widget)
         self.pack_start(loading_msg_widget, expand=False, fill=True)
 
         self.scrolled_window = gtk.ScrolledWindow()
