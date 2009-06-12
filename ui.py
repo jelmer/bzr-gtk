@@ -48,6 +48,7 @@ class GtkProgressBar(gtk.ProgressBar):
         self.total = None
 
     def tick(self):
+        self.show()
         self.pulse()
 
     def update(self, msg=None, current_cnt=None, total_cnt=None):
@@ -86,6 +87,7 @@ class ProgressBarWindow(gtk.Window):
         self.set_resizable(False)
 
     def tick(self, *args, **kwargs):
+        self.show_all()
         self.pb.tick(*args, **kwargs)
 
     def update(self, *args, **kwargs):
@@ -93,12 +95,13 @@ class ProgressBarWindow(gtk.Window):
         self.pb.update(*args, **kwargs)
 
     def finished(self):
+        self.pb.finished()
         self.hide_all()
+        self.destroy()
 
     def clear(self):
         self.pb.clear()
-        # FIXME: destroy() ? Really ? -- vila 20090610
-        self.destroy()
+        self.hide_all()
 
 
 class ProgressPanel(gtk.HBox):
@@ -116,6 +119,7 @@ class ProgressPanel(gtk.HBox):
         self.pack_start(self.pb, True, True)
 
     def tick(self, *args, **kwargs):
+        self.show_all()
         self.pb.tick(*args, **kwargs)
 
     def update(self, *args, **kwargs):
@@ -133,6 +137,7 @@ class ProgressPanel(gtk.HBox):
 
 class PasswordDialog(gtk.Dialog):
     """ Prompt the user for a password. """
+
     def __init__(self, prompt):
         gtk.Dialog.__init__(self)
 
@@ -160,11 +165,7 @@ class GtkUIFactory(UIFactory):
     def __init__(self):
         """Create a GtkUIFactory"""
         super(GtkUIFactory, self).__init__()
-        # FIXME: The following seems to be there to provide a default for cases
-        # where set_progress_bar_widget() is not called explicitely. It will be
-        # better to call it explicitely and get rid of that default. (I'm not
-        # even sure it really needed now :-/ -- vila 20090610.
-        self.set_progress_bar_widget(ProgressBarWindow())
+        self.set_progress_bar_widget(None)
 
     def get_boolean(self, prompt):
         """GtkDialog with yes/no answers"""
@@ -197,12 +198,16 @@ class GtkUIFactory(UIFactory):
         pbw = self._progress_bar_widget
         if pbw:
             pbw.finished()
+            self.set_progress_bar_widget(None)
 
     def _progress_updated(self, task):
         """See UIFactory._progress_updated"""
-        pbw = self._progress_bar_widget
-        if pbw:
-            pbw.update(task.msg, task.current_cnt, task.total_cnt)
+        if self._progress_bar_widget is None:
+            # Default to a window since nobody gave us a better mean to report
+            # progress.
+            self.set_progress_bar_widget(ProgressBarWindow())
+        self._progress_bar_widget.update(task.msg,
+                                         task.current_cnt, task.total_cnt)
 
     def set_progress_bar_widget(self, widget):
         self._progress_bar_widget = widget
