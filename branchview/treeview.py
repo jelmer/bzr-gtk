@@ -111,9 +111,8 @@ class TreeView(gtk.VBox):
         gtk.VBox.__init__(self, spacing=0)
 
         loading_msg_widget = ProgressPanel()
-        # FIXME: Why is the following needed ? Are there really cases where we
-        # use a TreeView without installing our own ui ? --vila 20090610
         if getattr(ui.ui_factory, "set_progress_bar_widget", None) is not None:
+            # We'are using our own ui, let's tell it to use our widget.
             ui.ui_factory.set_progress_bar_widget(loading_msg_widget)
         self.pack_start(loading_msg_widget, expand=False, fill=True)
 

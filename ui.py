@@ -167,6 +167,9 @@ class GtkUIFactory(UIFactory):
         super(GtkUIFactory, self).__init__()
         self.set_progress_bar_widget(None)
 
+    def set_progress_bar_widget(self, widget):
+        self._progress_bar_widget = widget
+
     def get_boolean(self, prompt):
         """GtkDialog with yes/no answers"""
         dialog = PromptDialog(prompt)
@@ -208,7 +211,4 @@ class GtkUIFactory(UIFactory):
             self.set_progress_bar_widget(ProgressBarWindow())
         self._progress_bar_widget.update(task.msg,
                                          task.current_cnt, task.total_cnt)
-
-    def set_progress_bar_widget(self, widget):
-        self._progress_bar_widget = widget
 
