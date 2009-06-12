@@ -95,9 +95,10 @@ class DiffFileView(gtk.ScrolledWindow):
 
         client = gconf.client_get_default()
         style_scheme_name = client.get_string(GEDIT_SCHEME_PATH)
-        style_scheme = gtksourceview2.StyleSchemeManager().get_scheme(style_scheme_name)
-        
-        buf.set_style_scheme(style_scheme)
+        if style_scheme_name is not None:
+            style_scheme = gtksourceview2.StyleSchemeManager().get_scheme(style_scheme_name)
+            
+            buf.set_style_scheme(style_scheme)
 
     @classmethod
     def apply_colordiff_colors(klass, buf):
