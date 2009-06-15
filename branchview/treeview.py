@@ -112,6 +112,9 @@ class TreeView(gtk.VBox):
 
         self.progress_widget = ProgressPanel()
         self.pack_start(self.progress_widget, expand=False, fill=True)
+        if getattr(ui.ui_factory, "set_progress_bar_widget", None) is not None:
+            # We'are using our own ui, let's tell it to use our widget.
+            ui.ui_factory.set_progress_bar_widget(self.progress_widget)
 
         self.scrolled_window = gtk.ScrolledWindow()
         self.scrolled_window.set_policy(gtk.POLICY_AUTOMATIC,
@@ -133,7 +136,13 @@ class TreeView(gtk.VBox):
 
         gobject.idle_add(self.populate)
 
-        self.connect("destroy", lambda x: self.branch.unlock())
+        self.connect("destroy", self._on_destroy)
+
+    def _on_destroy(self, *ignored):
+        self.branch.unlock()
+        if getattr(ui.ui_factory, "set_progress_bar_widget", None) is not None:
+            # We'are using our own ui, let's tell it to stop using our widget.
+            ui.ui_factory.set_progress_bar_widget(None)
 
     def do_get_property(self, property):
         if property.name == 'revno-column-visible':
