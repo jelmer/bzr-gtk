@@ -201,7 +201,6 @@ class GtkUIFactory(UIFactory):
         pbw = self._progress_bar_widget
         if pbw:
             pbw.finished()
-            self.set_progress_bar_widget(None)
 
     def _progress_updated(self, task):
         """See UIFactory._progress_updated"""

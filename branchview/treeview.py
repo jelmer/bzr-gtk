@@ -110,11 +110,11 @@ class TreeView(gtk.VBox):
         """
         gtk.VBox.__init__(self, spacing=0)
 
-        loading_msg_widget = ProgressPanel()
+        self.progress_widget = ProgressPanel()
+        self.pack_start(self.progress_widget, expand=False, fill=True)
         if getattr(ui.ui_factory, "set_progress_bar_widget", None) is not None:
             # We'are using our own ui, let's tell it to use our widget.
-            ui.ui_factory.set_progress_bar_widget(loading_msg_widget)
-        self.pack_start(loading_msg_widget, expand=False, fill=True)
+            ui.ui_factory.set_progress_bar_widget(self.progress_widget)
 
         self.scrolled_window = gtk.ScrolledWindow()
         self.scrolled_window.set_policy(gtk.POLICY_AUTOMATIC,
@@ -125,7 +125,7 @@ class TreeView(gtk.VBox):
 
         self.scrolled_window.add(self.construct_treeview())
 
-        self.iter = None
+        self.path = None
         self.branch = branch
         self.revision = None
         self.index = {}
@@ -136,7 +136,13 @@ class TreeView(gtk.VBox):
 
         gobject.idle_add(self.populate)
 
-        self.connect("destroy", lambda x: self.branch.unlock())
+        self.connect("destroy", self._on_destroy)
+
+    def _on_destroy(self, *ignored):
+        self.branch.unlock()
+        if getattr(ui.ui_factory, "set_progress_bar_widget", None) is not None:
+            # We'are using our own ui, let's tell it to stop using our widget.
+            ui.ui_factory.set_progress_bar_widget(None)
 
     def do_get_property(self, property):
         if property.name == 'revno-column-visible':
@@ -152,13 +158,17 @@ class TreeView(gtk.VBox):
         elif property.name == 'branch':
             return self.branch
         elif property.name == 'revision':
-            return self.model.get_value(self.iter, treemodel.REVISION)
+            return self.model.get_value(self.model.get_iter(self.path),
+                                        treemodel.REVISION)
         elif property.name == 'revision-number':
-            return self.model.get_value(self.iter, treemodel.REVNO)
+            return self.model.get_value(self.model.get_iter(self.path),
+                                        treemodel.REVNO)
         elif property.name == 'children':
-            return self.model.get_value(self.iter, treemodel.CHILDREN)
+            return self.model.get_value(self.model.get_iter(self.path),
+                                        treemodel.CHILDREN)
         elif property.name == 'parents':
-            return self.model.get_value(self.iter, treemodel.PARENTS)
+            return self.model.get_value(self.model.get_iter(self.path),
+                                        treemodel.PARENTS)
         else:
             raise AttributeError, 'unknown property %s' % property.name
 
@@ -283,6 +293,9 @@ class TreeView(gtk.VBox):
                        should be broken.
         """
 
+        if getattr(ui.ui_factory, "set_progress_bar_widget", None) is not None:
+            # We'are using our own ui, let's tell it to use our widget.
+            ui.ui_factory.set_progress_bar_widget(self.progress_widget)
         self.progress_bar = ui.ui_factory.nested_progress_bar()
         self.progress_bar.update("Loading ancestry graph", 0, 5)
 
@@ -412,7 +425,7 @@ class TreeView(gtk.VBox):
         (path, focus) = treeview.get_cursor()
         if (path is not None) and (path != self._prev_cursor_path):
             self._prev_cursor_path = path # avoid emitting twice per click
-            self.iter = self.model.get_iter(path)
+            self.path = path
             self.emit('revision-selected')
 
     def _on_revision_selected(self, widget, event):
