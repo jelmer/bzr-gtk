@@ -19,7 +19,8 @@ from bzrlib.config import GlobalConfig
 from bzrlib.plugin import load_plugins
 load_plugins()
 
-from bzrlib.plugins.gtk import _i18n, cmd_gannotate, start_viz_window
+from bzrlib.plugins.gtk import _i18n
+from bzrlib.plugins.gtk.commands import cmd_gannotate, start_viz_window
 
 print "Bazaar nautilus module initialized"
 
