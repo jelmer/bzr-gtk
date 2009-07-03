@@ -66,7 +66,12 @@ class DiffFileView(gtk.ScrolledWindow):
         if have_gtksourceview:
             self.buffer = gtksourceview2.Buffer()
             slm = gtksourceview2.LanguageManager()
-            gsl = slm.guess_language(content_type="text/x-patch")
+            gsl = None
+            for lang_id in slm.get_language_ids():
+                lang = slm.get_language(lang_id)
+                if "text/x-patch" in lang.get_mime_types():
+                    gsl = lang
+                    break
             if have_gconf:
                 self.apply_gedit_colors(self.buffer)
             self.apply_colordiff_colors(self.buffer)
