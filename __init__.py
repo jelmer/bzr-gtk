@@ -45,7 +45,7 @@ from bzrlib.commands import plugin_cmds
 
 import os.path
 
-version_info = (0, 96, 0, 'dev', 1)
+version_info = (0, 96, 0, 'final')
 
 if version_info[3] == 'final':
     version_string = '%d.%d.%d' % version_info[:3]
