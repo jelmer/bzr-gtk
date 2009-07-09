@@ -1,0 +1,190 @@
+((lp0
+S'Jelmer Vernooij <jelmer@samba.org>'
+p1
+aS'Daniel Schierbeck <daniel.schierbeck@gmail.com>'
+p2
+aS'Szilveszter Farkas (Phanatic) <Szilveszter.Farkas@gmail.com>'
+p3
+aS'Gary van der Merwe <garyvdm@gmail.com>'
+p4
+aS'Jasper Groenewegen <colbrac@xs4all.nl>'
+p5
+aS'John Arbash Meinel <john@arbash-meinel.com>'
+p6
+aS'Aaron Bentley <abentley@panoramicfeedback.com>'
+p7
+aS'Vincent Ladeuil <v.ladeuil+lp@free.fr>'
+p8
+aS'Aaron Bentley <aaron@aaronbentley.com>'
+p9
+aS'Alexander Belchenko <bialix@ukr.net>'
+p10
+aS'David Allouche <david.allouche@canonical.com>'
+p11
+aS'Dan Loda <danloda@gmail.com>'
+p12
+aS'Aaron Bentley <aaron.bentley@utoronto.ca>'
+p13
+aS'Scott James Remnant <scott@netsplit.com>'
+p14
+aS'Scott Scriven <ubuntu@toykeeper.net>'
+p15
+aS'Mateusz Korniak <matkor@laptop-hp>'
+p16
+aS'Robert Collins <robertc@robertcollins.net>'
+p17
+aS'Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>'
+p18
+aS'Martin Albisetti <argentina@gmail.com>'
+p19
+aS'Sabin Iacob (m0n5t3r) <iacobs@m0n5t3r.info>'
+p20
+aS'Javier Derderian <javierder@gmail.com>'
+p21
+aS'jbailey@ubuntu.com'
+p22
+aS'Gary van der Merwe <garyvdm@garyvdm-desktop>'
+p23
+aS'Richard Ferguson <ubuntu@fergusnet.com>'
+p24
+aS'Elliot Murphy <elliot@elliotmurphy.com>'
+p25
+aVAdeodato Simó <dato@net.com.org.es>
+p26
+aS'v.ladeuil+lp@free.fr'
+p27
+aS'Szilveszter Farkas <szilveszter.farkas@gmail.com>'
+p28
+aS'Wouter van Heyst <larstiq@larstiq.dyndns.org>'
+p29
+aS'Torsten Landschoff <torsten@debian.org>'
+p30
+aS'Jamie Wilkinson <jaq@spacepants.org>'
+p31
+aS'Gediminas Paulauskas <menesis@pov.lt>'
+p32
+aS'Ali Sabil <ali.sabil@gmail.com>'
+p33
+aS'Adrian Wilkins <adrian.wilkins@gmail.com>'
+p34
+aS'Michael Ellerman <michael@ellerman.id.au>'
+p35
+aS'Mateusz Korniak (matkor@laptop-hp)'
+p36
+aS'Jelmer Vernooij <Jelmer Vernooij@LENOVO-C29B82CD>'
+p37
+aS'Farkas Szilveszter <szilveszter@szilveszter-desktop>'
+p38
+aVDaniel Schömer <daniel.schoemer@gmx.net>
+p39
+aS'Chris Lamb <chris@chris-lamb.co.uk>'
+p40
+aS'Chad MILLER <chad@mysql.com>'
+p41
+aS'rodney.dawes@canonical.com'
+p42
+aS'matkor <matkor@laptop-hp>'
+p43
+aS'klight@walkertechnical.com'
+p44
+aS'klight <klight@X111>'
+p45
+aS'Vincent Geddes <vincent.geddes@gmail.com>'
+p46
+aS'Tom Badran <tom@badrunner.net>'
+p47
+aS'Szilveszter Farkas <szilveszter@MacBookPro.local>'
+p48
+aVStéphane Raimbault <stephane.raimbault@gmail.com>
+p49
+aS'Scott James Remnant <scott@ubuntu.com>'
+p50
+aS'Russ Brown <pickscrape@gmail.com>'
+p51
+aS'Richard Ferguson <fergus@fergusnet.com>'
+p52
+aS'Michael Vogt <michael.vogt@ubuntu.com>'
+p53
+aS'Markus Korn <thekorn@gmx.de>'
+p54
+aS'Kevin Light <klight@walkertechnical.com>'
+p55
+aVJean-François Fortin Tam <jeff@ecchi.ca>
+p56
+aS'Jasper Groenewegen <colbrac@xs4al.nl>'
+p57
+aS'James Westby <jw+debian@jameswestby.net>'
+p58
+aS'James Henstridge <james@jamesh.id.au>'
+p59
+aS'Erik Bagfors <erik@bagfors.nu>'
+p60
+aS'Dennis Miller <millerdl@telusplanet.net>'
+p61
+aS'Andrew Bennetts <andrew@puzzling.org>'
+p62
+a(lp63
+S'Jelmer Vernooij <jelmer@samba.org>'
+p64
+aS'Szilveszter Farkas (Phanatic) <Szilveszter.Farkas@gmail.com>'
+p65
+aS'Daniel Schierbeck <daniel.schierbeck@gmail.com>'
+p66
+ag12
+aS'Gary van der Merwe <garyvdm@gmail.com>'
+p67
+aS'Vincent Ladeuil <v.ladeuil+lp@free.fr>'
+p68
+aVAdeodato Simó <dato@net.com.org.es>
+p69
+aS'Szilveszter Farkas <szilveszter@MacBookPro.local>'
+p70
+aS'Szilveszter Farkas <szilveszter.farkas@gmail.com>'
+p71
+aS'Scott Scriven <ubuntu@toykeeper.net>'
+p72
+ag14
+ag58
+ag43
+aS'jbailey@ubuntu.com'
+p73
+aS'Tom Badran <tom@badrunner.net>'
+p74
+ag50
+aS'Russ Brown <pickscrape@gmail.com>'
+p75
+aS'Robert Collins <robertc@robertcollins.net>'
+p76
+aS'Mateusz Korniak <matkor@laptop-hp>'
+p77
+aS'Martin Albisetti <argentina@gmail.com>'
+p78
+aS'Kiddo <nekohayo@gmail.com>'
+p79
+ag55
+aS'Jelmer Vernooij <Jelmer Vernooij@LENOVO-C29B82CD>'
+p80
+aS'Jasper Groenewegen <colbrac@xs4all.nl>'
+p81
+ag23
+aS'David Allouche <david.allouche@canonical.com>'
+p82
+aS'Aaron Bentley <abentley@panoramicfeedback.com>'
+p83
+a(lp84
+S'Szilveszter Farkas (Phanatic) <Szilveszter.Farkas@gmail.com>'
+p85
+aS'Daniel Schierbeck <daniel.schierbeck@gmail.com>'
+p86
+aS'Martin Albisetti <argentina@gmail.com>'
+p87
+aS'Jelmer Vernooij <jelmer@samba.org>'
+p88
+a(lp89
+S'Szilveszter Farkas (Phanatic) <Szilveszter.Farkas@gmail.com>'
+p90
+aS'Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>'
+p91
+ag49
+atp92
+.
