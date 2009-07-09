@@ -1,3 +1,12 @@
+0.96.1	2009-07-08
+
+ BUG FIXES
+ 
+  * Rebuild the tarball after running 'python ./setup.py build_credits',
+    update http://bazaar-vcs.org/bzr-gtk/releasing accordingly.
+   (Vincent Ladeuil, #397526)
+ 
+
 0.96.0	2009-07-08
 
  UI
