@@ -46,6 +46,14 @@ from bzrlib.plugins.gtk.window import Window
 from dialog import error_dialog, info_dialog, warning_dialog
 
 
+def fallback_guess_language(slm, content_type):
+    for lang_id in slm.get_language_ids():
+        lang = slm.get_language(lang_id)
+        if "text/x-patch" in lang.get_mime_types():
+            return lang
+    return None
+
+
 class SelectCancelled(Exception):
 
     pass
@@ -66,7 +74,9 @@ class DiffFileView(gtk.ScrolledWindow):
         if have_gtksourceview:
             self.buffer = gtksourceview2.Buffer()
             slm = gtksourceview2.LanguageManager()
-            gsl = slm.guess_language(content_type="text/x-patch")
+            guess_language = getattr(gtksourceview2.LanguageManager, 
+                "guess_language", fallback_guess_language)
+            gsl = guess_language(slm, content_type="text/x-patch")
             if have_gconf:
                 self.apply_gedit_colors(self.buffer)
             self.apply_colordiff_colors(self.buffer)
