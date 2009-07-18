@@ -17,7 +17,6 @@ import os
 from bzrlib import (
     branch,
     builtins,
-    merge_directive,
     workingtree,
     )
 from bzrlib.commands import (
@@ -26,12 +25,14 @@ from bzrlib.commands import (
     )
 from bzrlib.errors import (
     BzrCommandError,
+    NoWorkingTree,
     NotVersionedError,
     NoSuchFile,
     )
 from bzrlib.option import Option
 
 from bzrlib.plugins.gtk import (
+    _i18n,
     open_display,
     import_pygtk,
     set_ui_factory,
@@ -269,12 +270,8 @@ class cmd_gcommit(GTKCommand):
     takes_options = []
 
     def run(self, filename=None):
-        import os
         open_display()
         from commit import CommitDialog
-        from bzrlib.errors import (BzrCommandError,
-                                   NotBranchError,
-                                   NoWorkingTree)
 
         wt = None
         br = None
@@ -310,7 +307,6 @@ class cmd_gstatus(GTKCommand):
     takes_options = ['revision']
 
     def run(self, path='.', revision=None):
-        import os
         gtk = open_display()
         from bzrlib.plugins.gtk.status import StatusWindow
         (wt, wt_path) = workingtree.WorkingTree.open_containing(path)
@@ -432,7 +428,7 @@ class cmd_gmissing(Command):
             other_branch = local_branch.get_parent()
             
             if other_branch is None:
-                raise errors.BzrCommandError("No peer location known or specified.")
+                raise BzrCommandError("No peer location known or specified.")
         remote_branch = Branch.open_containing(other_branch)[0]
         set_ui_factory()
         local_branch.lock_read()
