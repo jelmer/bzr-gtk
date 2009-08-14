@@ -29,9 +29,13 @@ class GnomeKeyringCredentialStore(CredentialStore):
 
     def __init__(self):
         CredentialStore.__init__(self)
-        # External apps that load bzrlib may also set this, so 
-        # don't override:
-        if gobject.get_application_name() is None:
+        # Older versions of gobject don't provide get_application_name so we
+        # can't always check.
+        get_app_name = getattr(gobject, 'get_application_name', None)
+        if get_app_name is None or get_app_name() is None:
+            # External applications that load bzrlib may already have set the
+            # application name so we don't contradict them (when we can
+            # determine it that is).
             gobject.set_application_name("bzr")
 
     def decode_password(self, credentials):
