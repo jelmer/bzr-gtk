@@ -137,7 +137,7 @@ class InstallData(install_data):
 
 setup(
     name = "bzr-gtk",
-    version = "0.97.0",
+    version = "0.96.2",
     maintainer = "Jelmer Vernooij",
     maintainer_email = "jelmer@samba.org",
     description = "GTK+ Frontends for various Bazaar commands",
@@ -196,7 +196,8 @@ setup(
                         'icons/emblem-bzr-conflict.svg', 
                         'icons/emblem-bzr-controlled.svg', 
                         'icons/emblem-bzr-modified.svg',
-                        'icons/emblem-bzr-removed.svg'])
+                        'icons/emblem-bzr-removed.svg',
+                        'icons/emblem-bzr-ignored.svg'])
                ],
     cmdclass={'install_data': InstallData,
               'build_credits': CreateCredits,

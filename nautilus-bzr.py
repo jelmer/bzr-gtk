@@ -401,10 +401,17 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         emblem = None
         status = None
 
-        if tree.has_filename(path):
+        id = tree.path2id(path)
+        if id == None:
+            if tree.is_ignored(path):
+                status = 'ignored'
+                emblem = 'bzr-ignored'
+            else:
+                status = 'unversioned'
+                        
+        elif tree.has_filename(path):
             emblem = 'bzr-controlled'
             status = 'unchanged'
-            id = tree.path2id(path)
 
             delta = tree.changes_from(tree.branch.basis_tree())
             if delta.touches_file_id(id):

@@ -5,6 +5,12 @@ BUG FIXES
   * Avoid GnomeKeyringCredentialStore traceback on Ubuntu Hardy
     by being more tolerant about gobject methods availability.
     (Vincent Ladeuil, #403430)
+  
+  * Fixed emblem and nautilus bzr-status column for ignored files.
+    (Lucas Shrewsbury, #294632)
+    
+  * Fixed emblem and nautilus bzr-status column for unversioned files.
+    (Lucas Shrewsbury, #417966)
 
 
 0.96.2	2009-07-08
