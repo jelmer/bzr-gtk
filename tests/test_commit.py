@@ -988,13 +988,14 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport, QuestionHelpers):
         rev = tree.branch.repository.get_revision(rev_id2)
         self.assertEqual('Commit just "a"', rev.message)
         file_info = rev.properties['file-info']
-        self.assertEqual('ld7:file_id4:a-id'
-                           '7:message14:Message for A\n'
-                           '4:path1:a'
-                         'ee', file_info)
+        self.assertEqual(u'ld7:file_id4:a-id'
+                         '7:message14:Message for A\n'
+                         '4:path1:a'
+                         'ee',
+                         file_info)
         self.assertEqual([{'path':'a', 'file_id':'a-id',
-                           'message':'Message for A\n'},
-                         ], bencode.bdecode(file_info))
+                           'message':'Message for A\n'},],
+                         bencode.bdecode(file_info.encode('UTF-8')))
 
     def test_commit_messages_after_merge(self):
         tree = self.make_branch_and_tree('tree')
@@ -1021,13 +1022,14 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport, QuestionHelpers):
         self.assertEqual('Merging from "tree2"\n', rev.message)
         self.assertEqual([rev_id1, rev_id2], rev.parent_ids)
         file_info = rev.properties['file-info']
-        self.assertEqual('ld7:file_id4:a-id'
-                           '7:message14:Message for A\n'
-                           '4:path1:a'
-                         'ee', file_info)
+        self.assertEqual(u'ld7:file_id4:a-id'
+                         '7:message14:Message for A\n'
+                         '4:path1:a'
+                         'ee',
+                         file_info)
         self.assertEqual([{'path':'a', 'file_id':'a-id',
-                           'message':'Message for A\n'},
-                         ], bencode.bdecode(file_info))
+                           'message':'Message for A\n'},],
+                         bencode.bdecode(file_info.encode('UTF-8')))
 
     def test_commit_unicode_messages(self):
         self.requireFeature(tests.UnicodeFilenameFeature)
