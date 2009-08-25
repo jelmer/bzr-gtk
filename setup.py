@@ -137,7 +137,7 @@ class InstallData(install_data):
 
 setup(
     name = "bzr-gtk",
-    version = "0.97.0",
+    version = "0.98.0",
     maintainer = "Jelmer Vernooij",
     maintainer_email = "jelmer@samba.org",
     description = "GTK+ Frontends for various Bazaar commands",
@@ -146,7 +146,7 @@ setup(
     url = "http://bazaar-vcs.org/BzrGtk",
     package_dir = {
         "bzrlib.plugins.gtk": ".",
-        "bzrlib.plugins.gtk.viz": "viz", 
+        "bzrlib.plugins.gtk.viz": "viz",
         "bzrlib.plugins.gtk.annotate": "annotate",
         "bzrlib.plugins.gtk.olive": "olive",
         "bzrlib.plugins.gtk.tests": "tests",
@@ -190,11 +190,12 @@ setup(
                                         'bzr-handle-patch.desktop',
                                         'bzr-notify.desktop']),
                 ('share/application-registry', ['bzr-gtk.applications']),
-                ('share/pixmaps', ['icons/olive-gtk.png', 'icons/bzr-icon-64.png']),
-                ('share/icons/hicolor/scalable/emblems', 
-                    ['icons/emblem-bzr-added.svg', 
-                        'icons/emblem-bzr-conflict.svg', 
-                        'icons/emblem-bzr-controlled.svg', 
+                ('share/pixmaps', ['icons/olive-gtk.png',
+                                   'icons/bzr-icon-64.png']),
+                ('share/icons/hicolor/scalable/emblems',
+                    ['icons/emblem-bzr-added.svg',
+                        'icons/emblem-bzr-conflict.svg',
+                        'icons/emblem-bzr-controlled.svg',
                         'icons/emblem-bzr-modified.svg',
                         'icons/emblem-bzr-removed.svg',
                         'icons/emblem-bzr-ignored.svg'])
