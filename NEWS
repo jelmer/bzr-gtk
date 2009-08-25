@@ -6,6 +6,8 @@ BUG FIXES
     by being more tolerant about gobject methods availability.
     (Vincent Ladeuil, #403430)
 
+  * Switch to using disutils sdist instead of bzr export.
+    (Mark Lee, #398242)
 
 0.96.2	2009-07-08
 

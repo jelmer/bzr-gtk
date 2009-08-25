@@ -1,2 +1,14 @@
 include AUTHORS
 include COPYING
+include HACKING
+include NEWS
+include TODO
+include bzr-gtk.applications
+include bzr-gtk.cfg
+include credits.pickle
+include olive-gtk.1
+include preferences/TODO
+include *.desktop
+include *.ui
+recursive-include icons *.png *.svg
+recursive-include po *.po *.pot
