@@ -196,7 +196,8 @@ setup(
                         'icons/emblem-bzr-conflict.svg', 
                         'icons/emblem-bzr-controlled.svg', 
                         'icons/emblem-bzr-modified.svg',
-                        'icons/emblem-bzr-removed.svg'])
+                        'icons/emblem-bzr-removed.svg',
+                        'icons/emblem-bzr-ignored.svg'])
                ],
     cmdclass={'install_data': InstallData,
               'build_credits': CreateCredits,
