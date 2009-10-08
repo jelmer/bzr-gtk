@@ -17,7 +17,10 @@ import pango
 import os
 import re
 import sys
-from xml.etree.ElementTree import Element, SubElement, tostring
+try:
+    from xml.etree.ElementTree import Element, SubElement, tostring
+except:
+    from elementtree.ElementTree import Element, SubElement, tostring
 
 try:
     import gtksourceview2
