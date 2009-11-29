@@ -33,7 +33,7 @@ try:
 	gtk = open_display()
 	window.connect("destroy", gtk.main_quit)
 except Exception, e:
-	from dialog import error_dialog
+	from bzrlib.plugins.gtk.dialog import error_dialog
 	error_dialog('Error', str(e))
 	raise
 gtk.main()
