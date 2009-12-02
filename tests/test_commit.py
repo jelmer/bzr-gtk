@@ -91,7 +91,7 @@ class TestPendingRevisions(tests.TestCaseWithTransport):
         rev_id4 = tree3.commit('four')
         rev_id5 = tree3.commit('five')
         tree.merge_from_branch(tree2.branch)
-        tree.merge_from_branch(tree3.branch)
+        tree.merge_from_branch(tree3.branch, force=True)
         self.assertEqual([rev_id1, rev_id3, rev_id5], tree.get_parent_ids())
 
         pending_revisions = commit.pending_revisions(tree)
@@ -271,7 +271,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
                                committer='Jerry Foo <jerry@foo.com>',
                                timestamp=1191372278.05,
                                timezone=+7200)
-        tree.merge_from_branch(tree3.branch)
+        tree.merge_from_branch(tree3.branch, force=True)
 
         dlg = commit.CommitDialog(tree)
         # TODO: assert that the pending box is set to show
