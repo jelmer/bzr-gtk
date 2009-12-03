@@ -38,14 +38,16 @@ import os
 import sys
 
 if getattr(sys, "frozen", None) is not None: # we run bzr.exe
+
+    # FIXME: Unless a better packaging solution is found, the following
+    # provides a workaround for https://bugs.launchpad.net/bzr/+bug/388790 Also
+    # see https://code.edge.launchpad.net/~vila/bzr-gtk/388790-windows-setup
+    # for more details about while it's needed.
+
     # NOTE: _lib must be ahead of bzrlib or sax.saxutils (in olive) fails
     here = os.path.dirname(__file__)
     sys.path.insert(0, os.path.join(here, '_lib'))
     sys.path.append(os.path.join(here, '_lib/gtk-2.0'))
-    # Do we really need the following (since we are executing that code, we
-    # should already be on the path at the appropriate place, I'm concerned
-    # about masking import bugs by adding that)? Can someone test and report?
-    #sys.path.append(here)
 
 
 import bzrlib
