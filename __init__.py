@@ -34,6 +34,22 @@ gtags             Manage branch tags.
 visualise         Graphically visualise this branch. 
 """
 
+import os
+import sys
+
+if getattr(sys, "frozen", None) is not None: # we run bzr.exe
+
+    # FIXME: Unless a better packaging solution is found, the following
+    # provides a workaround for https://bugs.launchpad.net/bzr/+bug/388790 Also
+    # see https://code.edge.launchpad.net/~vila/bzr-gtk/388790-windows-setup
+    # for more details about while it's needed.
+
+    # NOTE: _lib must be ahead of bzrlib or sax.saxutils (in olive) fails
+    here = os.path.dirname(__file__)
+    sys.path.insert(0, os.path.join(here, '_lib'))
+    sys.path.append(os.path.join(here, '_lib/gtk-2.0'))
+
+
 import bzrlib
 import bzrlib.api
 from bzrlib import (
@@ -43,7 +59,6 @@ from bzrlib import (
     )
 from bzrlib.commands import plugin_cmds
 
-import os.path
 
 version_info = (0, 98, 0, 'dev', 1)
 
