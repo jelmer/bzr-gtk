@@ -51,7 +51,7 @@ def _open_link(widget, uri):
             webbrowser._tryorder.insert(0, '%s "%%s"' % cmd)
     webbrowser.open(uri)
 
-gtk.link_button_set_uri_hook(_open_link)
+#gtk.link_button_set_uri_hook(_open_link)
 
 class BugsTab(gtk.VBox):
 

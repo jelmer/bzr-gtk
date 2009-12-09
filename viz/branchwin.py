@@ -80,7 +80,7 @@ class BranchWindow(Window):
         self.accel_group = gtk.AccelGroup()
         self.add_accel_group(self.accel_group)
 
-        gtk.Action.set_tool_item_type(gtk.MenuToolButton)
+#        gtk.Action.set_tool_item_type(gtk.MenuToolButton)
 
         self.prev_rev_action = gtk.Action("prev-rev", "_Previous Revision", "Go to the previous revision", gtk.STOCK_GO_DOWN)
         self.prev_rev_action.set_accel_path("<viz>/Go/Previous Revision")
