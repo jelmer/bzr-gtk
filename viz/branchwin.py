@@ -1,11 +1,10 @@
-# -*- coding: UTF-8 -*-
 """Branch window.
 
 This module contains the code to manage the branch information window,
 which contains both the revision graph and details panes.
 """
 
-__copyright__ = "Copyright © 2005 Canonical Ltd."
+__copyright__ = "Copyright (c) 2005 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 
@@ -80,7 +79,9 @@ class BranchWindow(Window):
         self.accel_group = gtk.AccelGroup()
         self.add_accel_group(self.accel_group)
 
-#        gtk.Action.set_tool_item_type(gtk.MenuToolButton)
+        if getattr(gtk.Action, 'set_tool_item_type', None) is not None:
+            # Not available before PyGtk-2.10
+            gtk.Action.set_tool_item_type(gtk.MenuToolButton)
 
         self.prev_rev_action = gtk.Action("prev-rev", "_Previous Revision", "Go to the previous revision", gtk.STOCK_GO_DOWN)
         self.prev_rev_action.set_accel_path("<viz>/Go/Previous Revision")

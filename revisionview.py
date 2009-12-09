@@ -51,13 +51,15 @@ def _open_link(widget, uri):
             webbrowser._tryorder.insert(0, '%s "%%s"' % cmd)
     webbrowser.open(uri)
 
-#gtk.link_button_set_uri_hook(_open_link)
+if getattr(gtk, 'link_button_set_uri_hook', None) is not None:
+    # Not available before PyGtk-2.10
+    gtk.link_button_set_uri_hook(_open_link)
 
 class BugsTab(gtk.VBox):
 
     def __init__(self):
         super(BugsTab, self).__init__(False, 6)
-    
+
         table = gtk.Table(rows=2, columns=2)
 
         table.set_row_spacings(6)
