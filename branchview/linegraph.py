@@ -1,4 +1,3 @@
-# -*- coding: UTF-8 -*-
 """Directed graph production.
 
 This module contains the code to produce an ordered directed graph of a
@@ -6,7 +5,7 @@ bzr branch, such as we display in the tree view at the top of the bzrk
 window.
 """
 
-__copyright__ = "Copyright © 2005 Canonical Ltd."
+__copyright__ = "Copyright 2005 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 from bzrlib.revision import NULL_REVISION
@@ -314,7 +313,7 @@ def linegraph(graph, start_revs, maxnum=None, broken_line_length=None,
         update_root_progress(5)
         progress_bar = ui.ui_factory.nested_progress_bar()
         try:
-            progress_bar.update("Pretifying graph", 0, len(lines))
+            progress_bar.update("Prettifying graph", 0, len(lines))
             for i, (child_index, parent_index, line_col_indexes) in enumerate(lines):
                 if i % 25 == 0:
                     progress_bar.update(None, i)
