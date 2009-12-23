@@ -281,18 +281,22 @@ class OliveGui(gtk.Window):
         self.tb_refresh_icon.set_from_file(icon_path("refresh.png"))
         self.tb_refresh = gtk.ToolButton(self.tb_refresh_icon, _i18n("Refresh"))
         self.tb_refresh.connect('clicked', self.signal.on_menuitem_view_refresh_activate)
+        self.tb_refresh.set_tooltip_text(_i18n("Refresh the file list"))
+        self.tb_refresh.set_is_important(True)
         self.tb.add(self.tb_refresh)
         
         self.tb_diff_icon = gtk.Image()
         self.tb_diff_icon.set_from_file(icon_path("diff.png"))
         self.tb_diff = gtk.ToolButton(self.tb_diff_icon, _i18n("Diff"))
         self.tb_diff.connect('clicked', self.signal.on_menuitem_stats_diff_activate)
+        self.tb_diff.set_tooltip_text(_i18n("View changes since last commit"))
         self.tb.add(self.tb_diff)
         
         self.tb_log_icon = gtk.Image()
         self.tb_log_icon.set_from_file(icon_path("log.png"))
         self.tb_log = gtk.ToolButton(self.tb_log_icon, _i18n("Log"))
         self.tb_log.connect('clicked', self.signal.on_menuitem_stats_log_activate)
+        self.tb_log.set_tooltip_text(_i18n("View the revision history"))
         self.tb.add(self.tb_log)
         
         self.tb.add(gtk.SeparatorToolItem())
@@ -301,6 +305,8 @@ class OliveGui(gtk.Window):
         self.tb_commit_icon.set_from_file(icon_path("commit.png"))
         self.tb_commit = gtk.ToolButton(self.tb_commit_icon, _i18n("Commit"))
         self.tb_commit.connect('clicked', self.signal.on_menuitem_branch_commit_activate)
+        self.tb_commit.set_tooltip_text(_i18n("Commit changes to the current branch"))
+        self.tb_commit.set_is_important(True)
         self.tb.add(self.tb_commit)
         
         self.tb.add(gtk.SeparatorToolItem())
@@ -309,18 +315,21 @@ class OliveGui(gtk.Window):
         self.tb_pull_icon.set_from_file(icon_path("pull.png"))
         self.tb_pull = gtk.ToolButton(self.tb_pull_icon, _i18n("Pull"))
         self.tb_pull.connect('clicked', self.signal.on_menuitem_branch_pull_activate)
+        self.tb_pull.set_tooltip_text(_i18n("Pull changes from the parent branch"))
         self.tb.add(self.tb_pull)
         
         self.tb_push_icon = gtk.Image()
         self.tb_push_icon.set_from_file(icon_path("push.png"))
         self.tb_push = gtk.ToolButton(self.tb_push_icon, _i18n("Push"))
         self.tb_push.connect('clicked', self.signal.on_menuitem_branch_push_activate)
+        self.tb_push.set_tooltip_text(_i18n("Push the branch to a remote location"))
         self.tb.add(self.tb_push)
         
         self.tb_update_icon = gtk.Image()
         self.tb_update_icon.set_from_file(icon_path("pull.png"))
         self.tb_update = gtk.ToolButton(self.tb_update_icon, _i18n("Update"))
         self.tb_update.connect('clicked', self.signal.on_menuitem_branch_update_activate)
+        self.tb_update.set_tooltip_text(_i18n("Update the working tree"))
         self.tb.add(self.tb_update)
     
     def _create_locationbar(self):
