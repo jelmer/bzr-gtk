@@ -282,7 +282,7 @@ class OliveMenu:
     
     def commit(self, action):
         """ Right context menu -> Commit """
-        from commit import CommitDialog
+        from bzrlib.plugins.gtk.commit import CommitDialog
         branch = None
         try:
             wt, path = WorkingTree.open_containing(self.path)
