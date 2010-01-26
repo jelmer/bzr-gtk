@@ -444,6 +444,11 @@ class cmd_gmissing(Command):
 
 
 class cmd_ginit(GTKCommand):
+    """ GTK+ init dialog
+
+    Graphical user interface for initializing new branches.
+
+    """
     def run(self):
         open_display()
         from initialize import InitDialog
@@ -452,6 +457,11 @@ class cmd_ginit(GTKCommand):
 
 
 class cmd_gtags(GTKCommand):
+    """ GTK+ tags dialog 
+
+    Graphical user interface to view, create, or remove tags.
+
+    """
     def run(self):
         br = branch.Branch.open_containing('.')[0]
         
