@@ -19,7 +19,10 @@ import os
 import gtk.gdk
 
 from bzrlib import config
-import bzrlib.util.configobj.configobj as configobj
+try:
+    import bzrlib.util.configobj.configobj as configobj
+except ImportError:
+    import configobj
 
 
 def gannotate_config_filename():
