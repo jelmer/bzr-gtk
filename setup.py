@@ -80,14 +80,16 @@ class BuildData(build):
 
 
 class InstallData(install_data):
+
     def run(self):
+        import subprocess
         self.data_files.extend(self._compile_po_files())
         self.data_files.extend(self._nautilus_plugin())
         install_data.run(self)
 
         try:
             subprocess.check_call('gtk-update-icon-cache -f -t /usr/share/icons/hicolor')
-        except:
+        except OSError:
             pass
 
     def _compile_po_files(self):
