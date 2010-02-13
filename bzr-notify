@@ -13,12 +13,9 @@ from bzrlib.plugins.gtk import open_display, icon_path
 
 from bzrlib.plugins.gtk.notify import NotifyPopupMenu
 gtk = open_display()
-menu = NotifyPopupMenu()
-icon = gtk.status_icon_new_from_file(icon_path("bzr-icon-64.png"))
-icon.connect('popup-menu', menu.display)
-icon.set_visible(False)
 
 import cgi
+import appindicator
 import dbus
 import dbus.service
 import gobject
@@ -27,13 +24,22 @@ from bzrlib.bzrdir import BzrDir
 from bzrlib import errors
 from bzrlib.osutils import format_date
 from bzrlib.transport import get_transport
+
+menu = NotifyPopupMenu()
+ind = appindicator.Indicator ("bzr-gtk-notify",
+                          "bzr-icon-64",
+                          appindicator.CATEGORY_APPLICATION_STATUS)
+ind.set_status (appindicator.STATUS_PASSIVE)
+ind.set_attention_icon("bzr-icon-64")
+ind.set_menu(menu)
+
 if getattr(dbus, 'version', (0,0,0)) >= (0,41,0):
 	import dbus.glib
 BROADCAST_INTERFACE = "org.bazaarvcs.plugins.dbus.Broadcast"
 bus = dbus.SessionBus()
 
 def hide_icon():
-	icon.set_visible(False)
+	ind.set_status (appindicator.STATUS_PASSIVE)
 
 def catch_branch(revision_id, urls):
 	# TODO: show all the urls, or perhaps choose the 'best'.
@@ -66,7 +72,7 @@ def catch_branch(revision_id, urls):
 		if "actions" in pynotify.get_server_caps():
 			nw.add_action("inspect", "Inspect", start_viz, None)
 			nw.add_action("branch", "Branch", start_branch, None)
-		icon.set_visible(True)
+		ind.set_status (appindicator.STATUS_ATTENTION)
 		gobject.timeout_add(5000, hide_icon)
 		nw.set_timeout(5000)
 		nw.show()
