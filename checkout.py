@@ -55,7 +55,7 @@ class CheckoutDialog(gtk.Dialog):
         self._combo = gtk.ComboBoxEntry()
         self._label_location = gtk.Label(_i18n("Branch location:"))
         self._label_destination = gtk.Label(_i18n("Destination:"))
-        self._label_nick = gtk.Label(_i18n("Branck nick:"))
+        self._label_nick = gtk.Label(_i18n("Branch nick:"))
         self._label_revision = gtk.Label(_i18n("Revision:"))
         self._hbox_revision = gtk.HBox()
         self._entry_revision = gtk.Entry()
