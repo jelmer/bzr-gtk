@@ -1,5 +1,15 @@
-0.98.0 UNRELEASED
+0.98.0 2010-02-24
 
+BUG FIXES
+
+  * Fix relative import in olive menu.
+    (Mathias Brodala, #269883)
+
+  * Fix typo in checkout dialog.
+    (Jasper Groenewegen, #466507)
+
+  * Adds help for ginit and gtags.
+    (Andrew Starr-Bochicchio, #512701)
 
 0.97.0 2009-08-25
 
