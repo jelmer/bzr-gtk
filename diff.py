@@ -34,14 +34,13 @@ except ImportError:
     have_gconf = False
 
 from bzrlib import (
+    errors,
     merge as _mod_merge,
     osutils,
-    progress,
     urlutils,
     workingtree,
 )
 from bzrlib.diff import show_diff_trees, internal_diff
-from bzrlib.errors import NoSuchFile
 from bzrlib.patches import parse_patches
 from bzrlib.trace import warning
 from bzrlib.plugins.gtk import _i18n
@@ -376,7 +375,7 @@ class DiffWidget(gtk.HPaned):
                     tv_path = child.path
                     break
         if tv_path is None:
-            raise NoSuchFile(file_path)
+            raise errors.NoSuchFile(file_path)
         self.treeview.set_cursor(tv_path)
         self.treeview.scroll_to_cell(tv_path)
 
@@ -584,9 +583,10 @@ class MergeDirectiveController(DiffController):
         tree.lock_write()
         try:
             try:
-                merger, verified = _mod_merge.Merger.from_mergeable(tree,
-                    self.directive, progress.DummyProgress())
-                merger.check_basis(True)
+                if tree.has_changes():
+                    raise errors.UncommittedChanges(tree)
+                merger, verified = _mod_merge.Merger.from_mergeable(
+                    tree, self.directive, pb=None)
                 merger.merge_type = _mod_merge.Merge3Merger
                 conflict_count = merger.do_merge()
                 merger.set_pending()
