@@ -1,5 +1,10 @@
 0.99.0 UNRELEASED
 
+FEATURES
+
+  * Add support for Indicator Application (Sense Hofstede, Jelmer Vernooij,
+    #518179)
+
 0.98.0 2010-02-24
 
 BUG FIXES
