@@ -137,7 +137,8 @@ class InstallData(install_data):
         return files
 
 
-setup(
+if __name__ == '__main__':
+    setup(
     name = "bzr-gtk",
     version = "0.99.0",
     maintainer = "Jelmer Vernooij",
