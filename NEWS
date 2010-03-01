@@ -1,5 +1,9 @@
 0.99.0 UNRELEASED
 
+BUG FIXES
+
+   * Guard setup() call when not loaded as __main__. (Robert Collins)
+
 FEATURES
 
   * Add support for Indicator Application (Sense Hofstede, Jelmer Vernooij,
