@@ -4,6 +4,9 @@ BUG FIXES
 
    * Guard setup() call when not loaded as __main__. (Robert Collins)
 
+   * Don't crash when there is already a lan-notify instance running.
+     (Jelmer Vernooij, #339284)
+
 FEATURES
 
   * Add support for Indicator Application (Sense Hofstede, Jelmer Vernooij,

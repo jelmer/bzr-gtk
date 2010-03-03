@@ -40,6 +40,7 @@ class NotifyPopupMenu(gtk.Menu):
         self.create_items()
 
     def create_items(self):
+        from bzrlib import errors
         item = gtk.CheckMenuItem('_Gateway to LAN')
         item.connect('toggled', self.toggle_lan_gateway)
         self.append(item)
@@ -48,6 +49,10 @@ class NotifyPopupMenu(gtk.Menu):
             from bzrlib.plugins.dbus.activity import LanGateway
             self.langateway = LanGateway()
         except ImportError:
+            item.set_sensitive(False)
+        except errors.BzrError:
+            # FIXME: Should only catch errors that indicate a lan-notify 
+            # process is already running.
             item.set_sensitive(False)
 
         item = gtk.CheckMenuItem('Announce _branches on LAN')
