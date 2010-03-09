@@ -4,6 +4,9 @@ BUG FIXES
 
    * Guard setup() call when not loaded as __main__. (Robert Collins)
 
+   * Ignore gnomekeyring.IOError when checking if credentials are available 
+     in the GNOME keyring. (Jelmer Vernooij, #534326)
+
 FEATURES
 
   * Add support for Indicator Application (Sense Hofstede, Jelmer Vernooij,
