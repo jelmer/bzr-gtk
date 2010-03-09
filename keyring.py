@@ -77,5 +77,6 @@ class GnomeKeyringCredentialStore(CredentialStore):
                 gnomekeyring.ITEM_NETWORK_PASSWORD, attrs)
             credentials["user"] = items[0].attributes["user"]
             credentials["password"] = items[0].secret
-        except (gnomekeyring.NoMatchError, gnomekeyring.DeniedError, gnomekeyring.NoKeyringDaemonError):
+        except (gnomekeyring.NoMatchError, gnomekeyring.DeniedError, gnomekeyring.NoKeyringDaemonError,
+                gnomekeyring.IOError):
             return None
