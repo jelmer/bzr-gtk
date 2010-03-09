@@ -78,5 +78,8 @@ class GnomeKeyringCredentialStore(CredentialStore):
             credentials["user"] = items[0].attributes["user"]
             credentials["password"] = items[0].secret
         except (gnomekeyring.NoMatchError, gnomekeyring.DeniedError, gnomekeyring.NoKeyringDaemonError,
-                gnomekeyring.IOError):
+                gnomekeyring.IOError), e:
+            from bzrlib import trace
+            trace.mutter('Unable to obtain credentials for %r from GNOME keyring: %r',
+                         attrs, e)
             return None
