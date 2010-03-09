@@ -7,6 +7,9 @@ BUG FIXES
    * Ignore gnomekeyring.IOError when checking if credentials are available 
      in the GNOME keyring. (Jelmer Vernooij, #534326)
 
+   * Don't crash when there is already a lan-notify instance running.
+     (Jelmer Vernooij, #339284)
+
 FEATURES
 
   * Add support for Indicator Application (Sense Hofstede, Jelmer Vernooij,
