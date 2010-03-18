@@ -143,7 +143,7 @@ commands = {
     "gsend": [],
     "gstatus": ["gst"],
     "gtags": [],
-    "visualise": ["visualize", "vis", "viz"],
+    "visualise": ["visualize", "vis", "viz", 'glog'],
     }
 
 try:

@@ -12,6 +12,10 @@ BUG FIXES
 
 FEATURES
 
+  * Add 'glog' as an alias for visualize (aka viz) as too many
+    people are still confused.
+    (Vincent Ladeuil)
+
   * Add support for Indicator Application (Sense Hofstede, Jelmer Vernooij,
     #518179)
 
