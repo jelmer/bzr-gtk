@@ -17,6 +17,7 @@ import pango
 import os
 import re
 import sys
+import inspect
 try:
     from xml.etree.ElementTree import Element, SubElement, tostring
 except ImportError:
@@ -524,9 +525,10 @@ class DiffWindow(Window):
 
 class DiffController(object):
 
-    def __init__(self, path, patch, window=None):
+    def __init__(self, path, patch, window=None, allow_dirty=False):
         self.path = path
         self.patch = patch
+        self.allow_dirty = allow_dirty
         if window is None:
             window = DiffWindow(operations=self._provide_operations())
             self.initialize_window(window)
@@ -538,7 +540,12 @@ class DiffController(object):
 
     def get_diff_sections(self):
         yield "Complete Diff", None, ''.join(self.patch)
-        for patch in parse_patches(self.patch):
+        # allow_dirty was added to parse_patches in bzrlib 2.2b1
+        if 'allow_dirty' in inspect.getargspec(parse_patches).args:
+            patches = parse_patches(self.patch, allow_dirty=self.allow_dirty)
+        else:
+            patches = parse_patches(self.patch)
+        for patch in patches:
             oldname = patch.oldname.split('\t')[0]
             newname = patch.newname.split('\t')[0]
             yield oldname, newname, str(patch)

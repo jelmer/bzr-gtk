@@ -25,7 +25,7 @@ try:
 	try:
 		directive = merge_directive.MergeDirective.from_lines(lines)
 	except errors.NotAMergeDirective:
-		controller = DiffController(path, lines)
+		controller = DiffController(path, lines, allow_dirty=True)
 	else:
 		controller = MergeDirectiveController(path, directive)
 	window = controller.window
