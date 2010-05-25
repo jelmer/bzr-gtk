@@ -166,13 +166,6 @@ branch.Branch.hooks.install_named_hook('post_uncommit',
                                        save_commit_messages,
                                        "Saving commit messages for gcommit")
 
-import gettext
-gettext.install('olive-gtk')
-
-# Let's create a specialized alias to protect '_' from being erased by other
-# uses of '_' as an anonymous variable (think pdb for one).
-_i18n = gettext.gettext
-
 class NoDisplayError(errors.BzrCommandError):
     """gtk could not find a proper display"""
 
