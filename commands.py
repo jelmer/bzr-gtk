@@ -201,7 +201,7 @@ class cmd_gannotate(GTKCommand):
     Browse changes to FILENAME line by line in a GTK+ window.
 
     Within the annotate window, you can use Ctrl-F to search for text, and 
-    Ctrl-G to repeat the previous search.
+    Ctrl-G to jump to a line by number.
     """
 
     takes_args = ["filename", "line?"]
