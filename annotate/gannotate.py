@@ -352,6 +352,7 @@ class GAnnotateWindow(Window):
         button = gtk.Button()
         button.set_use_stock(True)
         button.set_label("gtk-find")
+        button.set_tooltip_text("Search for text (Ctrl+F)")
         button.connect("clicked", self._search_by_text)
         button.set_relief(gtk.RELIEF_NONE)
         button.show()
@@ -361,6 +362,7 @@ class GAnnotateWindow(Window):
     def _create_goto_button(self):
         button = gtk.Button()
         button.set_label("Goto Line")
+        button.set_tooltip_text("Scroll to a line by entering its number (Ctrl+G)")
         button.connect("clicked", self._search_by_line)
         button.set_relief(gtk.RELIEF_NONE)
         button.show()
