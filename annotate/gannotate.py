@@ -212,6 +212,8 @@ class GAnnotateWindow(Window):
         hbox.pack_start(self.back_button, expand=False, fill=True)
         self.forward_button = self._create_forward_button()
         hbox.pack_start(self.forward_button, expand=False, fill=True)
+        self.find_button = self._create_find_button()
+        hbox.pack_start(self.find_button, expand=False, fill=True)
         hbox.show()
         vbox.pack_start(hbox, expand=False, fill=True)
         
@@ -234,7 +236,7 @@ class GAnnotateWindow(Window):
 
         self.add(vbox)
 
-    def _search_by_text(self, accel_group, window, key, modifiers):
+    def _search_by_text(self, *ignored): # (accel_group, window, key, modifiers):
         self._search.show_for('text')
         self._search.set_target(self.annoview, TEXT_LINE_COL)
 
@@ -342,6 +344,16 @@ class GAnnotateWindow(Window):
         button.set_relief(gtk.RELIEF_NONE)
         button.show()
         button.set_sensitive(False)
+        return button
+
+    def _create_find_button(self):
+        button = gtk.Button()
+        button.set_use_stock(True)
+        button.set_label("gtk-find")
+        button.connect("clicked", self._search_by_text)
+        button.set_relief(gtk.RELIEF_NONE)
+        button.show()
+        button.set_sensitive(True)
         return button
 
     def go_back(self):

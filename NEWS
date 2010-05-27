@@ -12,6 +12,9 @@ BUG FIXES
 
 FEATURES
 
+  * Add 'Find' button to start text search.
+    (Martin Pool, #556347)
+
   * Add 'glog' as an alias for visualize (aka viz) as too many
     people are still confused.
     (Vincent Ladeuil)
