@@ -24,7 +24,6 @@ from bzrlib.branch import Branch
 from bzrlib.config import GlobalConfig
 import gtk
 from history import UrlHistory
-from olive import Preferences
 import gobject
 
 class BranchSelectionBox(gtk.HBox):
@@ -56,10 +55,6 @@ class BranchSelectionBox(gtk.HBox):
         self._combo_model = gtk.ListStore(str)
         
         for item in self._history.get_entries():
-            self._combo_model.append([ item ])
-        
-        pref = Preferences()
-        for item in pref.get_bookmarks():
             self._combo_model.append([ item ])
         
         self._combo.set_model(self._combo_model)

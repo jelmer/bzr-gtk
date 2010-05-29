@@ -205,3 +205,8 @@ def load_tests(basic_tests, module, loader):
             reload(sys)
             sys.setdefaultencoding(default_encoding)
     return basic_tests
+
+
+def _i18n(text):
+    # Stub until we support proper i18n
+    return text
