@@ -372,19 +372,6 @@ class cmd_gpreferences(GTKCommand):
         dialog.run()
 
 
-class cmd_ginfo(Command):
-    """ GTK+ info dialog
-    
-    """
-    def run(self):
-        from bzrlib import workingtree
-        from bzrlib.plugins.gtk.olive.info import InfoDialog
-        wt = workingtree.WorkingTree.open_containing('.')[0]
-        info = InfoDialog(wt.branch)
-        info.display()
-        info.window.run()
-
-
 class cmd_gmerge(Command):
     """ GTK+ merge dialog
     

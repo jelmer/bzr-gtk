@@ -22,7 +22,6 @@ gcommit           GTK+ commit dialog.
 gconflicts        GTK+ conflicts. 
 gdiff             Show differences in working tree in a GTK+ Window. 
 ginit             Initialise a new branch.
-ginfo             GTK+ branch info dialog
 gloom             GTK+ loom browse dialog
 gmerge            GTK+ merge dialog
 gmissing          GTK+ missing revisions dialog. 
@@ -135,7 +134,6 @@ commands = {
     "gconflicts": [],
     "gdiff": [],
     "ginit": [],
-    "ginfo": [],
     "gmerge": [],
     "gmissing": [],
     "gpreferences": [],
