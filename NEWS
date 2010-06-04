@@ -10,6 +10,9 @@ BUG FIXES
    * Don't crash when there is already a lan-notify instance running.
      (Jelmer Vernooij, #339284)
 
+   * Return the credentials if successfully found in gnome-keyring.
+     (John Szakmeister)
+
 FEATURES
 
   * Add 'Find' button to start text search.
