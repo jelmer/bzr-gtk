@@ -23,7 +23,6 @@ def load_tests(basic_tests, module, loader):
         'test_diff',
         'test_history',
         'test_linegraph',
-        'test_preferences',
         'test_revisionview',
         ]
 

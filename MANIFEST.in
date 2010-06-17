@@ -6,7 +6,6 @@ include TODO
 include bzr-gtk.applications
 include bzr-gtk.cfg
 include credits.pickle
-include olive-gtk.1
 include preferences/TODO
 include *.desktop
 include *.ui

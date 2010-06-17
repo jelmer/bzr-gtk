@@ -22,7 +22,6 @@ gcommit           GTK+ commit dialog.
 gconflicts        GTK+ conflicts. 
 gdiff             Show differences in working tree in a GTK+ Window. 
 ginit             Initialise a new branch.
-ginfo             GTK+ branch info dialog
 gloom             GTK+ loom browse dialog
 gmerge            GTK+ merge dialog
 gmissing          GTK+ missing revisions dialog. 
@@ -135,7 +134,6 @@ commands = {
     "gconflicts": [],
     "gdiff": [],
     "ginit": [],
-    "ginfo": [],
     "gmerge": [],
     "gmissing": [],
     "gpreferences": [],
@@ -165,13 +163,6 @@ def save_commit_messages(*args):
 branch.Branch.hooks.install_named_hook('post_uncommit',
                                        save_commit_messages,
                                        "Saving commit messages for gcommit")
-
-import gettext
-gettext.install('olive-gtk')
-
-# Let's create a specialized alias to protect '_' from being erased by other
-# uses of '_' as an anonymous variable (think pdb for one).
-_i18n = gettext.gettext
 
 class NoDisplayError(errors.BzrCommandError):
     """gtk could not find a proper display"""
@@ -212,3 +203,8 @@ def load_tests(basic_tests, module, loader):
             reload(sys)
             sys.setdefaultencoding(default_encoding)
     return basic_tests
+
+
+def _i18n(text):
+    # Stub until we support proper i18n
+    return text
