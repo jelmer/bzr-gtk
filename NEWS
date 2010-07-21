@@ -13,6 +13,8 @@ BUG FIXES
    * Return the credentials if successfully found in gnome-keyring.
      (John Szakmeister)
 
+   * Support non-bzr patches. (Toshio Kuratomi, #502076)
+
 FEATURES
 
   * Add 'Find' button to start text search.
