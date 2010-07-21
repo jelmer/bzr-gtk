@@ -50,7 +50,7 @@ class CreateCredits(Command):
     def run(self):
         from bzrlib.plugin import load_plugins; load_plugins()
         from bzrlib.branch import Branch
-        from bzrlib.plugins.stats import find_credits
+        from bzrlib.plugins.stats.cmds import find_credits
 
         import pickle
 
