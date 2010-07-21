@@ -14,7 +14,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import os.path
 import re
 
 try:
@@ -28,7 +27,6 @@ import gobject
 import pango
 
 from bzrlib import (
-    branch,
     errors,
     osutils,
     trace,
@@ -812,7 +810,7 @@ class SavedCommitMessagesManager:
             self.global_message = u''
             self.file_messages = {}
         else:
-            config = branch.get_config()._get_branch_data_config()
+            config = branch.get_config()
             self.global_message = config.get_user_option(
                 'gtk_global_commit_message')
             if self.global_message is None:

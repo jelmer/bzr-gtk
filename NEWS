@@ -15,6 +15,9 @@ BUG FIXES
 
    * Support non-bzr patches. (Toshio Kuratomi, #502076)
 
+   * Avoid using private functions to get branch config. (Jelmer Vernooij,
+     #583554)
+
 FEATURES
 
   * Add 'Find' button to start text search.
