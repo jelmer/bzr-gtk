@@ -1,6 +1,7 @@
 #!/usr/bin/python
-
 """GTK+ Frontends for various Bazaar commands."""
+
+from info import *
 
 from distutils.core import setup, Command
 from distutils.command.install_data import install_data
@@ -103,9 +104,11 @@ class InstallData(install_data):
 
 
 if __name__ == '__main__':
+    version = bzr_plugin_version[:3]
+    version_string = ".".join([str(x) for x in version])
     setup(
         name = "bzr-gtk",
-        version = "0.99.0",
+        version = version_string,
         maintainer = "Jelmer Vernooij",
         maintainer_email = "jelmer@samba.org",
         description = "GTK+ Frontends for various Bazaar commands",

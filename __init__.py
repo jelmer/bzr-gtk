@@ -58,8 +58,10 @@ from bzrlib import (
     )
 from bzrlib.commands import plugin_cmds
 
-
-version_info = (0, 99, 0, 'final', 0)
+from info import (
+    bzr_plugin_version as version_info,
+    bzr_compatible_versions,
+    )
 
 if version_info[3] == 'final':
     version_string = '%d.%d.%d' % version_info[:3]
@@ -67,15 +69,7 @@ else:
     version_string = '%d.%d.%d%s%d' % version_info
 __version__ = version_string
 
-COMPATIBLE_BZR_VERSIONS = [(1, 6, 0), (1, 7, 0), (1, 8, 0), (1, 9, 0),
-                           (1, 10, 0), (1, 11, 0), (1, 12, 0), (1, 13, 0),
-                           (1, 15, 0),
-                           (1, 17, 0),
-                           (2, 1, 0),
-                           (2, 2, 0),
-                           ]
-
-bzrlib.api.require_any_api(bzrlib, COMPATIBLE_BZR_VERSIONS)
+bzrlib.api.require_any_api(bzrlib, bzr_compatible_versions)
 
 if __name__ != 'bzrlib.plugins.gtk':
     from bzrlib.trace import warning
