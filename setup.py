@@ -6,6 +6,7 @@ from info import *
 from distutils.core import setup, Command
 from distutils.command.install_data import install_data
 from distutils.command.build import build
+from DistUtilsExtra.command import *
 import os
 import sys
 
@@ -150,9 +151,6 @@ if __name__ == '__main__':
                                              'icons/tag-16.png',
                                              'icons/bug.png',
                                              'icons/bzr-icon-64.png']),
-                    ('share/applications', ['bazaar-properties.desktop',
-                                            'bzr-handle-patch.desktop',
-                                            'bzr-notify.desktop']),
                     ('share/application-registry', ['bzr-gtk.applications']),
                     ('share/pixmaps', ['icons/bzr-icon-64.png']),
                     ('share/icons/hicolor/scalable/emblems',
@@ -166,5 +164,6 @@ if __name__ == '__main__':
         cmdclass={'install_data': InstallData,
                   'build_credits': CreateCredits,
                   'build': BuildData,
+                  'build_i18n': build_i18n.build_i18n,
                   'check': Check}
         )
