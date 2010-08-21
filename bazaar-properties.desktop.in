@@ -1,6 +1,6 @@
 [Desktop Entry]
-Name=Bazaar Preferences
-Comment=Configure Bazaar settings
+_Name=Bazaar Preferences
+_Comment=Configure Bazaar settings
 Icon=bzr-icon-64
 Exec=bzr gpreferences
 Terminal=false
