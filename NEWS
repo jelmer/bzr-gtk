@@ -1,4 +1,8 @@
-0.100.0	UNRELEASED
+0.99.1	2010-08-26
+
+ BUG FIXES
+
+  * Trivial release to include credits pickle file.
 
    * Mark as compatible with Bazaar 2.3. (Vincent Ladeuil)
 
