@@ -1,5 +1,7 @@
 0.100.0	UNRELEASED
 
+   * Mark as compatible with Bazaar 2.3. (Vincent Ladeuil)
+
 0.99.0 2010-08-13
 
 BUG FIXES
