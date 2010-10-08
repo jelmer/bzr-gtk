@@ -1,3 +1,9 @@
+0.100.0	UNRELEASED
+
+ BUG FIXES
+
+  * Mark as compatible with bzr 2.3. (Jelmer Vernooij)
+
 0.99.1	2010-08-26
 
  BUG FIXES
@@ -8,7 +14,7 @@
 
 0.99.0 2010-08-13
 
-BUG FIXES
+ BUG FIXES
 
    * Guard setup() call when not loaded as __main__. (Robert Collins)
 
