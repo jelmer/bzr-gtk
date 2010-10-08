@@ -105,13 +105,18 @@ class DiffFileView(gtk.ScrolledWindow):
         :param buf: a gtksourceview2.Buffer object.
         """
         GEDIT_SCHEME_PATH = '/apps/gedit-2/preferences/editor/colors/scheme'
+        GEDIT_USER_STYLES_PATH = os.path.expanduser('~/.gnome2/gedit/styles')
 
         client = gconf.client_get_default()
         style_scheme_name = client.get_string(GEDIT_SCHEME_PATH)
         if style_scheme_name is not None:
-            style_scheme = gtksourceview2.StyleSchemeManager().get_scheme(style_scheme_name)
+            style_scheme_mgr = gtksourceview2.StyleSchemeManager()
+            style_scheme_mgr.append_search_path(GEDIT_USER_STYLES_PATH)
             
-            buf.set_style_scheme(style_scheme)
+            style_scheme = style_scheme_mgr.get_scheme(style_scheme_name)
+            
+            if style_scheme is not None:
+                buf.set_style_scheme(style_scheme)
 
     @classmethod
     def apply_colordiff_colors(klass, buf):
