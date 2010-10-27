@@ -162,13 +162,15 @@ def start_viz_window(branch, revisions, limit=None):
 
 
 class cmd_visualise(Command):
-    """Graphically visualise this branch.
+    """Graphically visualise one or several branches.
 
-    Opens a graphical window to allow you to see the history of the branch
-    and relationships between revisions in a visual manner,
+    Opens a graphical window to allow you to see branches history and
+    relationships between revisions in a visual manner,
 
-    The default starting point is latest revision on the branch, you can
-    specify a starting point with -r revision.
+    If no revision is specified, the branch last revision is taken as a
+    starting point. When a revision is specified, the presented graph starts
+    with it (as a side effect, when a shared repository is used, any revision
+    can be used even if it's not part of the branch history).
     """
     takes_options = [
         "revision",

@@ -2,6 +2,9 @@
 
  BUG FIXES
 
+  * Clarify 'visualise' help about the multiple branches feature
+    and the --revision parameter. (Vincent Ladeuil, #556347)
+
   * Mark as compatible with bzr 2.3. (Jelmer Vernooij)
 
 0.99.1	2010-08-26
