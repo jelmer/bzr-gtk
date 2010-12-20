@@ -132,7 +132,6 @@ commands = {
     "gmissing": [],
     "gpreferences": [],
     "gpush": [],
-    "gselftest": [],
     "gsend": [],
     "gstatus": ["gst"],
     "gtags": [],

@@ -462,34 +462,3 @@ class cmd_gtags(GTKCommand):
         window = TagsWindow(br)
         window.show()
         gtk.main()
-
-
-class cmd_gselftest(GTKCommand):
-    """Version of selftest that displays a notification at the end"""
-
-    takes_args = builtins.cmd_selftest.takes_args
-    takes_options = builtins.cmd_selftest.takes_options
-    _see_also = ['selftest']
-
-    def run(self, *args, **kwargs):
-        import cgi
-        import sys
-        default_encoding = sys.getdefaultencoding()
-        # prevent gtk from blowing up later
-        gtk = import_pygtk()
-        # prevent gtk from messing with default encoding
-        import pynotify
-        if sys.getdefaultencoding() != default_encoding:
-            reload(sys)
-            sys.setdefaultencoding(default_encoding)
-        result = builtins.cmd_selftest().run(*args, **kwargs)
-        if result == 0:
-            summary = 'Success'
-            body = 'Selftest succeeded in "%s"' % os.getcwd()
-        if result == 1:
-            summary = 'Failure'
-            body = 'Selftest failed in "%s"' % os.getcwd()
-        pynotify.init("bzr gselftest")
-        note = pynotify.Notification(cgi.escape(summary), cgi.escape(body))
-        note.set_timeout(pynotify.EXPIRES_NEVER)
-        note.show()
