@@ -7,6 +7,8 @@
 
   * Mark as compatible with bzr 2.3. (Jelmer Vernooij)
 
+  * Fix appindicator icon category. (Michael Terry, #685634)
+
 0.99.1	2010-08-26
 
  BUG FIXES
