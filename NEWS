@@ -9,6 +9,8 @@
 
   * Fix appindicator icon category. (Michael Terry, #685634)
 
+  * Mark as compatible with Bazaar 2.4. (Jelmer Vernooij)
+
 0.99.1	2010-08-26
 
  BUG FIXES
