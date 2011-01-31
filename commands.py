@@ -16,7 +16,7 @@ import os
 
 from bzrlib import (
     branch,
-    builtins,
+    errors,
     workingtree,
     )
 from bzrlib.commands import (
@@ -33,10 +33,29 @@ from bzrlib.option import Option
 
 from bzrlib.plugins.gtk import (
     _i18n,
-    open_display,
     import_pygtk,
     set_ui_factory,
     )
+
+
+class NoDisplayError(errors.BzrCommandError):
+    """gtk could not find a proper display"""
+
+    def __str__(self):
+        return "No DISPLAY. Unable to run GTK+ application."
+
+
+def open_display():
+    pygtk = import_pygtk()
+    try:
+        import gtk
+    except RuntimeError, e:
+        if str(e) == "could not open display":
+            raise NoDisplayError
+    set_ui_factory()
+    return gtk
+
+
 
 class GTKCommand(Command):
     """Abstract class providing GTK specific run commands."""
