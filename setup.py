@@ -155,6 +155,7 @@ if __name__ == '__main__':
                                             'bzr-notify.desktop']),
                     ('share/application-registry', ['bzr-gtk.applications']),
                     ('share/pixmaps', ['icons/bzr-icon-64.png']),
+                    ('share/icons/hicolor/scalable/apps', ['icons/bzr-panel.svg']),
                     ('share/icons/hicolor/scalable/emblems',
                      ['icons/emblem-bzr-added.svg',
                       'icons/emblem-bzr-conflict.svg',
