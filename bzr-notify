@@ -34,7 +34,7 @@ except ImportError:
     show_icon = lambda: icon.set_visible(True)
 else:
     indicator = appindicator.Indicator ("bzr-gtk-notify",
-        "bzr-panel", appindicator.CATEGORY_APPLICATION_STATUS)
+        "bzr-panel", appindicator.CATEGORY_OTHER)
     indicator.set_status (appindicator.STATUS_PASSIVE)
     indicator.set_attention_icon("bzr-panel")
     indicator.set_menu(menu)

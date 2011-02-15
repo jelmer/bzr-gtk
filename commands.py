@@ -16,7 +16,7 @@ import os
 
 from bzrlib import (
     branch,
-    builtins,
+    errors,
     workingtree,
     )
 from bzrlib.commands import (
@@ -33,10 +33,29 @@ from bzrlib.option import Option
 
 from bzrlib.plugins.gtk import (
     _i18n,
-    open_display,
     import_pygtk,
     set_ui_factory,
     )
+
+
+class NoDisplayError(errors.BzrCommandError):
+    """gtk could not find a proper display"""
+
+    def __str__(self):
+        return "No DISPLAY. Unable to run GTK+ application."
+
+
+def open_display():
+    pygtk = import_pygtk()
+    try:
+        import gtk
+    except RuntimeError, e:
+        if str(e) == "could not open display":
+            raise NoDisplayError
+    set_ui_factory()
+    return gtk
+
+
 
 class GTKCommand(Command):
     """Abstract class providing GTK specific run commands."""
@@ -162,13 +181,15 @@ def start_viz_window(branch, revisions, limit=None):
 
 
 class cmd_visualise(Command):
-    """Graphically visualise this branch.
+    """Graphically visualise one or several branches.
 
-    Opens a graphical window to allow you to see the history of the branch
-    and relationships between revisions in a visual manner,
+    Opens a graphical window to allow you to see branches history and
+    relationships between revisions in a visual manner,
 
-    The default starting point is latest revision on the branch, you can
-    specify a starting point with -r revision.
+    If no revision is specified, the branch last revision is taken as a
+    starting point. When a revision is specified, the presented graph starts
+    with it (as a side effect, when a shared repository is used, any revision
+    can be used even if it's not part of the branch history).
     """
     takes_options = [
         "revision",
@@ -460,34 +481,3 @@ class cmd_gtags(GTKCommand):
         window = TagsWindow(br)
         window.show()
         gtk.main()
-
-
-class cmd_gselftest(GTKCommand):
-    """Version of selftest that displays a notification at the end"""
-
-    takes_args = builtins.cmd_selftest.takes_args
-    takes_options = builtins.cmd_selftest.takes_options
-    _see_also = ['selftest']
-
-    def run(self, *args, **kwargs):
-        import cgi
-        import sys
-        default_encoding = sys.getdefaultencoding()
-        # prevent gtk from blowing up later
-        gtk = import_pygtk()
-        # prevent gtk from messing with default encoding
-        import pynotify
-        if sys.getdefaultencoding() != default_encoding:
-            reload(sys)
-            sys.setdefaultencoding(default_encoding)
-        result = builtins.cmd_selftest().run(*args, **kwargs)
-        if result == 0:
-            summary = 'Success'
-            body = 'Selftest succeeded in "%s"' % os.getcwd()
-        if result == 1:
-            summary = 'Failure'
-            body = 'Selftest failed in "%s"' % os.getcwd()
-        pynotify.init("bzr gselftest")
-        note = pynotify.Notification(cgi.escape(summary), cgi.escape(body))
-        note.set_timeout(pynotify.EXPIRES_NEVER)
-        note.show()

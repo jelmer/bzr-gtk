@@ -15,22 +15,22 @@
 """Graphical support for Bazaar using GTK.
 
 This plugin includes:
-gannotate         GTK+ annotate. 
-gbranch           GTK+ branching. 
-gcheckout         GTK+ checkout. 
+gannotate         GTK+ annotate.
+gbranch           GTK+ branching.
+gcheckout         GTK+ checkout.
 gcommit           GTK+ commit dialog.
-gconflicts        GTK+ conflicts. 
-gdiff             Show differences in working tree in a GTK+ Window. 
+gconflicts        GTK+ conflicts.
+gdiff             Show differences in working tree in a GTK+ Window.
 ginit             Initialise a new branch.
 gloom             GTK+ loom browse dialog
 gmerge            GTK+ merge dialog
-gmissing          GTK+ missing revisions dialog. 
-gpreferences      GTK+ preferences dialog. 
+gmissing          GTK+ missing revisions dialog.
+gpreferences      GTK+ preferences dialog.
 gpush             GTK+ push.
 gsend             GTK+ send merge directive.
 gstatus           GTK+ status dialog.
 gtags             Manage branch tags.
-visualise         Graphically visualise this branch. 
+visualise         Graphically visualise this branch.
 """
 
 import os
@@ -109,17 +109,6 @@ def icon_path(*args):
     return data_path(os.path.join('icons', *args))
 
 
-def open_display():
-    pygtk = import_pygtk()
-    try:
-        import gtk
-    except RuntimeError, e:
-        if str(e) == "could not open display":
-            raise NoDisplayError
-    set_ui_factory()
-    return gtk
-
-
 commands = {
     "gannotate": ["gblame", "gpraise"],
     "gbranch": [],
@@ -132,7 +121,6 @@ commands = {
     "gmissing": [],
     "gpreferences": [],
     "gpush": [],
-    "gselftest": [],
     "gsend": [],
     "gstatus": ["gst"],
     "gtags": [],
@@ -157,13 +145,6 @@ def save_commit_messages(*args):
 branch.Branch.hooks.install_named_hook('post_uncommit',
                                        save_commit_messages,
                                        "Saving commit messages for gcommit")
-
-class NoDisplayError(errors.BzrCommandError):
-    """gtk could not find a proper display"""
-
-    def __str__(self):
-        return "No DISPLAY. Unable to run GTK+ application."
-
 
 credential_store_registry = getattr(config, "credential_store_registry", None)
 if credential_store_registry is not None:
