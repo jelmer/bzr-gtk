@@ -33,11 +33,12 @@ def has_cia():
 
 
 class NotificationsPage(gtk.VBox):
+
     def __init__(self, config, homogeneous=False, spacing=6):
         self.config = config
         gtk.VBox.__init__(self, homogeneous=homogeneous, spacing=spacing)
         self.set_spacing(spacing) # The vertical one
-        
+
         lan_frame = gtk.Frame("LAN Notifications")
 
         lan_vbox = gtk.VBox()
@@ -67,12 +68,12 @@ class NotificationsPage(gtk.VBox):
         self.pack_start(email_frame)
 
         cia_frame = gtk.Frame("CIA notifications")
-        
+
         cia_user_hbox = gtk.HBox()
         cia_user_hbox.pack_start(gtk.Label("Author name"))
         self.cia_user = gtk.Entry()
         cia_user_hbox.pack_start(self.cia_user)
-    
+
         cia_frame.add(cia_user_hbox)
         cia_frame.set_sensitive(has_cia())
 

@@ -23,6 +23,7 @@ except:
 import gtk
 
 class IdentityPage(gtk.Table):
+
     def __init__(self, config):
         self.config = config
         gtk.Table.__init__(self, rows=4, columns=2)

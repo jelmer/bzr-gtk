@@ -9,7 +9,6 @@ __author__    = "Gary van der Merwe <garyvdm@gmail.com>"
 
 import gtk
 import gobject
-import pango
 import re
 from xml.sax.saxutils import escape
 from bzrlib.revision import NULL_REVISION
@@ -29,18 +28,18 @@ REVISION = 9
 PARENTS = 10
 CHILDREN = 11
 TAGS = 12
+AUTHORS = 13
 
 class TreeModel(gtk.GenericTreeModel):
 
-    
     def __init__ (self, branch, line_graph_data):
         gtk.GenericTreeModel.__init__(self)
         self.revisions = {}
-	self.branch = branch
+        self.branch = branch
         self.repository = branch.repository
         self.line_graph_data = line_graph_data
 
-    	if self.branch.supports_tags():
+        if self.branch.supports_tags():
             self.tags = self.branch.tags.get_reverse_tag_dict()
         else:
             self.tags = {}

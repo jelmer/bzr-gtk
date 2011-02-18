@@ -9,18 +9,15 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 
 import gtk
-import gobject
-import pango
 
 from bzrlib.plugins.gtk import icon_path
-from bzrlib.plugins.gtk.branchview import TreeView, treemodel
-from bzrlib.plugins.gtk.tags import AddTagDialog
+from bzrlib.plugins.gtk.branchview import TreeView
 from bzrlib.plugins.gtk.preferences import PreferencesWindow
 from bzrlib.plugins.gtk.revisionmenu import RevisionMenu
 from bzrlib.plugins.gtk.window import Window
 
-from bzrlib.config import BranchConfig, GlobalConfig
-from bzrlib.revision import Revision, NULL_REVISION
+from bzrlib.config import GlobalConfig
+from bzrlib.revision import NULL_REVISION
 from bzrlib.trace import mutter
 
 class BranchWindow(Window):
@@ -140,7 +137,7 @@ class BranchWindow(Window):
 
         self.treeview.connect('tag-added', lambda w, t, r: self._update_tags())
         vbox.show()
-    
+
     def construct_menubar(self):
         menubar = gtk.MenuBar()
 
@@ -150,10 +147,10 @@ class BranchWindow(Window):
 
         file_menu_close = gtk.ImageMenuItem(gtk.STOCK_CLOSE, self.accel_group)
         file_menu_close.connect('activate', lambda x: self.destroy())
-        
+
         file_menu_quit = gtk.ImageMenuItem(gtk.STOCK_QUIT, self.accel_group)
         file_menu_quit.connect('activate', lambda x: gtk.main_quit())
-        
+
         if self._parent is not None:
             file_menu.add(file_menu_close)
         file_menu.add(file_menu_quit)
@@ -191,25 +188,25 @@ class BranchWindow(Window):
         view_menu_compact = gtk.CheckMenuItem("Show Compact Graph")
         view_menu_compact.set_active(self.compact_view)
         view_menu_compact.connect('activate', self._brokenlines_toggled_cb)
-        
+
         view_menu_diffs = gtk.CheckMenuItem("Show Diffs")
         view_menu_diffs.set_active(False)
         if self.config.get_user_option('viz-show-diffs') == 'True':
             view_menu_diffs.set_active(True)
         view_menu_diffs.connect('toggled', self._diff_visibility_changed)
-        
+
         view_menu_wide_diffs = gtk.CheckMenuItem("Wide Diffs")
         view_menu_wide_diffs.set_active(False)
         if self.config.get_user_option('viz-wide-diffs') == 'True':
             view_menu_wide_diffs.set_active(True)
         view_menu_wide_diffs.connect('toggled', self._diff_placement_changed)
-        
+
         view_menu_wrap_diffs = gtk.CheckMenuItem("Wrap _Long Lines in Diffs")
         view_menu_wrap_diffs.set_active(False)
         if self.config.get_user_option('viz-wrap-diffs') == 'True':
             view_menu_wrap_diffs.set_active(True)
         view_menu_wrap_diffs.connect('toggled', self._diff_wrap_changed)
-                
+
         view_menu.add(view_menu_toolbar)
         view_menu.add(view_menu_compact)
         view_menu.add(gtk.SeparatorMenuItem())
@@ -236,7 +233,7 @@ class BranchWindow(Window):
         go_menu.set_accel_group(self.accel_group)
         go_menuitem = gtk.MenuItem("_Go")
         go_menuitem.set_submenu(go_menu)
-        
+
         go_menu_next = self.next_rev_action.create_menu_item()
         go_menu_prev = self.prev_rev_action.create_menu_item()
 
@@ -455,11 +452,11 @@ class BranchWindow(Window):
 
         self.show_diff(revision.revision_id, parent_id)
         self.treeview.grab_focus()
-        
+
     def _back_clicked_cb(self, *args):
         """Callback for when the back button is clicked."""
         self.treeview.back()
-        
+
     def _fwd_clicked_cb(self, *args):
         """Callback for when the forward button is clicked."""
         self.treeview.forward()
@@ -513,7 +510,7 @@ class BranchWindow(Window):
                 return
 
         dialog = SearchDialog(index)
-        
+
         if dialog.run() == gtk.RESPONSE_OK:
             self.set_revision(dialog.get_revision())
 
@@ -521,7 +518,6 @@ class BranchWindow(Window):
 
     def _about_dialog_cb(self, w):
         from bzrlib.plugins.gtk.about import AboutDialog
-
         AboutDialog().run()
 
     def _col_visibility_changed(self, col, property):
@@ -562,16 +558,11 @@ class BranchWindow(Window):
         self._make_diff_nonzero_size()
 
         self.treeview.emit('revision-selected')
-    
+
     def _diff_wrap_changed(self, widget):
         """Toggle word wrap in the diff widget."""
         self.config.set_user_option('viz-wrap-diffs', widget.get_active())
         self.diff._on_wraplines_toggled(widget)
-    
-    def _show_about_cb(self, w):
-        dialog = AboutDialog()
-        dialog.connect('response', lambda d,r: d.destroy())
-        dialog.run()
 
     def _refresh_clicked(self, w):
         self.treeview.refresh()

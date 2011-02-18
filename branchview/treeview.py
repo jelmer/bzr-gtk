@@ -6,17 +6,13 @@
 __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__    = "Daniel Schierbeck <daniel.schierbeck@gmail.com>"
 
-import sys
-import string
 import gtk
 import gobject
 import pango
-import re
 import treemodel
 from bzrlib import ui
 
-from bzrlib.plugins.gtk import _i18n
-from bzrlib.plugins.gtk.ui import GtkProgressBar, ProgressPanel
+from bzrlib.plugins.gtk.ui import ProgressPanel
 from linegraph import linegraph, same_branch
 from graphcell import CellRendererGraph
 from treemodel import TreeModel

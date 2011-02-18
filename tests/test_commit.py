@@ -22,7 +22,6 @@ import gtk
 
 from bzrlib import (
     branch,
-    revision,
     tests,
     uncommit,
     )

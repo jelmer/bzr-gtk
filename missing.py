@@ -22,10 +22,10 @@ except:
 
 import gtk
 
-from bzrlib.config import GlobalConfig
 from bzrlib.missing import find_unmerged
 
-from revisionview import RevisionView
+from bzrlib.plugins.gtk.revisionview import RevisionView
+
 
 class MissingWindow(gtk.Dialog):
     """Displays revisions present in one branch but missing in 
