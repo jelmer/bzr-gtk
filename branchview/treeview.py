@@ -21,6 +21,7 @@ from linegraph import linegraph, same_branch
 from graphcell import CellRendererGraph
 from treemodel import TreeModel
 from bzrlib.revision import NULL_REVISION
+from bzrlib.plugins.gtk import lock
 
 
 class TreeView(gtk.VBox):
@@ -225,19 +226,16 @@ class TreeView(gtk.VBox):
     def add_tag(self, tag, revid=None):
         if revid is None: revid = self.revision.revision_id
 
-        try:
-            self.branch.unlock()
-
+        if lock.release(self.branch):
             try:
-                self.branch.lock_write()
+                lock.acquire(self.branch, lock.WRITE)
                 self.model.add_tag(tag, revid)
             finally:
-                self.branch.unlock()
+                lock.release(self.branch)
 
-        finally:
-            self.branch.lock_read()
+            lock.acquire(self.branch, lock.READ)
 
-        self.emit('tag-added', tag, revid)
+            self.emit('tag-added', tag, revid)
         
     def refresh(self):
         gobject.idle_add(self.populate, self.get_revision())

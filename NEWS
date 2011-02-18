@@ -14,6 +14,10 @@
 
   * Mark as compatible with Bazaar 2.4. (Jelmer Vernooij)
 
+ FEATURES
+ 
+  * Add lock dialog. (Daniel Schierbeck, #93652)
+
 0.99.1	2010-08-26
 
  BUG FIXES
