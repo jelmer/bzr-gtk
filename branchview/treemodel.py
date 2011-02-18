@@ -11,6 +11,8 @@ import gtk
 import gobject
 import re
 from xml.sax.saxutils import escape
+
+from bzrlib.config import parse_username
 from bzrlib.revision import NULL_REVISION
 
 from time import (strftime, localtime)
@@ -53,10 +55,10 @@ class TreeModel(gtk.GenericTreeModel):
 
     def on_get_flags(self):
         return gtk.TREE_MODEL_LIST_ONLY
-    
+
     def on_get_n_columns(self):
-        return 13
-    
+        return 14
+
     def on_get_column_type(self, index):
         if index == REVID: return gobject.TYPE_STRING
         if index == NODE: return gobject.TYPE_PYOBJECT
@@ -71,13 +73,14 @@ class TreeModel(gtk.GenericTreeModel):
         if index == PARENTS: return gobject.TYPE_PYOBJECT
         if index == CHILDREN: return gobject.TYPE_PYOBJECT
         if index == TAGS: return gobject.TYPE_PYOBJECT
-        
+        if index == AUTHORS: return gobject.TYPE_STRING
+
     def on_get_iter(self, path):
         return path[0]
-    
+
     def on_get_path(self, rowref):
         return rowref
-    
+
     def on_get_value(self, rowref, column):
         if len(self.line_graph_data) > 0:
             (revid, node, lines, parents,
@@ -107,34 +110,36 @@ class TreeModel(gtk.GenericTreeModel):
             self.revisions[revid] = revision
         else:
             revision = self.revisions[revid]
-        
+
         if column == REVISION: return revision
         if column == SUMMARY: return escape(revision.get_summary())
         if column == MESSAGE: return escape(revision.message)
-        if column == COMMITTER: return re.sub('<.*@.*>', '', 
-                                             revision.committer).strip(' ')
-        if column == TIMESTAMP: 
+        if column == COMMITTER: return parse_username(revision.committer)[0]
+        if column == TIMESTAMP:
             return strftime("%Y-%m-%d %H:%M", localtime(revision.timestamp))
+        if column == AUTHORS:
+            return ", ".join([
+                parse_username(author)[0] for author in revision.get_apparent_authors()])
 
     def on_iter_next(self, rowref):
         if rowref < len(self.line_graph_data) - 1:
             return rowref+1
         return None
-    
+
     def on_iter_children(self, parent):
         if parent is None: return 0
         return None
-    
+
     def on_iter_has_child(self, rowref):
         return False
-    
+
     def on_iter_n_children(self, rowref):
         if rowref is None: return len(self.line_graph_data)
         return 0
-    
+
     def on_iter_nth_child(self, parent, n):
         if parent is None: return n
         return None
-    
+
     def on_iter_parent(self, child):
         return None
