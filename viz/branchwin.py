@@ -98,7 +98,7 @@ class BranchWindow(Window):
         self.refresh_action.connect("activate", self._refresh_clicked)
         self.refresh_action.connect_accelerator()
 
-        self.construct()
+        self.vbox = self.construct()
 
     def _save_size_on_destroy(self, widget, config_name):
         """Creates a hook that saves the size of widget to config option 
@@ -117,18 +117,15 @@ class BranchWindow(Window):
         vbox = gtk.VBox(spacing=0)
         self.add(vbox)
 
-        self.paned = gtk.VPaned()
-        self.paned.pack1(self.construct_top(), resize=False, shrink=True)
-        self.paned.pack2(self.construct_bottom(), resize=True, shrink=False)
-        self.paned.show()
-
+        # order is important here
+        paned = self.construct_paned()
         nav = self.construct_navigation()
         menubar = self.construct_menubar()
+
         vbox.pack_start(menubar, expand=False, fill=True)
         vbox.pack_start(nav, expand=False, fill=True)
-
-        vbox.pack_start(self.paned, expand=True, fill=True)
-        vbox.set_focus_child(self.paned)
+        vbox.pack_start(paned, expand=True, fill=True)
+        vbox.set_focus_child(paned)
 
         self.treeview.connect('revision-selected',
                 self._treeselection_changed_cb)
@@ -137,6 +134,21 @@ class BranchWindow(Window):
 
         self.treeview.connect('tag-added', lambda w, t, r: self._update_tags())
         vbox.show()
+
+        return vbox
+
+    def construct_paned(self):
+        """Construct the main HPaned/VPaned contents."""
+        if self.config.get_user_option('viz-vertical') == 'True':
+            self.paned = gtk.HPaned()
+        else:
+            self.paned = gtk.VPaned()
+
+        self.paned.pack1(self.construct_top(), resize=False, shrink=True)
+        self.paned.pack2(self.construct_bottom(), resize=True, shrink=False)
+        self.paned.show()
+
+        return self.paned
 
     def construct_menubar(self):
         menubar = gtk.MenuBar()
@@ -189,6 +201,12 @@ class BranchWindow(Window):
         view_menu_compact.set_active(self.compact_view)
         view_menu_compact.connect('activate', self._brokenlines_toggled_cb)
 
+        view_menu_vertical = gtk.CheckMenuItem("Side-by-side Layout")
+        view_menu_vertical.set_active(False)
+        if self.config.get_user_option('viz-vertical') == 'True':
+            view_menu_vertical.set_active(True)
+        view_menu_vertical.connect('toggled', self._vertical_layout)
+
         view_menu_diffs = gtk.CheckMenuItem("Show Diffs")
         view_menu_diffs.set_active(False)
         if self.config.get_user_option('viz-show-diffs') == 'True':
@@ -209,6 +227,7 @@ class BranchWindow(Window):
 
         view_menu.add(view_menu_toolbar)
         view_menu.add(view_menu_compact)
+        view_menu.add(view_menu_vertical)
         view_menu.add(gtk.SeparatorMenuItem())
         view_menu.add(view_menu_diffs)
         view_menu.add(view_menu_wide_diffs)
@@ -530,6 +549,25 @@ class BranchWindow(Window):
         else:
             self.toolbar.hide()
         self.config.set_user_option('viz-toolbar-visible', col.get_active())
+
+    def _vertical_layout(self, col):
+        """Toggle the layout vertical/horizontal"""
+        self.config.set_user_option('viz-vertical', str(col.get_active()))
+
+        old = self.paned
+        self.vbox.remove(old)
+        self.vbox.pack_start(self.construct_paned(), expand=True, fill=True)
+        self._make_diff_paned_nonzero_size()
+        self._make_diff_nonzero_size()
+
+        self.treeview.emit('revision-selected')
+
+    def _make_diff_paned_nonzero_size(self):
+        """make sure the diff/revision pane isn't zero-width or zero-height"""
+        alloc = self.diff_paned.get_allocation()
+        if (alloc.width < 10) or (alloc.height < 10):
+            width, height = self.get_size()
+            self.diff_paned.set_size_request(width/3, int(height / 2.5))
 
     def _make_diff_nonzero_size(self):
         """make sure the diff isn't zero-width or zero-height"""

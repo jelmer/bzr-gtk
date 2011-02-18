@@ -18,6 +18,11 @@
  
   * Add lock dialog. (Daniel Schierbeck, #93652)
 
+ FEATURES
+
+  * Add option to use "bzr viz" with a vertical layout.
+    (Ximin Luo, #649273)
+
 0.99.1	2010-08-26
 
  BUG FIXES
