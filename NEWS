@@ -16,6 +16,9 @@
 
   * "bzr viz" now shows authors instead of committers. (Jelmer Vernooij, #693949)
 
+  * Don't use markup for secondary text in error dialogs.
+    (Edward Ari Bichetero, #656641)
+
  FEATURES
  
   * Add lock dialog. (Daniel Schierbeck, #93652)
