@@ -6,6 +6,7 @@ from info import *
 from distutils.core import setup, Command
 from distutils.command.install_data import install_data
 from distutils.command.build import build
+from distutils.command.sdist import sdist
 import os
 import sys
 
@@ -76,6 +77,11 @@ def is_versioned(cmd):
 
 class BuildData(build):
     sub_commands = build.sub_commands[:]
+    sub_commands.append(('build_credits', is_versioned))
+
+
+class SourceDist(sdist):
+    sub_commands = sdist.sub_commands[:]
     sub_commands.append(('build_credits', is_versioned))
 
 
@@ -169,5 +175,6 @@ if __name__ == '__main__':
         cmdclass={'install_data': InstallData,
                   'build_credits': CreateCredits,
                   'build': BuildData,
+                  'sdist': SourceDist,
                   'check': Check}
         )
