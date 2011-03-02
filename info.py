@@ -20,7 +20,7 @@ bzr_plugin_name = "gtk"
 # versions ending in 'exp' mean experimental mappings
 # versions ending in 'dev' mean development version
 # versions ending in 'final' mean release (well tested, etc)
-bzr_plugin_version = (0, 99, 1, 'final', 0)
+bzr_plugin_version = (0, 100, 0, 'final', 0)
 
 #FIXME: fill this in automatically somehow
 bzr_commands = []
