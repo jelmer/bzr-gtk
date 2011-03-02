@@ -19,6 +19,8 @@
   * Don't use markup for secondary text in error dialogs.
     (Edward Ari Bichetero, #656641)
 
+  * Generate pickles file when running 'setup.py sdist'. (Jelmer Vernooij, #397526)
+
  FEATURES
  
   * Add lock dialog. (Daniel Schierbeck, #93652)
