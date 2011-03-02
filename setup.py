@@ -6,6 +6,7 @@ from info import *
 from distutils.core import setup, Command
 from distutils.command.install_data import install_data
 from distutils.command.build import build
+from distutils.command.sdist import sdist
 import os
 import sys
 
@@ -25,11 +26,13 @@ class Check(Command):
 
     def run(self):
         from bzrlib.tests import TestLoader, TestSuite, TextTestRunner
-        import __init__ as bzrgtk
-        runner = TextTestRunner()
-        loader = TestLoader()
+        from bzrlib.plugin import PluginImporter
+        PluginImporter.specific_paths["bzrlib.plugins.gtk"] = os.path.dirname(__file__)
+        from bzrlib.plugins.gtk.tests import load_tests
         suite = TestSuite()
-        suite.addTest(bzrgtk.test_suite())
+        loader = TestLoader()
+        load_tests(suite, None, loader)
+        runner = TextTestRunner()
         result = runner.run(suite)
         return result.wasSuccessful()
 
@@ -74,6 +77,11 @@ def is_versioned(cmd):
 
 class BuildData(build):
     sub_commands = build.sub_commands[:]
+    sub_commands.append(('build_credits', is_versioned))
+
+
+class SourceDist(sdist):
+    sub_commands = sdist.sub_commands[:]
     sub_commands.append(('build_credits', is_versioned))
 
 
@@ -167,5 +175,6 @@ if __name__ == '__main__':
         cmdclass={'install_data': InstallData,
                   'build_credits': CreateCredits,
                   'build': BuildData,
+                  'sdist': SourceDist,
                   'check': Check}
         )
