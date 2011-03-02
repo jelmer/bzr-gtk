@@ -25,11 +25,13 @@ class Check(Command):
 
     def run(self):
         from bzrlib.tests import TestLoader, TestSuite, TextTestRunner
-        import __init__ as bzrgtk
-        runner = TextTestRunner()
-        loader = TestLoader()
+        from bzrlib.plugin import PluginImporter
+        PluginImporter.specific_paths["bzrlib.plugins.gtk"] = os.path.dirname(__file__)
+        from bzrlib.plugins.gtk.tests import load_tests
         suite = TestSuite()
-        suite.addTest(bzrgtk.test_suite())
+        loader = TestLoader()
+        load_tests(suite, None, loader)
+        runner = TextTestRunner()
         result = runner.run(suite)
         return result.wasSuccessful()
 
