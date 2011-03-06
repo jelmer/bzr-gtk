@@ -7,7 +7,6 @@ from distutils.core import setup, Command
 from distutils.command.install_data import install_data
 from distutils.command.build import build
 from distutils.command.sdist import sdist
-from DistUtilsExtra.command import *
 try:
     from DistUtilsExtra.command import *
 except ImportError:
