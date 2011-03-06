@@ -29,10 +29,11 @@ from bzrlib.config import GlobalConfig
 from bzrlib.plugins.gtk import _i18n
 
 from dialog import error_dialog, warning_dialog
-from errors import show_bzr_error
+
 
 class ConflictsDialog(gtk.Dialog):
     """ This dialog displays the list of conflicts. """
+
     def __init__(self, wt, parent=None):
         """ Initialize the Conflicts dialog. """
         gtk.Dialog.__init__(self, title="Conflicts - Olive",

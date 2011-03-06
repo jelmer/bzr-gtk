@@ -20,18 +20,12 @@ bzr_plugin_name = "gtk"
 # versions ending in 'exp' mean experimental mappings
 # versions ending in 'dev' mean development version
 # versions ending in 'final' mean release (well tested, etc)
-bzr_plugin_version = (0, 100, 0, 'dev', 0)
+bzr_plugin_version = (0, 101, 0, 'dev', 0)
 
 #FIXME: fill this in automatically somehow
 bzr_commands = []
 
-bzr_compatible_versions = [(1, 6, 0), (1, 7, 0), (1, 8, 0), (1, 9, 0),
-                           (1, 10, 0), (1, 11, 0), (1, 12, 0), (1, 13, 0),
-                           (1, 15, 0),
-                           (1, 17, 0),
-                           (2, 1, 0),
-                           (2, 2, 0),
-                           ]
+bzr_compatible_versions = [(2, 1, 0), (2, 2, 0), (2, 3, 0), (2, 4, 0)]
 
 bzr_minimum_version = bzr_compatible_versions[0]
 

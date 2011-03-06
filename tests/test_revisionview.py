@@ -16,13 +16,8 @@
 
 """Test the RevisionView functionality."""
 
-import os
-
-import gtk
-
 from bzrlib import (
     tests,
-    revision,
     )
 try:
     from bzrlib import bencode

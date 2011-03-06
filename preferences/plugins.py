@@ -23,6 +23,7 @@ except:
 import gtk
 
 class PluginsPage(gtk.VPaned):
+
     def __init__(self):
         gtk.VPaned.__init__(self)
         self.set_border_width(12)
@@ -56,14 +57,14 @@ class PluginsPage(gtk.VPaned):
         column.pack_start(cell, expand=True)
         column.add_attribute(cell, "text", 1)
         treeview.append_column(column)
-        
+
         import bzrlib.plugin
         plugins = bzrlib.plugin.plugins()
         plugin_names = plugins.keys()
         plugin_names.sort()
         for name in plugin_names:
             self.model.append([name, getattr(plugins[name], '__file__', None)])
-                 
+
         scrolledwindow = gtk.ScrolledWindow()
         scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
         scrolledwindow.add_with_viewport(self.table)

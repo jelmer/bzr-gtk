@@ -14,12 +14,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+from bzrlib import config
 from bzrlib.tests import TestCaseInTempDir
+
 from bzrlib.plugins.gtk.history import UrlHistory
 
-from bzrlib import config
 
 class TestsUrlHistory(TestCaseInTempDir):
+
     def setUp(self):
         super(TestsUrlHistory, self).setUp()
         self.config = config.GlobalConfig()

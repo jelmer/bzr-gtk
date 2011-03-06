@@ -23,9 +23,6 @@ except:
 import bzrlib
 import gtk
 import os
-from bzrlib.branch import Branch
-from bzrlib.errors import NotBranchError, NoRepositoryPresent
-from bzrlib.trace import mutter
 
 from bzrlib.plugins.gtk import data_path, icon_path
 

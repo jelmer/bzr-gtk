@@ -12,14 +12,12 @@ import bzrlib
 from bzrlib.branch import Branch
 from bzrlib.bzrdir import BzrDir
 from bzrlib.errors import NotBranchError, NoWorkingTree, UnsupportedProtocol
-from bzrlib.tree import file_status
 from bzrlib.workingtree import WorkingTree
 from bzrlib.config import GlobalConfig
 
 from bzrlib.plugin import load_plugins
 load_plugins()
 
-from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.commands import cmd_gannotate, start_viz_window
 
 print "Bazaar nautilus module initialized"

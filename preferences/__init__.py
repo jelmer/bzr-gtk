@@ -23,9 +23,9 @@ except:
 import gtk
 
 from bzrlib.config import GlobalConfig
-from identity import IdentityPage
-from plugins import PluginsPage
-from notifications import NotificationsPage
+from bzrlib.plugins.gtk.preferences.identity import IdentityPage
+from bzrlib.plugins.gtk.preferences.plugins import PluginsPage
+from bzrlib.plugins.gtk.preferences.notifications import NotificationsPage
 
 class PreferencesWindow(gtk.Dialog):
     """Displays global preferences windows."""

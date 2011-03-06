@@ -102,6 +102,7 @@ class MockDiffWidget(object):
 
 
 class MockWindow(object):
+
     def __init__(self):
         self.diff = MockDiffWidget()
         self.merge_successful = False

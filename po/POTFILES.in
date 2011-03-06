@@ -16,7 +16,5 @@ nautilus-bzr.py
 push.py
 revbrowser.py
 search.py
-setup.cfg
-setup.py
 status.py
 tags.py

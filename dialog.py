@@ -33,7 +33,7 @@ def _message_dialog(type, primary, secondary, parent=None, buttons=gtk.BUTTONS_O
     dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL, type=type, parent=parent,
                                buttons=buttons)
     dialog.set_markup('<big><b>' + primary + '</b></big>')
-    dialog.format_secondary_markup(secondary)
+    dialog.format_secondary_text(secondary)
     response = dialog.run()
     dialog.destroy()
     return response

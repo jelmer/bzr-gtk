@@ -6,21 +6,18 @@
 __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__    = "Daniel Schierbeck <daniel.schierbeck@gmail.com>"
 
-import sys
-import string
 import gtk
 import gobject
 import pango
-import re
 import treemodel
 from bzrlib import ui
 
-from bzrlib.plugins.gtk import _i18n
-from bzrlib.plugins.gtk.ui import GtkProgressBar, ProgressPanel
+from bzrlib.plugins.gtk.ui import ProgressPanel
 from linegraph import linegraph, same_branch
 from graphcell import CellRendererGraph
 from treemodel import TreeModel
 from bzrlib.revision import NULL_REVISION
+from bzrlib.plugins.gtk import lock
 
 
 class TreeView(gtk.VBox):
@@ -225,19 +222,16 @@ class TreeView(gtk.VBox):
     def add_tag(self, tag, revid=None):
         if revid is None: revid = self.revision.revision_id
 
-        try:
-            self.branch.unlock()
-
+        if lock.release(self.branch):
             try:
-                self.branch.lock_write()
+                lock.acquire(self.branch, lock.WRITE)
                 self.model.add_tag(tag, revid)
             finally:
-                self.branch.unlock()
+                lock.release(self.branch)
 
-        finally:
-            self.branch.lock_read()
+            lock.acquire(self.branch, lock.READ)
 
-        self.emit('tag-added', tag, revid)
+            self.emit('tag-added', tag, revid)
         
     def refresh(self):
         gobject.idle_add(self.populate, self.get_revision())
@@ -398,13 +392,13 @@ class TreeView(gtk.VBox):
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 15)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.committer_column = gtk.TreeViewColumn("Committer")
-        self.committer_column.set_resizable(False)
-        self.committer_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.committer_column.set_fixed_width(200)
-        self.committer_column.pack_start(cell, expand=True)
-        self.committer_column.add_attribute(cell, "text", treemodel.COMMITTER)
-        self.treeview.append_column(self.committer_column)
+        self.authors_column = gtk.TreeViewColumn("Author(s)")
+        self.authors_column.set_resizable(False)
+        self.authors_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.authors_column.set_fixed_width(200)
+        self.authors_column.pack_start(cell, expand=True)
+        self.authors_column.add_attribute(cell, "text", treemodel.AUTHORS)
+        self.treeview.append_column(self.authors_column)
 
         cell = gtk.CellRendererText()
         cell.set_property("width-chars", 20)

@@ -23,11 +23,11 @@ import gtk
 import pango
 import re
 
-from bzrlib import patiencediff, tsort
+from bzrlib import patiencediff
 from bzrlib.errors import NoSuchRevision
 from bzrlib.revision import NULL_REVISION, CURRENT_REVISION
 
-from colormap import AnnotateColorMap, AnnotateColorSaturation
+from colormap import AnnotateColorSaturation
 from bzrlib.plugins.gtk.revisionview import RevisionView
 from bzrlib.plugins.gtk.window import Window
 
@@ -49,9 +49,9 @@ class GAnnotateWindow(Window):
         self.all = all
         self.plain = plain
         self._branch = branch
-        
+
         Window.__init__(self, parent)
-        
+
         self.set_icon(self.render_icon(gtk.STOCK_FIND, gtk.ICON_SIZE_BUTTON))
         self.annotate_colormap = AnnotateColorSaturation()
 
@@ -68,15 +68,15 @@ class GAnnotateWindow(Window):
         self.revisionview.set_file_id(file_id)
         self.revision_id = getattr(tree, 'get_revision_id', 
                                    lambda: CURRENT_REVISION)()
-        
+
         # [revision id, line number, author, revno, highlight color, line]
         self.annomodel = gtk.ListStore(gobject.TYPE_STRING,
-                                       gobject.TYPE_STRING,
+                                       gobject.TYPE_INT,
                                        gobject.TYPE_STRING,
                                        gobject.TYPE_STRING,
                                        gobject.TYPE_STRING,
                                        gobject.TYPE_STRING)
-        
+
         last_seen = None
         try:
             branch.lock_read()
@@ -86,7 +86,7 @@ class GAnnotateWindow(Window):
             for revision_id, revno in revno_map.iteritems():
                 self.dotted[revision_id] = '.'.join(str(num) for num in revno)
             for line_no, (revision, revno, line)\
-                    in enumerate(self._annotate(tree, file_id)):
+                in enumerate(self._annotate(tree, file_id)):
                 if revision.revision_id == last_seen and not self.all:
                     revno = author = ""
                 else:
@@ -102,7 +102,7 @@ class GAnnotateWindow(Window):
                                        revno,
                                        None,
                                        line.rstrip("\r\n")
-                                      ])
+                                       ])
                 self.annotations.append(revision)
 
             if not self.plain:
@@ -125,7 +125,7 @@ class GAnnotateWindow(Window):
             # bar?
             print("gannotate: Line number %d does't exist. Defaulting to "
                   "line 1." % lineno)
-	    return
+            return
         else:
             row = lineno - 1
 
@@ -218,7 +218,7 @@ class GAnnotateWindow(Window):
         hbox.pack_start(self.goto_button, expand=False, fill=True)
         hbox.show()
         vbox.pack_start(hbox, expand=False, fill=True)
-        
+
         self.pane = pane = gtk.VPaned()
         pane.add1(swbox)
         pane.add2(self.revisionview)
@@ -260,7 +260,7 @@ class GAnnotateWindow(Window):
             else:
                 tree2 = repository.revision_tree(NULL_REVISION)
         from bzrlib.plugins.gtk.diff import DiffWindow
-        window = DiffWindow()
+        window = DiffWindow(self)
         window.set_diff("Diff for line %d" % (row+1), tree1, tree2)
         window.set_file(tree1.id2path(self.file_id))
         window.show()
@@ -532,18 +532,22 @@ class SearchBox(gtk.HBox):
 
     def _match(self, model, iterator, column):
         matching_case = self._match_case.get_active()
-        string, = model.get(iterator, column)
+        cell_value, = model.get(iterator, column)
         key = self._entry.get_text()
-        if self._regexp.get_active():
+        if column == LINE_NUM_COL:
+            # FIXME: For goto-line there are faster algorithms than searching 
+            # every line til we find the right one! -- mbp 2011-01-27
+            return key.strip() == str(cell_value)
+        elif self._regexp.get_active():
             if matching_case:
-                match = re.compile(key).search(string, 1)
+                match = re.compile(key).search(cell_value, 1)
             else:
-                match = re.compile(key, re.I).search(string, 1)
+                match = re.compile(key, re.I).search(cell_value, 1)
         else:
             if not matching_case:
-                string = string.lower()
+                cell_value = cell_value.lower()
                 key = key.lower()
-            match = string.find(key) != -1
+            match = cell_value.find(key) != -1
 
         return match
 

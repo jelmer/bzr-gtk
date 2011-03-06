@@ -1,8 +1,43 @@
-0.100.0	UNRELEASED
+0.101.0	UNRELEASED
+
+0.100.0	2011-03-02
+
+ BUG FIXES
+
+  * make sure that gdiff opened from gannotate knows its parent
+    (gannotate, that is, and does not exit when it (gdiff) is closed.
+
+  * Clarify 'visualise' help about the multiple branches feature
+    and the --revision parameter. (Vincent Ladeuil, #556347)
+
+  * Mark as compatible with bzr 2.3. (Jelmer Vernooij)
+
+  * Fix appindicator icon category. (Michael Terry, #685634)
+
+  * Mark as compatible with Bazaar 2.4. (Jelmer Vernooij)
+
+  * "bzr viz" now shows authors instead of committers. (Jelmer Vernooij, #693949)
+
+  * Don't use markup for secondary text in error dialogs.
+    (Edward Ari Bichetero, #656641)
+
+  * Generate pickles file when running 'setup.py sdist'. (Jelmer Vernooij, #397526)
+
+ FEATURES
+ 
+  * Add lock dialog. (Daniel Schierbeck, #93652)
+
+0.99.1	2010-08-26
+
+ BUG FIXES
+
+  * Trivial release to include credits pickle file.
+
+   * Mark as compatible with Bazaar 2.3. (Vincent Ladeuil)
 
 0.99.0 2010-08-13
 
-BUG FIXES
+ BUG FIXES
 
    * Guard setup() call when not loaded as __main__. (Robert Collins)
 

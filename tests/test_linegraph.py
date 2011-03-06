@@ -16,12 +16,8 @@
 
 """Test the linegraph functionality."""
 
-import os
-
-import gtk
-
 from bzrlib import (
-	graph,
+    graph,
     tests,
     )
 
@@ -29,12 +25,13 @@ from bzrlib.plugins.gtk.branchview.linegraph import linegraph
 
 
 class TestLinegraph(tests.TestCase):
-	def get_graph(self, dict):
-		return graph.Graph(graph.DictParentsProvider(dict))
 
-	def test_simple(self):
-		lg = linegraph(self.get_graph({"A": ("B", "C"), "B": ()}), ["A"])
-		self.assertEquals(lg,  
+    def get_graph(self, dict):
+        return graph.Graph(graph.DictParentsProvider(dict))
+
+    def test_simple(self):
+        lg = linegraph(self.get_graph({"A": ("B", "C"), "B": ()}), ["A"])
+        self.assertEquals(lg,  
             ([
                ['A', (0, 0), [(0, 0, 0)], ['B'], [], (2,)],
                ['B', (0, 0), [], (), ['A'], (1,)]

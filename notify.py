@@ -35,6 +35,7 @@ def has_avahi():
 
 
 class NotifyPopupMenu(gtk.Menu):
+
     def __init__(self):
         super(NotifyPopupMenu, self).__init__()
         self.create_items()

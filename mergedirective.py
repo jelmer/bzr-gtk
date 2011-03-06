@@ -22,7 +22,6 @@ except:
 
 import bzrlib
 import gtk
-import os
 
 from bzrlib.plugins.gtk.branchbox import BranchSelectionBox
 

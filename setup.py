@@ -6,7 +6,19 @@ from info import *
 from distutils.core import setup, Command
 from distutils.command.install_data import install_data
 from distutils.command.build import build
+from distutils.command.sdist import sdist
 from DistUtilsExtra.command import *
+try:
+    from DistUtilsExtra.command import *
+except ImportError:
+   # Python distutils extra is not available.
+    class cmd_build_i18n(Command):
+        def run(self):
+            print >> sys.stderr, "For internationalization support you'll need to install https://launchpad.net/python-distutils-extra"
+else:
+    # Use build_i18n from DistUtilsExtra
+    cmd_build_i18n = build_i18n.build_i18n
+
 import os
 import sys
 
@@ -26,11 +38,13 @@ class Check(Command):
 
     def run(self):
         from bzrlib.tests import TestLoader, TestSuite, TextTestRunner
-        import __init__ as bzrgtk
-        runner = TextTestRunner()
-        loader = TestLoader()
+        from bzrlib.plugin import PluginImporter
+        PluginImporter.specific_paths["bzrlib.plugins.gtk"] = os.path.dirname(__file__)
+        from bzrlib.plugins.gtk.tests import load_tests
         suite = TestSuite()
-        suite.addTest(bzrgtk.test_suite())
+        loader = TestLoader()
+        load_tests(suite, None, loader)
+        runner = TextTestRunner()
         result = runner.run(suite)
         return result.wasSuccessful()
 
@@ -75,6 +89,11 @@ def is_versioned(cmd):
 
 class BuildData(build):
     sub_commands = build.sub_commands[:]
+    sub_commands.append(('build_credits', is_versioned))
+
+
+class SourceDist(sdist):
+    sub_commands = sdist.sub_commands[:]
     sub_commands.append(('build_credits', is_versioned))
 
 
@@ -151,8 +170,14 @@ if __name__ == '__main__':
                                              'icons/tag-16.png',
                                              'icons/bug.png',
                                              'icons/bzr-icon-64.png']),
+                    # In case Python distutils extra is not available,
+                    # install the .desktop files
+                    ('share/applications', ['bazaar-properties.desktop',
+                                            'bzr-handle-patch.desktop',
+                                            'bzr-notify.desktop']),
                     ('share/application-registry', ['bzr-gtk.applications']),
                     ('share/pixmaps', ['icons/bzr-icon-64.png']),
+                    ('share/icons/hicolor/scalable/apps', ['icons/bzr-panel.svg']),
                     ('share/icons/hicolor/scalable/emblems',
                      ['icons/emblem-bzr-added.svg',
                       'icons/emblem-bzr-conflict.svg',
@@ -164,6 +189,7 @@ if __name__ == '__main__':
         cmdclass={'install_data': InstallData,
                   'build_credits': CreateCredits,
                   'build': BuildData,
-                  'build_i18n': build_i18n.build_i18n,
+                  'build_i18n': cmd_build_i18n,
+                  'sdist': SourceDist,
                   'check': Check}
         )
