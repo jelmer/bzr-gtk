@@ -64,7 +64,9 @@ from info import (
     )
 from gettext import (
     gettext,
-    textdomain
+    textdomain,
+    bindtextdomain,
+    bind_textdomain_codeset,
     )
 
 # FIXME: We should find out LOCALEDIR at compile or run time. The current
