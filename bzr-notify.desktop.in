@@ -1,9 +1,9 @@
 [Desktop Entry]
 Type=Application
 Version=0.1
-Name=Bazaar Notification
-GenericName=Bazaar Notification
-Comment=Notification Area Icon for Bazaar
+_Name=Bazaar Notification
+_GenericName=Bazaar Notification
+_Comment=Notification Area Icon for Bazaar
 Icon=bzr-icon-64
 Exec=bzr-notify
 Categories=Application;Development;RevisionControl;

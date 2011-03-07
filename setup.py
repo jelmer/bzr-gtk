@@ -7,6 +7,17 @@ from distutils.core import setup, Command
 from distutils.command.install_data import install_data
 from distutils.command.build import build
 from distutils.command.sdist import sdist
+try:
+    from DistUtilsExtra.command import *
+except ImportError:
+   # Python distutils extra is not available.
+    class cmd_build_i18n(Command):
+        def run(self):
+            print >> sys.stderr, "For internationalization support you'll need to install https://launchpad.net/python-distutils-extra"
+else:
+    # Use build_i18n from DistUtilsExtra
+    cmd_build_i18n = build_i18n.build_i18n
+
 import os
 import sys
 
@@ -158,6 +169,8 @@ if __name__ == '__main__':
                                              'icons/tag-16.png',
                                              'icons/bug.png',
                                              'icons/bzr-icon-64.png']),
+                    # In case Python distutils extra is not available,
+                    # install the .desktop files
                     ('share/applications', ['bazaar-properties.desktop',
                                             'bzr-handle-patch.desktop',
                                             'bzr-notify.desktop']),
@@ -175,6 +188,7 @@ if __name__ == '__main__':
         cmdclass={'install_data': InstallData,
                   'build_credits': CreateCredits,
                   'build': BuildData,
+                  'build_i18n': cmd_build_i18n,
                   'sdist': SourceDist,
                   'check': Check}
         )
