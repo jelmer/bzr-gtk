@@ -1,16 +1,16 @@
-# Swedish translation for olive
-# Copyright (c) 2006 Rosetta Contributors and Canonical Ltd 2006
-# This file is distributed under the same license as the olive package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2006.
+# Simplified Chinese translation for bzr-gtk
+# Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
+# This file is distributed under the same license as the bzr-gtk package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: olive\n"
+"Project-Id-Version: bzr-gtk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2009-11-08 08:27+0000\n"
-"Last-Translator: Daniel Nylander <yeager@ubuntu.com>\n"
-"Language-Team: Swedish <sv@li.org>\n"
+"PO-Revision-Date: 2010-03-17 09:03+0000\n"
+"Last-Translator: Eleanor Chen <chenyueg@gmail.com>\n"
+"Language-Team: Simplified Chinese <zh_CN@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -44,15 +44,15 @@ msgstr ""
 #. Create the widgets
 #: ../branch.py:52
 msgid "_Branch"
-msgstr "_Gren"
+msgstr "分支(_B)"
 
 #: ../branch.py:55 ../checkout.py:55
 msgid "Branch location:"
-msgstr ""
+msgstr "分支位置："
 
 #: ../branch.py:57 ../checkout.py:56
 msgid "Destination:"
-msgstr "Mål:"
+msgstr "目标："
 
 #: ../branch.py:58
 msgid "Branck nick:"
@@ -60,37 +60,37 @@ msgstr ""
 
 #: ../branch.py:59 ../checkout.py:58
 msgid "Revision:"
-msgstr "Revision:"
+msgstr "修订版本:"
 
 #: ../branch.py:60 ../checkout.py:53
 msgid "Please select a folder"
-msgstr "Välj en mapp"
+msgstr "请选择一个文件夹"
 
 #: ../branch.py:140 ../checkout.py:159
 msgid "Missing branch location"
-msgstr ""
+msgstr "缺少分支地址"
 
 #: ../branch.py:141 ../checkout.py:160
 msgid "You must specify a branch location."
-msgstr ""
+msgstr "你必须指定一个分支地址"
 
 #: ../branch.py:182
 msgid "Branching successful"
-msgstr "Grening lyckades"
+msgstr "创建分支成功"
 
 #: ../branch.py:183
 #, python-format
 msgid "%d revision(s) branched."
-msgstr "%d revision(er) grenade."
+msgstr ""
 
 #: ../branch.py:191 ../checkout.py:191
 msgid "N/A"
-msgstr ""
+msgstr "N/A"
 
 #. Create the widgets
 #: ../checkout.py:50
 msgid "Check_out"
-msgstr ""
+msgstr "签出(_O)"
 
 #: ../checkout.py:57
 msgid "Branch nick:"
@@ -98,15 +98,15 @@ msgstr ""
 
 #: ../checkout.py:62
 msgid "_Lightweight checkout"
-msgstr ""
+msgstr "轻量级签出(_L)"
 
 #: ../commands.py:307
 msgid "Directory does not have a working tree"
-msgstr "Katalogen innehåller inte ett arbetsträd"
+msgstr ""
 
 #: ../commands.py:308
 msgid "Operation aborted."
-msgstr "Åtgärden avbruten."
+msgstr "操作中止。"
 
 #: ../commands.py:412
 msgid "There are local changes in the branch"
@@ -118,23 +118,23 @@ msgstr ""
 
 #: ../commit.py:182
 msgid "added"
-msgstr "lades till"
+msgstr "已添加"
 
 #: ../commit.py:183
 msgid "removed"
-msgstr "togs bort"
+msgstr "已移除"
 
 #: ../commit.py:184
 msgid "renamed"
-msgstr "bytte namn"
+msgstr "已重命名"
 
 #: ../commit.py:185
 msgid "renamed and modified"
-msgstr ""
+msgstr "已重命名并且已修改"
 
 #: ../commit.py:186
 msgid "modified"
-msgstr "ändrades"
+msgstr "已修改"
 
 #: ../commit.py:187
 msgid "kind changed"
@@ -150,7 +150,7 @@ msgstr ""
 
 #: ../commit.py:364
 msgid "Comm_it"
-msgstr ""
+msgstr "提交(_I)"
 
 #: ../commit.py:390
 msgid "Files"
@@ -174,15 +174,15 @@ msgstr ""
 
 #: ../commit.py:442
 msgid "Commit"
-msgstr "Verkställ"
+msgstr "提交"
 
 #: ../commit.py:446 ../conflicts.py:111
 msgid "Path"
-msgstr "Sökväg"
+msgstr "路径"
 
 #: ../commit.py:448 ../conflicts.py:113
 msgid "Type"
-msgstr "Typ"
+msgstr "类型"
 
 #: ../commit.py:481
 msgid "<i>* Cannot select specific files when merging</i>"
@@ -194,15 +194,15 @@ msgstr ""
 
 #: ../commit.py:507
 msgid "Date"
-msgstr "Datum"
+msgstr "日期"
 
 #: ../commit.py:509
 msgid "Committer"
-msgstr "Verkställd av"
+msgstr "提交者"
 
 #: ../commit.py:511 ../search.py:59
 msgid "Summary"
-msgstr "Sammanfattning"
+msgstr "概要"
 
 #. TODO: jam 2007-10-30 The diff label is currently disabled. If we
 #. decide that we really don't ever want to display it, we should
@@ -259,7 +259,7 @@ msgstr ""
 
 #: ../commit.py:750
 msgid "Commit with no changes?"
-msgstr ""
+msgstr "没有更改仍然要提交吗？"
 
 #: ../commit.py:751
 msgid ""
@@ -272,23 +272,23 @@ msgstr ""
 
 #: ../conflicts.py:101
 msgid "Conflicts"
-msgstr ""
+msgstr "冲突"
 
 #: ../conflicts.py:104
 msgid "No conflicts in working tree."
-msgstr ""
+msgstr "工作树中没有冲突。"
 
 #: ../conflicts.py:118
 msgid "path conflict"
-msgstr ""
+msgstr "路径冲突"
 
 #: ../conflicts.py:120
 msgid "contents conflict"
-msgstr ""
+msgstr "内容冲突"
 
 #: ../conflicts.py:122
 msgid "text conflict"
-msgstr ""
+msgstr "文本冲突"
 
 #: ../conflicts.py:124
 msgid "duplicate id"
@@ -296,7 +296,7 @@ msgstr ""
 
 #: ../conflicts.py:126
 msgid "duplicate"
-msgstr ""
+msgstr "复制"
 
 #: ../conflicts.py:128
 msgid "parent loop"
@@ -320,7 +320,7 @@ msgstr ""
 
 #: ../conflicts.py:165
 msgid "No file was selected"
-msgstr "Ingen fil valdes"
+msgstr ""
 
 #: ../conflicts.py:166
 msgid "Please select a file from the list."
@@ -344,7 +344,7 @@ msgstr ""
 #. View menu
 #: ../diff.py:445
 msgid "_View"
-msgstr "_Visa"
+msgstr ""
 
 #: ../diff.py:447
 msgid "Wrap _Long Lines"
@@ -370,7 +370,7 @@ msgstr ""
 
 #: ../errors.py:28
 msgid "Directory is not a branch"
-msgstr "Katalogen är inte en gren"
+msgstr ""
 
 #: ../errors.py:29
 msgid "You can perform this action only in a branch."
@@ -386,7 +386,7 @@ msgstr ""
 
 #: ../errors.py:34
 msgid "No changes to commit"
-msgstr "Inga ändringar att verkställa"
+msgstr ""
 
 #: ../errors.py:35
 msgid "Try force commit if you want to commit anyway."
@@ -402,7 +402,7 @@ msgstr ""
 
 #: ../errors.py:40
 msgid "Conflicts in tree"
-msgstr "Konflikter i träd"
+msgstr ""
 
 #: ../errors.py:41
 msgid "You need to resolve the conflicts before committing."
@@ -410,7 +410,7 @@ msgstr ""
 
 #: ../errors.py:43
 msgid "Strict commit failed"
-msgstr "Strikt verkställning misslyckades"
+msgstr ""
 
 #: ../errors.py:44
 msgid ""
@@ -426,11 +426,11 @@ msgstr ""
 #: ../errors.py:48
 #, python-format
 msgid "%s"
-msgstr "%s"
+msgstr ""
 
 #: ../errors.py:50
 msgid "File not versioned"
-msgstr "Filen inte versionskontrollerad"
+msgstr ""
 
 #: ../errors.py:51
 msgid "The selected file is not versioned."
@@ -452,7 +452,7 @@ msgstr ""
 
 #: ../errors.py:57
 msgid "The selected file hasn't changed."
-msgstr "Den valda filen har inte ändrats."
+msgstr ""
 
 #: ../errors.py:59
 msgid "No such revision"
@@ -460,11 +460,11 @@ msgstr ""
 
 #: ../errors.py:60
 msgid "The revision you specified doesn't exist."
-msgstr "Revisionen du angav finns inte."
+msgstr ""
 
 #: ../errors.py:62
 msgid "Target already exists"
-msgstr "Mål finns redan"
+msgstr ""
 
 #: ../errors.py:63
 msgid "Target directory already exists. Please select another target."
@@ -472,7 +472,7 @@ msgstr ""
 
 #: ../errors.py:65
 msgid "Directory is already a branch"
-msgstr "Katalogen är redan en gren"
+msgstr ""
 
 #: ../errors.py:66
 #, python-format
@@ -498,7 +498,7 @@ msgstr ""
 
 #: ../errors.py:73
 msgid "Permission denied"
-msgstr "Åtkomst nekas"
+msgstr ""
 
 #: ../errors.py:73
 msgid "permission denied."
@@ -506,12 +506,12 @@ msgstr ""
 
 #: ../errors.py:75
 msgid "Unknown error"
-msgstr "Okänt fel"
+msgstr ""
 
 #. Create the widgets
 #: ../initialize.py:48
 msgid "_Initialize"
-msgstr "_Initiera"
+msgstr ""
 
 #: ../initialize.py:49
 msgid "Which directory do you want to initialize?"
@@ -572,11 +572,11 @@ msgstr ""
 #. Create the widgets
 #: ../push.py:51
 msgid "Location:"
-msgstr "Plats:"
+msgstr ""
 
 #: ../push.py:53
 msgid "_Push"
-msgstr "_Skjut ut"
+msgstr ""
 
 #: ../push.py:100
 msgid ""
@@ -607,7 +607,7 @@ msgstr ""
 #. Create the widgets
 #: ../revbrowser.py:45
 msgid "_Select"
-msgstr "_Markera"
+msgstr ""
 
 #: ../search.py:44
 msgid "Search for:"
@@ -619,27 +619,27 @@ msgstr ""
 
 #: ../status.py:94
 msgid "Added"
-msgstr "Lades till"
+msgstr ""
 
 #: ../status.py:100
 msgid "Removed"
-msgstr "Togs bort"
+msgstr ""
 
 #: ../status.py:106
 msgid "Renamed"
-msgstr "Bytte namn"
+msgstr ""
 
 #: ../status.py:113
 msgid "Modified"
-msgstr "Ändrades"
+msgstr ""
 
 #: ../status.py:121
 msgid "Unknown"
-msgstr "Okänd"
+msgstr ""
 
 #: ../status.py:126
 msgid "No changes."
-msgstr "Inga ändringar."
+msgstr ""
 
 #. Set properties
 #: ../tags.py:66
@@ -678,11 +678,11 @@ msgstr ""
 #. Create the widgets
 #: ../tags.py:288
 msgid "_Add tag"
-msgstr "_Lägg till tagg"
+msgstr ""
 
 #: ../tags.py:290
 msgid "Tag Name:"
-msgstr "Taggnamn:"
+msgstr ""
 
 #: ../tags.py:291
 msgid "Revision ID:"
@@ -696,290 +696,14 @@ msgstr ""
 msgid "You have to specify the tag's desired name."
 msgstr ""
 
-#~ msgid "_Rename..."
-#~ msgstr "_Byt namn..."
-
-#~ msgid "_Move..."
-#~ msgstr "_Flytta..."
-
-#~ msgid "Make _directory..."
-#~ msgstr "Skapa _katalog..."
-
-#~ msgid "Remove file(s)..."
-#~ msgstr "Ta bort fil(er)..."
-
-#~ msgid "Olive - Bazaar GUI"
-#~ msgstr "Olive - Användargränssnitt för Bazaar"
-
-#~ msgid "_Add file(s)..."
-#~ msgstr "_Lägg till fil(er)..."
-
-#~ msgid "_File"
-#~ msgstr "_Arkiv"
-
-#~ msgid "_Refresh"
-#~ msgstr "_Uppdatera"
-
-#~ msgid "_Get..."
-#~ msgstr "_Hämta..."
-
-#~ msgid "Show _hidden files"
-#~ msgstr "Visa _dolda filer"
-
-#~ msgid "C_heckout..."
-#~ msgstr "C_hecka ut..."
-
-#~ msgid "Pu_ll"
-#~ msgstr "Dra _in"
-
-#~ msgid "_Commit..."
-#~ msgstr "_Verkställ..."
-
-#~ msgid "Pu_sh..."
-#~ msgstr "Skjut _ut..."
-
-#~ msgid "S_tatus..."
-#~ msgstr "S_tatus..."
-
-#~ msgid "_Log..."
-#~ msgstr "_Logg..."
-
-#~ msgid "_Differences..."
-#~ msgstr "_Skillnader"
-
-#~ msgid "_Statistics"
-#~ msgstr "_Statistik"
-
-#~ msgid "_Help"
-#~ msgstr "_Hjälp"
-
-#~ msgid "Diff"
-#~ msgstr "Diff"
-
-#~ msgid "https://launchpad.net/products/olive"
-#~ msgstr "https://launchpad.net/products/olive"
-
-#~ msgid "Copyright (C) 2006 Szilveszter Farkas (Phanatic)"
-#~ msgstr "Copyright (C) 2006 Szilveszter Farkas (Phanatic)"
-
-#~ msgid "Which file(s) do you want to add?"
-#~ msgstr "Vilka fil(er) vill du lägga till?"
-
-#~ msgid "Olive - Add file(s)"
-#~ msgstr "Olive - Lägg till fil(er)"
-
-#~ msgid "_Remove"
-#~ msgstr "_Ta bort"
-
-#~ msgid "Selected only"
-#~ msgstr "Endast markerade"
-
-#~ msgid "Olive - Remove file(s)"
-#~ msgstr "Olive - Ta bort fil(er)"
-
-#~ msgid "Which file(s) do you want to remove?"
-#~ msgstr "Vilka fil(er) vill du ta bort?"
-
-#~ msgid "_Add"
-#~ msgstr "_Lägg till"
-
-#~ msgid "Olive - Make directory"
-#~ msgstr "Olive - Skapa katalog"
-
-#~ msgid "_Versioned directory"
-#~ msgstr "_Versionshanterad katalog"
-
-#~ msgid "Olive - Move"
-#~ msgstr "Olive - Flytta"
-
-#~ msgid "Move to"
-#~ msgstr "Flytta till"
-
-#~ msgid "_Make directory"
-#~ msgstr "_Skapa katalog"
-
-#~ msgid "Olive - Rename"
-#~ msgstr "Olive - Byt namn"
-
-#~ msgid "_Move"
-#~ msgstr "_Flytta"
-
-#~ msgid "Select a directory"
-#~ msgstr "Välj en katalog"
-
-#~ msgid "Repository checkout: "
-#~ msgstr "Förrådsutcheckning: "
-
-#~ msgid "Checkout of branch: "
-#~ msgstr "Checka ut gren: "
-
-#~ msgid "Repository branch: "
-#~ msgstr "Förrådsgren: "
-
-#~ msgid "Shared repository: "
-#~ msgstr "Delat förråd: "
-
-#~ msgid "_Rename"
-#~ msgstr "_Byt namn"
-
-#~ msgid "Rename to"
-#~ msgstr "Byt namn till"
-
-#~ msgid "Publish to branch: "
-#~ msgstr "Publicera till gren: "
-
-#~ msgid "Parent branch: "
-#~ msgstr "Föräldergren: "
-
-#~ msgid "(none)"
-#~ msgstr "(ingen)"
-
-#~ msgid "Unchanged files: "
-#~ msgstr "Oförändrade filer: "
-
-#~ msgid "Modified files: "
-#~ msgstr "Ändrade filer: "
-
-#~ msgid "Added files: "
-#~ msgstr "Tillagda filer: "
-
-#~ msgid "Missing revisions in working tree: "
-#~ msgstr "Saknade revisioner i arbetsträd: "
-
-#~ msgid "Missing revisions in branch: "
-#~ msgstr "Saknade revisioner i gren: "
-
-#~ msgid "Revisions in branch: "
-#~ msgstr "Revisioner i gren: "
-
-#~ msgid "Renamed files: "
-#~ msgstr "Filer som bytt namn: "
-
-#~ msgid "Unknown files: "
-#~ msgstr "Okända filer: "
-
-#~ msgid "Ignored files: "
-#~ msgstr "Ignorerade filer: "
-
-#~ msgid "Versioned subdirectories: "
-#~ msgstr "Versionshanterade underkataloger: "
-
-#~ msgid "Time of first revision: "
-#~ msgstr "Tid för första revision: "
-
-#~ msgid "Age of branch in days: "
-#~ msgstr "Ålder för gren (i dagar): "
-
-#~ msgid "Number of commiters: "
-#~ msgstr "Antal insändare: "
-
-#~ msgid "Removed files: "
-#~ msgstr "Borttagna filer: "
-
-#~ msgid "Title:"
-#~ msgstr "Titel:"
-
-#~ msgid "Time of last revision: "
-#~ msgstr "Tid för sista revision: "
-
-#~ msgid "Size of repository: "
-#~ msgstr "Storlek på förråd: "
-
-#~ msgid "Revisions in repository: "
-#~ msgstr "Revisioner i förråd: "
-
-#~ msgid "There are missing revisions"
-#~ msgstr "Det finns saknade revisioner"
-
-#~ msgid "Local branch up to date"
-#~ msgstr "Lokal gren uppdaterad"
-
-#, python-format
-#~ msgid "%d revision(s) missing."
-#~ msgstr "%d revision(er) saknas."
-
-#~ msgid "There are no missing revisions."
-#~ msgstr "Det finns inga saknade revisioner."
-
-#~ msgid "Bookmark"
-#~ msgstr "Bokmärke"
-
-#~ msgid "Bookmarks"
-#~ msgstr "Bokmärken"
-
-#~ msgid "Glade file cannot be found."
-#~ msgstr "Glade-filen kunde inte hittas."
-
-#~ msgid "Add the selected file"
-#~ msgstr "Lägg till den markerade filen"
-
-#~ msgid "Add"
-#~ msgstr "Lägg till"
-
-#~ msgid "unchanged"
-#~ msgstr "oförändrad"
-
-#~ msgid "Status"
-#~ msgstr "Status"
-
-#~ msgid "Filename"
-#~ msgstr "Filnamn"
-
-#~ msgid "unknown"
-#~ msgstr "okänd"
-
-#~ msgid "Remove"
-#~ msgstr "Ta bort"
-
-#~ msgid "Remove the selected file"
-#~ msgstr "Ta bort den markerade filen"
-
-#~ msgid "Commit the changes"
-#~ msgstr "Verkställ ändringarna"
-
-#~ msgid "Show the differences of all files"
-#~ msgstr "Visa skillnaderna för alla filer"
-
-#~ msgid "All..."
-#~ msgstr "Alla..."
-
-#~ msgid "Bookmark current location"
-#~ msgstr "Bokmärk aktuell plats"
-
-#~ msgid "Edit"
-#~ msgstr "Redigera"
-
-#~ msgid "Edit the selected bookmark"
-#~ msgstr "Redigera det markerade bokmärket"
-
-#~ msgid "Remove the selected bookmark"
-#~ msgstr "Ta bort det markerade bokmärket"
-
-#~ msgid "No directory name given"
-#~ msgstr "Inget katalognamn angavs"
-
-#~ msgid "Directory already exists"
-#~ msgstr "Katalogen finns redan"
-
-#~ msgid "Not the same branch"
-#~ msgstr "Inte i samma gren"
-
-#~ msgid "No matching files"
-#~ msgstr "Inga filer matchades"
-
-#~ msgid "Please specify a new name for the file."
-#~ msgstr "Ange ett nytt namn för filen."
-
-#~ msgid "Filename not given"
-#~ msgstr "Filnamn angavs inte"
-
-#~ msgid "Time"
-#~ msgstr "Tid"
-
 #~ msgid "translator-credits"
 #~ msgstr ""
 #~ "Launchpad Contributions:\n"
-#~ "  Carl-Uno Olsson https://launchpad.net/~carl-uno\n"
-#~ "  Daniel Nylander https://launchpad.net/~yeager\n"
-#~ "  Fredrik Portström https://launchpad.net/~rheo\n"
-#~ "  Zirro https://launchpad.net/~magne-andersson"
+#~ "  Aron Xu https://launchpad.net/~happyaron\n"
+#~ "  Chen Tao https://launchpad.net/~pro711"
+
+#~ msgid "File(s) to commit"
+#~ msgstr "准备提交的文件"
+
+#~ msgid "Commit message:"
+#~ msgstr "提交说明："
