@@ -8,22 +8,23 @@ msgstr ""
 "Project-Id-Version: olive\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2009-11-13 20:16+0000\n"
-"Last-Translator: Ricardo Ichizo <n1ghtcr4wler@gmail.com>\n"
+"PO-Revision-Date: 2011-03-08 23:22+0000\n"
+"Last-Translator: Paulo Guilherme Pilotti Duarte "
+"<guilhermepilotti@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <pt_BR@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-08 04:41+0000\n"
+"X-Launchpad-Export-Date: 2011-03-09 04:32+0000\n"
 "X-Generator: Launchpad (build 12351)\n"
 
 #: ../bazaar-properties.desktop.in.h:1
 msgid "Bazaar Preferences"
-msgstr ""
+msgstr "Preferências do Bazaar"
 
 #: ../bazaar-properties.desktop.in.h:2
 msgid "Configure Bazaar settings"
-msgstr ""
+msgstr "Configure as opções do Bazaar"
 
 #: ../bzr-handle-patch.desktop.in.h:1
 msgid "Apply Bazaar Bundle"
@@ -31,15 +32,15 @@ msgstr ""
 
 #: ../bzr-handle-patch.desktop.in.h:2
 msgid "Bazaar"
-msgstr ""
+msgstr "Bazaar"
 
 #: ../bzr-notify.desktop.in.h:1
 msgid "Bazaar Notification"
-msgstr ""
+msgstr "Notificação do Bazaar"
 
 #: ../bzr-notify.desktop.in.h:2
 msgid "Notification Area Icon for Bazaar"
-msgstr ""
+msgstr "Ícone de Área de notificação para o Bazaar"
 
 #. Create the widgets
 #: ../branch.py:52
@@ -154,7 +155,7 @@ msgstr "Consol_idar"
 
 #: ../commit.py:390
 msgid "Files"
-msgstr ""
+msgstr "Arquivos"
 
 #: ../commit.py:395
 msgid "Commit all changes"
@@ -174,7 +175,7 @@ msgstr ""
 
 #: ../commit.py:442
 msgid "Commit"
-msgstr ""
+msgstr "Enviar"
 
 #: ../commit.py:446 ../conflicts.py:111
 msgid "Path"
@@ -223,7 +224,7 @@ msgstr ""
 
 #: ../commit.py:554
 msgid "<b>Global Commit Message</b>"
-msgstr ""
+msgstr "<b>Mensagem de Envio</b>"
 
 #: ../commit.py:581
 msgid "Diff for "
@@ -235,7 +236,7 @@ msgstr ""
 
 #: ../commit.py:689
 msgid "Commit cancelled"
-msgstr ""
+msgstr "Envio cancelado"
 
 #: ../commit.py:690
 msgid "Do you want to save your commit messages ?"
@@ -388,7 +389,7 @@ msgstr ""
 
 #: ../errors.py:32
 msgid "You can perform local commit only on checkouts."
-msgstr ""
+msgstr "Você só pode executar consolidações locais em checkouts."
 
 #: ../errors.py:34
 msgid "No changes to commit"
@@ -401,7 +402,7 @@ msgstr ""
 
 #: ../errors.py:37
 msgid "No changes to merge"
-msgstr ""
+msgstr "Nenhuma mudança para mesclar"
 
 #: ../errors.py:38
 msgid "Merge location is already fully merged in working tree."
@@ -439,11 +440,11 @@ msgstr "%s"
 
 #: ../errors.py:50
 msgid "File not versioned"
-msgstr ""
+msgstr "Arquivo sem versão definida"
 
 #: ../errors.py:51
 msgid "The selected file is not versioned."
-msgstr ""
+msgstr "O arquivo selecionado não tem versão definida."
 
 #: ../errors.py:53 ../push.py:99
 msgid "Branches have been diverged"
@@ -558,15 +559,15 @@ msgstr ""
 
 #: ../merge.py:54
 msgid "Merge from"
-msgstr ""
+msgstr "Mesclar de"
 
 #: ../merge.py:56
 msgid "Folder"
-msgstr ""
+msgstr "Pasta"
 
 #: ../merge.py:56
 msgid "Custom Location"
-msgstr ""
+msgstr "Localização Personalizada"
 
 #: ../merge.py:59
 msgid "_Merge"
@@ -578,7 +579,7 @@ msgstr "Ramo não fornecido"
 
 #: ../merge.py:133
 msgid "Please specify a branch to merge from."
-msgstr ""
+msgstr "Por favor especifique um ramo do qual mesclar."
 
 #: ../merge.py:141
 msgid "Bazaar command error"
@@ -630,11 +631,11 @@ msgstr "_Selecionar"
 
 #: ../search.py:44
 msgid "Search for:"
-msgstr ""
+msgstr "Buscar por:"
 
 #: ../search.py:56
 msgid "Document"
-msgstr ""
+msgstr "Documento"
 
 #: ../status.py:94
 msgid "Added"
@@ -689,7 +690,7 @@ msgstr "_Remover tag"
 
 #: ../tags.py:241
 msgid "<b><big>Remove tag?</big></b>"
-msgstr ""
+msgstr "<b><big>Remover tag?</big></b>"
 
 #: ../tags.py:243
 #, python-format
@@ -1226,4 +1227,5 @@ msgstr "Você tem de especificar o nome desejado da tag."
 #~ "  Flávio Pontes https://launchpad.net/~flaviocpontes\n"
 #~ "  Leandro Pereira de Lima e Silva https://launchpad.net/~leandro-limaesilva\n"
 #~ "  Nelson do Vale https://launchpad.net/~nelsondovale\n"
+#~ "  Paulo Guilherme Pilotti Duarte https://launchpad.net/~guilhermepilotti\n"
 #~ "  Ricardo Ichizo https://launchpad.net/~n1ghtcr4wler"
