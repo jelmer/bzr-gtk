@@ -8,18 +8,18 @@ msgstr ""
 "Project-Id-Version: bzr-gtk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2009-11-18 01:31+0000\n"
-"Last-Translator: Lieven van der Heide <lievenvanderheide@gmail.com>\n"
+"PO-Revision-Date: 2011-03-09 09:42+0000\n"
+"Last-Translator: Rachid <Unknown>\n"
 "Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-08 04:41+0000\n"
+"X-Launchpad-Export-Date: 2011-03-10 04:40+0000\n"
 "X-Generator: Launchpad (build 12351)\n"
 
 #: ../bazaar-properties.desktop.in.h:1
 msgid "Bazaar Preferences"
-msgstr ""
+msgstr "Bazaar voorkeuren"
 
 #: ../bazaar-properties.desktop.in.h:2
 msgid "Configure Bazaar settings"
@@ -31,7 +31,7 @@ msgstr ""
 
 #: ../bzr-handle-patch.desktop.in.h:2
 msgid "Bazaar"
-msgstr ""
+msgstr "Bazaar"
 
 #: ../bzr-notify.desktop.in.h:1
 msgid "Bazaar Notification"
@@ -1100,5 +1100,6 @@ msgstr "U moet de gewenste labelnaam opgeven."
 #~ msgstr ""
 #~ "Launchpad Contributions:\n"
 #~ "  Lieven van der Heide https://launchpad.net/~lievenvanderheide\n"
+#~ "  Rachid https://launchpad.net/~rachidbm\n"
 #~ "  Roel Huybrechts https://launchpad.net/~rulus\n"
 #~ "  Wim Rosseel https://launchpad.net/~wim-rosseel"
