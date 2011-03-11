@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: olive\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2009-11-13 20:03+0000\n"
-"Last-Translator: Jan Vlnas <Unknown>\n"
+"PO-Revision-Date: 2011-03-09 10:28+0000\n"
+"Last-Translator: Daniel Milde <info@milde.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-08 04:41+0000\n"
+"X-Launchpad-Export-Date: 2011-03-10 04:40+0000\n"
 "X-Generator: Launchpad (build 12351)\n"
 
 #: ../bazaar-properties.desktop.in.h:1
@@ -44,11 +44,11 @@ msgstr ""
 #. Create the widgets
 #: ../branch.py:52
 msgid "_Branch"
-msgstr ""
+msgstr "_Větev"
 
 #: ../branch.py:55 ../checkout.py:55
 msgid "Branch location:"
-msgstr ""
+msgstr "Umístění větve:"
 
 #: ../branch.py:57 ../checkout.py:56
 msgid "Destination:"
@@ -56,7 +56,7 @@ msgstr "Cíl:"
 
 #: ../branch.py:58
 msgid "Branck nick:"
-msgstr ""
+msgstr "Označení větve:"
 
 #: ../branch.py:59 ../checkout.py:58
 msgid "Revision:"
@@ -64,28 +64,28 @@ msgstr "Revize:"
 
 #: ../branch.py:60 ../checkout.py:53
 msgid "Please select a folder"
-msgstr ""
+msgstr "Zvolte adresář"
 
 #: ../branch.py:140 ../checkout.py:159
 msgid "Missing branch location"
-msgstr ""
+msgstr "Chybí umístění větve"
 
 #: ../branch.py:141 ../checkout.py:160
 msgid "You must specify a branch location."
-msgstr ""
+msgstr "Musíte zadat umístění větve."
 
 #: ../branch.py:182
 msgid "Branching successful"
-msgstr ""
+msgstr "Větvení bylo úspěšné"
 
 #: ../branch.py:183
 #, python-format
 msgid "%d revision(s) branched."
-msgstr ""
+msgstr "%d revize byla rozvětvena."
 
 #: ../branch.py:191 ../checkout.py:191
 msgid "N/A"
-msgstr ""
+msgstr "N / A"
 
 #. Create the widgets
 #: ../checkout.py:50
@@ -102,11 +102,11 @@ msgstr ""
 
 #: ../commands.py:307
 msgid "Directory does not have a working tree"
-msgstr ""
+msgstr "Adresář nemá pracovní strom"
 
 #: ../commands.py:308
 msgid "Operation aborted."
-msgstr ""
+msgstr "Operace byla přerušena."
 
 #: ../commands.py:412
 msgid "There are local changes in the branch"
@@ -122,19 +122,19 @@ msgstr "přidáno"
 
 #: ../commit.py:183
 msgid "removed"
-msgstr ""
+msgstr "odstraněno"
 
 #: ../commit.py:184
 msgid "renamed"
-msgstr ""
+msgstr "přejmenováno"
 
 #: ../commit.py:185
 msgid "renamed and modified"
-msgstr ""
+msgstr "přejmenováno a změněno"
 
 #: ../commit.py:186
 msgid "modified"
-msgstr ""
+msgstr "změněno"
 
 #: ../commit.py:187
 msgid "kind changed"
@@ -178,7 +178,7 @@ msgstr ""
 
 #: ../commit.py:446 ../conflicts.py:111
 msgid "Path"
-msgstr ""
+msgstr "Cesta"
 
 #: ../commit.py:448 ../conflicts.py:113
 msgid "Type"
@@ -194,7 +194,7 @@ msgstr ""
 
 #: ../commit.py:507
 msgid "Date"
-msgstr ""
+msgstr "Datum"
 
 #: ../commit.py:509
 msgid "Committer"
@@ -202,7 +202,7 @@ msgstr ""
 
 #: ../commit.py:511 ../search.py:59
 msgid "Summary"
-msgstr ""
+msgstr "Souhrn"
 
 #. TODO: jam 2007-10-30 The diff label is currently disabled. If we
 #. decide that we really don't ever want to display it, we should
@@ -268,27 +268,27 @@ msgstr ""
 
 #: ../conflicts.py:50
 msgid "External utility:"
-msgstr ""
+msgstr "Vnější nástroj:"
 
 #: ../conflicts.py:101
 msgid "Conflicts"
-msgstr ""
+msgstr "Konflikty"
 
 #: ../conflicts.py:104
 msgid "No conflicts in working tree."
-msgstr ""
+msgstr "V pracovním stromě nejsou žádné konflikty."
 
 #: ../conflicts.py:118
 msgid "path conflict"
-msgstr ""
+msgstr "konflikt cesty"
 
 #: ../conflicts.py:120
 msgid "contents conflict"
-msgstr ""
+msgstr "konflikt obsahu"
 
 #: ../conflicts.py:122
 msgid "text conflict"
-msgstr ""
+msgstr "konflikt textu"
 
 #: ../conflicts.py:124
 msgid "duplicate id"
@@ -296,7 +296,7 @@ msgstr ""
 
 #: ../conflicts.py:126
 msgid "duplicate"
-msgstr ""
+msgstr "duplikát"
 
 #: ../conflicts.py:128
 msgid "parent loop"
@@ -316,7 +316,7 @@ msgstr ""
 
 #: ../conflicts.py:136
 msgid "unknown type of conflict"
-msgstr ""
+msgstr "neznámý typ konfliktu"
 
 #: ../conflicts.py:165
 msgid "No file was selected"
@@ -324,7 +324,7 @@ msgstr "Nebyl zvolen žádný soubor"
 
 #: ../conflicts.py:166
 msgid "Please select a file from the list."
-msgstr ""
+msgstr "Vyberte prosím soubor ze seznamu."
 
 #: ../conflicts.py:176
 msgid "Call to external utility failed"
@@ -332,7 +332,7 @@ msgstr ""
 
 #: ../conflicts.py:178
 msgid "Cannot resolve conflict"
-msgstr ""
+msgstr "Konflikt nelze vyřešit"
 
 #: ../conflicts.py:179
 msgid ""
@@ -344,7 +344,7 @@ msgstr ""
 #. View menu
 #: ../diff.py:445
 msgid "_View"
-msgstr ""
+msgstr "_Náhled"
 
 #: ../diff.py:447
 msgid "Wrap _Long Lines"
@@ -353,11 +353,11 @@ msgstr ""
 #. No conflicts found.
 #: ../diff.py:492 ../merge.py:146
 msgid "Merge successful"
-msgstr ""
+msgstr "Sloučení úspěšné"
 
 #: ../diff.py:493 ../merge.py:147
 msgid "All changes applied successfully."
-msgstr ""
+msgstr "Všechny změny byly úspěsně uplatněny."
 
 #. There are conflicts to be resolved.
 #: ../diff.py:496 ../merge.py:150
@@ -370,7 +370,7 @@ msgstr ""
 
 #: ../errors.py:28
 msgid "Directory is not a branch"
-msgstr ""
+msgstr "Adresář není větví"
 
 #: ../errors.py:29
 msgid "You can perform this action only in a branch."
@@ -402,7 +402,7 @@ msgstr ""
 
 #: ../errors.py:40
 msgid "Conflicts in tree"
-msgstr ""
+msgstr "Konflikty ve stromu"
 
 #: ../errors.py:41
 msgid "You need to resolve the conflicts before committing."
@@ -452,7 +452,7 @@ msgstr ""
 
 #: ../errors.py:57
 msgid "The selected file hasn't changed."
-msgstr ""
+msgstr "Vybraný soubor se nezměnil."
 
 #: ../errors.py:59
 msgid "No such revision"
@@ -460,15 +460,15 @@ msgstr ""
 
 #: ../errors.py:60
 msgid "The revision you specified doesn't exist."
-msgstr ""
+msgstr "Revize, kterou jste zadali, neexistuje."
 
 #: ../errors.py:62
 msgid "Target already exists"
-msgstr ""
+msgstr "Cíl již existuje"
 
 #: ../errors.py:63
 msgid "Target directory already exists. Please select another target."
-msgstr ""
+msgstr "Cílový adresář již existuje. Vyberte prosím jiný cíl."
 
 #: ../errors.py:65
 msgid "Directory is already a branch"
@@ -483,7 +483,7 @@ msgstr ""
 
 #: ../errors.py:68
 msgid "Branch without a working tree"
-msgstr ""
+msgstr "Větev bez pracovního stromu"
 
 #: ../errors.py:69
 #, python-format
@@ -494,24 +494,24 @@ msgstr ""
 
 #: ../errors.py:71
 msgid "Unknown bzr error"
-msgstr ""
+msgstr "Neznámá chyba bzr"
 
 #: ../errors.py:73
 msgid "Permission denied"
-msgstr ""
+msgstr "Přístup odepřen"
 
 #: ../errors.py:73
 msgid "permission denied."
-msgstr ""
+msgstr "Přístup byl odepřen."
 
 #: ../errors.py:75
 msgid "Unknown error"
-msgstr ""
+msgstr "Neznámá chyba"
 
 #. Create the widgets
 #: ../initialize.py:48
 msgid "_Initialize"
-msgstr ""
+msgstr "_Inicializovat"
 
 #: ../initialize.py:49
 msgid "Which directory do you want to initialize?"
@@ -519,11 +519,11 @@ msgstr ""
 
 #: ../initialize.py:50
 msgid "Current directory"
-msgstr ""
+msgstr "Současný adresář"
 
 #: ../initialize.py:51
 msgid "Create a new directory with the name:"
-msgstr ""
+msgstr "Vytvořit nový adresář se jménem:"
 
 #: ../initialize.py:86
 msgid "Directory name not specified"
@@ -555,7 +555,7 @@ msgstr ""
 
 #: ../merge.py:59
 msgid "_Merge"
-msgstr ""
+msgstr "_Sloučit"
 
 #: ../merge.py:132
 msgid "Branch not given"
@@ -572,7 +572,7 @@ msgstr ""
 #. Create the widgets
 #: ../push.py:51
 msgid "Location:"
-msgstr ""
+msgstr "Umístění:"
 
 #: ../push.py:53
 msgid "_Push"
@@ -607,7 +607,7 @@ msgstr ""
 #. Create the widgets
 #: ../revbrowser.py:45
 msgid "_Select"
-msgstr ""
+msgstr "_Vybrat"
 
 #: ../search.py:44
 msgid "Search for:"
@@ -619,27 +619,27 @@ msgstr ""
 
 #: ../status.py:94
 msgid "Added"
-msgstr ""
+msgstr "Přidáno"
 
 #: ../status.py:100
 msgid "Removed"
-msgstr ""
+msgstr "Odstraněno"
 
 #: ../status.py:106
 msgid "Renamed"
-msgstr ""
+msgstr "Přejmenováno"
 
 #: ../status.py:113
 msgid "Modified"
-msgstr ""
+msgstr "Upraveno"
 
 #: ../status.py:121
 msgid "Unknown"
-msgstr ""
+msgstr "Neznámý"
 
 #: ../status.py:126
 msgid "No changes."
-msgstr ""
+msgstr "Žádné změny."
 
 #. Set properties
 #: ../tags.py:66
@@ -652,7 +652,7 @@ msgstr ""
 
 #: ../tags.py:115
 msgid "Revision ID"
-msgstr ""
+msgstr "ID revize"
 
 #: ../tags.py:150
 msgid "Tags are not supported by this branch format. Please upgrade."
@@ -808,4 +808,5 @@ msgstr ""
 #~ "  DarkenCZ https://launchpad.net/~darkencz\n"
 #~ "  Fred https://launchpad.net/~fredrooks\n"
 #~ "  Jan Tojnar https://launchpad.net/~jtojnar\n"
-#~ "  Jan Vlnas https://launchpad.net/~jnv"
+#~ "  Jan Vlnas https://launchpad.net/~jnv\n"
+#~ "  Konki https://launchpad.net/~pavel-konkol"
