@@ -32,6 +32,9 @@ from bzrlib.testament import Testament
 
 from bzrlib.plugins.gtk import icon_path
 
+from bzrlib.plugins.gtk.avatarsbox import AvatarsBox
+from bzrlib.plugins.gtk.avatar import Avatar
+
 try:
     from bzrlib.plugins.gtk import seahorse
 except ImportError:
@@ -402,13 +405,18 @@ class RevisionView(gtk.Notebook):
 
     def _set_revision(self, revision):
         if revision is None: return
-
+        
+        self.avatarsbox.reset()
+        
         self._revision = revision
         if revision.committer is not None:
             self.committer.set_text(revision.committer)
+            self.avatarsbox.add(revision.committer, "committer")
         else:
             self.committer.set_text("")
+            self.avatarsbox.hide()
         author = revision.properties.get('author', '')
+        self.avatarsbox.merge(revision.get_apparent_authors(), "author")
         if author != '':
             self.author.set_text(author)
             self.author.show()
@@ -579,10 +587,15 @@ class RevisionView(gtk.Notebook):
         self.connect_after('notify::revision', self._update_signature)
 
     def _create_headers(self):
+        self.avatarsbox = AvatarsBox()
+        
         self.table = gtk.Table(rows=5, columns=2)
         self.table.set_row_spacings(6)
         self.table.set_col_spacings(6)
         self.table.show()
+        
+        self.avatarsbox.pack_start(self.table)
+        self.avatarsbox.show()
 
         row = 0
 
@@ -673,7 +686,8 @@ class RevisionView(gtk.Notebook):
 
         self.connect('notify::revision', self._add_tags)
 
-        return self.table
+        self.avatarsbox.show()
+        return self.avatarsbox
     
     def _create_parents(self):
         hbox = gtk.HBox(True, 3)
