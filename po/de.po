@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: olive\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2009-11-08 08:41+0000\n"
-"Last-Translator: welterde <dev@welterde.de>\n"
+"PO-Revision-Date: 2011-03-12 08:36+0000\n"
+"Last-Translator: C-S <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-08 04:41+0000\n"
-"X-Generator: Launchpad (build 12351)\n"
+"X-Launchpad-Export-Date: 2011-03-13 04:43+0000\n"
+"X-Generator: Launchpad (build 12559)\n"
 
 #: ../bazaar-properties.desktop.in.h:1
 msgid "Bazaar Preferences"
@@ -64,7 +64,7 @@ msgstr "Revision:"
 
 #: ../branch.py:60 ../checkout.py:53
 msgid "Please select a folder"
-msgstr "Bitte wählen Sie ein Verzeichniss"
+msgstr "Bitte wählen Sie ein Verzeichnis"
 
 #: ../branch.py:140 ../checkout.py:159
 msgid "Missing branch location"
@@ -270,7 +270,7 @@ msgstr ""
 
 #: ../conflicts.py:50
 msgid "External utility:"
-msgstr ""
+msgstr "Externes Hilfsprogramm"
 
 #: ../conflicts.py:101
 msgid "Conflicts"
@@ -282,7 +282,7 @@ msgstr "Kein konflikte im aktiven Verzeichnisstruktur"
 
 #: ../conflicts.py:118
 msgid "path conflict"
-msgstr "Pfad konflikt"
+msgstr "Pfadkonflikt"
 
 #: ../conflicts.py:120
 msgid "contents conflict"
@@ -290,7 +290,7 @@ msgstr "Inhaltskonflikt"
 
 #: ../conflicts.py:122
 msgid "text conflict"
-msgstr "Text konflikt"
+msgstr "Textkonflikt"
 
 #: ../conflicts.py:124
 msgid "duplicate id"
@@ -302,7 +302,7 @@ msgstr "Duplikat"
 
 #: ../conflicts.py:128
 msgid "parent loop"
-msgstr ""
+msgstr "Eltern-Schleife"
 
 #: ../conflicts.py:130
 msgid "unversioned parent"
@@ -1289,6 +1289,7 @@ msgstr "Sie müssen den gewünschten Tag Namen angeben."
 #~ "  Benjamin Jochheim https://launchpad.net/~benjamin-jochheim\n"
 #~ "  C-S https://launchpad.net/~c-s\n"
 #~ "  Christian Faulhammer https://launchpad.net/~fauli\n"
+#~ "  Matthias Loidolt https://launchpad.net/~kedapperdrake\n"
 #~ "  Mike Bronner https://launchpad.net/~mike.bronner\n"
 #~ "  Philipp Wolfer https://launchpad.net/~phw\n"
 #~ "  Pierre Vorhagen https://launchpad.net/~pep.\n"
