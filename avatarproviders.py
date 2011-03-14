@@ -14,6 +14,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import hashlib
+import urllib
+
 class AvatarProvider(object):
     """
     Master class for Avatar providers.
@@ -24,3 +27,29 @@ class AvatarProvider(object):
     def __init__(self, size=80):
         """ Constructor """
         self.size = size
+    
+    def get_base_url(self):
+        """
+        Override this methode in your provider class in order to return
+        base url of your provider.
+        """
+        raise NotImplementedError("You must implement the get_base_url method.")
+
+
+class AvatarProviderGravatar(AvatarProvider):
+    """ Gravatar provider """
+    
+    def __init__(self):
+        """ Constructor """
+        super(AvatarProviderGravatar, self).__init__()
+    
+    def get_base_url(self):
+        return "http://www.gravatar.com/avatar.php?"
+    
+    def gravatar_id_for_email(self, email):
+        """ Return a converted email address to a gravatar_id """
+        return self.get_base_url() + \
+                urllib.urlencode({
+                    'gravatar_id':hashlib.md5(email.lower()).hexdigest(),
+                    'size':str(self.size)
+                })

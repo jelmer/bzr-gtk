@@ -18,7 +18,7 @@ import gtk
 
 from bzrlib.plugins.gtk.avatar import Avatar
 from bzrlib.plugins.gtk.avatarbox import AvatarBox
-from bzrlib.plugins.gtk.avatarprovidergravatar import AvatarProviderGravatar
+from bzrlib.plugins.gtk.avatarproviders import AvatarProviderGravatar
 from bzrlib.plugins.gtk.avatardownloaderworker import AvatarDownloaderWorker
 
 class AvatarsBox(gtk.HBox):
