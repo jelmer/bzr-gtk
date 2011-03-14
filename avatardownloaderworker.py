@@ -30,8 +30,6 @@ class AvatarDownloaderWorker(threading.Thread):
         """
         Constructor
         
-        Initialize reusable connection from urllib3.
-        base_url:        Base of the provider url to use for each requests.
         provider_method: Provider method that return fields
                          to send with the request.
         """

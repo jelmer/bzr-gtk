@@ -62,7 +62,8 @@ class AvatarsBox(gtk.HBox):
     
     def merge(self, usernames, role):
         """ Add avatars from a list """
-        [self.add(username, role) for username in usernames]
+        for username in usernames:
+            self.add(username, role)
     
     def reset(self):
         """

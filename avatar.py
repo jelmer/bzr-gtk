@@ -22,44 +22,22 @@ from bzrlib.config import parse_username
 class Avatar(gtk.Box):
     """ Author or committer avatar """
     
-    def __init__(self, username):
+    def __init__(self, apparent_username):
         """ Constructor """
         gtk.Box.__init__(self)
         
-        self.__username = username
-        self.__name, self.__email = parse_username(username)
-        self.__image = None
+        self.apparent_username = apparent_username
+        self.username, self.email = parse_username(apparent_username)
+        self.image = None
     
-    
-    # ~~~~~ Properties ~~~~~
-    # username
-    def get_username(self):
-        return self.__username
-    def set_username(self, username):
-        self.__username = username
-    username = property(get_username, set_username)
-    
-    # Name
-    def get_name(self):
-        return self.__name
-    def set_name(self, name):
-        self.__name = name
-    name = property(get_name, set_name)
-    
-    # Email
-    def get_email(self):
-        return self.__email
-    def set_email(self, email):
-        self.__email = email
-    email = property(get_email, set_email)
-    
-    # Image
-    def get_image(self):
-        return self.__image
-    def set_image(self, image):
-        self.__image = image
-    image = property(get_image, set_image)
-    
+    def __eq__(self, other):
+        """
+        Return True if attributes of the given avatar
+        match to current object attributes otherwise return False
+        """
+        return self.apparent_username == other.apparent_username and \
+               self.name == other.name and \
+               self.email == other.email
     
     # ~~~~~ Public methods ~~~~~
     def show_spinner(self):
@@ -78,7 +56,7 @@ class Avatar(gtk.Box):
         else:
             no_email = gtk.Label(_i18n("No email"))
             self.pack_start(no_email)
-            self.set_tooltip_text("self.username")
+            self.set_tooltip_text(self.apparent_username)
             no_email.show()
     
     def show_image(self):
@@ -86,14 +64,5 @@ class Avatar(gtk.Box):
         if not self.email is "" and self.image:
             self.remove(self.get_children()[0])
             self.pack_start(self.image)
-            self.image.set_tooltip_text(self.username)
+            self.image.set_tooltip_text(self.apparent_username)
             self.image.show()
-    
-    def is_identical(self, avatar):
-        """
-        Return True if attributes of the given avatar
-        match to current object attributes otherwise return False
-        """
-        return self.username == avatar.username and \
-               self.name == avatar.name and \
-               self.email == avatar.email

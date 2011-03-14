@@ -26,8 +26,7 @@ class AvatarProviderGravatar(AvatarProvider):
     
     def __init__(self):
         """ Constructor """
-        AvatarProvider.__init__(self)
-        super
+        super(AvatarProviderGravatar, self).__init__()
     
     def gravatar_id_for_email(self, email):
         """ Return a converted email address to a gravatar_id """

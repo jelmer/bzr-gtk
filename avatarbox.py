@@ -25,17 +25,8 @@ class AvatarBox(gtk.HBox):
         """ Constructor """
         gtk.HBox.__init__(self, homogeneous, spacing)
         self.__avatars = {}
-        self.__current_avatar = None
+        self.avatar = None
         self.__displaying = None
-    
-    
-    # ~~~~~ Properties ~~~~~
-    # Avatar
-    def get_avatar(self):
-        return self.__current_avatar
-    def set_avatar(self, avatar):
-        self.__current_avatar = avatar
-    avatar = property(get_avatar, set_avatar)
     
     
     # ~~~~~ Public methods ~~~~~
@@ -57,7 +48,7 @@ class AvatarBox(gtk.HBox):
         Return True if the displaying avatar is the same
         as the given one otherwise return False
         """
-        return self.__displaying and self.__displaying.is_identical(avatar)
+        return self.__displaying and self.__displaying == avatar
     
     def append_avatars_with(self, avatar):
         """
@@ -80,8 +71,10 @@ class AvatarBox(gtk.HBox):
         in order to apply future actions
         """
         self.avatar = None
-        if not email is "":
-            self.avatar = self.__avatars[email] if email in self.__avatars else None
+        if not email is "" and email in self.__avatars:
+            self.avatar = self.__avatars[email]
+        else:
+            self.avatar = None
         return self
     
     def update_avatar_image_from_pixbuf_loader(self, loader):

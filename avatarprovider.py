@@ -23,12 +23,4 @@ class AvatarProvider(object):
     """
     def __init__(self, size=80):
         """ Constructor """
-        self.__size = size
-    
-    # ~~~~~ Properties ~~~~~
-    # Size
-    def get_size(self):
-        return self.__size
-    def set_size(self, size):
-        self.__size = size
-    size = property(get_size, set_size)
+        self.size = size
