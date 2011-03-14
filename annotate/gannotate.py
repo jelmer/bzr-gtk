@@ -27,7 +27,7 @@ from bzrlib import patiencediff
 from bzrlib.errors import NoSuchRevision
 from bzrlib.revision import NULL_REVISION, CURRENT_REVISION
 
-from colormap import AnnotateColorSaturation
+from bzrlib.plugins.gtk.annotate.colormap import AnnotateColorSaturation
 from bzrlib.plugins.gtk.revisionview import RevisionView
 from bzrlib.plugins.gtk.window import Window
 

@@ -23,7 +23,11 @@ except:
 import gtk
 
 import bzrlib.plugins.gtk
-from bzrlib.plugins.gtk.notify import has_avahi, has_dbus
+from bzrlib.plugins.gtk.notify import (
+    has_avahi,
+    has_dbus,
+    )
+
 
 def has_email():
     return (getattr(bzrlib.plugins, "email", None) is not None)

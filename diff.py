@@ -41,12 +41,16 @@ from bzrlib import (
     urlutils,
     workingtree,
 )
-from bzrlib.diff import show_diff_trees, internal_diff
+from bzrlib.diff import show_diff_trees
 from bzrlib.patches import parse_patches
 from bzrlib.trace import warning
 from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.window import Window
-from dialog import error_dialog, info_dialog, warning_dialog
+from bzrlib.plugins.gtk.dialog import (
+    error_dialog,
+    info_dialog,
+    warning_dialog,
+    )
 
 
 def fallback_guess_language(slm, content_type):

@@ -21,10 +21,9 @@ try:
 except:
     pass
 
-import bzrlib
 import gtk
 import gobject
-from bzrlib import (errors, ui)
+from bzrlib import ui
 from bzrlib.revision import NULL_REVISION
 
 class RevisionMenu(gtk.Menu):
@@ -73,7 +72,7 @@ class RevisionMenu(gtk.Menu):
             item = gtk.MenuItem("_Send Merge Directive")
             item.connect('activate', self.send_merge_directive)
             self.append(item)
-            
+
             if self.wt:
                 item = gtk.MenuItem("_Revert to this revision")
                 item.connect('activate', self.revert)
@@ -126,12 +125,12 @@ class RevisionMenu(gtk.Menu):
 
         if response != gtk.RESPONSE_NONE:
             dialog.hide()
-        
+
             if response == gtk.RESPONSE_OK:
                 self.emit('tag-added', dialog.tagname, dialog._revid)
-            
+
             dialog.destroy()
-    
+
     def revert(self, item):
         pb = ui.ui_factory.nested_progress_bar()
         revision_tree = self.branch.repository.revision_tree(self.revids[0])

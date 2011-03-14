@@ -29,6 +29,7 @@ from bzrlib.plugins.gtk import (
 
 class StatusWindow(window.Window):
     """ Display Status window and perform the needed actions. """
+
     def __init__(self, wt, wtpath, revision=None):
         """ Initialize the Status window. """
         super(StatusWindow, self).__init__()

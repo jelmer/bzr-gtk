@@ -20,6 +20,7 @@ from bzrlib.config import GlobalConfig
 from bzrlib.revision import NULL_REVISION
 from bzrlib.trace import mutter
 
+
 class BranchWindow(Window):
     """Branch window.
 
@@ -412,7 +413,7 @@ class BranchWindow(Window):
                 prev_menu.hide()
 
             if getattr(self.prev_button, 'set_menu', None) is not None:
-		self.prev_button.set_menu(prev_menu)
+                self.prev_button.set_menu(prev_menu)
 
             next_menu = gtk.Menu()
             if len(children) > 0:
@@ -433,7 +434,7 @@ class BranchWindow(Window):
                 next_menu.hide()
 
             if getattr(self.next_button, 'set_menu', None) is not None:
-		self.next_button.set_menu(next_menu)
+                self.next_button.set_menu(next_menu)
 
             self.revisionview.set_revision(revision)
             self.revisionview.set_children(children)

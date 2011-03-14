@@ -30,7 +30,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
       in_lines          (start, end, colour) tuple list to draw inward lines,
       out_lines         (start, end, colour) tuple list to draw outward lines.
     """
-    
+
     columns_len = 0
 
     __gproperties__ = {
@@ -51,7 +51,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                           gobject.PARAM_WRITABLE
                         ),
         }
-    
+
     def do_set_property(self, property, value):
         """Set properties from GObject properties."""
         if property.name == "node":
@@ -181,7 +181,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         ctx.fill()
 
         self.render_tags(ctx, widget.create_pango_context(), cell_area, box_size)
-    
+
     def render_line(self, ctx, cell_area, box_size, mid, height, start, end, colour, flags):
         if start is None:
             ctx.set_line_cap(cairo.LINE_CAP_ROUND)
@@ -190,7 +190,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             ctx.line_to(x, mid + height / 3)
             ctx.move_to(x, mid + height / 6)
             ctx.line_to(x, mid + height / 6)
-            
+
         elif end is None:
             ctx.set_line_cap(cairo.LINE_CAP_ROUND)
             x = cell_area.x + box_size * start + box_size / 2
@@ -203,9 +203,9 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             ctx.set_line_cap(cairo.LINE_CAP_BUTT)
             startx = cell_area.x + box_size * start + box_size / 2
             endx = cell_area.x + box_size * end + box_size / 2
-            
+
             ctx.move_to(startx, mid - height / 2)
-            
+
             if start - end == 0 :
                 ctx.line_to(endx, mid + height / 2 + 1)
             else:

@@ -26,8 +26,11 @@ import gobject
 from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.diff import DiffWidget
 from bzrlib.plugins.gtk.dialog import question_dialog
-from bzrlib.plugins.loom import branch as loom_branch
-from bzrlib.plugins.loom import tree as loom_tree
+from bzrlib.plugins.loom import (
+    branch as loom_branch,
+    tree as loom_tree,
+    )
+
 
 class LoomDialog(gtk.Dialog):
     """Simple Loom browse dialog."""

@@ -95,7 +95,7 @@ class BugsTab(gtk.VBox):
                 (url, status) = bugline.split(" ")
                 if status == "fixed":
                     self.add_bug(url, status)
-        
+
         if self.num_bugs == 0:
             return
         elif self.num_bugs == 1:

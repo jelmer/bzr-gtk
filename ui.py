@@ -20,14 +20,13 @@
 """
 
 import gtk
-import sys
 
-from bzrlib import progress
 from bzrlib.ui import UIFactory
 
 
 class PromptDialog(gtk.Dialog):
-    """ Prompt the user for a yes/no answer. """
+    """Prompt the user for a yes/no answer."""
+
     def __init__(self, prompt):
         gtk.Dialog.__init__(self)
 

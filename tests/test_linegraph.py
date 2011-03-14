@@ -31,7 +31,7 @@ class TestLinegraph(tests.TestCase):
 
     def test_simple(self):
         lg = linegraph(self.get_graph({"A": ("B", "C"), "B": ()}), ["A"])
-        self.assertEquals(lg,  
+        self.assertEquals(lg,
             ([
                ['A', (0, 0), [(0, 0, 0)], ['B'], [], (2,)],
                ['B', (0, 0), [], (), ['A'], (1,)]
