@@ -18,8 +18,7 @@ import gtk
 
 from bzrlib.plugins.gtk import _i18n
 from bzrlib.config import parse_username
-from bzrlib.plugins.gtk.avatarproviders import AvatarProviderGravatar
-from bzrlib.plugins.gtk.avatardownloaderworker import AvatarDownloaderWorker
+from bzrlib.plugins.gtk.avatarproviders import AvatarProviderGravatar, AvatarDownloaderWorker
 
 
 class Avatar(gtk.Box):
