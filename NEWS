@@ -4,6 +4,8 @@
 
   * Internationalization support has been added. (David Planella, #621680)
 
+  * Show avatars for committers and authors in "bzr viz". (Guillaume Hain)
+
 0.100.0	2011-03-02
 
  BUG FIXES
