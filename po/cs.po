@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: olive\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2011-03-19 07:53+0000\n"
-"Last-Translator: Daniel Milde <info@milde.cz>\n"
+"PO-Revision-Date: 2011-03-20 09:33+0000\n"
+"Last-Translator: Konki <pavel.konkol@seznam.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-20 04:30+0000\n"
+"X-Launchpad-Export-Date: 2011-03-21 04:30+0000\n"
 "X-Generator: Launchpad (build 12559)\n"
 
 #: ../bazaar-properties.desktop.in.h:1
@@ -328,7 +328,7 @@ msgstr "Vyberte prosím soubor ze seznamu."
 
 #: ../conflicts.py:176
 msgid "Call to external utility failed"
-msgstr ""
+msgstr "Volání vnějšího nástroje selhalo"
 
 #: ../conflicts.py:178
 msgid "Cannot resolve conflict"
@@ -362,7 +362,7 @@ msgstr "Všechny změny byly úspěsně uplatněny."
 #. There are conflicts to be resolved.
 #: ../diff.py:496 ../merge.py:150
 msgid "Conflicts encountered"
-msgstr ""
+msgstr "Objeveny konflikty"
 
 #: ../diff.py:497 ../merge.py:151
 msgid "Please resolve the conflicts manually before committing."
@@ -420,17 +420,17 @@ msgstr ""
 
 #: ../errors.py:46
 msgid "Bound branch is out of date"
-msgstr ""
+msgstr "Připojená větev je zastaralá"
 
 #. FIXME: Really ? Internationalizing %s ?? --vila080505
 #: ../errors.py:48
 #, python-format
 msgid "%s"
-msgstr ""
+msgstr "%s"
 
 #: ../errors.py:50
 msgid "File not versioned"
-msgstr ""
+msgstr "Soubor neverzován"
 
 #: ../errors.py:51
 msgid "The selected file is not versioned."
@@ -448,7 +448,7 @@ msgstr ""
 
 #: ../errors.py:56
 msgid "No diff output"
-msgstr ""
+msgstr "Žádný výstup nástroje diff"
 
 #: ../errors.py:57
 msgid "The selected file hasn't changed."
@@ -456,7 +456,7 @@ msgstr "Vybraný soubor se nezměnil."
 
 #: ../errors.py:59
 msgid "No such revision"
-msgstr ""
+msgstr "Neexistující revize"
 
 #: ../errors.py:60
 msgid "The revision you specified doesn't exist."
@@ -527,11 +527,11 @@ msgstr "Vytvořit nový adresář se jménem:"
 
 #: ../initialize.py:86
 msgid "Directory name not specified"
-msgstr ""
+msgstr "Název adresáře nezadán"
 
 #: ../initialize.py:87
 msgid "You should specify a new directory name."
-msgstr ""
+msgstr "Měl byste zadat jméno nového adresáře."
 
 #: ../loom.py:53
 msgid "Upgrade to Loom branch?"
@@ -644,11 +644,11 @@ msgstr "Žádné změny."
 #. Set properties
 #: ../tags.py:66
 msgid "Tags"
-msgstr ""
+msgstr "Popisky"
 
 #: ../tags.py:110
 msgid "Tag Name"
-msgstr ""
+msgstr "Název popisku"
 
 #: ../tags.py:115
 msgid "Revision ID"
@@ -660,41 +660,41 @@ msgstr ""
 
 #: ../tags.py:156
 msgid "No tagged revisions in the branch."
-msgstr ""
+msgstr "Žádné popsané revize ve větvi."
 
 #: ../tags.py:231
 msgid "_Remove tag"
-msgstr ""
+msgstr "Odst_ranit popisek"
 
 #: ../tags.py:241
 msgid "<b><big>Remove tag?</big></b>"
-msgstr ""
+msgstr "<b><big>Odstranit popisek?</big></b>"
 
 #: ../tags.py:243
 #, python-format
 msgid "Are you sure you want to remove the tag: <b>%s</b>?"
-msgstr ""
+msgstr "Jste si jistý, že chcete odstranit popisek: <b>%s</b>?"
 
 #. Create the widgets
 #: ../tags.py:288
 msgid "_Add tag"
-msgstr ""
+msgstr "Přid_at popisek"
 
 #: ../tags.py:290
 msgid "Tag Name:"
-msgstr ""
+msgstr "Název popisku:"
 
 #: ../tags.py:291
 msgid "Revision ID:"
-msgstr ""
+msgstr "ID revize:"
 
 #: ../tags.py:322
 msgid "No tag name specified"
-msgstr ""
+msgstr "Nebyl zadán název popisku"
 
 #: ../tags.py:323
 msgid "You have to specify the tag's desired name."
-msgstr ""
+msgstr "Musíte zadat požadovaný název popisku."
 
 #~ msgid "_Make directory"
 #~ msgstr "_Vytvořit adresář"
