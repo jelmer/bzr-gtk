@@ -6,6 +6,12 @@
 
   * Show avatars for committers and authors in "bzr viz". (Guillaume Hain)
 
+  * gannotate now supports interactive substring search in the file content.
+    interactive search for line numbers has been removed, use Ctrl-G instead.
+
+  * visualise now supports interactive changeset comment search.
+    interactive search for revision numbers continues to work.
+
 0.100.0	2011-03-02
 
  BUG FIXES
