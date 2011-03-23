@@ -318,9 +318,12 @@ class GAnnotateWindow(Window):
         col.add_attribute(cell, "text", TEXT_LINE_COL)
         tv.append_column(col)
 
-        # FIXME: Now that C-f is now used for search by text we
-        # may as well disable the auto search.
-        tv.set_search_column(LINE_NUM_COL)
+        # interactive substring search
+        def search_equal_func(model, column, key, iter):
+            return model.get_value(iter, TEXT_LINE_COL).lower().find(key.lower()) == -1
+
+        tv.set_enable_search(True)
+        tv.set_search_equal_func(search_equal_func)
 
         return tv
 

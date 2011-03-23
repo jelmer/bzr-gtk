@@ -334,7 +334,18 @@ class TreeView(gtk.VBox):
         self.treeview = gtk.TreeView()
 
         self.treeview.set_rules_hint(True)
-        self.treeview.set_search_column(treemodel.REVNO)
+        # combined revno/summary interactive search
+        #
+        # the row in a treemodel is considered "matched" if a REVNO *starts*
+        # from the key (that is the key is found in a REVNO at the offset 0)
+        # or if a MESSAGE *contains* the key anywhere (that is, the key is
+        # found case insensitively in a MESSAGE at any offset)
+        def search_equal_func(model, column, key, iter):
+            return (model.get_value(iter, treemodel.REVNO).find(key) != 0
+                and model.get_value(iter, treemodel.MESSAGE).lower().find(key.lower()) == -1)
+
+        self.treeview.set_search_equal_func(search_equal_func)
+        self.treeview.set_enable_search(True)
 
         # Fix old PyGTK bug - by JAM
         set_tooltip = getattr(self.treeview, 'set_tooltip_column', None)
