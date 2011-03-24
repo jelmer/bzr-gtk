@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: bzr-gtk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2011-03-09 09:42+0000\n"
+"PO-Revision-Date: 2011-03-23 10:15+0000\n"
 "Last-Translator: Rachid <Unknown>\n"
 "Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-10 04:40+0000\n"
-"X-Generator: Launchpad (build 12351)\n"
+"X-Launchpad-Export-Date: 2011-03-24 04:43+0000\n"
+"X-Generator: Launchpad (build 12559)\n"
 
 #: ../bazaar-properties.desktop.in.h:1
 msgid "Bazaar Preferences"
@@ -23,11 +23,11 @@ msgstr "Bazaar voorkeuren"
 
 #: ../bazaar-properties.desktop.in.h:2
 msgid "Configure Bazaar settings"
-msgstr ""
+msgstr "Bazaar instellingen aanpassen"
 
 #: ../bzr-handle-patch.desktop.in.h:1
 msgid "Apply Bazaar Bundle"
-msgstr ""
+msgstr "Bazaar bundel toepassen"
 
 #: ../bzr-handle-patch.desktop.in.h:2
 msgid "Bazaar"
@@ -35,11 +35,11 @@ msgstr "Bazaar"
 
 #: ../bzr-notify.desktop.in.h:1
 msgid "Bazaar Notification"
-msgstr ""
+msgstr "Bazaar mededeling"
 
 #: ../bzr-notify.desktop.in.h:2
 msgid "Notification Area Icon for Bazaar"
-msgstr ""
+msgstr "Pictogram voor mededelingengebied voor bazaar"
 
 #. Create the widgets
 #: ../branch.py:52
@@ -94,7 +94,7 @@ msgstr "Ophalen"
 
 #: ../checkout.py:57
 msgid "Branch nick:"
-msgstr ""
+msgstr "Branch naam:"
 
 #: ../checkout.py:62
 msgid "_Lightweight checkout"
@@ -144,7 +144,7 @@ msgstr ""
 
 #: ../commit.py:280
 msgid "<b>Commit Message</b>"
-msgstr ""
+msgstr "<b>Bericht bij doorvoeren</b>"
 
 #: ../commit.py:333
 msgid "_Only commit locally"
@@ -156,23 +156,23 @@ msgstr "Vastleggen"
 
 #: ../commit.py:390
 msgid "Files"
-msgstr ""
+msgstr "Bestanden"
 
 #: ../commit.py:395
 msgid "Commit all changes"
-msgstr ""
+msgstr "Alle  veranderingen doorvoeren"
 
 #: ../commit.py:401
 msgid "Only commit selected changes"
-msgstr ""
+msgstr "Alleen geselecteerde veranderingen doorvoeren"
 
 #: ../commit.py:407
 msgid "Commit all changes*"
-msgstr ""
+msgstr "Alle veranderingen doorvoeren*"
 
 #: ../commit.py:440
 msgid "Commit*"
-msgstr ""
+msgstr "Doorvoeren*"
 
 #: ../commit.py:442
 msgid "Commit"
@@ -189,10 +189,12 @@ msgstr "Type"
 #: ../commit.py:481
 msgid "<i>* Cannot select specific files when merging</i>"
 msgstr ""
+"<i>* Kan geen specifieke bestanden selecteren wanneer er wordt "
+"samengevoegd</i>"
 
 #: ../commit.py:485
 msgid "Pending Revisions"
-msgstr ""
+msgstr "Revisies in behandeling"
 
 #: ../commit.py:507
 msgid "Date"
@@ -221,11 +223,11 @@ msgstr ""
 
 #: ../commit.py:552
 msgid "Global Commit Message"
-msgstr ""
+msgstr "Globaal bericht bij doorvoeren"
 
 #: ../commit.py:554
 msgid "<b>Global Commit Message</b>"
-msgstr ""
+msgstr "<b>Globaal bericht bij doorvoeren</b>"
 
 #: ../commit.py:581
 msgid "Diff for "
@@ -233,15 +235,15 @@ msgstr ""
 
 #: ../commit.py:634
 msgid "Commit message for "
-msgstr ""
+msgstr "Bericht bij doorvoeren voor "
 
 #: ../commit.py:689
 msgid "Commit cancelled"
-msgstr ""
+msgstr "Doorvoeren geannuleerd"
 
 #: ../commit.py:690
 msgid "Do you want to save your commit messages ?"
-msgstr ""
+msgstr "Wilt u het bericht bij doorvoeren bewaren?"
 
 #: ../commit.py:708
 msgid "Commit with an empty message?"
@@ -269,6 +271,7 @@ msgstr "Vastleggen zonder wijzigingen?"
 msgid ""
 "There are no changes in the working tree. Do you want to commit anyway?"
 msgstr ""
+"Er zijn geen veranderingen in de boom waarin u werkt. Wilt u toch doorvoeren?"
 
 #: ../conflicts.py:50
 msgid "External utility:"
@@ -332,7 +335,7 @@ msgstr "Gelieve een bestand uit de lijst te selecteren."
 
 #: ../conflicts.py:176
 msgid "Call to external utility failed"
-msgstr ""
+msgstr "Aanroepen van extern hulpmiddel mislukt."
 
 #: ../conflicts.py:178
 msgid "Cannot resolve conflict"
@@ -355,7 +358,7 @@ msgstr "_Beeld"
 
 #: ../diff.py:447
 msgid "Wrap _Long Lines"
-msgstr ""
+msgstr "_Lange regels afbreken"
 
 #. No conflicts found.
 #: ../diff.py:492 ../merge.py:146
@@ -407,11 +410,11 @@ msgstr ""
 
 #: ../errors.py:37
 msgid "No changes to merge"
-msgstr ""
+msgstr "Geen veranderingen om samen te voegen"
 
 #: ../errors.py:38
 msgid "Merge location is already fully merged in working tree."
-msgstr ""
+msgstr "De gekozen locatie is al samengevoegd met de boom waarin u werkt"
 
 #: ../errors.py:40
 msgid "Conflicts in tree"
@@ -563,15 +566,15 @@ msgstr ""
 
 #: ../merge.py:54
 msgid "Merge from"
-msgstr ""
+msgstr "Samenvoegen van"
 
 #: ../merge.py:56
 msgid "Folder"
-msgstr ""
+msgstr "Map"
 
 #: ../merge.py:56
 msgid "Custom Location"
-msgstr ""
+msgstr "Aangepaste locatie"
 
 #: ../merge.py:59
 msgid "_Merge"
@@ -632,11 +635,11 @@ msgstr "_Selecteren"
 
 #: ../search.py:44
 msgid "Search for:"
-msgstr ""
+msgstr "Zoek naar:"
 
 #: ../search.py:56
 msgid "Document"
-msgstr ""
+msgstr "Document"
 
 #: ../status.py:94
 msgid "Added"
@@ -1099,6 +1102,7 @@ msgstr "U moet de gewenste labelnaam opgeven."
 #~ msgid "translator-credits"
 #~ msgstr ""
 #~ "Launchpad Contributions:\n"
+#~ "  Ewout De cat https://launchpad.net/~lotrfanaat\n"
 #~ "  Lieven van der Heide https://launchpad.net/~lievenvanderheide\n"
 #~ "  Rachid https://launchpad.net/~rachidbm\n"
 #~ "  Roel Huybrechts https://launchpad.net/~rulus\n"
