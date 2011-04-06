@@ -16,7 +16,7 @@
 
 import sys
 
-class AnnotateColorMap:
+class AnnotateColorMap(object):
 
     really_old_color = "#0046FF"
 
@@ -89,7 +89,7 @@ class AnnotateColorSaturation(AnnotateColorMap):
 
     def saturate_v(self, saturation, hv):
         return int(255 - (saturation/3*(1-hv)))
-    
+
     def committer_angle(self, committer):
         return float(abs(hash(committer))) / sys.maxint * 360.0
 

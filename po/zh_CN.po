@@ -1,0 +1,709 @@
+# Simplified Chinese translation for bzr-gtk
+# Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
+# This file is distributed under the same license as the bzr-gtk package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: bzr-gtk\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2011-03-06 02:19+0100\n"
+"PO-Revision-Date: 2010-03-17 09:03+0000\n"
+"Last-Translator: Eleanor Chen <chenyueg@gmail.com>\n"
+"Language-Team: Simplified Chinese <zh_CN@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2011-03-08 04:41+0000\n"
+"X-Generator: Launchpad (build 12351)\n"
+
+#: ../bazaar-properties.desktop.in.h:1
+msgid "Bazaar Preferences"
+msgstr ""
+
+#: ../bazaar-properties.desktop.in.h:2
+msgid "Configure Bazaar settings"
+msgstr ""
+
+#: ../bzr-handle-patch.desktop.in.h:1
+msgid "Apply Bazaar Bundle"
+msgstr ""
+
+#: ../bzr-handle-patch.desktop.in.h:2
+msgid "Bazaar"
+msgstr ""
+
+#: ../bzr-notify.desktop.in.h:1
+msgid "Bazaar Notification"
+msgstr ""
+
+#: ../bzr-notify.desktop.in.h:2
+msgid "Notification Area Icon for Bazaar"
+msgstr ""
+
+#. Create the widgets
+#: ../branch.py:52
+msgid "_Branch"
+msgstr "分支(_B)"
+
+#: ../branch.py:55 ../checkout.py:55
+msgid "Branch location:"
+msgstr "分支位置："
+
+#: ../branch.py:57 ../checkout.py:56
+msgid "Destination:"
+msgstr "目标："
+
+#: ../branch.py:58
+msgid "Branck nick:"
+msgstr ""
+
+#: ../branch.py:59 ../checkout.py:58
+msgid "Revision:"
+msgstr "修订版本:"
+
+#: ../branch.py:60 ../checkout.py:53
+msgid "Please select a folder"
+msgstr "请选择一个文件夹"
+
+#: ../branch.py:140 ../checkout.py:159
+msgid "Missing branch location"
+msgstr "缺少分支地址"
+
+#: ../branch.py:141 ../checkout.py:160
+msgid "You must specify a branch location."
+msgstr "你必须指定一个分支地址"
+
+#: ../branch.py:182
+msgid "Branching successful"
+msgstr "创建分支成功"
+
+#: ../branch.py:183
+#, python-format
+msgid "%d revision(s) branched."
+msgstr ""
+
+#: ../branch.py:191 ../checkout.py:191
+msgid "N/A"
+msgstr "N/A"
+
+#. Create the widgets
+#: ../checkout.py:50
+msgid "Check_out"
+msgstr "签出(_O)"
+
+#: ../checkout.py:57
+msgid "Branch nick:"
+msgstr ""
+
+#: ../checkout.py:62
+msgid "_Lightweight checkout"
+msgstr "轻量级签出(_L)"
+
+#: ../commands.py:307
+msgid "Directory does not have a working tree"
+msgstr ""
+
+#: ../commands.py:308
+msgid "Operation aborted."
+msgstr "操作中止。"
+
+#: ../commands.py:412
+msgid "There are local changes in the branch"
+msgstr ""
+
+#: ../commands.py:413
+msgid "Please commit or revert the changes before merging."
+msgstr ""
+
+#: ../commit.py:182
+msgid "added"
+msgstr "已添加"
+
+#: ../commit.py:183
+msgid "removed"
+msgstr "已移除"
+
+#: ../commit.py:184
+msgid "renamed"
+msgstr "已重命名"
+
+#: ../commit.py:185
+msgid "renamed and modified"
+msgstr "已重命名并且已修改"
+
+#: ../commit.py:186
+msgid "modified"
+msgstr "已修改"
+
+#: ../commit.py:187
+msgid "kind changed"
+msgstr ""
+
+#: ../commit.py:280
+msgid "<b>Commit Message</b>"
+msgstr ""
+
+#: ../commit.py:333
+msgid "_Only commit locally"
+msgstr ""
+
+#: ../commit.py:364
+msgid "Comm_it"
+msgstr "提交(_I)"
+
+#: ../commit.py:390
+msgid "Files"
+msgstr ""
+
+#: ../commit.py:395
+msgid "Commit all changes"
+msgstr ""
+
+#: ../commit.py:401
+msgid "Only commit selected changes"
+msgstr ""
+
+#: ../commit.py:407
+msgid "Commit all changes*"
+msgstr ""
+
+#: ../commit.py:440
+msgid "Commit*"
+msgstr ""
+
+#: ../commit.py:442
+msgid "Commit"
+msgstr "提交"
+
+#: ../commit.py:446 ../conflicts.py:111
+msgid "Path"
+msgstr "路径"
+
+#: ../commit.py:448 ../conflicts.py:113
+msgid "Type"
+msgstr "类型"
+
+#: ../commit.py:481
+msgid "<i>* Cannot select specific files when merging</i>"
+msgstr ""
+
+#: ../commit.py:485
+msgid "Pending Revisions"
+msgstr ""
+
+#: ../commit.py:507
+msgid "Date"
+msgstr "日期"
+
+#: ../commit.py:509
+msgid "Committer"
+msgstr "提交者"
+
+#: ../commit.py:511 ../search.py:59
+msgid "Summary"
+msgstr "概要"
+
+#. TODO: jam 2007-10-30 The diff label is currently disabled. If we
+#. decide that we really don't ever want to display it, we should
+#. actually remove it, and other references to it, along with the
+#. tests that it is set properly.
+#: ../commit.py:521
+msgid "Diff for whole tree"
+msgstr ""
+
+#. Whole tree
+#: ../commit.py:545 ../commit.py:628
+msgid "File commit message"
+msgstr ""
+
+#: ../commit.py:552
+msgid "Global Commit Message"
+msgstr ""
+
+#: ../commit.py:554
+msgid "<b>Global Commit Message</b>"
+msgstr ""
+
+#: ../commit.py:581
+msgid "Diff for "
+msgstr ""
+
+#: ../commit.py:634
+msgid "Commit message for "
+msgstr ""
+
+#: ../commit.py:689
+msgid "Commit cancelled"
+msgstr ""
+
+#: ../commit.py:690
+msgid "Do you want to save your commit messages ?"
+msgstr ""
+
+#: ../commit.py:708
+msgid "Commit with an empty message?"
+msgstr ""
+
+#: ../commit.py:709
+msgid "You can describe your commit intent in the message."
+msgstr ""
+
+#: ../commit.py:729
+msgid "Commit with unknowns?"
+msgstr ""
+
+#: ../commit.py:730
+msgid "Unknown files exist in the working tree. Commit anyway?"
+msgstr ""
+
+#: ../commit.py:750
+msgid "Commit with no changes?"
+msgstr "没有更改仍然要提交吗？"
+
+#: ../commit.py:751
+msgid ""
+"There are no changes in the working tree. Do you want to commit anyway?"
+msgstr ""
+
+#: ../conflicts.py:50
+msgid "External utility:"
+msgstr ""
+
+#: ../conflicts.py:101
+msgid "Conflicts"
+msgstr "冲突"
+
+#: ../conflicts.py:104
+msgid "No conflicts in working tree."
+msgstr "工作树中没有冲突。"
+
+#: ../conflicts.py:118
+msgid "path conflict"
+msgstr "路径冲突"
+
+#: ../conflicts.py:120
+msgid "contents conflict"
+msgstr "内容冲突"
+
+#: ../conflicts.py:122
+msgid "text conflict"
+msgstr "文本冲突"
+
+#: ../conflicts.py:124
+msgid "duplicate id"
+msgstr ""
+
+#: ../conflicts.py:126
+msgid "duplicate"
+msgstr "复制"
+
+#: ../conflicts.py:128
+msgid "parent loop"
+msgstr ""
+
+#: ../conflicts.py:130
+msgid "unversioned parent"
+msgstr ""
+
+#: ../conflicts.py:132
+msgid "missing parent"
+msgstr ""
+
+#: ../conflicts.py:134
+msgid "deleting parent"
+msgstr ""
+
+#: ../conflicts.py:136
+msgid "unknown type of conflict"
+msgstr ""
+
+#: ../conflicts.py:165
+msgid "No file was selected"
+msgstr ""
+
+#: ../conflicts.py:166
+msgid "Please select a file from the list."
+msgstr ""
+
+#: ../conflicts.py:176
+msgid "Call to external utility failed"
+msgstr ""
+
+#: ../conflicts.py:178
+msgid "Cannot resolve conflict"
+msgstr ""
+
+#: ../conflicts.py:179
+msgid ""
+"Only conflicts on the text of files can be resolved with Olive at the "
+"moment. Content conflicts, on the structure of the tree, need to be resolved "
+"using the command line."
+msgstr ""
+
+#. View menu
+#: ../diff.py:445
+msgid "_View"
+msgstr ""
+
+#: ../diff.py:447
+msgid "Wrap _Long Lines"
+msgstr ""
+
+#. No conflicts found.
+#: ../diff.py:492 ../merge.py:146
+msgid "Merge successful"
+msgstr ""
+
+#: ../diff.py:493 ../merge.py:147
+msgid "All changes applied successfully."
+msgstr ""
+
+#. There are conflicts to be resolved.
+#: ../diff.py:496 ../merge.py:150
+msgid "Conflicts encountered"
+msgstr ""
+
+#: ../diff.py:497 ../merge.py:151
+msgid "Please resolve the conflicts manually before committing."
+msgstr ""
+
+#: ../errors.py:28
+msgid "Directory is not a branch"
+msgstr ""
+
+#: ../errors.py:29
+msgid "You can perform this action only in a branch."
+msgstr ""
+
+#: ../errors.py:31
+msgid "Directory is not a checkout"
+msgstr ""
+
+#: ../errors.py:32
+msgid "You can perform local commit only on checkouts."
+msgstr ""
+
+#: ../errors.py:34
+msgid "No changes to commit"
+msgstr ""
+
+#: ../errors.py:35
+msgid "Try force commit if you want to commit anyway."
+msgstr ""
+
+#: ../errors.py:37
+msgid "No changes to merge"
+msgstr ""
+
+#: ../errors.py:38
+msgid "Merge location is already fully merged in working tree."
+msgstr ""
+
+#: ../errors.py:40
+msgid "Conflicts in tree"
+msgstr ""
+
+#: ../errors.py:41
+msgid "You need to resolve the conflicts before committing."
+msgstr ""
+
+#: ../errors.py:43
+msgid "Strict commit failed"
+msgstr ""
+
+#: ../errors.py:44
+msgid ""
+"There are unknown files in the working tree.\n"
+"Please add or delete them."
+msgstr ""
+
+#: ../errors.py:46
+msgid "Bound branch is out of date"
+msgstr ""
+
+#. FIXME: Really ? Internationalizing %s ?? --vila080505
+#: ../errors.py:48
+#, python-format
+msgid "%s"
+msgstr ""
+
+#: ../errors.py:50
+msgid "File not versioned"
+msgstr ""
+
+#: ../errors.py:51
+msgid "The selected file is not versioned."
+msgstr ""
+
+#: ../errors.py:53 ../push.py:99
+msgid "Branches have been diverged"
+msgstr ""
+
+#: ../errors.py:54
+msgid ""
+"You cannot push if branches have diverged. Use the\n"
+"overwrite option if you want to push anyway."
+msgstr ""
+
+#: ../errors.py:56
+msgid "No diff output"
+msgstr ""
+
+#: ../errors.py:57
+msgid "The selected file hasn't changed."
+msgstr ""
+
+#: ../errors.py:59
+msgid "No such revision"
+msgstr ""
+
+#: ../errors.py:60
+msgid "The revision you specified doesn't exist."
+msgstr ""
+
+#: ../errors.py:62
+msgid "Target already exists"
+msgstr ""
+
+#: ../errors.py:63
+msgid "Target directory already exists. Please select another target."
+msgstr ""
+
+#: ../errors.py:65
+msgid "Directory is already a branch"
+msgstr ""
+
+#: ../errors.py:66
+#, python-format
+msgid ""
+"The current directory (%s) is already a branch.\n"
+"You can start using it, or initialize another directory."
+msgstr ""
+
+#: ../errors.py:68
+msgid "Branch without a working tree"
+msgstr ""
+
+#: ../errors.py:69
+#, python-format
+msgid ""
+"The current directory (%s)\n"
+"is a branch without a working tree."
+msgstr ""
+
+#: ../errors.py:71
+msgid "Unknown bzr error"
+msgstr ""
+
+#: ../errors.py:73
+msgid "Permission denied"
+msgstr ""
+
+#: ../errors.py:73
+msgid "permission denied."
+msgstr ""
+
+#: ../errors.py:75
+msgid "Unknown error"
+msgstr ""
+
+#. Create the widgets
+#: ../initialize.py:48
+msgid "_Initialize"
+msgstr ""
+
+#: ../initialize.py:49
+msgid "Which directory do you want to initialize?"
+msgstr ""
+
+#: ../initialize.py:50
+msgid "Current directory"
+msgstr ""
+
+#: ../initialize.py:51
+msgid "Create a new directory with the name:"
+msgstr ""
+
+#: ../initialize.py:86
+msgid "Directory name not specified"
+msgstr ""
+
+#: ../initialize.py:87
+msgid "You should specify a new directory name."
+msgstr ""
+
+#: ../loom.py:53
+msgid "Upgrade to Loom branch?"
+msgstr ""
+
+#: ../loom.py:54
+msgid "Branch is not a loom branch. Upgrade to Loom format?"
+msgstr ""
+
+#: ../merge.py:54
+msgid "Merge from"
+msgstr ""
+
+#: ../merge.py:56
+msgid "Folder"
+msgstr ""
+
+#: ../merge.py:56
+msgid "Custom Location"
+msgstr ""
+
+#: ../merge.py:59
+msgid "_Merge"
+msgstr ""
+
+#: ../merge.py:132
+msgid "Branch not given"
+msgstr ""
+
+#: ../merge.py:133
+msgid "Please specify a branch to merge from."
+msgstr ""
+
+#: ../merge.py:141
+msgid "Bazaar command error"
+msgstr ""
+
+#. Create the widgets
+#: ../push.py:51
+msgid "Location:"
+msgstr ""
+
+#: ../push.py:53
+msgid "_Push"
+msgstr ""
+
+#: ../push.py:100
+msgid ""
+"You cannot push if branches have diverged.\n"
+"Overwrite?"
+msgstr ""
+
+#: ../push.py:108
+msgid "Push successful"
+msgstr ""
+
+#: ../push.py:109
+#, python-format
+msgid "%d revision(s) pushed."
+msgstr ""
+
+#: ../push.py:142
+msgid "Non existing parent directory"
+msgstr ""
+
+#: ../push.py:143
+#, python-format
+msgid ""
+"The parent directory (%s)\n"
+"doesn't exist. Create?"
+msgstr ""
+
+#. Create the widgets
+#: ../revbrowser.py:45
+msgid "_Select"
+msgstr ""
+
+#: ../search.py:44
+msgid "Search for:"
+msgstr ""
+
+#: ../search.py:56
+msgid "Document"
+msgstr ""
+
+#: ../status.py:94
+msgid "Added"
+msgstr ""
+
+#: ../status.py:100
+msgid "Removed"
+msgstr ""
+
+#: ../status.py:106
+msgid "Renamed"
+msgstr ""
+
+#: ../status.py:113
+msgid "Modified"
+msgstr ""
+
+#: ../status.py:121
+msgid "Unknown"
+msgstr ""
+
+#: ../status.py:126
+msgid "No changes."
+msgstr ""
+
+#. Set properties
+#: ../tags.py:66
+msgid "Tags"
+msgstr ""
+
+#: ../tags.py:110
+msgid "Tag Name"
+msgstr ""
+
+#: ../tags.py:115
+msgid "Revision ID"
+msgstr ""
+
+#: ../tags.py:150
+msgid "Tags are not supported by this branch format. Please upgrade."
+msgstr ""
+
+#: ../tags.py:156
+msgid "No tagged revisions in the branch."
+msgstr ""
+
+#: ../tags.py:231
+msgid "_Remove tag"
+msgstr ""
+
+#: ../tags.py:241
+msgid "<b><big>Remove tag?</big></b>"
+msgstr ""
+
+#: ../tags.py:243
+#, python-format
+msgid "Are you sure you want to remove the tag: <b>%s</b>?"
+msgstr ""
+
+#. Create the widgets
+#: ../tags.py:288
+msgid "_Add tag"
+msgstr ""
+
+#: ../tags.py:290
+msgid "Tag Name:"
+msgstr ""
+
+#: ../tags.py:291
+msgid "Revision ID:"
+msgstr ""
+
+#: ../tags.py:322
+msgid "No tag name specified"
+msgstr ""
+
+#: ../tags.py:323
+msgid "You have to specify the tag's desired name."
+msgstr ""
+
+#~ msgid "translator-credits"
+#~ msgstr ""
+#~ "Launchpad Contributions:\n"
+#~ "  Aron Xu https://launchpad.net/~happyaron\n"
+#~ "  Chen Tao https://launchpad.net/~pro711"
+
+#~ msgid "File(s) to commit"
+#~ msgstr "准备提交的文件"
+
+#~ msgid "Commit message:"
+#~ msgstr "提交说明："

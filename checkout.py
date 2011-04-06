@@ -25,27 +25,28 @@ except:
 import gtk
 
 from bzrlib.plugins.gtk import _i18n
-from errors import show_bzr_error
 
 from bzrlib.branch import Branch
 from bzrlib.config import GlobalConfig
 
-from dialog import error_dialog
+from bzrlib.plugins.gtk.dialog import error_dialog
+from bzrlib.plugins.gtk.errors import show_bzr_error
+from bzrlib.plugins.gtk.history import UrlHistory
 
-from history import UrlHistory
 
 class CheckoutDialog(gtk.Dialog):
     """ New implementation of the Checkout dialog. """
+
     def __init__(self, path=None, parent=None, remote_path=None):
         """ Initialize the Checkout dialog. """
         gtk.Dialog.__init__(self, title="Checkout - Olive",
                                   parent=parent,
                                   flags=0,
                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
-        
+
         # Get arguments
         self.path = path
-        
+
         # Create the widgets
         self._button_checkout = gtk.Button(_i18n("Check_out"), use_underline=True)
         self._button_revision = gtk.Button('')
@@ -61,12 +62,12 @@ class CheckoutDialog(gtk.Dialog):
         self._entry_nick = gtk.Entry()
         self._check_lightweight = gtk.CheckButton(_i18n("_Lightweight checkout"),
                                                   use_underline=True)
-        
+
         # Set callbacks
         self._button_checkout.connect('clicked', self._on_checkout_clicked)
         self._button_revision.connect('clicked', self._on_revision_clicked)
         self._combo.child.connect('focus-out-event', self._on_combo_changed)
-        
+
         # Create the table and pack the widgets into it
         self._table = gtk.Table(rows=3, columns=2)
         self._table.attach(self._label_location, 0, 1, 0, 1)
@@ -78,7 +79,7 @@ class CheckoutDialog(gtk.Dialog):
         self._table.attach(self._entry_nick, 1, 2, 2, 3)
         self._table.attach(self._hbox_revision, 1, 2, 3, 4)
         self._table.attach(self._check_lightweight, 1, 2, 4, 5)
-        
+
         # Set properties
         self._image_browse.set_from_stock(gtk.STOCK_OPEN, gtk.ICON_SIZE_BUTTON)
         self._button_revision.set_image(self._image_browse)
@@ -95,30 +96,30 @@ class CheckoutDialog(gtk.Dialog):
             self._filechooser.set_filename(self.path)
         if remote_path is not None:
             self._combo.child.set_text(remote_path)
-        
+
         # Pack some widgets
         self._hbox_revision.pack_start(self._entry_revision, True, True)
         self._hbox_revision.pack_start(self._button_revision, False, False)
         self.vbox.add(self._table)
         self.action_area.pack_end(self._button_checkout)
-        
+
         # Show the dialog
         self.vbox.show_all()
-        
+
         # Build checkout history
         self._history = UrlHistory(GlobalConfig(), 'branch_history')
         self._build_history()
-    
+
     def _build_history(self):
         """ Build up the checkout history. """
         self._combo_model = gtk.ListStore(str)
-        
+
         for item in self._history.get_entries():
             self._combo_model.append([ item ])
-        
+
         self._combo.set_model(self._combo_model)
         self._combo.set_text_column(0)
-    
+
     def _get_last_revno(self):
         """ Get the revno of the last revision (if any). """
         location = self._combo.get_child().get_text()
@@ -128,13 +129,13 @@ class CheckoutDialog(gtk.Dialog):
             return None
         else:
             return br.revno()
-    
+
     def _on_revision_clicked(self, button):
         """ Browse for revision button clicked handler. """
         from revbrowser import RevisionBrowser
-        
+
         location = self._combo.get_child().get_text()
-        
+
         try:
             br = Branch.open(location)
         except:
@@ -144,13 +145,13 @@ class CheckoutDialog(gtk.Dialog):
             response = revb.run()
             if response != gtk.RESPONSE_NONE:
                 revb.hide()
-        
+
                 if response == gtk.RESPONSE_OK:
                     if revb.selected_revno is not None:
                         self._entry_revision.set_text(revb.selected_revno)
-            
+
                 revb.destroy()
-    
+
     @show_bzr_error
     def _on_checkout_clicked(self, button):
         """ Checkout button clicked handler. """
@@ -159,31 +160,31 @@ class CheckoutDialog(gtk.Dialog):
             error_dialog(_i18n('Missing branch location'),
                          _i18n('You must specify a branch location.'))
             return
-        
+
         destination = self._filechooser.get_filename()
         try:
             revno = int(self._entry_revision.get_text())
         except:
             revno = None
-        
+
         nick = self._entry_nick.get_text()
         if nick is '':
             nick = os.path.basename(location.rstrip("/\\"))
-        
+
         br_from = Branch.open(location)
-        
+
         revision_id = br_from.get_rev_id(revno)
         lightweight = self._check_lightweight.get_active()
         to_location = destination + os.sep + nick
-        
+
         os.mkdir(to_location)
-        
+
         br_from.create_checkout(to_location, revision_id, lightweight)
-        
+
         self._history.add_entry(location)
-        
+
         self.response(gtk.RESPONSE_OK)
-    
+
     def _on_combo_changed(self, widget, event):
         """ We try to get the last revision if focus lost. """
         rev = self._get_last_revno()

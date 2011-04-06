@@ -1,0 +1,1282 @@
+# Romanian translation for bzr-gtk
+# Copyright (c) 2008 Rosetta Contributors and Canonical Ltd 2008
+# This file is distributed under the same license as the bzr-gtk package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2008.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: bzr-gtk\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2011-03-06 02:19+0100\n"
+"PO-Revision-Date: 2009-11-18 06:12+0000\n"
+"Last-Translator: Adi Roiban <adi@roiban.ro>\n"
+"Language-Team: Romanian <ro@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2011-03-08 04:41+0000\n"
+"X-Generator: Launchpad (build 12351)\n"
+
+#: ../bazaar-properties.desktop.in.h:1
+msgid "Bazaar Preferences"
+msgstr ""
+
+#: ../bazaar-properties.desktop.in.h:2
+msgid "Configure Bazaar settings"
+msgstr ""
+
+#: ../bzr-handle-patch.desktop.in.h:1
+msgid "Apply Bazaar Bundle"
+msgstr ""
+
+#: ../bzr-handle-patch.desktop.in.h:2
+msgid "Bazaar"
+msgstr ""
+
+#: ../bzr-notify.desktop.in.h:1
+msgid "Bazaar Notification"
+msgstr ""
+
+#: ../bzr-notify.desktop.in.h:2
+msgid "Notification Area Icon for Bazaar"
+msgstr ""
+
+#. Create the widgets
+#: ../branch.py:52
+msgid "_Branch"
+msgstr "_Branch"
+
+#: ../branch.py:55 ../checkout.py:55
+msgid "Branch location:"
+msgstr "Locaţie branch:"
+
+#: ../branch.py:57 ../checkout.py:56
+msgid "Destination:"
+msgstr "Destinaţie:"
+
+#: ../branch.py:58
+msgid "Branck nick:"
+msgstr "Nume branch:"
+
+#: ../branch.py:59 ../checkout.py:58
+msgid "Revision:"
+msgstr "Revizie:"
+
+#: ../branch.py:60 ../checkout.py:53
+msgid "Please select a folder"
+msgstr "Vă rog să selectaţi un folder"
+
+#: ../branch.py:140 ../checkout.py:159
+msgid "Missing branch location"
+msgstr "Lipseşte locaţia branch-ului"
+
+#: ../branch.py:141 ../checkout.py:160
+msgid "You must specify a branch location."
+msgstr "Trebuie să specificaţi o locaţie pentru branch."
+
+#: ../branch.py:182
+msgid "Branching successful"
+msgstr "Branch-ul a fost creat"
+
+#: ../branch.py:183
+#, python-format
+msgid "%d revision(s) branched."
+msgstr "%d revizii au fost copiate."
+
+#: ../branch.py:191 ../checkout.py:191
+msgid "N/A"
+msgstr "indisp."
+
+#. Create the widgets
+#: ../checkout.py:50
+msgid "Check_out"
+msgstr "Check_out"
+
+#: ../checkout.py:57
+msgid "Branch nick:"
+msgstr ""
+
+#: ../checkout.py:62
+msgid "_Lightweight checkout"
+msgstr "Checkout _lightweight"
+
+#: ../commands.py:307
+msgid "Directory does not have a working tree"
+msgstr "Directorul nu are working tree"
+
+#: ../commands.py:308
+msgid "Operation aborted."
+msgstr "Operaţie anulată."
+
+#: ../commands.py:412
+msgid "There are local changes in the branch"
+msgstr "Există modificări locale în branch"
+
+#: ../commands.py:413
+msgid "Please commit or revert the changes before merging."
+msgstr "Vă rog să executaţi un commit sau un revert înainte de merge."
+
+#: ../commit.py:182
+msgid "added"
+msgstr "adăugate"
+
+#: ../commit.py:183
+msgid "removed"
+msgstr "şterse"
+
+#: ../commit.py:184
+msgid "renamed"
+msgstr "redenumite"
+
+#: ../commit.py:185
+msgid "renamed and modified"
+msgstr "redenumite şi modificate"
+
+#: ../commit.py:186
+msgid "modified"
+msgstr "modificate"
+
+#: ../commit.py:187
+msgid "kind changed"
+msgstr ""
+
+#: ../commit.py:280
+msgid "<b>Commit Message</b>"
+msgstr ""
+
+#: ../commit.py:333
+msgid "_Only commit locally"
+msgstr "Execută c_ommit doar local"
+
+#: ../commit.py:364
+msgid "Comm_it"
+msgstr "Comm_it"
+
+#: ../commit.py:390
+msgid "Files"
+msgstr ""
+
+#: ../commit.py:395
+msgid "Commit all changes"
+msgstr ""
+
+#: ../commit.py:401
+msgid "Only commit selected changes"
+msgstr ""
+
+#: ../commit.py:407
+msgid "Commit all changes*"
+msgstr ""
+
+#: ../commit.py:440
+msgid "Commit*"
+msgstr ""
+
+#: ../commit.py:442
+msgid "Commit"
+msgstr "Commit"
+
+#: ../commit.py:446 ../conflicts.py:111
+msgid "Path"
+msgstr "Cale"
+
+#: ../commit.py:448 ../conflicts.py:113
+msgid "Type"
+msgstr "Tip"
+
+#: ../commit.py:481
+msgid "<i>* Cannot select specific files when merging</i>"
+msgstr ""
+
+#: ../commit.py:485
+msgid "Pending Revisions"
+msgstr ""
+
+#: ../commit.py:507
+msgid "Date"
+msgstr "Data"
+
+#: ../commit.py:509
+msgid "Committer"
+msgstr "Autor commit"
+
+#: ../commit.py:511 ../search.py:59
+msgid "Summary"
+msgstr "Rezumat"
+
+#. TODO: jam 2007-10-30 The diff label is currently disabled. If we
+#. decide that we really don't ever want to display it, we should
+#. actually remove it, and other references to it, along with the
+#. tests that it is set properly.
+#: ../commit.py:521
+msgid "Diff for whole tree"
+msgstr ""
+
+#. Whole tree
+#: ../commit.py:545 ../commit.py:628
+msgid "File commit message"
+msgstr ""
+
+#: ../commit.py:552
+msgid "Global Commit Message"
+msgstr ""
+
+#: ../commit.py:554
+msgid "<b>Global Commit Message</b>"
+msgstr ""
+
+#: ../commit.py:581
+msgid "Diff for "
+msgstr ""
+
+#: ../commit.py:634
+msgid "Commit message for "
+msgstr ""
+
+#: ../commit.py:689
+msgid "Commit cancelled"
+msgstr ""
+
+#: ../commit.py:690
+msgid "Do you want to save your commit messages ?"
+msgstr ""
+
+#: ../commit.py:708
+msgid "Commit with an empty message?"
+msgstr "Execut commit fără mesaj?"
+
+#: ../commit.py:709
+msgid "You can describe your commit intent in the message."
+msgstr "Puteţi descrie conţinutul commit-ului în mesaj"
+
+#: ../commit.py:729
+msgid "Commit with unknowns?"
+msgstr "Execut commit cu fişiere necunoscute?"
+
+#: ../commit.py:730
+msgid "Unknown files exist in the working tree. Commit anyway?"
+msgstr ""
+"Există fişiere necunoscute în working tree. Doriţi să continuaţi commit-ul?"
+
+#: ../commit.py:750
+msgid "Commit with no changes?"
+msgstr "Execut commit fără nicio schimbare?"
+
+#: ../commit.py:751
+msgid ""
+"There are no changes in the working tree. Do you want to commit anyway?"
+msgstr ""
+
+#: ../conflicts.py:50
+msgid "External utility:"
+msgstr "Utilitar extern:"
+
+#: ../conflicts.py:101
+msgid "Conflicts"
+msgstr "Conflicte"
+
+#: ../conflicts.py:104
+msgid "No conflicts in working tree."
+msgstr "Nu există conflicte în working tree"
+
+#: ../conflicts.py:118
+msgid "path conflict"
+msgstr "conflict cale"
+
+#: ../conflicts.py:120
+msgid "contents conflict"
+msgstr "conflict conţinut"
+
+#: ../conflicts.py:122
+msgid "text conflict"
+msgstr "conflict text"
+
+#: ../conflicts.py:124
+msgid "duplicate id"
+msgstr "id duplicat"
+
+#: ../conflicts.py:126
+msgid "duplicate"
+msgstr "duplicat"
+
+#: ../conflicts.py:128
+msgid "parent loop"
+msgstr "bucla părinte"
+
+#: ../conflicts.py:130
+msgid "unversioned parent"
+msgstr "părinte necunoscut"
+
+#: ../conflicts.py:132
+msgid "missing parent"
+msgstr "părinte lipsă"
+
+#: ../conflicts.py:134
+msgid "deleting parent"
+msgstr "şterg părinte"
+
+#: ../conflicts.py:136
+msgid "unknown type of conflict"
+msgstr "conflict de tip necunoscut"
+
+#: ../conflicts.py:165
+msgid "No file was selected"
+msgstr "Nu a fost selectat niciun fisier"
+
+#: ../conflicts.py:166
+msgid "Please select a file from the list."
+msgstr "Vă rog selectaţi un fişier din listă"
+
+#: ../conflicts.py:176
+msgid "Call to external utility failed"
+msgstr "Apelarea utilitarului extern a eşuat"
+
+#: ../conflicts.py:178
+msgid "Cannot resolve conflict"
+msgstr "Nu pot rezolva conflict"
+
+#: ../conflicts.py:179
+msgid ""
+"Only conflicts on the text of files can be resolved with Olive at the "
+"moment. Content conflicts, on the structure of the tree, need to be resolved "
+"using the command line."
+msgstr ""
+"Doar conflictele din fişierele text pot fi rezolvate cu Olive deocamdată. "
+"Conflictele de conţinut, de structură de directoare trebuie rezolvate "
+"folosind linia de comandă."
+
+#. View menu
+#: ../diff.py:445
+msgid "_View"
+msgstr "_Vizualizează"
+
+#: ../diff.py:447
+msgid "Wrap _Long Lines"
+msgstr ""
+
+#. No conflicts found.
+#: ../diff.py:492 ../merge.py:146
+msgid "Merge successful"
+msgstr "Merge încheiat cu succes"
+
+#: ../diff.py:493 ../merge.py:147
+msgid "All changes applied successfully."
+msgstr "Toate modificările efectuate cu succes."
+
+#. There are conflicts to be resolved.
+#: ../diff.py:496 ../merge.py:150
+msgid "Conflicts encountered"
+msgstr "Există conflicte"
+
+#: ../diff.py:497 ../merge.py:151
+msgid "Please resolve the conflicts manually before committing."
+msgstr "Vă rog rezolvaţi conflictele manual înainte de commit."
+
+#: ../errors.py:28
+msgid "Directory is not a branch"
+msgstr "Directorul nu este un branch"
+
+#: ../errors.py:29
+msgid "You can perform this action only in a branch."
+msgstr "Puteţi efectua această operaţie doar pe un branch."
+
+#: ../errors.py:31
+msgid "Directory is not a checkout"
+msgstr "Directorul nu este un checkout"
+
+#: ../errors.py:32
+msgid "You can perform local commit only on checkouts."
+msgstr "Puteţi efectua commit-uri locale doar în checkout-uri"
+
+#: ../errors.py:34
+msgid "No changes to commit"
+msgstr "Nicio schimbare pentru commit"
+
+#: ../errors.py:35
+msgid "Try force commit if you want to commit anyway."
+msgstr "Încercaţi să forţaţi commit-ul dacă doriţi să continuaţi oricum."
+
+#: ../errors.py:37
+msgid "No changes to merge"
+msgstr ""
+
+#: ../errors.py:38
+msgid "Merge location is already fully merged in working tree."
+msgstr ""
+
+#: ../errors.py:40
+msgid "Conflicts in tree"
+msgstr "Conflicte în structura de directoare"
+
+#: ../errors.py:41
+msgid "You need to resolve the conflicts before committing."
+msgstr "Trebuie să rezolvaţi conflictele înainte de commit."
+
+#: ../errors.py:43
+msgid "Strict commit failed"
+msgstr "Commit-ul strict a eşuat"
+
+#: ../errors.py:44
+msgid ""
+"There are unknown files in the working tree.\n"
+"Please add or delete them."
+msgstr ""
+"Există fişiere necunoscute în working tree.\n"
+"Vă rog să le adăugaţi sau să le ştergeţi."
+
+#: ../errors.py:46
+msgid "Bound branch is out of date"
+msgstr "Branch-ul legat este desincronizat"
+
+#. FIXME: Really ? Internationalizing %s ?? --vila080505
+#: ../errors.py:48
+#, python-format
+msgid "%s"
+msgstr "%s"
+
+#: ../errors.py:50
+msgid "File not versioned"
+msgstr "Fişier necunoscut"
+
+#: ../errors.py:51
+msgid "The selected file is not versioned."
+msgstr "Fişierul selectat nu este cunoscut"
+
+#: ../errors.py:53 ../push.py:99
+msgid "Branches have been diverged"
+msgstr "Branch-urile sunt desincronizate"
+
+#: ../errors.py:54
+msgid ""
+"You cannot push if branches have diverged. Use the\n"
+"overwrite option if you want to push anyway."
+msgstr ""
+"Nu puteţi executa push dacă branch-urile sunt desincronizate.\n"
+"Folosiţi opţiunea de suprascriere dacă doriţi să continuaţi."
+
+#: ../errors.py:56
+msgid "No diff output"
+msgstr "Nu există diferenţe"
+
+#: ../errors.py:57
+msgid "The selected file hasn't changed."
+msgstr "Fişierul selectat nu a fost modificat."
+
+#: ../errors.py:59
+msgid "No such revision"
+msgstr "Revizie inexistentă"
+
+#: ../errors.py:60
+msgid "The revision you specified doesn't exist."
+msgstr "Revizia pe care aţi specificat-o nu există."
+
+#: ../errors.py:62
+msgid "Target already exists"
+msgstr "Destinaţia există deja"
+
+#: ../errors.py:63
+msgid "Target directory already exists. Please select another target."
+msgstr ""
+"Directorul destinaţie există deja. Vă rog să selectaţi altă destinaţie."
+
+#: ../errors.py:65
+msgid "Directory is already a branch"
+msgstr "Directorul este deja un branch"
+
+#: ../errors.py:66
+#, python-format
+msgid ""
+"The current directory (%s) is already a branch.\n"
+"You can start using it, or initialize another directory."
+msgstr ""
+"Directorul curent (%s) este deja un branch.\n"
+"Puteţi să-l folosiţi sau să iniţializaţi un alt director."
+
+#: ../errors.py:68
+msgid "Branch without a working tree"
+msgstr "Branch fără ramură curentă de lucru"
+
+#: ../errors.py:69
+#, python-format
+msgid ""
+"The current directory (%s)\n"
+"is a branch without a working tree."
+msgstr ""
+"Directorul curent (%s)\n"
+"este un branch fără working tree"
+
+#: ../errors.py:71
+msgid "Unknown bzr error"
+msgstr "Eroare bzr necunoscută"
+
+#: ../errors.py:73
+msgid "Permission denied"
+msgstr "Acces interzis"
+
+#: ../errors.py:73
+msgid "permission denied."
+msgstr "acces interzis."
+
+#: ../errors.py:75
+msgid "Unknown error"
+msgstr "Eroare necunoscută"
+
+#. Create the widgets
+#: ../initialize.py:48
+msgid "_Initialize"
+msgstr "_Iniţializează"
+
+#: ../initialize.py:49
+msgid "Which directory do you want to initialize?"
+msgstr "Alegeţi directorul de iniţializat"
+
+#: ../initialize.py:50
+msgid "Current directory"
+msgstr "Directorul curent"
+
+#: ../initialize.py:51
+msgid "Create a new directory with the name:"
+msgstr "Creează un director nou cu numele:"
+
+#: ../initialize.py:86
+msgid "Directory name not specified"
+msgstr "Numele directorului nu a fost completat"
+
+#: ../initialize.py:87
+msgid "You should specify a new directory name."
+msgstr "Ar trebui să specificaţi un nume de director."
+
+#: ../loom.py:53
+msgid "Upgrade to Loom branch?"
+msgstr ""
+
+#: ../loom.py:54
+msgid "Branch is not a loom branch. Upgrade to Loom format?"
+msgstr ""
+
+#: ../merge.py:54
+msgid "Merge from"
+msgstr ""
+
+#: ../merge.py:56
+msgid "Folder"
+msgstr ""
+
+#: ../merge.py:56
+msgid "Custom Location"
+msgstr ""
+
+#: ../merge.py:59
+msgid "_Merge"
+msgstr "_Merge"
+
+#: ../merge.py:132
+msgid "Branch not given"
+msgstr "Branch necompletat"
+
+#: ../merge.py:133
+msgid "Please specify a branch to merge from."
+msgstr "Vă rog specificaţi un branch sursă"
+
+#: ../merge.py:141
+msgid "Bazaar command error"
+msgstr "Eroare comandă Bazaar"
+
+#. Create the widgets
+#: ../push.py:51
+msgid "Location:"
+msgstr "Locaţie:"
+
+#: ../push.py:53
+msgid "_Push"
+msgstr "_Push"
+
+#: ../push.py:100
+msgid ""
+"You cannot push if branches have diverged.\n"
+"Overwrite?"
+msgstr ""
+"Nu puteţi executa push dacă branch-urile sunt desincronizate.\n"
+"Suprascriu?"
+
+#: ../push.py:108
+msgid "Push successful"
+msgstr "Push încheiat cu succes"
+
+#: ../push.py:109
+#, python-format
+msgid "%d revision(s) pushed."
+msgstr "%d revizii copiate."
+
+#: ../push.py:142
+msgid "Non existing parent directory"
+msgstr "Directorul părinte nu există"
+
+#: ../push.py:143
+#, python-format
+msgid ""
+"The parent directory (%s)\n"
+"doesn't exist. Create?"
+msgstr ""
+"Directorul părinte (%s)\n"
+"nu există. Îl creez?"
+
+#. Create the widgets
+#: ../revbrowser.py:45
+msgid "_Select"
+msgstr "_Selectează"
+
+#: ../search.py:44
+msgid "Search for:"
+msgstr ""
+
+#: ../search.py:56
+msgid "Document"
+msgstr ""
+
+#: ../status.py:94
+msgid "Added"
+msgstr "Adăugat"
+
+#: ../status.py:100
+msgid "Removed"
+msgstr "Şters"
+
+#: ../status.py:106
+msgid "Renamed"
+msgstr "Redenumit"
+
+#: ../status.py:113
+msgid "Modified"
+msgstr "Modificat"
+
+#: ../status.py:121
+msgid "Unknown"
+msgstr "Necunoscut"
+
+#: ../status.py:126
+msgid "No changes."
+msgstr "Neschimbat."
+
+#. Set properties
+#: ../tags.py:66
+msgid "Tags"
+msgstr "Tag-uri"
+
+#: ../tags.py:110
+msgid "Tag Name"
+msgstr "Nume tag"
+
+#: ../tags.py:115
+msgid "Revision ID"
+msgstr "ID revizie"
+
+#: ../tags.py:150
+msgid "Tags are not supported by this branch format. Please upgrade."
+msgstr "Acest format de branch nu suportă tag-uri. Vă rog să-l actualizaţi."
+
+#: ../tags.py:156
+msgid "No tagged revisions in the branch."
+msgstr "Nu există revizi cu tag-uri în branch."
+
+#: ../tags.py:231
+msgid "_Remove tag"
+msgstr "Şte_rge tag"
+
+#: ../tags.py:241
+msgid "<b><big>Remove tag?</big></b>"
+msgstr "<b><big>Şterg tag?</big></b>"
+
+#: ../tags.py:243
+#, python-format
+msgid "Are you sure you want to remove the tag: <b>%s</b>?"
+msgstr "Sigur doriţi să ştergeţi tag-ul <b>%s</b>?"
+
+#. Create the widgets
+#: ../tags.py:288
+msgid "_Add tag"
+msgstr "Adaugă tag"
+
+#: ../tags.py:290
+msgid "Tag Name:"
+msgstr "Nume tag:"
+
+#: ../tags.py:291
+msgid "Revision ID:"
+msgstr "ID revizie:"
+
+#: ../tags.py:322
+msgid "No tag name specified"
+msgstr "Nume tag necompletat"
+
+#: ../tags.py:323
+msgid "You have to specify the tag's desired name."
+msgstr "Trebuie să specificaţi numele dorit pentru tag."
+
+#~ msgid "File(s) to commit"
+#~ msgstr "Fişier(e) pentru commit"
+
+#~ msgid "Commit message:"
+#~ msgstr "Mesaj commit:"
+
+#~ msgid "Pending merges"
+#~ msgstr "Merge-uri în aşteptare"
+
+#~ msgid "There are no changes in the working tree."
+#~ msgstr "Nu s-a schimbat nimic în working tree."
+
+#~ msgid "Revno"
+#~ msgstr "Nr. revizie"
+
+#~ msgid "Set default push location"
+#~ msgstr "Locaţia implicită pentru push"
+
+#, python-format
+#~ msgid ""
+#~ "There is no default push location set.\n"
+#~ "Set %r as default now?"
+#~ msgstr ""
+#~ "Nu e configurată o locaţie implicită pentru push.\n"
+#~ "Salvez %r ca locaţie implicită acum?"
+
+#~ msgid "Please wait, revisions are being loaded..."
+#~ msgstr "Vă rog aşteptaţi, încarc reviziile..."
+
+#~ msgid "Time"
+#~ msgstr "Ora"
+
+#~ msgid "Pull successful"
+#~ msgstr "Pull executat cu succes"
+
+#~ msgid "There are missing revisions"
+#~ msgstr "Există revizii lipsă"
+
+#~ msgid "There are no missing revisions."
+#~ msgstr "Nu există revizii lipsă"
+
+#~ msgid "Parent location is unknown"
+#~ msgstr "Locaţia părintelui necunoscută"
+
+#~ msgid "Cannot determine missing revisions if no parent location is known."
+#~ msgstr "Nu pot calcula reviziile lipsă dacă locaţia părintelui e necunoscută"
+
+#~ msgid "Local branch up to date"
+#~ msgstr "Branch local la zi"
+
+#, python-format
+#~ msgid "%d revision(s) missing."
+#~ msgstr "%d revizii lipsă."
+
+#~ msgid "Pulling is not possible until there is a parent location."
+#~ msgstr "Nu puteţi executa pull fără a avea locaţia branch-ului părinte"
+
+#, python-format
+#~ msgid "%d revision(s) pulled."
+#~ msgstr "%d revizii copiate"
+
+#~ msgid "unchanged"
+#~ msgstr "nemodificat"
+
+#~ msgid "Bookmark"
+#~ msgstr "Favorit"
+
+#~ msgid "Bookmarks"
+#~ msgstr "Favorite"
+
+#~ msgid "Revert successful"
+#~ msgstr "Revert executat cu succes"
+
+#~ msgid "All files reverted to last revision."
+#~ msgstr "Toate filele restaurate conform ultimei revizii."
+
+#~ msgid "ignored"
+#~ msgstr "ignorat"
+
+#~ msgid "unknown"
+#~ msgstr "necunoscut"
+
+#~ msgid "Please have a look at the working tree before continuing."
+#~ msgstr "Vă rog verificaţi working tree-ul înainte de a continua."
+
+#~ msgid "Conflicts detected"
+#~ msgstr "Am detectat conflicte"
+
+#~ msgid "Last modified"
+#~ msgstr "Ultima modificare"
+
+#~ msgid "Glade file cannot be found."
+#~ msgstr "Fişier Glade lipsă."
+
+#~ msgid "UI description file cannot be found."
+#~ msgstr "Fişierul care descrie interfaţa su utilizatorul nu poate fi găsit."
+
+#~ msgid "Status"
+#~ msgstr "Stare"
+
+#~ msgid "Filename"
+#~ msgstr "Nume fișier"
+
+#~ msgid "Title:"
+#~ msgstr "Titlu:"
+
+#~ msgid "Please specify a title to continue."
+#~ msgstr "Vă rog specificaţi un titlu pentru a continua."
+
+#~ msgid "No title given"
+#~ msgstr "Titlu necompletat"
+
+#~ msgid ""
+#~ "Please select a file from the list,\n"
+#~ "or choose the other option."
+#~ msgstr ""
+#~ "Vă rog selectaţi un fişier din listă,\n"
+#~ "sau alegeţi cealaltă opţiune."
+
+#~ msgid "Size"
+#~ msgstr "Mărime"
+
+#~ msgid "Open the selected file"
+#~ msgstr "Deschide fişierul selectat"
+
+#~ msgid "Add the selected file"
+#~ msgstr "Adaugă fişierul selectat"
+
+#~ msgid "Add"
+#~ msgstr "Adaugă"
+
+#~ msgid "Rename the selected file"
+#~ msgstr "Redenumeşte fişierul selectat"
+
+#~ msgid "Remove and delete"
+#~ msgstr "Elimină şi şterge"
+
+#~ msgid "Remove the selected file/dir and delete from disk"
+#~ msgstr "Elimină fişierul/directorul selectat şi şterge-l de pe disc"
+
+#~ msgid "Rename"
+#~ msgstr "Redenumește"
+
+#~ msgid "Open"
+#~ msgstr "Deschide"
+
+#~ msgid "Remove"
+#~ msgstr "Elimină"
+
+#~ msgid "Remove the selected file"
+#~ msgstr "Şterge fişierul selectat"
+
+#~ msgid "Revert"
+#~ msgstr "Revert"
+
+#~ msgid "Revert the changes"
+#~ msgstr "Anulează modificări"
+
+#~ msgid "Annotate"
+#~ msgstr "Adnotează"
+
+#~ msgid "Annotate the selected file"
+#~ msgstr "Adnotează fişierul selectat"
+
+#~ msgid "Diff"
+#~ msgstr "Diff"
+
+#~ msgid "Bookmark current location"
+#~ msgstr "Adaugă locaţia curentă la favorite"
+
+#~ msgid "Edit"
+#~ msgstr "Editează"
+
+#~ msgid "Edit the selected bookmark"
+#~ msgstr "Editează locaţia favorită selectată"
+
+#~ msgid "Commit the changes"
+#~ msgstr "Salvează modificări"
+
+#~ msgid "Show the diff of the file"
+#~ msgstr "Afişează diff pentru fişier"
+
+#~ msgid "View the contents of the file in a builtin viewer"
+#~ msgstr "Afişează conţinutul fişierului în viewer-ul inclus"
+
+#~ msgid "Show the differences of all files"
+#~ msgstr "Arată modificările pentru toate fişierele"
+
+#~ msgid "All..."
+#~ msgstr "Toate..."
+
+#~ msgid "Open Folder"
+#~ msgstr "Deschide folder"
+
+#~ msgid "Show differences"
+#~ msgstr "Afişează diferenţe"
+
+#~ msgid "Selected..."
+#~ msgstr "Selectat..."
+
+#~ msgid "Show the differences of the selected file"
+#~ msgstr "Afişează modificările fişierului selectat"
+
+#~ msgid "View contents"
+#~ msgstr "Afişează conţinut"
+
+#~ msgid "Remove the selected bookmark"
+#~ msgstr "Şterge favoritul selectat"
+
+#~ msgid "Revert to this revision"
+#~ msgstr "Restaurează la această revizie"
+
+#~ msgid ""
+#~ "The current directory was bookmarked. You can reach\n"
+#~ "it by selecting it from the left panel."
+#~ msgstr ""
+#~ "Directorul curent a fost adăugat la favorite. Îl puteţi accesa\n"
+#~ "selectându-l de pe panoul din stânga"
+
+#~ msgid "Bookmark successfully added"
+#~ msgstr "Locaţie favorită adăugată cu succes"
+
+#~ msgid ""
+#~ "The current directory is already bookmarked.\n"
+#~ "See the left panel for reference."
+#~ msgstr ""
+#~ "Directorul curent este deja prezent în favorite.\n"
+#~ "Verificaţi panoul din stânga."
+
+#~ msgid "Location already bookmarked"
+#~ msgstr "Locaţie deja prezentă în favorite"
+
+#~ msgid "Please specify a desired name for the new directory."
+#~ msgstr "Vă rog specificaţi un nume pentru noul director"
+
+#~ msgid "No directory name given"
+#~ msgstr "Nume director necompletat"
+
+#~ msgid "Revert the selected file to the selected revision"
+#~ msgstr "Restaurează fişierul selectat conform reviziei selectate"
+
+#~ msgid "Delete directory with all directories below ?"
+#~ msgstr "Şterg directorul şi toate directoarele din el?"
+
+#~ msgid "Show the differences between two revisions of the file"
+#~ msgstr "Afişează diferenţele dintre două revizii ale fişierului"
+
+#~ msgid "All files with status 'added'"
+#~ msgstr "Toate fişierele cu starea 'adăugat'"
+
+#~ msgid "No added files were found in the working tree."
+#~ msgstr "Nu am găsit fişiere proaspăt adăugate în working tree."
+
+#~ msgid "No matching files"
+#~ msgstr "Nu am găsit fişierele"
+
+#~ msgid "Not the same branch"
+#~ msgstr "Nu e în acelaşi branch"
+
+#~ msgid "Please select a file from the list to proceed."
+#~ msgstr "Vă rog selectaţi un fişier din listă pentru continuare."
+
+#~ msgid "Directory already exists"
+#~ msgstr "Directorul există deja"
+
+#~ msgid "Please specify another name to continue."
+#~ msgstr "Vă rog specificaţi alt nume pentru continuare."
+
+#~ msgid "Selected only"
+#~ msgstr "Doar cele selectate"
+
+#~ msgid "The destination is not in the same branch."
+#~ msgstr "Destinaţia nu este în acelaşi branch."
+
+#~ msgid "Which file(s) do you want to remove?"
+#~ msgstr "Ce fişier(e) doriţi să ştergeţi?"
+
+#~ msgid "_Rename..."
+#~ msgstr "_Redenumeşte..."
+
+#~ msgid "_Move..."
+#~ msgstr "_Mută..."
+
+#~ msgid "Please specify a new name for the file."
+#~ msgstr "Vă rog specificaţi un nume nou pentru fişier."
+
+#~ msgid "Filename not given"
+#~ msgstr "Nume fişier necompletat"
+
+#~ msgid "Olive - Bazaar GUI"
+#~ msgstr "Olive - GUI pentru Bazaar"
+
+#~ msgid "_Remove"
+#~ msgstr "Ște_rge"
+
+#~ msgid "Make _directory..."
+#~ msgstr "Creează _director..."
+
+#~ msgid "Remove file(s)..."
+#~ msgstr "Şterge fişier(e)..."
+
+#~ msgid "_Add file(s)..."
+#~ msgstr "_Adaugă fişier(e)..."
+
+#~ msgid "_File"
+#~ msgstr "_Fişier"
+
+#~ msgid "_Refresh"
+#~ msgstr "_Reîncarcă"
+
+#~ msgid "Show _hidden files"
+#~ msgstr "Afişează fişierele asc_unse"
+
+#~ msgid "C_heckout..."
+#~ msgstr "C_heckout..."
+
+#~ msgid "Pu_ll"
+#~ msgstr "Pu_ll"
+
+#~ msgid "_Initialize..."
+#~ msgstr "_Iniţializează..."
+
+#~ msgid "_Annotate..."
+#~ msgstr "_Adnotează"
+
+#~ msgid "_Revert all changes"
+#~ msgstr "Elimină toate modificările (revert)"
+
+#~ msgid "Pu_sh..."
+#~ msgstr "Pu_sh..."
+
+#~ msgid "_Differences..."
+#~ msgstr "_Diferenţe..."
+
+#~ msgid "_Merge..."
+#~ msgstr "_Merge..."
+
+#~ msgid "Missing _revisions"
+#~ msgstr "_Revizii lipsă"
+
+#~ msgid "Ta_gs..."
+#~ msgstr "Ta_g-uri..."
+
+#~ msgid "Con_flicts..."
+#~ msgstr "Con_flicte..."
+
+#~ msgid "_Commit..."
+#~ msgstr "_Commit..."
+
+#~ msgid "_Log..."
+#~ msgstr "_Log..."
+
+#~ msgid "_Statistics"
+#~ msgstr "_Statistici"
+
+#~ msgid "S_tatus..."
+#~ msgstr "S_tare..."
+
+#~ msgid "_Information..."
+#~ msgstr "_Informaţii..."
+
+#~ msgid "H_istory Mode"
+#~ msgstr "Mod _istorie"
+
+#~ msgid "gtk-jump-to"
+#~ msgstr "gtk-jump-to"
+
+#~ msgid "https://launchpad.net/products/olive"
+#~ msgstr "https://launchpad.net/products/olive"
+
+#~ msgid "Copyright (C) 2006 Szilveszter Farkas (Phanatic)"
+#~ msgstr "Copyright (C) 2006 Szilveszter Farkas (Phanatic)"
+
+#~ msgid "Which file(s) do you want to add?"
+#~ msgstr "Ce fişier(e) doriţi să adăugaţi?"
+
+#~ msgid "_Help"
+#~ msgstr "Ajutor"
+
+#~ msgid "_Add"
+#~ msgstr "_Adaugă"
+
+#~ msgid "Olive - Add file(s)"
+#~ msgstr "Olive - Adaugă fişier(e)"
+
+#~ msgid "All unknowns recursively"
+#~ msgstr "Toate fişerele necunoscute, recursiv"
+
+#~ msgid "Olive - Make directory"
+#~ msgstr "Olive - Creează director"
+
+#~ msgid "_Versioned directory"
+#~ msgstr "Director c_unoscut"
+
+#~ msgid "Olive - Move"
+#~ msgstr "Olive - Mută"
+
+#~ msgid "Move to"
+#~ msgstr "Mută în"
+
+#~ msgid "Rename to"
+#~ msgstr "Redenumeşte în"
+
+#~ msgid "Olive - Rename"
+#~ msgstr "Olive - Redenumeşte"
+
+#~ msgid "_Move"
+#~ msgstr "_Mută"
+
+#~ msgid "Select a directory"
+#~ msgstr "Selectaţi un director"
+
+#~ msgid "_Make directory"
+#~ msgstr "_Creează director"
+
+#~ msgid "Olive - Remove file(s)"
+#~ msgstr "Olive - Elimină fişier(e)"
+
+#~ msgid "Checkout root: "
+#~ msgstr "Rădăcină checkout: "
+
+#~ msgid "(none)"
+#~ msgstr "(nimic)"
+
+#~ msgid "Repository checkout: "
+#~ msgstr "Checkout repository: "
+
+#~ msgid "Branch root: "
+#~ msgstr "Rădăcină branch: "
+
+#~ msgid "Olive - Information"
+#~ msgstr "Olive - Informaţii"
+
+#~ msgid "Checkout of branch: "
+#~ msgstr "Checkout al branch-ului: "
+
+#~ msgid "Repository branch: "
+#~ msgstr "Branch repository: "
+
+#~ msgid "Light checkout root: "
+#~ msgstr "Rădăcină checkout lightweight: "
+
+#~ msgid "_Rename"
+#~ msgstr "_Redenumește"
+
+#~ msgid "Shared repository: "
+#~ msgstr "Repository partajat: "
+
+#~ msgid "Publish to branch: "
+#~ msgstr "Publică în branch-ul: "
+
+#~ msgid "Parent branch: "
+#~ msgstr "Branch părinte: "
+
+#~ msgid "Control format: "
+#~ msgstr "Format control: "
+
+#~ msgid "Working tree format: "
+#~ msgstr "Format working tree: "
+
+#~ msgid "<b>Format:</b>"
+#~ msgstr "<b>Format:</b>"
+
+#~ msgid "<b>Related branches:</b>"
+#~ msgstr "<b>Branch-uri înrudite:</b>"
+
+#~ msgid "<b>Location:</b>"
+#~ msgstr "<b>Locație:</b>"
+
+#~ msgid "Repository lock status: "
+#~ msgstr "Stare lock repository: "
+
+#~ msgid "Repository format: "
+#~ msgstr "Format repository: "
+
+#~ msgid "Branch format: "
+#~ msgstr "Format branch: "
+
+#~ msgid "Renamed files: "
+#~ msgstr "Fişiere redenumite: "
+
+#~ msgid "Unknown files: "
+#~ msgstr "Fişiere necunoscute: "
+
+#~ msgid "Ignored files: "
+#~ msgstr "Fişiere ignorate: "
+
+#~ msgid "<b>Missing revisions:</b>"
+#~ msgstr "<b>Revizii lipsă:</b>"
+
+#~ msgid "<b>Lock status:</b>"
+#~ msgstr "<b>Stare lock:</b>"
+
+#~ msgid "Branch lock status: "
+#~ msgstr "Stare lock branch: "
+
+#~ msgid "Missing revisions in working tree: "
+#~ msgstr "Revizii lipsă în working tree: "
+
+#~ msgid "Working tree lock status: "
+#~ msgstr "Stare lock working tree: "
+
+#~ msgid "Missing revisions in branch: "
+#~ msgstr "Revizii lipsă în branch: "
+
+#~ msgid "Revisions in branch: "
+#~ msgstr "Revizii în branch: "
+
+#~ msgid "Unchanged files: "
+#~ msgstr "Fişiere nemodificate: "
+
+#~ msgid "Modified files: "
+#~ msgstr "Fişiere modificate: "
+
+#~ msgid "Added files: "
+#~ msgstr "Fişiere adăugate: "
+
+#~ msgid "Removed files: "
+#~ msgstr "Fişiere eliminate: "
+
+#~ msgid "<b>In the working tree:</b>"
+#~ msgstr "<b>În working tree:</b>"
+
+#~ msgid "Time of last revision: "
+#~ msgstr "Data ultimei revizii: "
+
+#~ msgid "Time of first revision: "
+#~ msgstr "Data primei revizii: "
+
+#~ msgid "Age of branch in days: "
+#~ msgstr "Vârsta branch-ului în zile: "
+
+#~ msgid "Number of commiters: "
+#~ msgstr "Număr autori: "
+
+#~ msgid "Merge - Olive"
+#~ msgstr "Merge - Olive"
+
+#~ msgid "<b>Branch history:</b>"
+#~ msgstr "<b>Istorie branch:</b>"
+
+#~ msgid "<b>Revision store:</b>"
+#~ msgstr "<b>Stocare revizii:</b>"
+
+#~ msgid "Size of repository: "
+#~ msgstr "Dimensiune repository: "
+
+#~ msgid "Revisions in repository: "
+#~ msgstr "Revizii în repository: "
+
+#~ msgid "Merge from:"
+#~ msgstr "Sursa merge:"
+
+#~ msgid "Open bookmark folder in Nautilus"
+#~ msgstr "Deschide director favorite în Nautilus"
+
+#~ msgid "_Get..."
+#~ msgstr "Creează _branch local"
+
+#~ msgid "Versioned subdirectories: "
+#~ msgstr "Subdosare versionate: "
+
+#~ msgid "translator-credits"
+#~ msgstr ""
+#~ "Launchpad Contributions:\n"
+#~ "  Adi Roiban https://launchpad.net/~adiroiban\n"
+#~ "  Sabin Iacob https://launchpad.net/~iacobs"

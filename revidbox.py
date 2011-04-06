@@ -24,6 +24,7 @@ except:
 import gtk
 
 class RevisionSelectionBox(gtk.HBox):
+
     def __init__(self, branch):
         super(RevisionSelectionBox, self).__init__()
         self._branch = branch
@@ -32,25 +33,25 @@ class RevisionSelectionBox(gtk.HBox):
         self._button_revid.set_image(gtk.image_new_from_stock(
             gtk.STOCK_OPEN, gtk.ICON_SIZE_BUTTON))
         self.pack_start(self._entry_revid, True, True)
-        self.pack_start(self._button_revid, False, False) 
+        self.pack_start(self._button_revid, False, False)
 
         self._button_revid.connect('clicked', self._on_revid_clicked)
 
     def _on_revid_clicked(self, widget):
         """ Browse for revision button clicked handler. """
         from revbrowser import RevisionBrowser
-        
+
         # FIXME: Should specific parent window here - how to get to it?
         # JRV 20070715
         revb = RevisionBrowser(self._branch)
         response = revb.run()
         if response != gtk.RESPONSE_NONE:
             revb.hide()
-        
+
             if response == gtk.RESPONSE_OK:
                 if revb.selected_revno is not None:
                     self._entry_revid.set_text(revb.selected_revid)
-            
+
             revb.destroy()
 
     def get_revision_id(self):

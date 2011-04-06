@@ -20,11 +20,15 @@ try:
 except:
     pass
 
-import bzrlib
 import gtk
 import os
 
-from bzrlib.plugins.gtk import data_path, icon_path
+import bzrlib
+
+from bzrlib.plugins.gtk import (
+    data_path,
+    icon_path,
+    )
 
 
 def read_license():

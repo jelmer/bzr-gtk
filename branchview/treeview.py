@@ -9,15 +9,15 @@ __author__    = "Daniel Schierbeck <daniel.schierbeck@gmail.com>"
 import gtk
 import gobject
 import pango
-import treemodel
-from bzrlib import ui
 
-from bzrlib.plugins.gtk.ui import ProgressPanel
-from linegraph import linegraph, same_branch
-from graphcell import CellRendererGraph
-from treemodel import TreeModel
+from bzrlib import ui
 from bzrlib.revision import NULL_REVISION
+
 from bzrlib.plugins.gtk import lock
+from bzrlib.plugins.gtk.ui import ProgressPanel
+from bzrlib.plugins.gtk.branchview import treemodel
+from bzrlib.plugins.gtk.branchview.linegraph import linegraph, same_branch
+from bzrlib.plugins.gtk.branchview.graphcell import CellRendererGraph
 
 
 class TreeView(gtk.VBox):
@@ -232,7 +232,7 @@ class TreeView(gtk.VBox):
             lock.acquire(self.branch, lock.READ)
 
             self.emit('tag-added', tag, revid)
-        
+
     def refresh(self):
         gobject.idle_add(self.populate, self.get_revision())
 
@@ -298,7 +298,7 @@ class TreeView(gtk.VBox):
                 broken_line_length = 32
             else:
                 broken_line_length = None
-            
+
             show_graph = self.graph_column.get_visible()
 
             self.branch.lock_read()
@@ -310,7 +310,7 @@ class TreeView(gtk.VBox):
                                                             self.mainline_only,
                                                             self.progress_bar)
 
-            self.model = TreeModel(self.branch, linegraphdata)
+            self.model = treemodel.TreeModel(self.branch, linegraphdata)
             self.graph_cell.columns_len = columns_len
             width = self.graph_cell.get_size(self.treeview)[2]
             if width > 500:
@@ -334,8 +334,19 @@ class TreeView(gtk.VBox):
         self.treeview = gtk.TreeView()
 
         self.treeview.set_rules_hint(True)
-        self.treeview.set_search_column(treemodel.REVNO)
-        
+        # combined revno/summary interactive search
+        #
+        # the row in a treemodel is considered "matched" if a REVNO *starts*
+        # from the key (that is the key is found in a REVNO at the offset 0)
+        # or if a MESSAGE *contains* the key anywhere (that is, the key is
+        # found case insensitively in a MESSAGE at any offset)
+        def search_equal_func(model, column, key, iter):
+            return (model.get_value(iter, treemodel.REVNO).find(key) != 0
+                and model.get_value(iter, treemodel.MESSAGE).lower().find(key.lower()) == -1)
+
+        self.treeview.set_search_equal_func(search_equal_func)
+        self.treeview.set_enable_search(True)
+
         # Fix old PyGTK bug - by JAM
         set_tooltip = getattr(self.treeview, 'set_tooltip_column', None)
         if set_tooltip is not None:
@@ -411,9 +422,9 @@ class TreeView(gtk.VBox):
         self.date_column.pack_start(cell, expand=True)
         self.date_column.add_attribute(cell, "text", treemodel.TIMESTAMP)
         self.treeview.append_column(self.date_column)
-        
+
         return self.treeview
-    
+
     def _on_selection_changed(self, treeview):
         """callback for when the treeview changes."""
         (path, focus) = treeview.get_cursor()

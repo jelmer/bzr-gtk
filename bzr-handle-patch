@@ -2,7 +2,8 @@
 
 from bzrlib import errors, merge_directive
 from bzrlib.plugin import load_plugins
-from bzrlib.plugins.gtk import open_display
+from bzrlib.plugins.gtk.commands import open_display
+
 load_plugins()
 
 import sys

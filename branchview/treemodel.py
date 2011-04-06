@@ -9,13 +9,15 @@ __author__    = "Gary van der Merwe <garyvdm@gmail.com>"
 
 import gtk
 import gobject
-import re
 from xml.sax.saxutils import escape
 
 from bzrlib.config import parse_username
 from bzrlib.revision import NULL_REVISION
 
-from time import (strftime, localtime)
+from time import (
+    strftime,
+    localtime,
+    )
 
 REVID = 0
 NODE = 1

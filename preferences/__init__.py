@@ -29,9 +29,9 @@ from bzrlib.plugins.gtk.preferences.notifications import NotificationsPage
 
 class PreferencesWindow(gtk.Dialog):
     """Displays global preferences windows."""
-    # Note that we don't allow configuration of aliases or 
-    # default log formats. This is because doing so wouldn't make 
-    # a lot of sense to pure GUI users. Users that need these settings 
+    # Note that we don't allow configuration of aliases or
+    # default log formats. This is because doing so wouldn't make
+    # a lot of sense to pure GUI users. Users that need these settings
     # will already be familiar with the configuration file.
 
     def __init__(self, config=None):
@@ -60,7 +60,7 @@ class PreferencesWindow(gtk.Dialog):
         self.action_area.set_border_width(12)
 
     def _create_pages(self):
-        return [("Identity", IdentityPage(self.config)), 
+        return [("Identity", IdentityPage(self.config)),
                 ("Plugins", PluginsPage()),
                 ("Notifications", NotificationsPage(self.config))]
 

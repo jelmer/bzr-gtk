@@ -20,7 +20,6 @@ try:
 except:
     pass
 
-import bzrlib
 import gtk
 
 from bzrlib.plugins.gtk.branchbox import BranchSelectionBox
@@ -37,7 +36,7 @@ class CreateMergeDirectiveDialog(gtk.Dialog):
         # submittted
 
         # TODO: Create a frame with a the ability to select a branch
-        
+
         # TODO: Create a frame with a button for selecting a file name 
         # for the bundle
         pass

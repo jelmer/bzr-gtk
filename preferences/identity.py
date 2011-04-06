@@ -22,6 +22,7 @@ except:
 
 import gtk
 
+
 class IdentityPage(gtk.Table):
 
     def __init__(self, config):
@@ -58,10 +59,10 @@ class IdentityPage(gtk.Table):
         self.attach(align, 0, 1, 2, 3, gtk.FILL, gtk.FILL)
 
         sigvals = gtk.VBox()
-        self.check_sigs_if_possible = gtk.RadioButton(None, 
+        self.check_sigs_if_possible = gtk.RadioButton(None,
                                                       "_Check if possible")
         sigvals.pack_start(self.check_sigs_if_possible)
-        self.check_sigs_always = gtk.RadioButton(self.check_sigs_if_possible, 
+        self.check_sigs_always = gtk.RadioButton(self.check_sigs_if_possible,
                                                  "Check _always")
         sigvals.pack_start(self.check_sigs_always)
         self.check_sigs_never = gtk.RadioButton(self.check_sigs_if_possible,
@@ -77,7 +78,7 @@ class IdentityPage(gtk.Table):
         self.attach(align, 0, 1, 3, 4, gtk.FILL, gtk.FILL)
 
         create_sigs = gtk.VBox()
-        self.create_sigs_when_required = gtk.RadioButton(None, 
+        self.create_sigs_when_required = gtk.RadioButton(None,
                                                          "Sign When _Required")
         create_sigs.pack_start(self.create_sigs_when_required)
         self.create_sigs_always = gtk.RadioButton(

@@ -24,16 +24,20 @@ import gtk
 
 import os
 
-from dialog import error_dialog
-from errors import show_bzr_error
+from bzrlib import (
+    bzrdir,
+    errors,
+    transport,
+    )
 
-from bzrlib import bzrdir
-from bzrlib import transport
-import bzrlib.errors as errors
 from bzrlib.plugins.gtk import _i18n
+from bzrlib.plugins.gtk.dialog import error_dialog
+from bzrlib.plugins.gtk.errors import show_bzr_error
+
 
 class InitDialog(gtk.Dialog):
     """ Initialize dialog. """
+
     def __init__(self, path, parent=None):
         """ Initialize the Initialize dialog. """
         gtk.Dialog.__init__(self, title="Initialize - Olive",

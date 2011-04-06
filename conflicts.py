@@ -27,8 +27,10 @@ import gobject
 
 from bzrlib.config import GlobalConfig
 from bzrlib.plugins.gtk import _i18n
-
-from dialog import error_dialog, warning_dialog
+from bzrlib.plugins.gtk.dialog import (
+    error_dialog,
+    warning_dialog,
+    )
 
 
 class ConflictsDialog(gtk.Dialog):
@@ -40,10 +42,10 @@ class ConflictsDialog(gtk.Dialog):
                                   parent=parent,
                                   flags=0,
                                   buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CANCEL))
-        
+
         # Get arguments
         self.wt = wt
-        
+
         # Create the widgets
         self._scrolledwindow = gtk.ScrolledWindow()
         self._treeview = gtk.TreeView()
@@ -52,10 +54,10 @@ class ConflictsDialog(gtk.Dialog):
         self._image_diff3 = gtk.Image()
         self._button_diff3 = gtk.Button()
         self._hbox_diff3 = gtk.HBox()
-        
+
         # Set callbacks
         self._button_diff3.connect('clicked', self._on_diff3_clicked)
-        
+
         # Set properties
         self._scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
                                         gtk.POLICY_AUTOMATIC)
@@ -65,7 +67,7 @@ class ConflictsDialog(gtk.Dialog):
         self._hbox_diff3.set_spacing(3)
         self.vbox.set_spacing(3)
         self.set_default_size(400, 300)
-        
+
         # Construct dialog
         self._hbox_diff3.pack_start(self._label_diff3, False, False)
         self._hbox_diff3.pack_start(self._entry_diff3, True, True)
@@ -73,13 +75,13 @@ class ConflictsDialog(gtk.Dialog):
         self._scrolledwindow.add(self._treeview)
         self.vbox.pack_start(self._scrolledwindow, True, True)
         self.vbox.pack_start(self._hbox_diff3, False, False)
-        
+
         # Create the conflict list
         self._create_conflicts()
-        
+
         # Show the dialog
         self.vbox.show_all()
-    
+
     def _get_diff3(self):
         """ Get the specified diff3 utility. Default is meld. """
         config = GlobalConfig()
@@ -87,12 +89,12 @@ class ConflictsDialog(gtk.Dialog):
         if diff3 is None:
             diff3 = 'meld'
         return diff3
-    
+
     def _set_diff3(self, cmd):
         """ Set the default diff3 utility to cmd. """
         config = GlobalConfig()
         config.set_user_option('gconflicts_diff3', cmd)
-    
+
     def _create_conflicts(self):
         """ Construct the list of conflicts. """
         if len(self.wt.conflicts()) == 0:
@@ -100,7 +102,7 @@ class ConflictsDialog(gtk.Dialog):
             self._treeview.set_model(self.model)
             self._treeview.append_column(gtk.TreeViewColumn(_i18n('Conflicts'),
                                          gtk.CellRendererText(), text=0))
-            self._treeview.set_headers_visible(False)            
+            self._treeview.set_headers_visible(False)
             self.model.append([ _i18n("No conflicts in working tree.") ])
             self._button_diff3.set_sensitive(False)
         else:
@@ -134,29 +136,29 @@ class ConflictsDialog(gtk.Dialog):
                     t = _i18n("deleting parent")
                 else:
                     t = _i18n("unknown type of conflict")
-                
-                self.model.append([ conflict.path, t, conflict.typestring ]) 
-    
+
+                self.model.append([ conflict.path, t, conflict.typestring ])
+
     def _get_selected_file(self):
         """ Return the selected conflict's filename. """
         treeselection = self._treeview.get_selection()
         (model, iter) = treeselection.get_selected()
-        
+
         if iter is None:
             return None
         else:
             return model.get_value(iter, 0)
-    
+
     def _get_selected_type(self):
         """ Return the type of the selected conflict. """
         treeselection = self._treeview.get_selection()
         (model, iter) = treeselection.get_selected()
-        
+
         if iter is None:
             return None
         else:
             return model.get_value(iter, 2)
-    
+
     def _on_diff3_clicked(self, widget):
         """ Launch external utility to resolve conflicts. """
         self._set_diff3(self._entry_diff3.get_text())

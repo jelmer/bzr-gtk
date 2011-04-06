@@ -14,9 +14,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import bzrlib.errors as errors
+from bzrlib import errors
 from bzrlib.plugins.gtk import _i18n
-from dialog import error_dialog, info_dialog
+from bzrlib.plugins.gtk.dialog import (
+    error_dialog,
+    info_dialog,
+    )
 
 
 def show_bzr_error(unbound):

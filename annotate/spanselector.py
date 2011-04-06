@@ -32,10 +32,10 @@ import gtk
 class SpanSelector(gtk.HBox):
     """Encapsulates creation and functionality of widgets used for changing
     highlight spans.
-    
+
     Note that calling any activate_* methods will emit "span-changed".
     """
-    
+
     max_custom_spans = 4
     custom_spans = []
     last_selected = None
@@ -104,7 +104,7 @@ class SpanSelector(gtk.HBox):
         self.combo.show()
 
         span = float(w.get_text())
-        
+
         if span == 0:
             # FIXME this works as "cancel", returning to the previous span,
             # but it emits "span-changed", which isn't necessary.
@@ -121,11 +121,11 @@ class SpanSelector(gtk.HBox):
             self.custom_iter = self.model.insert_after(self.custom_iter,
                                                        self.separator)
             self.custom_iter_top = self.custom_iter.copy()
-        
+
         if len(self.custom_spans) == self.max_custom_spans:
             self.custom_spans.pop(0)
             self.model.remove(self.model.iter_next(self.custom_iter_top))
-        
+
         self.custom_spans.append(span)
         self.custom_iter = self.model.insert_after(
             self.custom_iter, [span, "%.2f Days" % span, False, False])
@@ -143,7 +143,7 @@ class SpanSelector(gtk.HBox):
                           gobject.TYPE_BOOLEAN)
 
         self.separator = [0., "", True, False]
-        
+
         self.oldest_iter = m.append([0., "to Oldest Revision", False, False])
         self.newest_iter = m.append([0., "Newest to Oldest", False, False])
         m.append(self.separator)
@@ -170,7 +170,7 @@ class SpanSelector(gtk.HBox):
 
     def _create_custom_entry(self):
         entry = gtk.HBox(False, 6)
-        
+
         spin = gtk.SpinButton(digits=2)
         spin.set_numeric(True)
         spin.set_increments(1., 10.)

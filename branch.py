@@ -24,16 +24,19 @@ except:
 
 import gtk
 
-from errors import show_bzr_error
-
+from bzrlib import (
+    errors,
+    )
 from bzrlib.branch import Branch
-import bzrlib.errors as errors
+from bzrlib.transport import get_transport
+
 
 from bzrlib.plugins.gtk import _i18n
 
-from dialog import error_dialog, info_dialog
+from bzrlib.plugins.gtk.dialog import error_dialog, info_dialog
+from bzrlib.plugins.gtk.errors import show_bzr_error
+from bzrlib.plugins.gtk.branchbox import BranchSelectionBox
 
-from branchbox import BranchSelectionBox
 
 class BranchDialog(gtk.Dialog):
     """ New implementation of the Branch dialog. """
@@ -44,10 +47,10 @@ class BranchDialog(gtk.Dialog):
                                   parent=parent,
                                   flags=0,
                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
-        
+
         # Get arguments
         self.path = path
-        
+
         # Create the widgets
         self._button_branch = gtk.Button(_i18n("_Branch"), use_underline=True)
         self._remote_branch = BranchSelectionBox()
@@ -62,7 +65,7 @@ class BranchDialog(gtk.Dialog):
         self._hbox_revision = gtk.HBox()
         self._entry_revision = gtk.Entry()
         self._entry_nick = gtk.Entry()
-        
+
         # Set callbacks
         self._button_branch.connect('clicked', self._on_branch_clicked)
         self._button_revision.connect('clicked', self._on_revision_clicked)
@@ -78,7 +81,7 @@ class BranchDialog(gtk.Dialog):
         self._table.attach(self._filechooser, 1, 2, 1, 2)
         self._table.attach(self._entry_nick, 1, 2, 2, 3)
         self._table.attach(self._hbox_revision, 1, 2, 3, 4)
-        
+
         # Set properties
         self._image_browse = gtk.Image()
         self._image_browse.set_from_stock(gtk.STOCK_OPEN, gtk.ICON_SIZE_BUTTON)
@@ -94,16 +97,16 @@ class BranchDialog(gtk.Dialog):
             self._remote_branch.set_url(remote_path)
         if self.path is not None:
             self._filechooser.set_filename(self.path)
-        
+
         # Pack some widgets
         self._hbox_revision.pack_start(self._entry_revision, True, True)
         self._hbox_revision.pack_start(self._button_revision, False, False)
         self.vbox.add(self._table)
         self.action_area.pack_end(self._button_branch)
-        
+
         # Show the dialog
         self.vbox.show_all()
-    
+
     def _get_last_revno(self):
         """ Get the revno of the last revision (if any). """
         try:
@@ -111,12 +114,12 @@ class BranchDialog(gtk.Dialog):
             return br.revno()
         except:
             pass
-    
+
     def _on_revision_clicked(self, button):
         """ Browse for revision button clicked handler. """
         from revbrowser import RevisionBrowser
-        
-        
+
+
         try:
             br = self._remote_branch.get_branch()
         except:
@@ -125,13 +128,13 @@ class BranchDialog(gtk.Dialog):
         response = revb.run()
         if response != gtk.RESPONSE_NONE:
             revb.hide()
-    
+
             if response == gtk.RESPONSE_OK:
                 if revb.selected_revno is not None:
                     self._entry_revision.set_text(revb.selected_revno)
-        
+
             revb.destroy()
-    
+
     @show_bzr_error
     def _on_branch_clicked(self, button):
         """ Branch button clicked handler. """
@@ -140,32 +143,30 @@ class BranchDialog(gtk.Dialog):
             error_dialog(_i18n('Missing branch location'),
                          _i18n('You must specify a branch location.'))
             return
-        
+
         destination = self._filechooser.get_filename()
         try:
             revno = int(self._entry_revision.get_text())
         except:
             revno = None
-        
+
         nick = self._entry_nick.get_text()
         if nick is '':
             nick = os.path.basename(location.rstrip("/\\"))
-        
+
         br_from = Branch.open(location)
-        
+
         br_from.lock_read()
         try:
-            from bzrlib.transport import get_transport
-
             revision_id = br_from.get_rev_id(revno)
 
             basis_dir = None
-            
+
             to_location = destination + os.sep + nick
             to_transport = get_transport(to_location)
-            
+
             to_transport.mkdir('.')
-            
+
             try:
                 # preserve whatever source format we have.
                 dir = br_from.bzrdir.sprout(to_transport.base,
@@ -178,12 +179,12 @@ class BranchDialog(gtk.Dialog):
                 raise
         finally:
             br_from.unlock()
-                
+
         info_dialog(_i18n('Branching successful'),
                     _i18n('%d revision(s) branched.') % revs)
-        
+
         self.response(gtk.RESPONSE_OK)
-    
+
     def _on_branch_changed(self, widget, event):
         """ We try to get the last revision if focus lost. """
         rev = self._get_last_revno()

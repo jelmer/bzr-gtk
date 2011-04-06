@@ -22,6 +22,7 @@ except:
 
 import gtk
 
+
 class PluginsPage(gtk.VPaned):
 
     def __init__(self):

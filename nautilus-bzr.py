@@ -8,22 +8,29 @@
 
 import gtk
 import nautilus
-import bzrlib
 from bzrlib.branch import Branch
 from bzrlib.bzrdir import BzrDir
-from bzrlib.errors import NotBranchError, NoWorkingTree, UnsupportedProtocol
+from bzrlib.errors import (
+    NotBranchError,
+    NoWorkingTree,
+    UnsupportedProtocol,
+    )
 from bzrlib.workingtree import WorkingTree
 from bzrlib.config import GlobalConfig
 
 from bzrlib.plugin import load_plugins
 load_plugins()
 
-from bzrlib.plugins.gtk.commands import cmd_gannotate, start_viz_window
+from bzrlib.plugins.gtk.commands import (
+    cmd_gannotate,
+    start_viz_window,
+    )
 
 print "Bazaar nautilus module initialized"
 
 
 class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.InfoProvider):
+
     def __init__(self):
         pass
 

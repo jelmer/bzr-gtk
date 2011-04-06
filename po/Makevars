@@ -1,0 +1,2 @@
+top_builddir=../
+XGETTEXT_OPTIONS =  --keyword=_i18n --keyword=_ --keyword=N_ --keyword=U_
