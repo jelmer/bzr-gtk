@@ -48,12 +48,19 @@ class Avatar(gtk.HBox):
         the translatable 'No email' text.
         """
         if self.email:
-            spinner = gtk.Spinner()
-            spinner.start()
-            self.pack_start(spinner, False)
-            spinner.set_tooltip_text(_i18n("Retrieving avatar for %s...") % self.email)
-            spinner.set_size_request(20, 20)
-            spinner.show()
+            tooltip = _i18n("Retrieving avatar for %s...") % self.email
+            if getattr(gtk, "Spinner", False):
+                spinner = gtk.Spinner()
+                spinner.start()
+                self.pack_start(spinner, False)
+                spinner.set_tooltip_text(tooltip)
+                spinner.set_size_request(20, 20)
+                spinner.show()
+            else:
+                spinner = gtk.Label(tooltip)
+                self.pack_start(spinner)
+                self.set_tooltip_text(self.apparent_username)
+                spinner.show()
         else:
             no_email = gtk.Label(_i18n("No email"))
             self.pack_start(no_email)
