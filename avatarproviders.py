@@ -20,65 +20,61 @@ import urllib2
 import hashlib
 import threading
 
+
 class AvatarProvider(object):
-    """
-    Master class for Avatar providers.
-    
+    """Base class for Avatar providers.
+
     All AvatarProviderXxxx classes should inherite from this one
     and override at least get_base_url.
     """
     def __init__(self, size=80):
         """ Constructor """
         self.size = size
-    
+
     def get_base_url(self):
+        """Return the base URL of this provider.
         """
-        Override this methode in your provider class in order to return
-        base url of your provider.
-        """
-        raise NotImplementedError("You must implement the get_base_url method.")
+        raise NotImplementedError(self.get_base_url)
 
 
 class AvatarDownloaderWorker(threading.Thread):
+    """Threaded worker to retrieve avatar from a provider.
+
+    This creates a persistant connection to the provider in order
+    to get avatars quickly through the same socket (urllib2).
     """
-    Threaded worker to retrieve avatar from a provider.
-    
-    It create a persitante connection to the provider in order
-    to get avatars quickly through the same socket (urllib3).
-    """
-    
+
     def __init__(self, provider_method):
-        """
-        Constructor
+        """Constructor
         
-        provider_method: Provider method that return fields
-                         to send with the request.
+        :param provider_method: Provider method that returns fields
+                 to send with the request.
         """
         threading.Thread.__init__(self)
         self.__stop = threading.Event()
         self.__queue = Queue.Queue()
-        
+
         self.__provider_method = provider_method
         self.__end_thread = False
-    
+
     def stop(self):
         """ Stop this worker """
         self.__end_thread = True
         self.__stop.set()
-    
+
     def set_callback_method(self, method):
         """ Fire the given callback method when treatment is finished """
         self.__callback_method = method
-    
+
     def queue(self, id_field):
-        """
-        Put in Queue the id_field to treat in the thread.
+        """Put in Queue the id_field to treat in the thread.
+
         This id_field is for example with Gravatar the email address.
         """
         self.__queue.put(id_field)
-    
+
     def run(self):
-        """ Worker core code. """
+        """Worker core code. """
         while not self.__end_thread:
             id_field = self.__queue.get()
             # Call provider method to get fields to pass in the request
@@ -92,17 +88,13 @@ class AvatarDownloaderWorker(threading.Thread):
 
 
 class AvatarProviderGravatar(AvatarProvider):
-    """ Gravatar provider """
-    
-    def __init__(self):
-        """ Constructor """
-        super(AvatarProviderGravatar, self).__init__()
-    
+    """Gravatar provider."""
+
     def get_base_url(self):
         return "http://www.gravatar.com/avatar.php?"
-    
+
     def gravatar_id_for_email(self, email):
-        """ Return a converted email address to a gravatar_id """
+        """Return a gravatar URL for an email address.."""
         return self.get_base_url() + \
                 urllib.urlencode({
                     'gravatar_id':hashlib.md5(email.lower()).hexdigest(),
