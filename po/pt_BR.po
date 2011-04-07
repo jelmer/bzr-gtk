@@ -8,15 +8,19 @@ msgstr ""
 "Project-Id-Version: olive\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2011-04-05 22:41+0000\n"
+"PO-Revision-Date: 2011-04-06 09:41+0000\n"
 "Last-Translator: Paulo Guilherme Pilotti Duarte "
 "<guilhermepilotti@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <pt_BR@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-04-06 04:34+0000\n"
-"X-Generator: Launchpad (build 12559)\n"
+"X-Launchpad-Export-Date: 2011-04-07 04:31+0000\n"
+"X-Generator: Launchpad (build 12735)\n"
+
+#: ../errors.py:31
+msgid "Directory is not a checkout"
+msgstr "O diretório não é um checagem de ítens."
 
 #: ../bazaar-properties.desktop.in.h:1
 msgid "Bazaar Preferences"
@@ -383,10 +387,6 @@ msgstr "O diretório não é um ramo."
 #: ../errors.py:29
 msgid "You can perform this action only in a branch."
 msgstr "Esta operação só pode ser executada em um ramo."
-
-#: ../errors.py:31
-msgid "Directory is not a checkout"
-msgstr "O diretório não é um checagem de ítens."
 
 #: ../errors.py:32
 msgid "You can perform local commit only on checkouts."
