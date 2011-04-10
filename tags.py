@@ -23,8 +23,8 @@ except:
 
 import gtk
 
-from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import error_dialog
+from bzrlib.plugins.gtk.i18n import _i18n
 from bzrlib.plugins.gtk.revidbox import RevisionSelectionBox
 from bzrlib.plugins.gtk.revisionview import RevisionView
 from bzrlib.plugins.gtk.window import Window

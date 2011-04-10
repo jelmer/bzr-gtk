@@ -23,13 +23,13 @@ except:
 import gtk
 import gobject
 
-from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.diff import DiffWidget
 from bzrlib.plugins.gtk.dialog import question_dialog
 from bzrlib.plugins.loom import (
     branch as loom_branch,
     tree as loom_tree,
     )
+from bzrlib.plugins.gtk.i18n import _i18n
 
 
 class LoomDialog(gtk.Dialog):

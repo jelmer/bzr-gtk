@@ -62,21 +62,6 @@ from info import (
     bzr_plugin_version as version_info,
     bzr_compatible_versions,
     )
-from gettext import (
-    gettext,
-    textdomain,
-    bindtextdomain,
-    bind_textdomain_codeset,
-    )
-
-# FIXME: We should find out LOCALEDIR at compile or run time. The current
-# hardcoded path will work for most distributions, but not for e.g. Solaris and
-# Windows
-GETTEXT_PACKAGE = 'bzr-gtk'
-LOCALEDIR = '/usr/share/locale'
-bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR)
-bind_textdomain_codeset(GETTEXT_PACKAGE, 'UTF-8')
-textdomain(GETTEXT_PACKAGE)
 
 if version_info[3] == 'final':
     version_string = '%d.%d.%d' % version_info[:3]
@@ -194,6 +179,3 @@ def load_tests(basic_tests, module, loader):
             sys.setdefaultencoding(default_encoding)
     return basic_tests
 
-
-def _i18n(text):
-    return gettext(text)

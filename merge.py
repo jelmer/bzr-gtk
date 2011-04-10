@@ -27,13 +27,14 @@ import gtk
 from bzrlib.branch import Branch
 import bzrlib.errors as errors
 
-from bzrlib.plugins.gtk import _i18n, icon_path
+from bzrlib.plugins.gtk import icon_path
 from bzrlib.plugins.gtk.dialog import (
     error_dialog,
     info_dialog,
     warning_dialog,
     )
 from bzrlib.plugins.gtk.errors import show_bzr_error
+from bzrlib.plugins.gtk.i18n import _i18n
 
 
 class MergeDialog(gtk.Dialog):

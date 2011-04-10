@@ -15,11 +15,11 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 from bzrlib import errors
-from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import (
     error_dialog,
     info_dialog,
     )
+from bzrlib.plugins.gtk.i18n import _i18n
 
 
 def show_bzr_error(unbound):
