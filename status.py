@@ -21,10 +21,8 @@ except:
     pass
 
 import gtk
-from bzrlib.plugins.gtk import (
-    _i18n,
-    window,
-    )
+from bzrlib.plugins.gtk import window
+from bzrlib.plugins.gtk.i18n import _i18n
 
 
 class StatusWindow(window.Window):

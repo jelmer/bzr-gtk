@@ -32,10 +32,10 @@ from bzrlib.errors import (
 from bzrlib.option import Option
 
 from bzrlib.plugins.gtk import (
-    _i18n,
     import_pygtk,
     set_ui_factory,
     )
+from bzrlib.plugins.gtk.i18n import _i18n
 
 
 class NoDisplayError(errors.BzrCommandError):

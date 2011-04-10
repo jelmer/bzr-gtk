@@ -24,7 +24,8 @@ import gobject
 import gtk
 
 from bzrlib.plugins.search import index as _mod_index
-from bzrlib.plugins.gtk import _i18n
+
+from bzrlib.plugins.gtk.i18n import _i18n
 
 class SearchDialog(gtk.Dialog):
     """Search dialog."""

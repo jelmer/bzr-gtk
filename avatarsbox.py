@@ -18,7 +18,7 @@ import gtk
 
 from bzrlib.config import parse_username
 
-from bzrlib.plugins.gtk import _i18n
+from bzrlib.plugins.gtk.i18n import _i18n
 from bzrlib.plugins.gtk.avatarproviders import (
     AvatarProviderGravatar,
     AvatarDownloaderWorker,

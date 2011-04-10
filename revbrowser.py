@@ -23,8 +23,8 @@ except:
 import gobject
 import gtk
 
-from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.branchview.treeview import TreeView
+from bzrlib.plugins.gtk.i18n import _i18n
 
 
 class RevisionBrowser(gtk.Dialog):

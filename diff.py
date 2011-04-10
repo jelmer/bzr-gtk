@@ -44,13 +44,13 @@ from bzrlib import (
 from bzrlib.diff import show_diff_trees
 from bzrlib.patches import parse_patches
 from bzrlib.trace import warning
-from bzrlib.plugins.gtk import _i18n
-from bzrlib.plugins.gtk.window import Window
 from bzrlib.plugins.gtk.dialog import (
     error_dialog,
     info_dialog,
     warning_dialog,
     )
+from bzrlib.plugins.gtk.i18n import _i18n
+from bzrlib.plugins.gtk.window import Window
 
 
 def fallback_guess_language(slm, content_type):

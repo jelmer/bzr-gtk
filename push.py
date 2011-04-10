@@ -27,20 +27,21 @@ from errors import show_bzr_error
 
 import bzrlib.errors as errors
 
-from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import (
     info_dialog,
     question_dialog,
     )
 
 from bzrlib.plugins.gtk.history import UrlHistory
+from bzrlib.plugins.gtk.i18n import _i18n
+
 
 class PushDialog(gtk.Dialog):
-    """ New implementation of the Push dialog. """
+    """New implementation of the Push dialog."""
 
     def __init__(self, repository, revid, branch=None, parent=None):
-        """ Initialize the Push dialog. """
-        gtk.Dialog.__init__(self, title="Push - Olive",
+        """Initialize the Push dialog. """
+        gtk.Dialog.__init__(self, title="Push",
                                   parent=parent,
                                   flags=0,
                                   buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
@@ -78,7 +79,7 @@ class PushDialog(gtk.Dialog):
         self._build_history()
 
     def _build_history(self):
-        """ Build up the location history. """
+        """Build up the location history. """
         self._combo_model = gtk.ListStore(str)
         for item in self._history.get_entries():
             self._combo_model.append([ item ])
@@ -92,7 +93,7 @@ class PushDialog(gtk.Dialog):
 
     @show_bzr_error
     def _on_push_clicked(self, widget):
-        """ Push button clicked handler. """
+        """Push button clicked handler. """
         location = self._combo.get_child().get_text()
         revs = 0
 
@@ -115,7 +116,7 @@ class PushDialog(gtk.Dialog):
 
 
 def do_push(br_from, location, overwrite):
-    """ Update a mirror of a branch.
+    """Update a mirror of a branch.
 
     :param br_from: the source branch
     :param location: the location of the branch that you'd like to update

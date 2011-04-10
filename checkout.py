@@ -24,14 +24,13 @@ except:
 
 import gtk
 
-from bzrlib.plugins.gtk import _i18n
-
 from bzrlib.branch import Branch
 from bzrlib.config import GlobalConfig
 
 from bzrlib.plugins.gtk.dialog import error_dialog
 from bzrlib.plugins.gtk.errors import show_bzr_error
 from bzrlib.plugins.gtk.history import UrlHistory
+from bzrlib.plugins.gtk.i18n import _i18n
 
 
 class CheckoutDialog(gtk.Dialog):

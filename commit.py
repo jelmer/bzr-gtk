@@ -36,9 +36,9 @@ try:
 except ImportError:
     from bzrlib.util import bencode
 
-from bzrlib.plugins.gtk import _i18n
 from bzrlib.plugins.gtk.dialog import question_dialog
 from bzrlib.plugins.gtk.errors import show_bzr_error
+from bzrlib.plugins.gtk.i18n import _i18n
 
 try:
     import dbus
@@ -512,7 +512,7 @@ class CommitDialog(gtk.Dialog):
                                              gtk.CellRendererText(), text=3))
 
     def _construct_diff_view(self):
-        from diff import DiffView
+        from bzrlib.plugins.gtk.diff import DiffView
 
         # TODO: jam 2007-10-30 The diff label is currently disabled. If we
         #       decide that we really don't ever want to display it, we should
