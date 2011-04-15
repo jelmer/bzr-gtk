@@ -268,7 +268,8 @@ class BranchWindow(Window):
         go_menu.add(gtk.SeparatorMenuItem())
         go_menu.add(self.go_menu_tags)
 
-        self.revision_menu = RevisionMenu(self.branch.repository, [], self.branch, parent=self)
+        self.revision_menu = RevisionMenu(self.branch.repository, [],
+            self.branch, parent=self)
         revision_menuitem = gtk.MenuItem("_Revision")
         revision_menuitem.set_submenu(self.revision_menu)
 
@@ -298,7 +299,8 @@ class BranchWindow(Window):
         help_menuitem = gtk.MenuItem("_Help")
         help_menuitem.set_submenu(help_menu)
 
-        help_about_menuitem = gtk.ImageMenuItem(gtk.STOCK_ABOUT, self.accel_group)
+        help_about_menuitem = gtk.ImageMenuItem(gtk.STOCK_ABOUT,
+            self.accel_group)
         help_about_menuitem.connect('activate', self._about_dialog_cb)
 
         help_menu.add(help_about_menuitem)
@@ -318,12 +320,14 @@ class BranchWindow(Window):
         """Construct the top-half of the window."""
         # FIXME: Make broken_line_length configurable
 
-        self.treeview = TreeView(self.branch, self.start_revs, self.maxnum, self.compact_view)
+        self.treeview = TreeView(self.branch, self.start_revs, self.maxnum,
+            self.compact_view)
 
         for col in ["revno", "date"]:
             option = self.config.get_user_option(col + '-column-visible')
             if option is not None:
-                self.treeview.set_property(col + '-column-visible', option == 'True')
+                self.treeview.set_property(col + '-column-visible',
+                    option == 'True')
             else:
                 self.treeview.set_property(col + '-column-visible', False)
 
@@ -387,7 +391,8 @@ class BranchWindow(Window):
         self.revisionview.show()
         self.revisionview.set_show_callback(self._show_clicked_cb)
         self.revisionview.connect('notify::revision', self._go_clicked_cb)
-        self.treeview.connect('tag-added', lambda w, t, r: self.revisionview.update_tags())
+        self.treeview.connect('tag-added',
+            lambda w, t, r: self.revisionview.update_tags())
         self.diff_paned.pack1(self.revisionview)
 
         from bzrlib.plugins.gtk.diff import DiffWidget
@@ -419,7 +424,7 @@ class BranchWindow(Window):
                     if parent_id and parent_id != NULL_REVISION:
                         parent = self.branch.repository.get_revision(parent_id)
                         try:
-                            str = ' (' + parent.properties['branch-nick'] + ')'
+                            str = ' (%s)' % parent.properties['branch-nick']
                         except KeyError:
                             str = ""
 
@@ -440,7 +445,7 @@ class BranchWindow(Window):
                 for child_id in children:
                     child = self.branch.repository.get_revision(child_id)
                     try:
-                        str = ' (' + child.properties['branch-nick'] + ')'
+                        str = ' (%s)' % child.properties['branch-nick']
                     except KeyError:
                         str = ""
 
@@ -511,9 +516,11 @@ class BranchWindow(Window):
         _mod_index.index_url(self.branch.base)
 
     def _branch_search_cb(self, w):
-        from bzrlib.plugins.search import index as _mod_index
+        from bzrlib.plugins.search import (
+            index as _mod_index,
+            errors as search_errors,
+            )
         from bzrlib.plugins.gtk.search import SearchDialog
-        from bzrlib.plugins.search import errors as search_errors
 
         try:
             index = _mod_index.open_index_url(self.branch.base)
