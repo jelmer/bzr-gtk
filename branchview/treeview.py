@@ -131,6 +131,7 @@ class TreeView(gtk.VBox):
         self.maxnum = maxnum
         self.compact = compact
 
+        self.model = treemodel.TreeModel(self.branch, [])
         gobject.idle_add(self.populate)
 
         self.connect("destroy", self._on_destroy)
@@ -310,7 +311,7 @@ class TreeView(gtk.VBox):
                                                             self.mainline_only,
                                                             self.progress_bar)
 
-            self.model = treemodel.TreeModel(self.branch, linegraphdata)
+            self.model.line_graph_data = linegraphdata
             self.graph_cell.columns_len = columns_len
             width = self.graph_cell.get_size(self.treeview)[2]
             if width > 500:
