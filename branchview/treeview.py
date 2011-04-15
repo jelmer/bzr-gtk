@@ -156,15 +156,23 @@ class TreeView(gtk.VBox):
         elif property.name == 'branch':
             return self.branch
         elif property.name == 'revision':
+            if self.path is None:
+                return None
             return self.model.get_value(self.model.get_iter(self.path),
                                         treemodel.REVISION)
         elif property.name == 'revision-number':
+            if self.path is None:
+                return None
             return self.model.get_value(self.model.get_iter(self.path),
                                         treemodel.REVNO)
         elif property.name == 'children':
+            if self.path is None:
+                return None
             return self.model.get_value(self.model.get_iter(self.path),
                                         treemodel.CHILDREN)
         elif property.name == 'parents':
+            if self.path is None:
+                return None
             return self.model.get_value(self.model.get_iter(self.path),
                                         treemodel.PARENTS)
         else:

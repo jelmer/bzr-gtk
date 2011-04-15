@@ -128,12 +128,7 @@ class BranchWindow(Window):
         vbox.pack_start(paned, expand=True, fill=True)
         vbox.set_focus_child(paned)
 
-        self.treeview.connect('revision-selected',
-                self._treeselection_changed_cb)
-        self.treeview.connect('revision-activated',
-                self._tree_revision_activated)
 
-        self.treeview.connect('tag-added', lambda w, t, r: self._update_tags())
         vbox.show()
 
         return vbox
@@ -393,6 +388,10 @@ class BranchWindow(Window):
         self.revisionview.connect('notify::revision', self._go_clicked_cb)
         self.treeview.connect('tag-added',
             lambda w, t, r: self.revisionview.update_tags())
+        self.treeview.connect('revision-selected',
+                self._treeselection_changed_cb)
+        self.treeview.connect('revision-activated',
+                self._tree_revision_activated)
         self.diff_paned.pack1(self.revisionview)
 
         from bzrlib.plugins.gtk.diff import DiffWidget
@@ -414,9 +413,8 @@ class BranchWindow(Window):
         parents  = self.treeview.get_parents()
         children = self.treeview.get_children()
 
-        self.revision_menu.set_revision_ids([revision.revision_id])
-
-        if revision and revision != NULL_REVISION:
+        if revision and revision.revision_id != NULL_REVISION:
+            self.revision_menu.set_revision_ids([revision.revision_id])
             prev_menu = gtk.Menu()
             if len(parents) > 0:
                 self.prev_rev_action.set_sensitive(True)
