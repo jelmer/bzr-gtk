@@ -131,6 +131,7 @@ class TreeView(gtk.VBox):
         self.maxnum = maxnum
         self.compact = compact
 
+        self.model = treemodel.TreeModel(self.branch, [])
         gobject.idle_add(self.populate)
 
         self.connect("destroy", self._on_destroy)
@@ -155,15 +156,23 @@ class TreeView(gtk.VBox):
         elif property.name == 'branch':
             return self.branch
         elif property.name == 'revision':
+            if self.path is None:
+                return None
             return self.model.get_value(self.model.get_iter(self.path),
                                         treemodel.REVISION)
         elif property.name == 'revision-number':
+            if self.path is None:
+                return None
             return self.model.get_value(self.model.get_iter(self.path),
                                         treemodel.REVNO)
         elif property.name == 'children':
+            if self.path is None:
+                return None
             return self.model.get_value(self.model.get_iter(self.path),
                                         treemodel.CHILDREN)
         elif property.name == 'parents':
+            if self.path is None:
+                return None
             return self.model.get_value(self.model.get_iter(self.path),
                                         treemodel.PARENTS)
         else:
@@ -310,7 +319,7 @@ class TreeView(gtk.VBox):
                                                             self.mainline_only,
                                                             self.progress_bar)
 
-            self.model = treemodel.TreeModel(self.branch, linegraphdata)
+            self.model.line_graph_data = linegraphdata
             self.graph_cell.columns_len = columns_len
             width = self.graph_cell.get_size(self.treeview)[2]
             if width > 500:
@@ -370,7 +379,7 @@ class TreeView(gtk.VBox):
         cell.set_property("width-chars", 15)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         self.revno_column = gtk.TreeViewColumn("Revision No")
-        self.revno_column.set_resizable(False)
+        self.revno_column.set_resizable(True)
         self.revno_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.revno_column.set_fixed_width(cell.get_size(self.treeview)[2])
         self.revno_column.pack_start(cell, expand=True)
@@ -379,7 +388,7 @@ class TreeView(gtk.VBox):
 
         self.graph_cell = CellRendererGraph()
         self.graph_column = gtk.TreeViewColumn()
-        self.graph_column.set_resizable(False)
+        self.graph_column.set_resizable(True)
         self.graph_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.graph_column.pack_start(self.graph_cell, expand=True)
         self.graph_column.add_attribute(self.graph_cell, "node", treemodel.NODE)
@@ -392,7 +401,7 @@ class TreeView(gtk.VBox):
         cell.set_property("width-chars", 65)
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         self.summary_column = gtk.TreeViewColumn("Summary")
-        self.summary_column.set_resizable(False)
+        self.summary_column.set_resizable(True)
         self.summary_column.set_expand(True)
         self.summary_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.summary_column.set_fixed_width(cell.get_size(self.treeview)[2])
@@ -416,7 +425,7 @@ class TreeView(gtk.VBox):
         cell.set_property("ellipsize", pango.ELLIPSIZE_END)
         self.date_column = gtk.TreeViewColumn("Date")
         self.date_column.set_visible(False)
-        self.date_column.set_resizable(False)
+        self.date_column.set_resizable(True)
         self.date_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
         self.date_column.set_fixed_width(130)
         self.date_column.pack_start(cell, expand=True)

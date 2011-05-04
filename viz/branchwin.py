@@ -99,7 +99,7 @@ class BranchWindow(Window):
         self.refresh_action.connect("activate", self._refresh_clicked)
         self.refresh_action.connect_accelerator()
 
-        self.construct()
+        self.vbox = self.construct()
 
     def _save_size_on_destroy(self, widget, config_name):
         """Creates a hook that saves the size of widget to config option 
@@ -118,26 +118,33 @@ class BranchWindow(Window):
         vbox = gtk.VBox(spacing=0)
         self.add(vbox)
 
-        self.paned = gtk.VPaned()
+        # order is important here
+        paned = self.construct_paned()
+        nav = self.construct_navigation()
+        menubar = self.construct_menubar()
+
+        vbox.pack_start(menubar, expand=False, fill=True)
+        vbox.pack_start(nav, expand=False, fill=True)
+        vbox.pack_start(paned, expand=True, fill=True)
+        vbox.set_focus_child(paned)
+
+
+        vbox.show()
+
+        return vbox
+
+    def construct_paned(self):
+        """Construct the main HPaned/VPaned contents."""
+        if self.config.get_user_option('viz-vertical') == 'True':
+            self.paned = gtk.HPaned()
+        else:
+            self.paned = gtk.VPaned()
+
         self.paned.pack1(self.construct_top(), resize=False, shrink=True)
         self.paned.pack2(self.construct_bottom(), resize=True, shrink=False)
         self.paned.show()
 
-        nav = self.construct_navigation()
-        menubar = self.construct_menubar()
-        vbox.pack_start(menubar, expand=False, fill=True)
-        vbox.pack_start(nav, expand=False, fill=True)
-
-        vbox.pack_start(self.paned, expand=True, fill=True)
-        vbox.set_focus_child(self.paned)
-
-        self.treeview.connect('revision-selected',
-                self._treeselection_changed_cb)
-        self.treeview.connect('revision-activated',
-                self._tree_revision_activated)
-
-        self.treeview.connect('tag-added', lambda w, t, r: self._update_tags())
-        vbox.show()
+        return self.paned
 
     def construct_menubar(self):
         menubar = gtk.MenuBar()
@@ -190,6 +197,12 @@ class BranchWindow(Window):
         view_menu_compact.set_active(self.compact_view)
         view_menu_compact.connect('activate', self._brokenlines_toggled_cb)
 
+        view_menu_vertical = gtk.CheckMenuItem("Side-by-side Layout")
+        view_menu_vertical.set_active(False)
+        if self.config.get_user_option('viz-vertical') == 'True':
+            view_menu_vertical.set_active(True)
+        view_menu_vertical.connect('toggled', self._vertical_layout)
+
         view_menu_diffs = gtk.CheckMenuItem("Show Diffs")
         view_menu_diffs.set_active(False)
         if self.config.get_user_option('viz-show-diffs') == 'True':
@@ -210,6 +223,7 @@ class BranchWindow(Window):
 
         view_menu.add(view_menu_toolbar)
         view_menu.add(view_menu_compact)
+        view_menu.add(view_menu_vertical)
         view_menu.add(gtk.SeparatorMenuItem())
         view_menu.add(view_menu_diffs)
         view_menu.add(view_menu_wide_diffs)
@@ -249,7 +263,8 @@ class BranchWindow(Window):
         go_menu.add(gtk.SeparatorMenuItem())
         go_menu.add(self.go_menu_tags)
 
-        self.revision_menu = RevisionMenu(self.branch.repository, [], self.branch, parent=self)
+        self.revision_menu = RevisionMenu(self.branch.repository, [],
+            self.branch, parent=self)
         revision_menuitem = gtk.MenuItem("_Revision")
         revision_menuitem.set_submenu(self.revision_menu)
 
@@ -279,7 +294,8 @@ class BranchWindow(Window):
         help_menuitem = gtk.MenuItem("_Help")
         help_menuitem.set_submenu(help_menu)
 
-        help_about_menuitem = gtk.ImageMenuItem(gtk.STOCK_ABOUT, self.accel_group)
+        help_about_menuitem = gtk.ImageMenuItem(gtk.STOCK_ABOUT,
+            self.accel_group)
         help_about_menuitem.connect('activate', self._about_dialog_cb)
 
         help_menu.add(help_about_menuitem)
@@ -299,12 +315,14 @@ class BranchWindow(Window):
         """Construct the top-half of the window."""
         # FIXME: Make broken_line_length configurable
 
-        self.treeview = TreeView(self.branch, self.start_revs, self.maxnum, self.compact_view)
+        self.treeview = TreeView(self.branch, self.start_revs, self.maxnum,
+            self.compact_view)
 
         for col in ["revno", "date"]:
             option = self.config.get_user_option(col + '-column-visible')
             if option is not None:
-                self.treeview.set_property(col + '-column-visible', option == 'True')
+                self.treeview.set_property(col + '-column-visible',
+                    option == 'True')
             else:
                 self.treeview.set_property(col + '-column-visible', False)
 
@@ -368,7 +386,12 @@ class BranchWindow(Window):
         self.revisionview.show()
         self.revisionview.set_show_callback(self._show_clicked_cb)
         self.revisionview.connect('notify::revision', self._go_clicked_cb)
-        self.treeview.connect('tag-added', lambda w, t, r: self.revisionview.update_tags())
+        self.treeview.connect('tag-added',
+            lambda w, t, r: self.revisionview.update_tags())
+        self.treeview.connect('revision-selected',
+                self._treeselection_changed_cb)
+        self.treeview.connect('revision-activated',
+                self._tree_revision_activated)
         self.diff_paned.pack1(self.revisionview)
 
         from bzrlib.plugins.gtk.diff import DiffWidget
@@ -390,9 +413,8 @@ class BranchWindow(Window):
         parents  = self.treeview.get_parents()
         children = self.treeview.get_children()
 
-        self.revision_menu.set_revision_ids([revision.revision_id])
-
-        if revision and revision != NULL_REVISION:
+        if revision and revision.revision_id != NULL_REVISION:
+            self.revision_menu.set_revision_ids([revision.revision_id])
             prev_menu = gtk.Menu()
             if len(parents) > 0:
                 self.prev_rev_action.set_sensitive(True)
@@ -400,7 +422,7 @@ class BranchWindow(Window):
                     if parent_id and parent_id != NULL_REVISION:
                         parent = self.branch.repository.get_revision(parent_id)
                         try:
-                            str = ' (' + parent.properties['branch-nick'] + ')'
+                            str = ' (%s)' % parent.properties['branch-nick']
                         except KeyError:
                             str = ""
 
@@ -421,7 +443,7 @@ class BranchWindow(Window):
                 for child_id in children:
                     child = self.branch.repository.get_revision(child_id)
                     try:
-                        str = ' (' + child.properties['branch-nick'] + ')'
+                        str = ' (%s)' % child.properties['branch-nick']
                     except KeyError:
                         str = ""
 
@@ -492,9 +514,11 @@ class BranchWindow(Window):
         _mod_index.index_url(self.branch.base)
 
     def _branch_search_cb(self, w):
-        from bzrlib.plugins.search import index as _mod_index
+        from bzrlib.plugins.search import (
+            index as _mod_index,
+            errors as search_errors,
+            )
         from bzrlib.plugins.gtk.search import SearchDialog
-        from bzrlib.plugins.search import errors as search_errors
 
         try:
             index = _mod_index.open_index_url(self.branch.base)
@@ -531,6 +555,25 @@ class BranchWindow(Window):
         else:
             self.toolbar.hide()
         self.config.set_user_option('viz-toolbar-visible', col.get_active())
+
+    def _vertical_layout(self, col):
+        """Toggle the layout vertical/horizontal"""
+        self.config.set_user_option('viz-vertical', str(col.get_active()))
+
+        old = self.paned
+        self.vbox.remove(old)
+        self.vbox.pack_start(self.construct_paned(), expand=True, fill=True)
+        self._make_diff_paned_nonzero_size()
+        self._make_diff_nonzero_size()
+
+        self.treeview.emit('revision-selected')
+
+    def _make_diff_paned_nonzero_size(self):
+        """make sure the diff/revision pane isn't zero-width or zero-height"""
+        alloc = self.diff_paned.get_allocation()
+        if (alloc.width < 10) or (alloc.height < 10):
+            width, height = self.get_size()
+            self.diff_paned.set_size_request(width/3, int(height / 2.5))
 
     def _make_diff_nonzero_size(self):
         """make sure the diff isn't zero-width or zero-height"""
