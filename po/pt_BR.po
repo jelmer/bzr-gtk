@@ -8,15 +8,14 @@ msgstr ""
 "Project-Id-Version: olive\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2011-04-06 09:41+0000\n"
-"Last-Translator: Paulo Guilherme Pilotti Duarte "
-"<guilhermepilotti@gmail.com>\n"
+"PO-Revision-Date: 2011-05-09 18:26+0000\n"
+"Last-Translator: André Gondim <andregondim@ubuntu.com>\n"
 "Language-Team: Brazilian Portuguese <pt_BR@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-04-07 04:31+0000\n"
-"X-Generator: Launchpad (build 12735)\n"
+"X-Launchpad-Export-Date: 2011-05-10 04:30+0000\n"
+"X-Generator: Launchpad (build 12959)\n"
 
 #: ../errors.py:31
 msgid "Directory is not a checkout"
@@ -568,11 +567,11 @@ msgstr "Pasta"
 
 #: ../merge.py:56
 msgid "Custom Location"
-msgstr "Localização Personalizada"
+msgstr "Localização personalizada"
 
 #: ../merge.py:59
 msgid "_Merge"
-msgstr "_fusão"
+msgstr "_Mesclar"
 
 #: ../merge.py:132
 msgid "Branch not given"
@@ -1225,6 +1224,7 @@ msgstr "Você tem de especificar o nome desejado da tag."
 #~ "Launchpad Contributions:\n"
 #~ "  Alexandre Sapata Carbonell https://launchpad.net/~alexandre-sapata-"
 #~ "carbonell\n"
+#~ "  André Gondim https://launchpad.net/~andregondim\n"
 #~ "  Edvaldo de Souza Cruz https://launchpad.net/~edvaldoscruz\n"
 #~ "  Flávio Pontes https://launchpad.net/~flaviocpontes\n"
 #~ "  Leandro Pereira de Lima e Silva https://launchpad.net/~leandro-limaesilva\n"
