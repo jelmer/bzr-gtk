@@ -61,14 +61,10 @@ class GnomeKeyringCredentialStore(CredentialStore):
                         realm=None):
         if gnomekeyring is None:
             return None
-        if scheme in ('http', 'https'):
-            attrs = {'domain': realm}
-        else:
-            attrs = {
-                "protocol": scheme.encode("utf-8"),
-                "server": host.encode("utf-8"),
-                }
-        # TODO: realm for non http, https?
+        attrs = {'domain': realm}
+        if scheme not in ('http', 'https'): # Is it subversion over http?
+            attrs["protocol"] = scheme.encode("utf-8")
+            attrs["server"] = host.encode("utf-8")
         if port is not None:
             attrs["port"] = port
         if user is not None:
