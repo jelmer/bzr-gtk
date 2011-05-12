@@ -69,7 +69,6 @@ class GnomeKeyringCredentialStore(CredentialStore):
             attrs["port"] = port
         if user is not None:
             attrs["user"] = user.encode("utf-8")
-        attrs["domain"] = realm
         credentials = {"scheme": scheme, "host": host, "port": port,
             "realm": realm, "user": user}
         try:
