@@ -76,7 +76,6 @@ class GnomeKeyringCredentialStore(CredentialStore):
         attrs["domain"] = realm
         credentials = {"scheme": scheme, "host": host, "port": port,
             "realm": realm, "user": user}
-        print locals()
         try:
             items = gnomekeyring.find_items_sync(
                 gnomekeyring.ITEM_NETWORK_PASSWORD, attrs)
