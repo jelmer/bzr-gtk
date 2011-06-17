@@ -90,7 +90,7 @@ class GAnnotateConfig(configobj.ConfigObj):
         return False
 
     def _write(self, *args):
+        config.ensure_config_dir_exists()
         self.write()
-
         return False
 
