@@ -49,7 +49,8 @@ except dbus.exceptions.DBusException, e:
     # DBus sometimes fails like this, just treat it as if seahorse is not
     # available rather than crashing.
     if name in ("org.freedesktop.DBus.Error.Spawn.ExecFailed", 
-                "org.freedesktop.DBus.Error.ServiceUnknown"):
+                "org.freedesktop.DBus.Error.ServiceUnknown",
+                "org.freedesktop.DBus.Error.NotSupported"):
         raise ImportError
     else:
         raise
