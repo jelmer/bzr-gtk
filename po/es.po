@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: olive\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2011-04-25 05:59+0000\n"
+"PO-Revision-Date: 2011-06-20 19:58+0000\n"
 "Last-Translator: Fitoschido <fitoschido@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-04-26 04:33+0000\n"
-"X-Generator: Launchpad (build 12758)\n"
+"X-Launchpad-Export-Date: 2011-06-21 04:30+0000\n"
+"X-Generator: Launchpad (build 13168)\n"
 
 #: ../bazaar-properties.desktop.in.h:1
 msgid "Bazaar Preferences"
@@ -27,7 +27,7 @@ msgstr "Configurar Bazaar"
 
 #: ../bzr-handle-patch.desktop.in.h:1
 msgid "Apply Bazaar Bundle"
-msgstr ""
+msgstr "Aplicar paquete de Bazaar"
 
 #: ../bzr-handle-patch.desktop.in.h:2
 msgid "Bazaar"
@@ -228,7 +228,7 @@ msgstr ""
 
 #: ../commit.py:581
 msgid "Diff for "
-msgstr ""
+msgstr "Dif. para "
 
 #: ../commit.py:634
 msgid "Commit message for "
@@ -401,7 +401,7 @@ msgstr "Intente forzar el commit si desea hacerlo de todas formas."
 
 #: ../errors.py:37
 msgid "No changes to merge"
-msgstr ""
+msgstr "No hay cambios que fusionar"
 
 #: ../errors.py:38
 msgid "Merge location is already fully merged in working tree."
@@ -558,15 +558,15 @@ msgstr ""
 
 #: ../merge.py:54
 msgid "Merge from"
-msgstr ""
+msgstr "Fusionar desde"
 
 #: ../merge.py:56
 msgid "Folder"
-msgstr ""
+msgstr "Carpeta"
 
 #: ../merge.py:56
 msgid "Custom Location"
-msgstr ""
+msgstr "Ubicación personalizada"
 
 #: ../merge.py:59
 msgid "_Merge"
@@ -630,11 +630,11 @@ msgstr "_Seleccionar"
 
 #: ../search.py:44
 msgid "Search for:"
-msgstr ""
+msgstr "Buscar:"
 
 #: ../search.py:56
 msgid "Document"
-msgstr ""
+msgstr "Documento"
 
 #: ../status.py:94
 msgid "Added"
