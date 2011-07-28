@@ -86,5 +86,5 @@ class TestPendingRevisions(tests.TestCaseWithMemoryTransport):
 
         self.assertEqual(rev.committer, rv.committer.get_text())
         self.assertFalse(rv.file_info_box.get_property('visible'))
-        log = self._get_log(True)
+        log = self.get_log()
         self.assertContainsRe(log, 'Invalid per-file info for revision:A')
