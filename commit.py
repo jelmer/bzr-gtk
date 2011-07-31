@@ -16,12 +16,6 @@
 
 import re
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
-
 from gi.repository import Gtk
 from gi.repository import GObject
 from gi.repository import Pango

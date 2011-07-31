@@ -1,5 +1,4 @@
 
-import pygtk
 from gi.repository import Gtk
 
 class Window(Gtk.Window):

@@ -32,7 +32,6 @@ from bzrlib.errors import (
 from bzrlib.option import Option
 
 from bzrlib.plugins.gtk import (
-    import_pygtk,
     set_ui_factory,
     )
 from bzrlib.plugins.gtk.i18n import _i18n
@@ -46,14 +45,13 @@ class NoDisplayError(errors.BzrCommandError):
 
 
 def open_display():
-    pygtk = import_pygtk()
     try:
         from gi.repository import Gtk
     except RuntimeError, e:
         if str(e) == "could not open display":
             raise NoDisplayError
     set_ui_factory()
-    return gtk
+    return Gtk
 
 
 
@@ -236,7 +234,7 @@ class cmd_gannotate(GTKCommand):
     aliases = ["gblame", "gpraise"]
     
     def run(self, filename, all=False, plain=False, line='1', revision=None):
-        gtk = open_display()
+        Gtk = open_display()
 
         try:
             line = int(line)
@@ -331,7 +329,7 @@ class cmd_gstatus(GTKCommand):
     takes_options = ['revision']
 
     def run(self, path='.', revision=None):
-        gtk = open_display()
+        Gtk = open_display()
         from bzrlib.plugins.gtk.status import StatusWindow
         (wt, wt_path) = workingtree.WorkingTree.open_containing(path)
 
@@ -357,7 +355,7 @@ class cmd_gsend(GTKCommand):
     """
     def run(self):
         (br, path) = branch.Branch.open_containing(".")
-        gtk = open_display()
+        Gtk = open_display()
         from bzrlib.plugins.gtk.mergedirective import SendMergeDirectiveDialog
         from StringIO import StringIO
         dialog = SendMergeDirectiveDialog(br)
@@ -424,7 +422,6 @@ class cmd_gmissing(Command):
     """
     takes_args = ["other_branch?"]
     def run(self, other_branch=None):
-        pygtk = import_pygtk()
         try:
             from gi.repository import Gtk
         except RuntimeError, e:
@@ -476,7 +473,7 @@ class cmd_gtags(GTKCommand):
     def run(self):
         br = branch.Branch.open_containing('.')[0]
         
-        gtk = open_display()
+        Gtk = open_display()
         from tags import TagsWindow
         window = TagsWindow(br)
         window.show()

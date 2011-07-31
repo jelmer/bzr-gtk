@@ -16,8 +16,6 @@
 
 import time
 
-import pygtk
-pygtk.require("2.0")
 from gi.repository import GObject
 from gi.repository import Gtk
 from gi.repository import Pango

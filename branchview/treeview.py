@@ -356,10 +356,7 @@ class TreeView(Gtk.VBox):
         self.treeview.set_search_equal_func(search_equal_func)
         self.treeview.set_enable_search(True)
 
-        # Fix old PyGTK bug - by JAM
-        set_tooltip = getattr(self.treeview, 'set_tooltip_column', None)
-        if set_tooltip is not None:
-            set_tooltip(treemodel.MESSAGE)
+        set_tooltip(treemodel.MESSAGE)
 
         self._prev_cursor_path = None
         self.treeview.connect("cursor-changed",

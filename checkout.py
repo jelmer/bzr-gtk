@@ -16,12 +16,6 @@
 
 import os
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
-
 from gi.repository import Gtk
 
 from bzrlib.branch import Branch

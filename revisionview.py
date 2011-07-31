@@ -15,8 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import pygtk
-pygtk.require("2.0")
 from gi.repository import Gtk
 from gi.repository import Pango
 from gi.repository import GObject
@@ -54,7 +52,6 @@ def _open_link(widget, uri):
     webbrowser.open(uri)
 
 if getattr(gtk, 'link_button_set_uri_hook', None) is not None:
-    # Not available before PyGtk-2.10
     Gtk.link_button_set_uri_hook(_open_link)
 
 class BugsTab(Gtk.VBox):

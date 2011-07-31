@@ -78,7 +78,6 @@ class BranchWindow(Window):
         self.add_accel_group(self.accel_group)
 
         if getattr(Gtk.Action, 'set_tool_item_type', None) is not None:
-            # Not available before PyGtk-2.10
             Gtk.Action.set_tool_item_type(Gtk.MenuToolButton)
 
         self.prev_rev_action = Gtk.Action("prev-rev", "_Previous Revision", "Go to the previous revision", Gtk.STOCK_GO_DOWN)
