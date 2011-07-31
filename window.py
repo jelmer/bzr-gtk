@@ -1,10 +1,12 @@
 
+from gi.repository import Gdk
 from gi.repository import Gtk
+
 
 class Window(Gtk.Window):
 
     def __init__(self, parent=None):
-        GObject.GObject.__init__(self, Gtk.WindowType.TOPLEVEL)
+        Gtk.Window.__init__(self, type=Gtk.WindowType.TOPLEVEL)
         self._parent = parent
 
         self.connect('key-press-event', self._on_key_press)

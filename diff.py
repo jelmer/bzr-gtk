@@ -68,7 +68,7 @@ class DiffFileView(Gtk.ScrolledWindow):
     """Window for displaying diffs from a diff file"""
 
     def __init__(self):
-        GObject.GObject.__init__(self)
+        Gtk.ScrolledWindow.__init__(self)
         self.construct()
         self._diffs = {}
 
@@ -78,17 +78,15 @@ class DiffFileView(Gtk.ScrolledWindow):
 
         if have_gtksourceview:
             self.buffer = GtkSource.Buffer()
-            slm = GtkSource.LanguageManager()
-            guess_language = getattr(GtkSource.LanguageManager, 
-                "guess_language", fallback_guess_language)
-            gsl = guess_language(slm, content_type="text/x-patch")
+            lang_manager = GtkSource.LanguageManager.get_default()
+            language = lang_manager.guess_language(None, "text/x-patch")
             if have_gconf:
                 self.apply_gedit_colors(self.buffer)
             self.apply_colordiff_colors(self.buffer)
-            self.buffer.set_language(gsl)
+            self.buffer.set_language(language)
             self.buffer.set_highlight_syntax(True)
 
-            self.sourceview = GtkSource.View(self.buffer)
+            self.sourceview = GtkSource.View(buffer=self.buffer)
         else:
             self.buffer = Gtk.TextBuffer()
             self.sourceview = Gtk.TextView(self.buffer)
@@ -297,7 +295,7 @@ class DiffWidget(Gtk.HPaned):
         scrollwin.show()
         
         self.model = Gtk.TreeStore(str, str)
-        self.treeview = Gtk.TreeView(self.model)
+        self.treeview = Gtk.TreeView(model=self.model)
         self.treeview.set_headers_visible(False)
         self.treeview.set_search_column(1)
         self.treeview.connect("cursor-changed", self._treeview_cursor_cb)
@@ -307,7 +305,7 @@ class DiffWidget(Gtk.HPaned):
         cell = Gtk.CellRendererText()
         cell.set_property("width-chars", 20)
         column = Gtk.TreeViewColumn()
-        column.pack_start(cell, True, True, 0)
+        column.pack_start(cell, True)
         column.add_attribute(cell, "text", 0)
         self.treeview.append_column(column)
 
@@ -444,9 +442,10 @@ class DiffWindow(Window):
     def _get_menu_bar(self):
         menubar = Gtk.MenuBar()
         # View menu
-        mb_view = Gtk.MenuItem(_i18n("_View"))
+        mb_view = Gtk.MenuItem(label=_i18n("_View"))
         mb_view_menu = Gtk.Menu()
-        mb_view_wrapsource = Gtk.CheckMenuItem(_i18n("Wrap _Long Lines"))
+        mb_view_wrapsource = Gtk.CheckMenuItem(
+            label=_i18n("Wrap _Long Lines"))
         mb_view_wrapsource.connect('activate', self.diff._on_wraplines_toggled)
         mb_view_wrapsource.show()
         mb_view_menu.append(mb_view_wrapsource)
