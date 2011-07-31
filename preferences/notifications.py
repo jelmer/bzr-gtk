@@ -20,7 +20,7 @@ try:
 except:
     pass
 
-import gtk
+from gi.repository import Gtk
 
 import bzrlib.plugins.gtk
 from bzrlib.plugins.gtk.notify import (
@@ -36,49 +36,49 @@ def has_cia():
     return (getattr(bzrlib.plugins, "cia", None) is not None)
 
 
-class NotificationsPage(gtk.VBox):
+class NotificationsPage(Gtk.VBox):
 
     def __init__(self, config, homogeneous=False, spacing=6):
         self.config = config
-        gtk.VBox.__init__(self, homogeneous=homogeneous, spacing=spacing)
+        GObject.GObject.__init__(self, homogeneous=homogeneous, spacing=spacing)
         self.set_spacing(spacing) # The vertical one
 
-        lan_frame = gtk.Frame("LAN Notifications")
+        lan_frame = Gtk.Frame("LAN Notifications")
 
-        lan_vbox = gtk.VBox()
+        lan_vbox = Gtk.VBox()
         lan_frame.add(lan_vbox)
 
-        self.gateway_to_lan = gtk.CheckButton("_Gateway to LAN")
-        lan_vbox.pack_start(self.gateway_to_lan)
+        self.gateway_to_lan = Gtk.CheckButton("_Gateway to LAN")
+        lan_vbox.pack_start(self.gateway_to_lan, True, True, 0)
         self.gateway_to_lan.set_sensitive(has_dbus())
 
-        self.announce_on_lan = gtk.CheckButton("_Announce on LAN")
-        lan_vbox.pack_start(self.announce_on_lan)
+        self.announce_on_lan = Gtk.CheckButton("_Announce on LAN")
+        lan_vbox.pack_start(self.announce_on_lan, True, True, 0)
         self.announce_on_lan.set_sensitive(has_avahi())
 
-        self.pack_start(lan_frame)
+        self.pack_start(lan_frame, True, True, 0)
 
-        email_frame = gtk.Frame("E-mail notifications")
+        email_frame = Gtk.Frame("E-mail notifications")
 
-        email_hbox = gtk.HBox()
-        self.send_email = gtk.CheckButton("Send _E-Mail to")
-        email_hbox.pack_start(self.send_email)
-        self.send_email_to = gtk.Entry()
-        email_hbox.pack_start(self.send_email_to)
+        email_hbox = Gtk.HBox()
+        self.send_email = Gtk.CheckButton("Send _E-Mail to")
+        email_hbox.pack_start(self.send_email, True, True, 0)
+        self.send_email_to = Gtk.Entry()
+        email_hbox.pack_start(self.send_email_to, True, True, 0)
 
         email_frame.add(email_hbox)
         email_frame.set_sensitive(has_email())
 
-        self.pack_start(email_frame)
+        self.pack_start(email_frame, True, True, 0)
 
-        cia_frame = gtk.Frame("CIA notifications")
+        cia_frame = Gtk.Frame("CIA notifications")
 
-        cia_user_hbox = gtk.HBox()
-        cia_user_hbox.pack_start(gtk.Label("Author name"))
-        self.cia_user = gtk.Entry()
-        cia_user_hbox.pack_start(self.cia_user)
+        cia_user_hbox = Gtk.HBox()
+        cia_user_hbox.pack_start(Gtk.Label("Author name", True, True, 0))
+        self.cia_user = Gtk.Entry()
+        cia_user_hbox.pack_start(self.cia_user, True, True, 0)
 
         cia_frame.add(cia_user_hbox)
         cia_frame.set_sensitive(has_cia())
 
-        self.pack_start(cia_frame)
+        self.pack_start(cia_frame, True, True, 0)

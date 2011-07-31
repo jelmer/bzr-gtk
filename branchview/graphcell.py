@@ -16,13 +16,13 @@ __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 import math
 
-import gtk
-import gobject
-import pango
+from gi.repository import Gtk
+from gi.repository import GObject
+from gi.repository import Pango
 import cairo
 
 
-class CellRendererGraph(gtk.GenericCellRenderer):
+class CellRendererGraph(Gtk.GenericCellRenderer):
     """Cell renderer for directed graph.
 
     Properties:
@@ -34,21 +34,21 @@ class CellRendererGraph(gtk.GenericCellRenderer):
     columns_len = 0
 
     __gproperties__ = {
-        "node":         ( gobject.TYPE_PYOBJECT, "node",
+        "node":         ( GObject.TYPE_PYOBJECT, "node",
                           "revision node instruction",
-                          gobject.PARAM_WRITABLE
+                          GObject.PARAM_WRITABLE
                         ),
-        "tags":         ( gobject.TYPE_PYOBJECT, "tags",
+        "tags":         ( GObject.TYPE_PYOBJECT, "tags",
                           "list of tags associated with the node",
-                          gobject.PARAM_WRITABLE
+                          GObject.PARAM_WRITABLE
                         ),
-        "in-lines":     ( gobject.TYPE_PYOBJECT, "in-lines",
+        "in-lines":     ( GObject.TYPE_PYOBJECT, "in-lines",
                           "instructions to draw lines into the cell",
-                          gobject.PARAM_WRITABLE
+                          GObject.PARAM_WRITABLE
                         ),
-        "out-lines":    ( gobject.TYPE_PYOBJECT, "out-lines",
+        "out-lines":    ( GObject.TYPE_PYOBJECT, "out-lines",
                           "instructions to draw lines out of the cell",
-                          gobject.PARAM_WRITABLE
+                          GObject.PARAM_WRITABLE
                         ),
         }
 
@@ -78,8 +78,8 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             font_desc = widget.get_style().font_desc
             metrics = pango_ctx.get_metrics(font_desc)
 
-            ascent = pango.PIXELS(metrics.get_ascent())
-            descent = pango.PIXELS(metrics.get_descent())
+            ascent = Pango.PIXELS(metrics.get_ascent())
+            descent = Pango.PIXELS(metrics.get_descent())
 
             self._box_size = ascent + descent + 6
             return self._box_size
@@ -168,7 +168,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                 cell_area.y + cell_area.height / 2,
                 box_size / 4, 0, 2 * math.pi)
 
-        if flags & gtk.CELL_RENDERER_SELECTED:
+        if flags & Gtk.CELL_RENDERER_SELECTED:
             ctx.set_source_rgb(1.0, 1.0, 1.0)
             ctx.set_line_width(box_size / 4)
             ctx.stroke_preserve()
@@ -217,7 +217,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                              endx, mid + height / 5 ,
                              endx, mid + height / 2 + 1)
 
-        if flags & gtk.CELL_RENDERER_SELECTED:
+        if flags & Gtk.CELL_RENDERER_SELECTED:
             ctx.set_source_rgb(1.0, 1.0, 1.0)
             ctx.set_line_width(box_size / 5)
             ctx.stroke_preserve()
@@ -233,10 +233,10 @@ class CellRendererGraph(gtk.GenericCellRenderer):
 
         (column, colour) = self.node
 
-        font_desc = pango.FontDescription()
-        font_desc.set_size(pango.SCALE * 7)
+        font_desc = Pango.FontDescription()
+        font_desc.set_size(Pango.SCALE * 7)
 
-        tag_layout = pango.Layout(pango_ctx)
+        tag_layout = Pango.Layout(pango_ctx)
         tag_layout.set_font_description(font_desc)
 
         # The width of the tag label stack

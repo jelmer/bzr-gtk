@@ -22,9 +22,9 @@ try:
 except:
     pass
 
-import gtk
-import gobject
-import pango
+from gi.repository import Gtk
+from gi.repository import GObject
+from gi.repository import Pango
 
 from bzrlib import (
     errors,
@@ -109,16 +109,16 @@ def _sanitize_and_decode_message(utf8_message):
     return fixed_newline.decode('utf-8')
 
 
-class CommitDialog(gtk.Dialog):
+class CommitDialog(Gtk.Dialog):
     """Implementation of Commit."""
 
     def __init__(self, wt, selected=None, parent=None):
-        gtk.Dialog.__init__(self, title="Commit to %s" % wt.basedir,
+        GObject.GObject.__init__(self, title="Commit to %s" % wt.basedir,
                             parent=parent, flags=0,)
         self.connect('delete-event', self._on_delete_window)
         self._question_dialog = question_dialog
 
-        self.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_NORMAL)
+        self.set_type_hint(Gdk.WindowTypeHint.NORMAL)
 
         self._wt = wt
         # TODO: Do something with this value, it is used by Olive
@@ -286,13 +286,13 @@ class CommitDialog(gtk.Dialog):
         """Build up the dialog widgets."""
         # The primary pane which splits it into left and right (adjustable)
         # sections.
-        self._hpane = gtk.HPaned()
+        self._hpane = Gtk.HPaned()
 
         self._construct_left_pane()
         self._construct_right_pane()
         self._construct_action_pane()
 
-        self.vbox.pack_start(self._hpane)
+        self.vbox.pack_start(self._hpane, True, True, 0)
         self._hpane.show()
         self.set_focus(self._global_message_text_view)
 
@@ -317,20 +317,20 @@ class CommitDialog(gtk.Dialog):
         self._hpane.set_position(300)
 
     def _construct_accelerators(self):
-        group = gtk.AccelGroup()
-        group.connect_group(gtk.gdk.keyval_from_name('N'),
-                            gtk.gdk.CONTROL_MASK, 0, self._on_accel_next)
+        group = Gtk.AccelGroup()
+        group.connect_group(Gdk.keyval_from_name('N'),
+                            Gdk.EventMask.CONTROL_MASK, 0, self._on_accel_next)
         self.add_accel_group(group)
 
         # ignore the escape key (avoid closing the window)
         self.connect_object('close', self.emit_stop_by_name, 'close')
 
     def _construct_left_pane(self):
-        self._left_pane_box = gtk.VBox(homogeneous=False, spacing=5)
+        self._left_pane_box = Gtk.VBox(homogeneous=False, spacing=5)
         self._construct_file_list()
         self._construct_pending_list()
 
-        self._check_local = gtk.CheckButton(_i18n("_Only commit locally"),
+        self._check_local = Gtk.CheckButton(_i18n("_Only commit locally"),
                                             use_underline=True)
         self._left_pane_box.pack_end(self._check_local, False, False)
         self._check_local.set_active(False)
@@ -345,7 +345,7 @@ class CommitDialog(gtk.Dialog):
         # commit, and 1 for file commit, and it looked good. But I don't seem
         # to have a way to do that with the gtk boxes... :( (Which is extra
         # weird since wx uses gtk on Linux...)
-        self._right_pane_table = gtk.Table(rows=10, columns=1, homogeneous=False)
+        self._right_pane_table = Gtk.Table(rows=10, columns=1, homogeneous=False)
         self._right_pane_table.set_row_spacings(5)
         self._right_pane_table.set_col_spacings(5)
         self._right_pane_table_row = 0
@@ -357,13 +357,13 @@ class CommitDialog(gtk.Dialog):
         self._hpane.pack2(self._right_pane_table, resize=True, shrink=True)
 
     def _construct_action_pane(self):
-        self._button_cancel = gtk.Button(stock=gtk.STOCK_CANCEL)
+        self._button_cancel = Gtk.Button(stock=Gtk.STOCK_CANCEL)
         self._button_cancel.connect('clicked', self._on_cancel_clicked)
         self._button_cancel.show()
         self.action_area.pack_end(self._button_cancel)
-        self._button_commit = gtk.Button(_i18n("Comm_it"), use_underline=True)
+        self._button_commit = Gtk.Button(_i18n("Comm_it"), use_underline=True)
         self._button_commit.connect('clicked', self._on_commit_clicked)
-        self._button_commit.set_flags(gtk.CAN_DEFAULT)
+        self._button_commit.set_can_default(True)
         self._button_commit.show()
         self.action_area.pack_end(self._button_commit)
         self._button_commit.grab_default()
@@ -377,7 +377,7 @@ class CommitDialog(gtk.Dialog):
         """
         end_row = self._right_pane_table_row + weight
         options = 0
-        expand_opts = gtk.EXPAND | gtk.FILL | gtk.SHRINK
+        expand_opts = Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL | Gtk.AttachOptions.SHRINK
         if expanding:
             options = expand_opts
         self._right_pane_table.attach(widget, 0, 1,
@@ -386,20 +386,20 @@ class CommitDialog(gtk.Dialog):
         self._right_pane_table_row = end_row
 
     def _construct_file_list(self):
-        self._files_box = gtk.VBox(homogeneous=False, spacing=0)
-        file_label = gtk.Label(_i18n('Files'))
+        self._files_box = Gtk.VBox(homogeneous=False, spacing=0)
+        file_label = Gtk.Label(label=_i18n('Files'))
         # file_label.show()
-        self._files_box.pack_start(file_label, expand=False)
+        self._files_box.pack_start(file_label, False, True, 0)
 
-        self._commit_all_files_radio = gtk.RadioButton(
+        self._commit_all_files_radio = Gtk.RadioButton(
             None, _i18n("Commit all changes"))
-        self._files_box.pack_start(self._commit_all_files_radio, expand=False)
+        self._files_box.pack_start(self._commit_all_files_radio, False, True, 0)
         self._commit_all_files_radio.show()
         self._commit_all_files_radio.connect('toggled',
             self._toggle_commit_selection)
-        self._commit_selected_radio = gtk.RadioButton(
+        self._commit_selected_radio = Gtk.RadioButton(
             self._commit_all_files_radio, _i18n("Only commit selected changes"))
-        self._files_box.pack_start(self._commit_selected_radio, expand=False)
+        self._files_box.pack_start(self._commit_selected_radio, False, True, 0)
         self._commit_selected_radio.show()
         self._commit_selected_radio.connect('toggled',
             self._toggle_commit_selection)
@@ -408,45 +408,45 @@ class CommitDialog(gtk.Dialog):
             self._commit_all_files_radio.set_sensitive(False)
             self._commit_selected_radio.set_sensitive(False)
 
-        scroller = gtk.ScrolledWindow()
-        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self._treeview_files = gtk.TreeView()
+        scroller = Gtk.ScrolledWindow()
+        scroller.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        self._treeview_files = Gtk.TreeView()
         self._treeview_files.show()
         scroller.add(self._treeview_files)
-        scroller.set_shadow_type(gtk.SHADOW_IN)
+        scroller.set_shadow_type(Gtk.ShadowType.IN)
         scroller.show()
         self._files_box.pack_start(scroller,
                                    expand=True, fill=True)
         self._files_box.show()
-        self._left_pane_box.pack_start(self._files_box)
+        self._left_pane_box.pack_start(self._files_box, True, True, 0)
 
         # Keep note that all strings stored in a ListStore must be UTF-8
         # strings. GTK does not support directly setting and restoring Unicode
         # objects.
-        liststore = gtk.ListStore(
-            gobject.TYPE_STRING,  # [0] file_id
-            gobject.TYPE_STRING,  # [1] real path
-            gobject.TYPE_BOOLEAN, # [2] checkbox
-            gobject.TYPE_STRING,  # [3] display path
-            gobject.TYPE_STRING,  # [4] changes type
-            gobject.TYPE_STRING,  # [5] commit message
+        liststore = Gtk.ListStore(
+            GObject.TYPE_STRING,  # [0] file_id
+            GObject.TYPE_STRING,  # [1] real path
+            GObject.TYPE_BOOLEAN, # [2] checkbox
+            GObject.TYPE_STRING,  # [3] display path
+            GObject.TYPE_STRING,  # [4] changes type
+            GObject.TYPE_STRING,  # [5] commit message
             )
         self._files_store = liststore
         self._treeview_files.set_model(liststore)
-        crt = gtk.CellRendererToggle()
+        crt = Gtk.CellRendererToggle()
         crt.set_property('activatable', not bool(self._pending))
         crt.connect("toggled", self._toggle_commit, self._files_store)
         if self._pending:
             name = _i18n('Commit*')
         else:
             name = _i18n('Commit')
-        commit_col = gtk.TreeViewColumn(name, crt, active=2)
+        commit_col = Gtk.TreeViewColumn(name, crt, active=2)
         commit_col.set_visible(False)
         self._treeview_files.append_column(commit_col)
-        self._treeview_files.append_column(gtk.TreeViewColumn(_i18n('Path'),
-                                           gtk.CellRendererText(), text=3))
-        self._treeview_files.append_column(gtk.TreeViewColumn(_i18n('Type'),
-                                           gtk.CellRendererText(), text=4))
+        self._treeview_files.append_column(Gtk.TreeViewColumn(_i18n('Path'),
+                                           Gtk.CellRendererText(), text=3))
+        self._treeview_files.append_column(Gtk.TreeViewColumn(_i18n('Type'),
+                                           Gtk.CellRendererText(), text=4))
         self._treeview_files.connect('cursor-changed',
                                      self._on_treeview_files_cursor_changed)
 
@@ -473,43 +473,43 @@ class CommitDialog(gtk.Dialog):
     def _construct_pending_list(self):
         # Pending information defaults to hidden, we put it all in 1 box, so
         # that we can show/hide all of them at once
-        self._pending_box = gtk.VBox()
+        self._pending_box = Gtk.VBox()
         self._pending_box.hide()
 
-        pending_message = gtk.Label()
+        pending_message = Gtk.Label()
         pending_message.set_markup(
             _i18n('<i>* Cannot select specific files when merging</i>'))
         self._pending_box.pack_start(pending_message, expand=False, padding=5)
         pending_message.show()
 
-        pending_label = gtk.Label(_i18n('Pending Revisions'))
+        pending_label = Gtk.Label(label=_i18n('Pending Revisions'))
         self._pending_box.pack_start(pending_label, expand=False, padding=0)
         pending_label.show()
 
-        scroller = gtk.ScrolledWindow()
-        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self._treeview_pending = gtk.TreeView()
+        scroller = Gtk.ScrolledWindow()
+        scroller.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        self._treeview_pending = Gtk.TreeView()
         scroller.add(self._treeview_pending)
-        scroller.set_shadow_type(gtk.SHADOW_IN)
+        scroller.set_shadow_type(Gtk.ShadowType.IN)
         scroller.show()
         self._pending_box.pack_start(scroller,
                                      expand=True, fill=True, padding=5)
         self._treeview_pending.show()
-        self._left_pane_box.pack_start(self._pending_box)
+        self._left_pane_box.pack_start(self._pending_box, True, True, 0)
 
-        liststore = gtk.ListStore(gobject.TYPE_STRING, # revision_id
-                                  gobject.TYPE_STRING, # date
-                                  gobject.TYPE_STRING, # committer
-                                  gobject.TYPE_STRING, # summary
+        liststore = Gtk.ListStore(GObject.TYPE_STRING, # revision_id
+                                  GObject.TYPE_STRING, # date
+                                  GObject.TYPE_STRING, # committer
+                                  GObject.TYPE_STRING, # summary
                                  )
         self._pending_store = liststore
         self._treeview_pending.set_model(liststore)
-        self._treeview_pending.append_column(gtk.TreeViewColumn(_i18n('Date'),
-                                             gtk.CellRendererText(), text=1))
-        self._treeview_pending.append_column(gtk.TreeViewColumn(_i18n('Committer'),
-                                             gtk.CellRendererText(), text=2))
-        self._treeview_pending.append_column(gtk.TreeViewColumn(_i18n('Summary'),
-                                             gtk.CellRendererText(), text=3))
+        self._treeview_pending.append_column(Gtk.TreeViewColumn(_i18n('Date'),
+                                             Gtk.CellRendererText(), text=1))
+        self._treeview_pending.append_column(Gtk.TreeViewColumn(_i18n('Committer'),
+                                             Gtk.CellRendererText(), text=2))
+        self._treeview_pending.append_column(Gtk.TreeViewColumn(_i18n('Summary'),
+                                             Gtk.CellRendererText(), text=3))
 
     def _construct_diff_view(self):
         from bzrlib.plugins.gtk.diff import DiffView
@@ -518,7 +518,7 @@ class CommitDialog(gtk.Dialog):
         #       decide that we really don't ever want to display it, we should
         #       actually remove it, and other references to it, along with the
         #       tests that it is set properly.
-        self._diff_label = gtk.Label(_i18n('Diff for whole tree'))
+        self._diff_label = Gtk.Label(label=_i18n('Diff for whole tree'))
         self._diff_label.set_alignment(0, 0)
         self._right_pane_table.set_row_spacing(self._right_pane_table_row, 0)
         self._add_to_right_table(self._diff_label, 1, False)
@@ -529,27 +529,27 @@ class CommitDialog(gtk.Dialog):
         self._diff_view.show()
 
     def _construct_file_message(self):
-        scroller = gtk.ScrolledWindow()
-        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroller = Gtk.ScrolledWindow()
+        scroller.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 
-        self._file_message_text_view = gtk.TextView()
+        self._file_message_text_view = Gtk.TextView()
         scroller.add(self._file_message_text_view)
-        scroller.set_shadow_type(gtk.SHADOW_IN)
+        scroller.set_shadow_type(Gtk.ShadowType.IN)
         scroller.show()
 
-        self._file_message_text_view.modify_font(pango.FontDescription("Monospace"))
-        self._file_message_text_view.set_wrap_mode(gtk.WRAP_WORD)
+        self._file_message_text_view.modify_font(Pango.FontDescription("Monospace"))
+        self._file_message_text_view.set_wrap_mode(Gtk.WrapMode.WORD)
         self._file_message_text_view.set_accepts_tab(False)
         self._file_message_text_view.show()
 
-        self._file_message_expander = gtk.Expander(_i18n('File commit message'))
+        self._file_message_expander = Gtk.Expander(_i18n('File commit message'))
         self._file_message_expander.set_expanded(True)
         self._file_message_expander.add(scroller)
         self._add_to_right_table(self._file_message_expander, 1, False)
         self._file_message_expander.show()
 
     def _construct_global_message(self):
-        self._global_message_label = gtk.Label(_i18n('Global Commit Message'))
+        self._global_message_label = Gtk.Label(label=_i18n('Global Commit Message'))
         self._global_message_label.set_markup(
             _i18n('<b>Global Commit Message</b>'))
         self._global_message_label.set_alignment(0, 0)
@@ -558,17 +558,17 @@ class CommitDialog(gtk.Dialog):
         # Can we remove the spacing between the label and the box?
         self._global_message_label.show()
 
-        scroller = gtk.ScrolledWindow()
-        scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+        scroller = Gtk.ScrolledWindow()
+        scroller.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
 
-        self._global_message_text_view = gtk.TextView()
+        self._global_message_text_view = Gtk.TextView()
         self._set_global_commit_message(self._saved_commit_messages_manager.get()[0])
-        self._global_message_text_view.modify_font(pango.FontDescription("Monospace"))
+        self._global_message_text_view.modify_font(Pango.FontDescription("Monospace"))
         scroller.add(self._global_message_text_view)
-        scroller.set_shadow_type(gtk.SHADOW_IN)
+        scroller.set_shadow_type(Gtk.ShadowType.IN)
         scroller.show()
         self._add_to_right_table(scroller, 2, True)
-        self._file_message_text_view.set_wrap_mode(gtk.WRAP_WORD)
+        self._file_message_text_view.set_wrap_mode(Gtk.WrapMode.WORD)
         self._file_message_text_view.set_accepts_tab(False)
         self._global_message_text_view.show()
 
@@ -689,11 +689,11 @@ class CommitDialog(gtk.Dialog):
                 _i18n('Commit cancelled'),
                 _i18n('Do you want to save your commit messages ?'),
                 parent=self)
-            if response == gtk.RESPONSE_NO:
+            if response == Gtk.ResponseType.NO:
                  # save nothing and destroy old comments if any
                 mgr = SavedCommitMessagesManager()
         mgr.save(self._wt, self._wt.branch)
-        self.response(gtk.RESPONSE_CANCEL) # close window
+        self.response(Gtk.ResponseType.CANCEL) # close window
 
     @show_bzr_error
     def _on_commit_clicked(self, button):
@@ -708,7 +708,7 @@ class CommitDialog(gtk.Dialog):
                 _i18n('Commit with an empty message?'),
                 _i18n('You can describe your commit intent in the message.'),
                 parent=self)
-            if response == gtk.RESPONSE_NO:
+            if response == Gtk.ResponseType.NO:
                 # Kindly give focus to message area
                 self._global_message_text_view.grab_focus()
                 return
@@ -730,7 +730,7 @@ class CommitDialog(gtk.Dialog):
                 _i18n("Unknown files exist in the working tree. Commit anyway?"),
                 parent=self)
                 # Doesn't set a parent for the dialog..
-            if response == gtk.RESPONSE_NO:
+            if response == Gtk.ResponseType.NO:
                 return
             break
 
@@ -751,7 +751,7 @@ class CommitDialog(gtk.Dialog):
                 _i18n('There are no changes in the working tree.'
                       ' Do you want to commit anyway?'),
                 parent=self)
-            if response == gtk.RESPONSE_YES:
+            if response == Gtk.ResponseType.YES:
                 rev_id = self._wt.commit(message,
                                allow_pointless=True,
                                strict=False,
@@ -761,7 +761,7 @@ class CommitDialog(gtk.Dialog):
         self.committed_revision_id = rev_id
         # destroy old comments if any
         SavedCommitMessagesManager().save(self._wt, self._wt.branch)
-        self.response(gtk.RESPONSE_OK)
+        self.response(Gtk.ResponseType.OK)
 
     def _get_global_commit_message(self):
         buf = self._global_message_text_view.get_buffer()

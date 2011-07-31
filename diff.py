@@ -12,8 +12,8 @@ from cStringIO import StringIO
 
 import pygtk
 pygtk.require("2.0")
-import gtk
-import pango
+from gi.repository import Gtk
+from gi.repository import Pango
 import os
 import re
 import sys
@@ -24,12 +24,12 @@ except ImportError:
     from elementtree.ElementTree import Element, SubElement, tostring
 
 try:
-    import gtksourceview2
+    from gi.repository import GtkSource
     have_gtksourceview = True
 except ImportError:
     have_gtksourceview = False
 try:
-    import gconf
+    from gi.repository import GConf
     have_gconf = True
 except ImportError:
     have_gconf = False
@@ -66,22 +66,22 @@ class SelectCancelled(Exception):
     pass
 
 
-class DiffFileView(gtk.ScrolledWindow):
+class DiffFileView(Gtk.ScrolledWindow):
     """Window for displaying diffs from a diff file"""
 
     def __init__(self):
-        gtk.ScrolledWindow.__init__(self)
+        GObject.GObject.__init__(self)
         self.construct()
         self._diffs = {}
 
     def construct(self):
-        self.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self.set_shadow_type(gtk.SHADOW_IN)
+        self.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        self.set_shadow_type(Gtk.ShadowType.IN)
 
         if have_gtksourceview:
-            self.buffer = gtksourceview2.Buffer()
-            slm = gtksourceview2.LanguageManager()
-            guess_language = getattr(gtksourceview2.LanguageManager, 
+            self.buffer = GtkSource.Buffer()
+            slm = GtkSource.LanguageManager()
+            guess_language = getattr(GtkSource.LanguageManager, 
                 "guess_language", fallback_guess_language)
             gsl = guess_language(slm, content_type="text/x-patch")
             if have_gconf:
@@ -90,13 +90,13 @@ class DiffFileView(gtk.ScrolledWindow):
             self.buffer.set_language(gsl)
             self.buffer.set_highlight_syntax(True)
 
-            self.sourceview = gtksourceview2.View(self.buffer)
+            self.sourceview = GtkSource.View(self.buffer)
         else:
-            self.buffer = gtk.TextBuffer()
-            self.sourceview = gtk.TextView(self.buffer)
+            self.buffer = Gtk.TextBuffer()
+            self.sourceview = Gtk.TextView(self.buffer)
 
         self.sourceview.set_editable(False)
-        self.sourceview.modify_font(pango.FontDescription("Monospace"))
+        self.sourceview.modify_font(Pango.FontDescription("Monospace"))
         self.add(self.sourceview)
         self.sourceview.show()
 
@@ -106,15 +106,15 @@ class DiffFileView(gtk.ScrolledWindow):
 
         This method needs the gconf module.
 
-        :param buf: a gtksourceview2.Buffer object.
+        :param buf: a GtkSource.Buffer object.
         """
         GEDIT_SCHEME_PATH = '/apps/gedit-2/preferences/editor/colors/scheme'
         GEDIT_USER_STYLES_PATH = os.path.expanduser('~/.gnome2/gedit/styles')
 
-        client = gconf.client_get_default()
+        client = GConf.Client.get_default()
         style_scheme_name = client.get_string(GEDIT_SCHEME_PATH)
         if style_scheme_name is not None:
-            style_scheme_mgr = gtksourceview2.StyleSchemeManager()
+            style_scheme_mgr = GtkSource.StyleSchemeManager()
             style_scheme_mgr.append_search_path(GEDIT_USER_STYLES_PATH)
             
             style_scheme = style_scheme_mgr.get_scheme(style_scheme_name)
@@ -128,9 +128,9 @@ class DiffFileView(gtk.ScrolledWindow):
 
         Both ~/.colordiffrc and ~/.colordiffrc.bzr-gtk are read.
 
-        :param buf: a "Diff" gtksourceview2.Buffer object.
+        :param buf: a "Diff" GtkSource.Buffer object.
         """
-        scheme_manager = gtksourceview2.StyleSchemeManager()
+        scheme_manager = GtkSource.StyleSchemeManager()
         style_scheme = scheme_manager.get_scheme('colordiff')
         
         # if style scheme not found, we'll generate it from colordiffrc
@@ -284,7 +284,7 @@ class DiffView(DiffFileView):
         self.buffer.set_text(decoded.encode('UTF-8'))
 
 
-class DiffWidget(gtk.HPaned):
+class DiffWidget(Gtk.HPaned):
     """Diff widget
 
     """
@@ -292,24 +292,24 @@ class DiffWidget(gtk.HPaned):
         super(DiffWidget, self).__init__()
 
         # The file hierarchy: a scrollable treeview
-        scrollwin = gtk.ScrolledWindow()
-        scrollwin.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-        scrollwin.set_shadow_type(gtk.SHADOW_IN)
+        scrollwin = Gtk.ScrolledWindow()
+        scrollwin.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scrollwin.set_shadow_type(Gtk.ShadowType.IN)
         self.pack1(scrollwin)
         scrollwin.show()
         
-        self.model = gtk.TreeStore(str, str)
-        self.treeview = gtk.TreeView(self.model)
+        self.model = Gtk.TreeStore(str, str)
+        self.treeview = Gtk.TreeView(self.model)
         self.treeview.set_headers_visible(False)
         self.treeview.set_search_column(1)
         self.treeview.connect("cursor-changed", self._treeview_cursor_cb)
         scrollwin.add(self.treeview)
         self.treeview.show()
 
-        cell = gtk.CellRendererText()
+        cell = Gtk.CellRendererText()
         cell.set_property("width-chars", 20)
-        column = gtk.TreeViewColumn()
-        column.pack_start(cell, expand=True)
+        column = Gtk.TreeViewColumn()
+        column.pack_start(cell, True, True, 0)
         column.add_attribute(cell, "text", 0)
         self.treeview.append_column(column)
 
@@ -403,9 +403,9 @@ class DiffWidget(gtk.HPaned):
     def _on_wraplines_toggled(self, widget=None, wrap=False):
         """Callback for when the wrap lines checkbutton is toggled"""
         if wrap or widget.get_active():
-            self.diff_view.sourceview.set_wrap_mode(gtk.WRAP_WORD)
+            self.diff_view.sourceview.set_wrap_mode(Gtk.WrapMode.WORD)
         else:
-            self.diff_view.sourceview.set_wrap_mode(gtk.WRAP_NONE)
+            self.diff_view.sourceview.set_wrap_mode(Gtk.WrapMode.NONE)
 
 class DiffWindow(Window):
     """Diff window.
@@ -429,7 +429,7 @@ class DiffWindow(Window):
 
     def construct(self, operations):
         """Construct the window contents."""
-        self.vbox = gtk.VBox()
+        self.vbox = Gtk.VBox()
         self.add(self.vbox)
         self.vbox.show()
         self.diff = DiffWidget()
@@ -444,11 +444,11 @@ class DiffWindow(Window):
         
     
     def _get_menu_bar(self):
-        menubar = gtk.MenuBar()
+        menubar = Gtk.MenuBar()
         # View menu
-        mb_view = gtk.MenuItem(_i18n("_View"))
-        mb_view_menu = gtk.Menu()
-        mb_view_wrapsource = gtk.CheckMenuItem(_i18n("Wrap _Long Lines"))
+        mb_view = Gtk.MenuItem(_i18n("_View"))
+        mb_view_menu = Gtk.Menu()
+        mb_view_wrapsource = Gtk.CheckMenuItem(_i18n("Wrap _Long Lines"))
         mb_view_wrapsource.connect('activate', self.diff._on_wraplines_toggled)
         mb_view_wrapsource.show()
         mb_view_menu.append(mb_view_wrapsource)
@@ -466,26 +466,26 @@ class DiffWindow(Window):
         """
         if operations is None:
             return None
-        hbox = gtk.HButtonBox()
-        hbox.set_layout(gtk.BUTTONBOX_START)
+        hbox = Gtk.HButtonBox()
+        hbox.set_layout(Gtk.ButtonBoxStyle.START)
         for title, method in operations:
-            merge_button = gtk.Button(title)
+            merge_button = Gtk.Button(title)
             merge_button.show()
-            merge_button.set_relief(gtk.RELIEF_NONE)
+            merge_button.set_relief(Gtk.ReliefStyle.NONE)
             merge_button.connect("clicked", method)
             hbox.pack_start(merge_button, expand=False, fill=True)
         hbox.show()
         return hbox
 
     def _get_merge_target(self):
-        d = gtk.FileChooserDialog('Merge branch', self,
-                                  gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER,
-                                  buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
-                                           gtk.STOCK_CANCEL,
-                                           gtk.RESPONSE_CANCEL,))
+        d = Gtk.FileChooserDialog('Merge branch', self,
+                                  Gtk.FileChooserAction.SELECT_FOLDER,
+                                  buttons=(Gtk.STOCK_OK, Gtk.ResponseType.OK,
+                                           Gtk.STOCK_CANCEL,
+                                           Gtk.ResponseType.CANCEL,))
         try:
             result = d.run()
-            if result != gtk.RESPONSE_OK:
+            if result != Gtk.ResponseType.OK:
                 raise SelectCancelled()
             return d.get_current_folder_uri()
         finally:
@@ -505,15 +505,15 @@ class DiffWindow(Window):
         error_dialog('Error', str(e))
 
     def _get_save_path(self, basename):
-        d = gtk.FileChooserDialog('Save As', self,
-                                  gtk.FILE_CHOOSER_ACTION_SAVE,
-                                  buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
-                                           gtk.STOCK_CANCEL,
-                                           gtk.RESPONSE_CANCEL,))
+        d = Gtk.FileChooserDialog('Save As', self,
+                                  Gtk.FileChooserAction.SAVE,
+                                  buttons=(Gtk.STOCK_OK, Gtk.ResponseType.OK,
+                                           Gtk.STOCK_CANCEL,
+                                           Gtk.ResponseType.CANCEL,))
         d.set_current_name(basename)
         try:
             result = d.run()
-            if result != gtk.RESPONSE_OK:
+            if result != Gtk.ResponseType.OK:
                 raise SelectCancelled()
             return urlutils.local_path_from_url(d.get_uri())
         finally:

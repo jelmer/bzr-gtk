@@ -20,7 +20,7 @@ try:
 except:
     pass
 
-import gtk
+from gi.repository import Gtk
 import os
 
 import bzrlib
@@ -49,14 +49,14 @@ def load_credits():
     return credits
 
 
-class AboutDialog(gtk.AboutDialog):
+class AboutDialog(Gtk.AboutDialog):
     def __init__(self):
         super(AboutDialog, self).__init__()
         self.set_name("Bazaar GTK")
         self.set_version(bzrlib.plugins.gtk.version_string)
         self.set_website("http://bazaar-vcs.org/BzrGtk")
         self.set_license(read_license())
-        self.set_logo(gtk.gdk.pixbuf_new_from_file(icon_path("bzr-icon-64.png")))
+        self.set_logo(GdkPixbuf.Pixbuf.new_from_file(icon_path("bzr-icon-64.png")))
         credits = load_credits()
         if credits is not None:
             (authors, documenters, artists, translators) = credits

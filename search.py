@@ -20,48 +20,48 @@ try:
 except:
     pass
 
-import gobject
-import gtk
+from gi.repository import GObject
+from gi.repository import Gtk
 
 from bzrlib.plugins.search import index as _mod_index
 
 from bzrlib.plugins.gtk.i18n import _i18n
 
-class SearchDialog(gtk.Dialog):
+class SearchDialog(Gtk.Dialog):
     """Search dialog."""
     def __init__(self, index, parent=None):
-        gtk.Dialog.__init__(self, title="Search Revisions",
+        GObject.GObject.__init__(self, title="Search Revisions",
                                   parent=parent,
-                                  flags=gtk.DIALOG_MODAL,
-                                  buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
-                                           gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
-        pixbuf = self.render_icon(gtk.STOCK_FIND, gtk.ICON_SIZE_MENU)
+                                  flags=Gtk.DialogFlags.MODAL,
+                                  buttons=(Gtk.STOCK_OK, Gtk.ResponseType.OK,
+                                           Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
+        pixbuf = self.render_icon(Gtk.STOCK_FIND, Gtk.IconSize.MENU)
         self.set_icon(pixbuf)
         
         # Get arguments
         self.index = index
 
-        self.searchbar = gtk.HBox()
-        searchbar_label = gtk.Label(_i18n("Search for:"))
+        self.searchbar = Gtk.HBox()
+        searchbar_label = Gtk.Label(label=_i18n("Search for:"))
         self.searchbar.pack_start(searchbar_label, False, False, 0)
-        self.searchentry = gtk.Entry()
+        self.searchentry = Gtk.Entry()
         self.searchentry.connect('activate', self._searchentry_activate)
         # TODO: Completion using the bzr-search suggests functionality
         self.searchbar.add(self.searchentry)
         self.vbox.pack_start(self.searchbar, expand=False, fill=False)
 
-        self.results_model = gtk.ListStore(gobject.TYPE_STRING, gobject.TYPE_STRING, gobject.TYPE_PYOBJECT)
-        self.results_treeview = gtk.TreeView(self.results_model)
+        self.results_model = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING, GObject.TYPE_PYOBJECT)
+        self.results_treeview = Gtk.TreeView(self.results_model)
         self.results_treeview.connect("row-activated", self._searchresult_row_activated)
 
-        documentname_column = gtk.TreeViewColumn(_i18n("Document"), gtk.CellRendererText(), text=0)
+        documentname_column = Gtk.TreeViewColumn(_i18n("Document"), Gtk.CellRendererText(), text=0)
         self.results_treeview.append_column(documentname_column)
 
-        summary_column = gtk.TreeViewColumn(_i18n("Summary"), gtk.CellRendererText(), text=1)
+        summary_column = Gtk.TreeViewColumn(_i18n("Summary"), Gtk.CellRendererText(), text=1)
         self.results_treeview.append_column(summary_column)
 
-        results_scrolledwindow = gtk.ScrolledWindow()
-        results_scrolledwindow.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        results_scrolledwindow = Gtk.ScrolledWindow()
+        results_scrolledwindow.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         results_scrolledwindow.add(self.results_treeview)
 
         self.vbox.pack_start(results_scrolledwindow, expand=True, fill=True)
@@ -94,4 +94,4 @@ class SearchDialog(gtk.Dialog):
             self.index._branch.unlock()
     
     def _searchresult_row_activated(self, treeview, path, view_column):
-        self.response(gtk.RESPONSE_OK)
+        self.response(Gtk.ResponseType.OK)

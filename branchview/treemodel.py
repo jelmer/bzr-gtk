@@ -34,10 +34,10 @@ CHILDREN = 11
 TAGS = 12
 AUTHORS = 13
 
-class TreeModel(gtk.GenericTreeModel):
+class TreeModel(Gtk.GenericTreeModel):
 
     def __init__ (self, branch, line_graph_data):
-        gtk.GenericTreeModel.__init__(self)
+        GObject.GObject.__init__(self)
         self.revisions = {}
         self.branch = branch
         self.repository = branch.repository
@@ -56,26 +56,26 @@ class TreeModel(gtk.GenericTreeModel):
             self.tags[revid] = [tag]
 
     def on_get_flags(self):
-        return gtk.TREE_MODEL_LIST_ONLY
+        return Gtk.TREE_MODEL_LIST_ONLY
 
     def on_get_n_columns(self):
         return 14
 
     def on_get_column_type(self, index):
-        if index == REVID: return gobject.TYPE_STRING
-        if index == NODE: return gobject.TYPE_PYOBJECT
-        if index == LINES: return gobject.TYPE_PYOBJECT
-        if index == LAST_LINES: return gobject.TYPE_PYOBJECT
-        if index == REVNO: return gobject.TYPE_STRING
-        if index == SUMMARY: return gobject.TYPE_STRING
-        if index == MESSAGE: return gobject.TYPE_STRING
-        if index == COMMITTER: return gobject.TYPE_STRING
-        if index == TIMESTAMP: return gobject.TYPE_STRING
-        if index == REVISION: return gobject.TYPE_PYOBJECT
-        if index == PARENTS: return gobject.TYPE_PYOBJECT
-        if index == CHILDREN: return gobject.TYPE_PYOBJECT
-        if index == TAGS: return gobject.TYPE_PYOBJECT
-        if index == AUTHORS: return gobject.TYPE_STRING
+        if index == REVID: return GObject.TYPE_STRING
+        if index == NODE: return GObject.TYPE_PYOBJECT
+        if index == LINES: return GObject.TYPE_PYOBJECT
+        if index == LAST_LINES: return GObject.TYPE_PYOBJECT
+        if index == REVNO: return GObject.TYPE_STRING
+        if index == SUMMARY: return GObject.TYPE_STRING
+        if index == MESSAGE: return GObject.TYPE_STRING
+        if index == COMMITTER: return GObject.TYPE_STRING
+        if index == TIMESTAMP: return GObject.TYPE_STRING
+        if index == REVISION: return GObject.TYPE_PYOBJECT
+        if index == PARENTS: return GObject.TYPE_PYOBJECT
+        if index == CHILDREN: return GObject.TYPE_PYOBJECT
+        if index == TAGS: return GObject.TYPE_PYOBJECT
+        if index == AUTHORS: return GObject.TYPE_STRING
 
     def on_get_iter(self, path):
         return path[0]

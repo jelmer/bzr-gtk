@@ -20,11 +20,11 @@ try:
 except:
     pass
 
-import gtk
+from gi.repository import Gtk
 
 from bzrlib.plugins.gtk.branchbox import BranchSelectionBox
 
-class CreateMergeDirectiveDialog(gtk.Dialog):
+class CreateMergeDirectiveDialog(Gtk.Dialog):
     def __init__(self, branch, stop_revid=None):
         super(CreateMergeDirectiveDialog, self).__init__()
         self.branch = branch
@@ -42,7 +42,7 @@ class CreateMergeDirectiveDialog(gtk.Dialog):
         pass
 
 
-class SendMergeDirectiveDialog(gtk.Dialog):
+class SendMergeDirectiveDialog(Gtk.Dialog):
     def __init__(self, branch, parent=None):
         super(SendMergeDirectiveDialog, self).__init__(parent)
         self.branch = branch
@@ -50,31 +50,31 @@ class SendMergeDirectiveDialog(gtk.Dialog):
         self._create()
 
     def _create(self):
-        table = gtk.Table(rows=3, columns=2)
+        table = Gtk.Table(rows=3, columns=2)
         self.vbox.add(table)
 
-        label = gtk.Label()
+        label = Gtk.Label()
         label.set_markup("<b>Branch to Submit:</b>")
-        table.attach(label, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
+        table.attach(label, 0, 1, 0, 1, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        label = gtk.Label(str(self.branch))
-        table.attach(label, 1, 2, 0, 1, gtk.FILL, gtk.FILL)
+        label = Gtk.Label(label=str(self.branch))
+        table.attach(label, 1, 2, 0, 1, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        label = gtk.Label()
+        label = Gtk.Label()
         label.set_markup("<b>Target Branch:</b>")
-        table.attach(label, 0, 1, 1, 2, gtk.FILL, gtk.FILL)
+        table.attach(label, 0, 1, 1, 2, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
         self.submit_branch = BranchSelectionBox(self.branch.get_submit_branch())
-        table.attach(self.submit_branch, 1, 2, 1, 2, gtk.FILL, gtk.FILL)
+        table.attach(self.submit_branch, 1, 2, 1, 2, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
         # TODO: Display number of revisions to be send whenever 
         # submit branch changes
 
-        label = gtk.Label()
+        label = Gtk.Label()
         label.set_markup("<b>Email To:</b>")
-        table.attach(label, 0, 1, 2, 3, gtk.FILL, gtk.FILL)
+        table.attach(label, 0, 1, 2, 3, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        self.mail_to = gtk.ComboBoxEntry()
+        self.mail_to = Gtk.ComboBoxEntry()
         mail_to = self.branch.get_config().get_user_option('submit_to')
         if mail_to is None:
             submit_branch = self.submit_branch.get_branch()
@@ -83,10 +83,10 @@ class SendMergeDirectiveDialog(gtk.Dialog):
                             'child_submit_to')
         if mail_to is not None:
             self.mail_to.get_child().set_text(mail_to)
-        table.attach(self.mail_to, 1, 2, 2, 3, gtk.FILL, gtk.FILL)
+        table.attach(self.mail_to, 1, 2, 2, 3, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        self.add_buttons(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, 
-                         gtk.STOCK_OK, gtk.RESPONSE_OK)
+        self.add_buttons(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, 
+                         Gtk.STOCK_OK, Gtk.ResponseType.OK)
 
         self.show_all()
 
@@ -110,6 +110,6 @@ class SendMergeDirectiveDialog(gtk.Dialog):
 
 
 
-class ApplyMergeDirectiveDialog(gtk.Dialog):
+class ApplyMergeDirectiveDialog(Gtk.Dialog):
     def __init__(self):
         super(ApplyMergeDirectiveDialog, self).__init__()

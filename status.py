@@ -20,7 +20,7 @@ try:
 except:
     pass
 
-import gtk
+from gi.repository import Gtk
 from bzrlib.plugins.gtk import window
 from bzrlib.plugins.gtk.i18n import _i18n
 
@@ -46,10 +46,10 @@ class StatusWindow(window.Window):
 
     def _create(self):
         self.set_default_size(400, 300)
-        sw = gtk.ScrolledWindow()
-        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        sw.set_shadow_type(gtk.SHADOW_IN)
-        self.treeview = gtk.TreeView()
+        sw = Gtk.ScrolledWindow()
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        sw.set_shadow_type(Gtk.ShadowType.IN)
+        self.treeview = Gtk.TreeView()
         sw.add(self.treeview)
         self.add(sw)
 
@@ -72,15 +72,15 @@ class StatusWindow(window.Window):
 
     def _generate_status(self):
         """ Generate 'bzr status' output. """
-        self.model = gtk.TreeStore(str, str)
+        self.model = Gtk.TreeStore(str, str)
         self.treeview.set_headers_visible(False)
         self.treeview.set_model(self.model)
         self.treeview.connect("row-activated", self.row_diff)
 
-        cell = gtk.CellRendererText()
+        cell = Gtk.CellRendererText()
         cell.set_property("width-chars", 20)
-        column = gtk.TreeViewColumn()
-        column.pack_start(cell, expand=True)
+        column = Gtk.TreeViewColumn()
+        column.pack_start(cell, True, True, 0)
         column.add_attribute(cell, "text", 0)
         self.treeview.append_column(column)
 

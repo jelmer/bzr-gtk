@@ -21,18 +21,18 @@ try:
 except:
     pass
 
-import gtk
-import gobject
+from gi.repository import Gtk
+from gi.repository import GObject
 from bzrlib import ui
 from bzrlib.revision import NULL_REVISION
 
-class RevisionMenu(gtk.Menu):
+class RevisionMenu(Gtk.Menu):
 
     __gsignals__ = {
             'tag-added': (
-                gobject.SIGNAL_RUN_FIRST,
-                gobject.TYPE_NONE,
-                (gobject.TYPE_STRING, gobject.TYPE_STRING)
+                GObject.SignalFlags.RUN_FIRST,
+                None,
+                (GObject.TYPE_STRING, GObject.TYPE_STRING)
             )
     }
 
@@ -53,28 +53,28 @@ class RevisionMenu(gtk.Menu):
 
     def create_items(self):
         if len(self.revids) == 1:
-            item = gtk.MenuItem("View _Changes")
+            item = Gtk.MenuItem("View _Changes")
             item.connect('activate', self.show_diff)
             self.append(item)
 
-            item = gtk.MenuItem("_Push")
+            item = Gtk.MenuItem("_Push")
             item.connect('activate', self.show_push)
             self.append(item)
 
-            item = gtk.MenuItem("_Tag Revision")
+            item = Gtk.MenuItem("_Tag Revision")
             item.connect('activate', self.show_tag)
             self.append(item)
 
-            item = gtk.MenuItem("_Merge Directive")
+            item = Gtk.MenuItem("_Merge Directive")
             item.connect('activate', self.store_merge_directive)
             # FIXME: self.append(item)
 
-            item = gtk.MenuItem("_Send Merge Directive")
+            item = Gtk.MenuItem("_Send Merge Directive")
             item.connect('activate', self.send_merge_directive)
             self.append(item)
 
             if self.wt:
-                item = gtk.MenuItem("_Revert to this revision")
+                item = Gtk.MenuItem("_Revert to this revision")
                 item.connect('activate', self.revert)
                 self.append(item)
 
@@ -89,7 +89,7 @@ class RevisionMenu(gtk.Menu):
         from bzrlib.plugins.gtk.mergedirective import SendMergeDirectiveDialog
         from cStringIO import StringIO
         window = SendMergeDirectiveDialog(self.branch, self.revids[0])
-        if window.run() == gtk.RESPONSE_OK:
+        if window.run() == Gtk.ResponseType.OK:
             outf = StringIO()
             outf.writelines(window.get_merge_directive().to_lines())
             mail_client = self.branch.get_config().get_mail_client()
@@ -115,7 +115,7 @@ class RevisionMenu(gtk.Menu):
         dialog = PushDialog(self.repository, self.revids[0], self.branch)
         response = dialog.run()
 
-        if response != gtk.RESPONSE_NONE:
+        if response != Gtk.ResponseType.NONE:
             dialog.destroy()
 
     def show_tag(self, item):
@@ -123,10 +123,10 @@ class RevisionMenu(gtk.Menu):
         dialog = AddTagDialog(self.repository, self.revids[0], self.branch)
         response = dialog.run()
 
-        if response != gtk.RESPONSE_NONE:
+        if response != Gtk.ResponseType.NONE:
             dialog.hide()
 
-            if response == gtk.RESPONSE_OK:
+            if response == Gtk.ResponseType.OK:
                 self.emit('tag-added', dialog.tagname, dialog._revid)
 
             dialog.destroy()

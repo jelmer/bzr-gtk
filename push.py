@@ -21,7 +21,7 @@ try:
 except:
     pass
 
-import gtk
+from gi.repository import Gtk
 
 from errors import show_bzr_error
 
@@ -36,15 +36,15 @@ from bzrlib.plugins.gtk.history import UrlHistory
 from bzrlib.plugins.gtk.i18n import _i18n
 
 
-class PushDialog(gtk.Dialog):
+class PushDialog(Gtk.Dialog):
     """New implementation of the Push dialog."""
 
     def __init__(self, repository, revid, branch=None, parent=None):
         """Initialize the Push dialog. """
-        gtk.Dialog.__init__(self, title="Push",
+        GObject.GObject.__init__(self, title="Push",
                                   parent=parent,
                                   flags=0,
-                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+                                  buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
 
         # Get arguments
         self.repository = repository
@@ -52,10 +52,10 @@ class PushDialog(gtk.Dialog):
         self.branch = branch
 
         # Create the widgets
-        self._label_location = gtk.Label(_i18n("Location:"))
-        self._combo = gtk.ComboBoxEntry()
-        self._button_push = gtk.Button(_i18n("_Push"), use_underline=True)
-        self._hbox_location = gtk.HBox()
+        self._label_location = Gtk.Label(label=_i18n("Location:"))
+        self._combo = Gtk.ComboBoxEntry()
+        self._button_push = Gtk.Button(_i18n("_Push"), use_underline=True)
+        self._hbox_location = Gtk.HBox()
 
         # Set callbacks
         self._button_push.connect('clicked', self._on_push_clicked)
@@ -68,7 +68,7 @@ class PushDialog(gtk.Dialog):
         # Pack widgets
         self._hbox_location.pack_start(self._label_location, False, False)
         self._hbox_location.pack_start(self._combo, True, True)
-        self.vbox.pack_start(self._hbox_location)
+        self.vbox.pack_start(self._hbox_location, True, True, 0)
         self.action_area.pack_end(self._button_push)
 
         # Show the dialog
@@ -80,7 +80,7 @@ class PushDialog(gtk.Dialog):
 
     def _build_history(self):
         """Build up the location history. """
-        self._combo_model = gtk.ListStore(str)
+        self._combo_model = Gtk.ListStore(str)
         for item in self._history.get_entries():
             self._combo_model.append([ item ])
         self._combo.set_model(self._combo_model)
@@ -102,7 +102,7 @@ class PushDialog(gtk.Dialog):
         except errors.DivergedBranches:
             response = question_dialog(_i18n('Branches have been diverged'),
                                        _i18n('You cannot push if branches have diverged.\nOverwrite?'))
-            if response == gtk.RESPONSE_YES:
+            if response == Gtk.ResponseType.YES:
                 revs = do_push(self.branch, location=location, overwrite=True)
 
         if self.branch is not None and self.branch.get_push_location() is None:
@@ -112,7 +112,7 @@ class PushDialog(gtk.Dialog):
         info_dialog(_i18n('Push successful'),
                     _i18n("%d revision(s) pushed.") % revs)
 
-        self.response(gtk.RESPONSE_OK)
+        self.response(Gtk.ResponseType.OK)
 
 
 def do_push(br_from, location, overwrite):
@@ -143,7 +143,7 @@ def do_push(br_from, location, overwrite):
         except errors.NoSuchFile:
             response = question_dialog(_i18n('Non existing parent directory'),
                          _i18n("The parent directory (%s)\ndoesn't exist. Create?") % location)
-            if response == gtk.RESPONSE_OK:
+            if response == Gtk.ResponseType.OK:
                 transport.create_prefix()
             else:
                 return

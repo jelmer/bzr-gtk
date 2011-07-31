@@ -48,7 +48,7 @@ class NoDisplayError(errors.BzrCommandError):
 def open_display():
     pygtk = import_pygtk()
     try:
-        import gtk
+        from gi.repository import Gtk
     except RuntimeError, e:
         if str(e) == "could not open display":
             raise NoDisplayError
@@ -150,9 +150,9 @@ class cmd_gdiff(GTKCommand):
                 tree2 = tree1.basis_tree()
 
             from diff import DiffWindow
-            import gtk
+            from gi.repository import Gtk
             window = DiffWindow()
-            window.connect("destroy", gtk.main_quit)
+            window.connect("destroy", Gtk.main_quit)
             window.set_diff("Working Tree", tree1, tree2)
             if filename is not None:
                 tree_filename = wt.relpath(filename)
@@ -166,7 +166,7 @@ class cmd_gdiff(GTKCommand):
                                           filename)
             window.show()
 
-            gtk.main()
+            Gtk.main()
         finally:
             wt.unlock()
 
@@ -209,11 +209,11 @@ class cmd_visualise(Command):
                 revids.append(br.last_revision())
             else:
                 revids.append(revision[0].as_revision_id(br))
-        import gtk
+        from gi.repository import Gtk
         pp = start_viz_window(br, revids, limit)
-        pp.connect("destroy", lambda w: gtk.main_quit())
+        pp.connect("destroy", lambda w: Gtk.main_quit())
         pp.show()
-        gtk.main()
+        Gtk.main()
 
 
 class cmd_gannotate(GTKCommand):
@@ -267,7 +267,7 @@ class cmd_gannotate(GTKCommand):
             revision_id = getattr(tree, 'get_revision_id', lambda: None)()
 
         window = GAnnotateWindow(all, plain, branch=br)
-        window.connect("destroy", lambda w: gtk.main_quit())
+        window.connect("destroy", lambda w: Gtk.main_quit())
         config = GAnnotateConfig(window)
         window.show()
         br.lock_read()
@@ -276,7 +276,7 @@ class cmd_gannotate(GTKCommand):
         try:
             window.annotate(tree, br, file_id)
             window.jump_to_line(line)
-            gtk.main()
+            Gtk.main()
         finally:
             br.unlock()
             if wt is not None:
@@ -346,9 +346,9 @@ class cmd_gstatus(GTKCommand):
             revision_id = None
 
         status = StatusWindow(wt, wt_path, revision_id)
-        status.connect("destroy", gtk.main_quit)
+        status.connect("destroy", Gtk.main_quit)
         status.show()
-        gtk.main()
+        Gtk.main()
 
 
 class cmd_gsend(GTKCommand):
@@ -361,7 +361,7 @@ class cmd_gsend(GTKCommand):
         from bzrlib.plugins.gtk.mergedirective import SendMergeDirectiveDialog
         from StringIO import StringIO
         dialog = SendMergeDirectiveDialog(br)
-        if dialog.run() == gtk.RESPONSE_OK:
+        if dialog.run() == Gtk.ResponseType.OK:
             outf = StringIO()
             outf.writelines(dialog.get_merge_directive().to_lines())
             mail_client = br.get_config().get_mail_client()
@@ -426,7 +426,7 @@ class cmd_gmissing(Command):
     def run(self, other_branch=None):
         pygtk = import_pygtk()
         try:
-            import gtk
+            from gi.repository import Gtk
         except RuntimeError, e:
             if str(e) == "could not open display":
                 raise NoDisplayError
@@ -480,4 +480,4 @@ class cmd_gtags(GTKCommand):
         from tags import TagsWindow
         window = TagsWindow(br)
         window.show()
-        gtk.main()
+        Gtk.main()

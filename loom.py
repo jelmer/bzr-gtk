@@ -20,8 +20,8 @@ try:
 except:
     pass
 
-import gtk
-import gobject
+from gi.repository import Gtk
+from gi.repository import GObject
 
 from bzrlib.plugins.gtk.diff import DiffWidget
 from bzrlib.plugins.gtk.dialog import question_dialog
@@ -32,14 +32,14 @@ from bzrlib.plugins.loom import (
 from bzrlib.plugins.gtk.i18n import _i18n
 
 
-class LoomDialog(gtk.Dialog):
+class LoomDialog(Gtk.Dialog):
     """Simple Loom browse dialog."""
 
     def __init__(self, branch, tree=None, parent=None):
-        gtk.Dialog.__init__(self, title="Threads",
+        GObject.GObject.__init__(self, title="Threads",
                                   parent=parent,
                                   flags=0,
-                                  buttons=(gtk.STOCK_CLOSE,gtk.RESPONSE_OK))
+                                  buttons=(Gtk.STOCK_CLOSE,Gtk.ResponseType.OK))
         self.branch = branch
         if tree is not None:
             self.tree = loom_tree.LoomTreeDecorator(tree)
@@ -57,7 +57,7 @@ class LoomDialog(gtk.Dialog):
                 _i18n("Branch is not a loom branch. Upgrade to Loom format?"),
                 parent=self)
                 # Doesn't set a parent for the dialog..
-            if response == gtk.RESPONSE_NO:
+            if response == Gtk.ResponseType.NO:
                 return
             assert self.branch.nick is not None
             loom_branch.loomify(self.branch)
@@ -65,19 +65,19 @@ class LoomDialog(gtk.Dialog):
         return super(LoomDialog, self).run()
 
     def _construct(self):
-        hbox = gtk.HBox()
+        hbox = Gtk.HBox()
 
-        self._threads_scroller = gtk.ScrolledWindow()
-        self._threads_scroller.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        self._threads_view = gtk.TreeView()
+        self._threads_scroller = Gtk.ScrolledWindow()
+        self._threads_scroller.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        self._threads_view = Gtk.TreeView()
         self._threads_scroller.add(self._threads_view)
-        self._threads_scroller.set_shadow_type(gtk.SHADOW_IN)
-        hbox.pack_start(self._threads_scroller)
+        self._threads_scroller.set_shadow_type(Gtk.ShadowType.IN)
+        hbox.pack_start(self._threads_scroller, True, True, 0)
 
-        self._threads_store = gtk.ListStore(
-                gobject.TYPE_STRING, gobject.TYPE_STRING, gobject.TYPE_PYOBJECT, gobject.TYPE_STRING)
+        self._threads_store = Gtk.ListStore(
+                GObject.TYPE_STRING, GObject.TYPE_STRING, GObject.TYPE_PYOBJECT, GObject.TYPE_STRING)
         self._threads_view.set_model(self._threads_store)
-        self._threads_view.append_column(gtk.TreeViewColumn("Name", gtk.CellRendererText(), text=0))
+        self._threads_view.append_column(Gtk.TreeViewColumn("Name", Gtk.CellRendererText(), text=0))
         self._threads_view.connect('cursor-changed', self._on_view_thread)
         if self.tree is not None:
             self._threads_view.connect('row-activated', self._on_switch_thread)
@@ -87,7 +87,7 @@ class LoomDialog(gtk.Dialog):
         hbox.pack_end(self._diff)
 
         hbox.show_all()
-        self.vbox.pack_start(hbox)
+        self.vbox.pack_start(hbox, True, True, 0)
 
         # FIXME: Buttons: combine-thread, revert-loom, record
         self.set_default_size(500, 350)

@@ -20,72 +20,72 @@ try:
 except:
     pass
 
-import gtk
+from gi.repository import Gtk
 
 
-class IdentityPage(gtk.Table):
+class IdentityPage(Gtk.Table):
 
     def __init__(self, config):
         self.config = config
-        gtk.Table.__init__(self, rows=4, columns=2)
+        GObject.GObject.__init__(self, rows=4, columns=2)
         self.set_border_width(12)
         self.set_row_spacings(6)
         self.set_col_spacings(6)
 
-        align = gtk.Alignment(0.0, 0.5)
-        label = gtk.Label()
+        align = Gtk.Alignment.new(0.0, 0.5)
+        label = Gtk.Label()
         label.set_markup("E-Mail:")
         align.add(label)
-        self.attach(align, 0, 1, 0, 1, gtk.FILL, gtk.FILL)
+        self.attach(align, 0, 1, 0, 1, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        self.username = gtk.Entry()
+        self.username = Gtk.Entry()
         self.username.set_text(self.config.username())
-        self.attach(self.username, 1, 2, 0, 1, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.attach(self.username, 1, 2, 0, 1, Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        align = gtk.Alignment(0.0, 0.5)
-        label = gtk.Label()
+        align = Gtk.Alignment.new(0.0, 0.5)
+        label = Gtk.Label()
         label.set_markup("GPG signing command:")
         align.add(label)
-        self.attach(align, 0, 1, 1, 2, gtk.FILL, gtk.FILL)
+        self.attach(align, 0, 1, 1, 2, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        self.email = gtk.Entry()
+        self.email = Gtk.Entry()
         self.email.set_text(self.config.gpg_signing_command())
-        self.attach(self.email, 1, 2, 1, 2, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.attach(self.email, 1, 2, 1, 2, Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        align = gtk.Alignment(0.0, 0.1)
-        label = gtk.Label()
+        align = Gtk.Alignment.new(0.0, 0.1)
+        label = Gtk.Label()
         label.set_markup("Check GPG Signatures:")
         align.add(label)
-        self.attach(align, 0, 1, 2, 3, gtk.FILL, gtk.FILL)
+        self.attach(align, 0, 1, 2, 3, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        sigvals = gtk.VBox()
-        self.check_sigs_if_possible = gtk.RadioButton(None,
+        sigvals = Gtk.VBox()
+        self.check_sigs_if_possible = Gtk.RadioButton(None,
                                                       "_Check if possible")
-        sigvals.pack_start(self.check_sigs_if_possible)
-        self.check_sigs_always = gtk.RadioButton(self.check_sigs_if_possible,
+        sigvals.pack_start(self.check_sigs_if_possible, True, True, 0)
+        self.check_sigs_always = Gtk.RadioButton(self.check_sigs_if_possible,
                                                  "Check _always")
-        sigvals.pack_start(self.check_sigs_always)
-        self.check_sigs_never = gtk.RadioButton(self.check_sigs_if_possible,
+        sigvals.pack_start(self.check_sigs_always, True, True, 0)
+        self.check_sigs_never = Gtk.RadioButton(self.check_sigs_if_possible,
                                                 "Check _never")
-        sigvals.pack_start(self.check_sigs_never)
+        sigvals.pack_start(self.check_sigs_never, True, True, 0)
         # FIXME: Set default
-        self.attach(sigvals, 1, 2, 2, 3, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.attach(sigvals, 1, 2, 2, 3, Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        align = gtk.Alignment(0.0, 0.1)
-        label = gtk.Label()
+        align = Gtk.Alignment.new(0.0, 0.1)
+        label = Gtk.Label()
         label.set_markup("Create GPG Signatures:")
         align.add(label)
-        self.attach(align, 0, 1, 3, 4, gtk.FILL, gtk.FILL)
+        self.attach(align, 0, 1, 3, 4, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        create_sigs = gtk.VBox()
-        self.create_sigs_when_required = gtk.RadioButton(None,
+        create_sigs = Gtk.VBox()
+        self.create_sigs_when_required = Gtk.RadioButton(None,
                                                          "Sign When _Required")
-        create_sigs.pack_start(self.create_sigs_when_required)
-        self.create_sigs_always = gtk.RadioButton(
+        create_sigs.pack_start(self.create_sigs_when_required, True, True, 0)
+        self.create_sigs_always = Gtk.RadioButton(
             self.create_sigs_when_required, "Sign _Always")
-        create_sigs.pack_start(self.create_sigs_always)
-        self.create_sigs_never = gtk.RadioButton(
+        create_sigs.pack_start(self.create_sigs_always, True, True, 0)
+        self.create_sigs_never = Gtk.RadioButton(
             self.create_sigs_when_required, "Sign _Never")
-        create_sigs.pack_start(self.create_sigs_never)
+        create_sigs.pack_start(self.create_sigs_never, True, True, 0)
         # FIXME: Set default
-        self.attach(create_sigs, 1, 2, 3, 4, gtk.EXPAND | gtk.FILL, gtk.FILL)
+        self.attach(create_sigs, 1, 2, 3, 4, Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)

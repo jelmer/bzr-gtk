@@ -20,14 +20,14 @@ try:
 except:
     pass
 
-import gtk
+from gi.repository import Gtk
 
 from bzrlib.config import GlobalConfig
 from bzrlib.plugins.gtk.preferences.identity import IdentityPage
 from bzrlib.plugins.gtk.preferences.plugins import PluginsPage
 from bzrlib.plugins.gtk.preferences.notifications import NotificationsPage
 
-class PreferencesWindow(gtk.Dialog):
+class PreferencesWindow(Gtk.Dialog):
     """Displays global preferences windows."""
     # Note that we don't allow configuration of aliases or
     # default log formats. This is because doing so wouldn't make
@@ -36,7 +36,7 @@ class PreferencesWindow(gtk.Dialog):
 
     def __init__(self, config=None):
         """ Initialize the Status window. """
-        super(PreferencesWindow, self).__init__(flags=gtk.DIALOG_MODAL)
+        super(PreferencesWindow, self).__init__(flags=Gtk.DialogFlags.MODAL)
         self.set_title("Bazaar Preferences")
         self.set_has_separator(False)
         self.config = config
@@ -48,10 +48,10 @@ class PreferencesWindow(gtk.Dialog):
         self.set_default_size(320, 480)
         self.set_border_width(0)
 
-        notebook = gtk.Notebook()
+        notebook = Gtk.Notebook()
         notebook.set_border_width(12)
         for (label, page) in self._create_pages():
-            notebook.append_page(page, gtk.Label(label))
+            notebook.append_page(page, Gtk.Label(label=label))
 
         notebook.set_current_page(0)
         self.vbox.set_border_width(0)
@@ -70,7 +70,7 @@ class PreferencesWindow(gtk.Dialog):
     def close(self, widget=None):
         self.window.destroy()
 
-class BranchPreferencesWindow(gtk.Dialog):
+class BranchPreferencesWindow(Gtk.Dialog):
     """Displays global preferences windows."""
     def __init__(self, config=None):
         super(BranchPreferencesWindow, self).__init__(config)

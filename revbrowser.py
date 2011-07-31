@@ -20,26 +20,26 @@ try:
 except:
     pass
 
-import gobject
-import gtk
+from gi.repository import GObject
+from gi.repository import Gtk
 
 from bzrlib.plugins.gtk.branchview.treeview import TreeView
 from bzrlib.plugins.gtk.i18n import _i18n
 
 
-class RevisionBrowser(gtk.Dialog):
+class RevisionBrowser(Gtk.Dialog):
     """ Revision Browser main window. """
     def __init__(self, branch, parent=None):
-        gtk.Dialog.__init__(self, title="Revision Browser - Olive",
+        GObject.GObject.__init__(self, title="Revision Browser - Olive",
                                   parent=parent,
-                                  flags=gtk.DIALOG_MODAL,
-                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+                                  flags=Gtk.DialogFlags.MODAL,
+                                  buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
 
         # Get arguments
         self.branch = branch
 
         # Create the widgets
-        self._button_select = gtk.Button(_i18n("_Select"), use_underline=True)
+        self._button_select = Gtk.Button(_i18n("_Select"), use_underline=True)
         start_revs = [branch.last_revision(),]
         self.treeview = TreeView(branch, start_revs, None)
 
@@ -74,4 +74,4 @@ class RevisionBrowser(gtk.Dialog):
         self.selected_revno = self.treeview.get_property('revision-number')
         self.selected_revid = \
                     self.treeview.get_property('revision').revision_id
-        self.response(gtk.RESPONSE_OK)
+        self.response(Gtk.ResponseType.OK)

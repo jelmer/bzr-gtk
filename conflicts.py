@@ -22,8 +22,8 @@ except:
 
 import subprocess
 
-import gtk
-import gobject
+from gi.repository import Gtk
+from gi.repository import GObject
 
 from bzrlib.config import GlobalConfig
 from bzrlib.plugins.gtk import _i18n
@@ -33,35 +33,35 @@ from bzrlib.plugins.gtk.dialog import (
     )
 
 
-class ConflictsDialog(gtk.Dialog):
+class ConflictsDialog(Gtk.Dialog):
     """ This dialog displays the list of conflicts. """
 
     def __init__(self, wt, parent=None):
         """ Initialize the Conflicts dialog. """
-        gtk.Dialog.__init__(self, title="Conflicts - Olive",
+        GObject.GObject.__init__(self, title="Conflicts - Olive",
                                   parent=parent,
                                   flags=0,
-                                  buttons=(gtk.STOCK_CLOSE, gtk.RESPONSE_CANCEL))
+                                  buttons=(Gtk.STOCK_CLOSE, Gtk.ResponseType.CANCEL))
 
         # Get arguments
         self.wt = wt
 
         # Create the widgets
-        self._scrolledwindow = gtk.ScrolledWindow()
-        self._treeview = gtk.TreeView()
-        self._label_diff3 = gtk.Label(_i18n("External utility:"))
-        self._entry_diff3 = gtk.Entry()
-        self._image_diff3 = gtk.Image()
-        self._button_diff3 = gtk.Button()
-        self._hbox_diff3 = gtk.HBox()
+        self._scrolledwindow = Gtk.ScrolledWindow()
+        self._treeview = Gtk.TreeView()
+        self._label_diff3 = Gtk.Label(label=_i18n("External utility:"))
+        self._entry_diff3 = Gtk.Entry()
+        self._image_diff3 = Gtk.Image()
+        self._button_diff3 = Gtk.Button()
+        self._hbox_diff3 = Gtk.HBox()
 
         # Set callbacks
         self._button_diff3.connect('clicked', self._on_diff3_clicked)
 
         # Set properties
-        self._scrolledwindow.set_policy(gtk.POLICY_AUTOMATIC,
-                                        gtk.POLICY_AUTOMATIC)
-        self._image_diff3.set_from_stock(gtk.STOCK_APPLY, gtk.ICON_SIZE_BUTTON)
+        self._scrolledwindow.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                        Gtk.PolicyType.AUTOMATIC)
+        self._image_diff3.set_from_stock(Gtk.STOCK_APPLY, Gtk.IconSize.BUTTON)
         self._button_diff3.set_image(self._image_diff3)
         self._entry_diff3.set_text(self._get_diff3())
         self._hbox_diff3.set_spacing(3)
@@ -98,22 +98,22 @@ class ConflictsDialog(gtk.Dialog):
     def _create_conflicts(self):
         """ Construct the list of conflicts. """
         if len(self.wt.conflicts()) == 0:
-            self.model = gtk.ListStore(gobject.TYPE_STRING)
+            self.model = Gtk.ListStore(GObject.TYPE_STRING)
             self._treeview.set_model(self.model)
-            self._treeview.append_column(gtk.TreeViewColumn(_i18n('Conflicts'),
-                                         gtk.CellRendererText(), text=0))
+            self._treeview.append_column(Gtk.TreeViewColumn(_i18n('Conflicts'),
+                                         Gtk.CellRendererText(), text=0))
             self._treeview.set_headers_visible(False)
             self.model.append([ _i18n("No conflicts in working tree.") ])
             self._button_diff3.set_sensitive(False)
         else:
-            self.model = gtk.ListStore(gobject.TYPE_STRING,
-                                       gobject.TYPE_STRING,
-                                       gobject.TYPE_STRING)
+            self.model = Gtk.ListStore(GObject.TYPE_STRING,
+                                       GObject.TYPE_STRING,
+                                       GObject.TYPE_STRING)
             self._treeview.set_model(self.model)
-            self._treeview.append_column(gtk.TreeViewColumn(_i18n('Path'),
-                                         gtk.CellRendererText(), text=0))
-            self._treeview.append_column(gtk.TreeViewColumn(_i18n('Type'),
-                                         gtk.CellRendererText(), text=1))
+            self._treeview.append_column(Gtk.TreeViewColumn(_i18n('Path'),
+                                         Gtk.CellRendererText(), text=0))
+            self._treeview.append_column(Gtk.TreeViewColumn(_i18n('Type'),
+                                         Gtk.CellRendererText(), text=1))
             self._treeview.set_search_column(0)
             for conflict in self.wt.conflicts():
                 if conflict.typestring == 'path conflict':

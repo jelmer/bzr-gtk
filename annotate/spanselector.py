@@ -17,8 +17,8 @@
 
 import pygtk
 pygtk.require("2.0")
-import gobject
-import gtk
+from gi.repository import GObject
+from gi.repository import Gtk
 
 
 (
@@ -29,7 +29,7 @@ import gtk
 ) = range(4)
 
 
-class SpanSelector(gtk.HBox):
+class SpanSelector(Gtk.HBox):
     """Encapsulates creation and functionality of widgets used for changing
     highlight spans.
 
@@ -41,13 +41,13 @@ class SpanSelector(gtk.HBox):
     last_selected = None
 
     def __init__(self, homogeneous=False, spacing=6):
-        gtk.HBox.__init__(self, homogeneous, spacing)
+        GObject.GObject.__init__(self, homogeneous, spacing)
 
         self.model = self._create_model()
         self.combo = self._create_combobox(self.model)
         self.entry = self._create_custom_entry()
 
-        label = gtk.Label("Highlighting spans:")
+        label = Gtk.Label(label="Highlighting spans:")
         label.show()
 
         self.pack_start(label, expand=False, fill=True)
@@ -67,7 +67,7 @@ class SpanSelector(gtk.HBox):
         self.max_custom_spans = n
 
     def activate(self, iter):
-        """Activate the row pointed to by gtk.TreeIter iter."""
+        """Activate the row pointed to by Gtk.TreeIter iter."""
         index = self._get_index_from_iter(iter)
         self.combo.set_active(index)
 
@@ -137,10 +137,10 @@ class SpanSelector(gtk.HBox):
     def _create_model(self):
         # [span in days, span as string, row is seperator?, row is select
         # default?]
-        m = gtk.ListStore(gobject.TYPE_FLOAT,
-                          gobject.TYPE_STRING,
-                          gobject.TYPE_BOOLEAN,
-                          gobject.TYPE_BOOLEAN)
+        m = Gtk.ListStore(GObject.TYPE_FLOAT,
+                          GObject.TYPE_STRING,
+                          GObject.TYPE_BOOLEAN,
+                          GObject.TYPE_BOOLEAN)
 
         self.separator = [0., "", True, False]
 
@@ -157,10 +157,10 @@ class SpanSelector(gtk.HBox):
         return m
 
     def _create_combobox(self, model):
-        cb = gtk.ComboBox(model)
+        cb = Gtk.ComboBox(model)
         cb.set_row_separator_func(
             lambda m, i: m.get_value(i, SPAN_IS_SEPARATOR_COL))
-        cell = gtk.CellRendererText()
+        cell = Gtk.CellRendererText()
         cb.pack_start(cell, False)
         cb.add_attribute(cell, "text", SPAN_STR_COL)
         cb.connect("changed", self._combo_changed_cb)
@@ -169,16 +169,16 @@ class SpanSelector(gtk.HBox):
         return cb
 
     def _create_custom_entry(self):
-        entry = gtk.HBox(False, 6)
+        entry = Gtk.HBox(False, 6)
 
-        spin = gtk.SpinButton(digits=2)
+        spin = Gtk.SpinButton(digits=2)
         spin.set_numeric(True)
         spin.set_increments(1., 10.)
         spin.set_range(0., 100 * 365) # I presume 100 years is sufficient
         spin.connect("activate", self._activate_custom_span_cb)
         spin.connect("show", lambda w: w.grab_focus())
 
-        label = gtk.Label("Days")
+        label = Gtk.Label(label="Days")
 
         entry.pack_start(spin, expand=False, fill=False)
         entry.pack_start(label, expand=False, fill=False)
@@ -191,18 +191,18 @@ entered.
 
 Callback signature: def callback(SpanSelector, span, [user_param, ...])
 """
-gobject.signal_new("span-changed", SpanSelector,
-                   gobject.SIGNAL_RUN_LAST,
-                   gobject.TYPE_NONE,
-                   (gobject.TYPE_FLOAT,))
+GObject.signal_new("span-changed", SpanSelector,
+                   GObject.SignalFlags.RUN_LAST,
+                   None,
+                   (GObject.TYPE_FLOAT,))
 
 """The "custom-span-added" signal is emitted after a custom span has been
 added, but before it has been selected.
 
 Callback signature: def callback(SpanSelector, span, [user_param, ...])
 """
-gobject.signal_new("custom-span-added", SpanSelector,
-                   gobject.SIGNAL_RUN_LAST,
-                   gobject.TYPE_NONE,
-                   (gobject.TYPE_FLOAT,))
+GObject.signal_new("custom-span-added", SpanSelector,
+                   GObject.SignalFlags.RUN_LAST,
+                   None,
+                   (GObject.TYPE_FLOAT,))
 

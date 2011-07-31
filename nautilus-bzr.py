@@ -6,7 +6,7 @@
 #
 # Published under the GNU GPL
 
-import gtk
+from gi.repository import Gtk
 import nautilus
 from bzrlib.branch import Branch
 from bzrlib.bzrdir import BzrDir
@@ -143,7 +143,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         
         dialog = BranchDialog(vfs_file.get_name())
         response = dialog.run()
-        if response != gtk.RESPONSE_NONE:
+        if response != Gtk.ResponseType.NONE:
             dialog.hide()
             dialog.destroy()
  
@@ -171,7 +171,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         from bzrlib.plugins.gtk.commit import CommitDialog
         dialog = CommitDialog(tree, path)
         response = dialog.run()
-        if response != gtk.RESPONSE_NONE:
+        if response != Gtk.ResponseType.NONE:
             dialog.hide()
             dialog.destroy()
 
@@ -190,7 +190,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
 
         pp = start_viz_window(branch, [branch.last_revision()])
         pp.show()
-        gtk.main()
+        Gtk.main()
 
     def pull_cb(self, menu, vfs_file):
         # We can only cope with local files
@@ -208,7 +208,7 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         from bzrlib.plugins.gtk.pull import PullDialog
         dialog = PullDialog(tree, path)
         dialog.display()
-        gtk.main()
+        Gtk.main()
 
     def merge_cb(self, menu, vfs_file):
         # We can only cope with local files

@@ -18,9 +18,9 @@ import time
 
 import pygtk
 pygtk.require("2.0")
-import gobject
-import gtk
-import pango
+from gi.repository import GObject
+from gi.repository import Gtk
+from gi.repository import Pango
 import re
 
 from bzrlib import patiencediff
@@ -52,7 +52,7 @@ class GAnnotateWindow(Window):
 
         Window.__init__(self, parent)
 
-        self.set_icon(self.render_icon(gtk.STOCK_FIND, gtk.ICON_SIZE_BUTTON))
+        self.set_icon(self.render_icon(Gtk.STOCK_FIND, Gtk.IconSize.BUTTON))
         self.annotate_colormap = AnnotateColorSaturation()
 
         self._create()
@@ -70,12 +70,12 @@ class GAnnotateWindow(Window):
                                    lambda: CURRENT_REVISION)()
 
         # [revision id, line number, author, revno, highlight color, line]
-        self.annomodel = gtk.ListStore(gobject.TYPE_STRING,
-                                       gobject.TYPE_INT,
-                                       gobject.TYPE_STRING,
-                                       gobject.TYPE_STRING,
-                                       gobject.TYPE_STRING,
-                                       gobject.TYPE_STRING)
+        self.annomodel = Gtk.ListStore(GObject.TYPE_STRING,
+                                       GObject.TYPE_INT,
+                                       GObject.TYPE_STRING,
+                                       GObject.TYPE_STRING,
+                                       GObject.TYPE_STRING,
+                                       GObject.TYPE_STRING)
 
         last_seen = None
         try:
@@ -193,21 +193,21 @@ class GAnnotateWindow(Window):
         self.revisionview = self._create_log_view()
         self.annoview = self._create_annotate_view()
 
-        vbox = gtk.VBox(False)
+        vbox = Gtk.VBox(False)
         vbox.show()
 
-        sw = gtk.ScrolledWindow()
-        sw.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
-        sw.set_shadow_type(gtk.SHADOW_IN)
+        sw = Gtk.ScrolledWindow()
+        sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        sw.set_shadow_type(Gtk.ShadowType.IN)
         sw.add(self.annoview)
         self.annoview.gwindow = self
         sw.show()
 
-        swbox = gtk.VBox()
-        swbox.pack_start(sw)
+        swbox = Gtk.VBox()
+        swbox.pack_start(sw, True, True, 0)
         swbox.show()
 
-        hbox = gtk.HBox(False, 6)
+        hbox = Gtk.HBox(False, 6)
         self.back_button = self._create_back_button()
         hbox.pack_start(self.back_button, expand=False, fill=True)
         self.forward_button = self._create_forward_button()
@@ -219,7 +219,7 @@ class GAnnotateWindow(Window):
         hbox.show()
         vbox.pack_start(hbox, expand=False, fill=True)
 
-        self.pane = pane = gtk.VPaned()
+        self.pane = pane = Gtk.VPaned()
         pane.add1(swbox)
         pane.add2(self.revisionview)
         pane.show()
@@ -227,12 +227,12 @@ class GAnnotateWindow(Window):
 
         self._search = SearchBox()
         swbox.pack_start(self._search, expand=False, fill=True)
-        accels = gtk.AccelGroup()
-        accels.connect_group(gtk.keysyms.f, gtk.gdk.CONTROL_MASK,
-                             gtk.ACCEL_LOCKED,
+        accels = Gtk.AccelGroup()
+        accels.connect_group(Gdk.KEY_f, Gdk.EventMask.CONTROL_MASK,
+                             Gtk.ACCEL_LOCKED,
                              self._search_by_text)
-        accels.connect_group(gtk.keysyms.g, gtk.gdk.CONTROL_MASK,
-                             gtk.ACCEL_LOCKED,
+        accels.connect_group(Gdk.KEY_g, Gdk.EventMask.CONTROL_MASK,
+                             Gtk.ACCEL_LOCKED,
                              self._search_by_line)
         self.add_accel_group(accels)
 
@@ -267,52 +267,52 @@ class GAnnotateWindow(Window):
 
 
     def _create_annotate_view(self):
-        tv = gtk.TreeView()
+        tv = Gtk.TreeView()
         tv.set_rules_hint(False)
         tv.connect("cursor-changed", self._activate_selected_revision)
         tv.show()
         tv.connect("row-activated", self.line_diff)
 
-        cell = gtk.CellRendererText()
+        cell = Gtk.CellRendererText()
         cell.set_property("xalign", 1.0)
         cell.set_property("ypad", 0)
         cell.set_property("family", "Monospace")
         cell.set_property("cell-background-gdk",
-                          tv.get_style().bg[gtk.STATE_NORMAL])
-        col = gtk.TreeViewColumn()
+                          tv.get_style().bg[Gtk.StateType.NORMAL])
+        col = Gtk.TreeViewColumn()
         col.set_resizable(False)
-        col.pack_start(cell, expand=True)
+        col.pack_start(cell, True, True, 0)
         col.add_attribute(cell, "text", LINE_NUM_COL)
         tv.append_column(col)
 
-        cell = gtk.CellRendererText()
+        cell = Gtk.CellRendererText()
         cell.set_property("ypad", 0)
-        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
+        cell.set_property("ellipsize", Pango.EllipsizeMode.END)
         cell.set_property("cell-background-gdk",
-                          self.get_style().bg[gtk.STATE_NORMAL])
-        col = gtk.TreeViewColumn("Committer")
+                          self.get_style().bg[Gtk.StateType.NORMAL])
+        col = Gtk.TreeViewColumn("Committer")
         col.set_resizable(True)
-        col.pack_start(cell, expand=True)
+        col.pack_start(cell, True, True, 0)
         col.add_attribute(cell, "text", COMMITTER_COL)
         tv.append_column(col)
 
-        cell = gtk.CellRendererText()
+        cell = Gtk.CellRendererText()
         cell.set_property("xalign", 1.0)
         cell.set_property("ypad", 0)
         cell.set_property("cell-background-gdk",
-                          self.get_style().bg[gtk.STATE_NORMAL])
-        col = gtk.TreeViewColumn("Revno")
+                          self.get_style().bg[Gtk.StateType.NORMAL])
+        col = Gtk.TreeViewColumn("Revno")
         col.set_resizable(False)
-        col.pack_start(cell, expand=True)
+        col.pack_start(cell, True, True, 0)
         col.add_attribute(cell, "markup", REVNO_COL)
         tv.append_column(col)
 
-        cell = gtk.CellRendererText()
+        cell = Gtk.CellRendererText()
         cell.set_property("ypad", 0)
         cell.set_property("family", "Monospace")
-        col = gtk.TreeViewColumn()
+        col = Gtk.TreeViewColumn()
         col.set_resizable(False)
-        col.pack_start(cell, expand=True)
+        col.pack_start(cell, True, True, 0)
 #        col.add_attribute(cell, "foreground", HIGHLIGHT_COLOR_COL)
         col.add_attribute(cell, "background", HIGHLIGHT_COLOR_COL)
         col.add_attribute(cell, "text", TEXT_LINE_COL)
@@ -333,41 +333,41 @@ class GAnnotateWindow(Window):
         return lv
 
     def _create_back_button(self):
-        button = gtk.Button()
+        button = Gtk.Button()
         button.set_use_stock(True)
         button.set_label("gtk-go-back")
         button.connect("clicked", lambda w: self.go_back())
-        button.set_relief(gtk.RELIEF_NONE)
+        button.set_relief(Gtk.ReliefStyle.NONE)
         button.show()
         return button
 
     def _create_forward_button(self):
-        button = gtk.Button()
+        button = Gtk.Button()
         button.set_use_stock(True)
         button.set_label("gtk-go-forward")
         button.connect("clicked", lambda w: self.go_forward())
-        button.set_relief(gtk.RELIEF_NONE)
+        button.set_relief(Gtk.ReliefStyle.NONE)
         button.show()
         button.set_sensitive(False)
         return button
 
     def _create_find_button(self):
-        button = gtk.Button()
+        button = Gtk.Button()
         button.set_use_stock(True)
         button.set_label("gtk-find")
         button.set_tooltip_text("Search for text (Ctrl+F)")
         button.connect("clicked", self._search_by_text)
-        button.set_relief(gtk.RELIEF_NONE)
+        button.set_relief(Gtk.ReliefStyle.NONE)
         button.show()
         button.set_sensitive(True)
         return button
 
     def _create_goto_button(self):
-        button = gtk.Button()
+        button = Gtk.Button()
         button.set_label("Goto Line")
         button.set_tooltip_text("Scroll to a line by entering its number (Ctrl+G)")
         button.connect("clicked", self._search_by_line)
-        button.set_relief(gtk.RELIEF_NONE)
+        button.set_relief(Gtk.ReliefStyle.NONE)
         button.show()
         button.set_sensitive(True)
         return button
@@ -452,54 +452,54 @@ class RevisionCache(object):
             self.__cache[revision_id] = revision
         return self.__cache[revision_id]
 
-class SearchBox(gtk.HBox):
+class SearchBox(Gtk.HBox):
     """A button box for searching in text or lines of annotations"""
     def __init__(self):
-        gtk.HBox.__init__(self, False, 6)
+        GObject.GObject.__init__(self, False, 6)
 
         # Close button
-        button = gtk.Button()
-        image = gtk.Image()
-        image.set_from_stock('gtk-stop', gtk.ICON_SIZE_BUTTON)
+        button = Gtk.Button()
+        image = Gtk.Image()
+        image.set_from_stock('gtk-stop', Gtk.IconSize.BUTTON)
         button.set_image(image)
-        button.set_relief(gtk.RELIEF_NONE)
+        button.set_relief(Gtk.ReliefStyle.NONE)
         button.connect("clicked", lambda w: self.hide_all())
         self.pack_start(button, expand=False, fill=False)
 
         # Search entry
-        label = gtk.Label()
+        label = Gtk.Label()
         self._label = label
         self.pack_start(label, expand=False, fill=False)
 
-        entry = gtk.Entry()
+        entry = Gtk.Entry()
         self._entry = entry
         entry.connect("activate", lambda w, d: self._do_search(d),
                       'forward')
         self.pack_start(entry, expand=False, fill=False)
 
         # Next/previous buttons
-        button = gtk.Button('_Next')
-        image = gtk.Image()
-        image.set_from_stock('gtk-go-forward', gtk.ICON_SIZE_BUTTON)
+        button = Gtk.Button('_Next')
+        image = Gtk.Image()
+        image.set_from_stock('gtk-go-forward', Gtk.IconSize.BUTTON)
         button.set_image(image)
         button.connect("clicked", lambda w, d: self._do_search(d),
                        'forward')
         self.pack_start(button, expand=False, fill=False)
 
-        button = gtk.Button('_Previous')
-        image = gtk.Image()
-        image.set_from_stock('gtk-go-back', gtk.ICON_SIZE_BUTTON)
+        button = Gtk.Button('_Previous')
+        image = Gtk.Image()
+        image.set_from_stock('gtk-go-back', Gtk.IconSize.BUTTON)
         button.set_image(image)
         button.connect("clicked", lambda w, d: self._do_search(d),
                        'backward')
         self.pack_start(button, expand=False, fill=False)
 
         # Search options
-        check = gtk.CheckButton('Match case')
+        check = Gtk.CheckButton('Match case')
         self._match_case = check
         self.pack_start(check, expand=False, fill=False)
 
-        check = gtk.CheckButton('Regexp')
+        check = Gtk.CheckButton('Regexp')
         check.connect("toggled", lambda w: self._set_label())
         self._regexp = check
         self.pack_start(check, expand=False, fill=False)

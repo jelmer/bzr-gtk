@@ -19,29 +19,29 @@
 """GTK UI
 """
 
-import gtk
+from gi.repository import Gtk
 
 from bzrlib.ui import UIFactory
 
 
-class PromptDialog(gtk.Dialog):
+class PromptDialog(Gtk.Dialog):
     """Prompt the user for a yes/no answer."""
 
     def __init__(self, prompt):
-        gtk.Dialog.__init__(self)
+        GObject.GObject.__init__(self)
 
-        label = gtk.Label(prompt)
-        self.vbox.pack_start(label, padding=10)
+        label = Gtk.Label(label=prompt)
+        self.vbox.pack_start(label, True, True, 10)
         self.vbox.show_all()
 
-        self.add_buttons(gtk.STOCK_YES, gtk.RESPONSE_YES, gtk.STOCK_NO,
-                         gtk.RESPONSE_NO)
+        self.add_buttons(Gtk.STOCK_YES, Gtk.ResponseType.YES, Gtk.STOCK_NO,
+                         Gtk.ResponseType.NO)
 
 
-class GtkProgressBar(gtk.ProgressBar):
+class GtkProgressBar(Gtk.ProgressBar):
 
     def __init__(self):
-        gtk.ProgressBar.__init__(self)
+        GObject.GObject.__init__(self)
         self.set_fraction(0.0)
         self.current = None
         self.total = None
@@ -63,8 +63,8 @@ class GtkProgressBar(gtk.ProgressBar):
             if self.fraction < 0.0 or self.fraction > 1.0:
                 raise AssertionError
             self.set_fraction(self.fraction)
-        while gtk.events_pending():
-            gtk.main_iteration()
+        while Gtk.events_pending():
+            Gtk.main_iteration()
 
     def finished(self):
         self.hide()
@@ -73,13 +73,13 @@ class GtkProgressBar(gtk.ProgressBar):
         self.hide()
 
 
-class ProgressBarWindow(gtk.Window):
+class ProgressBarWindow(Gtk.Window):
 
     def __init__(self):
-        super(ProgressBarWindow, self).__init__(type=gtk.WINDOW_TOPLEVEL)
+        super(ProgressBarWindow, self).__init__(type=Gtk.WindowType.TOPLEVEL)
         self.set_border_width(0)
         self.set_title("Progress")
-        self.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+        self.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
         self.pb = GtkProgressBar()
         self.add(self.pb)
         self.resize(250, 15)
@@ -103,12 +103,12 @@ class ProgressBarWindow(gtk.Window):
         self.hide_all()
 
 
-class ProgressPanel(gtk.HBox):
+class ProgressPanel(Gtk.HBox):
 
     def __init__(self):
         super(ProgressPanel, self).__init__()
-        image_loading = gtk.image_new_from_stock(gtk.STOCK_REFRESH,
-                                                 gtk.ICON_SIZE_BUTTON)
+        image_loading = Gtk.Image.new_from_stock(Gtk.STOCK_REFRESH,
+                                                 Gtk.IconSize.BUTTON)
         image_loading.show()
 
         self.pb = GtkProgressBar()
@@ -134,23 +134,23 @@ class ProgressPanel(gtk.HBox):
         self.hide_all()
 
 
-class PasswordDialog(gtk.Dialog):
+class PasswordDialog(Gtk.Dialog):
     """ Prompt the user for a password. """
 
     def __init__(self, prompt):
-        gtk.Dialog.__init__(self)
+        GObject.GObject.__init__(self)
 
-        label = gtk.Label(prompt)
-        self.vbox.pack_start(label, padding=10)
+        label = Gtk.Label(label=prompt)
+        self.vbox.pack_start(label, True, True, 10)
 
-        self.entry = gtk.Entry()
+        self.entry = Gtk.Entry()
         self.entry.set_visibility(False)
         self.vbox.pack_end(self.entry, padding=10)
 
         self.vbox.show_all()
 
-        self.add_buttons(gtk.STOCK_OK, gtk.RESPONSE_OK,
-                         gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL)
+        self.add_buttons(Gtk.STOCK_OK, Gtk.ResponseType.OK,
+                         Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
 
     def _get_passwd(self):
         return self.entry.get_text()
@@ -174,7 +174,7 @@ class GtkUIFactory(UIFactory):
         dialog = PromptDialog(prompt)
         response = dialog.run()
         dialog.destroy()
-        return (response == gtk.RESPONSE_YES)
+        return (response == Gtk.ResponseType.YES)
 
     def get_password(self, prompt='', **kwargs):
         """Prompt the user for a password.
@@ -190,7 +190,7 @@ class GtkUIFactory(UIFactory):
         response = dialog.run()
         passwd = dialog.passwd
         dialog.destroy()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             return passwd
         else:
             return None

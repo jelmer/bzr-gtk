@@ -20,17 +20,17 @@ try:
 except:
     pass
 
-import gtk
+from gi.repository import Gtk
 
 
-def _message_dialog(type, primary, secondary, parent=None, buttons=gtk.BUTTONS_OK):
+def _message_dialog(type, primary, secondary, parent=None, buttons=Gtk.ButtonsType.OK):
     """ Display a given type of MessageDialog with the given message.
 
     :param type: message dialog type
 
     :param message: the message you want to display.
     """
-    dialog = gtk.MessageDialog(flags=gtk.DIALOG_MODAL, type=type, parent=parent,
+    dialog = Gtk.MessageDialog(flags=Gtk.DialogFlags.MODAL, type=type, parent=parent,
                                buttons=buttons)
     dialog.set_markup('<big><b>' + primary + '</b></big>')
     dialog.format_secondary_text(secondary)
@@ -40,16 +40,16 @@ def _message_dialog(type, primary, secondary, parent=None, buttons=gtk.BUTTONS_O
 
 def error_dialog(primary, secondary, parent=None):
     """ Display an error dialog with the given message. """
-    return _message_dialog(gtk.MESSAGE_ERROR, primary, secondary, parent)
+    return _message_dialog(Gtk.MessageType.ERROR, primary, secondary, parent)
 
 def info_dialog(primary, secondary, parent=None):
     """ Display an info dialog with the given message. """
-    return _message_dialog(gtk.MESSAGE_INFO, primary, secondary, parent)
+    return _message_dialog(Gtk.MessageType.INFO, primary, secondary, parent)
 
 def warning_dialog(primary, secondary, parent=None):
     """ Display a warning dialog with the given message. """
-    return _message_dialog(gtk.MESSAGE_WARNING, primary, secondary, parent)
+    return _message_dialog(Gtk.MessageType.WARNING, primary, secondary, parent)
 
 def question_dialog(primary, secondary, parent=None):
     """ Display a dialog with the given question. """
-    return _message_dialog(gtk.MESSAGE_QUESTION, primary, secondary, parent, gtk.BUTTONS_YES_NO)
+    return _message_dialog(Gtk.MessageType.QUESTION, primary, secondary, parent, Gtk.ButtonsType.YES_NO)

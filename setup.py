@@ -174,7 +174,7 @@ if __name__ == '__main__':
                     ('share/applications', ['bazaar-properties.desktop',
                                             'bzr-handle-patch.desktop',
                                             'bzr-notify.desktop']),
-                    ('share/application-registry', ['bzr-gtk.applications']),
+                    ('share/application-registry', ['bzr-Gtk.applications']),
                     ('share/pixmaps', ['icons/bzr-icon-64.png']),
                     ('share/icons/hicolor/scalable/apps', ['icons/bzr-panel.svg']),
                     ('share/icons/hicolor/scalable/emblems',

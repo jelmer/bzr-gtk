@@ -18,7 +18,7 @@
 
 import os
 
-import gtk
+from gi.repository import Gtk
 
 from bzrlib import (
     branch,
@@ -679,7 +679,7 @@ class QuestionHelpers(object):
         def _question_yes(*args, **kwargs):
             self.questions.append(args)
             self.questions.append('YES')
-            return gtk.RESPONSE_YES
+            return Gtk.ResponseType.YES
         dlg._question_dialog = _question_yes
 
     def _set_question_no(self, dlg):
@@ -688,7 +688,7 @@ class QuestionHelpers(object):
         def _question_no(*args, **kwargs):
             self.questions.append(args)
             self.questions.append('NO')
-            return gtk.RESPONSE_NO
+            return Gtk.ResponseType.NO
         dlg._question_dialog = _question_no
 
 
