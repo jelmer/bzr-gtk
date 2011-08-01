@@ -16,7 +16,7 @@
 
 import os
 
-import Gtk.gdk
+from gi.repository import Gdk
 
 from bzrlib import config
 try:

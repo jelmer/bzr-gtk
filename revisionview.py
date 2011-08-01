@@ -51,13 +51,13 @@ def _open_link(widget, uri):
             webbrowser._tryorder.insert(0, '%s "%%s"' % cmd)
     webbrowser.open(uri)
 
-if getattr(gtk, 'link_button_set_uri_hook', None) is not None:
+if getattr(Gtk, 'link_button_set_uri_hook', None) is not None:
     Gtk.link_button_set_uri_hook(_open_link)
 
 class BugsTab(Gtk.VBox):
 
     def __init__(self):
-        super(BugsTab, self).__init__(False, 6)
+        super(BugsTab, self).__init__(homogeneous=False, spacing=6)
 
         table = Gtk.Table(rows=2, columns=2)
 
@@ -68,7 +68,7 @@ class BugsTab(Gtk.VBox):
         image.set_from_file(icon_path("bug.png"))
         table.attach(image, 0, 1, 0, 1, Gtk.AttachOptions.FILL)
 
-        align = Gtk.Alignment.new(0.0, 0.1)
+        align = Gtk.Alignment.new(0.0, 0.1, 0, 0)
         self.label = Gtk.Label()
         align.add(self.label)
         table.attach(align, 1, 2, 0, 1, Gtk.AttachOptions.FILL)
@@ -106,7 +106,7 @@ class BugsTab(Gtk.VBox):
 
     def construct_treeview(self):
         self.bugs = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING)
-        self.treeview = Gtk.TreeView(self.bugs)
+        self.treeview = Gtk.TreeView(model=self.bugs)
         self.treeview.set_headers_visible(False)
 
         uri_column = Gtk.TreeViewColumn('Bug URI', Gtk.CellRendererText(), text=0)
@@ -533,7 +533,7 @@ class RevisionView(Gtk.Notebook):
                                       Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
             align.show()
 
-            hbox = Gtk.HBox(False, spacing=6)
+            hbox = Gtk.HBox(homogeneous=False, spacing=6)
             align.add(hbox)
             hbox.show()
 
@@ -556,30 +556,32 @@ class RevisionView(Gtk.Notebook):
             revid_label.set_alignment(0.0, 0.5)
             button.add(revid_label)
             button.connect("clicked",
-                    lambda w, r: self.set_revision(self._repository.get_revision(r)), revid)
+                    lambda w, r: self.set_revision(
+                        self._repository.get_revision(r)), revid)
             button.set_use_underline(False)
             hbox.pack_start(button, expand=True, fill=True)
             button.show_all()
 
     def _create_general(self):
-        vbox = Gtk.VBox(False, 6)
+        vbox = Gtk.VBox(homogeneous=False, spacing=6)
         vbox.set_border_width(6)
-        vbox.pack_start(self._create_headers(, True, True, 0), expand=False, fill=True)
-        vbox.pack_start(self._create_message_view(, True, True, 0))
-        self.append_page(vbox, tab_label=Gtk.Label(label="General"))
+        vbox.pack_start(self._create_headers(), False, True, 0)
+        vbox.pack_start(self._create_message_view(), True, True, 0)
+        self.append_page(vbox, Gtk.Label(label="General"))
         vbox.show()
 
     def _create_relations(self):
-        vbox = Gtk.VBox(False, 6)
+        vbox = Gtk.VBox(homogeneous=False, spacing=6)
         vbox.set_border_width(6)
-        vbox.pack_start(self._create_parents(, True, True, 0), expand=False, fill=True)
-        vbox.pack_start(self._create_children(, True, True, 0), expand=False, fill=True)
-        self.append_page(vbox, tab_label=Gtk.Label(label="Relations"))
+        vbox.pack_start(self._create_parents(), False, True, 0)
+        vbox.pack_start(self._create_children(), False, True, 0)
+        self.append_page(vbox, Gtk.Label(label="Relations"))
         vbox.show()
 
     def _create_signature(self):
         self.signature_table = SignatureTab(self._repository)
-        self.append_page(self.signature_table, tab_label=Gtk.Label(label='Signature'))
+        self.append_page(
+            self.signature_table, tab_label=Gtk.Label(label='Signature'))
         self.connect_after('notify::revision', self._update_signature)
 
     def _create_headers(self):
@@ -686,7 +688,7 @@ class RevisionView(Gtk.Notebook):
         return self.avatarsbox
     
     def _create_parents(self):
-        hbox = Gtk.HBox(True, 3)
+        hbox = Gtk.HBox(homogeneous=True, spacing=3)
         
         self.parents_table = self._create_parents_or_children_table(
             "<b>Parents:</b>")
@@ -697,7 +699,7 @@ class RevisionView(Gtk.Notebook):
         return hbox
 
     def _create_children(self):
-        hbox = Gtk.HBox(True, 3)
+        hbox = Gtk.HBox(homogeneous=True, spacing=3)
         self.children_table = self._create_parents_or_children_table(
             "<b>Children:</b>")
         self.children_widgets = []
@@ -713,7 +715,7 @@ class RevisionView(Gtk.Notebook):
 
         label = Gtk.Label()
         label.set_markup(text)
-        align = Gtk.Alignment.new(0.0, 0.5)
+        align = Gtk.Alignment.new(0.0, 0.5, 0, 0)
         align.add(label)
         table.attach(align, 0, 1, 0, 1, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
         label.show()
@@ -728,7 +730,7 @@ class RevisionView(Gtk.Notebook):
         window = Gtk.ScrolledWindow()
         window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         window.set_shadow_type(Gtk.ShadowType.IN)
-        tv = Gtk.TextView(msg_buffer)
+        tv = Gtk.TextView(buffer=msg_buffer)
         tv.set_editable(False)
         tv.set_wrap_mode(Gtk.WrapMode.WORD)
 
@@ -741,16 +743,16 @@ class RevisionView(Gtk.Notebook):
     def _create_bugs(self):
         self.bugs_page = BugsTab()
         self.connect_after('notify::revision', self._update_bugs) 
-        self.append_page(self.bugs_page, tab_label=Gtk.Label(label='Bugs'))
+        self.append_page(self.bugs_page, Gtk.Label(label='Bugs'))
 
     def _create_file_info_view(self):
-        self.file_info_box = Gtk.VBox(False, 6)
+        self.file_info_box = Gtk.VBox(homogeneous=False, spacing=6)
         self.file_info_box.set_border_width(6)
         self.file_info_buffer = Gtk.TextBuffer()
         window = Gtk.ScrolledWindow()
         window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         window.set_shadow_type(Gtk.ShadowType.IN)
-        tv = Gtk.TextView(self.file_info_buffer)
+        tv = Gtk.TextView(buffer=self.file_info_buffer)
         tv.set_editable(False)
         tv.set_wrap_mode(Gtk.WrapMode.WORD)
         tv.modify_font(Pango.FontDescription("Monospace"))
@@ -759,5 +761,5 @@ class RevisionView(Gtk.Notebook):
         window.show()
         self.file_info_box.pack_start(window, True, True, 0)
         self.file_info_box.hide() # Only shown when there are per-file messages
-        self.append_page(self.file_info_box, tab_label=Gtk.Label(label='Per-file'))
+        self.append_page(self.file_info_box, Gtk.Label(label='Per-file'))
 

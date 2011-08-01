@@ -14,7 +14,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from gi.repository import GObject
 from gi.repository import Gtk
 
 from bzrlib.config import parse_username
@@ -31,7 +30,7 @@ class Avatar(Gtk.HBox):
 
     def __init__(self, apparent_username):
         """ Constructor """
-        GObject.GObject.__init__(self)
+        Gtk.HBox.__init__(self)
 
         self.apparent_username = apparent_username
         self.username, self.email = parse_username(apparent_username)
@@ -39,7 +38,7 @@ class Avatar(Gtk.HBox):
 
     def __eq__(self, other):
         return (self.apparent_username == other.apparent_username and
-                self.name == other.name and
+                self.username == other.username and
                 self.email == other.email)
 
     def show_spinner(self):
@@ -50,18 +49,12 @@ class Avatar(Gtk.HBox):
         """
         if self.email:
             tooltip = _i18n("Retrieving avatar for %s...") % self.email
-            if getattr(gtk, "Spinner", False):
-                spinner = Gtk.Spinner()
-                spinner.start()
-                self.pack_start(spinner, False)
-                spinner.set_tooltip_text(tooltip)
-                spinner.set_size_request(20, 20)
-                spinner.show()
-            else:
-                spinner = Gtk.Label(label=tooltip)
-                self.pack_start(spinner, True, True, 0)
-                self.set_tooltip_text(self.apparent_username)
-                spinner.show()
+            spinner = Gtk.Spinner()
+            spinner.start()
+            self.pack_start(spinner, False, True, 0)
+            spinner.set_tooltip_text(tooltip)
+            spinner.set_size_request(20, 20)
+            spinner.show()
         else:
             no_email = Gtk.Label(label=_i18n("No email"))
             self.pack_start(no_email, True, True, 0)
@@ -81,7 +74,7 @@ class AvatarBox(Gtk.HBox):
     """HBox showing an avatar."""
 
     def __init__(self, homogeneous=False, spacing=0):
-        GObject.GObject.__init__(self, homogeneous, spacing)
+        Gtk.HBox.__init__(self, homogeneous=homogeneous, spacing=spacing)
         self.__avatars = {}
         self.avatar = None
         self.__displaying = None
@@ -163,7 +156,7 @@ class AvatarsBox(Gtk.HBox):
     """GTK container for author and committer avatars."""
 
     def __init__(self):
-        GObject.GObject.__init__(self, False, 10)
+        Gtk.HBox.__init__(self, homogeneous=False, spacing=10)
 
         self.__committer_box = None
         self.__authors_box = None
@@ -214,11 +207,11 @@ class AvatarsBox(Gtk.HBox):
         # Committer
         self.__committer_box = AvatarBox()
         self.__committer_box.set_size_request(80, 80)
-        self.pack_end(self.__committer_box, False)
+        self.pack_end(self.__committer_box, False, True, 0)
         self.__committer_box.show()
         # Authors
         self.__authors_box = AvatarBox()
-        self.pack_end(self.__authors_box, False)
+        self.pack_end(self.__authors_box, False, True, 0)
         self.__authors_box.set_spacing(10)
         self.__authors_box.show()
 
@@ -228,14 +221,15 @@ class AvatarsBox(Gtk.HBox):
         :param response: a urllib2.urlopen() return value.
         :param email: used to identify item from self.__avatars.
         """
-        if email:
-            # Convert downloaded image from provider to Gtk.Image
-            loader = GdkPixbuf.PixbufLoader()
-            loader.write(response.read())
-            loader.close()
+        # XXX sinzui 2011-08-01: This must be implemented in cairo
+#        if email:
+#            # Convert downloaded image from provider to Gtk.Image
+#            loader = Gdk.GdkPixbuf.PixbufLoader()
+#            loader.write(response.read())
+#            loader.close()
 
-            for role in ["committer", "author"]:
-                self._role_box_for(role).and_avatar_email(email).update_avatar_image_from_pixbuf_loader(loader)
+#            for role in ["committer", "author"]:
+#                self._role_box_for(role).and_avatar_email(email).update_avatar_image_from_pixbuf_loader(loader)
 
     def _role_box_for(self, role):
         """ Return the Gtk.HBox for the given role """
