@@ -95,12 +95,12 @@ class ProgressBarWindow(Gtk.Window):
 
     def finished(self):
         self.pb.finished()
-        self.hide_all()
+        self.hide()
         self.destroy()
 
     def clear(self):
         self.pb.clear()
-        self.hide_all()
+        self.hide()
 
 
 class ProgressPanel(Gtk.HBox):
