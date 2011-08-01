@@ -16,6 +16,7 @@
 
 import re
 
+from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import GObject
 from gi.repository import Pango
@@ -107,7 +108,7 @@ class CommitDialog(Gtk.Dialog):
     """Implementation of Commit."""
 
     def __init__(self, wt, selected=None, parent=None):
-        GObject.GObject.__init__(self, title="Commit to %s" % wt.basedir,
+        Gtk.Dialog.__init__(self, title="Commit to %s" % wt.basedir,
                             parent=parent, flags=0,)
         self.connect('delete-event', self._on_delete_window)
         self._question_dialog = question_dialog
@@ -121,7 +122,8 @@ class CommitDialog(Gtk.Dialog):
         self._enable_per_file_commits = True
         self._commit_all_changes = True
         self.committed_revision_id = None # Nothing has been committed yet
-        self._saved_commit_messages_manager = SavedCommitMessagesManager(self._wt, self._wt.branch)
+        self._saved_commit_messages_manager = SavedCommitMessagesManager(
+            self._wt, self._wt.branch)
 
         self.setup_params()
         self.construct()
@@ -226,7 +228,7 @@ class CommitDialog(Gtk.Dialog):
         # This sets the cursor, which causes the expander to close, which
         # causes the _file_message_text_view to never get realized. So we have
         # to give it a little kick, or it warns when we try to grab the focus
-        self._treeview_files.set_cursor(initial_cursor)
+        self._treeview_files.set_cursor(initial_cursor, None, None)
 
         def _realize_file_message_tree_view(*args):
             self._file_message_text_view.realize()
@@ -286,7 +288,7 @@ class CommitDialog(Gtk.Dialog):
         self._construct_right_pane()
         self._construct_action_pane()
 
-        self.vbox.pack_start(self._hpane, True, True, 0)
+        self.get_content_area().pack_start(self._hpane, True, True, 0)
         self._hpane.show()
         self.set_focus(self._global_message_text_view)
 
@@ -312,8 +314,8 @@ class CommitDialog(Gtk.Dialog):
 
     def _construct_accelerators(self):
         group = Gtk.AccelGroup()
-        group.connect_group(Gdk.keyval_from_name('N'),
-                            Gdk.EventMask.CONTROL_MASK, 0, self._on_accel_next)
+        group.connect(Gdk.keyval_from_name('N'),
+                      Gdk.ModifierType.CONTROL_MASK, 0, self._on_accel_next)
         self.add_accel_group(group)
 
         # ignore the escape key (avoid closing the window)
@@ -326,7 +328,7 @@ class CommitDialog(Gtk.Dialog):
 
         self._check_local = Gtk.CheckButton(_i18n("_Only commit locally"),
                                             use_underline=True)
-        self._left_pane_box.pack_end(self._check_local, False, False)
+        self._left_pane_box.pack_end(self._check_local, False, False, 0)
         self._check_local.set_active(False)
 
         self._hpane.pack1(self._left_pane_box, resize=False, shrink=False)
@@ -354,12 +356,14 @@ class CommitDialog(Gtk.Dialog):
         self._button_cancel = Gtk.Button(stock=Gtk.STOCK_CANCEL)
         self._button_cancel.connect('clicked', self._on_cancel_clicked)
         self._button_cancel.show()
-        self.action_area.pack_end(self._button_cancel)
+        self.get_action_area().pack_end(
+            self._button_cancel, True, True, 0)
         self._button_commit = Gtk.Button(_i18n("Comm_it"), use_underline=True)
         self._button_commit.connect('clicked', self._on_commit_clicked)
         self._button_commit.set_can_default(True)
         self._button_commit.show()
-        self.action_area.pack_end(self._button_commit)
+        self.get_action_area().pack_end(
+            self._button_commit, True, True, 0)
         self._button_commit.grab_default()
 
     def _add_to_right_table(self, widget, weight, expanding=False):
@@ -409,8 +413,7 @@ class CommitDialog(Gtk.Dialog):
         scroller.add(self._treeview_files)
         scroller.set_shadow_type(Gtk.ShadowType.IN)
         scroller.show()
-        self._files_box.pack_start(scroller,
-                                   expand=True, fill=True)
+        self._files_box.pack_start(scroller, True, True, 0)
         self._files_box.show()
         self._left_pane_box.pack_start(self._files_box, True, True, 0)
 
@@ -473,11 +476,11 @@ class CommitDialog(Gtk.Dialog):
         pending_message = Gtk.Label()
         pending_message.set_markup(
             _i18n('<i>* Cannot select specific files when merging</i>'))
-        self._pending_box.pack_start(pending_message, expand=False, padding=5)
+        self._pending_box.pack_start(pending_message, False, True, 5)
         pending_message.show()
 
         pending_label = Gtk.Label(label=_i18n('Pending Revisions'))
-        self._pending_box.pack_start(pending_label, expand=False, padding=0)
+        self._pending_box.pack_start(pending_label, False, True, 0)
         pending_label.show()
 
         scroller = Gtk.ScrolledWindow()
@@ -486,8 +489,7 @@ class CommitDialog(Gtk.Dialog):
         scroller.add(self._treeview_pending)
         scroller.set_shadow_type(Gtk.ShadowType.IN)
         scroller.show()
-        self._pending_box.pack_start(scroller,
-                                     expand=True, fill=True, padding=5)
+        self._pending_box.pack_start(scroller, True, True, 5)
         self._treeview_pending.show()
         self._left_pane_box.pack_start(self._pending_box, True, True, 0)
 
@@ -536,7 +538,8 @@ class CommitDialog(Gtk.Dialog):
         self._file_message_text_view.set_accepts_tab(False)
         self._file_message_text_view.show()
 
-        self._file_message_expander = Gtk.Expander(_i18n('File commit message'))
+        self._file_message_expander = Gtk.Expander(
+            label=_i18n('File commit message'))
         self._file_message_expander.set_expanded(True)
         self._file_message_expander.add(scroller)
         self._add_to_right_table(self._file_message_expander, 1, False)
@@ -606,7 +609,7 @@ class CommitDialog(Gtk.Dialog):
             return # Nothing to save
         text_buffer = self._file_message_text_view.get_buffer()
         cur_text = text_buffer.get_text(text_buffer.get_start_iter(),
-                                        text_buffer.get_end_iter())
+                                        text_buffer.get_end_iter(), True)
         last_selected = self._files_store.get_iter(self._last_selected_file)
         self._files_store.set_value(last_selected, 5, cur_text)
 
@@ -760,7 +763,7 @@ class CommitDialog(Gtk.Dialog):
     def _get_global_commit_message(self):
         buf = self._global_message_text_view.get_buffer()
         start, end = buf.get_bounds()
-        text = buf.get_text(start, end)
+        text = buf.get_text(start, end, True)
         return _sanitize_and_decode_message(text)
 
     def _set_global_commit_message(self, message):

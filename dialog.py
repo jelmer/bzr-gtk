@@ -24,8 +24,8 @@ def _message_dialog(type, primary, secondary, parent=None, buttons=Gtk.ButtonsTy
 
     :param message: the message you want to display.
     """
-    dialog = Gtk.MessageDialog(flags=Gtk.DialogFlags.MODAL, type=type, parent=parent,
-                               buttons=buttons)
+    dialog = Gtk.MessageDialog(parent=parent, flags=Gtk.DialogFlags.MODAL,
+                               type=type, buttons=buttons)
     dialog.set_markup('<big><b>' + primary + '</b></big>')
     dialog.format_secondary_text(secondary)
     response = dialog.run()

@@ -28,7 +28,7 @@ class PromptDialog(Gtk.Dialog):
     """Prompt the user for a yes/no answer."""
 
     def __init__(self, prompt):
-        GObject.GObject.__init__(self)
+        Gtk.Dialog.__init__(self)
 
         label = Gtk.Label(label=prompt)
         self.vbox.pack_start(label, True, True, 10)
@@ -41,7 +41,7 @@ class PromptDialog(Gtk.Dialog):
 class GtkProgressBar(Gtk.ProgressBar):
 
     def __init__(self):
-        GObject.GObject.__init__(self)
+        Gtk.ProgressBar.__init__(self)
         self.set_fraction(0.0)
         self.current = None
         self.total = None
@@ -138,7 +138,7 @@ class PasswordDialog(Gtk.Dialog):
     """ Prompt the user for a password. """
 
     def __init__(self, prompt):
-        GObject.GObject.__init__(self)
+        Gtk.Dialog.__init__(self)
 
         label = Gtk.Label(label=prompt)
         self.vbox.pack_start(label, True, True, 10)
