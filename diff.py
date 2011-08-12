@@ -382,7 +382,7 @@ class DiffWidget(Gtk.HPaned):
                     break
         if tv_path is None:
             raise errors.NoSuchFile(file_path)
-        self.treeview.set_cursor(tv_path)
+        self.treeview.set_cursor(tv_path, None, False)
         self.treeview.scroll_to_cell(tv_path)
 
     def _treeview_cursor_cb(self, *args):

@@ -78,6 +78,7 @@ class TreeModel(Gtk.GenericTreeModel):
         if index == AUTHORS: return GObject.TYPE_STRING
 
     def on_get_iter(self, path):
+        # XXX sinzui 2011-08-12: maybe path.get_indices()[0]?
         return path[0]
 
     def on_get_path(self, rowref):

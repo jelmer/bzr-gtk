@@ -168,8 +168,9 @@ class GAnnotateWindow(Window):
     def _highlight_annotation(self, model, path, iter, now):
         revision_id, = model.get(iter, REVISION_ID_COL)
         revision = self.revisions[revision_id]
-        model.set(iter, HIGHLIGHT_COLOR_COL,
-                  self.annotate_colormap.get_color(revision, now))
+        # XXX sinzui 2011-08-12: What does get_color return?
+        color = self.annotate_colormap.get_color(revision, now)
+        model.set_value(iter, HIGHLIGHT_COLOR_COL, color)
 
     def _selected_revision(self):
         (path, col) = self.annoview.get_cursor()
@@ -248,7 +249,7 @@ class GAnnotateWindow(Window):
         self._search.set_target(self.annoview, LINE_NUM_COL)
 
     def line_diff(self, tv, path, tvc):
-        row = path[0]
+        row = path.get_indices()[0]
         revision = self.annotations[row]
         repository = self.branch.repository
         if revision.revision_id == CURRENT_REVISION:
@@ -397,12 +398,14 @@ class GAnnotateWindow(Window):
         rev_id = self._selected_revision()
         if self.file_id in target_tree:
             offset = self.get_scroll_offset(target_tree)
-            (row,), col = self.annoview.get_cursor()
+            path, col = self.annoview.get_cursor()
+            (row,) = path.get_indices()
             self.annotate(target_tree, self.branch, self.file_id)
             new_row = row+offset
             if new_row < 0:
                 new_row = 0
-            self.annoview.set_cursor(new_row)
+            new_path = Gtk.TreePath(path=new_row)
+            self.annoview.set_cursor(new_path, None, False)
             return True
         else:
             return False
@@ -410,7 +413,8 @@ class GAnnotateWindow(Window):
     def get_scroll_offset(self, tree):
         old = self.tree.get_file(self.file_id)
         new = tree.get_file(self.file_id)
-        (row,), col = self.annoview.get_cursor()
+        path, col = self.annoview.get_cursor()
+        (row,) = path.get_indices()
         matcher = patiencediff.PatienceSequenceMatcher(None, old.readlines(),
                                                        new.readlines())
         for i, j, n in matcher.get_matching_blocks():
