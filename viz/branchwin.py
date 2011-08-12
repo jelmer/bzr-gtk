@@ -122,9 +122,9 @@ class BranchWindow(Window):
         nav = self.construct_navigation()
         menubar = self.construct_menubar()
 
-        vbox.pack_start(menubar, expand=False, fill=True)
-        vbox.pack_start(nav, expand=False, fill=True)
-        vbox.pack_start(paned, expand=True, fill=True)
+        vbox.pack_start(menubar, False, True, True, 0)
+        vbox.pack_start(nav, False, True,True, 0)
+        vbox.pack_start(paned, True, True, True, 0)
         vbox.set_focus_child(paned)
 
 
@@ -561,7 +561,8 @@ class BranchWindow(Window):
 
         old = self.paned
         self.vbox.remove(old)
-        self.vbox.pack_start(self.construct_paned(, True, True, 0), expand=True, fill=True)
+        self.vbox.pack_start(
+            self.construct_paned(, True, True, 0), True, True, True, 0)
         self._make_diff_paned_nonzero_size()
         self._make_diff_nonzero_size()
 

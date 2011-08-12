@@ -48,9 +48,9 @@ class SpanSelector(Gtk.HBox):
         label = Gtk.Label(label="Highlighting spans:")
         label.show()
 
-        self.pack_start(label, expand=False, fill=True)
-        self.pack_start(self.combo, expand=False, fill=False)
-        self.pack_start(self.entry, expand=False, fill=False)
+        self.pack_start(label, False, True, True, 0)
+        self.pack_start(self.combo, False, False, True, 0)
+        self.pack_start(self.entry, False, False, True, 0)
 
     def set_to_oldest_span(self, span):
         """Set the span associated with the "to Oldest Revision" entry."""
@@ -178,8 +178,8 @@ class SpanSelector(Gtk.HBox):
 
         label = Gtk.Label(label="Days")
 
-        entry.pack_start(spin, expand=False, fill=False)
-        entry.pack_start(label, expand=False, fill=False)
+        entry.pack_start(spin, False, False, True, 0)
+        entry.pack_start(label, False, False, True, 0)
 
         return entry
 

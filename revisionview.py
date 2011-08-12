@@ -547,7 +547,7 @@ class RevisionView(Gtk.Notebook):
                 button.add(image)
                 button.connect("clicked", self._show_clicked_cb,
                                self._revision.revision_id, revid)
-                hbox.pack_start(button, expand=False, fill=True)
+                hbox.pack_start(button, False, True, True, 0)
                 button.show()
 
             button = Gtk.Button()
@@ -559,7 +559,7 @@ class RevisionView(Gtk.Notebook):
                     lambda w, r: self.set_revision(
                         self._repository.get_revision(r)), revid)
             button.set_use_underline(False)
-            hbox.pack_start(button, expand=True, fill=True)
+            hbox.pack_start(button, True, True, True, 0)
             button.show_all()
 
     def _create_general(self):
