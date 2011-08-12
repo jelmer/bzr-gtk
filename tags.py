@@ -40,7 +40,7 @@ class TagsWindow(Window):
         self._button_refresh = Gtk.Button(stock=Gtk.STOCK_REFRESH)
         self._button_close = Gtk.Button(stock=Gtk.STOCK_CLOSE)
         self._model = Gtk.ListStore(str, str)
-        self._treeview_tags = Gtk.TreeView(self._model)
+        self._treeview_tags = Gtk.TreeView(model=self._model)
         self._scrolledwindow_tags = Gtk.ScrolledWindow()
         self._revisionview = RevisionView()
         self._hbox = Gtk.HBox()
@@ -74,19 +74,19 @@ class TagsWindow(Window):
         # Construct the dialog
         self._scrolledwindow_tags.add(self._treeview_tags)
 
-        self._vbox_buttons_top.pack_start(self._button_add, False, False)
-        self._vbox_buttons_top.pack_start(self._button_remove, False, False)
-        self._vbox_buttons_top.pack_start(self._button_refresh, False, False)
-        self._vbox_buttons_bottom.pack_start(self._button_close, False, False)
+        self._vbox_buttons_top.pack_start(self._button_add, False, False, 0)
+        self._vbox_buttons_top.pack_start(self._button_remove, False, False, 0)
+        self._vbox_buttons_top.pack_start(self._button_refresh, False, False, 0)
+        self._vbox_buttons_bottom.pack_start(self._button_close, False, False, 0)
 
-        self._vbox_buttons.pack_start(self._vbox_buttons_top, True, True)
-        self._vbox_buttons.pack_start(self._vbox_buttons_bottom, False, False)
+        self._vbox_buttons.pack_start(self._vbox_buttons_top, True, True, 0)
+        self._vbox_buttons.pack_start(self._vbox_buttons_bottom, False, False, 0)
 
         self._vpaned.add1(self._scrolledwindow_tags)
         self._vpaned.add2(self._revisionview)
 
-        self._hbox.pack_start(self._vpaned, True, True)
-        self._hbox.pack_start(self._vbox_buttons, False, True)
+        self._hbox.pack_start(self._vpaned, True, True, 0)
+        self._hbox.pack_start(self._vbox_buttons, False, True, 0)
 
         self.add(self._hbox)
 

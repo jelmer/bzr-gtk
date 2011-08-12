@@ -559,7 +559,7 @@ class RevisionView(Gtk.Notebook):
                     lambda w, r: self.set_revision(
                         self._repository.get_revision(r)), revid)
             button.set_use_underline(False)
-            hbox.pack_start(button, True, True, True, 0)
+            hbox.pack_start(button, True, True, 0)
             button.show_all()
 
     def _create_general(self):
