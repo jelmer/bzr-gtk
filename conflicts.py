@@ -20,7 +20,7 @@ from gi.repository import Gtk
 from gi.repository import GObject
 
 from bzrlib.config import GlobalConfig
-from bzrlib.plugins.gtk import _i18n
+from bzrlib.plugins.gtk.i18n import _i18n
 from bzrlib.plugins.gtk.dialog import (
     error_dialog,
     warning_dialog,
@@ -32,7 +32,7 @@ class ConflictsDialog(Gtk.Dialog):
 
     def __init__(self, wt, parent=None):
         """ Initialize the Conflicts dialog. """
-        GObject.GObject.__init__(self, title="Conflicts - Olive",
+        Gtk.Dialog.__init__(self, title="Conflicts - Olive",
                                   parent=parent,
                                   flags=0,
                                   buttons=(Gtk.STOCK_CLOSE, Gtk.ResponseType.CANCEL))
@@ -59,22 +59,23 @@ class ConflictsDialog(Gtk.Dialog):
         self._button_diff3.set_image(self._image_diff3)
         self._entry_diff3.set_text(self._get_diff3())
         self._hbox_diff3.set_spacing(3)
-        self.vbox.set_spacing(3)
+        content_area = self.get_content_area()
+        content_area.set_spacing(3)
         self.set_default_size(400, 300)
 
         # Construct dialog
-        self._hbox_diff3.pack_start(self._label_diff3, False, False)
-        self._hbox_diff3.pack_start(self._entry_diff3, True, True)
-        self._hbox_diff3.pack_start(self._button_diff3, False, False)
+        self._hbox_diff3.pack_start(self._label_diff3, False, False, 0)
+        self._hbox_diff3.pack_start(self._entry_diff3, True, True, 0)
+        self._hbox_diff3.pack_start(self._button_diff3, False, False, 0)
         self._scrolledwindow.add(self._treeview)
-        self.vbox.pack_start(self._scrolledwindow, True, True)
-        self.vbox.pack_start(self._hbox_diff3, False, False)
+        content_area.pack_start(self._scrolledwindow, True, True, 0)
+        content_area.pack_start(self._hbox_diff3, False, False, 0)
 
         # Create the conflict list
         self._create_conflicts()
 
         # Show the dialog
-        self.vbox.show_all()
+        content_area.show_all()
 
     def _get_diff3(self):
         """ Get the specified diff3 utility. Default is meld. """
