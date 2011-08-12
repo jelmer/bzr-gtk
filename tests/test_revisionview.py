@@ -32,7 +32,8 @@ class TestPendingRevisions(tests.TestCaseWithMemoryTransport):
     def assertBufferText(self, text, buffer):
         """Check the text stored in the buffer."""
         self.assertEqual(text, buffer.get_text(buffer.get_start_iter(),
-                                               buffer.get_end_iter()))
+                                               buffer.get_end_iter(),
+                                               True))
 
     def test_create_view(self):
         builder = self.make_branch_builder('test')

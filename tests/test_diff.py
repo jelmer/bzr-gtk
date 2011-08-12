@@ -84,7 +84,7 @@ class TestDiffView(tests.TestCaseWithTransport):
         view.show_diff(None)
         buf = view.buffer
         start, end = buf.get_bounds()
-        text = buf.get_text(start, end)
+        text = buf.get_text(start, end, True)
         self.assertContainsRe(text,
             "=== added file '\xce\xa9'\n"
             '--- .*\t1970-01-01 00:00:00 \\+0000\n'

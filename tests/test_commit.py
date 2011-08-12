@@ -413,7 +413,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         dlg = commit.CommitDialog(tree)
         diff_buffer = dlg._diff_view.buffer
         text = diff_buffer.get_text(diff_buffer.get_start_iter(),
-                                    diff_buffer.get_end_iter()).splitlines(True)
+                                    diff_buffer.get_end_iter(),
+                                    True).splitlines(True)
 
         self.assertEqual("=== modified file 'a'\n", text[0])
         self.assertContainsRe(text[1],
@@ -467,7 +468,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         dlg._treeview_files.set_cursor((1,))
         self.assertEqual('Diff for a', dlg._diff_label.get_text())
         text = diff_buffer.get_text(diff_buffer.get_start_iter(),
-                                    diff_buffer.get_end_iter()).splitlines(True)
+                                    diff_buffer.get_end_iter(),
+                                    True).splitlines(True)
         self.assertEqual("=== added file 'a'\n", text[0])
         self.assertContainsRe(text[1],
             r"--- a\t\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d\d\d")
@@ -484,7 +486,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         dlg._treeview_files.set_cursor((2,))
         self.assertEqual('Diff for b', dlg._diff_label.get_text())
         text = diff_buffer.get_text(diff_buffer.get_start_iter(),
-                                    diff_buffer.get_end_iter()).splitlines(True)
+                                    diff_buffer.get_end_iter(),
+                                    True).splitlines(True)
         self.assertEqual("=== added file 'b'\n", text[0])
         self.assertContainsRe(text[1],
             r"--- b\t\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d\d\d")
@@ -514,7 +517,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         def get_file_text():
             buf = dlg._file_message_text_view.get_buffer()
-            return buf.get_text(buf.get_start_iter(), buf.get_end_iter())
+            return buf.get_text(
+                buf.get_start_iter(), buf.get_end_iter(), True)
 
         def get_saved_text(path):
             """Get the saved text for a given record."""
