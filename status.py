@@ -74,7 +74,7 @@ class StatusWindow(window.Window):
         cell = Gtk.CellRendererText()
         cell.set_property("width-chars", 20)
         column = Gtk.TreeViewColumn()
-        column.pack_start(cell, True, True, 0)
+        column.pack_start(cell, True)
         column.add_attribute(cell, "text", 0)
         self.treeview.append_column(column)
 
