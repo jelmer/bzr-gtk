@@ -45,7 +45,7 @@ class SendMergeDirectiveDialog(Gtk.Dialog):
 
     def _create(self):
         table = Gtk.Table(rows=3, columns=2)
-        self.vbox.add(table)
+        self.get_content_area().add(table)
 
         label = Gtk.Label()
         label.set_markup("<b>Branch to Submit:</b>")
@@ -68,7 +68,7 @@ class SendMergeDirectiveDialog(Gtk.Dialog):
         label.set_markup("<b>Email To:</b>")
         table.attach(label, 0, 1, 2, 3, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        self.mail_to = Gtk.ComboBoxEntry()
+        self.mail_to = Gtk.ComboBox.new_with_entry()
         mail_to = self.branch.get_config().get_user_option('submit_to')
         if mail_to is None:
             submit_branch = self.submit_branch.get_branch()

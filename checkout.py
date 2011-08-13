@@ -46,7 +46,7 @@ class CheckoutDialog(Gtk.Dialog):
         self._button_revision = Gtk.Button('')
         self._image_browse = Gtk.Image()
         self._filechooser = Gtk.FileChooserButton(_i18n("Please select a folder"))
-        self._combo = Gtk.ComboBoxEntry()
+        self._combo = Gtk.ComboBox.new_with_entry()
         self._label_location = Gtk.Label(label=_i18n("Branch location:"))
         self._label_destination = Gtk.Label(label=_i18n("Destination:"))
         self._label_nick = Gtk.Label(label=_i18n("Branch nick:"))
@@ -112,7 +112,7 @@ class CheckoutDialog(Gtk.Dialog):
             self._combo_model.append([ item ])
 
         self._combo.set_model(self._combo_model)
-        self._combo.set_text_column(0)
+        self._combo.set_entry_text_column(0)
 
     def _get_last_revno(self):
         """ Get the revno of the last revision (if any). """
