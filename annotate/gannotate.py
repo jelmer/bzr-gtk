@@ -468,7 +468,7 @@ class SearchBox(Gtk.HBox):
         image.set_from_stock('gtk-stop', Gtk.IconSize.BUTTON)
         button.set_image(image)
         button.set_relief(Gtk.ReliefStyle.NONE)
-        button.connect("clicked", lambda w: self.hide_all())
+        button.connect("clicked", lambda w: self.hide())
         self.pack_start(button, False, False, 0)
 
         # Search entry
@@ -593,6 +593,6 @@ class SearchBox(Gtk.HBox):
         for row in iterate(model, start):
             if self._match(model, row, self._column):
                 path = model.get_path(row)
-                self._view.set_cursor(path)
+                self._view.set_cursor(path, None, False)
                 self._view.scroll_to_cell(path, use_align=True)
                 break

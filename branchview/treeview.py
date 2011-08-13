@@ -211,7 +211,7 @@ class TreeView(Gtk.VBox):
 
         :param revid: Revision id of revision to display.
         """
-        self.treeview.set_cursor(self.index[revid])
+        self.treeview.set_cursor(self.index[revid], None, False)
         self.treeview.grab_focus()
 
     def get_children(self):
@@ -330,7 +330,7 @@ class TreeView(Gtk.VBox):
             self.treeview.set_model(self.model)
 
             if not revision or revision == NULL_REVISION:
-                self.treeview.set_cursor(0)
+                self.treeview.set_cursor(0, None, False)
             else:
                 self.set_revision(revision)
 
