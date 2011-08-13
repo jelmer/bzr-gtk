@@ -36,10 +36,11 @@ class PushDialog(Gtk.Dialog):
 
     def __init__(self, repository, revid, branch=None, parent=None):
         """Initialize the Push dialog. """
-        GObject.GObject.__init__(self, title="Push",
+        Gtk.Dialog.__init__(self, title="Push",
                                   parent=parent,
                                   flags=0,
                                   buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
+
 
         # Get arguments
         self.repository = repository
@@ -48,7 +49,7 @@ class PushDialog(Gtk.Dialog):
 
         # Create the widgets
         self._label_location = Gtk.Label(label=_i18n("Location:"))
-        self._combo = Gtk.ComboBoxEntry()
+        self._combo = Gtk.ComboBox.new_with_entry()
         self._button_push = Gtk.Button(_i18n("_Push"), use_underline=True)
         self._hbox_location = Gtk.HBox()
 
@@ -58,16 +59,18 @@ class PushDialog(Gtk.Dialog):
         # Set properties
         self._label_location.set_alignment(0, 0.5)
         self._hbox_location.set_spacing(3)
-        self.vbox.set_spacing(3)
+        self.get_content_area().set_spacing(3)
 
         # Pack widgets
-        self._hbox_location.pack_start(self._label_location, False, False)
-        self._hbox_location.pack_start(self._combo, True, True)
-        self.vbox.pack_start(self._hbox_location, True, True, 0)
-        self.action_area.pack_end(self._button_push)
+        self._hbox_location.pack_start(
+            self._label_location, False, False, 0)
+        self._hbox_location.pack_start(self._combo, True, True, 0)
+        self.get_content_area().pack_start(self._hbox_location, True, True, 0)
+        # XXX sinzui 2011-08-12: maybe False, False, 0
+        self.get_action_area().pack_end(self._button_push, True, True, 0)
 
         # Show the dialog
-        self.vbox.show_all()
+        self.get_content_area().show_all()
 
         # Build location history
         self._history = UrlHistory(self.branch.get_config(), 'push_history')
@@ -79,7 +82,7 @@ class PushDialog(Gtk.Dialog):
         for item in self._history.get_entries():
             self._combo_model.append([ item ])
         self._combo.set_model(self._combo_model)
-        self._combo.set_text_column(0)
+        self._combo.set_entry_text_column(0)
 
         if self.branch is not None:
             location = self.branch.get_push_location()
