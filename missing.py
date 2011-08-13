@@ -40,7 +40,7 @@ class MissingWindow(Gtk.Dialog):
         for rev in revisions:
             rv = RevisionView()
             rv.set_revision(rev)
-            vbox.pack_start(rv, True, True)
+            vbox.pack_start(rv, True, True, 0)
         extra_revs.add_with_viewport(vbox)
         extra_revs.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         return extra_revs
@@ -49,7 +49,7 @@ class MissingWindow(Gtk.Dialog):
         self.set_default_size(600, 600)
         paned = Gtk.VPaned()
 
-        frame = Gtk.Frame("You have the following extra revisions:")
+        frame = Gtk.Frame(label="You have the following extra revisions:")
 
         extra_revs = self._create_revisions_frame(
                 self.local_branch.repository.get_revisions(
@@ -61,10 +61,10 @@ class MissingWindow(Gtk.Dialog):
                 self.remote_branch.repository.get_revisions(
                     map(lambda (x,y):y, self.remote_extra)))
 
-        frame = Gtk.Frame("You are missing following revisions:")
+        frame = Gtk.Frame(label="You are missing following revisions:")
         frame.add(missing_revs)
 
         paned.pack2(frame, resize=False, shrink=True)
 
-        self.vbox.pack_start(paned, True, True)
-        self.vbox.show_all()
+        self.get_content_area().pack_start(paned, True, True, 0)
+        self.get_content_area().show_all()

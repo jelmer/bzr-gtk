@@ -148,7 +148,7 @@ class SignatureTab(Gtk.VBox):
         self.revision = None
         self.repository = repository
 
-        super(SignatureTab, self).__init__(False, 6)
+        super(SignatureTab, self).__init__(homogeneous=False, spacing=6)
         signature_box = Gtk.Table(rows=3, columns=3)
         signature_box.set_col_spacing(0, 16)
         signature_box.set_col_spacing(1, 12)
@@ -157,42 +157,42 @@ class SignatureTab(Gtk.VBox):
         self.signature_image = Gtk.Image()
         signature_box.attach(self.signature_image, 0, 1, 0, 1, Gtk.AttachOptions.FILL)
 
-        align = Gtk.Alignment.new(0.0, 0.1)
+        align = Gtk.Alignment.new(0.0, 0.1, 0.0, 0.0)
         self.signature_label = Gtk.Label()
         align.add(self.signature_label)
         signature_box.attach(align, 1, 3, 0, 1, Gtk.AttachOptions.FILL)
 
-        align = Gtk.Alignment.new(0.0, 0.5)
+        align = Gtk.Alignment.new(0.0, 0.5, 0.0, 0.0)
         self.signature_key_id_label = Gtk.Label()
         self.signature_key_id_label.set_markup("<b>Key Id:</b>")
         align.add(self.signature_key_id_label)
         signature_box.attach(align, 1, 2, 1, 2, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        align = Gtk.Alignment.new(0.0, 0.5)
+        align = Gtk.Alignment.new(0.0, 0.5, 0.0, 0.0)
         self.signature_key_id = Gtk.Label()
         self.signature_key_id.set_selectable(True)
         align.add(self.signature_key_id)
         signature_box.attach(align, 2, 3, 1, 2, Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        align = Gtk.Alignment.new(0.0, 0.5)
+        align = Gtk.Alignment.new(0.0, 0.5, 0.0, 0.0)
         self.signature_fingerprint_label = Gtk.Label()
         self.signature_fingerprint_label.set_markup("<b>Fingerprint:</b>")
         align.add(self.signature_fingerprint_label)
         signature_box.attach(align, 1, 2, 2, 3, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        align = Gtk.Alignment.new(0.0, 0.5)
+        align = Gtk.Alignment.new(0.0, 0.5, 0.0, 0.0)
         self.signature_fingerprint = Gtk.Label()
         self.signature_fingerprint.set_selectable(True)
         align.add(self.signature_fingerprint)
         signature_box.attach(align, 2, 3, 2, 3, Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        align = Gtk.Alignment.new(0.0, 0.5)
+        align = Gtk.Alignment.new(0.0, 0.5, 0.0, 0.0)
         self.signature_trust_label = Gtk.Label()
         self.signature_trust_label.set_markup("<b>Trust:</b>")
         align.add(self.signature_trust_label)
         signature_box.attach(align, 1, 2, 3, 4, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        align = Gtk.Alignment.new(0.0, 0.5)
+        align = Gtk.Alignment.new(0.0, 0.5, 0.0, 0.0)
         self.signature_trust = Gtk.Label()
         self.signature_trust.set_selectable(True)
         align.add(self.signature_trust)
@@ -327,7 +327,7 @@ class RevisionView(Gtk.Notebook):
     }
 
     def __init__(self, branch=None, repository=None):
-        GObject.GObject.__init__(self)
+        Gtk.Notebook.__init__(self)
 
         self._revision = None
         self._branch = branch
@@ -335,6 +335,7 @@ class RevisionView(Gtk.Notebook):
             self._repository = branch.repository
         else:
             self._repository = repository
+        self.signature_table = None
 
         self._create_general()
         self._create_relations()
@@ -474,6 +475,8 @@ class RevisionView(Gtk.Notebook):
         self._add_tags()
 
     def _update_signature(self, widget, param):
+        if not has_seahorse:
+            return
         if self.get_current_page() == PAGE_SIGNATURE:
             self.signature_table.set_revision(self._revision)
 
@@ -488,6 +491,8 @@ class RevisionView(Gtk.Notebook):
                                       self.children_table)
 
     def _switch_page_cb(self, notebook, page, page_num):
+        if not has_seahorse:
+            return
         if page_num == PAGE_SIGNATURE:
             self.signature_table.set_revision(self._revision)
 
@@ -581,7 +586,7 @@ class RevisionView(Gtk.Notebook):
     def _create_signature(self):
         self.signature_table = SignatureTab(self._repository)
         self.append_page(
-            self.signature_table, tab_label=Gtk.Label(label='Signature'))
+            self.signature_table, Gtk.Label(label='Signature'))
         self.connect_after('notify::revision', self._update_signature)
 
     def _create_headers(self):
