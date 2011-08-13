@@ -32,7 +32,6 @@ class PreferencesWindow(Gtk.Dialog):
         """ Initialize the Status window. """
         super(PreferencesWindow, self).__init__(flags=Gtk.DialogFlags.MODAL)
         self.set_title("Bazaar Preferences")
-        self.set_has_separator(False)
         self.config = config
         if self.config is None:
             self.config = GlobalConfig()
@@ -48,10 +47,11 @@ class PreferencesWindow(Gtk.Dialog):
             notebook.append_page(page, Gtk.Label(label=label))
 
         notebook.set_current_page(0)
-        self.vbox.set_border_width(0)
-        self.vbox.pack_start(notebook, True, True)
-        self.vbox.show_all()
-        self.action_area.set_border_width(12)
+        content_area = self.get_content_area()
+        content_area.set_border_width(0)
+        content_area.pack_start(notebook, True, True, 0)
+        content_area.show_all()
+        self.get_action_area().set_border_width(12)
 
     def _create_pages(self):
         return [("Identity", IdentityPage(self.config)),

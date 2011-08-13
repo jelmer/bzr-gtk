@@ -34,45 +34,45 @@ class NotificationsPage(Gtk.VBox):
 
     def __init__(self, config, homogeneous=False, spacing=6):
         self.config = config
-        GObject.GObject.__init__(self, homogeneous=homogeneous, spacing=spacing)
+        Gtk.VBox.__init__(self, homogeneous=homogeneous, spacing=spacing)
         self.set_spacing(spacing) # The vertical one
 
-        lan_frame = Gtk.Frame("LAN Notifications")
+        lan_frame = Gtk.Frame(label="LAN Notifications")
 
         lan_vbox = Gtk.VBox()
         lan_frame.add(lan_vbox)
 
         self.gateway_to_lan = Gtk.CheckButton("_Gateway to LAN")
-        lan_vbox.pack_start(self.gateway_to_lan, True, True, 0)
+        lan_vbox.pack_start(self.gateway_to_lan, False, False, 0)
         self.gateway_to_lan.set_sensitive(has_dbus())
 
         self.announce_on_lan = Gtk.CheckButton("_Announce on LAN")
-        lan_vbox.pack_start(self.announce_on_lan, True, True, 0)
+        lan_vbox.pack_start(self.announce_on_lan, False, False, 0)
         self.announce_on_lan.set_sensitive(has_avahi())
 
-        self.pack_start(lan_frame, True, True, 0)
+        self.pack_start(lan_frame, False, False, 0)
 
-        email_frame = Gtk.Frame("E-mail notifications")
+        email_frame = Gtk.Frame(label="E-mail notifications")
 
         email_hbox = Gtk.HBox()
         self.send_email = Gtk.CheckButton("Send _E-Mail to")
-        email_hbox.pack_start(self.send_email, True, True, 0)
+        email_hbox.pack_start(self.send_email, False, False, 0)
         self.send_email_to = Gtk.Entry()
-        email_hbox.pack_start(self.send_email_to, True, True, 0)
+        email_hbox.pack_start(self.send_email_to, False, False, 0)
 
         email_frame.add(email_hbox)
         email_frame.set_sensitive(has_email())
 
-        self.pack_start(email_frame, True, True, 0)
+        self.pack_start(email_frame, False, False, 0)
 
-        cia_frame = Gtk.Frame("CIA notifications")
+        cia_frame = Gtk.Frame(label="CIA notifications")
 
         cia_user_hbox = Gtk.HBox()
-        cia_user_hbox.pack_start(Gtk.Label("Author name", True, True, 0))
+        cia_user_hbox.pack_start(Gtk.Label("Author name"), False, False, 0)
         self.cia_user = Gtk.Entry()
-        cia_user_hbox.pack_start(self.cia_user, True, True, 0)
+        cia_user_hbox.pack_start(self.cia_user, False, False, 0)
 
         cia_frame.add(cia_user_hbox)
         cia_frame.set_sensitive(has_cia())
 
-        self.pack_start(cia_frame, True, True, 0)
+        self.pack_start(cia_frame, False, False, 0)

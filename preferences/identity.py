@@ -21,12 +21,12 @@ class IdentityPage(Gtk.Table):
 
     def __init__(self, config):
         self.config = config
-        GObject.GObject.__init__(self, rows=4, columns=2)
+        Gtk.Table.__init__(self, rows=4, columns=2)
         self.set_border_width(12)
         self.set_row_spacings(6)
         self.set_col_spacings(6)
 
-        align = Gtk.Alignment.new(0.0, 0.5)
+        align = Gtk.Alignment.new(0.0, 0.5, 0.0, 0.0)
         label = Gtk.Label()
         label.set_markup("E-Mail:")
         align.add(label)
@@ -36,7 +36,7 @@ class IdentityPage(Gtk.Table):
         self.username.set_text(self.config.username())
         self.attach(self.username, 1, 2, 0, 1, Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        align = Gtk.Alignment.new(0.0, 0.5)
+        align = Gtk.Alignment.new(0.0, 0.5, 0.0, 0.0)
         label = Gtk.Label()
         label.set_markup("GPG signing command:")
         align.add(label)
@@ -46,7 +46,7 @@ class IdentityPage(Gtk.Table):
         self.email.set_text(self.config.gpg_signing_command())
         self.attach(self.email, 1, 2, 1, 2, Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        align = Gtk.Alignment.new(0.0, 0.1)
+        align = Gtk.Alignment.new(0.0, 0.1, 0.0, 0.0)
         label = Gtk.Label()
         label.set_markup("Check GPG Signatures:")
         align.add(label)
@@ -65,7 +65,7 @@ class IdentityPage(Gtk.Table):
         # FIXME: Set default
         self.attach(sigvals, 1, 2, 2, 3, Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        align = Gtk.Alignment.new(0.0, 0.1)
+        align = Gtk.Alignment.new(0.0, 0.1, 0.0, 0.0)
         label = Gtk.Label()
         label.set_markup("Create GPG Signatures:")
         align.add(label)

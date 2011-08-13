@@ -20,12 +20,13 @@ from gi.repository import Gtk
 class PluginsPage(Gtk.VPaned):
 
     def __init__(self):
-        GObject.GObject.__init__(self)
+        Gtk.VPaned.__init__(self)
         self.set_border_width(12)
         self.set_position(216)
 
         scrolledwindow = Gtk.ScrolledWindow()
-        scrolledwindow.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        scrolledwindow.set_policy(
+            Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scrolledwindow.set_shadow_type(Gtk.ShadowType.IN)
         self.model = Gtk.ListStore(str, str)
         treeview = Gtk.TreeView()
@@ -43,13 +44,13 @@ class PluginsPage(Gtk.VPaned):
 
         cell = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn()
-        column.pack_start(cell, True, True, 0)
+        column.pack_start(cell, True)
         column.add_attribute(cell, "text", 0)
         treeview.append_column(column)
 
         cell = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn()
-        column.pack_start(cell, True, True, 0)
+        column.pack_start(cell, True)
         column.add_attribute(cell, "text", 1)
         treeview.append_column(column)
 
@@ -61,7 +62,8 @@ class PluginsPage(Gtk.VPaned):
             self.model.append([name, getattr(plugins[name], '__file__', None)])
 
         scrolledwindow = Gtk.ScrolledWindow()
-        scrolledwindow.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        scrolledwindow.set_policy(
+            Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
         scrolledwindow.add_with_viewport(self.table)
         self.pack2(scrolledwindow, resize=False, shrink=True)
         self.show()
@@ -75,7 +77,7 @@ class PluginsPage(Gtk.VPaned):
             self.table.remove(w)
 
         if getattr(p, '__author__', None) is not None:
-            align = Gtk.Alignment.new(0.0, 0.5)
+            align = Gtk.Alignment.new(0.0, 0.5, 0.0, 0.0)
             label = Gtk.Label()
             label.set_markup("<b>Author:</b>")
             align.add(label)
@@ -83,7 +85,7 @@ class PluginsPage(Gtk.VPaned):
             align.show()
             label.show()
 
-            align = Gtk.Alignment.new(0.0, 0.5)
+            align = Gtk.Alignment.new(0.0, 0.5, 0.0, 0.0)
             author = Gtk.Label()
             author.set_text(p.__author__)
             author.set_selectable(True)
@@ -91,7 +93,7 @@ class PluginsPage(Gtk.VPaned):
             self.table.attach(align, 1, 2, 0, 1, Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
         if getattr(p, '__version__', None) is not None:
-            align = Gtk.Alignment.new(0.0, 0.5)
+            align = Gtk.Alignment.new(0.0, 0.5, 0.0, 0.0)
             label = Gtk.Label()
             label.set_markup("<b>Version:</b>")
             align.add(label)
@@ -99,7 +101,7 @@ class PluginsPage(Gtk.VPaned):
             align.show()
             label.show()
 
-            align = Gtk.Alignment.new(0.0, 0.5)
+            align = Gtk.Alignment.new(0.0, 0.5, 0.0, 0.0)
             author = Gtk.Label()
             author.set_text(p.__version__)
             author.set_selectable(True)
@@ -107,7 +109,7 @@ class PluginsPage(Gtk.VPaned):
             self.table.attach(align, 1, 2, 0, 1, Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
         if getdoc(p) is not None:
-            align = Gtk.Alignment.new(0.0, 0.5)
+            align = Gtk.Alignment.new(0.0, 0.5, 0.0, 0.0)
             description = Gtk.Label()
             description.set_text(getdoc(p))
             description.set_selectable(True)
