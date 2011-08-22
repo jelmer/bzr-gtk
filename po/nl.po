@@ -8,26 +8,26 @@ msgstr ""
 "Project-Id-Version: bzr-gtk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2011-03-09 09:42+0000\n"
-"Last-Translator: Rachid <Unknown>\n"
+"PO-Revision-Date: 2011-04-05 18:57+0000\n"
+"Last-Translator: Wouter Bolsterlee (uws) <uws+launchpad@xs4all.nl>\n"
 "Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-10 04:40+0000\n"
-"X-Generator: Launchpad (build 12351)\n"
+"X-Launchpad-Export-Date: 2011-04-06 04:34+0000\n"
+"X-Generator: Launchpad (build 12559)\n"
 
 #: ../bazaar-properties.desktop.in.h:1
 msgid "Bazaar Preferences"
-msgstr "Bazaar voorkeuren"
+msgstr "Bazaar-voorkeuren"
 
 #: ../bazaar-properties.desktop.in.h:2
 msgid "Configure Bazaar settings"
-msgstr ""
+msgstr "Instellingen voor Bazaar aanpassen"
 
 #: ../bzr-handle-patch.desktop.in.h:1
 msgid "Apply Bazaar Bundle"
-msgstr ""
+msgstr "Bazaar-bundel toepassen"
 
 #: ../bzr-handle-patch.desktop.in.h:2
 msgid "Bazaar"
@@ -35,28 +35,28 @@ msgstr "Bazaar"
 
 #: ../bzr-notify.desktop.in.h:1
 msgid "Bazaar Notification"
-msgstr ""
+msgstr "Bazaar-notificatie"
 
 #: ../bzr-notify.desktop.in.h:2
 msgid "Notification Area Icon for Bazaar"
-msgstr ""
+msgstr "Bazaar-pictogram in mededelingengebied"
 
 #. Create the widgets
 #: ../branch.py:52
 msgid "_Branch"
-msgstr "_Tak"
+msgstr "_Branch"
 
 #: ../branch.py:55 ../checkout.py:55
 msgid "Branch location:"
-msgstr "Locatie aftakking"
+msgstr "Branch-locatie:"
 
 #: ../branch.py:57 ../checkout.py:56
 msgid "Destination:"
-msgstr "Bestemming:"
+msgstr "Doel:"
 
 #: ../branch.py:58
 msgid "Branck nick:"
-msgstr "Alias aftakking"
+msgstr "Branch-alias:"
 
 #: ../branch.py:59 ../checkout.py:58
 msgid "Revision:"
@@ -64,59 +64,58 @@ msgstr "Revisie:"
 
 #: ../branch.py:60 ../checkout.py:53
 msgid "Please select a folder"
-msgstr "Selecteer een map alstublieft"
+msgstr "Selecteer een map"
 
 #: ../branch.py:140 ../checkout.py:159
 msgid "Missing branch location"
-msgstr "Locatie aftakking niet teruggevonden."
+msgstr "Branch-locatie ontbreekt"
 
 #: ../branch.py:141 ../checkout.py:160
 msgid "You must specify a branch location."
-msgstr "U moet een locatie voor uw aftakking opgeven."
+msgstr "Er dient een branch-locatie opgegeven te worden."
 
 #: ../branch.py:182
 msgid "Branching successful"
-msgstr "Successvol afgetakt."
+msgstr "Branchen succesvol"
 
 #: ../branch.py:183
 #, python-format
 msgid "%d revision(s) branched."
-msgstr "%d revisie(s) afgetakt."
+msgstr "%d revisies gebranchet."
 
 #: ../branch.py:191 ../checkout.py:191
 msgid "N/A"
-msgstr "N/B"
+msgstr "Niet van toepassing"
 
 #. Create the widgets
 #: ../checkout.py:50
 msgid "Check_out"
-msgstr "Ophalen"
+msgstr "Check_out"
 
 #: ../checkout.py:57
 msgid "Branch nick:"
-msgstr ""
+msgstr "Branch-alias:"
 
 #: ../checkout.py:62
 msgid "_Lightweight checkout"
-msgstr ""
+msgstr "Lichtgewicht checkout"
 
 #: ../commands.py:307
 msgid "Directory does not have a working tree"
-msgstr "Folder bevat geen werkkopie!"
+msgstr "Map bevat geen werkkopie"
 
 #: ../commands.py:308
 msgid "Operation aborted."
-msgstr "Bewerking afgebroken."
+msgstr "Handeling afgebroken"
 
 #: ../commands.py:412
 msgid "There are local changes in the branch"
-msgstr "Er zijn locale wijzigingen in deze branch"
+msgstr "Er zijn lokale wijzigingen in deze branch"
 
 #: ../commands.py:413
 msgid "Please commit or revert the changes before merging."
 msgstr ""
-"Gelieve uw wijzigingen vast te leggen of ongedaan te maken vooralleer samen "
-"te voegen."
+"Wijzigiging dienen eerst gecommit danwal teruggedraaid (revert) te worden."
 
 #: ../commit.py:182
 msgid "added"
@@ -140,39 +139,39 @@ msgstr "gewijzigd"
 
 #: ../commit.py:187
 msgid "kind changed"
-msgstr ""
+msgstr "van type veranderd"
 
 #: ../commit.py:280
 msgid "<b>Commit Message</b>"
-msgstr ""
+msgstr "<b>Commit-bericht</b>"
 
 #: ../commit.py:333
 msgid "_Only commit locally"
-msgstr "Enkel lokaal comitten"
+msgstr "Alleen _lokaal comitten"
 
 #: ../commit.py:364
 msgid "Comm_it"
-msgstr "Vastleggen"
+msgstr "Co_mmitten"
 
 #: ../commit.py:390
 msgid "Files"
-msgstr ""
+msgstr "Bestanden"
 
 #: ../commit.py:395
 msgid "Commit all changes"
-msgstr ""
+msgstr "Alle  wijzigingen committen"
 
 #: ../commit.py:401
 msgid "Only commit selected changes"
-msgstr ""
+msgstr "Alleen geselecteerde wijzigingen committen"
 
 #: ../commit.py:407
 msgid "Commit all changes*"
-msgstr ""
+msgstr "Alle wijzigingen committen*"
 
 #: ../commit.py:440
 msgid "Commit*"
-msgstr ""
+msgstr "Committen*"
 
 #: ../commit.py:442
 msgid "Commit"
@@ -189,10 +188,11 @@ msgstr "Type"
 #: ../commit.py:481
 msgid "<i>* Cannot select specific files when merging</i>"
 msgstr ""
+"<i>* Er kunnen geen specifieke bestanden geselecteerd worden bij mergen.</i>"
 
 #: ../commit.py:485
 msgid "Pending Revisions"
-msgstr ""
+msgstr "Revisies in behandeling"
 
 #: ../commit.py:507
 msgid "Date"
@@ -212,63 +212,63 @@ msgstr "Samenvatting"
 #. tests that it is set properly.
 #: ../commit.py:521
 msgid "Diff for whole tree"
-msgstr ""
+msgstr "Verschillen voor gehele mappenstructuur"
 
 #. Whole tree
 #: ../commit.py:545 ../commit.py:628
 msgid "File commit message"
-msgstr ""
+msgstr "Commit-bericht voor bestand"
 
 #: ../commit.py:552
 msgid "Global Commit Message"
-msgstr ""
+msgstr "Globaal commit-bericht"
 
 #: ../commit.py:554
 msgid "<b>Global Commit Message</b>"
-msgstr ""
+msgstr "<b>Globaal commit-bericht</b>"
 
 #: ../commit.py:581
 msgid "Diff for "
-msgstr ""
+msgstr "Verschillen voor "
 
 #: ../commit.py:634
 msgid "Commit message for "
-msgstr ""
+msgstr "Commit-bericht voor "
 
 #: ../commit.py:689
 msgid "Commit cancelled"
-msgstr ""
+msgstr "Committen geannuleerd"
 
 #: ../commit.py:690
 msgid "Do you want to save your commit messages ?"
-msgstr ""
+msgstr "Moeten commit-berichten bewaard blijven?"
 
 #: ../commit.py:708
 msgid "Commit with an empty message?"
-msgstr "Vastleggen zonder boodschap?"
+msgstr "Met leeg bericht committen?"
 
 #: ../commit.py:709
 msgid "You can describe your commit intent in the message."
-msgstr "In dit bericht kan je de reden voor je commit beschrijven."
+msgstr ""
+"In het commit-bericht kan de bedoeling achter deze commit vastgelegd worden."
 
 #: ../commit.py:729
 msgid "Commit with unknowns?"
-msgstr "Vastleggen met onbekende bestanden?"
+msgstr "Committen met onbekende bestanden?"
 
 #: ../commit.py:730
 msgid "Unknown files exist in the working tree. Commit anyway?"
 msgstr ""
-"Er bestaan onbekende bestanden in uw werkkopie. Bent U zeker dat U dit wenst "
-"vast te leggen?"
+"Er zijn onbekende bestanden in de werkkopie aanwezig. Toch committen?"
 
 #: ../commit.py:750
 msgid "Commit with no changes?"
-msgstr "Vastleggen zonder wijzigingen?"
+msgstr "Zonder wijzigingen committen?"
 
 #: ../commit.py:751
 msgid ""
 "There are no changes in the working tree. Do you want to commit anyway?"
-msgstr ""
+msgstr "Er zijn geen wijzigingen in de werkkopie. Toch committen?"
 
 #: ../conflicts.py:50
 msgid "External utility:"
@@ -284,15 +284,15 @@ msgstr "Geen conflicten in de werkkopie."
 
 #: ../conflicts.py:118
 msgid "path conflict"
-msgstr "pad conflict"
+msgstr "pad-conflict"
 
 #: ../conflicts.py:120
 msgid "contents conflict"
-msgstr "Conflicterende inhoud"
+msgstr "conflicterende inhoud"
 
 #: ../conflicts.py:122
 msgid "text conflict"
-msgstr "Conflicterende text"
+msgstr "conflicterende text"
 
 #: ../conflicts.py:124
 msgid "duplicate id"
@@ -304,23 +304,23 @@ msgstr "duplicaat"
 
 #: ../conflicts.py:128
 msgid "parent loop"
-msgstr ""
+msgstr "parent loop"
 
 #: ../conflicts.py:130
 msgid "unversioned parent"
-msgstr ""
+msgstr "parent niet onder versiebeheer"
 
 #: ../conflicts.py:132
 msgid "missing parent"
-msgstr "ontbrekende ouder"
+msgstr "ontbrekende parent"
 
 #: ../conflicts.py:134
 msgid "deleting parent"
-msgstr "verwijderen van de ouder"
+msgstr "parent verwijderen"
 
 #: ../conflicts.py:136
 msgid "unknown type of conflict"
-msgstr "onbekend soort conflict"
+msgstr "onbekend conflicttype"
 
 #: ../conflicts.py:165
 msgid "No file was selected"
@@ -328,15 +328,15 @@ msgstr "Geen bestand geselecteerd"
 
 #: ../conflicts.py:166
 msgid "Please select a file from the list."
-msgstr "Gelieve een bestand uit de lijst te selecteren."
+msgstr "Kies een bestand uit de lijst."
 
 #: ../conflicts.py:176
 msgid "Call to external utility failed"
-msgstr ""
+msgstr "Aanroepen van extern hulpmiddel mislukt."
 
 #: ../conflicts.py:178
 msgid "Cannot resolve conflict"
-msgstr "Can conflict niet oplossen"
+msgstr "Kan conflict niet oplossen"
 
 #: ../conflicts.py:179
 msgid ""
@@ -344,27 +344,27 @@ msgid ""
 "moment. Content conflicts, on the structure of the tree, need to be resolved "
 "using the command line."
 msgstr ""
-"Enkel conflicten met textbestanden kunnen, op dit moment, met Olive opgelost "
-"worden. Inhoudelijke conflicten, op de structuur, dienen via de commandolijn "
-"opgelost te worden."
+"Olive kan momenteel alleen conflicten in tekstbestanden oplossen. "
+"Inhoudelijke conflicten op de structuur van de mappen moeten met de "
+"opdrachtregel opgelost worden."
 
 #. View menu
 #: ../diff.py:445
 msgid "_View"
-msgstr "_Beeld"
+msgstr "Beel_d"
 
 #: ../diff.py:447
 msgid "Wrap _Long Lines"
-msgstr ""
+msgstr "_Lange regels afbreken"
 
 #. No conflicts found.
 #: ../diff.py:492 ../merge.py:146
 msgid "Merge successful"
-msgstr "Succesvol samengevoegd"
+msgstr "Merge succesvol"
 
 #: ../diff.py:493 ../merge.py:147
 msgid "All changes applied successfully."
-msgstr "Alle wijzigingen succesvol toegepast."
+msgstr "Alle wijzigingen succesvol verwerkt."
 
 #. There are conflicts to be resolved.
 #: ../diff.py:496 ../merge.py:150
@@ -373,69 +373,63 @@ msgstr "Conflict gedetecteerd"
 
 #: ../diff.py:497 ../merge.py:151
 msgid "Please resolve the conflicts manually before committing."
-msgstr ""
-"Gelieve de conflicten manueel op te lossen vooralleer uw wijzigingen vast te "
-"leggen,"
+msgstr "Los de conflicten handmatig op alvorens te committen."
 
 #: ../errors.py:28
 msgid "Directory is not a branch"
-msgstr "Folder is geen aftakking."
+msgstr "Map is geen branch"
 
 #: ../errors.py:29
 msgid "You can perform this action only in a branch."
-msgstr "U kunt deze actie enkel op een aftakking uitvoeren."
+msgstr "Deze actie kan alleen op een branch uitgevoerd worden."
 
 #: ../errors.py:31
 msgid "Directory is not a checkout"
-msgstr "Folder werd niet uit versiecontrole opgehaald!"
+msgstr "Map is geen checkout"
 
 #: ../errors.py:32
 msgid "You can perform local commit only on checkouts."
-msgstr ""
-"Lokaal vastleggen is enkel mogelijk via een werkkopie verkregen door het "
-"ophalen uit versiecontrole."
+msgstr "Lokaal committen kan alleen op checkouts."
 
 #: ../errors.py:34
 msgid "No changes to commit"
-msgstr "Geen wijzigingen vast te leggen."
+msgstr "Niets te committen"
 
 #: ../errors.py:35
 msgid "Try force commit if you want to commit anyway."
-msgstr ""
-"Probeer prioritair vastleggen indien U uw wijzigingen toch wenst vast te "
-"leggen."
+msgstr "Forceer een commit als u toch wilt committen."
 
 #: ../errors.py:37
 msgid "No changes to merge"
-msgstr ""
+msgstr "Geen wijzigingen voor merge"
 
 #: ../errors.py:38
 msgid "Merge location is already fully merged in working tree."
-msgstr ""
+msgstr "De merge-locatie is al geheel aanwezig in de werkkopie."
 
 #: ../errors.py:40
 msgid "Conflicts in tree"
-msgstr "Er werden conflicten in de versieboom gedetecteerd."
+msgstr "Conflicten in mappenstructuur"
 
 #: ../errors.py:41
 msgid "You need to resolve the conflicts before committing."
-msgstr "De conflicten moeten opgelost worden voordat u kan comiten."
+msgstr "Deze conflicten moeten worden opgelost voordat gecommit kan worden."
 
 #: ../errors.py:43
 msgid "Strict commit failed"
-msgstr "Strikt vastleggen faalde."
+msgstr "Strikte commit is mislukt."
 
 #: ../errors.py:44
 msgid ""
 "There are unknown files in the working tree.\n"
 "Please add or delete them."
 msgstr ""
-"Er bestaan ongekende bestanden in uw werkkopie!\n"
-"Gelieve deze toe te voegen of te verwijderen."
+"Er zijn onbekende bestanden in de werkkopie aanwezig, die eerst toegevoegd "
+"of verwijderd moeten worden."
 
 #: ../errors.py:46
 msgid "Bound branch is out of date"
-msgstr "Gebonden aftakking is niet meer actueel."
+msgstr "Gekoppelde branch is niet meer up-to-date."
 
 #. FIXME: Really ? Internationalizing %s ?? --vila080505
 #: ../errors.py:48
@@ -445,7 +439,7 @@ msgstr "%s"
 
 #: ../errors.py:50
 msgid "File not versioned"
-msgstr "Bestand niet onder versiecontrole"
+msgstr "Bestand niet onder versiebeheer"
 
 #: ../errors.py:51
 msgid "The selected file is not versioned."
@@ -453,44 +447,45 @@ msgstr "Het geselecteerde bestand staat niet onder versiebeheer."
 
 #: ../errors.py:53 ../push.py:99
 msgid "Branches have been diverged"
-msgstr "Aftakkingen werden afgeleid."
+msgstr "Branches zijn uit elkaar gegroeid."
 
 #: ../errors.py:54
 msgid ""
 "You cannot push if branches have diverged. Use the\n"
 "overwrite option if you want to push anyway."
 msgstr ""
-"U kunt geen \"push\" uitvoeren op vertakkingen die afgeleid werden. Gebruik "
-"de optie overschrijven (overwrite) indien U de \"push\" toch wenst uit te "
-"voeren."
+"Een push kan niet uitgevoerd worden als de branches uit elkaar gegroeid "
+"zijn.\n"
+"Gebruik de optie ‘overwrite’ (overschrijven) als u de push toch wilt "
+"uitvoeren."
 
 #: ../errors.py:56
 msgid "No diff output"
-msgstr "Geen verschil gevonden (diff)"
+msgstr "Geen verschillen gevonden (diff)"
 
 #: ../errors.py:57
 msgid "The selected file hasn't changed."
-msgstr "Het geselecteerde bestand is ongewijzigd."
+msgstr "Het geselecteerde bestand is niet gewijzigd."
 
 #: ../errors.py:59
 msgid "No such revision"
-msgstr "Revisie onbestaande"
+msgstr "Revisie bestaat niet"
 
 #: ../errors.py:60
 msgid "The revision you specified doesn't exist."
-msgstr "De opgegeven revisie bestaat niet ."
+msgstr "De opgegeven revisie bestaat niet."
 
 #: ../errors.py:62
 msgid "Target already exists"
-msgstr "Het doel bestaat reeds"
+msgstr "Het doel bestaat al"
 
 #: ../errors.py:63
 msgid "Target directory already exists. Please select another target."
-msgstr "Doel directory bestaad reeds. Kies een ander doel."
+msgstr "De doelmap bestaat al. Kies een andere bestemming."
 
 #: ../errors.py:65
 msgid "Directory is already a branch"
-msgstr "Folder is al een vertakking."
+msgstr "De map is al een branch"
 
 #: ../errors.py:66
 #, python-format
@@ -498,23 +493,23 @@ msgid ""
 "The current directory (%s) is already a branch.\n"
 "You can start using it, or initialize another directory."
 msgstr ""
-"De huidige folder (%s) is reeds een vertakking. U kunt deze in gebruik nemen "
-"of een andere folder instellen."
+"De huidige map ‘%s’ is al een branch. U kunt deze map gebruiken of een "
+"andere map initialiseren."
 
 #: ../errors.py:68
 msgid "Branch without a working tree"
-msgstr "Vertakking zonder werkkopie."
+msgstr "Branch zonder werkkopie"
 
 #: ../errors.py:69
 #, python-format
 msgid ""
 "The current directory (%s)\n"
 "is a branch without a working tree."
-msgstr "De huidige folder (%s) is een vertakking zonder werkkopie."
+msgstr "De huidige map ‘%s’ is een branch zonder werkkopie."
 
 #: ../errors.py:71
 msgid "Unknown bzr error"
-msgstr "Onbekende bzr fout"
+msgstr "Onbekende bzr-fout"
 
 #: ../errors.py:73
 msgid "Permission denied"
@@ -522,7 +517,7 @@ msgstr "Toegang geweigerd"
 
 #: ../errors.py:73
 msgid "permission denied."
-msgstr "toegang geweigerd"
+msgstr "toegang geweigerd."
 
 #: ../errors.py:75
 msgid "Unknown error"
@@ -531,63 +526,63 @@ msgstr "Onbekende fout"
 #. Create the widgets
 #: ../initialize.py:48
 msgid "_Initialize"
-msgstr "_Initializeren"
+msgstr "_Initialiseren"
 
 #: ../initialize.py:49
 msgid "Which directory do you want to initialize?"
-msgstr "Welke directory wilt u initializeren?"
+msgstr "Welke map wilt u initialiseren?"
 
 #: ../initialize.py:50
 msgid "Current directory"
-msgstr "Huidige directory"
+msgstr "Huidige map"
 
 #: ../initialize.py:51
 msgid "Create a new directory with the name:"
-msgstr "Maak een nieuwe directory aan, genaamd:"
+msgstr "Een nieuwe map aanmaken met de volgende naam:"
 
 #: ../initialize.py:86
 msgid "Directory name not specified"
-msgstr "Geen directory naam gespecificeerd"
+msgstr "Geen mapnaam opgegeven"
 
 #: ../initialize.py:87
 msgid "You should specify a new directory name."
-msgstr "Een directory naam moet opgegeven worden."
+msgstr "Er dient een nieuwe mapnaam opgegeven te worden."
 
 #: ../loom.py:53
 msgid "Upgrade to Loom branch?"
-msgstr ""
+msgstr "Naar loom-branch upgraden?"
 
 #: ../loom.py:54
 msgid "Branch is not a loom branch. Upgrade to Loom format?"
-msgstr ""
+msgstr "De branch is geen loom-branch. Upgraden naar loom-formaat?"
 
 #: ../merge.py:54
 msgid "Merge from"
-msgstr ""
+msgstr "Mergen van"
 
 #: ../merge.py:56
 msgid "Folder"
-msgstr ""
+msgstr "Map"
 
 #: ../merge.py:56
 msgid "Custom Location"
-msgstr ""
+msgstr "Aangepaste locatie"
 
 #: ../merge.py:59
 msgid "_Merge"
-msgstr "_Samenvoegen"
+msgstr "_Mergen"
 
 #: ../merge.py:132
 msgid "Branch not given"
-msgstr "Vertakking niet opgegeven"
+msgstr "Geen branch opgegeven"
 
 #: ../merge.py:133
 msgid "Please specify a branch to merge from."
-msgstr "Gelieve een vertakking op te geven om van samen te voegen."
+msgstr "Geef een merge-branch op."
 
 #: ../merge.py:141
 msgid "Bazaar command error"
-msgstr "Fout in bazaar commando"
+msgstr "Fout in Bazaar-opdracht"
 
 #. Create the widgets
 #: ../push.py:51
@@ -596,26 +591,28 @@ msgstr "Locatie:"
 
 #: ../push.py:53
 msgid "_Push"
-msgstr ""
+msgstr "_Pushen"
 
 #: ../push.py:100
 msgid ""
 "You cannot push if branches have diverged.\n"
 "Overwrite?"
 msgstr ""
+"Pushen is niet mogelijk als de branches uit elkaar gegroeid zijn. "
+"Overschrijven?"
 
 #: ../push.py:108
 msgid "Push successful"
-msgstr ""
+msgstr "Push succesvol"
 
 #: ../push.py:109
 #, python-format
 msgid "%d revision(s) pushed."
-msgstr ""
+msgstr "%d revisie(s) gepusht."
 
 #: ../push.py:142
 msgid "Non existing parent directory"
-msgstr ""
+msgstr "Bovenliggende map bestaat niet"
 
 #: ../push.py:143
 #, python-format
@@ -623,7 +620,8 @@ msgid ""
 "The parent directory (%s)\n"
 "doesn't exist. Create?"
 msgstr ""
-"De bovenliggende directory (%s) bestaat niet. Moet deze nu aangemaakt worden?"
+"De bovenliggende map ‘%s’\n"
+"bestaat niet. Wilt u deze aanmaken?"
 
 #. Create the widgets
 #: ../revbrowser.py:45
@@ -632,11 +630,11 @@ msgstr "_Selecteren"
 
 #: ../search.py:44
 msgid "Search for:"
-msgstr ""
+msgstr "Zoeken naar:"
 
 #: ../search.py:56
 msgid "Document"
-msgstr ""
+msgstr "Document"
 
 #: ../status.py:94
 msgid "Added"
@@ -673,25 +671,24 @@ msgstr "Tag-naam"
 
 #: ../tags.py:115
 msgid "Revision ID"
-msgstr "Revisienr."
+msgstr "Revisie-ID"
 
 #: ../tags.py:150
 msgid "Tags are not supported by this branch format. Please upgrade."
 msgstr ""
-"Labels worden niet ondersteund door dit aftakkingsformaat. Gelieve uw versie "
-"te actualizeren."
+"Tags worden niet door dit branch-formaat ondersteunt. Probeer te upgraden."
 
 #: ../tags.py:156
 msgid "No tagged revisions in the branch."
-msgstr "Er zijn geen gelabelde versies op de aftakking;"
+msgstr "Deze branch bevat geen revisies met een tag."
 
 #: ../tags.py:231
 msgid "_Remove tag"
-msgstr "Tag _verwijderen"
+msgstr "Tag ver_wijderen"
 
 #: ../tags.py:241
 msgid "<b><big>Remove tag?</big></b>"
-msgstr "<b><big>Verwijder tag?</big></b>"
+msgstr "<b><big>Tag verwijderen?</big></b>"
 
 #: ../tags.py:243
 #, python-format
@@ -701,7 +698,7 @@ msgstr "Weet u zeker dat u de tag <b>%s</b> wilt verwijderen?"
 #. Create the widgets
 #: ../tags.py:288
 msgid "_Add tag"
-msgstr "T_ag toevoegen"
+msgstr "Tag _toevoegen"
 
 #: ../tags.py:290
 msgid "Tag Name:"
@@ -709,7 +706,7 @@ msgstr "Tag-naam:"
 
 #: ../tags.py:291
 msgid "Revision ID:"
-msgstr "Revisienr. :"
+msgstr "Revisie-ID:"
 
 #: ../tags.py:322
 msgid "No tag name specified"
@@ -717,7 +714,7 @@ msgstr "Geen tag-naam opgegeven"
 
 #: ../tags.py:323
 msgid "You have to specify the tag's desired name."
-msgstr "U moet de gewenste labelnaam opgeven."
+msgstr "De gewenste tag-naam moet opgegeven worden."
 
 #~ msgid "Time"
 #~ msgstr "Tijd"
@@ -1099,7 +1096,9 @@ msgstr "U moet de gewenste labelnaam opgeven."
 #~ msgid "translator-credits"
 #~ msgstr ""
 #~ "Launchpad Contributions:\n"
+#~ "  Ewout De cat https://launchpad.net/~lotrfanaat\n"
 #~ "  Lieven van der Heide https://launchpad.net/~lievenvanderheide\n"
 #~ "  Rachid https://launchpad.net/~rachidbm\n"
 #~ "  Roel Huybrechts https://launchpad.net/~rulus\n"
-#~ "  Wim Rosseel https://launchpad.net/~wim-rosseel"
+#~ "  Wim Rosseel https://launchpad.net/~wim-rosseel\n"
+#~ "  Wouter Bolsterlee (uws) https://launchpad.net/~uws"

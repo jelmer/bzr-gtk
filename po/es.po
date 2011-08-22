@@ -8,38 +8,38 @@ msgstr ""
 "Project-Id-Version: olive\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2009-11-08 08:27+0000\n"
-"Last-Translator: BigSus <bigsus@gmail.com>\n"
+"PO-Revision-Date: 2011-06-20 19:58+0000\n"
+"Last-Translator: Fitoschido <fitoschido@gmail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-08 04:41+0000\n"
-"X-Generator: Launchpad (build 12351)\n"
+"X-Launchpad-Export-Date: 2011-06-21 04:30+0000\n"
+"X-Generator: Launchpad (build 13168)\n"
 
 #: ../bazaar-properties.desktop.in.h:1
 msgid "Bazaar Preferences"
-msgstr ""
+msgstr "Preferencias de Bazaar"
 
 #: ../bazaar-properties.desktop.in.h:2
 msgid "Configure Bazaar settings"
-msgstr ""
+msgstr "Configurar Bazaar"
 
 #: ../bzr-handle-patch.desktop.in.h:1
 msgid "Apply Bazaar Bundle"
-msgstr ""
+msgstr "Aplicar paquete de Bazaar"
 
 #: ../bzr-handle-patch.desktop.in.h:2
 msgid "Bazaar"
-msgstr ""
+msgstr "Bazaar"
 
 #: ../bzr-notify.desktop.in.h:1
 msgid "Bazaar Notification"
-msgstr ""
+msgstr "Notificación Bazaar"
 
 #: ../bzr-notify.desktop.in.h:2
 msgid "Notification Area Icon for Bazaar"
-msgstr ""
+msgstr "Icono del área de notificación para Bazaar"
 
 #. Create the widgets
 #: ../branch.py:52
@@ -64,7 +64,7 @@ msgstr "Revisión:"
 
 #: ../branch.py:60 ../checkout.py:53
 msgid "Please select a folder"
-msgstr "Por favor, seleccione una carpeta"
+msgstr "Seleccionar una carpeta"
 
 #: ../branch.py:140 ../checkout.py:159
 msgid "Missing branch location"
@@ -72,7 +72,7 @@ msgstr "No se ha encontrado la ubicación de la rama"
 
 #: ../branch.py:141 ../checkout.py:160
 msgid "You must specify a branch location."
-msgstr "Debe especificar la ubicación de una rama"
+msgstr "Debe especificar la ubicación de una rama."
 
 #: ../branch.py:182
 msgid "Branching successful"
@@ -90,7 +90,7 @@ msgstr "N/D"
 #. Create the widgets
 #: ../checkout.py:50
 msgid "Check_out"
-msgstr "Comprobación"
+msgstr "C_omprobar"
 
 #: ../checkout.py:57
 msgid "Branch nick:"
@@ -155,7 +155,7 @@ msgstr "Comm_it"
 
 #: ../commit.py:390
 msgid "Files"
-msgstr ""
+msgstr "Archivos"
 
 #: ../commit.py:395
 msgid "Commit all changes"
@@ -191,7 +191,7 @@ msgstr ""
 
 #: ../commit.py:485
 msgid "Pending Revisions"
-msgstr ""
+msgstr "Revisiones pendientes"
 
 #: ../commit.py:507
 msgid "Date"
@@ -228,7 +228,7 @@ msgstr ""
 
 #: ../commit.py:581
 msgid "Diff for "
-msgstr ""
+msgstr "Dif. para "
 
 #: ../commit.py:634
 msgid "Commit message for "
@@ -401,7 +401,7 @@ msgstr "Intente forzar el commit si desea hacerlo de todas formas."
 
 #: ../errors.py:37
 msgid "No changes to merge"
-msgstr ""
+msgstr "No hay cambios que fusionar"
 
 #: ../errors.py:38
 msgid "Merge location is already fully merged in working tree."
@@ -558,15 +558,15 @@ msgstr ""
 
 #: ../merge.py:54
 msgid "Merge from"
-msgstr ""
+msgstr "Fusionar desde"
 
 #: ../merge.py:56
 msgid "Folder"
-msgstr ""
+msgstr "Carpeta"
 
 #: ../merge.py:56
 msgid "Custom Location"
-msgstr ""
+msgstr "Ubicación personalizada"
 
 #: ../merge.py:59
 msgid "_Merge"
@@ -630,11 +630,11 @@ msgstr "_Seleccionar"
 
 #: ../search.py:44
 msgid "Search for:"
-msgstr ""
+msgstr "Buscar:"
 
 #: ../search.py:56
 msgid "Document"
-msgstr ""
+msgstr "Documento"
 
 #: ../status.py:94
 msgid "Added"
@@ -1286,6 +1286,7 @@ msgstr "Debe especificar el nombre que desea para la etiqueta."
 #~ "Launchpad Contributions:\n"
 #~ "  BigSus https://launchpad.net/~bigsus\n"
 #~ "  David Arnoldo Ortiz Lozano https://launchpad.net/~tyoc\n"
+#~ "  Fitoschido https://launchpad.net/~fitoschido\n"
 #~ "  Joseph https://launchpad.net/~josephmail7\n"
 #~ "  Lightbuster https://launchpad.net/~herramienta-vx2\n"
 #~ "  Mario del Pozo https://launchpad.net/~mariodpros\n"
