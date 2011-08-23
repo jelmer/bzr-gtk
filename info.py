@@ -25,7 +25,7 @@ bzr_plugin_version = (0, 101, 0, 'dev', 0)
 #FIXME: fill this in automatically somehow
 bzr_commands = []
 
-bzr_compatible_versions = [(2, 1, 0), (2, 2, 0), (2, 3, 0), (2, 4, 0)]
+bzr_compatible_versions = [(2, 1, 0), (2, 2, 0), (2, 3, 0), (2, 4, 0), (2, 5, 0)]
 
 bzr_minimum_version = bzr_compatible_versions[0]
 
