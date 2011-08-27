@@ -15,6 +15,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 from gi.repository import Gtk
+from gi.repository import GdkPixbuf
 
 from bzrlib.config import parse_username
 
@@ -221,15 +222,14 @@ class AvatarsBox(Gtk.HBox):
         :param response: a urllib2.urlopen() return value.
         :param email: used to identify item from self.__avatars.
         """
-        # XXX sinzui 2011-08-01: This must be implemented in cairo
-#        if email:
-#            # Convert downloaded image from provider to Gtk.Image
-#            loader = Gdk.GdkPixbuf.PixbufLoader()
-#            loader.write(response.read())
-#            loader.close()
+        if email:
+            # Convert downloaded image from provider to Gtk.Image
+            loader = GdkPixbuf.PixbufLoader()
+            loader.write(response.read())
+            loader.close()
 
-#            for role in ["committer", "author"]:
-#                self._role_box_for(role).and_avatar_email(email).update_avatar_image_from_pixbuf_loader(loader)
+            for role in ["committer", "author"]:
+                self._role_box_for(role).and_avatar_email(email).update_avatar_image_from_pixbuf_loader(loader)
 
     def _role_box_for(self, role):
         """ Return the Gtk.HBox for the given role """
