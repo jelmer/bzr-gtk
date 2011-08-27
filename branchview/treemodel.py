@@ -7,8 +7,8 @@ __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__    = "Gary van der Merwe <garyvdm@gmail.com>"
 
 
-import gtk
-import gobject
+from gi.repository import Gtk
+from gi.repository import GObject
 from xml.sax.saxutils import escape
 
 from bzrlib.config import parse_username
@@ -34,10 +34,10 @@ CHILDREN = 11
 TAGS = 12
 AUTHORS = 13
 
-class TreeModel(Gtk.GenericTreeModel):
+class TreeModel(Gtk.TreeStore):
 
     def __init__ (self, branch, line_graph_data):
-        GObject.GObject.__init__(self)
+        Gtk.GenericTreeModel.__init__(self)
         self.revisions = {}
         self.branch = branch
         self.repository = branch.repository

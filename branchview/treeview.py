@@ -105,7 +105,7 @@ class TreeView(Gtk.VBox):
         :param broken_line_length: After how much lines to break 
                                    branches.
         """
-        GObject.GObject.__init__(self, spacing=0)
+        Gtk.VBox.__init__(self, homogeneous=False, spacing=0)
 
         self.progress_widget = ProgressPanel()
         self.pack_start(self.progress_widget, expand=False, fill=True)

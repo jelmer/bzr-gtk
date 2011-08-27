@@ -19,10 +19,10 @@ import math
 from gi.repository import Gtk
 from gi.repository import GObject
 from gi.repository import Pango
-import cairo
+from gi.repository import cairo
 
 
-class CellRendererGraph(Gtk.GenericCellRenderer):
+class CellRendererGraph(Gtk.CellRenderer):
     """Cell renderer for directed graph.
 
     Properties:
