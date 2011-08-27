@@ -53,14 +53,14 @@ class IdentityPage(Gtk.Table):
         self.attach(align, 0, 1, 2, 3, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
         sigvals = Gtk.VBox()
-        self.check_sigs_if_possible = Gtk.RadioButton(None,
-                                                      "_Check if possible")
+        self.check_sigs_if_possible = Gtk.RadioButton.new_with_label(
+            None, "_Check if possible")
         sigvals.pack_start(self.check_sigs_if_possible, True, True, 0)
-        self.check_sigs_always = Gtk.RadioButton(self.check_sigs_if_possible,
-                                                 "Check _always")
+        self.check_sigs_always = Gtk.RadioButton.new_with_label_from_widget(
+            self.check_sigs_if_possible, "Check _always")
         sigvals.pack_start(self.check_sigs_always, True, True, 0)
-        self.check_sigs_never = Gtk.RadioButton(self.check_sigs_if_possible,
-                                                "Check _never")
+        self.check_sigs_never = Gtk.RadioButton.new_with_label_from_widget(
+            self.check_sigs_if_possible, "Check _never")
         sigvals.pack_start(self.check_sigs_never, True, True, 0)
         # FIXME: Set default
         self.attach(sigvals, 1, 2, 2, 3, Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
@@ -72,13 +72,13 @@ class IdentityPage(Gtk.Table):
         self.attach(align, 0, 1, 3, 4, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
         create_sigs = Gtk.VBox()
-        self.create_sigs_when_required = Gtk.RadioButton(None,
-                                                         "Sign When _Required")
+        self.create_sigs_when_required = Gtk.RadioButton.new_with_label(
+            None, "Sign When _Required")
         create_sigs.pack_start(self.create_sigs_when_required, True, True, 0)
-        self.create_sigs_always = Gtk.RadioButton(
+        self.create_sigs_always = Gtk.RadioButton.new_with_label_from_widget(
             self.create_sigs_when_required, "Sign _Always")
         create_sigs.pack_start(self.create_sigs_always, True, True, 0)
-        self.create_sigs_never = Gtk.RadioButton(
+        self.create_sigs_never = Gtk.RadioButton.new_with_label_from_widget(
             self.create_sigs_when_required, "Sign _Never")
         create_sigs.pack_start(self.create_sigs_never, True, True, 0)
         # FIXME: Set default

@@ -46,8 +46,10 @@ class InitDialog(Gtk.Dialog):
         # Create the widgets
         self._button_init = Gtk.Button(_i18n("_Initialize"), use_underline=True)
         self._label_question = Gtk.Label(label=_i18n("Which directory do you want to initialize?"))
-        self._radio_current = Gtk.RadioButton(None, _i18n("Current directory"))
-        self._radio_custom = Gtk.RadioButton(self._radio_current, _i18n("Create a new directory with the name:"))
+        self._radio_current = Gtk.RadioButton.new_with_label(
+            None, _i18n("Current directory"))
+        self._radio_custom = Gtk.RadioButton.new_with_label_from_widget(
+            self._radio_current, _i18n("Create a new directory with the name:"))
         self._entry_custom = Gtk.Entry()
         self._hbox_custom = Gtk.HBox()
         

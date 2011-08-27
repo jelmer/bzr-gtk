@@ -389,13 +389,13 @@ class CommitDialog(Gtk.Dialog):
         # file_label.show()
         self._files_box.pack_start(file_label, False, True, 0)
 
-        self._commit_all_files_radio = Gtk.RadioButton(
+        self._commit_all_files_radio = Gtk.RadioButton.new_with_label(
             None, _i18n("Commit all changes"))
         self._files_box.pack_start(self._commit_all_files_radio, False, True, 0)
         self._commit_all_files_radio.show()
         self._commit_all_files_radio.connect('toggled',
             self._toggle_commit_selection)
-        self._commit_selected_radio = Gtk.RadioButton(
+        self._commit_selected_radio = Gtk.RadioButton.new_with_label_from_widget(
             self._commit_all_files_radio, _i18n("Only commit selected changes"))
         self._files_box.pack_start(self._commit_selected_radio, False, True, 0)
         self._commit_selected_radio.show()
