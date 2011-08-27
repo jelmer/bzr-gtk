@@ -211,7 +211,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         commit_col = dlg._treeview_files.get_column(0)
         self.assertEqual('Commit', commit_col.get_title())
-        renderer = commit_col.get_cell_renderers()[0]
+        renderer = commit_col.get_cells()[0]
         self.assertTrue(renderer.get_property('activatable'))
 
         self.assertEqual('Commit all changes',
@@ -236,7 +236,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         commit_col = dlg._treeview_files.get_column(0)
         self.assertEqual('Commit*', commit_col.get_title())
-        renderer = commit_col.get_cell_renderers()[0]
+        renderer = commit_col.get_cells()[0]
         self.assertFalse(renderer.get_property('activatable'))
 
         values = [(r[0], r[1], r[2], r[3]) for r in dlg._pending_store]
@@ -581,7 +581,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         #       do with. So instead, we just call toggle directly, and assume
         #       that toggle is hooked in correctly
         # column = dlg._treeview_files.get_column(0)
-        # renderer = column.get_cell_renderers()[0]
+        # renderer = column.get_cells()[0]
 
         # Toggle a single entry should set just that entry to False
         dlg._toggle_commit(None, 1, dlg._files_store)

@@ -464,7 +464,7 @@ class CommitDialog(Gtk.Dialog):
                 checked_col.set_visible(False)
             else:
                 checked_col.set_visible(True)
-            renderer = checked_col.get_cell_renderers()[0]
+            renderer = checked_col.get_cells()[0]
             renderer.set_property('activatable', not all_files)
 
     def _construct_pending_list(self):
