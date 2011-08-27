@@ -596,7 +596,8 @@ class CommitDialog(Gtk.Dialog):
             # We have either made it to the end of the list, or nothing was
             # selected. Either way, select All Files, and jump to the global
             # commit message.
-            self._treeview_files.set_cursor((0,), None, False)
+            self._treeview_files.set_cursor(
+                Gtk.TreePath(path=0), None, False)
             self._global_message_text_view.grab_focus()
         else:
             # Set the cursor to this entry, and jump to the per-file commit
