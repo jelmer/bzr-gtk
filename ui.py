@@ -114,8 +114,8 @@ class ProgressPanel(Gtk.HBox):
         self.pb = GtkProgressBar()
         self.set_spacing(5)
         self.set_border_width(5)
-        self.pack_start(image_loading, False, False)
-        self.pack_start(self.pb, True, True)
+        self.pack_start(image_loading, False, False, 0)
+        self.pack_start(self.pb, True, True, 0)
 
     def tick(self, *args, **kwargs):
         self.show_all()
@@ -127,11 +127,11 @@ class ProgressPanel(Gtk.HBox):
 
     def finished(self):
         self.pb.finished()
-        self.hide_all()
+        self.hide()
 
     def clear(self):
         self.pb.clear()
-        self.hide_all()
+        self.hide()
 
 
 class PasswordDialog(Gtk.Dialog):

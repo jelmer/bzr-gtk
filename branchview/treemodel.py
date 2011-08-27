@@ -37,7 +37,7 @@ AUTHORS = 13
 class TreeModel(Gtk.TreeStore):
 
     def __init__ (self, branch, line_graph_data):
-        Gtk.GenericTreeModel.__init__(self)
+        Gtk.TreeStore.__init__(self)
         self.revisions = {}
         self.branch = branch
         self.repository = branch.repository

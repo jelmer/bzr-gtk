@@ -98,7 +98,7 @@ class SpanSelector(Gtk.HBox):
             self.emit("span-changed", model.get_value(iter, SPAN_DAYS_COL))
 
     def _activate_custom_span_cb(self, w):
-        self.entry.hide_all()
+        self.entry.hide()
         self.combo.show()
 
         span = float(w.get_text())

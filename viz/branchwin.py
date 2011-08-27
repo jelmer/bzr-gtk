@@ -8,6 +8,7 @@ __copyright__ = "Copyright (c) 2005 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 
+from gi.repository import Gdk
 from gi.repository import Gtk
 
 from bzrlib.plugins.gtk import icon_path
@@ -67,7 +68,7 @@ class BranchWindow(Window):
         self._save_size_on_destroy(self, 'viz-window-size')
 
         # FIXME AndyFitz!
-        icon = self.render_icon(Gtk.STOCK_INDEX, Gtk.IconSize.BUTTON)
+        icon = self.render_icon_pixbuf(Gtk.STOCK_INDEX, Gtk.IconSize.BUTTON)
         self.set_icon(icon)
 
         Gtk.AccelMap.add_entry("<viz>/Go/Next Revision", Gdk.KEY_Up, Gdk.ModifierType.MOD1_MASK)
@@ -122,9 +123,9 @@ class BranchWindow(Window):
         nav = self.construct_navigation()
         menubar = self.construct_menubar()
 
-        vbox.pack_start(menubar, False, True, True, 0)
-        vbox.pack_start(nav, False, True,True, 0)
-        vbox.pack_start(paned, True, True, True, 0)
+        vbox.pack_start(menubar, False, True, 0)
+        vbox.pack_start(nav, False, True, 0)
+        vbox.pack_start(paned, True, True, 0)
         vbox.set_focus_child(paned)
 
 
@@ -149,13 +150,15 @@ class BranchWindow(Window):
         menubar = Gtk.MenuBar()
 
         file_menu = Gtk.Menu()
-        file_menuitem = Gtk.MenuItem("_File")
+        file_menuitem = Gtk.MenuItem.new_with_mnemonic("_File")
         file_menuitem.set_submenu(file_menu)
 
-        file_menu_close = Gtk.ImageMenuItem(Gtk.STOCK_CLOSE, self.accel_group)
+        file_menu_close = Gtk.ImageMenuItem.new_from_stock(
+            Gtk.STOCK_CLOSE, self.accel_group)
         file_menu_close.connect('activate', lambda x: self.destroy())
 
-        file_menu_quit = Gtk.ImageMenuItem(Gtk.STOCK_QUIT, self.accel_group)
+        file_menu_quit = Gtk.ImageMenuItem.new_from_stock(
+            Gtk.STOCK_QUIT, self.accel_group)
         file_menu_quit.connect('activate', lambda x: Gtk.main_quit())
 
         if self._parent is not None:
@@ -163,20 +166,20 @@ class BranchWindow(Window):
         file_menu.add(file_menu_quit)
 
         edit_menu = Gtk.Menu()
-        edit_menuitem = Gtk.MenuItem("_Edit")
+        edit_menuitem = Gtk.MenuItem.new_with_mnemonic("_Edit")
         edit_menuitem.set_submenu(edit_menu)
 
-        edit_menu_branchopts = Gtk.MenuItem("Branch Settings")
+        edit_menu_branchopts = Gtk.MenuItem(label="Branch Settings")
         edit_menu_branchopts.connect('activate', lambda x: PreferencesWindow(self.branch.get_config()).show())
 
-        edit_menu_globopts = Gtk.MenuItem("Global Settings")
+        edit_menu_globopts = Gtk.MenuItem(label="Global Settings")
         edit_menu_globopts.connect('activate', lambda x: PreferencesWindow().show())
 
         edit_menu.add(edit_menu_branchopts)
         edit_menu.add(edit_menu_globopts)
 
         view_menu = Gtk.Menu()
-        view_menuitem = Gtk.MenuItem("_View")
+        view_menuitem = Gtk.MenuItem.new_with_mnemonic("_View")
         view_menuitem.set_submenu(view_menu)
 
         view_menu_refresh = self.refresh_action.create_menu_item()
@@ -185,36 +188,37 @@ class BranchWindow(Window):
         view_menu.add(view_menu_refresh)
         view_menu.add(Gtk.SeparatorMenuItem())
 
-        view_menu_toolbar = Gtk.CheckMenuItem("Show Toolbar")
+        view_menu_toolbar = Gtk.CheckMenuItem(label="Show Toolbar")
         view_menu_toolbar.set_active(True)
         if self.config.get_user_option('viz-toolbar-visible') == 'False':
             view_menu_toolbar.set_active(False)
             self.toolbar.hide()
         view_menu_toolbar.connect('toggled', self._toolbar_visibility_changed)
 
-        view_menu_compact = Gtk.CheckMenuItem("Show Compact Graph")
+        view_menu_compact = Gtk.CheckMenuItem(label="Show Compact Graph")
         view_menu_compact.set_active(self.compact_view)
         view_menu_compact.connect('activate', self._brokenlines_toggled_cb)
 
-        view_menu_vertical = Gtk.CheckMenuItem("Side-by-side Layout")
+        view_menu_vertical = Gtk.CheckMenuItem(label="Side-by-side Layout")
         view_menu_vertical.set_active(False)
         if self.config.get_user_option('viz-vertical') == 'True':
             view_menu_vertical.set_active(True)
         view_menu_vertical.connect('toggled', self._vertical_layout)
 
-        view_menu_diffs = Gtk.CheckMenuItem("Show Diffs")
+        view_menu_diffs = Gtk.CheckMenuItem(label="Show Diffs")
         view_menu_diffs.set_active(False)
         if self.config.get_user_option('viz-show-diffs') == 'True':
             view_menu_diffs.set_active(True)
         view_menu_diffs.connect('toggled', self._diff_visibility_changed)
 
-        view_menu_wide_diffs = Gtk.CheckMenuItem("Wide Diffs")
+        view_menu_wide_diffs = Gtk.CheckMenuItem(label="Wide Diffs")
         view_menu_wide_diffs.set_active(False)
         if self.config.get_user_option('viz-wide-diffs') == 'True':
             view_menu_wide_diffs.set_active(True)
         view_menu_wide_diffs.connect('toggled', self._diff_placement_changed)
 
-        view_menu_wrap_diffs = Gtk.CheckMenuItem("Wrap _Long Lines in Diffs")
+        view_menu_wrap_diffs = Gtk.CheckMenuItem.new_with_mnemonic(
+            "Wrap _Long Lines in Diffs")
         view_menu_wrap_diffs.set_active(False)
         if self.config.get_user_option('viz-wrap-diffs') == 'True':
             view_menu_wrap_diffs.set_active(True)
@@ -229,8 +233,10 @@ class BranchWindow(Window):
         view_menu.add(view_menu_wrap_diffs)
         view_menu.add(Gtk.SeparatorMenuItem())
 
-        self.mnu_show_revno_column = Gtk.CheckMenuItem("Show Revision _Number Column")
-        self.mnu_show_date_column = Gtk.CheckMenuItem("Show _Date Column")
+        self.mnu_show_revno_column = Gtk.CheckMenuItem.new_with_mnemonic(
+            "Show Revision _Number Column")
+        self.mnu_show_date_column = Gtk.CheckMenuItem.new_with_mnemonic(
+            "Show _Date Column")
 
         # Revision numbers are pointless if there are multiple branches
         if len(self.start_revs) > 1:
@@ -245,7 +251,7 @@ class BranchWindow(Window):
 
         go_menu = Gtk.Menu()
         go_menu.set_accel_group(self.accel_group)
-        go_menuitem = Gtk.MenuItem("_Go")
+        go_menuitem = Gtk.MenuItem.new_with_mnemonic("_Go")
         go_menuitem.set_submenu(go_menu)
 
         go_menu_next = self.next_rev_action.create_menu_item()
@@ -253,7 +259,7 @@ class BranchWindow(Window):
 
         tag_image = Gtk.Image()
         tag_image.set_from_file(icon_path("tag-16.png"))
-        self.go_menu_tags = Gtk.ImageMenuItem("_Tags")
+        self.go_menu_tags = Gtk.ImageMenuItem.new_with_mnemonic("_Tags")
         self.go_menu_tags.set_image(tag_image)
         self.treeview.connect('refreshed', lambda w: self._update_tags())
 
@@ -264,15 +270,15 @@ class BranchWindow(Window):
 
         self.revision_menu = RevisionMenu(self.branch.repository, [],
             self.branch, parent=self)
-        revision_menuitem = Gtk.MenuItem("_Revision")
+        revision_menuitem = Gtk.MenuItem.new_with_mnemonic("_Revision")
         revision_menuitem.set_submenu(self.revision_menu)
 
         branch_menu = Gtk.Menu()
-        branch_menuitem = Gtk.MenuItem("_Branch")
+        branch_menuitem = Gtk.MenuItem.new_with_mnemonic("_Branch")
         branch_menuitem.set_submenu(branch_menu)
 
-        branch_menu.add(Gtk.MenuItem("Pu_ll Revisions"))
-        branch_menu.add(Gtk.MenuItem("Pu_sh Revisions"))
+        branch_menu.add(Gtk.MenuItem.new_with_mnemonic("Pu_ll Revisions"))
+        branch_menu.add(Gtk.MenuItem.new_with_mnemonic("Pu_sh Revisions"))
 
         try:
             from bzrlib.plugins import search
@@ -281,20 +287,20 @@ class BranchWindow(Window):
         else:
             branch_menu.add(Gtk.SeparatorMenuItem())
 
-            branch_index_menuitem = Gtk.MenuItem("_Index")
+            branch_index_menuitem = Gtk.MenuItem.new_with_mnemonic("_Index")
             branch_index_menuitem.connect('activate', self._branch_index_cb)
             branch_menu.add(branch_index_menuitem)
 
-            branch_search_menuitem = Gtk.MenuItem("_Search")
+            branch_search_menuitem = Gtk.MenuItem.new_with_mnemonic("_Search")
             branch_search_menuitem.connect('activate', self._branch_search_cb)
             branch_menu.add(branch_search_menuitem)
 
         help_menu = Gtk.Menu()
-        help_menuitem = Gtk.MenuItem("_Help")
+        help_menuitem = Gtk.MenuItem.new_with_mnemonic("_Help")
         help_menuitem.set_submenu(help_menu)
 
-        help_about_menuitem = Gtk.ImageMenuItem(Gtk.STOCK_ABOUT,
-            self.accel_group)
+        help_about_menuitem = Gtk.ImageMenuItem.new_from_stock(
+            Gtk.STOCK_ABOUT, self.accel_group)
         help_about_menuitem.connect('activate', self._about_dialog_cb)
 
         help_menu.add(help_about_menuitem)
@@ -346,7 +352,7 @@ class BranchWindow(Window):
     def construct_navigation(self):
         """Construct the navigation buttons."""
         self.toolbar = Gtk.Toolbar()
-        self.toolbar.set_style(Gtk.TOOLBAR_BOTH_HORIZ)
+        self.toolbar.set_style(Gtk.ToolbarStyle.BOTH_HORIZ)
 
         self.prev_button = self.prev_rev_action.create_tool_item()
         self.toolbar.insert(self.prev_button, -1)
@@ -356,7 +362,7 @@ class BranchWindow(Window):
 
         self.toolbar.insert(Gtk.SeparatorToolItem(), -1)
 
-        refresh_button = Gtk.ToolButton(Gtk.STOCK_REFRESH)
+        refresh_button = Gtk.ToolButton.new_from_stock(Gtk.STOCK_REFRESH)
         refresh_button.connect('clicked', self._refresh_clicked)
         self.toolbar.insert(refresh_button, -1)
 
@@ -562,7 +568,7 @@ class BranchWindow(Window):
         old = self.paned
         self.vbox.remove(old)
         self.vbox.pack_start(
-            self.construct_paned(, True, True, 0), True, True, True, 0)
+            self.construct_paned(), True, True, True, 0)
         self._make_diff_paned_nonzero_size()
         self._make_diff_nonzero_size()
 
@@ -620,7 +626,8 @@ class BranchWindow(Window):
             for tag, revid in tags:
                 tag_image = Gtk.Image()
                 tag_image.set_from_file(icon_path('tag-16.png'))
-                tag_item = Gtk.ImageMenuItem(tag.replace('_', '__'))
+                tag_item = Gtk.ImageMenuItem.new_with_mnemonic(
+                    tag.replace('_', '__'))
                 tag_item.set_image(tag_image)
                 tag_item.connect('activate', self._tag_selected_cb, revid)
                 tag_item.set_sensitive(self.treeview.has_revision_id(revid))

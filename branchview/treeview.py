@@ -108,7 +108,7 @@ class TreeView(Gtk.VBox):
         Gtk.VBox.__init__(self, homogeneous=False, spacing=0)
 
         self.progress_widget = ProgressPanel()
-        self.pack_start(self.progress_widget, expand=False, fill=True)
+        self.pack_start(self.progress_widget, False, True, 0)
         if getattr(ui.ui_factory, "set_progress_bar_widget", None) is not None:
             # We'are using our own ui, let's tell it to use our widget.
             ui.ui_factory.set_progress_bar_widget(self.progress_widget)
@@ -118,7 +118,7 @@ class TreeView(Gtk.VBox):
                                         Gtk.PolicyType.AUTOMATIC)
         self.scrolled_window.set_shadow_type(Gtk.ShadowType.IN)
         self.scrolled_window.show()
-        self.pack_start(self.scrolled_window, expand=True, fill=True)
+        self.pack_start(self.scrolled_window, True, True, 0)
 
         self.scrolled_window.add(self.construct_treeview())
 
@@ -322,7 +322,7 @@ class TreeView(Gtk.VBox):
 
             self.model.line_graph_data = linegraphdata
             self.graph_cell.columns_len = columns_len
-            width = self.graph_cell.get_size(self.treeview)[2]
+            width = self.graph_cell.get_preferred_width(self.treeview)[1]
             if width > 500:
                 width = 500
             self.graph_column.set_fixed_width(width)
@@ -354,10 +354,10 @@ class TreeView(Gtk.VBox):
             return (model.get_value(iter, treemodel.REVNO).find(key) != 0
                 and model.get_value(iter, treemodel.MESSAGE).lower().find(key.lower()) == -1)
 
-        self.treeview.set_search_equal_func(search_equal_func)
+        self.treeview.set_search_equal_func(search_equal_func, None)
         self.treeview.set_enable_search(True)
 
-        set_tooltip(treemodel.MESSAGE)
+        self.treeview.set_tooltip_column(treemodel.MESSAGE)
 
         self._prev_cursor_path = None
         self.treeview.connect("cursor-changed",
@@ -379,8 +379,9 @@ class TreeView(Gtk.VBox):
         self.revno_column = Gtk.TreeViewColumn("Revision No")
         self.revno_column.set_resizable(True)
         self.revno_column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
-        self.revno_column.set_fixed_width(cell.get_size(self.treeview)[2])
-        self.revno_column.pack_start(cell, True, True, 0)
+        self.revno_column.set_fixed_width(
+            cell.get_preferred_width(self.treeview)[1])
+        self.revno_column.pack_start(cell, True)
         self.revno_column.add_attribute(cell, "text", treemodel.REVNO)
         self.treeview.append_column(self.revno_column)
 
@@ -388,7 +389,7 @@ class TreeView(Gtk.VBox):
         self.graph_column = Gtk.TreeViewColumn()
         self.graph_column.set_resizable(True)
         self.graph_column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
-        self.graph_column.pack_start(self.graph_cell, True, True, 0)
+        self.graph_column.pack_start(self.graph_cell, True)
         self.graph_column.add_attribute(self.graph_cell, "node", treemodel.NODE)
         self.graph_column.add_attribute(self.graph_cell, "tags", treemodel.TAGS)
         self.graph_column.add_attribute(self.graph_cell, "in-lines", treemodel.LAST_LINES)
@@ -402,8 +403,9 @@ class TreeView(Gtk.VBox):
         self.summary_column.set_resizable(True)
         self.summary_column.set_expand(True)
         self.summary_column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
-        self.summary_column.set_fixed_width(cell.get_size(self.treeview)[2])
-        self.summary_column.pack_start(cell, True, True, 0)
+        self.summary_column.set_fixed_width(
+            cell.get_preferred_width(self.treeview)[1])
+        self.summary_column.pack_start(cell, True)
         self.summary_column.add_attribute(cell, "markup", treemodel.SUMMARY)
         self.treeview.append_column(self.summary_column)
 
@@ -414,7 +416,7 @@ class TreeView(Gtk.VBox):
         self.authors_column.set_resizable(False)
         self.authors_column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
         self.authors_column.set_fixed_width(200)
-        self.authors_column.pack_start(cell, True, True, 0)
+        self.authors_column.pack_start(cell, True)
         self.authors_column.add_attribute(cell, "text", treemodel.AUTHORS)
         self.treeview.append_column(self.authors_column)
 
@@ -426,7 +428,7 @@ class TreeView(Gtk.VBox):
         self.date_column.set_resizable(True)
         self.date_column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
         self.date_column.set_fixed_width(130)
-        self.date_column.pack_start(cell, True, True, 0)
+        self.date_column.pack_start(cell, True)
         self.date_column.add_attribute(cell, "text", treemodel.TIMESTAMP)
         self.treeview.append_column(self.date_column)
 

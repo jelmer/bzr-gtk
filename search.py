@@ -29,7 +29,7 @@ class SearchDialog(Gtk.Dialog):
                                   flags=Gtk.DialogFlags.MODAL,
                                   buttons=(Gtk.STOCK_OK, Gtk.ResponseType.OK,
                                            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
-        pixbuf = self.render_icon(Gtk.STOCK_FIND, Gtk.IconSize.MENU)
+        pixbuf = self.render_icon_pixbuf(Gtk.STOCK_FIND, Gtk.IconSize.MENU)
         self.set_icon(pixbuf)
         
         # Get arguments
