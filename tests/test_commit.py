@@ -26,6 +26,10 @@ from bzrlib import (
     uncommit,
     )
 try:
+    from bzrlib.tests.features import UnicodeFilenameFeature
+except ImportError: # bzr < 2.5
+    from bzrlib.tests import UnicodeFilenameFeature
+try:
     from bzrlib import bencode
 except ImportError:
     from bzrlib.util import bencode
@@ -1031,7 +1035,7 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport, QuestionHelpers):
                          bencode.bdecode(file_info.encode('UTF-8')))
 
     def test_commit_unicode_messages(self):
-        self.requireFeature(tests.UnicodeFilenameFeature)
+        self.requireFeature(UnicodeFilenameFeature)
 
         tree = self.make_branch_and_tree('tree')
         tree.branch.get_config().set_user_option('per_file_commits', 'true')

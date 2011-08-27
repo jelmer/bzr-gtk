@@ -23,6 +23,10 @@ from bzrlib import (
     errors,
     tests,
     )
+try:
+    from bzrlib.tests.features import UnicodeFilenameFeature
+except ImportError: # bzr < 2.5
+    from bzrlib.tests import UnicodeFilenameFeature
 from bzrlib.merge_directive import MergeDirective2
 
 from bzrlib.plugins.gtk.diff import (
@@ -73,7 +77,7 @@ diffstuff = #ffff00
 class TestDiffView(tests.TestCaseWithTransport):
 
     def test_unicode(self):
-        self.requireFeature(tests.UnicodeFilenameFeature)
+        self.requireFeature(UnicodeFilenameFeature)
 
         tree = self.make_branch_and_tree('tree')
         self.build_tree([u'tree/\u03a9'])
