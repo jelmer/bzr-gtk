@@ -41,6 +41,7 @@ class PluginsPage(Gtk.VPaned):
         treeview.set_headers_visible(False)
         treeview.set_model(self.model)
         treeview.connect("row-activated", self.row_selected)
+        treeview.connect("cursor-changed", self.row_selected)
 
         cell = Gtk.CellRendererText()
         column = Gtk.TreeViewColumn()
@@ -68,7 +69,9 @@ class PluginsPage(Gtk.VPaned):
         self.pack2(scrolledwindow, resize=False, shrink=True)
         self.show()
 
-    def row_selected(self, tv, path, tvc):
+    def row_selected(self, tv, path=None, tvc=None):
+        if path is None:
+            (path, focus) = tv.get_cursor()
         import bzrlib
         p = bzrlib.plugin.plugins()[self.model[path][0]].module
         from inspect import getdoc
@@ -117,5 +120,3 @@ class PluginsPage(Gtk.VPaned):
             self.table.attach(align, 0, 2, 1, 2, Gtk.AttachOptions.EXPAND | Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
         self.table.show_all()
-
-
