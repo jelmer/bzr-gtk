@@ -37,7 +37,7 @@ class MergeDialog(Gtk.Dialog):
     
     def __init__(self, wt, wtpath, default_branch_path=None, parent=None):
         """ Initialize the Merge dialog. """
-        GObject.GObject.__init__(self, title="Merge changes",
+        Gtk.Dialog.__init__(self, title="Merge changes",
                                   parent=parent,
                                   flags=0,
                                   buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
@@ -63,7 +63,7 @@ class MergeDialog(Gtk.Dialog):
         self._button_merge.connect('clicked', self._on_merge_clicked)
         
         # Add widgets to dialog
-        self.vbox.pack_start(self._hbox, False, False, 0)
+        self.get_content_area().pack_start(self._hbox, False, False, 0)
         self._hbox.add(self._label_merge_from)
         self._hbox.add(self._combo_source)
         self._hbox.set_spacing(5)
@@ -78,7 +78,7 @@ class MergeDialog(Gtk.Dialog):
         else:
             # If no default_branch_path give, default to folder source with current folder
             self._combo_source.set_active(0)
-        self.vbox.show_all()
+        self.get_content_area().show_all()
     
     def _on_folder_source(self):
         """ Merge from folder, create a filechooser dialog and button """
@@ -96,7 +96,7 @@ class MergeDialog(Gtk.Dialog):
             directory = os.path.dirname(self.wt.abspath(self.wtpath))
         self._filechooser_dialog.set_current_folder(directory)
         self._source.pack_start(self._filechooser, True, True, 0)
-        self.vbox.pack_start(self._source, True, True, 5)
+        self.get_content_area().pack_start(self._source, True, True, 5)
         self._source.show()
     
     def _on_custom_source(self):
@@ -108,7 +108,7 @@ class MergeDialog(Gtk.Dialog):
         self._custom_entry.connect("activate", self._on_merge_clicked)
         self._custom_entry.show()
         self._source.pack_start(self._custom_entry, True, True, 0)
-        self.vbox.pack_start(self._source, True, True, 5)
+        self.get_content_area().pack_start(self._source, True, True, 5)
         self._source.show()
     
     def _on_combo_changed(self, widget):
