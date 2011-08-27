@@ -76,10 +76,14 @@ class CellRendererGraph(Gtk.CellRenderer):
         except AttributeError:
             pango_ctx = widget.get_pango_context()
             font_desc = widget.get_style().font_desc
-            metrics = pango_ctx.get_metrics(font_desc)
+            metrics = pango_ctx.get_metrics(font_desc, None)
 
-            ascent = Pango.PIXELS(metrics.get_ascent())
-            descent = Pango.PIXELS(metrics.get_descent())
+            def PANGO_PIXELS(d):
+                # Macro from  Pango header.
+                return (d + 512) / 1000
+
+            ascent = PANGO_PIXELS(metrics.get_ascent())
+            descent = PANGO_PIXELS(metrics.get_descent())
 
             self._box_size = ascent + descent + 6
             return self._box_size

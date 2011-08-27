@@ -325,6 +325,9 @@ class TreeView(Gtk.VBox):
             width = self.graph_cell.get_preferred_width(self.treeview)[1]
             if width > 500:
                 width = 500
+            elif width == 0:
+                # The get_preferred_width() call got an insane value.
+                width = 200
             self.graph_column.set_fixed_width(width)
             self.graph_column.set_max_width(width)
             self.index = index
