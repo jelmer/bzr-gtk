@@ -228,7 +228,7 @@ class CommitDialog(Gtk.Dialog):
         # This sets the cursor, which causes the expander to close, which
         # causes the _file_message_text_view to never get realized. So we have
         # to give it a little kick, or it warns when we try to grab the focus
-        self._treeview_files.set_cursor(initial_cursor, None, None)
+        self._treeview_files.set_cursor(initial_cursor, None, False)
 
         def _realize_file_message_tree_view(*args):
             self._file_message_text_view.realize()

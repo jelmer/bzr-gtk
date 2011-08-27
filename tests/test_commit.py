@@ -465,7 +465,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertFalse(dlg._file_message_expander.get_expanded())
         self.assertFalse(dlg._file_message_expander.get_property('sensitive'))
 
-        dlg._treeview_files.set_cursor((1,))
+        dlg._treeview_files.set_cursor((1,), None, False)
         self.assertEqual('Diff for a', dlg._diff_label.get_text())
         text = diff_buffer.get_text(diff_buffer.get_start_iter(),
                                     diff_buffer.get_end_iter(),
@@ -483,7 +483,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertTrue(dlg._file_message_expander.get_expanded())
         self.assertTrue(dlg._file_message_expander.get_property('sensitive'))
 
-        dlg._treeview_files.set_cursor((2,))
+        dlg._treeview_files.set_cursor((2,), None, False)
         self.assertEqual('Diff for b', dlg._diff_label.get_text())
         text = diff_buffer.get_text(diff_buffer.get_start_iter(),
                                     diff_buffer.get_end_iter(),
@@ -501,7 +501,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertTrue(dlg._file_message_expander.get_expanded())
         self.assertTrue(dlg._file_message_expander.get_property('sensitive'))
 
-        dlg._treeview_files.set_cursor((0,))
+        dlg._treeview_files.set_cursor((0,), None, False)
         self.assertEqual('Diff for All Files', dlg._diff_label.get_text())
         self.assertEqual('File commit message',
                          dlg._file_message_expander.get_label())
@@ -531,7 +531,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertFalse(dlg._file_message_expander.get_property('sensitive'))
         self.assertEqual('', get_file_text())
 
-        dlg._treeview_files.set_cursor((1,))
+        dlg._treeview_files.set_cursor((1,), None, False)
         self.assertEqual('Commit message for a',
                          dlg._file_message_expander.get_label())
         self.assertTrue(dlg._file_message_expander.get_expanded())
@@ -544,7 +544,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         # We should have updated the ListStore with the new file commit info
         self.assertEqual('Some text\nfor a\n', get_saved_text(1))
 
-        dlg._treeview_files.set_cursor((2,))
+        dlg._treeview_files.set_cursor((2,), None, False)
         self.assertEqual('Commit message for b/',
                          dlg._file_message_expander.get_label())
         self.assertTrue(dlg._file_message_expander.get_expanded())
@@ -555,7 +555,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         dlg._set_file_commit_message('More text\nfor b\n')
         # Now switch back to 'a'. The message should be saved, and the buffer
         # should be updated with the other text
-        dlg._treeview_files.set_cursor((1,))
+        dlg._treeview_files.set_cursor((1,), None, False)
         self.assertEqual('More text\nfor b\n', get_saved_text(2))
         self.assertEqual('Commit message for a',
                          dlg._file_message_expander.get_label())
@@ -634,9 +634,9 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         dlg._commit_selected_radio.set_active(True)
         self.assertEqual((['a_file', 'b_dir'], []), dlg._get_specific_files())
 
-        dlg._treeview_files.set_cursor((1,))
+        dlg._treeview_files.set_cursor((1,), None, False)
         dlg._set_file_commit_message('Test\nmessage\nfor a_file\n')
-        dlg._treeview_files.set_cursor((2,))
+        dlg._treeview_files.set_cursor((2,), None, False)
         dlg._set_file_commit_message('message\nfor b_dir\n')
 
         self.assertEqual((['a_file', 'b_dir'],
@@ -662,9 +662,9 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         dlg._commit_selected_radio.set_active(True)
         self.assertEqual((['a_file', 'b_dir'], []), dlg._get_specific_files())
 
-        dlg._treeview_files.set_cursor((1,))
+        dlg._treeview_files.set_cursor((1,), None, False)
         dlg._set_file_commit_message('Test\r\nmessage\rfor a_file\n')
-        dlg._treeview_files.set_cursor((2,))
+        dlg._treeview_files.set_cursor((2,), None, False)
         dlg._set_file_commit_message('message\r\nfor\nb_dir\r')
 
         self.assertEqual((['a_file', 'b_dir'],
@@ -977,9 +977,9 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport, QuestionHelpers):
 
         dlg = commit.CommitDialog(tree)
         dlg._commit_selected_radio.set_active(True) # enable partial
-        dlg._treeview_files.set_cursor((1,))
+        dlg._treeview_files.set_cursor((1,), None, False)
         dlg._set_file_commit_message('Message for A\n')
-        dlg._treeview_files.set_cursor((2,))
+        dlg._treeview_files.set_cursor((2,), None, False)
         dlg._set_file_commit_message('Message for B\n')
         dlg._toggle_commit(None, 2, dlg._files_store) # unset 'b'
         dlg._set_global_commit_message('Commit just "a"')
@@ -1012,7 +1012,7 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport, QuestionHelpers):
         tree.merge_from_branch(tree2.branch)
 
         dlg = commit.CommitDialog(tree)
-        dlg._treeview_files.set_cursor((1,)) # 'a'
+        dlg._treeview_files.set_cursor((1,), None, False) # 'a'
         dlg._set_file_commit_message('Message for A\n')
         # No message for 'B'
         dlg._set_global_commit_message('Merging from "tree2"\n')
@@ -1043,9 +1043,9 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport, QuestionHelpers):
         tree.add(['a', u'\u03a9'], ['a-id', 'omega-id'])
 
         dlg = commit.CommitDialog(tree)
-        dlg._treeview_files.set_cursor((1,)) # 'a'
+        dlg._treeview_files.set_cursor((1,), None, False) # 'a'
         dlg._set_file_commit_message(u'Test \xfan\xecc\xf6de\n')
-        dlg._treeview_files.set_cursor((2,)) # omega
+        dlg._treeview_files.set_cursor((2,), None, False) # omega
         dlg._set_file_commit_message(u'\u03a9 is the end of all things.\n')
         dlg._set_global_commit_message(u'\u03a9 and \xfan\xecc\xf6de\n')
 

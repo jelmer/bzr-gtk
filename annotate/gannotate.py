@@ -130,7 +130,7 @@ class GAnnotateWindow(Window):
             row = lineno - 1
 
         tree_path = Gtk.TreePath.new_from_string(str(row))
-        self.annoview.set_cursor(tree_path, None, None)
+        self.annoview.set_cursor(tree_path, None, False)
         self.annoview.scroll_to_cell(tree_path, use_align=True)
 
 
