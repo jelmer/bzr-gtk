@@ -8,8 +8,6 @@ The GNOME Human Interface Guidelines
 (http://developer.gnome.org/projects/gup/hig/) should be followed where 
 possible.
 
-Several parts of bzr-gtk are currently using glade. However, we are slowly
-trying to move away from glade so please don't add new code that uses glade and
-try to remove the use of glade.
+Don't add new code that uses glade.
 
 Please update the NEWS file when closing bugs or adding new features.
