@@ -46,7 +46,7 @@ class AvatarDownloaderWorker(threading.Thread):
 
     def __init__(self, provider_method):
         """Constructor
-        
+
         :param provider_method: Provider method that returns fields
                  to send with the request.
         """
@@ -97,6 +97,6 @@ class AvatarProviderGravatar(AvatarProvider):
         """Return a gravatar URL for an email address.."""
         return self.get_base_url() + \
                 urllib.urlencode({
-                    'gravatar_id':hashlib.md5(email.lower()).hexdigest(),
-                    'size':str(self.size)
+                    'gravatar_id': hashlib.md5(email.lower()).hexdigest(),
+                    'size': str(self.size)
                 })

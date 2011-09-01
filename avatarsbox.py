@@ -67,7 +67,7 @@ class Avatar(Gtk.HBox):
         if self.email and self.image:
             children = self.get_children()
             if children != []:
-                self.remove(children[0])    
+                self.remove(children[0])
             self.pack_start(self.image, True, True, 0)
             self.image.set_tooltip_text(self.apparent_username)
             self.image.show()
@@ -149,7 +149,7 @@ class AvatarBox(Gtk.HBox):
         self.__displaying = avatar
 
     def _show_no_email(self):
-        """Show a Gtk.Label with test 'No email'."""
+        """Show a Gtk.Label with text 'No email'."""
         no_email = Gtk.Label(label=_i18n("No email"))
         self.pack_start(no_email, True, True, 0)
         no_email.show()
@@ -187,7 +187,8 @@ class AvatarsBox(Gtk.HBox):
         """Add the given username in the role box and add in the worker queue.
         """
         avatar = Avatar(username)
-        if (role == "author" and not self._role_box_for("committer").showing(avatar)) or role == "committer":
+        is_shown = self._role_box_for("committer").showing(avatar)
+        if (role == "author" and not is_shown) or role == "committer":
             if self._role_box_for(role).append_avatars_with(avatar):
                 self.__worker.queue(avatar.email)
 
@@ -231,7 +232,8 @@ class AvatarsBox(Gtk.HBox):
             loader.close()
 
             for role in ["committer", "author"]:
-                self._role_box_for(role).and_avatar_email(email).update_avatar_image_from_pixbuf_loader(loader)
+                self._role_box_for(role).and_avatar_email(
+                    email).update_avatar_image_from_pixbuf_loader(loader)
 
     def _role_box_for(self, role):
         """ Return the Gtk.HBox for the given role """
