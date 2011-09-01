@@ -16,6 +16,8 @@
 
 """Test the RevisionView functionality."""
 
+import os
+
 from bzrlib import (
     tests,
     )
@@ -27,7 +29,16 @@ except ImportError:
 from bzrlib.plugins.gtk import revisionview
 
 
+def fake_icon_path(*args):
+    return os.path.join(
+        os.path.dirname(__file__),  '..', 'icons', *args)
+
+
 class TestPendingRevisions(tests.TestCaseWithMemoryTransport):
+
+    def setUp(self):
+        super(TestPendingRevisions, self).setUp()
+        self.overrideAttr(revisionview, 'icon_path', new=fake_icon_path)
 
     def assertBufferText(self, text, buffer):
         """Check the text stored in the buffer."""
