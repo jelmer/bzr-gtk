@@ -689,7 +689,6 @@ class RevisionView(Gtk.Notebook):
 
         self.connect('notify::revision', self._add_tags)
 
-        self.avatarsbox.show()
         return self.avatarsbox
     
     def _create_parents(self):
