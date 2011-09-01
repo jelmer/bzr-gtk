@@ -65,7 +65,9 @@ class Avatar(Gtk.HBox):
     def show_image(self):
         """Replace the current content of the Avatar with the Gtk.Image """
         if self.email and self.image:
-            self.remove(self.get_children()[0])
+            children = self.get_children()
+            if children != []:
+                self.remove(children[0])    
             self.pack_start(self.image, True, True, 0)
             self.image.set_tooltip_text(self.apparent_username)
             self.image.show()
