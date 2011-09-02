@@ -34,6 +34,10 @@ class TestConfig(tests.TestCaseInTempDir):
         self.window = gannotate.GAnnotateWindow()
         super(TestConfig, self).setUp()
 
+    def tearDown(self):
+        self.window.destroy()
+        super(TestConfig, self).tearDown()
+
     def test_create_initial_config(self):
         """We can create a config even without a prior conf file"""
         conf = config.GAnnotateConfig(self.window)

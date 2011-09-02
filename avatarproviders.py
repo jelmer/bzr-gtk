@@ -55,12 +55,22 @@ class AvatarDownloaderWorker(threading.Thread):
         self.__queue = Queue.Queue()
 
         self.__provider_method = provider_method
-        self.__end_thread = False
 
     def stop(self):
         """ Stop this worker """
-        self.__end_thread = True
         self.__stop.set()
+        try:
+            while self.__queue.qsize() > 0:
+                self.__queue.get_nowait()
+                self.__queue.task_done()
+        except ValueError:
+            # A thread may have completed during the loop.
+            pass
+        self.__queue.join()
+
+    @property
+    def is_running(self):
+        return not self.__stop.is_set()
 
     def set_callback_method(self, method):
         """ Fire the given callback method when treatment is finished """
@@ -71,20 +81,34 @@ class AvatarDownloaderWorker(threading.Thread):
 
         This id_field is for example with Gravatar the email address.
         """
-        self.__queue.put(id_field)
+        if self.is_running:
+            if not self.is_alive():
+                self.start()
+            self.__queue.put(id_field)
 
     def run(self):
         """Worker core code. """
-        while not self.__end_thread:
-            id_field = self.__queue.get()
-            # Call provider method to get fields to pass in the request
-            url = self.__provider_method(id_field)
-            # Execute the request
-            response = urllib2.urlopen(url)
-            # Fire the callback method
-            if not self.__callback_method is None:
-                self.__callback_method(response, id_field)
-            self.__queue.task_done()
+        while self.is_running:
+            try:
+                id_field = self.__queue.get_nowait()
+                # Call provider method to get fields to pass in the request
+                url = self.__provider_method(id_field)
+                # Execute the request
+                response = urllib2.urlopen(url)
+                # Fire the callback method
+                if not self.__callback_method is None:
+                    self.__callback_method(response, id_field)
+                try:
+                    self.__queue.task_done()
+                except ValueError, error:
+                    # The worker and queue was stopped during the loop.
+                    if not self.is_running:
+                        pass
+                    else:
+                        raise error
+            except Queue.Empty:
+                # There is no more work to do.
+                pass
 
 
 class AvatarProviderGravatar(AvatarProvider):

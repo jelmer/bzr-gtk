@@ -159,8 +159,7 @@ class AvatarsBox(Gtk.HBox):
     """GTK container for author and committer avatars."""
 
     def __init__(self):
-        Gtk.HBox.__init__(self, homogeneous=False, spacing=10)
-
+        super(AvatarsBox, self).__init__(homogeneous=False, spacing=10)
         self.__committer_box = None
         self.__authors_box = None
         self._init_gui()
@@ -181,7 +180,12 @@ class AvatarsBox(Gtk.HBox):
         # This callback method should be fired by all workers when a request
         # is done.
         self.__worker.set_callback_method(self._update_avatar_from_response)
-        self.__worker.start()
+        self.connect('destroy', self.on_destroy)
+
+    def on_destroy(self, widget):
+        self.__worker.stop()
+        if self.__worker.is_alive():
+            self.__worker.join()
 
     def add(self, username, role):
         """Add the given username in the role box and add in the worker queue.

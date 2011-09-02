@@ -53,6 +53,7 @@ class TestPendingRevisions(tests.TestCaseWithMemoryTransport):
         b = builder.get_branch()
 
         rv = revisionview.RevisionView(b)
+        self.addCleanup(rv.destroy)
         rev = b.repository.get_revision('A')
         rv.set_revision(rev)
         self.assertEqual(rev.committer, rv.committer.get_text())
@@ -73,6 +74,7 @@ class TestPendingRevisions(tests.TestCaseWithMemoryTransport):
         b = tree.branch
 
         rv = revisionview.RevisionView(b)
+        self.addCleanup(rv.destroy)
         rev = b.repository.get_revision('A')
         rv.set_revision(rev)
 
@@ -93,6 +95,7 @@ class TestPendingRevisions(tests.TestCaseWithMemoryTransport):
         b = tree.branch
 
         rv = revisionview.RevisionView(b)
+        self.addCleanup(rv.destroy)
         rev = b.repository.get_revision('A')
         rv.set_revision(rev)
 
