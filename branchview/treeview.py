@@ -260,7 +260,7 @@ class TreeView(Gtk.VBox):
     def back(self):
         """Signal handler for the Back button."""
         parents = self.get_parents()
-        if not len(parents):
+        if not parents:
             return
 
         for parent_id in parents:
@@ -275,7 +275,7 @@ class TreeView(Gtk.VBox):
     def forward(self):
         """Signal handler for the Forward button."""
         children = self.get_children()
-        if not len(children):
+        if not children:
             return
 
         for child_id in children:
