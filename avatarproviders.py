@@ -78,14 +78,14 @@ class AvatarDownloaderWorker(threading.Thread):
         This id_field is for example with Gravatar the email address.
         """
         if self.is_running:
+            self.__queue.put(id_field)
             if not self.is_alive():
                 self.start()
-            self.__queue.put(id_field)
 
     def run(self):
         """Worker core code. """
-        try:
-            while self.is_running:
+        while self.is_running:
+            try:
                 id_field = self.__queue.get_nowait()
                 # Call provider method to get fields to pass in the request
                 url = self.__provider_method(id_field)
@@ -95,9 +95,9 @@ class AvatarDownloaderWorker(threading.Thread):
                 if not self.__callback_method is None:
                     self.__callback_method(response, id_field)
                 self.__queue.task_done()
-        except Queue.Empty:
-            # There is no more work to do.
-            pass
+            except Queue.Empty:
+                # There is no more work to do.
+                pass
 
 
 class AvatarProviderGravatar(AvatarProvider):
