@@ -8,23 +8,22 @@ msgstr ""
 "Project-Id-Version: bzr-gtk\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2009-12-23 20:48+0000\n"
-"Last-Translator: Launchpad Translations Administrators "
-"<rosetta@launchpad.net>\n"
+"PO-Revision-Date: 2011-04-07 14:05+0000\n"
+"Last-Translator: Michael Moroni <michael.moroni@mailoo.org>\n"
 "Language-Team: Esperanto <eo@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-08 04:41+0000\n"
-"X-Generator: Launchpad (build 12351)\n"
+"X-Launchpad-Export-Date: 2011-04-08 04:40+0000\n"
+"X-Generator: Launchpad (build 12735)\n"
 
 #: ../bazaar-properties.desktop.in.h:1
 msgid "Bazaar Preferences"
-msgstr ""
+msgstr "Preferoj de Bazaro"
 
 #: ../bazaar-properties.desktop.in.h:2
 msgid "Configure Bazaar settings"
-msgstr ""
+msgstr "Agordi Bazaron"
 
 #: ../bzr-handle-patch.desktop.in.h:1
 msgid "Apply Bazaar Bundle"
@@ -32,24 +31,24 @@ msgstr ""
 
 #: ../bzr-handle-patch.desktop.in.h:2
 msgid "Bazaar"
-msgstr ""
+msgstr "Bazaro"
 
 #: ../bzr-notify.desktop.in.h:1
 msgid "Bazaar Notification"
-msgstr ""
+msgstr "Atentigoj de Bazaro"
 
 #: ../bzr-notify.desktop.in.h:2
 msgid "Notification Area Icon for Bazaar"
-msgstr ""
+msgstr "Atentigarea piktogramo por Bazaro"
 
 #. Create the widgets
 #: ../branch.py:52
 msgid "_Branch"
-msgstr ""
+msgstr "_Branĉo"
 
 #: ../branch.py:55 ../checkout.py:55
 msgid "Branch location:"
-msgstr ""
+msgstr "Branĉloko"
 
 #: ../branch.py:57 ../checkout.py:56
 msgid "Destination:"
@@ -61,45 +60,45 @@ msgstr ""
 
 #: ../branch.py:59 ../checkout.py:58
 msgid "Revision:"
-msgstr ""
+msgstr "Revizio:"
 
 #: ../branch.py:60 ../checkout.py:53
 msgid "Please select a folder"
-msgstr "Bonvolu elekti leterujon"
+msgstr "Bonvolu elekti dosierujon"
 
 #: ../branch.py:140 ../checkout.py:159
 msgid "Missing branch location"
-msgstr ""
+msgstr "Branĉloko mankas"
 
 #: ../branch.py:141 ../checkout.py:160
 msgid "You must specify a branch location."
-msgstr ""
+msgstr "Vi devu specifi branĉlokon."
 
 #: ../branch.py:182
 msgid "Branching successful"
-msgstr ""
+msgstr "Sukcesa branĉado"
 
 #: ../branch.py:183
 #, python-format
 msgid "%d revision(s) branched."
-msgstr ""
+msgstr "%d revizio(j) branĉita(j)."
 
 #: ../branch.py:191 ../checkout.py:191
 msgid "N/A"
-msgstr "N/A"
+msgstr "N/D"
 
 #. Create the widgets
 #: ../checkout.py:50
 msgid "Check_out"
-msgstr ""
+msgstr "K_ontrolo"
 
 #: ../checkout.py:57
 msgid "Branch nick:"
-msgstr ""
+msgstr "Branĉnomo:"
 
 #: ../checkout.py:62
 msgid "_Lightweight checkout"
-msgstr ""
+msgstr "Ma_lpeza kontrolo"
 
 #: ../commands.py:307
 msgid "Directory does not have a working tree"
@@ -701,4 +700,5 @@ msgstr ""
 #~ msgstr ""
 #~ "Launchpad Contributions:\n"
 #~ "  Colin Dean https://launchpad.net/~colindean\n"
-#~ "  Larry Gilbert https://launchpad.net/~l2g"
+#~ "  Larry Gilbert https://launchpad.net/~l2g\n"
+#~ "  Michael Moroni https://launchpad.net/~airon90"

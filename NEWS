@@ -19,6 +19,8 @@
   * Ensure config directory exists before writing configuration.
     (Jelmer Vernooij, #231150)
 
+  * Mark as supporting bzr 2.5.0. (Jelmer Vernooij)
+
 0.100.0	2011-03-02
 
  BUG FIXES

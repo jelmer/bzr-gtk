@@ -8,15 +8,18 @@ msgstr ""
 "Project-Id-Version: olive\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2011-03-08 23:22+0000\n"
-"Last-Translator: Paulo Guilherme Pilotti Duarte "
-"<guilhermepilotti@gmail.com>\n"
+"PO-Revision-Date: 2011-07-07 15:16+0000\n"
+"Last-Translator: Fitoschido <fitoschido@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <pt_BR@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-10 04:41+0000\n"
-"X-Generator: Launchpad (build 12351)\n"
+"X-Launchpad-Export-Date: 2011-07-08 04:40+0000\n"
+"X-Generator: Launchpad (build 13168)\n"
+
+#: ../errors.py:31
+msgid "Directory is not a checkout"
+msgstr "O diretório não é um checagem de ítens."
 
 #: ../bazaar-properties.desktop.in.h:1
 msgid "Bazaar Preferences"
@@ -28,7 +31,7 @@ msgstr "Configure as opções do Bazaar"
 
 #: ../bzr-handle-patch.desktop.in.h:1
 msgid "Apply Bazaar Bundle"
-msgstr ""
+msgstr "Aplica o pacote Bazaar"
 
 #: ../bzr-handle-patch.desktop.in.h:2
 msgid "Bazaar"
@@ -69,7 +72,7 @@ msgstr "Por favor selecione uma pasta"
 
 #: ../branch.py:140 ../checkout.py:159
 msgid "Missing branch location"
-msgstr ""
+msgstr "Falta o local do ramo."
 
 #: ../branch.py:141 ../checkout.py:160
 msgid "You must specify a branch location."
@@ -95,7 +98,7 @@ msgstr "Verificaçã_o Geral"
 
 #: ../checkout.py:57
 msgid "Branch nick:"
-msgstr ""
+msgstr "Nome do ramo:"
 
 #: ../checkout.py:62
 msgid "_Lightweight checkout"
@@ -139,11 +142,11 @@ msgstr "modificado"
 
 #: ../commit.py:187
 msgid "kind changed"
-msgstr ""
+msgstr "tipo modificado"
 
 #: ../commit.py:280
 msgid "<b>Commit Message</b>"
-msgstr ""
+msgstr "<b>Mensagem de Envio</b>"
 
 #: ../commit.py:333
 msgid "_Only commit locally"
@@ -159,19 +162,19 @@ msgstr "Arquivos"
 
 #: ../commit.py:395
 msgid "Commit all changes"
-msgstr ""
+msgstr "Enviar todas as mudanças"
 
 #: ../commit.py:401
 msgid "Only commit selected changes"
-msgstr ""
+msgstr "Enviar apenas as mudanças selecionadas"
 
 #: ../commit.py:407
 msgid "Commit all changes*"
-msgstr ""
+msgstr "Enviar todas as mudanças*"
 
 #: ../commit.py:440
 msgid "Commit*"
-msgstr ""
+msgstr "Enviar*"
 
 #: ../commit.py:442
 msgid "Commit"
@@ -191,7 +194,7 @@ msgstr ""
 
 #: ../commit.py:485
 msgid "Pending Revisions"
-msgstr ""
+msgstr "Revisões pendentes"
 
 #: ../commit.py:507
 msgid "Date"
@@ -220,7 +223,7 @@ msgstr ""
 
 #: ../commit.py:552
 msgid "Global Commit Message"
-msgstr ""
+msgstr "Mensagem de Envio"
 
 #: ../commit.py:554
 msgid "<b>Global Commit Message</b>"
@@ -232,7 +235,7 @@ msgstr ""
 
 #: ../commit.py:634
 msgid "Commit message for "
-msgstr ""
+msgstr "Mensagem de envio para "
 
 #: ../commit.py:689
 msgid "Commit cancelled"
@@ -240,7 +243,7 @@ msgstr "Envio cancelado"
 
 #: ../commit.py:690
 msgid "Do you want to save your commit messages ?"
-msgstr ""
+msgstr "Você deseja salvas as suas mensagens de envio ?"
 
 #: ../commit.py:708
 msgid "Commit with an empty message?"
@@ -269,6 +272,7 @@ msgstr "Consolidar sem modificaçãoes?"
 msgid ""
 "There are no changes in the working tree. Do you want to commit anyway?"
 msgstr ""
+"Não existe mudanças na árvore de trabalho. Você deseja enviar mesmo assim?"
 
 #: ../conflicts.py:50
 msgid "External utility:"
@@ -355,7 +359,7 @@ msgstr "_Visualizar"
 
 #: ../diff.py:447
 msgid "Wrap _Long Lines"
-msgstr ""
+msgstr "Quebra de _Linhas Longas"
 
 #. No conflicts found.
 #: ../diff.py:492 ../merge.py:146
@@ -382,10 +386,6 @@ msgstr "O diretório não é um ramo."
 #: ../errors.py:29
 msgid "You can perform this action only in a branch."
 msgstr "Esta operação só pode ser executada em um ramo."
-
-#: ../errors.py:31
-msgid "Directory is not a checkout"
-msgstr ""
 
 #: ../errors.py:32
 msgid "You can perform local commit only on checkouts."
@@ -567,11 +567,11 @@ msgstr "Pasta"
 
 #: ../merge.py:56
 msgid "Custom Location"
-msgstr "Localização Personalizada"
+msgstr "Localização personalizada"
 
 #: ../merge.py:59
 msgid "_Merge"
-msgstr "_fusão"
+msgstr "_Mesclar"
 
 #: ../merge.py:132
 msgid "Branch not given"
@@ -1224,6 +1224,9 @@ msgstr "Você tem de especificar o nome desejado da tag."
 #~ "Launchpad Contributions:\n"
 #~ "  Alexandre Sapata Carbonell https://launchpad.net/~alexandre-sapata-"
 #~ "carbonell\n"
+#~ "  André Gondim https://launchpad.net/~andregondim\n"
+#~ "  Edvaldo de Souza Cruz https://launchpad.net/~edvaldoscruz\n"
+#~ "  Fitoschido https://launchpad.net/~fitoschido\n"
 #~ "  Flávio Pontes https://launchpad.net/~flaviocpontes\n"
 #~ "  Leandro Pereira de Lima e Silva https://launchpad.net/~leandro-limaesilva\n"
 #~ "  Nelson do Vale https://launchpad.net/~nelsondovale\n"
