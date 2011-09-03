@@ -84,7 +84,7 @@ class GAnnotateConfig(configobj.ConfigObj):
         return False
 
     def _save_pane_props(self, w, gparam):
-        if gparam.name == "position":
+        if gparam and gparam.name == "position":
             self["window"]["pane_position"] = w.get_position()
 
         return False
