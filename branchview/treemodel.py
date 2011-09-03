@@ -1,7 +1,5 @@
 # -*- coding: UTF-8 -*-
-"""Tree model.
-
-"""
+"""BranchTreeModel."""
 
 __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__ = "Gary van der Merwe <garyvdm@gmail.com>"
@@ -19,6 +17,7 @@ from time import (
     localtime,
     )
 
+
 REVID = 0
 NODE = 1
 LINES = 2
@@ -35,7 +34,7 @@ TAGS = 12
 AUTHORS = 13
 
 
-class BranchTreeModel(Gtk.TreeStore):
+class BranchTreeModel(Gtk.ListStore):
     """A model of branch's merge history."""
 
     def __init__(self, branch, line_graph_data):
@@ -100,122 +99,7 @@ class BranchTreeModel(Gtk.TreeStore):
                 authors = ", ".join([
                     parse_username(author)[0]
                     for author in revision.get_apparent_authors()])
-            self.append(
-                None,
-                (revid, node, lines, last_lines, revno, summary, message,
+            self.append((
+                revid, node, lines, last_lines, revno, summary, message,
                 committer, timestamp, revision, parents, children, tags,
                 authors))
-
-
-class TreeModel(Gtk.TreeStore):
-
-    def __init__(self, branch, line_graph_data):
-        Gtk.TreeStore.__init__(self)
-        self.revisions = {}
-        self.branch = branch
-        self.repository = branch.repository
-        self.line_graph_data = line_graph_data
-
-        if self.branch.supports_tags():
-            self.tags = self.branch.tags.get_reverse_tag_dict()
-        else:
-            self.tags = {}
-
-    def add_tag(self, tag, revid):
-        self.branch.tags.set_tag(tag, revid)
-        try:
-            self.tags[revid].append(tag)
-        except KeyError:
-            self.tags[revid] = [tag]
-
-    def on_get_flags(self):
-        return Gtk.TREE_MODEL_LIST_ONLY
-
-    def on_get_n_columns(self):
-        return 14
-
-    def on_get_column_type(self, index):
-        if index == REVID: return GObject.TYPE_STRING
-        if index == NODE: return GObject.TYPE_PYOBJECT
-        if index == LINES: return GObject.TYPE_PYOBJECT
-        if index == LAST_LINES: return GObject.TYPE_PYOBJECT
-        if index == REVNO: return GObject.TYPE_STRING
-        if index == SUMMARY: return GObject.TYPE_STRING
-        if index == MESSAGE: return GObject.TYPE_STRING
-        if index == COMMITTER: return GObject.TYPE_STRING
-        if index == TIMESTAMP: return GObject.TYPE_STRING
-        if index == REVISION: return GObject.TYPE_PYOBJECT
-        if index == PARENTS: return GObject.TYPE_PYOBJECT
-        if index == CHILDREN: return GObject.TYPE_PYOBJECT
-        if index == TAGS: return GObject.TYPE_PYOBJECT
-        if index == AUTHORS: return GObject.TYPE_STRING
-
-    def on_get_iter(self, path):
-        # XXX sinzui 2011-08-12: maybe path.get_indices()[0]?
-        return path[0]
-
-    def on_get_path(self, rowref):
-        return rowref
-
-    def on_get_value(self, rowref, column):
-        if len(self.line_graph_data) > 0:
-            (revid, node, lines, parents,
-             children, revno_sequence) = self.line_graph_data[rowref]
-        else:
-            (revid, node, lines, parents,
-             children, revno_sequence) = (None, (0, 0), (), (),
-                                          (), ())
-        if column == REVID: return revid
-        if column == NODE: return node
-        if column == LINES: return lines
-        if column == PARENTS: return parents
-        if column == CHILDREN: return children
-        if column == LAST_LINES:
-            if rowref>0:
-                return self.line_graph_data[rowref-1][2]
-            return []
-        if column == REVNO: return ".".join(["%d" % (revno)
-                                      for revno in revno_sequence])
-
-        if column == TAGS: return self.tags.get(revid, [])
-
-        if not revid or revid == NULL_REVISION:
-            return None
-        if revid not in self.revisions:
-            revision = self.repository.get_revisions([revid])[0]
-            self.revisions[revid] = revision
-        else:
-            revision = self.revisions[revid]
-
-        if column == REVISION: return revision
-        if column == SUMMARY: return escape(revision.get_summary())
-        if column == MESSAGE: return escape(revision.message)
-        if column == COMMITTER: return parse_username(revision.committer)[0]
-        if column == TIMESTAMP:
-            return strftime("%Y-%m-%d %H:%M", localtime(revision.timestamp))
-        if column == AUTHORS:
-            return ", ".join([
-                parse_username(author)[0] for author in revision.get_apparent_authors()])
-
-    def on_iter_next(self, rowref):
-        if rowref < len(self.line_graph_data) - 1:
-            return rowref+1
-        return None
-
-    def on_iter_children(self, parent):
-        if parent is None: return 0
-        return None
-
-    def on_iter_has_child(self, rowref):
-        return False
-
-    def on_iter_n_children(self, rowref):
-        if rowref is None: return len(self.line_graph_data)
-        return 0
-
-    def on_iter_nth_child(self, parent, n):
-        if parent is None: return n
-        return None
-
-    def on_iter_parent(self, child):
-        return None

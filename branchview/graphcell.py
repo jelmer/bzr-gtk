@@ -65,6 +65,20 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
         else:
             raise AttributeError, "no such property: '%s'" % property.name
 
+    def do_get_property(self, property):
+        """Set properties from GObject properties."""
+        if property.name == "node":
+            return self.node
+        elif property.name == "tags":
+            return self.tags
+        elif property.name == "in-lines":
+            return self.in_lines
+        elif property.name == "out-lines":
+            print "get outlines"
+            return self.out_lines
+        else:
+            raise AttributeError, "no such property: '%s'" % property.name
+
     def box_size(self, widget):
         """Calculate box size based on widget's font.
 
