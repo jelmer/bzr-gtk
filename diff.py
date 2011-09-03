@@ -442,10 +442,10 @@ class DiffWindow(Window):
     def _get_menu_bar(self):
         menubar = Gtk.MenuBar()
         # View menu
-        mb_view = Gtk.MenuItem(label=_i18n("_View"))
+        mb_view = Gtk.MenuItem.new_with_mnemonic(_i18n("_View"))
         mb_view_menu = Gtk.Menu()
-        mb_view_wrapsource = Gtk.CheckMenuItem(
-            label=_i18n("Wrap _Long Lines"))
+        mb_view_wrapsource = Gtk.CheckMenuItem.new_with_mnemonic(
+            _i18n("Wrap _Long Lines"))
         mb_view_wrapsource.connect('activate', self.diff._on_wraplines_toggled)
         mb_view_wrapsource.show()
         mb_view_menu.append(mb_view_wrapsource)

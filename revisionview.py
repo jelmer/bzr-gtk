@@ -552,7 +552,7 @@ class RevisionView(Gtk.Notebook):
                 button.add(image)
                 button.connect("clicked", self._show_clicked_cb,
                                self._revision.revision_id, revid)
-                hbox.pack_start(button, False, True, True, 0)
+                hbox.pack_start(button, False, True, 0)
                 button.show()
 
             button = Gtk.Button()

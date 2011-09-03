@@ -36,7 +36,7 @@ class NotifyPopupMenu(Gtk.Menu):
 
     def create_items(self):
         from bzrlib import errors
-        item = Gtk.CheckMenuItem('_Gateway to LAN')
+        item = Gtk.CheckMenuItem.new_with_mnemonic('_Gateway to LAN')
         item.connect('toggled', self.toggle_lan_gateway)
         self.append(item)
         self.append(Gtk.SeparatorMenuItem())
@@ -50,7 +50,8 @@ class NotifyPopupMenu(Gtk.Menu):
             # process is already running.
             item.set_sensitive(False)
 
-        item = Gtk.CheckMenuItem('Announce _branches on LAN')
+        item = Gtk.CheckMenuItem.new_with_mnemonic(
+            'Announce _branches on LAN')
         item.connect('toggled', self.toggle_announce_branches)
         self.append(item)
         self.append(Gtk.SeparatorMenuItem())

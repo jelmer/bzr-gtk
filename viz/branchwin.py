@@ -432,7 +432,8 @@ class BranchWindow(Window):
                         except KeyError:
                             str = ""
 
-                        item = Gtk.MenuItem(parent.message.split("\n")[0] + str)
+                        item = Gtk.MenuItem(
+                            label=parent.message.split("\n")[0] + str)
                         item.connect('activate', self._set_revision_cb, parent_id)
                         prev_menu.add(item)
                 prev_menu.show_all()

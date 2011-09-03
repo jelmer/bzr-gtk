@@ -47,28 +47,29 @@ class RevisionMenu(Gtk.Menu):
 
     def create_items(self):
         if len(self.revids) == 1:
-            item = Gtk.MenuItem("View _Changes")
+            item = Gtk.MenuItem.new_with_mnemonic("View _Changes")
             item.connect('activate', self.show_diff)
             self.append(item)
 
-            item = Gtk.MenuItem("_Push")
+            item = Gtk.MenuItem.new_with_mnemonic("_Push")
             item.connect('activate', self.show_push)
             self.append(item)
 
-            item = Gtk.MenuItem("_Tag Revision")
+            item = Gtk.MenuItem.new_with_mnemonic("_Tag Revision")
             item.connect('activate', self.show_tag)
             self.append(item)
 
-            item = Gtk.MenuItem("_Merge Directive")
+            item = Gtk.MenuItem.new_with_mnemonic("_Merge Directive")
             item.connect('activate', self.store_merge_directive)
             # FIXME: self.append(item)
 
-            item = Gtk.MenuItem("_Send Merge Directive")
+            item = Gtk.MenuItem.new_with_mnemonic("_Send Merge Directive")
             item.connect('activate', self.send_merge_directive)
             self.append(item)
 
             if self.wt:
-                item = Gtk.MenuItem("_Revert to this revision")
+                item = Gtk.MenuItem.new_with_mnemonic(
+                    "_Revert to this revision")
                 item.connect('activate', self.revert)
                 self.append(item)
 
