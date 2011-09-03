@@ -66,7 +66,7 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
             raise AttributeError, "no such property: '%s'" % property.name
 
     def do_get_property(self, property):
-        """Set properties from GObject properties."""
+        """Get properties from GObject properties."""
         if property.name == "node":
             return self.node
         elif property.name == "tags":
@@ -131,13 +131,14 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
 
         ctx.set_source_rgb(red, green, blue)
 
-    def activate(event, widget, path, background_area, cell_area, flags):
+    def do_activate(event, widget, path, background_area, cell_area, flags):
         return True
 
-    def start_editing(event, widget, path, background_area, cell_area, flags):
+    def do_editing_started(event, widget, path, background_area, cell_area,
+                           flags):
         return None
 
-    def get_size(self, widget, cell_area, x_offset, y_offset, width, height):
+    def do_get_size(self, widget, cell_area):
         """Return the size we need for this cell.
 
         Each cell is drawn individually and is only as wide as it needs
@@ -152,7 +153,7 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
         # FIXME I have no idea how to use cell_area properly
         return (0, 0, width, height)
 
-    def render(self, ctx, widget, bg_area, cell_area, flags):
+    def do_render(self, ctx, widget, bg_area, cell_area, flags):
         """Render an individual cell.
 
         Draws the cell contents using cairo, taking care to clip what we
@@ -166,7 +167,6 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
         instead of a pure diagonal ... this reduces confusion by an
         incredible amount.
         """
-        print "rendering"
         ctx.rectangle(bg_area.x, bg_area.y, bg_area.width, bg_area.height)
         ctx.clip()
 
@@ -192,7 +192,7 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
                 cell_area.y + cell_area.height / 2,
                 box_size / 4, 0, 2 * math.pi)
 
-        if flags & Gtk.CELL_RENDERER_SELECTED:
+        if flags & Gtk.CellRendererState.SELECTED:
             ctx.set_source_rgb(1.0, 1.0, 1.0)
             ctx.set_line_width(box_size / 4)
             ctx.stroke_preserve()
@@ -206,9 +206,10 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
 
         self.render_tags(ctx, widget.create_pango_context(), cell_area, box_size)
 
-    def render_line(self, ctx, cell_area, box_size, mid, height, start, end, colour, flags):
+    def render_line(self, ctx, cell_area, box_size,
+                    mid, height, start, end, colour, flags):
         if start is None:
-            ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+            #ctx.set_line_cap(cairo.LINE_CAP_ROUND)
             x = cell_area.x + box_size * end + box_size / 2
             ctx.move_to(x, mid + height / 3)
             ctx.line_to(x, mid + height / 3)
@@ -216,7 +217,7 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
             ctx.line_to(x, mid + height / 6)
 
         elif end is None:
-            ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+            #ctx.set_line_cap(cairo.LINE_CAP_ROUND)
             x = cell_area.x + box_size * start + box_size / 2
             ctx.move_to(x, mid - height / 3)
             ctx.line_to(x, mid - height / 3)
@@ -224,7 +225,7 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
             ctx.line_to(x, mid - height / 6)
 
         else:
-            ctx.set_line_cap(cairo.LINE_CAP_BUTT)
+            #ctx.set_line_cap(cairo.LINE_CAP_BUTT)
             startx = cell_area.x + box_size * start + box_size / 2
             endx = cell_area.x + box_size * end + box_size / 2
 
@@ -241,7 +242,7 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
                              endx, mid + height / 5 ,
                              endx, mid + height / 2 + 1)
 
-        if flags & Gtk.CELL_RENDERER_SELECTED:
+        if flags & Gtk.CellRendererState.SELECTED:
             ctx.set_source_rgb(1.0, 1.0, 1.0)
             ctx.set_line_width(box_size / 5)
             ctx.stroke_preserve()
@@ -267,7 +268,7 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
         width = 0
 
         for tag_idx, tag in enumerate(self.tags):
-            tag_layout.set_text(" " + tag + " ")
+            tag_layout.set_text(" " + tag + " ", -1)
             text_width, text_height = tag_layout.get_pixel_size()
 
             x0 = cell_area.x + \
