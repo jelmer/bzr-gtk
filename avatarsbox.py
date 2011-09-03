@@ -38,7 +38,7 @@ class Avatar(gtk.HBox):
 
     def __eq__(self, other):
         return (self.apparent_username == other.apparent_username and
-                self.name == other.name and
+                self.username == other.username and
                 self.email == other.email)
 
     def show_spinner(self):
@@ -184,7 +184,12 @@ class AvatarsBox(gtk.HBox):
         # This callback method should be fired by all workers when a request
         # is done.
         self.__worker.set_callback_method(self._update_avatar_from_response)
-        self.__worker.start()
+        self.connect('destroy', self.on_destroy)
+
+    def on_destroy(self, widget):
+        self.__worker.stop()
+        if self.__worker.is_alive():
+            self.__worker.join()
 
     def add(self, username, role):
         """Add the given username in the role box and add in the worker queue.

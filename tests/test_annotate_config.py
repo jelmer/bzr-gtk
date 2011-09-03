@@ -25,11 +25,18 @@ from bzrlib.plugins.gtk.annotate import (
     gannotate,
     )
 
+
 class TestConfig(tests.TestCaseInTempDir):
 
     def setUp(self):
-        super(TestConfig, self).setUp()
+        # Create an instance before the env is changed so that
+        # icon lookups work.
         self.window = gannotate.GAnnotateWindow()
+        super(TestConfig, self).setUp()
+
+    def tearDown(self):
+        self.window.destroy()
+        super(TestConfig, self).tearDown()
 
     def test_create_initial_config(self):
         """We can create a config even without a prior conf file"""
