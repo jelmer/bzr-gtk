@@ -312,13 +312,14 @@ class TreeView(Gtk.VBox):
             show_graph = self.graph_column.get_visible()
 
             self.branch.lock_read()
-            (linegraphdata, index, columns_len) = linegraph(self.branch.repository.get_graph(),
-                                                            self.start,
-                                                            self.maxnum, 
-                                                            broken_line_length,
-                                                            show_graph,
-                                                            self.mainline_only,
-                                                            self.progress_bar)
+            (linegraphdata, index, columns_len) = linegraph(
+                self.branch.repository.get_graph(),
+                self.start,
+                self.maxnum, 
+                broken_line_length,
+                show_graph,
+                self.mainline_only,
+                self.progress_bar)
 
             self.model.set_line_graph_data(linegraphdata)
             self.graph_cell.columns_len = columns_len
@@ -361,6 +362,7 @@ class TreeView(Gtk.VBox):
         self.treeview.set_enable_search(True)
 
         self.treeview.set_tooltip_column(treemodel.MESSAGE)
+        self.treeview.set_headers_visible(True)
 
         self._prev_cursor_path = None
         self.treeview.connect("cursor-changed",

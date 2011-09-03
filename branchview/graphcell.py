@@ -22,7 +22,7 @@ from gi.repository import Pango
 from gi.repository import cairo
 
 
-class CellRendererGraph(Gtk.CellRenderer):
+class CellRendererGraph(Gtk.CellRendererPixbuf):
     """Cell renderer for directed graph.
 
     Properties:
@@ -117,7 +117,13 @@ class CellRendererGraph(Gtk.CellRenderer):
 
         ctx.set_source_rgb(red, green, blue)
 
-    def on_get_size(self, widget, cell_area):
+    def activate(event, widget, path, background_area, cell_area, flags):
+        return True
+
+    def start_editing(event, widget, path, background_area, cell_area, flags):
+        return None
+
+    def get_size(self, widget, cell_area, x_offset, y_offset, width, height):
         """Return the size we need for this cell.
 
         Each cell is drawn individually and is only as wide as it needs
@@ -132,7 +138,7 @@ class CellRendererGraph(Gtk.CellRenderer):
         # FIXME I have no idea how to use cell_area properly
         return (0, 0, width, height)
 
-    def on_render(self, window, widget, bg_area, cell_area, exp_area, flags):
+    def render(self, ctx, widget, bg_area, cell_area, flags):
         """Render an individual cell.
 
         Draws the cell contents using cairo, taking care to clip what we
@@ -146,7 +152,7 @@ class CellRendererGraph(Gtk.CellRenderer):
         instead of a pure diagonal ... this reduces confusion by an
         incredible amount.
         """
-        ctx = window.cairo_create()
+        print "rendering"
         ctx.rectangle(bg_area.x, bg_area.y, bg_area.width, bg_area.height)
         ctx.clip()
 
