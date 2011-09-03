@@ -195,7 +195,8 @@ class AvatarsBox(gtk.HBox):
         """Add the given username in the role box and add in the worker queue.
         """
         avatar = Avatar(username)
-        if (role == "author" and not self._role_box_for("committer").showing(avatar)) or role == "committer":
+        is_shown = self._role_box_for("committer").showing(avatar)
+        if (role == "author" and not is_shown) or role == "committer":
             if self._role_box_for(role).append_avatars_with(avatar):
                 self.__worker.queue(avatar.email)
 
@@ -239,7 +240,8 @@ class AvatarsBox(gtk.HBox):
             loader.close()
 
             for role in ["committer", "author"]:
-                self._role_box_for(role).and_avatar_email(email).update_avatar_image_from_pixbuf_loader(loader)
+                self._role_box_for(role).and_avatar_email(
+                    email).update_avatar_image_from_pixbuf_loader(loader)
 
     def _role_box_for(self, role):
         """ Return the gtk.HBox for the given role """
