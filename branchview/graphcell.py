@@ -10,7 +10,7 @@ we cheat and draw over the bits of the TreeViewColumn that are supposed to
 just be for the background.
 """
 
-__copyright__ = "Copyright © 2005 Canonical Ltd."
+__copyright__ = "Copyright © 2005-2011 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 
@@ -19,7 +19,18 @@ import math
 from gi.repository import Gtk
 from gi.repository import GObject
 from gi.repository import Pango
+from gi.repository import PangoCairo
 from gi.repository import cairo
+
+
+# Cairo constants are not exported yet. These are taken from documentation.
+CAIRO_LINE_CAP_BUTT = 0
+CAIRO_LINE_CAP_ROUND = 1
+CAIRO_LINE_CAP_SQUARE = 2
+
+
+CAIRO_FILL_RULE_WINDING = 0
+CAIRO_FILL_RULE_EVEN_ODD = 1
 
 
 class CellRendererGraph(Gtk.CellRendererPixbuf):
@@ -131,11 +142,10 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
 
         ctx.set_source_rgb(red, green, blue)
 
-    def do_activate(event, widget, path, background_area, cell_area, flags):
+    def do_activate(event, widget, path, bg_area, cell_area, flags):
         return True
 
-    def do_editing_started(event, widget, path, background_area, cell_area,
-                           flags):
+    def do_editing_started(event, widget, path, fb_area, cell_area, flags):
         return None
 
     def do_get_size(self, widget, cell_area):
@@ -209,7 +219,7 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
     def render_line(self, ctx, cell_area, box_size,
                     mid, height, start, end, colour, flags):
         if start is None:
-            #ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+            ctx.set_line_cap(CAIRO_LINE_CAP_ROUND)
             x = cell_area.x + box_size * end + box_size / 2
             ctx.move_to(x, mid + height / 3)
             ctx.line_to(x, mid + height / 3)
@@ -217,7 +227,7 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
             ctx.line_to(x, mid + height / 6)
 
         elif end is None:
-            #ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+            ctx.set_line_cap(CAIRO_LINE_CAP_ROUND)
             x = cell_area.x + box_size * start + box_size / 2
             ctx.move_to(x, mid - height / 3)
             ctx.line_to(x, mid - height / 3)
@@ -225,7 +235,7 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
             ctx.line_to(x, mid - height / 6)
 
         else:
-            #ctx.set_line_cap(cairo.LINE_CAP_BUTT)
+            ctx.set_line_cap(CAIRO_LINE_CAP_BUTT)
             startx = cell_area.x + box_size * start + box_size / 2
             endx = cell_area.x + box_size * end + box_size / 2
 
@@ -297,12 +307,11 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
             self.set_colour(ctx, TAG_COLOUR_ID, 0.0, 0.5)
             ctx.stroke_preserve()
 
-            ctx.set_fill_rule (cairo.FILL_RULE_EVEN_ODD)
+            ctx.set_fill_rule (CAIRO_FILL_RULE_EVEN_ODD)
             self.set_colour(ctx, TAG_COLOUR_ID, 0.5, 1.0)
             ctx.fill()
 
             # Draw the tag text
             self.set_colour(ctx, 0, 0.0, 0.0)
             ctx.move_to(x0, y0)
-            ctx.show_layout(tag_layout)
-
+            PangoCairo.show_layout(ctx, tag_layout)
