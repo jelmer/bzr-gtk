@@ -395,10 +395,14 @@ class TreeView(Gtk.VBox):
         self.graph_column.set_resizable(True)
         self.graph_column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
         self.graph_column.pack_start(self.graph_cell, True)
-        self.graph_column.add_attribute(self.graph_cell, "node", treemodel.NODE)
-        self.graph_column.add_attribute(self.graph_cell, "tags", treemodel.TAGS)
-        self.graph_column.add_attribute(self.graph_cell, "in-lines", treemodel.LAST_LINES)
-        self.graph_column.add_attribute(self.graph_cell, "out-lines", treemodel.LINES)
+        self.graph_column.add_attribute(
+            self.graph_cell, "node", treemodel.NODE)
+        self.graph_column.add_attribute(
+            self.graph_cell, "tags", treemodel.TAGS)
+        self.graph_column.add_attribute(
+            self.graph_cell, "in-lines", treemodel.LAST_LINES)
+        self.graph_column.add_attribute(
+            self.graph_cell, "out-lines", treemodel.LINES)
         self.treeview.append_column(self.graph_column)
 
         cell = Gtk.CellRendererText()

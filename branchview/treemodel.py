@@ -39,31 +39,29 @@ class BranchTreeModel(Gtk.TreeStore):
     """A model of branch's merge history."""
 
     def __init__(self, branch, line_graph_data):
-        super(BranchTreeModel, self).__init__()
+        super(BranchTreeModel, self).__init__(
+            GObject.TYPE_STRING,
+            GObject.TYPE_PYOBJECT,
+            GObject.TYPE_PYOBJECT,
+            GObject.TYPE_PYOBJECT,
+            GObject.TYPE_STRING,
+            GObject.TYPE_STRING,
+            GObject.TYPE_STRING,
+            GObject.TYPE_STRING,
+            GObject.TYPE_STRING,
+            GObject.TYPE_PYOBJECT,
+            GObject.TYPE_PYOBJECT,
+            GObject.TYPE_PYOBJECT,
+            GObject.TYPE_PYOBJECT,
+            GObject.TYPE_STRING)
         self.revisions = {}
         self.branch = branch
         self.repository = branch.repository
-        self.line_graph_data = line_graph_data
-
         if self.branch.supports_tags():
             self.tags = self.branch.tags.get_reverse_tag_dict()
         else:
             self.tags = {}
-        self.set_column_types(
-            (GObject.TYPE_STRING,
-             GObject.TYPE_PYOBJECT,
-             GObject.TYPE_PYOBJECT,
-             GObject.TYPE_PYOBJECT,
-             GObject.TYPE_STRING,
-             GObject.TYPE_STRING,
-             GObject.TYPE_STRING,
-             GObject.TYPE_STRING,
-             GObject.TYPE_STRING,
-             GObject.TYPE_PYOBJECT,
-             GObject.TYPE_PYOBJECT,
-             GObject.TYPE_PYOBJECT,
-             GObject.TYPE_PYOBJECT,
-             GObject.TYPE_STRING))
+        self.set_line_graph_data(line_graph_data)
 
     def add_tag(self, tag, revid):
         self.branch.tags.set_tag(tag, revid)
