@@ -33,6 +33,11 @@ CAIRO_FILL_RULE_WINDING = 0
 CAIRO_FILL_RULE_EVEN_ODD = 1
 
 
+def PANGO_PIXELS(d):
+    # Macro from  Pango header.
+    return (d + 512) / 1000
+
+
 class CellRendererGraph(Gtk.CellRendererPixbuf):
     """Cell renderer for directed graph.
 
@@ -76,20 +81,6 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
         else:
             raise AttributeError, "no such property: '%s'" % property.name
 
-    def do_get_property(self, property):
-        """Get properties from GObject properties."""
-        if property.name == "node":
-            return self.node
-        elif property.name == "tags":
-            return self.tags
-        elif property.name == "in-lines":
-            return self.in_lines
-        elif property.name == "out-lines":
-            print "get outlines"
-            return self.out_lines
-        else:
-            raise AttributeError, "no such property: '%s'" % property.name
-
     def box_size(self, widget):
         """Calculate box size based on widget's font.
 
@@ -102,14 +93,8 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
             pango_ctx = widget.get_pango_context()
             font_desc = widget.get_style().font_desc
             metrics = pango_ctx.get_metrics(font_desc, None)
-
-            def PANGO_PIXELS(d):
-                # Macro from  Pango header.
-                return (d + 512) / 1000
-
             ascent = PANGO_PIXELS(metrics.get_ascent())
             descent = PANGO_PIXELS(metrics.get_descent())
-
             self._box_size = ascent + descent + 6
             return self._box_size
 
@@ -143,9 +128,11 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
         ctx.set_source_rgb(red, green, blue)
 
     def do_activate(event, widget, path, bg_area, cell_area, flags):
+        """Renderers cannot be activated; always return True."""
         return True
 
     def do_editing_started(event, widget, path, fb_area, cell_area, flags):
+        """Renderers cannot be edited; always return None."""
         return None
 
     def do_get_size(self, widget, cell_area):

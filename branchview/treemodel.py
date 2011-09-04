@@ -69,37 +69,39 @@ class BranchTreeModel(Gtk.ListStore):
         except KeyError:
             self.tags[revid] = [tag]
 
+    def _line_graph_item_to_model_row(self, rowref, data):
+        revid, node, lines, parents, children, revno_sequence = data
+        if rowref > 0:
+            last_lines = self.line_graph_data[rowref - 1][2]
+        else:
+            last_lines = []
+        revno = ".".join(["%d" % (revno) for revno in revno_sequence])
+        tags = self.tags.get(revid, [])
+        if not revid or revid == NULL_REVISION:
+            revision = None
+        elif revid not in self.revisions:
+            revision = self.repository.get_revisions([revid])[0]
+            self.revisions[revid] = revision
+        else:
+            revision = self.revisions[revid]
+        if revision is None:
+            summary = message = committer = timestamp = authors = None
+        else:
+            summary = escape(revision.get_summary())
+            message = escape(revision.message)
+            committer = parse_username(revision.committer)[0]
+            timestamp = strftime(
+                "%Y-%m-%d %H:%M", localtime(revision.timestamp))
+            authors = ", ".join([
+                parse_username(author)[0]
+                for author in revision.get_apparent_authors()])
+        return (revid, node, lines, last_lines, revno, summary, message,
+                committer, timestamp, revision, parents, children, tags,
+                authors)
+
     def set_line_graph_data(self, line_graph_data):
         self.clear()
         self.line_graph_data = line_graph_data
-        # (None, (0, 0), (), (), (), ())
         for rowref, data in enumerate(self.line_graph_data):
-            revid, node, lines, parents, children, revno_sequence = data
-            if rowref > 0:
-                last_lines = self.line_graph_data[rowref - 1][2]
-            else:
-                last_lines = []
-            revno = ".".join(["%d" % (revno) for revno in revno_sequence])
-            tags = self.tags.get(revid, [])
-            if not revid or revid == NULL_REVISION:
-                revision = None
-            elif revid not in self.revisions:
-                revision = self.repository.get_revisions([revid])[0]
-                self.revisions[revid] = revision
-            else:
-                revision = self.revisions[revid]
-            if revision is None:
-                summary = message = committer = timestamp = authors = None
-            else:
-                summary = escape(revision.get_summary())
-                message = escape(revision.message)
-                committer = parse_username(revision.committer)[0]
-                timestamp = strftime(
-                    "%Y-%m-%d %H:%M", localtime(revision.timestamp))
-                authors = ", ".join([
-                    parse_username(author)[0]
-                    for author in revision.get_apparent_authors()])
-            self.append((
-                revid, node, lines, last_lines, revno, summary, message,
-                committer, timestamp, revision, parents, children, tags,
-                authors))
+            row = self._line_graph_item_to_model_row(rowref, data)
+            self.append(row)

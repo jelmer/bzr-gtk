@@ -22,8 +22,10 @@ def load_tests(basic_tests, module, loader):
         'test_commit',
         'test_diff',
         'test_history',
+        'test_graphcell',
         'test_linegraph',
         'test_revisionview',
+        'test_treemodel',
         ]
 
     basic_tests.addTest(loader.loadTestsFromModuleNames(
