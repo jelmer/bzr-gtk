@@ -38,7 +38,7 @@ class Avatar(gtk.HBox):
 
     def __eq__(self, other):
         return (self.apparent_username == other.apparent_username and
-                self.name == other.name and
+                self.username == other.username and
                 self.email == other.email)
 
     def show_spinner(self):
@@ -184,13 +184,19 @@ class AvatarsBox(gtk.HBox):
         # This callback method should be fired by all workers when a request
         # is done.
         self.__worker.set_callback_method(self._update_avatar_from_response)
-        self.__worker.start()
+        self.connect('destroy', self.on_destroy)
+
+    def on_destroy(self, widget):
+        self.__worker.stop()
+        if self.__worker.is_alive():
+            self.__worker.join()
 
     def add(self, username, role):
         """Add the given username in the role box and add in the worker queue.
         """
         avatar = Avatar(username)
-        if (role == "author" and not self._role_box_for("committer").showing(avatar)) or role == "committer":
+        is_shown = self._role_box_for("committer").showing(avatar)
+        if (role == "author" and not is_shown) or role == "committer":
             if self._role_box_for(role).append_avatars_with(avatar):
                 self.__worker.queue(avatar.email)
 
@@ -234,7 +240,8 @@ class AvatarsBox(gtk.HBox):
             loader.close()
 
             for role in ["committer", "author"]:
-                self._role_box_for(role).and_avatar_email(email).update_avatar_image_from_pixbuf_loader(loader)
+                self._role_box_for(role).and_avatar_email(
+                    email).update_avatar_image_from_pixbuf_loader(loader)
 
     def _role_box_for(self, role):
         """ Return the gtk.HBox for the given role """

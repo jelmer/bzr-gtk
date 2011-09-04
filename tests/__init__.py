@@ -18,6 +18,7 @@
 def load_tests(basic_tests, module, loader):
     testmod_names = [
         'test_annotate_config',
+        'test_avatarsbox',
         'test_commit',
         'test_diff',
         'test_history',
