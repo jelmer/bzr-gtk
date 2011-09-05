@@ -31,7 +31,7 @@ class Avatar(Gtk.HBox):
 
     def __init__(self, apparent_username):
         """ Constructor """
-        Gtk.HBox.__init__(self)
+        super(Avatar, self).__init__()
 
         self.apparent_username = apparent_username
         self.username, self.email = parse_username(apparent_username)
@@ -77,7 +77,8 @@ class AvatarBox(Gtk.HBox):
     """HBox showing an avatar."""
 
     def __init__(self, homogeneous=False, spacing=0):
-        Gtk.HBox.__init__(self, homogeneous=homogeneous, spacing=spacing)
+        super(AvatarBox, self).__init__(
+            homogeneous=homogeneous, spacing=spacing)
         self.__avatars = {}
         self.avatar = None
         self.__displaying = None

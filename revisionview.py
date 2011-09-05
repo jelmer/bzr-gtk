@@ -327,7 +327,7 @@ class RevisionView(Gtk.Notebook):
     }
 
     def __init__(self, branch=None, repository=None):
-        Gtk.Notebook.__init__(self)
+        super(RevisionView, self).__init__()
 
         self._revision = None
         self._branch = branch

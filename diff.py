@@ -68,7 +68,7 @@ class DiffFileView(Gtk.ScrolledWindow):
     """Window for displaying diffs from a diff file"""
 
     def __init__(self):
-        Gtk.ScrolledWindow.__init__(self)
+        super(DiffFileView, self).__init__()
         self.construct()
         self._diffs = {}
 
@@ -250,7 +250,7 @@ class DiffView(DiffFileView):
     """This is the soft and chewy filling for a DiffWindow."""
 
     def __init__(self):
-        DiffFileView.__init__(self)
+        super(DiffView, self).__init__()
         self.rev_tree = None
         self.parent_tree = None
 
@@ -411,7 +411,7 @@ class DiffWindow(Window):
     """
 
     def __init__(self, parent=None, operations=None):
-        Window.__init__(self, parent)
+        super(DiffWindow, self).__init__(parent=parent)
         self.set_border_width(0)
         self.set_title("bzrk diff")
 
@@ -578,8 +578,8 @@ class DiffController(object):
 class MergeDirectiveController(DiffController):
 
     def __init__(self, path, directive, window=None):
-        DiffController.__init__(self, path, directive.patch.splitlines(True),
-                                window)
+        super(MergeDirectiveController, self).__init__(
+            path, directive.patch.splitlines(True), window)
         self.directive = directive
         self.merge_target = None
 

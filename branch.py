@@ -16,7 +16,6 @@
 
 import os
 
-from gi.repository import GObject
 from gi.repository import Gtk
 
 from bzrlib import (
@@ -36,10 +35,9 @@ class BranchDialog(Gtk.Dialog):
 
     def __init__(self, path=None, parent=None, remote_path=None):
         """ Initialize the Branch dialog. """
-        GObject.GObject.__init__(self, title="Branch - Olive",
-                                  parent=parent,
-                                  flags=0,
-                                  buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
+        super(BranchDialog, self).__init__(
+            title="Branch - Olive", parent=parent, flags=0,
+            buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
 
         # Get arguments
         self.path = path
@@ -85,20 +83,20 @@ class BranchDialog(Gtk.Dialog):
         self._label_revision.set_alignment(0, 0.5)
         self._table.set_row_spacings(3)
         self._table.set_col_spacings(3)
-        self.vbox.set_spacing(3)
+        self.get_content_area().set_spacing(3)
         if remote_path is not None:
             self._remote_branch.set_url(remote_path)
         if self.path is not None:
             self._filechooser.set_filename(self.path)
 
         # Pack some widgets
-        self._hbox_revision.pack_start(self._entry_revision, True, True)
-        self._hbox_revision.pack_start(self._button_revision, False, False)
-        self.vbox.add(self._table)
-        self.action_area.pack_end(self._button_branch)
+        self._hbox_revision.pack_start(self._entry_revision, True, True, 0)
+        self._hbox_revision.pack_start(self._button_revision, False, False, 0)
+        self.get_content_area().add(self._table)
+        self.action_area.pack_end(self._button_branch, False, False, 0)
 
         # Show the dialog
-        self.vbox.show_all()
+        self.get_content_area().show_all()
 
     def _get_last_revno(self):
         """ Get the revno of the last revision (if any). """

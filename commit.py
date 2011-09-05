@@ -108,8 +108,8 @@ class CommitDialog(Gtk.Dialog):
     """Implementation of Commit."""
 
     def __init__(self, wt, selected=None, parent=None):
-        Gtk.Dialog.__init__(self, title="Commit to %s" % wt.basedir,
-                            parent=parent, flags=0,)
+        super(CommitDialog, self).__init__(
+            title="Commit to %s" % wt.basedir, parent=parent, flags=0)
         self.connect('delete-event', self._on_delete_window)
         self._question_dialog = question_dialog
 

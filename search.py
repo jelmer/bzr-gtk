@@ -21,14 +21,16 @@ from bzrlib.plugins.search import index as _mod_index
 
 from bzrlib.plugins.gtk.i18n import _i18n
 
+
 class SearchDialog(Gtk.Dialog):
     """Search dialog."""
+
     def __init__(self, index, parent=None):
-        GObject.GObject.__init__(self, title="Search Revisions",
-                                  parent=parent,
-                                  flags=Gtk.DialogFlags.MODAL,
-                                  buttons=(Gtk.STOCK_OK, Gtk.ResponseType.OK,
-                                           Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
+        super(SearchDialog, self).__init__(
+            title="Search Revisions", parent=parent,
+            flags=Gtk.DialogFlags.MODAL,
+            buttons=(Gtk.STOCK_OK, Gtk.ResponseType.OK,
+                Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
         pixbuf = self.render_icon_pixbuf(Gtk.STOCK_FIND, Gtk.IconSize.MENU)
         self.set_icon(pixbuf)
         
@@ -42,23 +44,29 @@ class SearchDialog(Gtk.Dialog):
         self.searchentry.connect('activate', self._searchentry_activate)
         # TODO: Completion using the bzr-search suggests functionality
         self.searchbar.add(self.searchentry)
-        self.vbox.pack_start(self.searchbar, expand=False, fill=False)
+        self.get_content_area().pack_start(self.searchbar, False, False, 0)
 
-        self.results_model = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_STRING, GObject.TYPE_PYOBJECT)
+        self.results_model = Gtk.ListStore(
+            GObject.TYPE_STRING, GObject.TYPE_STRING, GObject.TYPE_PYOBJECT)
         self.results_treeview = Gtk.TreeView(self.results_model)
-        self.results_treeview.connect("row-activated", self._searchresult_row_activated)
+        self.results_treeview.connect(
+            "row-activated", self._searchresult_row_activated)
 
-        documentname_column = Gtk.TreeViewColumn(_i18n("Document"), Gtk.CellRendererText(), text=0)
+        documentname_column = Gtk.TreeViewColumn(
+            _i18n("Document"), Gtk.CellRendererText(), text=0)
         self.results_treeview.append_column(documentname_column)
 
-        summary_column = Gtk.TreeViewColumn(_i18n("Summary"), Gtk.CellRendererText(), text=1)
+        summary_column = Gtk.TreeViewColumn(
+            _i18n("Summary"), Gtk.CellRendererText(), text=1)
         self.results_treeview.append_column(summary_column)
 
         results_scrolledwindow = Gtk.ScrolledWindow()
-        results_scrolledwindow.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        results_scrolledwindow.set_policy(
+            Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         results_scrolledwindow.add(self.results_treeview)
 
-        self.vbox.pack_start(results_scrolledwindow, expand=True, fill=True)
+        self.get_content_area().pack_start(
+            results_scrolledwindow, True, True, 0)
 
         self.set_default_size(600, 400)
         # Show the dialog
@@ -75,7 +83,9 @@ class SearchDialog(Gtk.Dialog):
         self.results_model.clear()
         self.index._branch.lock_read()
         try:
-            query = [(query_item,) for query_item in self.searchentry.get_text().split(" ")]
+            query = [
+                (query_item,)
+                for query_item in self.searchentry.get_text().split(" ")]
             for result in self.index.search(query):
                 if isinstance(result, _mod_index.FileTextHit):
                     revid = result.text_key[-1]
@@ -83,7 +93,8 @@ class SearchDialog(Gtk.Dialog):
                     revid = result.revision_key[0]
                 else:
                     raise AssertionError()
-                self.results_model.append([result.document_name(), result.summary(), revid])
+                self.results_model.append(
+                    [result.document_name(), result.summary(), revid])
         finally:
             self.index._branch.unlock()
     

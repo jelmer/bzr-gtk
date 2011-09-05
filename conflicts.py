@@ -32,10 +32,9 @@ class ConflictsDialog(Gtk.Dialog):
 
     def __init__(self, wt, parent=None):
         """ Initialize the Conflicts dialog. """
-        Gtk.Dialog.__init__(self, title="Conflicts - Olive",
-                                  parent=parent,
-                                  flags=0,
-                                  buttons=(Gtk.STOCK_CLOSE, Gtk.ResponseType.CANCEL))
+        super(ConflictsDialog, self).__init__(
+            title="Conflicts - Olive", parent=parent, flags=0,
+            buttons=(Gtk.STOCK_CLOSE, Gtk.ResponseType.CANCEL))
 
         # Get arguments
         self.wt = wt

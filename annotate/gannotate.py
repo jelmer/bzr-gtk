@@ -49,7 +49,7 @@ class GAnnotateWindow(Window):
         self.plain = plain
         self._branch = branch
 
-        Window.__init__(self, parent)
+        super(GAnnotateWindow, self).__init__(parent=parent)
 
         self.set_icon(
             self.render_icon_pixbuf(Gtk.STOCK_FIND, Gtk.IconSize.BUTTON))
@@ -457,10 +457,11 @@ class RevisionCache(object):
             self.__cache[revision_id] = revision
         return self.__cache[revision_id]
 
+
 class SearchBox(Gtk.HBox):
     """A button box for searching in text or lines of annotations"""
     def __init__(self):
-        Gtk.HBox.__init__(self, homogeneous=False, spacing=6)
+        super(SearchBox, self).__init__(homogeneous=False, spacing=6)
 
         # Close button
         button = Gtk.Button()

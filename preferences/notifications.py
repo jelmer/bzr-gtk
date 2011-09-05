@@ -34,7 +34,8 @@ class NotificationsPage(Gtk.VBox):
 
     def __init__(self, config, homogeneous=False, spacing=6):
         self.config = config
-        Gtk.VBox.__init__(self, homogeneous=homogeneous, spacing=spacing)
+        super(NotificationsPage, self).__init__(
+            homogeneous=homogeneous, spacing=spacing)
         self.set_spacing(spacing) # The vertical one
 
         lan_frame = Gtk.Frame(label="LAN Notifications")

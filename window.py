@@ -6,7 +6,7 @@ from gi.repository import Gtk
 class Window(Gtk.Window):
 
     def __init__(self, parent=None):
-        Gtk.Window.__init__(self, type=Gtk.WindowType.TOPLEVEL)
+        super(Window, self).__init__(type=Gtk.WindowType.TOPLEVEL)
         self._parent = parent
 
         self.connect('key-press-event', self._on_key_press)

@@ -1,4 +1,3 @@
-from gi.repository import GObject
 from gi.repository import Gtk
 
 
@@ -47,16 +46,18 @@ def release(branch):
 class LockDialog(Gtk.Dialog):
 
     def __init__(self, branch):
-        GObject.GObject.__init__(self)
+        super(LockDialog, self).__init__()
 
         self.branch = branch
 
         self.set_title('Lock Not Held')
 
-        self.vbox.add(Gtk.Label(label='This operation cannot be completed as ' \
-                                'another application has locked the branch.'))
+        self.get_content_area().add(
+            Gtk.Label(label=(
+                'This operation cannot be completed as '
+                'another application has locked the branch.')))
 
         self.add_button('Break Lock', RESPONSE_BREAK)
         self.add_button(Gtk.STOCK_CANCEL, RESPONSE_CANCEL)
 
-        self.vbox.show_all()
+        self.get_content_area().show_all()

@@ -36,10 +36,9 @@ class PushDialog(Gtk.Dialog):
 
     def __init__(self, repository, revid, branch=None, parent=None):
         """Initialize the Push dialog. """
-        Gtk.Dialog.__init__(self, title="Push",
-                                  parent=parent,
-                                  flags=0,
-                                  buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
+        super(PushDialog, self).__init__(
+            title="Push", parent=parent, flags=0,
+            buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
 
 
         # Get arguments

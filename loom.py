@@ -30,10 +30,9 @@ class LoomDialog(Gtk.Dialog):
     """Simple Loom browse dialog."""
 
     def __init__(self, branch, tree=None, parent=None):
-        GObject.GObject.__init__(self, title="Threads",
-                                  parent=parent,
-                                  flags=0,
-                                  buttons=(Gtk.STOCK_CLOSE,Gtk.ResponseType.OK))
+        super(LoomDialog, self).__init__(
+            title="Threads", parent=parent, flags=0,
+            buttons=(Gtk.STOCK_CLOSE,Gtk.ResponseType.OK))
         self.branch = branch
         if tree is not None:
             self.tree = loom_tree.LoomTreeDecorator(tree)
@@ -81,7 +80,7 @@ class LoomDialog(Gtk.Dialog):
         hbox.pack_end(self._diff)
 
         hbox.show_all()
-        self.vbox.pack_start(hbox, True, True, 0)
+        self.get_content_area().pack_start(hbox, True, True, 0)
 
         # FIXME: Buttons: combine-thread, revert-loom, record
         self.set_default_size(500, 350)

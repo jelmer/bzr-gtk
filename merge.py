@@ -37,10 +37,9 @@ class MergeDialog(Gtk.Dialog):
     
     def __init__(self, wt, wtpath, default_branch_path=None, parent=None):
         """ Initialize the Merge dialog. """
-        Gtk.Dialog.__init__(self, title="Merge changes",
-                                  parent=parent,
-                                  flags=0,
-                                  buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
+        super(MergeDialog, self).__init__(
+            title="Merge changes", parent=parent, flags=0,
+            buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
         self.set_icon_from_file(icon_path("bzr-icon-64.png"))
         # Get arguments
         self.wt = wt

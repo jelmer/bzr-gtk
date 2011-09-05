@@ -35,10 +35,9 @@ class InitDialog(Gtk.Dialog):
 
     def __init__(self, path, parent=None):
         """ Initialize the Initialize dialog. """
-        GObject.GObject.__init__(self, title="Initialize - Olive",
-                                  parent=parent,
-                                  flags=0,
-                                  buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
+        super(InitDialog, self).__init__(
+            title="Initialize - Olive", parent=parent, flags=0,
+            buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
         
         # Get arguments
         self.path = path
@@ -61,17 +60,18 @@ class InitDialog(Gtk.Dialog):
         self._entry_custom.set_sensitive(False)
         
         # Construct the dialog
-        self.action_area.pack_end(self._button_init)
+        self.action_area.pack_end(self._button_init, False, False, 0)
         
-        self._hbox_custom.pack_start(self._radio_custom, False, False)
-        self._hbox_custom.pack_start(self._entry_custom, True, True)
+        self._hbox_custom.pack_start(self._radio_custom, False, False, 0)
+        self._hbox_custom.pack_start(self._entry_custom, True, True, 0)
         
-        self.vbox.pack_start(self._label_question, True, True, 0)
-        self.vbox.pack_start(self._radio_current, True, True, 0)
-        self.vbox.pack_start(self._hbox_custom, True, True, 0)
+        content_area = self.get_content_area()
+        content_area.pack_start(self._label_question, True, True, 0)
+        content_area.pack_start(self._radio_current, True, True, 0)
+        content_area.pack_start(self._hbox_custom, True, True, 0)
         
         # Display the dialog
-        self.vbox.show_all()
+        content_area.show_all()
     
     def _on_custom_toggled(self, widget):
         """ Occurs if the Custom radiobutton is toggled. """

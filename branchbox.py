@@ -22,12 +22,14 @@ from bzrlib.config import GlobalConfig
 
 from bzrlib.plugins.gtk.history import UrlHistory
 
+
 class BranchSelectionBox(Gtk.HBox):
 
     def __init__(self, path=None):
-        Gtk.HBox.__init__(self)
+        super(BranchSelectionBox, self).__init__()
         self._combo = Gtk.ComboBox.new_with_entry()
-        self._combo.get_child().connect('focus-out-event', self._on_combo_changed)
+        self._combo.get_child().connect(
+            'focus-out-event', self._on_combo_changed)
 
         # Build branch history
         self._history = UrlHistory(GlobalConfig(), 'branch_history')
@@ -59,6 +61,7 @@ class BranchSelectionBox(Gtk.HBox):
 
     def _on_combo_changed(self, widget, event):
         self.emit('branch-changed', widget)
+
 
 GObject.signal_new('branch-changed', BranchSelectionBox,
                    GObject.SignalFlags.RUN_LAST,

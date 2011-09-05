@@ -33,10 +33,9 @@ class CheckoutDialog(Gtk.Dialog):
 
     def __init__(self, path=None, parent=None, remote_path=None):
         """ Initialize the Checkout dialog. """
-        GObject.GObject.__init__(self, title="Checkout - Olive",
-                                  parent=parent,
-                                  flags=0,
-                                  buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
+        super(CheckoutDialog, self).__init__(
+            title="Checkout - Olive", parent=parent, flags=0,
+            buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
 
         # Get arguments
         self.path = path
@@ -85,20 +84,20 @@ class CheckoutDialog(Gtk.Dialog):
         self._label_revision.set_alignment(0, 0.5)
         self._table.set_row_spacings(3)
         self._table.set_col_spacings(3)
-        self.vbox.set_spacing(3)
+        self.get_content_area().set_spacing(3)
         if self.path is not None:
             self._filechooser.set_filename(self.path)
         if remote_path is not None:
             self._combo.get_child().set_text(remote_path)
 
         # Pack some widgets
-        self._hbox_revision.pack_start(self._entry_revision, True, True)
-        self._hbox_revision.pack_start(self._button_revision, False, False)
-        self.vbox.add(self._table)
-        self.action_area.pack_end(self._button_checkout)
+        self._hbox_revision.pack_start(self._entry_revision, True, True, 0)
+        self._hbox_revision.pack_start(self._button_revision, False, False, 0)
+        self.get_content_area().add(self._table)
+        self.action_area.pack_end(self._button_checkout, False, False, 0)
 
         # Show the dialog
-        self.vbox.show_all()
+        self.get_content_area().show_all()
 
         # Build checkout history
         self._history = UrlHistory(GlobalConfig(), 'branch_history')

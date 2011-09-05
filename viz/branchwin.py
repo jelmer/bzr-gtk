@@ -38,7 +38,7 @@ class BranchWindow(Window):
                        None for no limit.
         """
 
-        Window.__init__(self, parent=parent)
+        super(BranchWindow, self).__init__(parent=parent)
         self.set_border_width(0)
 
         self.branch      = branch

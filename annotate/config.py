@@ -38,7 +38,7 @@ class GAnnotateConfig(configobj.ConfigObj):
     """
 
     def __init__(self, window):
-        configobj.ConfigObj.__init__(self, gannotate_config_filename())
+        super(GAnnotateConfig, self).__init__(gannotate_config_filename())
         self.window = window
         self.pane = window.pane
 

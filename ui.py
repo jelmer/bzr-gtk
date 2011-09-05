@@ -28,11 +28,11 @@ class PromptDialog(Gtk.Dialog):
     """Prompt the user for a yes/no answer."""
 
     def __init__(self, prompt):
-        Gtk.Dialog.__init__(self)
+        super(PromptDialog, self).__init__()
 
         label = Gtk.Label(label=prompt)
-        self.vbox.pack_start(label, True, True, 10)
-        self.vbox.show_all()
+        self.get_content_area().pack_start(label, True, True, 10)
+        self.get_content_area().show_all()
 
         self.add_buttons(Gtk.STOCK_YES, Gtk.ResponseType.YES, Gtk.STOCK_NO,
                          Gtk.ResponseType.NO)
@@ -41,7 +41,7 @@ class PromptDialog(Gtk.Dialog):
 class GtkProgressBar(Gtk.ProgressBar):
 
     def __init__(self):
-        Gtk.ProgressBar.__init__(self)
+        super(GtkProgressBar, self).__init__()
         self.set_fraction(0.0)
         self.current = None
         self.total = None
@@ -138,16 +138,16 @@ class PasswordDialog(Gtk.Dialog):
     """ Prompt the user for a password. """
 
     def __init__(self, prompt):
-        Gtk.Dialog.__init__(self)
+        super(PasswordDialog, self).__init__()
 
         label = Gtk.Label(label=prompt)
-        self.vbox.pack_start(label, True, True, 10)
+        self.get_content_area().pack_start(label, True, True, 10)
 
         self.entry = Gtk.Entry()
         self.entry.set_visibility(False)
-        self.vbox.pack_end(self.entry, padding=10)
+        self.get_content_area().pack_end(self.entry, padding=10)
 
-        self.vbox.show_all()
+        self.get_content_area().show_all()
 
         self.add_buttons(Gtk.STOCK_OK, Gtk.ResponseType.OK,
                          Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)

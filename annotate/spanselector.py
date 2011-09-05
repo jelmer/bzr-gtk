@@ -39,7 +39,8 @@ class SpanSelector(Gtk.HBox):
     last_selected = None
 
     def __init__(self, homogeneous=False, spacing=6):
-        GObject.GObject.__init__(self, homogeneous, spacing)
+        super(SpanSelector, self).__init__(
+            homogeneous=homogeneous, spacing=spacing)
 
         self.model = self._create_model()
         self.combo = self._create_combobox(self.model)

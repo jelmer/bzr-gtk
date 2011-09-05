@@ -21,7 +21,7 @@ class IdentityPage(Gtk.Table):
 
     def __init__(self, config):
         self.config = config
-        Gtk.Table.__init__(self, rows=4, columns=2)
+        super(IdentityPage, self).__init__(rows=4, columns=2)
         self.set_border_width(12)
         self.set_row_spacings(6)
         self.set_col_spacings(6)

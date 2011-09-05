@@ -20,7 +20,7 @@ from gi.repository import Gtk
 class PluginsPage(Gtk.VPaned):
 
     def __init__(self):
-        Gtk.VPaned.__init__(self)
+        super(PluginsPage, self).__init__()
         self.set_border_width(12)
         self.set_position(216)
 

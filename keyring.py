@@ -28,7 +28,7 @@ from bzrlib.config import (
 class GnomeKeyringCredentialStore(CredentialStore):
 
     def __init__(self):
-        CredentialStore.__init__(self)
+        super(GnomeKeyringCredentialStore, self).__init__()
         if GObject.get_application_name() is None:
             # External applications that load bzrlib may already have set the
             # application name so we don't contradict them (when we can

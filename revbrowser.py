@@ -14,7 +14,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from gi.repository import GObject
 from gi.repository import Gtk
 
 from bzrlib.plugins.gtk.branchview.treeview import TreeView
@@ -24,10 +23,10 @@ from bzrlib.plugins.gtk.i18n import _i18n
 class RevisionBrowser(Gtk.Dialog):
     """ Revision Browser main window. """
     def __init__(self, branch, parent=None):
-        GObject.GObject.__init__(self, title="Revision Browser - Olive",
-                                  parent=parent,
-                                  flags=Gtk.DialogFlags.MODAL,
-                                  buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
+        super(RevisionBrowser, self).__init__(
+            title="Revision Browser - Olive", parent=parent,
+            flags=Gtk.DialogFlags.MODAL,
+            buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
 
         # Get arguments
         self.branch = branch
@@ -44,7 +43,7 @@ class RevisionBrowser(Gtk.Dialog):
 
         # Set properties
         self.set_default_size(600, 400)
-        self.vbox.set_spacing(3)
+        self.get_content_area().set_spacing(3)
         self.treeview.set_property('graph-column-visible', False)
         self.treeview.set_property('date-column-visible', True)
         self.treeview.set_property('mainline-only', True)
@@ -52,7 +51,7 @@ class RevisionBrowser(Gtk.Dialog):
         # Construct the dialog
         self.action_area.pack_end(self._button_select)
 
-        self.vbox.pack_start(self.treeview, True, True)
+        self.get_content_area().pack_start(self.treeview, True, True)
 
         # Show the dialog
         self.show_all()

@@ -29,7 +29,7 @@ class TagsWindow(Window):
     """ Tags window. Allows the user to view/add/remove tags. """
     def __init__(self, branch, parent=None):
         """ Initialize the Tags window. """
-        Window.__init__(self, parent)
+        super(TagsWindow, self).__init__(parent=parent)
 
         # Get arguments
         self.branch = branch
@@ -74,13 +74,19 @@ class TagsWindow(Window):
         # Construct the dialog
         self._scrolledwindow_tags.add(self._treeview_tags)
 
-        self._vbox_buttons_top.pack_start(self._button_add, False, False, 0)
-        self._vbox_buttons_top.pack_start(self._button_remove, False, False, 0)
-        self._vbox_buttons_top.pack_start(self._button_refresh, False, False, 0)
-        self._vbox_buttons_bottom.pack_start(self._button_close, False, False, 0)
+        self._vbox_buttons_top.pack_start(
+            self._button_add, False, False, 0)
+        self._vbox_buttons_top.pack_start(
+            self._button_remove, False, False, 0)
+        self._vbox_buttons_top.pack_start(
+            self._button_refresh, False, False, 0)
+        self._vbox_buttons_bottom.pack_start(
+            self._button_close, False, False, 0)
 
-        self._vbox_buttons.pack_start(self._vbox_buttons_top, True, True, 0)
-        self._vbox_buttons.pack_start(self._vbox_buttons_bottom, False, False, 0)
+        self._vbox_buttons.pack_start(
+            self._vbox_buttons_top, True, True, 0)
+        self._vbox_buttons.pack_start(
+            self._vbox_buttons_bottom, False, False, 0)
 
         self._vpaned.add1(self._scrolledwindow_tags)
         self._vpaned.add2(self._revisionview)
@@ -199,10 +205,9 @@ class TagsWindow(Window):
 class RemoveTagDialog(Gtk.Dialog):
     """ Confirm removal of tag. """
     def __init__(self, tagname, parent):
-        GObject.GObject.__init__(self, title="Remove tag",
-                                  parent=parent,
-                                  flags=0,
-                                  buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
+        super(RemoveTagDialog, self).__init__(
+            title="Remove tag", parent=parent, flags=0,
+            buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
 
         # Get the arguments
         self.tag = tagname
@@ -240,12 +245,12 @@ class RemoveTagDialog(Gtk.Dialog):
         self._hbox.pack_start(self._image_question, True, True, 0)
         self._hbox.pack_start(self._vbox_question, True, True, 0)
 
-        self.vbox.add(self._hbox)
+        self.get_content_area().add(self._hbox)
 
-        self.action_area.pack_end(self._button_remove)
+        self.action_area.pack_end(self._button_remove, False, False, 0)
 
         # Display dialog
-        self.vbox.show_all()
+        self.get_content_area().show_all()
 
         # Default to Commit button
         self._button_remove.grab_default()
@@ -260,11 +265,9 @@ class AddTagDialog(Gtk.Dialog):
 
     def __init__(self, repository, revid=None, branch=None, parent=None):
         """ Initialize Add tag dialog. """
-        GObject.GObject.__init__(self, title="Add tag",
-                                  parent=parent,
-                                  flags=0,
-                                  buttons=(Gtk.STOCK_CANCEL, 
-                                           Gtk.ResponseType.CANCEL))
+        super(AddTagDialog, self).__init__(
+            title="Add tag", parent=parent, flags=0,
+            buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
 
         # Get arguments
         self._repository = repository
@@ -297,11 +300,11 @@ class AddTagDialog(Gtk.Dialog):
         self._table.attach(self._label_revid, 0, 1, 1, 2)
         self._table.attach(self._entry_name, 1, 2, 0, 1)
         self._table.attach(self._hbox_revid, 1, 2, 1, 2)
-        self.vbox.add(self._table)
-        self.action_area.pack_end(self._button_add)
+        self.get_content_area().add(self._table)
+        self.action_area.pack_end(self._button_add, False, False, 0)
 
         # Show the dialog
-        self.vbox.show_all()
+        self.get_content_area().show_all()
 
     def _on_add_clicked(self, widget):
         """ Add button clicked handler. """
