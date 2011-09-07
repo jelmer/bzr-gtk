@@ -20,7 +20,6 @@ from gi.repository import Gtk
 from gi.repository import GObject
 from gi.repository import Pango
 from gi.repository import PangoCairo
-from gi.repository import cairo
 
 
 # Cairo constants are not exported yet. These are taken from documentation.
@@ -33,8 +32,8 @@ CAIRO_FILL_RULE_WINDING = 0
 CAIRO_FILL_RULE_EVEN_ODD = 1
 
 
+# Macro from  Pango header.
 def PANGO_PIXELS(d):
-    # Macro from  Pango header.
     return (d + 512) / 1000
 
 

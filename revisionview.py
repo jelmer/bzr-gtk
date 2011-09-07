@@ -51,8 +51,6 @@ def _open_link(widget, uri):
             webbrowser._tryorder.insert(0, '%s "%%s"' % cmd)
     webbrowser.open(uri)
 
-if getattr(Gtk, 'link_button_set_uri_hook', None) is not None:
-    Gtk.link_button_set_uri_hook(_open_link)
 
 class BugsTab(Gtk.VBox):
 

@@ -64,6 +64,7 @@ class PreferencesWindow(Gtk.Dialog):
     def close(self, widget=None):
         self.window.destroy()
 
+
 class BranchPreferencesWindow(Gtk.Dialog):
     """Displays global preferences windows."""
     def __init__(self, config=None):
