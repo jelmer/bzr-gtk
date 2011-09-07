@@ -53,8 +53,9 @@ class AvatarDownloaderWorker(threading.Thread):
         threading.Thread.__init__(self)
         self.__stop = threading.Event()
         self.__queue = Queue.Queue()
-
         self.__provider_method = provider_method
+        self.__callback_method = None
+        self.__error_method = None
 
     def stop(self):
         """ Stop this worker """
@@ -69,8 +70,12 @@ class AvatarDownloaderWorker(threading.Thread):
         return not self.__stop.is_set()
 
     def set_callback_method(self, method):
-        """ Fire the given callback method when treatment is finished """
+        """Fire the given callback method when treatment is finished."""
         self.__callback_method = method
+
+    def set_error_method(self, method):
+        """Fire the given callback when retrieving a avatar fails."""
+        self.__error_method = method
 
     def queue(self, id_field):
         """Put in Queue the id_field to treat in the thread.
@@ -90,10 +95,15 @@ class AvatarDownloaderWorker(threading.Thread):
                 # Call provider method to get fields to pass in the request
                 url = self.__provider_method(id_field)
                 # Execute the request
-                response = urllib2.urlopen(url)
-                # Fire the callback method
-                if not self.__callback_method is None:
-                    self.__callback_method(response, id_field)
+                try:
+                    response = urllib2.urlopen(url)
+                except urllib2.URLError, e:
+                    if self.__error_method is not None:
+                        self.__error_method(e)
+                else:
+                    # Fire the callback method
+                    if not self.__callback_method is None:
+                        self.__callback_method(response, id_field)
                 self.__queue.task_done()
             except Queue.Empty:
                 # There is no more work to do.
