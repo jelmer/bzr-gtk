@@ -16,7 +16,6 @@
 
 import os
 
-from gi.repository import GObject
 from gi.repository import Gtk
 
 from bzrlib.branch import Branch
@@ -66,7 +65,7 @@ class MergeDialog(Gtk.Dialog):
         self._hbox.add(self._label_merge_from)
         self._hbox.add(self._combo_source)
         self._hbox.set_spacing(5)
-        self.action_area.pack_end(self._button_merge)
+        self.action_area.pack_end(self._button_merge, False, False, 0)
         
         if self.default_branch_path and os.path.isdir(
                             self.default_branch_path.partition('file://')[2]):

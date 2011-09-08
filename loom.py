@@ -77,7 +77,7 @@ class LoomDialog(Gtk.Dialog):
 
         self._diff = DiffWidget()
         self._diff.show()
-        hbox.pack_end(self._diff)
+        hbox.pack_end(self._diff, False, False, 0)
 
         hbox.show_all()
         self.get_content_area().pack_start(hbox, True, True, 0)

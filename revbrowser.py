@@ -49,9 +49,9 @@ class RevisionBrowser(Gtk.Dialog):
         self.treeview.set_property('mainline-only', True)
 
         # Construct the dialog
-        self.action_area.pack_end(self._button_select)
+        self.action_area.pack_end(self._button_select, False, False, 0)
 
-        self.get_content_area().pack_start(self.treeview, True, True)
+        self.get_content_area().pack_start(self.treeview, True, True, 0)
 
         # Show the dialog
         self.show_all()

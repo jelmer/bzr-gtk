@@ -145,7 +145,7 @@ class PasswordDialog(Gtk.Dialog):
 
         self.entry = Gtk.Entry()
         self.entry.set_visibility(False)
-        self.get_content_area().pack_end(self.entry, padding=10)
+        self.get_content_area().pack_end(self.entry, False, False, 10)
 
         self.get_content_area().show_all()
 

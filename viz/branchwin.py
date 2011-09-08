@@ -568,7 +568,7 @@ class BranchWindow(Window):
         old = self.paned
         self.vbox.remove(old)
         self.vbox.pack_start(
-            self.construct_paned(), True, True, True, 0)
+            self.construct_paned(), True, True, 0)
         self._make_diff_paned_nonzero_size()
         self._make_diff_nonzero_size()
 
