@@ -21,6 +21,9 @@
 
   * Mark as supporting bzr 2.5.0. (Jelmer Vernooij)
 
+  * Add X-GNOME-Autostart-Delay=30 to bzr-notify.desktop.
+    (Mikkel Kamstrup Erlandsen, #861201)
+
 0.100.0	2011-03-02
 
  BUG FIXES
