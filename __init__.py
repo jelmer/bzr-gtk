@@ -130,8 +130,8 @@ for cmd, aliases in commands.iteritems():
                               "bzrlib.plugins.gtk.commands")
 
 def save_commit_messages(*args):
-    from bzrlib.plugins.gtk import commit
-    commit.save_commit_messages(*args)
+    from bzrlib.plugins.gtk import commitmsgs
+    commitmsgs.save_commit_messages(*args)
 
 branch.Branch.hooks.install_named_hook('post_uncommit',
                                        save_commit_messages,
