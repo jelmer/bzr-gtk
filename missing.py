@@ -14,25 +14,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
-
-import gtk
+from gi.repository import Gtk
 
 from bzrlib.missing import find_unmerged
 
 from bzrlib.plugins.gtk.revisionview import RevisionView
 
 
-class MissingWindow(gtk.Dialog):
+class MissingWindow(Gtk.Dialog):
     """Displays revisions present in one branch but missing in 
     another."""
     def __init__(self, local_branch, remote_branch):
         """ Initialize the Status window. """
-        super(MissingWindow, self).__init__(flags=gtk.DIALOG_MODAL)
+        super(MissingWindow, self).__init__(flags=Gtk.DialogFlags.MODAL)
         self.set_title("Missing Revisions")
         self.local_branch = local_branch
         self.remote_branch = remote_branch
@@ -41,21 +35,21 @@ class MissingWindow(gtk.Dialog):
         self._create()
 
     def _create_revisions_frame(self, revisions):
-        extra_revs = gtk.ScrolledWindow()
-        vbox = gtk.VBox()
+        extra_revs = Gtk.ScrolledWindow()
+        vbox = Gtk.VBox()
         for rev in revisions:
             rv = RevisionView()
             rv.set_revision(rev)
-            vbox.pack_start(rv, True, True)
+            vbox.pack_start(rv, True, True, 0)
         extra_revs.add_with_viewport(vbox)
-        extra_revs.set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+        extra_revs.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         return extra_revs
 
     def _create(self):
         self.set_default_size(600, 600)
-        paned = gtk.VPaned()
+        paned = Gtk.VPaned()
 
-        frame = gtk.Frame("You have the following extra revisions:")
+        frame = Gtk.Frame(label="You have the following extra revisions:")
 
         extra_revs = self._create_revisions_frame(
                 self.local_branch.repository.get_revisions(
@@ -67,10 +61,10 @@ class MissingWindow(gtk.Dialog):
                 self.remote_branch.repository.get_revisions(
                     map(lambda (x,y):y, self.remote_extra)))
 
-        frame = gtk.Frame("You are missing following revisions:")
+        frame = Gtk.Frame(label="You are missing following revisions:")
         frame.add(missing_revs)
 
         paned.pack2(frame, resize=False, shrink=True)
 
-        self.vbox.pack_start(paned, True, True)
-        self.vbox.show_all()
+        self.get_content_area().pack_start(paned, True, True, 0)
+        self.get_content_area().show_all()

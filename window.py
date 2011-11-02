@@ -1,22 +1,23 @@
 
-import pygtk
-import gtk
+from gi.repository import Gdk
+from gi.repository import Gtk
 
-class Window(gtk.Window):
+
+class Window(Gtk.Window):
 
     def __init__(self, parent=None):
-        gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+        super(Window, self).__init__(type=Gtk.WindowType.TOPLEVEL)
         self._parent = parent
 
         self.connect('key-press-event', self._on_key_press)
 
     def _on_key_press(self, widget, event):
-        keyname = gtk.gdk.keyval_name(event.keyval)
-        if event.state & gtk.gdk.CONTROL_MASK:
+        keyname = Gdk.keyval_name(event.keyval)
+        if event.get_state() & Gdk.ModifierType.CONTROL_MASK:
             if keyname is "w":
                 self.destroy()
                 if self._parent is None:
-                    gtk.main_quit()
+                    Gtk.main_quit()
             elif keyname is "q":
-                gtk.main_quit()
+                Gtk.main_quit()
 

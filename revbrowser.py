@@ -14,32 +14,25 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
-
-import gobject
-import gtk
+from gi.repository import Gtk
 
 from bzrlib.plugins.gtk.branchview.treeview import TreeView
 from bzrlib.plugins.gtk.i18n import _i18n
 
 
-class RevisionBrowser(gtk.Dialog):
+class RevisionBrowser(Gtk.Dialog):
     """ Revision Browser main window. """
     def __init__(self, branch, parent=None):
-        gtk.Dialog.__init__(self, title="Revision Browser - Olive",
-                                  parent=parent,
-                                  flags=gtk.DIALOG_MODAL,
-                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+        super(RevisionBrowser, self).__init__(
+            title="Revision Browser - Olive", parent=parent,
+            flags=Gtk.DialogFlags.MODAL,
+            buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
 
         # Get arguments
         self.branch = branch
 
         # Create the widgets
-        self._button_select = gtk.Button(_i18n("_Select"), use_underline=True)
+        self._button_select = Gtk.Button(_i18n("_Select"), use_underline=True)
         start_revs = [branch.last_revision(),]
         self.treeview = TreeView(branch, start_revs, None)
 
@@ -50,15 +43,15 @@ class RevisionBrowser(gtk.Dialog):
 
         # Set properties
         self.set_default_size(600, 400)
-        self.vbox.set_spacing(3)
+        self.get_content_area().set_spacing(3)
         self.treeview.set_property('graph-column-visible', False)
         self.treeview.set_property('date-column-visible', True)
         self.treeview.set_property('mainline-only', True)
 
         # Construct the dialog
-        self.action_area.pack_end(self._button_select)
+        self.action_area.pack_end(self._button_select, False, False, 0)
 
-        self.vbox.pack_start(self.treeview, True, True)
+        self.get_content_area().pack_start(self.treeview, True, True, 0)
 
         # Show the dialog
         self.show_all()
@@ -74,4 +67,4 @@ class RevisionBrowser(gtk.Dialog):
         self.selected_revno = self.treeview.get_property('revision-number')
         self.selected_revid = \
                     self.treeview.get_property('revision').revision_id
-        self.response(gtk.RESPONSE_OK)
+        self.response(Gtk.ResponseType.OK)

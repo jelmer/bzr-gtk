@@ -14,13 +14,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
-
-import gtk
+from gi.repository import GObject
+from gi.repository import Gtk
 
 import os
 
@@ -35,26 +30,27 @@ from bzrlib.plugins.gtk.errors import show_bzr_error
 from bzrlib.plugins.gtk.i18n import _i18n
 
 
-class InitDialog(gtk.Dialog):
+class InitDialog(Gtk.Dialog):
     """ Initialize dialog. """
 
     def __init__(self, path, parent=None):
         """ Initialize the Initialize dialog. """
-        gtk.Dialog.__init__(self, title="Initialize - Olive",
-                                  parent=parent,
-                                  flags=0,
-                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+        super(InitDialog, self).__init__(
+            title="Initialize - Olive", parent=parent, flags=0,
+            buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
         
         # Get arguments
         self.path = path
         
         # Create the widgets
-        self._button_init = gtk.Button(_i18n("_Initialize"), use_underline=True)
-        self._label_question = gtk.Label(_i18n("Which directory do you want to initialize?"))
-        self._radio_current = gtk.RadioButton(None, _i18n("Current directory"))
-        self._radio_custom = gtk.RadioButton(self._radio_current, _i18n("Create a new directory with the name:"))
-        self._entry_custom = gtk.Entry()
-        self._hbox_custom = gtk.HBox()
+        self._button_init = Gtk.Button(_i18n("_Initialize"), use_underline=True)
+        self._label_question = Gtk.Label(label=_i18n("Which directory do you want to initialize?"))
+        self._radio_current = Gtk.RadioButton.new_with_label(
+            None, _i18n("Current directory"))
+        self._radio_custom = Gtk.RadioButton.new_with_label_from_widget(
+            self._radio_current, _i18n("Create a new directory with the name:"))
+        self._entry_custom = Gtk.Entry()
+        self._hbox_custom = Gtk.HBox()
         
         # Set callbacks
         self._button_init.connect('clicked', self._on_init_clicked)
@@ -64,17 +60,18 @@ class InitDialog(gtk.Dialog):
         self._entry_custom.set_sensitive(False)
         
         # Construct the dialog
-        self.action_area.pack_end(self._button_init)
+        self.action_area.pack_end(self._button_init, False, False, 0)
         
-        self._hbox_custom.pack_start(self._radio_custom, False, False)
-        self._hbox_custom.pack_start(self._entry_custom, True, True)
+        self._hbox_custom.pack_start(self._radio_custom, False, False, 0)
+        self._hbox_custom.pack_start(self._entry_custom, True, True, 0)
         
-        self.vbox.pack_start(self._label_question)
-        self.vbox.pack_start(self._radio_current)
-        self.vbox.pack_start(self._hbox_custom)
+        content_area = self.get_content_area()
+        content_area.pack_start(self._label_question, True, True, 0)
+        content_area.pack_start(self._radio_current, True, True, 0)
+        content_area.pack_start(self._hbox_custom, True, True, 0)
         
         # Display the dialog
-        self.vbox.show_all()
+        content_area.show_all()
     
     def _on_custom_toggled(self, widget):
         """ Occurs if the Custom radiobutton is toggled. """
@@ -120,4 +117,4 @@ class InitDialog(gtk.Dialog):
                 branch = existing_bzrdir.create_branch()
                 existing_bzrdir.create_workingtree()
         
-        self.response(gtk.RESPONSE_OK)
+        self.response(Gtk.ResponseType.OK)

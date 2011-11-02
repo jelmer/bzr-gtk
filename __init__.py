@@ -75,17 +75,8 @@ if __name__ != 'bzrlib.plugins.gtk':
     from bzrlib.trace import warning
     warning("Not running as bzrlib.plugins.gtk, things may break.")
 
-def import_pygtk():
-    try:
-        import pygtk
-    except ImportError:
-        raise errors.BzrCommandError("PyGTK not installed.")
-    pygtk.require('2.0')
-    return pygtk
-
 
 def set_ui_factory():
-    import_pygtk()
     from ui import GtkUIFactory
     import bzrlib.ui
     bzrlib.ui.ui_factory = GtkUIFactory()
@@ -168,8 +159,8 @@ def load_tests(basic_tests, module, loader):
     try:
         result = basic_tests
         try:
-            import_pygtk()
-        except errors.BzrCommandError:
+            import gi.repository.Gtk
+        except ImportError:
             return basic_tests
         basic_tests.addTest(loader.loadTestsFromModuleNames(
                 ["%s.%s" % (__name__, tmn) for tmn in testmod_names]))

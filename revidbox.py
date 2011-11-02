@@ -15,23 +15,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
+from gi.repository import Gtk
 
-import gtk
-
-class RevisionSelectionBox(gtk.HBox):
+class RevisionSelectionBox(Gtk.HBox):
 
     def __init__(self, branch):
         super(RevisionSelectionBox, self).__init__()
         self._branch = branch
-        self._entry_revid = gtk.Entry()
-        self._button_revid = gtk.Button('')
-        self._button_revid.set_image(gtk.image_new_from_stock(
-            gtk.STOCK_OPEN, gtk.ICON_SIZE_BUTTON))
+        self._entry_revid = Gtk.Entry()
+        self._button_revid = Gtk.Button('')
+        self._button_revid.set_image(Gtk.Image.new_from_stock(
+            Gtk.STOCK_OPEN, Gtk.IconSize.BUTTON))
         self.pack_start(self._entry_revid, True, True)
         self.pack_start(self._button_revid, False, False)
 
@@ -45,10 +39,10 @@ class RevisionSelectionBox(gtk.HBox):
         # JRV 20070715
         revb = RevisionBrowser(self._branch)
         response = revb.run()
-        if response != gtk.RESPONSE_NONE:
+        if response != Gtk.ResponseType.NONE:
             revb.hide()
 
-            if response == gtk.RESPONSE_OK:
+            if response == Gtk.ResponseType.OK:
                 if revb.selected_revno is not None:
                     self._entry_revid.set_text(revb.selected_revid)
 

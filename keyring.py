@@ -14,7 +14,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import gobject
+from gi.repository import GObject
 try:
     import gnomekeyring
 except ImportError:
@@ -28,15 +28,12 @@ from bzrlib.config import (
 class GnomeKeyringCredentialStore(CredentialStore):
 
     def __init__(self):
-        CredentialStore.__init__(self)
-        # Older versions of gobject don't provide get_application_name so we
-        # can't always check.
-        get_app_name = getattr(gobject, 'get_application_name', None)
-        if get_app_name is None or get_app_name() is None:
+        super(GnomeKeyringCredentialStore, self).__init__()
+        if GObject.get_application_name() is None:
             # External applications that load bzrlib may already have set the
             # application name so we don't contradict them (when we can
             # determine it that is).
-            gobject.set_application_name("bzr")
+            GObject.set_application_name("bzr")
 
     def decode_password(self, credentials):
         if gnomekeyring is None:

@@ -16,13 +16,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 """Notification area icon and notification for Bazaar."""
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
-
-import gtk
+from gi.repository import Gtk
 import bzrlib
 
 
@@ -34,7 +28,7 @@ def has_avahi():
     return (getattr(bzrlib.plugins, "avahi", None) is not None)
 
 
-class NotifyPopupMenu(gtk.Menu):
+class NotifyPopupMenu(Gtk.Menu):
 
     def __init__(self):
         super(NotifyPopupMenu, self).__init__()
@@ -42,10 +36,10 @@ class NotifyPopupMenu(gtk.Menu):
 
     def create_items(self):
         from bzrlib import errors
-        item = gtk.CheckMenuItem('_Gateway to LAN')
+        item = Gtk.CheckMenuItem.new_with_mnemonic('_Gateway to LAN')
         item.connect('toggled', self.toggle_lan_gateway)
         self.append(item)
-        self.append(gtk.SeparatorMenuItem())
+        self.append(Gtk.SeparatorMenuItem())
         try:
             from bzrlib.plugins.dbus.activity import LanGateway
             self.langateway = LanGateway()
@@ -56,10 +50,11 @@ class NotifyPopupMenu(gtk.Menu):
             # process is already running.
             item.set_sensitive(False)
 
-        item = gtk.CheckMenuItem('Announce _branches on LAN')
+        item = Gtk.CheckMenuItem.new_with_mnemonic(
+            'Announce _branches on LAN')
         item.connect('toggled', self.toggle_announce_branches)
         self.append(item)
-        self.append(gtk.SeparatorMenuItem())
+        self.append(Gtk.SeparatorMenuItem())
         try:
             from bzrlib.plugins.avahi.share import ZeroConfServer
             from bzrlib import urlutils
@@ -67,20 +62,20 @@ class NotifyPopupMenu(gtk.Menu):
         except ImportError:
             item.set_sensitive(False)
 
-        item = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES, None)
+        item = Gtk.ImageMenuItem(Gtk.STOCK_PREFERENCES, None)
         item.connect('activate', self.show_preferences)
         self.append(item)
-        item = gtk.ImageMenuItem(gtk.STOCK_ABOUT, None)
+        item = Gtk.ImageMenuItem(Gtk.STOCK_ABOUT, None)
         item.connect('activate', self.show_about)
         self.append(item)
-        self.append(gtk.SeparatorMenuItem())
-        item = gtk.ImageMenuItem(gtk.STOCK_QUIT, None)
-        item.connect('activate', gtk.main_quit)
+        self.append(Gtk.SeparatorMenuItem())
+        item = Gtk.ImageMenuItem(Gtk.STOCK_QUIT, None)
+        item.connect('activate', Gtk.main_quit)
         self.append(item)
         self.show_all()
 
     def display(self, icon, event_button, event_time):
-        self.popup(None, None, gtk.status_icon_position_menu, 
+        self.popup(None, None, Gtk.status_icon_position_menu, 
                event_button, event_time, icon)
 
     def toggle_lan_gateway(self, item):

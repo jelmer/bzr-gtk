@@ -16,7 +16,7 @@
 
 import os
 
-import gtk.gdk
+from gi.repository import Gdk
 
 from bzrlib import config
 try:
@@ -38,7 +38,7 @@ class GAnnotateConfig(configobj.ConfigObj):
     """
 
     def __init__(self, window):
-        configobj.ConfigObj.__init__(self, gannotate_config_filename())
+        super(GAnnotateConfig, self).__init__(gannotate_config_filename())
         self.window = window
         self.pane = window.pane
 
@@ -74,7 +74,7 @@ class GAnnotateConfig(configobj.ConfigObj):
         self.pane.connect("notify", self._save_pane_props)
 
     def _save_window_props(self, w, e, *args):
-        if e.window.get_state() & gtk.gdk.WINDOW_STATE_MAXIMIZED:
+        if e.window.get_state() & Gdk.WindowState.MAXIMIZED:
             maximized = True
         else:
             self["window"]["width"], self["window"]["height"] = w.get_size()
@@ -84,7 +84,7 @@ class GAnnotateConfig(configobj.ConfigObj):
         return False
 
     def _save_pane_props(self, w, gparam):
-        if gparam.name == "position":
+        if gparam and gparam.name == "position":
             self["window"]["pane_position"] = w.get_position()
 
         return False

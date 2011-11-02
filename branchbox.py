@@ -14,26 +14,22 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
-
-import gtk
-import gobject
+from gi.repository import Gtk
+from gi.repository import GObject
 
 from bzrlib.branch import Branch
 from bzrlib.config import GlobalConfig
 
 from bzrlib.plugins.gtk.history import UrlHistory
 
-class BranchSelectionBox(gtk.HBox):
+
+class BranchSelectionBox(Gtk.HBox):
 
     def __init__(self, path=None):
-        gobject.GObject.__init__(self)
-        self._combo = gtk.ComboBoxEntry()
-        self._combo.child.connect('focus-out-event', self._on_combo_changed)
+        super(BranchSelectionBox, self).__init__()
+        self._combo = Gtk.ComboBox.new_with_entry()
+        self._combo.get_child().connect(
+            'focus-out-event', self._on_combo_changed)
 
         # Build branch history
         self._history = UrlHistory(GlobalConfig(), 'branch_history')
@@ -55,18 +51,19 @@ class BranchSelectionBox(gtk.HBox):
 
     def _build_history(self):
         """ Build up the branch history. """
-        self._combo_model = gtk.ListStore(str)
+        self._combo_model = Gtk.ListStore(str)
 
         for item in self._history.get_entries():
             self._combo_model.append([ item ])
 
         self._combo.set_model(self._combo_model)
-        self._combo.set_text_column(0)
+        self._combo.set_entry_text_column(0)
 
     def _on_combo_changed(self, widget, event):
         self.emit('branch-changed', widget)
 
-gobject.signal_new('branch-changed', BranchSelectionBox,
-                   gobject.SIGNAL_RUN_LAST,
-                   gobject.TYPE_NONE, (gobject.TYPE_OBJECT,))
-gobject.type_register(BranchSelectionBox)
+
+GObject.signal_new('branch-changed', BranchSelectionBox,
+                   GObject.SignalFlags.RUN_LAST,
+                   None, (GObject.TYPE_OBJECT,))
+GObject.type_register(BranchSelectionBox)

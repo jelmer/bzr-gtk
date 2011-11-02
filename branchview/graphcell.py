@@ -10,19 +10,34 @@ we cheat and draw over the bits of the TreeViewColumn that are supposed to
 just be for the background.
 """
 
-__copyright__ = "Copyright © 2005 Canonical Ltd."
+__copyright__ = "Copyright © 2005-2011 Canonical Ltd."
 __author__    = "Scott James Remnant <scott@ubuntu.com>"
 
 
 import math
 
-import gtk
-import gobject
-import pango
-import cairo
+from gi.repository import Gtk
+from gi.repository import GObject
+from gi.repository import Pango
+from gi.repository import PangoCairo
 
 
-class CellRendererGraph(gtk.GenericCellRenderer):
+# Cairo constants are not exported yet. These are taken from documentation.
+CAIRO_LINE_CAP_BUTT = 0
+CAIRO_LINE_CAP_ROUND = 1
+CAIRO_LINE_CAP_SQUARE = 2
+
+
+CAIRO_FILL_RULE_WINDING = 0
+CAIRO_FILL_RULE_EVEN_ODD = 1
+
+
+# Macro from  Pango header.
+def PANGO_PIXELS(d):
+    return (d + 512) / 1000
+
+
+class CellRendererGraph(Gtk.CellRendererPixbuf):
     """Cell renderer for directed graph.
 
     Properties:
@@ -34,21 +49,21 @@ class CellRendererGraph(gtk.GenericCellRenderer):
     columns_len = 0
 
     __gproperties__ = {
-        "node":         ( gobject.TYPE_PYOBJECT, "node",
+        "node":         ( GObject.TYPE_PYOBJECT, "node",
                           "revision node instruction",
-                          gobject.PARAM_WRITABLE
+                          GObject.PARAM_WRITABLE
                         ),
-        "tags":         ( gobject.TYPE_PYOBJECT, "tags",
+        "tags":         ( GObject.TYPE_PYOBJECT, "tags",
                           "list of tags associated with the node",
-                          gobject.PARAM_WRITABLE
+                          GObject.PARAM_WRITABLE
                         ),
-        "in-lines":     ( gobject.TYPE_PYOBJECT, "in-lines",
+        "in-lines":     ( GObject.TYPE_PYOBJECT, "in-lines",
                           "instructions to draw lines into the cell",
-                          gobject.PARAM_WRITABLE
+                          GObject.PARAM_WRITABLE
                         ),
-        "out-lines":    ( gobject.TYPE_PYOBJECT, "out-lines",
+        "out-lines":    ( GObject.TYPE_PYOBJECT, "out-lines",
                           "instructions to draw lines out of the cell",
-                          gobject.PARAM_WRITABLE
+                          GObject.PARAM_WRITABLE
                         ),
         }
 
@@ -76,11 +91,9 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         except AttributeError:
             pango_ctx = widget.get_pango_context()
             font_desc = widget.get_style().font_desc
-            metrics = pango_ctx.get_metrics(font_desc)
-
-            ascent = pango.PIXELS(metrics.get_ascent())
-            descent = pango.PIXELS(metrics.get_descent())
-
+            metrics = pango_ctx.get_metrics(font_desc, None)
+            ascent = PANGO_PIXELS(metrics.get_ascent())
+            descent = PANGO_PIXELS(metrics.get_descent())
             self._box_size = ascent + descent + 6
             return self._box_size
 
@@ -113,7 +126,15 @@ class CellRendererGraph(gtk.GenericCellRenderer):
 
         ctx.set_source_rgb(red, green, blue)
 
-    def on_get_size(self, widget, cell_area):
+    def do_activate(event, widget, path, bg_area, cell_area, flags):
+        """Renderers cannot be activated; always return True."""
+        return True
+
+    def do_editing_started(event, widget, path, fb_area, cell_area, flags):
+        """Renderers cannot be edited; always return None."""
+        return None
+
+    def do_get_size(self, widget, cell_area):
         """Return the size we need for this cell.
 
         Each cell is drawn individually and is only as wide as it needs
@@ -128,7 +149,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         # FIXME I have no idea how to use cell_area properly
         return (0, 0, width, height)
 
-    def on_render(self, window, widget, bg_area, cell_area, exp_area, flags):
+    def do_render(self, ctx, widget, bg_area, cell_area, flags):
         """Render an individual cell.
 
         Draws the cell contents using cairo, taking care to clip what we
@@ -142,7 +163,6 @@ class CellRendererGraph(gtk.GenericCellRenderer):
         instead of a pure diagonal ... this reduces confusion by an
         incredible amount.
         """
-        ctx = window.cairo_create()
         ctx.rectangle(bg_area.x, bg_area.y, bg_area.width, bg_area.height)
         ctx.clip()
 
@@ -168,7 +188,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                 cell_area.y + cell_area.height / 2,
                 box_size / 4, 0, 2 * math.pi)
 
-        if flags & gtk.CELL_RENDERER_SELECTED:
+        if flags & Gtk.CellRendererState.SELECTED:
             ctx.set_source_rgb(1.0, 1.0, 1.0)
             ctx.set_line_width(box_size / 4)
             ctx.stroke_preserve()
@@ -182,9 +202,10 @@ class CellRendererGraph(gtk.GenericCellRenderer):
 
         self.render_tags(ctx, widget.create_pango_context(), cell_area, box_size)
 
-    def render_line(self, ctx, cell_area, box_size, mid, height, start, end, colour, flags):
+    def render_line(self, ctx, cell_area, box_size,
+                    mid, height, start, end, colour, flags):
         if start is None:
-            ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+            ctx.set_line_cap(CAIRO_LINE_CAP_ROUND)
             x = cell_area.x + box_size * end + box_size / 2
             ctx.move_to(x, mid + height / 3)
             ctx.line_to(x, mid + height / 3)
@@ -192,7 +213,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             ctx.line_to(x, mid + height / 6)
 
         elif end is None:
-            ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+            ctx.set_line_cap(CAIRO_LINE_CAP_ROUND)
             x = cell_area.x + box_size * start + box_size / 2
             ctx.move_to(x, mid - height / 3)
             ctx.line_to(x, mid - height / 3)
@@ -200,7 +221,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             ctx.line_to(x, mid - height / 6)
 
         else:
-            ctx.set_line_cap(cairo.LINE_CAP_BUTT)
+            ctx.set_line_cap(CAIRO_LINE_CAP_BUTT)
             startx = cell_area.x + box_size * start + box_size / 2
             endx = cell_area.x + box_size * end + box_size / 2
 
@@ -217,7 +238,7 @@ class CellRendererGraph(gtk.GenericCellRenderer):
                              endx, mid + height / 5 ,
                              endx, mid + height / 2 + 1)
 
-        if flags & gtk.CELL_RENDERER_SELECTED:
+        if flags & Gtk.CellRendererState.SELECTED:
             ctx.set_source_rgb(1.0, 1.0, 1.0)
             ctx.set_line_width(box_size / 5)
             ctx.stroke_preserve()
@@ -233,17 +254,17 @@ class CellRendererGraph(gtk.GenericCellRenderer):
 
         (column, colour) = self.node
 
-        font_desc = pango.FontDescription()
-        font_desc.set_size(pango.SCALE * 7)
+        font_desc = Pango.FontDescription()
+        font_desc.set_size(Pango.SCALE * 7)
 
-        tag_layout = pango.Layout(pango_ctx)
+        tag_layout = Pango.Layout(pango_ctx)
         tag_layout.set_font_description(font_desc)
 
         # The width of the tag label stack
         width = 0
 
         for tag_idx, tag in enumerate(self.tags):
-            tag_layout.set_text(" " + tag + " ")
+            tag_layout.set_text(" " + tag + " ", -1)
             text_width, text_height = tag_layout.get_pixel_size()
 
             x0 = cell_area.x + \
@@ -272,12 +293,11 @@ class CellRendererGraph(gtk.GenericCellRenderer):
             self.set_colour(ctx, TAG_COLOUR_ID, 0.0, 0.5)
             ctx.stroke_preserve()
 
-            ctx.set_fill_rule (cairo.FILL_RULE_EVEN_ODD)
+            ctx.set_fill_rule (CAIRO_FILL_RULE_EVEN_ODD)
             self.set_colour(ctx, TAG_COLOUR_ID, 0.5, 1.0)
             ctx.fill()
 
             # Draw the tag text
             self.set_colour(ctx, 0, 0.0, 0.0)
             ctx.move_to(x0, y0)
-            ctx.show_layout(tag_layout)
-
+            PangoCairo.show_layout(ctx, tag_layout)

@@ -18,7 +18,7 @@
 
 import os
 
-import gtk
+from gi.repository import Gtk
 
 from bzrlib import (
     branch,
@@ -215,7 +215,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         commit_col = dlg._treeview_files.get_column(0)
         self.assertEqual('Commit', commit_col.get_title())
-        renderer = commit_col.get_cell_renderers()[0]
+        renderer = commit_col.get_cells()[0]
         self.assertTrue(renderer.get_property('activatable'))
 
         self.assertEqual('Commit all changes',
@@ -240,7 +240,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         commit_col = dlg._treeview_files.get_column(0)
         self.assertEqual('Commit*', commit_col.get_title())
-        renderer = commit_col.get_cell_renderers()[0]
+        renderer = commit_col.get_cells()[0]
         self.assertFalse(renderer.get_property('activatable'))
 
         values = [(r[0], r[1], r[2], r[3]) for r in dlg._pending_store]
@@ -388,7 +388,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
                           ('b-id', 'b', True, 'b/', 'removed'),
                          ], values)
         # All Files should be selected
-        self.assertEqual(((0,), None), dlg._treeview_files.get_cursor())
+        self.assertEqual(
+            (Gtk.TreePath(path=0), None), dlg._treeview_files.get_cursor())
 
     def test_filelist_with_selected(self):
         tree = self.make_branch_and_tree('tree')
@@ -403,7 +404,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
                          ], values)
         # This file should also be selected in the file list, rather than the
         # 'All Files' selection
-        self.assertEqual(((1,), None), dlg._treeview_files.get_cursor())
+        self.assertEqual(
+            (Gtk.TreePath(path=1), None), dlg._treeview_files.get_cursor())
 
     def test_diff_view(self):
         tree = self.make_branch_and_tree('tree')
@@ -417,7 +419,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         dlg = commit.CommitDialog(tree)
         diff_buffer = dlg._diff_view.buffer
         text = diff_buffer.get_text(diff_buffer.get_start_iter(),
-                                    diff_buffer.get_end_iter()).splitlines(True)
+                                    diff_buffer.get_end_iter(),
+                                    True).splitlines(True)
 
         self.assertEqual("=== modified file 'a'\n", text[0])
         self.assertContainsRe(text[1],
@@ -468,10 +471,12 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertFalse(dlg._file_message_expander.get_expanded())
         self.assertFalse(dlg._file_message_expander.get_property('sensitive'))
 
-        dlg._treeview_files.set_cursor((1,))
+        dlg._treeview_files.set_cursor(
+            Gtk.TreePath(path=1), None, False)
         self.assertEqual('Diff for a', dlg._diff_label.get_text())
         text = diff_buffer.get_text(diff_buffer.get_start_iter(),
-                                    diff_buffer.get_end_iter()).splitlines(True)
+                                    diff_buffer.get_end_iter(),
+                                    True).splitlines(True)
         self.assertEqual("=== added file 'a'\n", text[0])
         self.assertContainsRe(text[1],
             r"--- a\t\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d\d\d")
@@ -485,10 +490,12 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertTrue(dlg._file_message_expander.get_expanded())
         self.assertTrue(dlg._file_message_expander.get_property('sensitive'))
 
-        dlg._treeview_files.set_cursor((2,))
+        dlg._treeview_files.set_cursor(
+            Gtk.TreePath(path=2), None, False)
         self.assertEqual('Diff for b', dlg._diff_label.get_text())
         text = diff_buffer.get_text(diff_buffer.get_start_iter(),
-                                    diff_buffer.get_end_iter()).splitlines(True)
+                                    diff_buffer.get_end_iter(),
+                                    True).splitlines(True)
         self.assertEqual("=== added file 'b'\n", text[0])
         self.assertContainsRe(text[1],
             r"--- b\t\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d [+-]\d\d\d\d")
@@ -502,7 +509,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertTrue(dlg._file_message_expander.get_expanded())
         self.assertTrue(dlg._file_message_expander.get_property('sensitive'))
 
-        dlg._treeview_files.set_cursor((0,))
+        dlg._treeview_files.set_cursor(
+            Gtk.TreePath(path=0), None, False)
         self.assertEqual('Diff for All Files', dlg._diff_label.get_text())
         self.assertEqual('File commit message',
                          dlg._file_message_expander.get_label())
@@ -518,7 +526,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         def get_file_text():
             buf = dlg._file_message_text_view.get_buffer()
-            return buf.get_text(buf.get_start_iter(), buf.get_end_iter())
+            return buf.get_text(
+                buf.get_start_iter(), buf.get_end_iter(), True)
 
         def get_saved_text(path):
             """Get the saved text for a given record."""
@@ -531,7 +540,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         self.assertFalse(dlg._file_message_expander.get_property('sensitive'))
         self.assertEqual('', get_file_text())
 
-        dlg._treeview_files.set_cursor((1,))
+        dlg._treeview_files.set_cursor(
+            Gtk.TreePath(path=1), None, False)
         self.assertEqual('Commit message for a',
                          dlg._file_message_expander.get_label())
         self.assertTrue(dlg._file_message_expander.get_expanded())
@@ -544,7 +554,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         # We should have updated the ListStore with the new file commit info
         self.assertEqual('Some text\nfor a\n', get_saved_text(1))
 
-        dlg._treeview_files.set_cursor((2,))
+        dlg._treeview_files.set_cursor(
+            Gtk.TreePath(path=2), None, False)
         self.assertEqual('Commit message for b/',
                          dlg._file_message_expander.get_label())
         self.assertTrue(dlg._file_message_expander.get_expanded())
@@ -555,7 +566,8 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         dlg._set_file_commit_message('More text\nfor b\n')
         # Now switch back to 'a'. The message should be saved, and the buffer
         # should be updated with the other text
-        dlg._treeview_files.set_cursor((1,))
+        dlg._treeview_files.set_cursor(
+            Gtk.TreePath(path=1), None, False)
         self.assertEqual('More text\nfor b\n', get_saved_text(2))
         self.assertEqual('Commit message for a',
                          dlg._file_message_expander.get_label())
@@ -581,7 +593,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         #       do with. So instead, we just call toggle directly, and assume
         #       that toggle is hooked in correctly
         # column = dlg._treeview_files.get_column(0)
-        # renderer = column.get_cell_renderers()[0]
+        # renderer = column.get_cells()[0]
 
         # Toggle a single entry should set just that entry to False
         dlg._toggle_commit(None, 1, dlg._files_store)
@@ -634,9 +646,11 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         dlg._commit_selected_radio.set_active(True)
         self.assertEqual((['a_file', 'b_dir'], []), dlg._get_specific_files())
 
-        dlg._treeview_files.set_cursor((1,))
+        dlg._treeview_files.set_cursor(
+            Gtk.TreePath(path=1), None, False)
         dlg._set_file_commit_message('Test\nmessage\nfor a_file\n')
-        dlg._treeview_files.set_cursor((2,))
+        dlg._treeview_files.set_cursor(
+            Gtk.TreePath(path=2), None, False)
         dlg._set_file_commit_message('message\nfor b_dir\n')
 
         self.assertEqual((['a_file', 'b_dir'],
@@ -662,9 +676,11 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         dlg._commit_selected_radio.set_active(True)
         self.assertEqual((['a_file', 'b_dir'], []), dlg._get_specific_files())
 
-        dlg._treeview_files.set_cursor((1,))
+        dlg._treeview_files.set_cursor(
+            Gtk.TreePath(path=1), None, False)
         dlg._set_file_commit_message('Test\r\nmessage\rfor a_file\n')
-        dlg._treeview_files.set_cursor((2,))
+        dlg._treeview_files.set_cursor(
+            Gtk.TreePath(path=2), None, False)
         dlg._set_file_commit_message('message\r\nfor\nb_dir\r')
 
         self.assertEqual((['a_file', 'b_dir'],
@@ -683,7 +699,7 @@ class QuestionHelpers(object):
         def _question_yes(*args, **kwargs):
             self.questions.append(args)
             self.questions.append('YES')
-            return gtk.RESPONSE_YES
+            return Gtk.ResponseType.YES
         dlg._question_dialog = _question_yes
 
     def _set_question_no(self, dlg):
@@ -692,7 +708,7 @@ class QuestionHelpers(object):
         def _question_no(*args, **kwargs):
             self.questions.append(args)
             self.questions.append('NO')
-            return gtk.RESPONSE_NO
+            return Gtk.ResponseType.NO
         dlg._question_dialog = _question_no
 
 
@@ -977,9 +993,11 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport, QuestionHelpers):
 
         dlg = commit.CommitDialog(tree)
         dlg._commit_selected_radio.set_active(True) # enable partial
-        dlg._treeview_files.set_cursor((1,))
+        dlg._treeview_files.set_cursor(
+            Gtk.TreePath(path=1), None, False)
         dlg._set_file_commit_message('Message for A\n')
-        dlg._treeview_files.set_cursor((2,))
+        dlg._treeview_files.set_cursor(
+            Gtk.TreePath(path=2), None, False)
         dlg._set_file_commit_message('Message for B\n')
         dlg._toggle_commit(None, 2, dlg._files_store) # unset 'b'
         dlg._set_global_commit_message('Commit just "a"')
@@ -1012,7 +1030,8 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport, QuestionHelpers):
         tree.merge_from_branch(tree2.branch)
 
         dlg = commit.CommitDialog(tree)
-        dlg._treeview_files.set_cursor((1,)) # 'a'
+        dlg._treeview_files.set_cursor(
+            Gtk.TreePath(path=1), None, False) # 'a'
         dlg._set_file_commit_message('Message for A\n')
         # No message for 'B'
         dlg._set_global_commit_message('Merging from "tree2"\n')
@@ -1043,9 +1062,11 @@ class TestCommitDialog_Commit(tests.TestCaseWithTransport, QuestionHelpers):
         tree.add(['a', u'\u03a9'], ['a-id', 'omega-id'])
 
         dlg = commit.CommitDialog(tree)
-        dlg._treeview_files.set_cursor((1,)) # 'a'
+        dlg._treeview_files.set_cursor(
+            Gtk.TreePath(path=1), None, False) # 'a'
         dlg._set_file_commit_message(u'Test \xfan\xecc\xf6de\n')
-        dlg._treeview_files.set_cursor((2,)) # omega
+        dlg._treeview_files.set_cursor(
+            Gtk.TreePath(path=2), None, False) # omega
         dlg._set_file_commit_message(u'\u03a9 is the end of all things.\n')
         dlg._set_global_commit_message(u'\u03a9 and \xfan\xecc\xf6de\n')
 

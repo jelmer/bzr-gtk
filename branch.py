@@ -16,13 +16,7 @@
 
 import os
 
-try:
-    import pygtk
-    pygtk.require("2.0")
-except:
-    pass
-
-import gtk
+from gi.repository import Gtk
 
 from bzrlib import (
     errors,
@@ -36,33 +30,32 @@ from bzrlib.plugins.gtk.i18n import _i18n
 from bzrlib.plugins.gtk.branchbox import BranchSelectionBox
 
 
-class BranchDialog(gtk.Dialog):
+class BranchDialog(Gtk.Dialog):
     """ New implementation of the Branch dialog. """
 
     def __init__(self, path=None, parent=None, remote_path=None):
         """ Initialize the Branch dialog. """
-        gtk.Dialog.__init__(self, title="Branch - Olive",
-                                  parent=parent,
-                                  flags=0,
-                                  buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+        super(BranchDialog, self).__init__(
+            title="Branch - Olive", parent=parent, flags=0,
+            buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
 
         # Get arguments
         self.path = path
 
         # Create the widgets
-        self._button_branch = gtk.Button(_i18n("_Branch"), use_underline=True)
+        self._button_branch = Gtk.Button(_i18n("_Branch"), use_underline=True)
         self._remote_branch = BranchSelectionBox()
-        self._button_revision = gtk.Button('')
-        self._label_location = gtk.Label(_i18n("Branch location:"))
+        self._button_revision = Gtk.Button('')
+        self._label_location = Gtk.Label(label=_i18n("Branch location:"))
         self._label_location.set_alignment(0, 0.5)
-        self._label_destination = gtk.Label(_i18n("Destination:"))
-        self._label_nick = gtk.Label(_i18n("Branck nick:"))
-        self._label_revision = gtk.Label(_i18n("Revision:"))
-        self._filechooser = gtk.FileChooserButton(_i18n("Please select a folder"))
-        self._filechooser.set_action(gtk.FILE_CHOOSER_ACTION_SELECT_FOLDER)
-        self._hbox_revision = gtk.HBox()
-        self._entry_revision = gtk.Entry()
-        self._entry_nick = gtk.Entry()
+        self._label_destination = Gtk.Label(label=_i18n("Destination:"))
+        self._label_nick = Gtk.Label(label=_i18n("Branck nick:"))
+        self._label_revision = Gtk.Label(label=_i18n("Revision:"))
+        self._filechooser = Gtk.FileChooserButton(_i18n("Please select a folder"))
+        self._filechooser.set_action(Gtk.FileChooserAction.SELECT_FOLDER)
+        self._hbox_revision = Gtk.HBox()
+        self._entry_revision = Gtk.Entry()
+        self._entry_nick = Gtk.Entry()
 
         # Set callbacks
         self._button_branch.connect('clicked', self._on_branch_clicked)
@@ -70,7 +63,7 @@ class BranchDialog(gtk.Dialog):
         self._remote_branch.connect('branch-changed', self._on_branch_changed)
 
         # Create the table and pack the widgets into it
-        self._table = gtk.Table(rows=3, columns=2)
+        self._table = Gtk.Table(rows=3, columns=2)
         self._table.attach(self._label_location, 0, 1, 0, 1)
         self._table.attach(self._remote_branch, 1, 2, 0, 1)
         self._table.attach(self._label_destination, 0, 1, 1, 2)
@@ -81,8 +74,8 @@ class BranchDialog(gtk.Dialog):
         self._table.attach(self._hbox_revision, 1, 2, 3, 4)
 
         # Set properties
-        self._image_browse = gtk.Image()
-        self._image_browse.set_from_stock(gtk.STOCK_OPEN, gtk.ICON_SIZE_BUTTON)
+        self._image_browse = Gtk.Image()
+        self._image_browse.set_from_stock(Gtk.STOCK_OPEN, Gtk.IconSize.BUTTON)
         self._button_revision.set_image(self._image_browse)
         self._button_revision.set_sensitive(False)
         self._label_destination.set_alignment(0, 0.5)
@@ -90,20 +83,20 @@ class BranchDialog(gtk.Dialog):
         self._label_revision.set_alignment(0, 0.5)
         self._table.set_row_spacings(3)
         self._table.set_col_spacings(3)
-        self.vbox.set_spacing(3)
+        self.get_content_area().set_spacing(3)
         if remote_path is not None:
             self._remote_branch.set_url(remote_path)
         if self.path is not None:
             self._filechooser.set_filename(self.path)
 
         # Pack some widgets
-        self._hbox_revision.pack_start(self._entry_revision, True, True)
-        self._hbox_revision.pack_start(self._button_revision, False, False)
-        self.vbox.add(self._table)
-        self.action_area.pack_end(self._button_branch)
+        self._hbox_revision.pack_start(self._entry_revision, True, True, 0)
+        self._hbox_revision.pack_start(self._button_revision, False, False, 0)
+        self.get_content_area().add(self._table)
+        self.action_area.pack_end(self._button_branch, False, False, 0)
 
         # Show the dialog
-        self.vbox.show_all()
+        self.get_content_area().show_all()
 
     def _get_last_revno(self):
         """ Get the revno of the last revision (if any). """
@@ -124,10 +117,10 @@ class BranchDialog(gtk.Dialog):
             return
         revb = RevisionBrowser(br, self)
         response = revb.run()
-        if response != gtk.RESPONSE_NONE:
+        if response != Gtk.ResponseType.NONE:
             revb.hide()
 
-            if response == gtk.RESPONSE_OK:
+            if response == Gtk.ResponseType.OK:
                 if revb.selected_revno is not None:
                     self._entry_revision.set_text(revb.selected_revno)
 
@@ -181,7 +174,7 @@ class BranchDialog(gtk.Dialog):
         info_dialog(_i18n('Branching successful'),
                     _i18n('%d revision(s) branched.') % revs)
 
-        self.response(gtk.RESPONSE_OK)
+        self.response(Gtk.ResponseType.OK)
 
     def _on_branch_changed(self, widget, event):
         """ We try to get the last revision if focus lost. """

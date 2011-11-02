@@ -14,7 +14,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-import gtk
+from gi.repository import Gtk
+from gi.repository import GdkPixbuf
 
 from bzrlib.config import parse_username
 
@@ -25,12 +26,12 @@ from bzrlib.plugins.gtk.avatarproviders import (
     )
 
 
-class Avatar(gtk.HBox):
+class Avatar(Gtk.HBox):
     """ Author or committer avatar """
 
     def __init__(self, apparent_username):
         """ Constructor """
-        gtk.HBox.__init__(self)
+        super(Avatar, self).__init__()
 
         self.apparent_username = apparent_username
         self.username, self.email = parse_username(apparent_username)
@@ -43,44 +44,41 @@ class Avatar(gtk.HBox):
 
     def show_spinner(self):
         """
-        Replace the current content of the Avatar with a gtk.Spinner
-        if an email address has been parsed. If not, show an gtk.Label with
+        Replace the current content of the Avatar with a Gtk.Spinner
+        if an email address has been parsed. If not, show an Gtk.Label with
         the translatable 'No email' text.
         """
         if self.email:
             tooltip = _i18n("Retrieving avatar for %s...") % self.email
-            if getattr(gtk, "Spinner", False):
-                spinner = gtk.Spinner()
-                spinner.start()
-                self.pack_start(spinner, False)
-                spinner.set_tooltip_text(tooltip)
-                spinner.set_size_request(20, 20)
-                spinner.show()
-            else:
-                spinner = gtk.Label(tooltip)
-                self.pack_start(spinner)
-                self.set_tooltip_text(self.apparent_username)
-                spinner.show()
+            spinner = Gtk.Spinner()
+            spinner.start()
+            self.pack_start(spinner, False, True, 0)
+            spinner.set_tooltip_text(tooltip)
+            spinner.set_size_request(20, 20)
+            spinner.show()
         else:
-            no_email = gtk.Label(_i18n("No email"))
-            self.pack_start(no_email)
+            no_email = Gtk.Label(label=_i18n("No email"))
+            self.pack_start(no_email, True, True, 0)
             self.set_tooltip_text(self.apparent_username)
             no_email.show()
 
     def show_image(self):
-        """Replace the current content of the Avatar with the gtk.Image """
+        """Replace the current content of the Avatar with the Gtk.Image """
         if self.email and self.image:
-            self.remove(self.get_children()[0])
-            self.pack_start(self.image)
+            children = self.get_children()
+            if children != []:
+                self.remove(children[0])
+            self.pack_start(self.image, True, True, 0)
             self.image.set_tooltip_text(self.apparent_username)
             self.image.show()
 
 
-class AvatarBox(gtk.HBox):
+class AvatarBox(Gtk.HBox):
     """HBox showing an avatar."""
 
     def __init__(self, homogeneous=False, spacing=0):
-        gtk.HBox.__init__(self, homogeneous, spacing)
+        super(AvatarBox, self).__init__(
+            homogeneous=homogeneous, spacing=spacing)
         self.__avatars = {}
         self.avatar = None
         self.__displaying = None
@@ -129,9 +127,9 @@ class AvatarBox(gtk.HBox):
         return self
 
     def update_avatar_image_from_pixbuf_loader(self, loader):
-        """Replace the gtk.Spinner with the given loader."""
+        """Replace the Gtk.Spinner with the given loader."""
         if self.avatar:
-            self.avatar.image = gtk.Image()
+            self.avatar.image = Gtk.Image()
             self.avatar.image.set_from_pixbuf(loader.get_pixbuf())
             self.avatar.show_image()
             self.__displaying = self.avatar
@@ -139,31 +137,30 @@ class AvatarBox(gtk.HBox):
     def come_back_to_gui(self):
         """Render back avatar in the GUI."""
         if self.avatar:
-            self.pack_start(self.avatar)
+            self.pack_start(self.avatar, True, True, 0)
             self.__displaying = self.avatar
         else:
             self._show_no_email()
 
     def _new_cell_for_avatar(self, avatar):
-        """Create a new cell in this box with a gtk.Spinner."""
+        """Create a new cell in this box with a Gtk.Spinner."""
         avatar.show_spinner()
-        self.pack_start(avatar)
+        self.pack_start(avatar, True, True, 0)
         avatar.show()
         self.__displaying = avatar
 
     def _show_no_email(self):
-        """Show a gtk.Label with test 'No email'."""
-        no_email = gtk.Label(_i18n("No email"))
-        self.pack_start(no_email)
+        """Show a Gtk.Label with text 'No email'."""
+        no_email = Gtk.Label(label=_i18n("No email"))
+        self.pack_start(no_email, True, True, 0)
         no_email.show()
 
 
-class AvatarsBox(gtk.HBox):
+class AvatarsBox(Gtk.HBox):
     """GTK container for author and committer avatars."""
 
     def __init__(self):
-        gtk.HBox.__init__(self, False, 10)
-
+        super(AvatarsBox, self).__init__(homogeneous=False, spacing=10)
         self.__committer_box = None
         self.__authors_box = None
         self._init_gui()
@@ -215,15 +212,15 @@ class AvatarsBox(gtk.HBox):
 
     def _init_gui(self):
         """Create boxes where avatars will be displayed."""
-        # 2 gtk.HBox: One for the committer and one for authors
+        # 2 Gtk.HBox: One for the committer and one for authors
         # Committer
         self.__committer_box = AvatarBox()
         self.__committer_box.set_size_request(80, 80)
-        self.pack_end(self.__committer_box, False)
+        self.pack_end(self.__committer_box, False, True, 0)
         self.__committer_box.show()
         # Authors
         self.__authors_box = AvatarBox()
-        self.pack_end(self.__authors_box, False)
+        self.pack_end(self.__authors_box, False, True, 0)
         self.__authors_box.set_spacing(10)
         self.__authors_box.show()
 
@@ -234,8 +231,8 @@ class AvatarsBox(gtk.HBox):
         :param email: used to identify item from self.__avatars.
         """
         if email:
-            # Convert downloaded image from provider to gtk.Image
-            loader = gtk.gdk.PixbufLoader()
+            # Convert downloaded image from provider to Gtk.Image
+            loader = GdkPixbuf.PixbufLoader()
             loader.write(response.read())
             loader.close()
 
@@ -244,7 +241,7 @@ class AvatarsBox(gtk.HBox):
                     email).update_avatar_image_from_pixbuf_loader(loader)
 
     def _role_box_for(self, role):
-        """ Return the gtk.HBox for the given role """
+        """ Return the Gtk.HBox for the given role """
         if role == "committer":
             return self.__committer_box
         else:

@@ -6,9 +6,9 @@
 __copyright__ = "Copyright © 2005 Canonical Ltd."
 __author__    = "Daniel Schierbeck <daniel.schierbeck@gmail.com>"
 
-import gtk
-import gobject
-import pango
+from gi.repository import Gtk
+from gi.repository import GObject
+from gi.repository import Pango
 
 from bzrlib import ui
 from bzrlib.revision import NULL_REVISION
@@ -20,78 +20,78 @@ from bzrlib.plugins.gtk.branchview.linegraph import linegraph, same_branch
 from bzrlib.plugins.gtk.branchview.graphcell import CellRendererGraph
 
 
-class TreeView(gtk.VBox):
+class TreeView(Gtk.VBox):
 
     __gproperties__ = {
-        'branch': (gobject.TYPE_PYOBJECT,
+        'branch': (GObject.TYPE_PYOBJECT,
                    'Branch',
                    'The Bazaar branch being visualized',
-                   gobject.PARAM_CONSTRUCT_ONLY | gobject.PARAM_WRITABLE),
+                   GObject.PARAM_CONSTRUCT_ONLY | GObject.PARAM_WRITABLE),
 
-        'revision': (gobject.TYPE_PYOBJECT,
+        'revision': (GObject.TYPE_PYOBJECT,
                      'Revision',
                      'The currently selected revision',
-                     gobject.PARAM_READWRITE),
+                     GObject.PARAM_READWRITE),
 
-        'revision-number': (gobject.TYPE_STRING,
+        'revision-number': (GObject.TYPE_STRING,
                             'Revision number',
                             'The number of the selected revision',
                             '',
-                            gobject.PARAM_READABLE),
+                            GObject.PARAM_READABLE),
 
-        'children': (gobject.TYPE_PYOBJECT,
+        'children': (GObject.TYPE_PYOBJECT,
                      'Child revisions',
                      'Children of the currently selected revision',
-                     gobject.PARAM_READABLE),
+                     GObject.PARAM_READABLE),
 
-        'parents': (gobject.TYPE_PYOBJECT,
+        'parents': (GObject.TYPE_PYOBJECT,
                     'Parent revisions',
                     'Parents to the currently selected revision',
-                    gobject.PARAM_READABLE),
+                    GObject.PARAM_READABLE),
 
-        'revno-column-visible': (gobject.TYPE_BOOLEAN,
+        'revno-column-visible': (GObject.TYPE_BOOLEAN,
                                  'Revision number column',
                                  'Show revision number column',
                                  True,
-                                 gobject.PARAM_READWRITE),
+                                 GObject.PARAM_READWRITE),
 
-        'graph-column-visible': (gobject.TYPE_BOOLEAN,
+        'graph-column-visible': (GObject.TYPE_BOOLEAN,
                                  'Graph column',
                                  'Show graph column',
                                  True,
-                                 gobject.PARAM_READWRITE),
+                                 GObject.PARAM_READWRITE),
 
-        'date-column-visible': (gobject.TYPE_BOOLEAN,
+        'date-column-visible': (GObject.TYPE_BOOLEAN,
                                  'Date',
                                  'Show date column',
                                  False,
-                                 gobject.PARAM_READWRITE),
+                                 GObject.PARAM_READWRITE),
 
-        'compact': (gobject.TYPE_BOOLEAN,
+        'compact': (GObject.TYPE_BOOLEAN,
                     'Compact view',
                     'Break ancestry lines to save space',
                     True,
-                    gobject.PARAM_CONSTRUCT | gobject.PARAM_READWRITE),
+                    GObject.PARAM_CONSTRUCT | GObject.PARAM_READWRITE),
 
-        'mainline-only': (gobject.TYPE_BOOLEAN,
+        'mainline-only': (GObject.TYPE_BOOLEAN,
                     'Mainline only',
                     'Only show the mainline history.',
                     False,
-                    gobject.PARAM_CONSTRUCT | gobject.PARAM_READWRITE),
+                    GObject.PARAM_CONSTRUCT | GObject.PARAM_READWRITE),
 
     }
 
     __gsignals__ = {
-        'revision-selected': (gobject.SIGNAL_RUN_FIRST,
-                              gobject.TYPE_NONE,
+        'revision-selected': (GObject.SignalFlags.RUN_FIRST,
+                              None,
                               ()),
-        'revision-activated': (gobject.SIGNAL_RUN_FIRST,
-                              gobject.TYPE_NONE,
-                              (gobject.TYPE_PYOBJECT, gobject.TYPE_PYOBJECT)),
-        'tag-added': (gobject.SIGNAL_RUN_FIRST,
-                              gobject.TYPE_NONE,
-                              (gobject.TYPE_STRING, gobject.TYPE_STRING)),
-        'refreshed': (gobject.SIGNAL_RUN_FIRST, gobject.TYPE_NONE,
+        'revision-activated': (GObject.SignalFlags.RUN_FIRST,
+                              None,
+                              (GObject.TYPE_PYOBJECT, GObject.TYPE_PYOBJECT)),
+        'tag-added': (GObject.SignalFlags.RUN_FIRST,
+                              None,
+                              (GObject.TYPE_STRING, GObject.TYPE_STRING)),
+        'refreshed': (GObject.SignalFlags.RUN_FIRST, None,
                               ())
     }
 
@@ -105,20 +105,20 @@ class TreeView(gtk.VBox):
         :param broken_line_length: After how much lines to break 
                                    branches.
         """
-        gtk.VBox.__init__(self, spacing=0)
+        super(TreeView, self).__init__(homogeneous=False, spacing=0)
 
         self.progress_widget = ProgressPanel()
-        self.pack_start(self.progress_widget, expand=False, fill=True)
+        self.pack_start(self.progress_widget, False, True, 0)
         if getattr(ui.ui_factory, "set_progress_bar_widget", None) is not None:
             # We'are using our own ui, let's tell it to use our widget.
             ui.ui_factory.set_progress_bar_widget(self.progress_widget)
 
-        self.scrolled_window = gtk.ScrolledWindow()
-        self.scrolled_window.set_policy(gtk.POLICY_AUTOMATIC,
-                                        gtk.POLICY_AUTOMATIC)
-        self.scrolled_window.set_shadow_type(gtk.SHADOW_IN)
+        self.scrolled_window = Gtk.ScrolledWindow()
+        self.scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC,
+                                        Gtk.PolicyType.AUTOMATIC)
+        self.scrolled_window.set_shadow_type(Gtk.ShadowType.IN)
         self.scrolled_window.show()
-        self.pack_start(self.scrolled_window, expand=True, fill=True)
+        self.pack_start(self.scrolled_window, True, True, 0)
 
         self.scrolled_window.add(self.construct_treeview())
 
@@ -131,8 +131,8 @@ class TreeView(gtk.VBox):
         self.maxnum = maxnum
         self.compact = compact
 
-        self.model = treemodel.TreeModel(self.branch, [])
-        gobject.idle_add(self.populate)
+        self.model = treemodel.BranchTreeModel(self.branch, [])
+        GObject.idle_add(self.populate)
 
         self.connect("destroy", self._on_destroy)
 
@@ -211,7 +211,8 @@ class TreeView(gtk.VBox):
 
         :param revid: Revision id of revision to display.
         """
-        self.treeview.set_cursor(self.index[revid])
+        self.treeview.set_cursor(
+            Gtk.TreePath(path=self.index[revid]), None, False)
         self.treeview.grab_focus()
 
     def get_children(self):
@@ -243,7 +244,7 @@ class TreeView(gtk.VBox):
             self.emit('tag-added', tag, revid)
 
     def refresh(self):
-        gobject.idle_add(self.populate, self.get_revision())
+        GObject.idle_add(self.populate, self.get_revision())
 
     def update(self):
         try:
@@ -259,7 +260,7 @@ class TreeView(gtk.VBox):
     def back(self):
         """Signal handler for the Back button."""
         parents = self.get_parents()
-        if not len(parents):
+        if not parents:
             return
 
         for parent_id in parents:
@@ -274,7 +275,7 @@ class TreeView(gtk.VBox):
     def forward(self):
         """Signal handler for the Forward button."""
         children = self.get_children()
-        if not len(children):
+        if not children:
             return
 
         for child_id in children:
@@ -311,26 +312,30 @@ class TreeView(gtk.VBox):
             show_graph = self.graph_column.get_visible()
 
             self.branch.lock_read()
-            (linegraphdata, index, columns_len) = linegraph(self.branch.repository.get_graph(),
-                                                            self.start,
-                                                            self.maxnum, 
-                                                            broken_line_length,
-                                                            show_graph,
-                                                            self.mainline_only,
-                                                            self.progress_bar)
+            (linegraphdata, index, columns_len) = linegraph(
+                self.branch.repository.get_graph(),
+                self.start,
+                self.maxnum, 
+                broken_line_length,
+                show_graph,
+                self.mainline_only,
+                self.progress_bar)
 
-            self.model.line_graph_data = linegraphdata
+            self.model.set_line_graph_data(linegraphdata)
             self.graph_cell.columns_len = columns_len
-            width = self.graph_cell.get_size(self.treeview)[2]
+            width = self.graph_cell.get_preferred_width(self.treeview)[1]
             if width > 500:
                 width = 500
+            elif width == 0:
+                # The get_preferred_width() call got an insane value.
+                width = 200
             self.graph_column.set_fixed_width(width)
             self.graph_column.set_max_width(width)
             self.index = index
             self.treeview.set_model(self.model)
 
             if not revision or revision == NULL_REVISION:
-                self.treeview.set_cursor(0)
+                self.treeview.set_cursor(Gtk.TreePath(path=0), None, False)
             else:
                 self.set_revision(revision)
 
@@ -340,7 +345,7 @@ class TreeView(gtk.VBox):
             self.progress_bar.finished()
 
     def construct_treeview(self):
-        self.treeview = gtk.TreeView()
+        self.treeview = Gtk.TreeView()
 
         self.treeview.set_rules_hint(True)
         # combined revno/summary interactive search
@@ -353,13 +358,11 @@ class TreeView(gtk.VBox):
             return (model.get_value(iter, treemodel.REVNO).find(key) != 0
                 and model.get_value(iter, treemodel.MESSAGE).lower().find(key.lower()) == -1)
 
-        self.treeview.set_search_equal_func(search_equal_func)
+        self.treeview.set_search_equal_func(search_equal_func, None)
         self.treeview.set_enable_search(True)
 
-        # Fix old PyGTK bug - by JAM
-        set_tooltip = getattr(self.treeview, 'set_tooltip_column', None)
-        if set_tooltip is not None:
-            set_tooltip(treemodel.MESSAGE)
+        self.treeview.set_tooltip_column(treemodel.MESSAGE)
+        self.treeview.set_headers_visible(True)
 
         self._prev_cursor_path = None
         self.treeview.connect("cursor-changed",
@@ -375,60 +378,66 @@ class TreeView(gtk.VBox):
 
         self.treeview.show()
 
-        cell = gtk.CellRendererText()
+        cell = Gtk.CellRendererText()
         cell.set_property("width-chars", 15)
-        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.revno_column = gtk.TreeViewColumn("Revision No")
+        cell.set_property("ellipsize", Pango.EllipsizeMode.END)
+        self.revno_column = Gtk.TreeViewColumn("Revision No")
         self.revno_column.set_resizable(True)
-        self.revno_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.revno_column.set_fixed_width(cell.get_size(self.treeview)[2])
-        self.revno_column.pack_start(cell, expand=True)
+        self.revno_column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+        self.revno_column.set_fixed_width(
+            cell.get_preferred_width(self.treeview)[1])
+        self.revno_column.pack_start(cell, True)
         self.revno_column.add_attribute(cell, "text", treemodel.REVNO)
         self.treeview.append_column(self.revno_column)
 
         self.graph_cell = CellRendererGraph()
-        self.graph_column = gtk.TreeViewColumn()
+        self.graph_column = Gtk.TreeViewColumn()
         self.graph_column.set_resizable(True)
-        self.graph_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.graph_column.pack_start(self.graph_cell, expand=True)
-        self.graph_column.add_attribute(self.graph_cell, "node", treemodel.NODE)
-        self.graph_column.add_attribute(self.graph_cell, "tags", treemodel.TAGS)
-        self.graph_column.add_attribute(self.graph_cell, "in-lines", treemodel.LAST_LINES)
-        self.graph_column.add_attribute(self.graph_cell, "out-lines", treemodel.LINES)
+        self.graph_column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+        self.graph_column.pack_start(self.graph_cell, True)
+        self.graph_column.add_attribute(
+            self.graph_cell, "node", treemodel.NODE)
+        self.graph_column.add_attribute(
+            self.graph_cell, "tags", treemodel.TAGS)
+        self.graph_column.add_attribute(
+            self.graph_cell, "in-lines", treemodel.LAST_LINES)
+        self.graph_column.add_attribute(
+            self.graph_cell, "out-lines", treemodel.LINES)
         self.treeview.append_column(self.graph_column)
 
-        cell = gtk.CellRendererText()
+        cell = Gtk.CellRendererText()
         cell.set_property("width-chars", 65)
-        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.summary_column = gtk.TreeViewColumn("Summary")
+        cell.set_property("ellipsize", Pango.EllipsizeMode.END)
+        self.summary_column = Gtk.TreeViewColumn("Summary")
         self.summary_column.set_resizable(True)
         self.summary_column.set_expand(True)
-        self.summary_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
-        self.summary_column.set_fixed_width(cell.get_size(self.treeview)[2])
-        self.summary_column.pack_start(cell, expand=True)
+        self.summary_column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
+        self.summary_column.set_fixed_width(
+            cell.get_preferred_width(self.treeview)[1])
+        self.summary_column.pack_start(cell, True)
         self.summary_column.add_attribute(cell, "markup", treemodel.SUMMARY)
         self.treeview.append_column(self.summary_column)
 
-        cell = gtk.CellRendererText()
+        cell = Gtk.CellRendererText()
         cell.set_property("width-chars", 15)
-        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.authors_column = gtk.TreeViewColumn("Author(s)")
+        cell.set_property("ellipsize", Pango.EllipsizeMode.END)
+        self.authors_column = Gtk.TreeViewColumn("Author(s)")
         self.authors_column.set_resizable(False)
-        self.authors_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.authors_column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
         self.authors_column.set_fixed_width(200)
-        self.authors_column.pack_start(cell, expand=True)
+        self.authors_column.pack_start(cell, True)
         self.authors_column.add_attribute(cell, "text", treemodel.AUTHORS)
         self.treeview.append_column(self.authors_column)
 
-        cell = gtk.CellRendererText()
+        cell = Gtk.CellRendererText()
         cell.set_property("width-chars", 20)
-        cell.set_property("ellipsize", pango.ELLIPSIZE_END)
-        self.date_column = gtk.TreeViewColumn("Date")
+        cell.set_property("ellipsize", Pango.EllipsizeMode.END)
+        self.date_column = Gtk.TreeViewColumn("Date")
         self.date_column.set_visible(False)
         self.date_column.set_resizable(True)
-        self.date_column.set_sizing(gtk.TREE_VIEW_COLUMN_FIXED)
+        self.date_column.set_sizing(Gtk.TreeViewColumnSizing.FIXED)
         self.date_column.set_fixed_width(130)
-        self.date_column.pack_start(cell, expand=True)
+        self.date_column.pack_start(cell, True)
         self.date_column.add_attribute(cell, "text", treemodel.TIMESTAMP)
         self.treeview.append_column(self.date_column)
 
@@ -449,7 +458,7 @@ class TreeView(gtk.VBox):
                 [self.get_revision().revision_id],
                 self.branch)
             menu.connect('tag-added', lambda w, t, r: self.add_tag(t, r))
-            menu.popup(None, None, None, event.button, event.get_time())
+            menu.popup(None, None, None, None, event.button, event.get_time())
 
     def _on_revision_activated(self, widget, path, col):
         self.emit('revision-activated', path, col)

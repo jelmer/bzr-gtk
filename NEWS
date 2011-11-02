@@ -14,6 +14,8 @@
     interactive search for revision numbers continues to work.
     (Sergei Golubchik)
 
+  * Switch to gtk3. The old gtk2 branch is still available as lp:bzr-gtk/gtk2. (Curtis Hovey)
+
  BUG FIXES
 
   * Ensure config directory exists before writing configuration.

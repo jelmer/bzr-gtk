@@ -14,9 +14,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+__metaclass__ = type
+
 import sys
 
-class AnnotateColorMap(object):
+
+class AnnotateColorMap:
 
     really_old_color = "#0046FF"
 
@@ -62,9 +65,10 @@ class AnnotateColorMap(object):
 
         return color
 
+
 class AnnotateColorSaturation(AnnotateColorMap):
     def __init__(self, span=340.):
-        AnnotateColorMap.__init__(self, span)
+        super(AnnotateColorSaturation, self).__init__(span)
         self.current_angle = 0
 
     def hue(self, angle):
