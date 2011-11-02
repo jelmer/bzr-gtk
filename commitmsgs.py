@@ -96,7 +96,8 @@ def save_commit_messages(local, master, old_revno, old_revid,
     if b is None:
         b = master
     mgr = SavedCommitMessagesManager(None, b)
-    revid_iterator = b.repository.iter_reverse_revision_history(old_revid)
+    graph = b.repository.get_graph()
+    revid_iterator = graph.iter_lefthand_ancestry(old_revid)
     cur_revno = old_revno
     new_revision_id = old_revid
     graph = b.repository.get_graph()
