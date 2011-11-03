@@ -54,7 +54,6 @@ import bzrlib.api
 from bzrlib import (
     branch,
     config,
-    errors,
     )
 from bzrlib.commands import plugin_cmds
 
@@ -137,17 +136,9 @@ branch.Branch.hooks.install_named_hook('post_uncommit',
                                        save_commit_messages,
                                        "Saving commit messages for gcommit")
 
-credential_store_registry = getattr(config, "credential_store_registry", None)
-if credential_store_registry is not None:
-    try:
-        credential_store_registry.register_lazy(
-            "gnome-keyring", "bzrlib.plugins.gtk.keyring", "GnomeKeyringCredentialStore",
-            help="The GNOME Keyring.", fallback=True)
-    except TypeError:
-    # Fallback credentials stores were introduced in Bazaar 1.15
-        credential_store_registry.register_lazy(
-            "gnome-keyring", "bzrlib.plugins.gtk.keyring", "GnomeKeyringCredentialStore",
-            help="The GNOME Keyring.")
+config.credential_store_registry.register_lazy(
+    "gnome-keyring", "bzrlib.plugins.gtk.keyring", "GnomeKeyringCredentialStore",
+    help="The GNOME Keyring.", fallback=True)
 
 
 def load_tests(basic_tests, module, loader):
