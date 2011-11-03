@@ -24,6 +24,8 @@ from bzrlib.config import (
     CredentialStore,
     )
 
+from bzrlib import trace
+
 
 class GnomeKeyringCredentialStore(CredentialStore):
 
@@ -77,7 +79,6 @@ class GnomeKeyringCredentialStore(CredentialStore):
             return credentials
         except (gnomekeyring.NoMatchError, gnomekeyring.DeniedError, gnomekeyring.NoKeyringDaemonError,
                 gnomekeyring.IOError), e:
-            from bzrlib import trace
             trace.mutter('Unable to obtain credentials for %r from GNOME keyring: %r',
                          attrs, e)
             return None
