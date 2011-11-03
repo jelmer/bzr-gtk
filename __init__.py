@@ -136,10 +136,6 @@ branch.Branch.hooks.install_named_hook('post_uncommit',
                                        save_commit_messages,
                                        "Saving commit messages for gcommit")
 
-config.credential_store_registry.register_lazy(
-    "gnome-keyring", "bzrlib.plugins.gtk.keyring", "GnomeKeyringCredentialStore",
-    help="The GNOME Keyring.", fallback=True)
-
 
 def load_tests(basic_tests, module, loader):
     testmod_names = [

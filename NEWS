@@ -16,6 +16,10 @@
 
   * Switch to gtk3. The old gtk2 branch is still available as lp:bzr-gtk/gtk2. (Curtis Hovey)
 
+  * Remove keyring support - this is broken for GTK3, and replaced by a DBus service
+    that is not specific to GNOME. Instead, bzr or bzr-dbus will provide support
+    for this service. (Jelmer Vernooij)
+
  BUG FIXES
 
   * Ensure config directory exists before writing configuration.
