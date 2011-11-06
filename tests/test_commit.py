@@ -34,7 +34,10 @@ try:
 except ImportError:
     from bzrlib.util import bencode
 
-from bzrlib.plugins.gtk import commit
+from bzrlib.plugins.gtk import (
+    commit,
+    commitmsgs,
+    )
 
 
 # TODO: All we need is basic ancestry code to test this, we shouldn't need a
@@ -1128,7 +1131,7 @@ class TestSavedCommitMessages(tests.TestCaseWithTransport):
         super(TestSavedCommitMessages, self).setUp()
         # Install our hook
         branch.Branch.hooks.install_named_hook(
-            'post_uncommit', commit.save_commit_messages, None)
+            'post_uncommit', commitmsgs.save_commit_messages, None)
 
     def _get_file_info_dict(self, rank):
         file_info = [dict(path='a', file_id='a-id', message='a msg %d' % rank),
