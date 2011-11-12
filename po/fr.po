@@ -9,14 +9,14 @@ msgstr ""
 "Project-Id-Version: Olive 0.11\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2009-11-08 08:06+0000\n"
-"Last-Translator: Pierre Slamich <pierre.slamich@gmail.com>\n"
+"PO-Revision-Date: 2011-11-08 20:41+0000\n"
+"Last-Translator: Yoan Blanc <Unknown>\n"
 "Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-08 04:41+0000\n"
-"X-Generator: Launchpad (build 12351)\n"
+"X-Launchpad-Export-Date: 2011-11-09 04:37+0000\n"
+"X-Generator: Launchpad (build 14263)\n"
 
 #: ../bazaar-properties.desktop.in.h:1
 msgid "Bazaar Preferences"
@@ -309,7 +309,7 @@ msgstr ""
 
 #: ../conflicts.py:132
 msgid "missing parent"
-msgstr ""
+msgstr "parent manquant"
 
 #: ../conflicts.py:134
 msgid "deleting parent"
@@ -342,7 +342,7 @@ msgid ""
 "using the command line."
 msgstr ""
 "Actuellement, seuls les conflits sur les fichiers textes peuvent être "
-"résolus par Olive. Les conflits de contenu ou sur la structure de "
+"résolus par Olive. Les conflits de contenu sur la structure de "
 "l'arborescence doivent êtres résolus en utilisant la ligne de commande."
 
 #. View menu
@@ -378,7 +378,7 @@ msgstr "Le répertoire n'est pas une branche"
 
 #: ../errors.py:29
 msgid "You can perform this action only in a branch."
-msgstr "Cette action ne peut effectuée que sur une branche."
+msgstr "Cette action ne peut être effectuée que sur une branche."
 
 #: ../errors.py:31
 msgid "Directory is not a checkout"
@@ -407,7 +407,7 @@ msgstr ""
 
 #: ../errors.py:40
 msgid "Conflicts in tree"
-msgstr "Conflits dans l'arbre"
+msgstr "Conflits dans l'arborescence"
 
 #: ../errors.py:41
 msgid "You need to resolve the conflicts before committing."
@@ -422,7 +422,7 @@ msgid ""
 "There are unknown files in the working tree.\n"
 "Please add or delete them."
 msgstr ""
-"L'arbre de travail contient des fichiers inconnus.\n"
+"L'arborescence de travail contient des fichiers inconnus.\n"
 "Veuillez les ajouter ou les supprimer."
 
 #: ../errors.py:46
@@ -495,7 +495,7 @@ msgstr ""
 
 #: ../errors.py:68
 msgid "Branch without a working tree"
-msgstr "Branche sans répertoire de travail"
+msgstr "Branche sans arborescence de travail"
 
 #: ../errors.py:69
 #, python-format
@@ -715,577 +715,3 @@ msgstr "Aucun nom d'étiquette indiqué"
 #: ../tags.py:323
 msgid "You have to specify the tag's desired name."
 msgstr "Vous devez renseigner le nom d'étiquette souhaité."
-
-#~ msgid "_Rename..."
-#~ msgstr "_Renommer..."
-
-#~ msgid "_Move..."
-#~ msgstr "_Déplacer..."
-
-#~ msgid "Make _directory..."
-#~ msgstr "Créer un _répertoire..."
-
-#~ msgid "Remove file(s)..."
-#~ msgstr "Supprimer des fichiers..."
-
-#~ msgid "Olive - Bazaar GUI"
-#~ msgstr "Olive - Interface graphique de Bazaar"
-
-#~ msgid "_Add file(s)..."
-#~ msgstr "_Ajouter des fichiers..."
-
-#~ msgid "_File"
-#~ msgstr "_Fichier"
-
-#~ msgid "_Refresh"
-#~ msgstr "_Rafraîchir"
-
-#~ msgid "Show _hidden files"
-#~ msgstr "Afficher les fichiers _cachés"
-
-#~ msgid "C_heckout..."
-#~ msgstr "C_heckout..."
-
-#~ msgid "Pu_ll"
-#~ msgstr "Pu_ll"
-
-#~ msgid "S_tatus..."
-#~ msgstr "S_tatus"
-
-#~ msgid "_Commit..."
-#~ msgstr "_Commit..."
-
-#~ msgid "Pu_sh..."
-#~ msgstr "Pu_sh..."
-
-#~ msgid "_Log..."
-#~ msgstr "_Historique..."
-
-#~ msgid "_Differences..."
-#~ msgstr "_Différences..."
-
-#~ msgid "_Statistics"
-#~ msgstr "_Statistiques"
-
-#~ msgid "_Help"
-#~ msgstr "Aid_e"
-
-#~ msgid "Diff"
-#~ msgstr "Analyse des différences"
-
-#~ msgid "https://launchpad.net/products/olive"
-#~ msgstr "https://launchpad.net/products/olive"
-
-#~ msgid "Copyright (C) 2006 Szilveszter Farkas (Phanatic)"
-#~ msgstr "Copyright (C) 2006 Szilveszter Farkas (Phanatic)"
-
-#~ msgid "Which file(s) do you want to add?"
-#~ msgstr "Quel(s) fichier(s) souhaitez-vous ajouter ?"
-
-#~ msgid "Selected only"
-#~ msgstr "Uniquement sélectionné(s)"
-
-#~ msgid "Olive - Add file(s)"
-#~ msgstr "Olive - Ajouter des fichiers"
-
-#~ msgid "Olive - Remove file(s)"
-#~ msgstr "Olive - Suppression de fichiers"
-
-#~ msgid "Which file(s) do you want to remove?"
-#~ msgstr "Quel(s) fichier(s) souhaitez-vous supprimer ?"
-
-#~ msgid "All unknowns recursively"
-#~ msgstr "Tous les inconnus récursivement"
-
-#~ msgid "_Add"
-#~ msgstr "_Ajouter"
-
-#~ msgid "All files with status 'added'"
-#~ msgstr "Tous les fichiers avec le statut « added »"
-
-#~ msgid "_Remove"
-#~ msgstr "_Supprimer"
-
-#~ msgid "Olive - Make directory"
-#~ msgstr "Olive - Créer un répertoire"
-
-#~ msgid "_Versioned directory"
-#~ msgstr "Répertoire sous ré_vision"
-
-#~ msgid "_Make directory"
-#~ msgstr "_Créer un répertoire"
-
-#~ msgid "_Get..."
-#~ msgstr "_Obtenir..."
-
-#~ msgid "Olive - Move"
-#~ msgstr "Olive - Move"
-
-#~ msgid "Move to"
-#~ msgstr "Déplacer vers"
-
-#~ msgid "Shared repository: "
-#~ msgstr "Dépôt partagé : "
-
-#~ msgid "Light checkout root: "
-#~ msgstr "Racine du checkout léger : "
-
-#~ msgid "_Rename"
-#~ msgstr "_Renommer"
-
-#~ msgid "Rename to"
-#~ msgstr "Renommer en"
-
-#~ msgid "Olive - Rename"
-#~ msgstr "Olive - Renommer"
-
-#~ msgid "_Move"
-#~ msgstr "_Déplacer"
-
-#~ msgid "Select a directory"
-#~ msgstr "Sélectionnez un répertoire"
-
-#~ msgid "Publish to branch: "
-#~ msgstr "Publier vers la branche : "
-
-#~ msgid "Parent branch: "
-#~ msgstr "Branche parente : "
-
-#~ msgid "Checkout root: "
-#~ msgstr "Checkout racine : "
-
-#~ msgid "(none)"
-#~ msgstr "(aucun)"
-
-#~ msgid "Repository checkout: "
-#~ msgstr "Dépôt du checkout : "
-
-#~ msgid "Branch root: "
-#~ msgstr "Branche racine : "
-
-#~ msgid "Control format: "
-#~ msgstr "Format de contrôle : "
-
-#~ msgid "Working tree format: "
-#~ msgstr "Format du répertoire de travail : "
-
-#~ msgid "Repository lock status: "
-#~ msgstr "Statut du verrou du dépôt : "
-
-#~ msgid "Branch lock status: "
-#~ msgstr "Statut du verrou de la branche : "
-
-#~ msgid "Missing revisions in working tree: "
-#~ msgstr "Révisions manquantes dans le répertoire de travail : "
-
-#~ msgid "Repository format: "
-#~ msgstr "Format du dépôt : "
-
-#~ msgid "Branch format: "
-#~ msgstr "Format de la branche : "
-
-#~ msgid "Working tree lock status: "
-#~ msgstr "Statut du verrou du répertoire de travail : "
-
-#~ msgid "Missing revisions in branch: "
-#~ msgstr "Révisions manquantes dans la branche : "
-
-#~ msgid "Revisions in branch: "
-#~ msgstr "Révisions dans la branche : "
-
-#~ msgid "Renamed files: "
-#~ msgstr "Fichiers renommés : "
-
-#~ msgid "Unknown files: "
-#~ msgstr "Fichiers inconnus : "
-
-#~ msgid "Versioned subdirectories: "
-#~ msgstr "Sous-répertoires avec révisions : "
-
-#~ msgid "Removed files: "
-#~ msgstr "Fichiers supprimés : "
-
-#~ msgid "Ignored files: "
-#~ msgstr "Fichiers ignorés : "
-
-#~ msgid "Time of first revision: "
-#~ msgstr "Date de la première révision : "
-
-#~ msgid "Age of branch in days: "
-#~ msgstr "Age de la branche en jours : "
-
-#~ msgid "Number of commiters: "
-#~ msgstr "Nombre de commiteurs : "
-
-#~ msgid "Title:"
-#~ msgstr "Titre :"
-
-#~ msgid ""
-#~ "Please select a file from the list,\n"
-#~ "or choose the other option."
-#~ msgstr ""
-#~ "Veuillez sélectionner un fichier de la liste\n"
-#~ "ou choisir l'autre option."
-
-#~ msgid "Size of repository: "
-#~ msgstr "Taille du dépôt : "
-
-#~ msgid "Revisions in repository: "
-#~ msgstr "Révisions dans le dépôt : "
-
-#~ msgid "Please specify a title to continue."
-#~ msgstr "Veuillez renseigner un titre pour poursuivre."
-
-#~ msgid "No title given"
-#~ msgstr "Aucun titre renseigné"
-
-#~ msgid "Parent location is unknown"
-#~ msgstr "L'emplacement parent est inconnu"
-
-#~ msgid "Pull successful"
-#~ msgstr "Pull réussi"
-
-#, python-format
-#~ msgid "%d revision(s) pulled."
-#~ msgstr "%d révision(s) importée(s)."
-
-#~ msgid "Add the selected file"
-#~ msgstr "Ajoute le fichier sélectionné"
-
-#~ msgid "Add"
-#~ msgstr "Ajouter"
-
-#~ msgid "unchanged"
-#~ msgstr "inchangé"
-
-#~ msgid "Bookmark"
-#~ msgstr "Marque-page"
-
-#~ msgid "Bookmarks"
-#~ msgstr "Marque-pages"
-
-#~ msgid "UI description file cannot be found."
-#~ msgstr "Impossible de trouver le fichier de description UI."
-
-#~ msgid "Status"
-#~ msgstr "État"
-
-#~ msgid "Filename"
-#~ msgstr "Nom de fichier"
-
-#~ msgid "unknown"
-#~ msgstr "inconnu"
-
-#~ msgid "Glade file cannot be found."
-#~ msgstr "Impossible de trouver le fichier Glade."
-
-#~ msgid "Show the differences of all files"
-#~ msgstr "Affiche les différences de tous les fichiers"
-
-#~ msgid "All..."
-#~ msgstr "Toutes..."
-
-#~ msgid "Selected..."
-#~ msgstr "Sélectionné..."
-
-#~ msgid "Show the differences of the selected file"
-#~ msgstr "Affiche les différences du fichier sélectionné"
-
-#~ msgid "Bookmark current location"
-#~ msgstr "Marque l'emplacement courant"
-
-#~ msgid "Edit"
-#~ msgstr "Éditer"
-
-#~ msgid "Edit the selected bookmark"
-#~ msgstr "Édite le marque-page sélectionné"
-
-#~ msgid "Remove the selected bookmark"
-#~ msgstr "Supprime le marque-page sélectionné"
-
-#~ msgid "Commit the changes"
-#~ msgstr "Commit les changements"
-
-#~ msgid "Show the diff of the file"
-#~ msgstr "Affiche les différences du fichier"
-
-#~ msgid ""
-#~ "The current directory was bookmarked. You can reach\n"
-#~ "it by selecting it from the left panel."
-#~ msgstr ""
-#~ "Le répertoire courant a été marqué. Il est dorénavant\n"
-#~ "possible de l'atteindre en le sélectionnant depuis le\n"
-#~ "panneau gauche."
-
-#~ msgid ""
-#~ "The current directory is already bookmarked.\n"
-#~ "See the left panel for reference."
-#~ msgstr ""
-#~ "Le répertoire courant est déjà marqué.\n"
-#~ "Consultez le panneau de gauche pour référence."
-
-#~ msgid "Location already bookmarked"
-#~ msgstr "Emplacement déjà marqué"
-
-#~ msgid "Please specify a desired name for the new directory."
-#~ msgstr "Veuillez indiquer le nom souhaité pour le nouveau répertoire."
-
-#~ msgid "No directory name given"
-#~ msgstr "Aucun nom de répertoire renseigné"
-
-#~ msgid "Bookmark successfully added"
-#~ msgstr "Marque-page ajouté avec succès"
-
-#~ msgid "Directory already exists"
-#~ msgstr "Le répertoire existe déjà"
-
-#~ msgid "Please specify another name to continue."
-#~ msgstr "Veuillez indiquer un nom différent pour poursuivre."
-
-#~ msgid "Not the same branch"
-#~ msgstr "Ce n'est pas la même branche"
-
-#~ msgid "Please select a file from the list to proceed."
-#~ msgstr "Veuillez choisir un fichier de la liste pour opérer."
-
-#~ msgid "The destination is not in the same branch."
-#~ msgstr "La destination ne se trouve pas dans la même branche."
-
-#~ msgid "No added files were found in the working tree."
-#~ msgstr "Aucun fichier ajouté n'a été trouvé dans le répertoire de travail."
-
-#~ msgid "No matching files"
-#~ msgstr "Aucun fichier correspondant"
-
-#~ msgid "Checkout of branch: "
-#~ msgstr "Checkout de la branche : "
-
-#~ msgid "Repository branch: "
-#~ msgstr "Branche du dépôt : "
-
-#~ msgid "Please specify a new name for the file."
-#~ msgstr "Veuillez indiquer un nouveau nom pour le fichier."
-
-#~ msgid "Filename not given"
-#~ msgstr "Nom de fichier non fourni"
-
-#~ msgid "Unchanged files: "
-#~ msgstr "Fichiers inchangés : "
-
-#~ msgid "Modified files: "
-#~ msgstr "Fichiers modifiés : "
-
-#~ msgid "Added files: "
-#~ msgstr "Fichiers ajoutés : "
-
-#~ msgid "Time of last revision: "
-#~ msgstr "Date de la dernière révision : "
-
-#~ msgid "There are missing revisions"
-#~ msgstr "Il y a des révisions manquantes"
-
-#~ msgid "Cannot determine missing revisions if no parent location is known."
-#~ msgstr ""
-#~ "Impossible de trouver les révisions manquantes si l'emplacement parent n'est "
-#~ "pas connu."
-
-#~ msgid "Local branch up to date"
-#~ msgstr "La branche locale est à jour"
-
-#, python-format
-#~ msgid "%d revision(s) missing."
-#~ msgstr "%d révision(s) manquante(s)."
-
-#~ msgid "There are no missing revisions."
-#~ msgstr "Il n'y a pas de révisions manquantes."
-
-#~ msgid "_Information..."
-#~ msgstr "_Information..."
-
-#~ msgid "Olive - Information"
-#~ msgstr "Olive - Information"
-
-#~ msgid "<b>Location:</b>"
-#~ msgstr "<b>Emplacement :</b>"
-
-#~ msgid "<b>Related branches:</b>"
-#~ msgstr "<b>Relatifs aux branches :</b>"
-
-#~ msgid "<b>Format:</b>"
-#~ msgstr "<b>Format :</b>"
-
-#~ msgid "<b>Lock status:</b>"
-#~ msgstr "<b>État du verrou :</b>"
-
-#~ msgid "<b>Missing revisions:</b>"
-#~ msgstr "<b>Révisions manquantes :</b>"
-
-#~ msgid "<b>In the working tree:</b>"
-#~ msgstr "<b>Dans le répertoire de travail :</b>"
-
-#~ msgid "<b>Branch history:</b>"
-#~ msgstr "<b>Historique de la branche :</b>"
-
-#~ msgid "<b>Revision store:</b>"
-#~ msgstr "<b>Stockage des révisions :</b>"
-
-#~ msgid "Pulling is not possible until there is a parent location."
-#~ msgstr ""
-#~ "Impossible d'effectuer un « pull » tant que l'emplacement parent est absent."
-
-#~ msgid "Remove"
-#~ msgstr "Supprimer"
-
-#~ msgid "Remove the selected file"
-#~ msgstr "Supprime le fichier sélectionné"
-
-#~ msgid "Open"
-#~ msgstr "Ouvrir"
-
-#~ msgid "Open the selected file"
-#~ msgstr "Ouvrir le fichier sélectionné"
-
-#~ msgid "Open Folder"
-#~ msgstr "Ouvrir le dossier"
-
-#~ msgid "Open bookmark folder in Nautilus"
-#~ msgstr "Ouvrir le dossier en marque-page dans Nautilus"
-
-#~ msgid "There are no changes in the working tree."
-#~ msgstr "Aucun changement n'a été effectué dans le répertoire de travail."
-
-#~ msgid "Pending merges"
-#~ msgstr "Fusions en attente"
-
-#~ msgid "Revno"
-#~ msgstr "Renvo"
-
-#~ msgid "Set default push location"
-#~ msgstr "Définition de l'emplacement par défaut du push"
-
-#, python-format
-#~ msgid ""
-#~ "There is no default push location set.\n"
-#~ "Set %r as default now?"
-#~ msgstr ""
-#~ "Il n'y a pas d'emplacement défini par défaut pour le push.\n"
-#~ "Voulez-vous maintenant définir « %r » par défaut ?"
-
-#~ msgid "Please wait, revisions are being loaded..."
-#~ msgstr "Veuillez patienter, les révisions sont en cours de chargement..."
-
-#~ msgid "Revert successful"
-#~ msgstr "Rétablissement réussi"
-
-#~ msgid "All files reverted to last revision."
-#~ msgstr "Tous les fichiers ont été rétablis à la dernière révision."
-
-#~ msgid "ignored"
-#~ msgstr "ignoré"
-
-#~ msgid "Please have a look at the working tree before continuing."
-#~ msgstr "Vérifiez le répertoire de travail avant de poursuivre."
-
-#~ msgid "Conflicts detected"
-#~ msgstr "Conflits détectés"
-
-#~ msgid "Last modified"
-#~ msgstr "Dernière modification"
-
-#~ msgid "Size"
-#~ msgstr "Taille"
-
-#~ msgid "Rename the selected file"
-#~ msgstr "Renommer le fichier sélectionné"
-
-#~ msgid "Remove the selected file/dir and delete from disk"
-#~ msgstr "Enlève les fichiers/répertoires sélectionnés et les efface"
-
-#~ msgid "Rename"
-#~ msgstr "Renommer"
-
-#~ msgid "H_istory Mode"
-#~ msgstr "Mode H_istorique"
-
-#~ msgid "_Initialize..."
-#~ msgstr "_Initialiser..."
-
-#~ msgid "_Annotate..."
-#~ msgstr "_Annoter..."
-
-#~ msgid "_Merge..."
-#~ msgstr "_Fusionner..."
-
-#~ msgid "Missing _revisions"
-#~ msgstr "_Révisions manquantes"
-
-#~ msgid "_Revert all changes"
-#~ msgstr "Annule_r les modifications"
-
-#~ msgid "Delete directory with all directories below ?"
-#~ msgstr "Supprimer le répertoire et tous ses sous-répertoires ?"
-
-#~ msgid "Revert"
-#~ msgstr "Rétablir"
-
-#~ msgid "Annotate the selected file"
-#~ msgstr "Annoter le fichier sélectionné"
-
-#~ msgid "View contents"
-#~ msgstr "Voir le contenu"
-
-#~ msgid "Revert the changes"
-#~ msgstr "Annuler les changements"
-
-#~ msgid "Annotate"
-#~ msgstr "Annoter"
-
-#~ msgid "Show the differences between two revisions of the file"
-#~ msgstr "Afficher les différences entre deux révisions du fichier"
-
-#~ msgid "View the contents of the file in a builtin viewer"
-#~ msgstr "Voir le contenu du fichier dans le visualiseur intégré"
-
-#~ msgid "Show differences"
-#~ msgstr "Montrer les différences"
-
-#~ msgid "Merge - Olive"
-#~ msgstr "Fusion - Olive"
-
-#~ msgid "Merge from:"
-#~ msgstr "Fusionner à partir de :"
-
-#~ msgid "gtk-jump-to"
-#~ msgstr "gtk-jump-to"
-
-#~ msgid "Remove and delete"
-#~ msgstr "Supprimer et effacer"
-
-#~ msgid "Revert the selected file to the selected revision"
-#~ msgstr "Rétablir le fichier sélectionné vers la révision sélectionnée"
-
-#~ msgid "Revert to this revision"
-#~ msgstr "Rétablir à cette révision"
-
-#~ msgid "Commit message:"
-#~ msgstr "Message de validation :"
-
-#~ msgid "Con_flicts..."
-#~ msgstr "Con_flits"
-
-#~ msgid "translator-credits"
-#~ msgstr ""
-#~ "Launchpad Contributions:\n"
-#~ "  Bastien Jaillot https://launchpad.net/~bastnic\n"
-#~ "  Bruno Bord https://launchpad.net/~brunobord\n"
-#~ "  DarkRedman https://launchpad.net/~darkredman\n"
-#~ "  Francois Audirac https://launchpad.net/~francois-audirac\n"
-#~ "  Hanusz leszek https://launchpad.net/~leszek-skynet\n"
-#~ "  Jean-François Fortin Tam https://launchpad.net/~kiddo\n"
-#~ "  NSV https://launchpad.net/~nsv\n"
-#~ "  Pierre Slamich https://launchpad.net/~pierre-slamich\n"
-#~ "  Shrat https://launchpad.net/~dyonisiaque\n"
-#~ "  Stéphane Raimbault https://launchpad.net/~sra\n"
-#~ "  Wilfried Kopp https://launchpad.net/~chevdor\n"
-#~ "  Yoan Blanc https://launchpad.net/~greut\n"
-#~ "  codL https://launchpad.net/~codlgaez"
