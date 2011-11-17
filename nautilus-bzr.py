@@ -88,11 +88,11 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
         tree = controldir.open_workingtree()
         tree.remove(path)
 
-    def annotate_cb(self, menu, vfs_file):
+    def annotate_cb(self, menu, tree, path, file_id):
         from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
-        controldir, path = self._open_bzrdir(vfs_file)
         win = GAnnotateWindow()
-        win.annotate(controldir.open_workingtree(), controldir.open_branch(), path)
+        win.show()
+        win.annotate(tree, tree.branch, file_id)
         Gtk.main()
 
     def clone_cb(self, menu, vfs_file=None):
@@ -120,7 +120,7 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
         from bzrlib.plugins.gtk.viz import BranchWindow
         controldir, path = self._open_bzrdir(vfs_file)
         branch = controldir.open_branch()
-        pp = BranchWindow(branch, [branch.last_revision()])
+        pp = BranchWindow(branch, [branch.last_revision()], None)
         pp.show()
         Gtk.main()
 
@@ -149,15 +149,17 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
             branch = controldir.open_branch()
         except NotBranchError:
             items = []
-            item = Nautilus.MenuItem('BzrNautilus::newtree',
-                                 'Make directory versioned',
-                                 'Create new Bazaar tree in this folder')
+            item = Nautilus.MenuItem(name='BzrNautilus::newtree',
+                                 label='Make directory versioned',
+                                 tip='Create new Bazaar tree in this folder',
+                                 icon='')
             item.connect('activate', self.newtree_cb, vfs_file)
             items.append(item)
 
-            item = Nautilus.MenuItem('BzrNautilus::clone',
-                                 'Checkout Bazaar branch ...',
-                                 'Checkout Existing Bazaar Branch')
+            item = Nautilus.MenuItem(name='BzrNautilus::clone',
+                                 label='Checkout Bazaar branch ...',
+                                 tip='Checkout Existing Bazaar Branch',
+                                 icon='')
             item.connect('activate', self.clone_cb, vfs_file)
             items.append(item)
             return items
@@ -166,48 +168,55 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
 
         nautilus_integration = self.check_branch_enabled(branch)
         if not nautilus_integration:
-            item = Nautilus.MenuItem('BzrNautilus::enable',
-                                     'Enable Bazaar Plugin for this Branch',
-                                     'Enable Bazaar plugin for nautilus')
+            item = Nautilus.MenuItem(name='BzrNautilus::enable',
+                                     label='Enable Bazaar Plugin for this Branch',
+                                     tip='Enable Bazaar plugin for nautilus',
+                                     icon='')
             item.connect('activate', self.toggle_integration, True, vfs_file)
             return [item]
         else:
-            item = Nautilus.MenuItem('BzrNautilus::disable',
-                                     'Disable Bazaar Plugin this Branch',
-                                     'Disable Bazaar plugin for nautilus')
+            item = Nautilus.MenuItem(name='BzrNautilus::disable',
+                                     label='Disable Bazaar Plugin this Branch',
+                                     tip='Disable Bazaar plugin for nautilus',
+                                     icon='')
             item.connect('activate', self.toggle_integration, False, vfs_file)
             items.append(item)
 
-        item = Nautilus.MenuItem('BzrNautilus::log',
-                             'History ...',
-                             'Show Bazaar history')
+        item = Nautilus.MenuItem(name='BzrNautilus::log',
+                             label='History ...',
+                             tip='Show Bazaar history',
+                             icon='')
         item.connect('activate', self.log_cb, vfs_file)
         items.append(item)
 
-        item = Nautilus.MenuItem('BzrNautilus::pull',
-                             'Pull ...',
-                             'Pull from another branch')
+        item = Nautilus.MenuItem(name='BzrNautilus::pull',
+                             label='Pull ...',
+                             tip='Pull from another branch',
+                             icon='')
         item.connect('activate', self.pull_cb, vfs_file)
         items.append(item)
 
         try:
             tree = controldir.open_workingtree()
         except NoWorkingTree:
-            item = Nautilus.MenuItem('BzrNautilus::create_tree',
-                                 'Create working tree...',
-                                 'Create a working tree for this branch')
+            item = Nautilus.MenuItem(name='BzrNautilus::create_tree',
+                                 label='Create working tree...',
+                                 tip='Create a working tree for this branch',
+                                 icon='')
             item.connect('activate', self.create_tree_cb, vfs_file)
             items.append(item)
         else:
-            item = Nautilus.MenuItem('BzrNautilus::merge',
-                                 'Merge ...',
-                                 'Merge from another branch')
+            item = Nautilus.MenuItem(name='BzrNautilus::merge',
+                                 label='Merge ...',
+                                 tip='Merge from another branch',
+                                 icon='')
             item.connect('activate', self.merge_cb, vfs_file)
             items.append(item)
 
-            item = Nautilus.MenuItem('BzrNautilus::commit',
-                                 'Commit ...',
-                                 'Commit Changes')
+            item = Nautilus.MenuItem(name='BzrNautilus::commit',
+                                 label='Commit ...',
+                                 tip='Commit Changes',
+                                 icon='')
             item.connect('activate', self.commit_cb, vfs_file)
             items.append(item)
 
@@ -230,54 +239,62 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
 
             file_id = tree.path2id(path)
             if file_id is None:
-                item = Nautilus.MenuItem('BzrNautilus::add',
-                                     'Add',
-                                     'Add as versioned file')
+                item = Nautilus.MenuItem(name='BzrNautilus::add',
+                                     label='Add',
+                                     tip='Add as versioned file',
+                                     icon='')
                 item.connect('activate', self.add_cb, vfs_file)
                 items.append(item)
 
-                item = Nautilus.MenuItem('BzrNautilus::ignore',
-                                     'Ignore',
-                                     'Ignore file for versioning')
+                item = Nautilus.MenuItem(name='BzrNautilus::ignore',
+                                     label='Ignore',
+                                     tip='Ignore file for versioning',
+                                     icon='')
                 item.connect('activate', self.ignore_cb, vfs_file)
                 items.append(item)
             elif tree.is_ignored(path):
-                item = Nautilus.MenuItem('BzrNautilus::unignore',
-                                     'Unignore',
-                                     'Unignore file for versioning')
+                item = Nautilus.MenuItem(name='BzrNautilus::unignore',
+                                     label='Unignore',
+                                     tip='Unignore file for versioning',
+                                     icon='')
                 item.connect('activate', self.unignore_cb, vfs_file)
                 items.append(item)
             else:
-                item = Nautilus.MenuItem('BzrNautilus::log',
-                                 'History ...',
-                                 'List changes')
+                item = Nautilus.MenuItem(name='BzrNautilus::log',
+                                 label='History ...',
+                                 tip='List changes',
+                                 icon='')
                 item.connect('activate', self.log_cb, vfs_file)
                 items.append(item)
 
                 intertree = InterTree.get(tree.basis_tree(), tree)
                 if not intertree.file_content_matches(file_id, file_id):
-                    item = Nautilus.MenuItem('BzrNautilus::diff',
-                                     'View Changes ...',
-                                     'Show differences')
+                    item = Nautilus.MenuItem(name='BzrNautilus::diff',
+                                     label='View Changes ...',
+                                     tip='Show differences',
+                                     icon='')
                     item.connect('activate', self.diff_cb, vfs_file)
                     items.append(item)
 
-                    item = Nautilus.MenuItem('BzrNautilus::commit',
-                                 'Commit ...',
-                                 'Commit Changes')
+                    item = Nautilus.MenuItem(name='BzrNautilus::commit',
+                                 label='Commit ...',
+                                 tip='Commit Changes',
+                                 icon='')
                     item.connect('activate', self.commit_cb, vfs_file)
                     items.append(item)
 
-                item = Nautilus.MenuItem('BzrNautilus::remove',
-                                     'Remove',
-                                     'Remove this file from versioning')
+                item = Nautilus.MenuItem(name='BzrNautilus::remove',
+                                     label='Remove',
+                                     tip='Remove this file from versioning',
+                                     icon='')
                 item.connect('activate', self.remove_cb, vfs_file)
                 items.append(item)
 
-                item = Nautilus.MenuItem('BzrNautilus::annotate',
-                             'Annotate ...',
-                             'Annotate File Data')
-                item.connect('activate', self.annotate_cb, vfs_file)
+                item = Nautilus.MenuItem(name='BzrNautilus::annotate',
+                             label='Annotate ...',
+                             tip='Annotate File Data',
+                             icon='')
+                item.connect('activate', self.annotate_cb, tree, path, file_id)
                 items.append(item)
         return items
 
