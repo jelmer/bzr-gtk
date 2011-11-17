@@ -14,8 +14,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-13 04:43+0000\n"
-"X-Generator: Launchpad (build 12559)\n"
+"X-Launchpad-Export-Date: 2011-11-17 04:31+0000\n"
+"X-Generator: Launchpad (build 14291)\n"
 
 #: ../bazaar-properties.desktop.in.h:1
 msgid "Bazaar Preferences"
@@ -42,165 +42,165 @@ msgid "Notification Area Icon for Bazaar"
 msgstr ""
 
 #. Create the widgets
-#: ../branch.py:52
+#: ../branch.py:46
 msgid "_Branch"
 msgstr "_Zweig"
 
-#: ../branch.py:55 ../checkout.py:55
+#: ../branch.py:49 ../checkout.py:49
 msgid "Branch location:"
 msgstr "Zweig Position:"
 
-#: ../branch.py:57 ../checkout.py:56
+#: ../branch.py:51 ../checkout.py:50
 msgid "Destination:"
 msgstr "Zielort:"
 
-#: ../branch.py:58
+#: ../branch.py:52
 msgid "Branck nick:"
 msgstr "Zweig Spitzname:"
 
-#: ../branch.py:59 ../checkout.py:58
+#: ../branch.py:53 ../checkout.py:52
 msgid "Revision:"
 msgstr "Revision:"
 
-#: ../branch.py:60 ../checkout.py:53
+#: ../branch.py:54 ../checkout.py:47
 msgid "Please select a folder"
 msgstr "Bitte wählen Sie ein Verzeichnis"
 
-#: ../branch.py:140 ../checkout.py:159
+#: ../branch.py:134 ../checkout.py:153
 msgid "Missing branch location"
 msgstr "Fehlender Zweigpfad"
 
-#: ../branch.py:141 ../checkout.py:160
+#: ../branch.py:135 ../checkout.py:154
 msgid "You must specify a branch location."
 msgstr "Sie müssen einen Zweigpfad angeben."
 
-#: ../branch.py:182
+#: ../branch.py:174
 msgid "Branching successful"
 msgstr "Abzweigung erfolgreich"
 
-#: ../branch.py:183
+#: ../branch.py:175
 #, python-format
 msgid "%d revision(s) branched."
 msgstr "%d Revision(en) abgezweigt."
 
-#: ../branch.py:191 ../checkout.py:191
+#: ../branch.py:183 ../checkout.py:185
 msgid "N/A"
 msgstr "Nicht Verfügbar"
 
 #. Create the widgets
-#: ../checkout.py:50
+#: ../checkout.py:44
 msgid "Check_out"
 msgstr "_Checkout"
 
-#: ../checkout.py:57
+#: ../checkout.py:51
 msgid "Branch nick:"
 msgstr ""
 
-#: ../checkout.py:62
+#: ../checkout.py:56
 msgid "_Lightweight checkout"
 msgstr "_Lightweight checkout"
 
-#: ../commands.py:307
+#: ../commands.py:305
 msgid "Directory does not have a working tree"
 msgstr "Verzeichnis hat keine aktive Verzeichnisstruktur"
 
-#: ../commands.py:308
+#: ../commands.py:306
 msgid "Operation aborted."
 msgstr "Aktion abgebrochen."
 
-#: ../commands.py:412
+#: ../commands.py:410
 msgid "There are local changes in the branch"
 msgstr "Es gibt lokale Änderungen im dem Zweig"
 
-#: ../commands.py:413
+#: ../commands.py:411
 msgid "Please commit or revert the changes before merging."
 msgstr "Bitte führen sie commit oder revert aus bevor sie mergen."
 
-#: ../commit.py:182
+#: ../commit.py:178
 msgid "added"
 msgstr "hinzugefügt"
 
-#: ../commit.py:183
+#: ../commit.py:179
 msgid "removed"
 msgstr "entfernt"
 
-#: ../commit.py:184
+#: ../commit.py:180
 msgid "renamed"
 msgstr "umbenannt"
 
-#: ../commit.py:185
+#: ../commit.py:181
 msgid "renamed and modified"
 msgstr "umbenannt und verändert"
 
-#: ../commit.py:186
+#: ../commit.py:182
 msgid "modified"
 msgstr "verändert"
 
-#: ../commit.py:187
+#: ../commit.py:183
 msgid "kind changed"
 msgstr ""
 
-#: ../commit.py:280
+#: ../commit.py:276
 msgid "<b>Commit Message</b>"
 msgstr ""
 
-#: ../commit.py:333
+#: ../commit.py:329
 msgid "_Only commit locally"
 msgstr "Nur l_okal abschicken"
 
-#: ../commit.py:364
+#: ../commit.py:361
 msgid "Comm_it"
 msgstr "Absch_icken"
 
-#: ../commit.py:390
+#: ../commit.py:388
 msgid "Files"
 msgstr ""
 
-#: ../commit.py:395
+#: ../commit.py:393
 msgid "Commit all changes"
 msgstr ""
 
-#: ../commit.py:401
+#: ../commit.py:399
 msgid "Only commit selected changes"
 msgstr ""
 
-#: ../commit.py:407
+#: ../commit.py:405
 msgid "Commit all changes*"
 msgstr ""
 
-#: ../commit.py:440
+#: ../commit.py:437
 msgid "Commit*"
 msgstr ""
 
-#: ../commit.py:442
+#: ../commit.py:439
 msgid "Commit"
 msgstr "Festlegen"
 
-#: ../commit.py:446 ../conflicts.py:111
+#: ../commit.py:443 ../conflicts.py:107
 msgid "Path"
 msgstr "Pfad"
 
-#: ../commit.py:448 ../conflicts.py:113
+#: ../commit.py:445 ../conflicts.py:109
 msgid "Type"
 msgstr "Typ"
 
-#: ../commit.py:481
+#: ../commit.py:478
 msgid "<i>* Cannot select specific files when merging</i>"
 msgstr ""
 
-#: ../commit.py:485
+#: ../commit.py:482
 msgid "Pending Revisions"
 msgstr ""
 
-#: ../commit.py:507
+#: ../commit.py:503
 msgid "Date"
 msgstr "Datum"
 
-#: ../commit.py:509
+#: ../commit.py:505
 msgid "Committer"
 msgstr "Festleger"
 
-#: ../commit.py:511 ../search.py:59
+#: ../commit.py:507 ../search.py:60
 msgid "Summary"
 msgstr "Zusammenfassung"
 
@@ -208,135 +208,135 @@ msgstr "Zusammenfassung"
 #. decide that we really don't ever want to display it, we should
 #. actually remove it, and other references to it, along with the
 #. tests that it is set properly.
-#: ../commit.py:521
+#: ../commit.py:517
 msgid "Diff for whole tree"
 msgstr ""
 
 #. Whole tree
-#: ../commit.py:545 ../commit.py:628
+#: ../commit.py:542 ../commit.py:626
 msgid "File commit message"
 msgstr ""
 
-#: ../commit.py:552
+#: ../commit.py:549
 msgid "Global Commit Message"
 msgstr ""
 
-#: ../commit.py:554
+#: ../commit.py:551
 msgid "<b>Global Commit Message</b>"
 msgstr ""
 
-#: ../commit.py:581
+#: ../commit.py:578
 msgid "Diff for "
 msgstr ""
 
-#: ../commit.py:634
+#: ../commit.py:632
 msgid "Commit message for "
 msgstr ""
 
-#: ../commit.py:689
+#: ../commit.py:687
 msgid "Commit cancelled"
 msgstr ""
 
-#: ../commit.py:690
+#: ../commit.py:688
 msgid "Do you want to save your commit messages ?"
 msgstr ""
 
-#: ../commit.py:708
+#: ../commit.py:706
 msgid "Commit with an empty message?"
 msgstr "Hinzufügen mit Leerer Kommentar?"
 
-#: ../commit.py:709
+#: ../commit.py:707
 msgid "You can describe your commit intent in the message."
 msgstr "Du kannst Grund für deine Übermittlung in der Nachricht beschreiben."
 
-#: ../commit.py:729
+#: ../commit.py:727
 msgid "Commit with unknowns?"
 msgstr "Abschicken mit Unbekannten?"
 
-#: ../commit.py:730
+#: ../commit.py:728
 msgid "Unknown files exist in the working tree. Commit anyway?"
 msgstr ""
 "Unbekannte Dateien bestehen im aktiven Verzeichnisstruktur. Definitiv "
 "festlegen?"
 
-#: ../commit.py:750
+#: ../commit.py:748
 msgid "Commit with no changes?"
 msgstr "Festlegen ohne Änderungen im Arbeitsbaum?"
 
-#: ../commit.py:751
+#: ../commit.py:749
 msgid ""
 "There are no changes in the working tree. Do you want to commit anyway?"
 msgstr ""
 
-#: ../conflicts.py:50
+#: ../conflicts.py:45
 msgid "External utility:"
 msgstr "Externes Hilfsprogramm"
 
-#: ../conflicts.py:101
+#: ../conflicts.py:97
 msgid "Conflicts"
 msgstr "Konflikte"
 
-#: ../conflicts.py:104
+#: ../conflicts.py:100
 msgid "No conflicts in working tree."
 msgstr "Kein konflikte im aktiven Verzeichnisstruktur"
 
-#: ../conflicts.py:118
+#: ../conflicts.py:114
 msgid "path conflict"
 msgstr "Pfadkonflikt"
 
-#: ../conflicts.py:120
+#: ../conflicts.py:116
 msgid "contents conflict"
 msgstr "Inhaltskonflikt"
 
-#: ../conflicts.py:122
+#: ../conflicts.py:118
 msgid "text conflict"
 msgstr "Textkonflikt"
 
-#: ../conflicts.py:124
+#: ../conflicts.py:120
 msgid "duplicate id"
 msgstr "Doppelte ID"
 
-#: ../conflicts.py:126
+#: ../conflicts.py:122
 msgid "duplicate"
 msgstr "Duplikat"
 
-#: ../conflicts.py:128
+#: ../conflicts.py:124
 msgid "parent loop"
 msgstr "Eltern-Schleife"
 
-#: ../conflicts.py:130
+#: ../conflicts.py:126
 msgid "unversioned parent"
 msgstr "unversionierter parent"
 
-#: ../conflicts.py:132
+#: ../conflicts.py:128
 msgid "missing parent"
 msgstr "fehlender parent"
 
-#: ../conflicts.py:134
+#: ../conflicts.py:130
 msgid "deleting parent"
 msgstr "lösche parent"
 
-#: ../conflicts.py:136
+#: ../conflicts.py:132
 msgid "unknown type of conflict"
 msgstr "Unbekannte type des Konflikts"
 
-#: ../conflicts.py:165
+#: ../conflicts.py:161
 msgid "No file was selected"
 msgstr "Keine Datei wurde ausgewählt"
 
-#: ../conflicts.py:166
+#: ../conflicts.py:162
 msgid "Please select a file from the list."
 msgstr "Wählen Sie bitte eine Datei von der Liste."
 
-#: ../conflicts.py:176
+#: ../conflicts.py:172
 msgid "Call to external utility failed"
 msgstr "Keine Verbindung mit externem Dienstprogramm möglich"
 
-#: ../conflicts.py:178
+#: ../conflicts.py:174
 msgid "Cannot resolve conflict"
 msgstr "Konflikt kann nicht aufgelöst werden"
 
-#: ../conflicts.py:179
+#: ../conflicts.py:175
 msgid ""
 "Only conflicts on the text of files can be resolved with Olive at the "
 "moment. Content conflicts, on the structure of the tree, need to be resolved "
@@ -351,75 +351,75 @@ msgstr ""
 msgid "_View"
 msgstr "Anzeigen"
 
-#: ../diff.py:447
+#: ../diff.py:448
 msgid "Wrap _Long Lines"
 msgstr ""
 
 #. No conflicts found.
-#: ../diff.py:492 ../merge.py:146
+#: ../diff.py:493 ../merge.py:144
 msgid "Merge successful"
 msgstr "Merge erfolgreich"
 
-#: ../diff.py:493 ../merge.py:147
+#: ../diff.py:494 ../merge.py:145
 msgid "All changes applied successfully."
 msgstr "Alle Änderungen erfolgreich angewendet."
 
 #. There are conflicts to be resolved.
-#: ../diff.py:496 ../merge.py:150
+#: ../diff.py:497 ../merge.py:148
 msgid "Conflicts encountered"
 msgstr "Konflikte gefunden"
 
-#: ../diff.py:497 ../merge.py:151
+#: ../diff.py:498 ../merge.py:149
 msgid "Please resolve the conflicts manually before committing."
 msgstr "Bitte löse die Konflikte vor der Übermittlung manuell auf."
 
-#: ../errors.py:28
+#: ../errors.py:31
 msgid "Directory is not a branch"
 msgstr "Verzeichnis ist kein Zweig"
 
-#: ../errors.py:29
+#: ../errors.py:32
 msgid "You can perform this action only in a branch."
 msgstr "Sie können diese Aktion nur in einem Zweig ausführen."
 
-#: ../errors.py:31
+#: ../errors.py:34
 msgid "Directory is not a checkout"
 msgstr "Verzeichnis ist kein Austrag"
 
-#: ../errors.py:32
+#: ../errors.py:35
 msgid "You can perform local commit only on checkouts."
 msgstr "Sie können eine lokale Festlegung nur an Austrägen ausführen."
 
-#: ../errors.py:34
+#: ../errors.py:37
 msgid "No changes to commit"
 msgstr "Keine Änderungen festzulegen"
 
-#: ../errors.py:35
+#: ../errors.py:38
 msgid "Try force commit if you want to commit anyway."
 msgstr ""
 "Versuchen Sie eine Zwangsfestlegung, falls Sie trotzdem festlegen wollen."
 
-#: ../errors.py:37
+#: ../errors.py:40
 msgid "No changes to merge"
 msgstr ""
 
-#: ../errors.py:38
+#: ../errors.py:41
 msgid "Merge location is already fully merged in working tree."
 msgstr ""
 
-#: ../errors.py:40
+#: ../errors.py:43
 msgid "Conflicts in tree"
 msgstr "Konflikte in der Verzeichnisstruktur"
 
-#: ../errors.py:41
+#: ../errors.py:44
 msgid "You need to resolve the conflicts before committing."
 msgstr ""
 "Sie müssen erst die Konflikte beseitigen, bevor Sie festlegen können."
 
-#: ../errors.py:43
+#: ../errors.py:46
 msgid "Strict commit failed"
 msgstr "Striktes festlegen misslingt"
 
-#: ../errors.py:44
+#: ../errors.py:47
 msgid ""
 "There are unknown files in the working tree.\n"
 "Please add or delete them."
@@ -427,29 +427,29 @@ msgstr ""
 "Es befinden sich unbekannte Dateien in dem aktiven Verzeichnisstruktur.\n"
 "Fügen Sie bitte diese hinzu oder löschen Sie sie."
 
-#: ../errors.py:46
+#: ../errors.py:49
 msgid "Bound branch is out of date"
 msgstr "Gebundener Zweig ist veraltet"
 
 #. FIXME: Really ? Internationalizing %s ?? --vila080505
-#: ../errors.py:48
+#: ../errors.py:51
 #, python-format
 msgid "%s"
 msgstr "%s"
 
-#: ../errors.py:50
+#: ../errors.py:53
 msgid "File not versioned"
 msgstr "Datei nicht versioniert"
 
-#: ../errors.py:51
+#: ../errors.py:54
 msgid "The selected file is not versioned."
 msgstr "Die ausgewählte Datei ist nicht versioniert."
 
-#: ../errors.py:53 ../push.py:99
+#: ../errors.py:56 ../push.py:100
 msgid "Branches have been diverged"
 msgstr "Zweige sind geschieden"
 
-#: ../errors.py:54
+#: ../errors.py:57
 msgid ""
 "You cannot push if branches have diverged. Use the\n"
 "overwrite option if you want to push anyway."
@@ -457,37 +457,37 @@ msgstr ""
 "Getrennte Zweige koennen nicht hochgeladen werden. Benutzen\n"
 "Sie die Überschreibungsoption um trotzdem hochzuladen."
 
-#: ../errors.py:56
+#: ../errors.py:59
 msgid "No diff output"
 msgstr "Kein Unterschied gefunden"
 
-#: ../errors.py:57
+#: ../errors.py:60
 msgid "The selected file hasn't changed."
 msgstr "Die gewählte Datei hat sich nicht geändert"
 
-#: ../errors.py:59
+#: ../errors.py:62
 msgid "No such revision"
 msgstr "keine solche Revision"
 
-#: ../errors.py:60
+#: ../errors.py:63
 msgid "The revision you specified doesn't exist."
 msgstr "Die angegebene Revision existiert nicth."
 
-#: ../errors.py:62
+#: ../errors.py:65
 msgid "Target already exists"
 msgstr "Ziel existiert bereits"
 
-#: ../errors.py:63
+#: ../errors.py:66
 msgid "Target directory already exists. Please select another target."
 msgstr ""
 "Zielverzeichnis existiert schon. Bitte wählen Sie einen anderen "
 "Zielverzeichnis."
 
-#: ../errors.py:65
+#: ../errors.py:68
 msgid "Directory is already a branch"
 msgstr "Verzeichnis ist schon ein Zweig"
 
-#: ../errors.py:66
+#: ../errors.py:69
 #, python-format
 msgid ""
 "The current directory (%s) is already a branch.\n"
@@ -496,11 +496,11 @@ msgstr ""
 "Das aktuelle Verzeichnis (%s) ist schon ein Zweig.\n"
 "Sie können es benutzen, oder ein anderes Verzeichnis initialisieren."
 
-#: ../errors.py:68
+#: ../errors.py:71
 msgid "Branch without a working tree"
 msgstr "Zweig ohne aktives Verzeichnisstruktur"
 
-#: ../errors.py:69
+#: ../errors.py:72
 #, python-format
 msgid ""
 "The current directory (%s)\n"
@@ -509,32 +509,32 @@ msgstr ""
 "Das aktuelle Verzeichnis (%s)\n"
 "ist ein Zweig ohne funktionsfähige Verzeichnisstruktur."
 
-#: ../errors.py:71
+#: ../errors.py:74
 msgid "Unknown bzr error"
 msgstr "Unbekannte bzr Fehler"
 
-#: ../errors.py:73
+#: ../errors.py:76
 msgid "Permission denied"
 msgstr "Zugriff verboten"
 
-#: ../errors.py:73
+#: ../errors.py:76
 msgid "permission denied."
 msgstr "Zugriff verboten"
 
-#: ../errors.py:75
+#: ../errors.py:78
 msgid "Unknown error"
 msgstr "Unbekannte Fehler"
 
 #. Create the widgets
-#: ../initialize.py:48
+#: ../initialize.py:46
 msgid "_Initialize"
 msgstr "_Initializieren"
 
-#: ../initialize.py:49
+#: ../initialize.py:47
 msgid "Which directory do you want to initialize?"
 msgstr "Welches Verzeichnis möchten Sie initialisieren?"
 
-#: ../initialize.py:50
+#: ../initialize.py:49
 msgid "Current directory"
 msgstr "Aktuelles Verzeichnis"
 
@@ -542,60 +542,60 @@ msgstr "Aktuelles Verzeichnis"
 msgid "Create a new directory with the name:"
 msgstr "Erzeugen Sie ein neues Verzeichnis mit dem Namen:"
 
-#: ../initialize.py:86
+#: ../initialize.py:87
 msgid "Directory name not specified"
 msgstr "Verzeichnis Name ist nicht spezifiziert"
 
-#: ../initialize.py:87
+#: ../initialize.py:88
 msgid "You should specify a new directory name."
 msgstr "Sie solten ein neues Verzeichnis Name spezifizieren"
 
-#: ../loom.py:53
+#: ../loom.py:49
 msgid "Upgrade to Loom branch?"
 msgstr ""
 
-#: ../loom.py:54
+#: ../loom.py:50
 msgid "Branch is not a loom branch. Upgrade to Loom format?"
 msgstr ""
 
-#: ../merge.py:54
+#: ../merge.py:52
 msgid "Merge from"
 msgstr ""
 
-#: ../merge.py:56
+#: ../merge.py:54
 msgid "Folder"
 msgstr ""
 
-#: ../merge.py:56
+#: ../merge.py:54
 msgid "Custom Location"
 msgstr ""
 
-#: ../merge.py:59
+#: ../merge.py:57
 msgid "_Merge"
 msgstr "_Merge"
 
-#: ../merge.py:132
+#: ../merge.py:130
 msgid "Branch not given"
 msgstr "Zweig nicht angegeben"
 
-#: ../merge.py:133
+#: ../merge.py:131
 msgid "Please specify a branch to merge from."
 msgstr "Bitte geben Sie einen Zweig an von dem gemerged werden soll."
 
-#: ../merge.py:141
+#: ../merge.py:139
 msgid "Bazaar command error"
 msgstr "Bazaar Befehl Fehler"
 
 #. Create the widgets
-#: ../push.py:51
+#: ../push.py:50
 msgid "Location:"
 msgstr "Ort:"
 
-#: ../push.py:53
+#: ../push.py:52
 msgid "_Push"
 msgstr "_Drücken"
 
-#: ../push.py:100
+#: ../push.py:101
 msgid ""
 "You cannot push if branches have diverged.\n"
 "Overwrite?"
@@ -603,20 +603,20 @@ msgstr ""
 "Du kannst nicht pushen, wenn die Branches sich unterscheiden.\n"
 "Überschreiben?"
 
-#: ../push.py:108
+#: ../push.py:109
 msgid "Push successful"
 msgstr "Hochladen erfolgreich"
 
-#: ../push.py:109
+#: ../push.py:110
 #, python-format
 msgid "%d revision(s) pushed."
 msgstr "%d Revision(en) hochgeladen."
 
-#: ../push.py:142
+#: ../push.py:141
 msgid "Non existing parent directory"
 msgstr "Nicht-existierendes Überverzeichnis."
 
-#: ../push.py:143
+#: ../push.py:142
 #, python-format
 msgid ""
 "The parent directory (%s)\n"
@@ -626,11 +626,11 @@ msgstr ""
 "existiert nicht. Erzeugen?"
 
 #. Create the widgets
-#: ../revbrowser.py:45
+#: ../revbrowser.py:35
 msgid "_Select"
 msgstr "Aus_wahl"
 
-#: ../search.py:44
+#: ../search.py:41
 msgid "Search for:"
 msgstr ""
 
@@ -638,32 +638,32 @@ msgstr ""
 msgid "Document"
 msgstr ""
 
-#: ../status.py:94
+#: ../status.py:87
 msgid "Added"
 msgstr "Hinzugefügt"
 
-#: ../status.py:100
+#: ../status.py:93
 msgid "Removed"
 msgstr "Entfernt"
 
-#: ../status.py:106
+#: ../status.py:99
 msgid "Renamed"
 msgstr "Umbenannt"
 
-#: ../status.py:113
+#: ../status.py:106
 msgid "Modified"
 msgstr "Geändert"
 
-#: ../status.py:121
+#: ../status.py:114
 msgid "Unknown"
 msgstr "Unbekannt"
 
-#: ../status.py:126
+#: ../status.py:119
 msgid "No changes."
 msgstr "Keine Änderungen."
 
 #. Set properties
-#: ../tags.py:66
+#: ../tags.py:60
 msgid "Tags"
 msgstr "Tags"
 
@@ -675,626 +675,45 @@ msgstr "Tagname"
 msgid "Revision ID"
 msgstr "Revision ID"
 
-#: ../tags.py:150
+#: ../tags.py:148
 msgid "Tags are not supported by this branch format. Please upgrade."
 msgstr ""
 "Tags werden in diesem Branch-Format nicht unterstützt. Bitte upgraden."
 
-#: ../tags.py:156
+#: ../tags.py:154
 msgid "No tagged revisions in the branch."
 msgstr "Keine markierten Überarbeitungen im Branch."
 
-#: ../tags.py:231
+#: ../tags.py:222
 msgid "_Remove tag"
 msgstr "_Entferne tag"
 
-#: ../tags.py:241
+#: ../tags.py:232
 msgid "<b><big>Remove tag?</big></b>"
 msgstr "<b><big>Entferne Tag?</big></b>"
 
-#: ../tags.py:243
+#: ../tags.py:234
 #, python-format
 msgid "Are you sure you want to remove the tag: <b>%s</b>?"
 msgstr "Sind sie sicher das Sie das Tag <b>%s</b> entfernen möchten?"
 
 #. Create the widgets
-#: ../tags.py:288
+#: ../tags.py:278
 msgid "_Add tag"
 msgstr "T_ag hinzufügen"
 
-#: ../tags.py:290
+#: ../tags.py:280
 msgid "Tag Name:"
 msgstr "Tag Name:"
 
-#: ../tags.py:291
+#: ../tags.py:281
 msgid "Revision ID:"
 msgstr "Revision ID:"
 
-#: ../tags.py:322
+#: ../tags.py:312
 msgid "No tag name specified"
 msgstr "Kein Tag Name angegeben"
 
-#: ../tags.py:323
+#: ../tags.py:313
 msgid "You have to specify the tag's desired name."
 msgstr "Sie müssen den gewünschten Tag Namen angeben."
-
-#~ msgid "_Rename..."
-#~ msgstr "_Umbenennen..."
-
-#~ msgid "_Move..."
-#~ msgstr "_Verschieben..."
-
-#~ msgid "Make _directory..."
-#~ msgstr "Verzeichniss erstellen..."
-
-#~ msgid "Remove file(s)..."
-#~ msgstr "Datei(en) entfernen..."
-
-#~ msgid "Olive - Bazaar GUI"
-#~ msgstr "Olive - Bazaar GUI"
-
-#~ msgid "_Add file(s)..."
-#~ msgstr "_Datei(en) hinzufügen..."
-
-#~ msgid "_File"
-#~ msgstr "_Datei"
-
-#~ msgid "_Refresh"
-#~ msgstr "Aktualisie_ren"
-
-#~ msgid "_Get..."
-#~ msgstr "Holen..."
-
-#~ msgid "Show _hidden files"
-#~ msgstr "Versteckte Dateien zeigen"
-
-#~ msgid "C_heckout..."
-#~ msgstr "Auschecken..."
-
-#~ msgid "Pu_ll"
-#~ msgstr "Herunter_laden"
-
-#~ msgid "S_tatus..."
-#~ msgstr "S_tatus..."
-
-#~ msgid "_Commit..."
-#~ msgstr "Festlegen..."
-
-#~ msgid "Pu_sh..."
-#~ msgstr "Hochloaden..."
-
-#~ msgid "_Log..."
-#~ msgstr "_Logbuch..."
-
-#~ msgid "_Differences..."
-#~ msgstr "_Unterschiede"
-
-#~ msgid "_Statistics"
-#~ msgstr "_Statistik"
-
-#~ msgid "_Help"
-#~ msgstr "_Hilfe"
-
-#~ msgid "Diff"
-#~ msgstr "Diff"
-
-#~ msgid "https://launchpad.net/products/olive"
-#~ msgstr "https://launchpad.net/products/olive"
-
-#~ msgid "Copyright (C) 2006 Szilveszter Farkas (Phanatic)"
-#~ msgstr "Copyright (C) 2006 Szilveszter Farkas (Phanatic)"
-
-#~ msgid "Which file(s) do you want to add?"
-#~ msgstr "Welche Datei(en) möchten Sie hinzufügen?"
-
-#~ msgid "Olive - Add file(s)"
-#~ msgstr "Olive - Datei(en) hinzufügen"
-
-#~ msgid "All files with status 'added'"
-#~ msgstr "Alle Dateien mit Status 'hinzugefügt'"
-
-#~ msgid "_Remove"
-#~ msgstr "_Entfernen"
-
-#~ msgid "Selected only"
-#~ msgstr "Nur ausgewältes"
-
-#~ msgid "Olive - Remove file(s)"
-#~ msgstr "Olive - Datei(en) entfernen"
-
-#~ msgid "Which file(s) do you want to remove?"
-#~ msgstr "Welche Datei(en) wollen Sie entfernen?"
-
-#~ msgid "All unknowns recursively"
-#~ msgstr "Alle unbekannten rekursiv"
-
-#~ msgid "_Add"
-#~ msgstr "_Hinzufügen"
-
-#~ msgid "Olive - Make directory"
-#~ msgstr "Olive - Verzeichnis erstellen"
-
-#~ msgid "_Versioned directory"
-#~ msgstr "_Versioniertes Verzeichnis"
-
-#~ msgid "Olive - Move"
-#~ msgstr "Olive - Versetzen"
-
-#~ msgid "Move to"
-#~ msgstr "Versetzen nach"
-
-#~ msgid "_Make directory"
-#~ msgstr "Verzeichnis erstellen"
-
-#~ msgid "Olive - Rename"
-#~ msgstr "Olive - Umbennen"
-
-#~ msgid "_Move"
-#~ msgstr "_Verschieben"
-
-#~ msgid "Select a directory"
-#~ msgstr "Wählen Sie ein Verzeichnis aus"
-
-#~ msgid "Checkout root: "
-#~ msgstr "Austragsstammpfad: "
-
-#~ msgid "Repository checkout: "
-#~ msgstr "Quellenaustrag: "
-
-#~ msgid "Branch root: "
-#~ msgstr "Zweigstammpfad: "
-
-#~ msgid "Checkout of branch: "
-#~ msgstr "Zweigaustrag: "
-
-#~ msgid "Repository branch: "
-#~ msgstr "Quellenzweig: "
-
-#~ msgid "Shared repository: "
-#~ msgstr "Beteiligte Quelle: "
-
-#~ msgid "Light checkout root: "
-#~ msgstr "Leichtaustragsstammpfad: "
-
-#~ msgid "_Rename"
-#~ msgstr "_Umbenennen"
-
-#~ msgid "Rename to"
-#~ msgstr "Umbenennen zu"
-
-#~ msgid "Publish to branch: "
-#~ msgstr "Zu Zweig veröffentlichen: "
-
-#~ msgid "Parent branch: "
-#~ msgstr "Zweigvorläufer: "
-
-#~ msgid "(none)"
-#~ msgstr "(nichts)"
-
-#~ msgid "Control format: "
-#~ msgstr "Kontroll Format "
-
-#~ msgid "Working tree format: "
-#~ msgstr "Aktive Verzeichnisstrukturformat: "
-
-#~ msgid "Repository format: "
-#~ msgstr "Quellenformat: "
-
-#~ msgid "Branch format: "
-#~ msgstr "Branch Format "
-
-#~ msgid "Repository lock status: "
-#~ msgstr "Quellen Festlegungsstatus: "
-
-#~ msgid "Branch lock status: "
-#~ msgstr "Zweig Festlegungsstatus: "
-
-#~ msgid "Working tree lock status: "
-#~ msgstr "Arbeitsverzeichnisstruktur SperrFetatus: "
-
-#~ msgid "Renamed files: "
-#~ msgstr "Umbennante Dateien: "
-
-#~ msgid "Unknown files: "
-#~ msgstr "Unbekannte Dateien: "
-
-#~ msgid "Ignored files: "
-#~ msgstr "Ignorierte Dateien: "
-
-#~ msgid "Versioned subdirectories: "
-#~ msgstr "Versionierte Unterverzeichnisse: "
-
-#~ msgid "Unchanged files: "
-#~ msgstr "Unveränderte Dateien: "
-
-#~ msgid "Modified files: "
-#~ msgstr "Geänderte Dateien: "
-
-#~ msgid "Added files: "
-#~ msgstr "Hinzugefügte Dateien: "
-
-#~ msgid "Removed files: "
-#~ msgstr "Entfernte Dateien: "
-
-#~ msgid "Missing revisions in branch: "
-#~ msgstr "Fehlende Revisionen in Zweig: "
-
-#~ msgid "Title:"
-#~ msgstr "Titel:"
-
-#~ msgid ""
-#~ "Please select a file from the list,\n"
-#~ "or choose the other option."
-#~ msgstr ""
-#~ "Bitte wählen Sie eine Datei aus der Liste,\n"
-#~ "oder wählen Sie eine andere Option."
-
-#~ msgid "Size of repository: "
-#~ msgstr "Quellengrösse: "
-
-#~ msgid "Revisions in repository: "
-#~ msgstr "Revisionen in der Quelle: "
-
-#~ msgid "No title given"
-#~ msgstr "Kein Titel angegeben."
-
-#~ msgid "Revisions in branch: "
-#~ msgstr "Revisionen in Zweig: "
-
-#~ msgid "Missing revisions in working tree: "
-#~ msgstr "Fehlende Revisionen in der Arbeitsverzeichnisstruktur: "
-
-#~ msgid "Number of commiters: "
-#~ msgstr "Anzahl Festleger: "
-
-#~ msgid "Please specify a title to continue."
-#~ msgstr "Bitte geben Sie einen Titel an, um fortzufahren."
-
-#~ msgid "Parent location is unknown"
-#~ msgstr "Vorläuferpfad ist unbekannt"
-
-#~ msgid "There are missing revisions"
-#~ msgstr "Es fehlen Revisionen"
-
-#~ msgid "Cannot determine missing revisions if no parent location is known."
-#~ msgstr ""
-#~ "Kann fehlende Revisionen nicht ermitteln falls Vorläuferpfad unbekannt ist."
-
-#~ msgid "Local branch up to date"
-#~ msgstr "Lokaler Zweig ist aktuell"
-
-#, python-format
-#~ msgid "%d revision(s) missing."
-#~ msgstr "%d fehlende Revision(en)"
-
-#~ msgid "There are no missing revisions."
-#~ msgstr "Es fehlen keine Revisionen."
-
-#~ msgid "unchanged"
-#~ msgstr "unverändert"
-
-#~ msgid "Bookmark"
-#~ msgstr "Lesezeichen"
-
-#~ msgid "Bookmarks"
-#~ msgstr "Lesezeichen"
-
-#~ msgid "Glade file cannot be found."
-#~ msgstr "Glade Datei konnte nicht gefunden werden."
-
-#~ msgid "unknown"
-#~ msgstr "unbekennt"
-
-#~ msgid "Bookmark successfully added"
-#~ msgstr "Lesezeichen erfolgreich hinzugefügt."
-
-#~ msgid "Show the differences of all files"
-#~ msgstr "Unterschiede aller Dateien anzeigen"
-
-#~ msgid "All..."
-#~ msgstr "Alles..."
-
-#~ msgid "Selected..."
-#~ msgstr "Ausgewählt..."
-
-#~ msgid "Show the differences of the selected file"
-#~ msgstr "Unterschiede der ausgewählten Dateien anzeigen"
-
-#~ msgid "Edit"
-#~ msgstr "Bearbeiten"
-
-#~ msgid "Edit the selected bookmark"
-#~ msgstr "Ausgewähltes Lesezeichen bearbeiten"
-
-#~ msgid "Remove the selected bookmark"
-#~ msgstr "Auswähltes Lesezeichen entfernen"
-
-#~ msgid "Not the same branch"
-#~ msgstr "Nicht dasselbe Zweig"
-
-#~ msgid "The destination is not in the same branch."
-#~ msgstr "Das Zielort ist nicht in demselben Zweig."
-
-#~ msgid "Please specify a new name for the file."
-#~ msgstr "Bitte geben Sie einen neuen Dateiennamen an."
-
-#~ msgid "Filename not given"
-#~ msgstr "Dateienname nicht angegeben"
-
-#~ msgid "No added files were found in the working tree."
-#~ msgstr ""
-#~ "Keine hinzugefuegten Dateien konnten in der aktiven Verzeichnisstruktur "
-#~ "gefunden werden."
-
-#~ msgid "No matching files"
-#~ msgstr "Keine übereinstimmende Dateien"
-
-#~ msgid "Time of last revision: "
-#~ msgstr "Zeit der letzten Revision: "
-
-#~ msgid "Time of first revision: "
-#~ msgstr "Zeit der ersten Revision: "
-
-#~ msgid "Age of branch in days: "
-#~ msgstr "Zweigalter in Tagen: "
-
-#~ msgid "Pull successful"
-#~ msgstr "Herunterladen erfolgreich"
-
-#, python-format
-#~ msgid "%d revision(s) pulled."
-#~ msgstr "%d Revision(en) heruntergeladen."
-
-#~ msgid "Location already bookmarked"
-#~ msgstr "Pfad ist schon als Lesezeichen abgespeichert"
-
-#~ msgid ""
-#~ "The current directory was bookmarked. You can reach\n"
-#~ "it by selecting it from the left panel."
-#~ msgstr ""
-#~ "Das aktuelle Verzeichnis wurde as Lesezeichen abgespeichert. Sie können\n"
-#~ "es im linken Panel auswählen."
-
-#~ msgid ""
-#~ "The current directory is already bookmarked.\n"
-#~ "See the left panel for reference."
-#~ msgstr ""
-#~ "Das aktuelle Verzeichnis wurde schon als Lesezeichen abgespeichert.\n"
-#~ "Bitte berufen Sie sich auf das linke Panel."
-
-#~ msgid "Please specify a desired name for the new directory."
-#~ msgstr ""
-#~ "Bitte geben Sie den gewünschten Verzeichnisnamen für das neue Verzeichnis an."
-
-#~ msgid "No directory name given"
-#~ msgstr "Kein Verzeichnisnamen angegeben"
-
-#~ msgid "Directory already exists"
-#~ msgstr "Verzeichnis existiert bereits"
-
-#~ msgid "Please specify another name to continue."
-#~ msgstr "Bitte geben Sie einen anderen Namen an, um fortzufahren."
-
-#~ msgid "Bookmark current location"
-#~ msgstr "Aktueller Pfad als Lesezeichen abspeichern"
-
-#~ msgid "Please select a file from the list to proceed."
-#~ msgstr "Bitte wählen Sie eine Datei aus der List aus um fortzufahren."
-
-#~ msgid "Add the selected file"
-#~ msgstr "Ausgewählte Datei hinzufügen"
-
-#~ msgid "Add"
-#~ msgstr "Hinzufügen"
-
-#~ msgid "UI description file cannot be found."
-#~ msgstr "UI Beschreibungsdatei konnte nicht gefunden werden."
-
-#~ msgid "Status"
-#~ msgstr "Status"
-
-#~ msgid "Filename"
-#~ msgstr "Dateiname"
-
-#~ msgid "Remove"
-#~ msgstr "Entfernen"
-
-#~ msgid "Remove the selected file"
-#~ msgstr "Ausgewählte Datei entfernen"
-
-#~ msgid "Commit the changes"
-#~ msgstr "Änderungen festlegen"
-
-#~ msgid "Show the diff of the file"
-#~ msgstr "Dateiendifferenzen anzeigen"
-
-#~ msgid "File(s) to commit"
-#~ msgstr "Datei(en) zu hinzufügen"
-
-#~ msgid "Commit message:"
-#~ msgstr "Nachricht abschicken"
-
-#~ msgid "Pending merges"
-#~ msgstr "Wartende Merges"
-
-#~ msgid "There are no changes in the working tree."
-#~ msgstr "Es gibt keine Änderungen im Arbeitsbaum."
-
-#~ msgid "Set default push location"
-#~ msgstr "Standard-Push-Ziel einstellen"
-
-#, python-format
-#~ msgid ""
-#~ "There is no default push location set.\n"
-#~ "Set %r as default now?"
-#~ msgstr ""
-#~ "Es wurde kein Standard-Push-Ziel eingestellt.\n"
-#~ "Willst du %r als Standard einstellen?"
-
-#~ msgid "Revno"
-#~ msgstr "Revno"
-
-#~ msgid "Please wait, revisions are being loaded..."
-#~ msgstr "Warten Sie bitte, Revisionen werden geladen..."
-
-#~ msgid "Time"
-#~ msgstr "Datum"
-
-#~ msgid "Pulling is not possible until there is a parent location."
-#~ msgstr "Herunterladen ist nicht möglich bis es ein Vorläuferpfad existiert."
-
-#~ msgid "Conflicts detected"
-#~ msgstr "Konflikte gefunden"
-
-#~ msgid "ignored"
-#~ msgstr "ignoriert"
-
-#~ msgid "Please have a look at the working tree before continuing."
-#~ msgstr ""
-#~ "Schauen Sie bitte das aktive Verzeichnisstruktur an, bevor Sie fortfahren."
-
-#~ msgid "Last modified"
-#~ msgstr "Zuletzt verändert"
-
-#~ msgid "Size"
-#~ msgstr "Gr&ouml;&szlig;e"
-
-#~ msgid "Rename the selected file"
-#~ msgstr "Die ausgewählte Datei umbenennen"
-
-#~ msgid "Remove and delete"
-#~ msgstr "Entfernen und löschen"
-
-#~ msgid "Rename"
-#~ msgstr "Umbenenen"
-
-#~ msgid "Open the selected file"
-#~ msgstr "Öffne die ausgewählte Datei"
-
-#~ msgid "View the contents of the file in a builtin viewer"
-#~ msgstr "Zeige Dateiinhalt an in einem built-in viewer"
-
-#~ msgid "Open bookmark folder in Nautilus"
-#~ msgstr "Öffne Lesezeichen in Nautilus"
-
-#~ msgid "Show differences"
-#~ msgstr "Zeige differenz ain"
-
-#~ msgid "View contents"
-#~ msgstr "Zeige Inhalt an"
-
-#~ msgid "Open Folder"
-#~ msgstr "Öffne Verzeichnis"
-
-#~ msgid "Revert to this revision"
-#~ msgstr "Bis zu dieser Überarbeitung rückgängig machen"
-
-#~ msgid "Revert the selected file to the selected revision"
-#~ msgstr "Die gewählte Datei bis zur gewählten Überarbeitung zurücksetzen."
-
-#~ msgid "Delete directory with all directories below ?"
-#~ msgstr "Lösche Verzeichnis und alle Unterverzeichnisse?"
-
-#~ msgid "Revert"
-#~ msgstr "Rückgängig"
-
-#~ msgid "Annotate"
-#~ msgstr "Beschreibe"
-
-#~ msgid "Revert the changes"
-#~ msgstr "Änderung verwerfen"
-
-#~ msgid "_Initialize..."
-#~ msgstr "_Initialisiere..."
-
-#~ msgid "_Annotate..."
-#~ msgstr "_Beschreibe..."
-
-#~ msgid "_Revert all changes"
-#~ msgstr "Alle Änderungen _rückgängig machen"
-
-#~ msgid "Missing _revisions"
-#~ msgstr "Fehlende Übe_rarbeitungen"
-
-#~ msgid "Ta_gs..."
-#~ msgstr "Ta_gs..."
-
-#~ msgid "Con_flicts..."
-#~ msgstr "Kon_flikte..."
-
-#~ msgid "_Merge..."
-#~ msgstr "_Merge..."
-
-#~ msgid "<b>Format:</b>"
-#~ msgstr "<b>Format:</b>"
-
-#~ msgid "<b>Related branches:</b>"
-#~ msgstr "<b>Verbindende Zweige</b>"
-
-#~ msgid "Olive - Information"
-#~ msgstr "Olive - Informationen"
-
-#~ msgid "<b>In the working tree:</b>"
-#~ msgstr "<b>Im aktiven Verzeichnisstruktur:</b>"
-
-#~ msgid "<b>Missing revisions:</b>"
-#~ msgstr "<b>Fehlende Revisionen:</b>"
-
-#~ msgid "<b>Lock status:</b>"
-#~ msgstr "<b>Sperrstatus:</b>"
-
-#~ msgid "Annotate the selected file"
-#~ msgstr "Breschreibe die gewählte Datei"
-
-#~ msgid "Merge from:"
-#~ msgstr "Mergen aus:"
-
-#~ msgid "<b>Location:</b>"
-#~ msgstr "<b>Ort:</b>"
-
-#~ msgid "Revert successful"
-#~ msgstr "Revert erfolgreich"
-
-#~ msgid "All files reverted to last revision."
-#~ msgstr ""
-#~ "Sämtliche Dateien wurden zur letzten Revision zurückgesetzt (revert)."
-
-#~ msgid "_Information..."
-#~ msgstr "_Information..."
-
-#~ msgid "H_istory Mode"
-#~ msgstr "H_istory Modus"
-
-#~ msgid "<b>Branch history:</b>"
-#~ msgstr "<b>Zweig history:</b>"
-
-#~ msgid "<b>Revision store:</b>"
-#~ msgstr "<b>Revisions Speicher:</b>"
-
-#~ msgid "Remove the selected file/dir and delete from disk"
-#~ msgstr ""
-#~ "Entferne die gewählte(n) Datei(en)/Verzeichnis(se) und lösche sie von der "
-#~ "Festplatte"
-
-#~ msgid "Open"
-#~ msgstr "Öffnen..."
-
-#~ msgid "Show the differences between two revisions of the file"
-#~ msgstr "Zeige die Unterschiede zwischen zwei Revisionen der Datei"
-
-#~ msgid "translator-credits"
-#~ msgstr ""
-#~ "Launchpad Contributions:\n"
-#~ "  Augustus Kling https://launchpad.net/~augustus-kling\n"
-#~ "  Benjamin Jochheim https://launchpad.net/~benjamin-jochheim\n"
-#~ "  C-S https://launchpad.net/~c-s\n"
-#~ "  Christian Faulhammer https://launchpad.net/~fauli\n"
-#~ "  Matthias Loidolt https://launchpad.net/~kedapperdrake\n"
-#~ "  Mike Bronner https://launchpad.net/~mike.bronner\n"
-#~ "  Philipp Wolfer https://launchpad.net/~phw\n"
-#~ "  Pierre Vorhagen https://launchpad.net/~pep.\n"
-#~ "  Roman Stingler https://launchpad.net/~coolx67\n"
-#~ "  Sebastian Wallroth https://launchpad.net/~sebastian-wallroth\n"
-#~ "  Simon Pascal Klein https://launchpad.net/~klepas\n"
-#~ "  Xandi https://launchpad.net/~launchpad-net-20-taube\n"
-#~ "  welterde https://launchpad.net/~welterde"

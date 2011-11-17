@@ -15,8 +15,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-11-09 04:37+0000\n"
-"X-Generator: Launchpad (build 14263)\n"
+"X-Launchpad-Export-Date: 2011-11-17 04:31+0000\n"
+"X-Generator: Launchpad (build 14291)\n"
 
 #: ../bazaar-properties.desktop.in.h:1
 msgid "Bazaar Preferences"
@@ -43,165 +43,165 @@ msgid "Notification Area Icon for Bazaar"
 msgstr ""
 
 #. Create the widgets
-#: ../branch.py:52
+#: ../branch.py:46
 msgid "_Branch"
 msgstr "_Branche"
 
-#: ../branch.py:55 ../checkout.py:55
+#: ../branch.py:49 ../checkout.py:49
 msgid "Branch location:"
 msgstr "Emplacement de la branche :"
 
-#: ../branch.py:57 ../checkout.py:56
+#: ../branch.py:51 ../checkout.py:50
 msgid "Destination:"
 msgstr "Destination :"
 
-#: ../branch.py:58
+#: ../branch.py:52
 msgid "Branck nick:"
 msgstr "Pseudo de la branche :"
 
-#: ../branch.py:59 ../checkout.py:58
+#: ../branch.py:53 ../checkout.py:52
 msgid "Revision:"
 msgstr "Révision :"
 
-#: ../branch.py:60 ../checkout.py:53
+#: ../branch.py:54 ../checkout.py:47
 msgid "Please select a folder"
 msgstr "Veuillez choisir un dossier"
 
-#: ../branch.py:140 ../checkout.py:159
+#: ../branch.py:134 ../checkout.py:153
 msgid "Missing branch location"
 msgstr "Emplacement de la branche manquante"
 
-#: ../branch.py:141 ../checkout.py:160
+#: ../branch.py:135 ../checkout.py:154
 msgid "You must specify a branch location."
 msgstr "Vous devez préciser l'emplacement de la branche."
 
-#: ../branch.py:182
+#: ../branch.py:174
 msgid "Branching successful"
 msgstr "Succès de la création de la branche"
 
-#: ../branch.py:183
+#: ../branch.py:175
 #, python-format
 msgid "%d revision(s) branched."
 msgstr "%d révision(s) ont été branchées."
 
-#: ../branch.py:191 ../checkout.py:191
+#: ../branch.py:183 ../checkout.py:185
 msgid "N/A"
 msgstr "N/D"
 
 #. Create the widgets
-#: ../checkout.py:50
+#: ../checkout.py:44
 msgid "Check_out"
 msgstr "Check_out"
 
-#: ../checkout.py:57
+#: ../checkout.py:51
 msgid "Branch nick:"
 msgstr ""
 
-#: ../checkout.py:62
+#: ../checkout.py:56
 msgid "_Lightweight checkout"
 msgstr "Checkout _léger"
 
-#: ../commands.py:307
+#: ../commands.py:305
 msgid "Directory does not have a working tree"
 msgstr "Le répertoire ne contient pas de répertoire de travail"
 
-#: ../commands.py:308
+#: ../commands.py:306
 msgid "Operation aborted."
 msgstr "Opération annulée."
 
-#: ../commands.py:412
+#: ../commands.py:410
 msgid "There are local changes in the branch"
 msgstr "Cette branche contient des modifications locales."
 
-#: ../commands.py:413
+#: ../commands.py:411
 msgid "Please commit or revert the changes before merging."
 msgstr "Veuillez commiter ou annuler les modifications avant la fusion."
 
-#: ../commit.py:182
+#: ../commit.py:178
 msgid "added"
 msgstr "ajouté"
 
-#: ../commit.py:183
+#: ../commit.py:179
 msgid "removed"
 msgstr "supprimé"
 
-#: ../commit.py:184
+#: ../commit.py:180
 msgid "renamed"
 msgstr "renommé"
 
-#: ../commit.py:185
+#: ../commit.py:181
 msgid "renamed and modified"
 msgstr "renommé et modifié"
 
-#: ../commit.py:186
+#: ../commit.py:182
 msgid "modified"
 msgstr "modifié"
 
-#: ../commit.py:187
+#: ../commit.py:183
 msgid "kind changed"
 msgstr ""
 
-#: ../commit.py:280
+#: ../commit.py:276
 msgid "<b>Commit Message</b>"
 msgstr ""
 
-#: ../commit.py:333
+#: ../commit.py:329
 msgid "_Only commit locally"
 msgstr "Ne valider que l_ocalement"
 
-#: ../commit.py:364
+#: ../commit.py:361
 msgid "Comm_it"
 msgstr "Comm_it"
 
-#: ../commit.py:390
+#: ../commit.py:388
 msgid "Files"
 msgstr ""
 
-#: ../commit.py:395
+#: ../commit.py:393
 msgid "Commit all changes"
 msgstr ""
 
-#: ../commit.py:401
+#: ../commit.py:399
 msgid "Only commit selected changes"
 msgstr ""
 
-#: ../commit.py:407
+#: ../commit.py:405
 msgid "Commit all changes*"
 msgstr ""
 
-#: ../commit.py:440
+#: ../commit.py:437
 msgid "Commit*"
 msgstr ""
 
-#: ../commit.py:442
+#: ../commit.py:439
 msgid "Commit"
 msgstr "Valider"
 
-#: ../commit.py:446 ../conflicts.py:111
+#: ../commit.py:443 ../conflicts.py:107
 msgid "Path"
 msgstr "Chemin"
 
-#: ../commit.py:448 ../conflicts.py:113
+#: ../commit.py:445 ../conflicts.py:109
 msgid "Type"
 msgstr "Type"
 
-#: ../commit.py:481
+#: ../commit.py:478
 msgid "<i>* Cannot select specific files when merging</i>"
 msgstr ""
 
-#: ../commit.py:485
+#: ../commit.py:482
 msgid "Pending Revisions"
 msgstr ""
 
-#: ../commit.py:507
+#: ../commit.py:503
 msgid "Date"
 msgstr "Date"
 
-#: ../commit.py:509
+#: ../commit.py:505
 msgid "Committer"
 msgstr "Commiteur"
 
-#: ../commit.py:511 ../search.py:59
+#: ../commit.py:507 ../search.py:60
 msgid "Summary"
 msgstr "Résumé"
 
@@ -209,133 +209,133 @@ msgstr "Résumé"
 #. decide that we really don't ever want to display it, we should
 #. actually remove it, and other references to it, along with the
 #. tests that it is set properly.
-#: ../commit.py:521
+#: ../commit.py:517
 msgid "Diff for whole tree"
 msgstr ""
 
 #. Whole tree
-#: ../commit.py:545 ../commit.py:628
+#: ../commit.py:542 ../commit.py:626
 msgid "File commit message"
 msgstr ""
 
-#: ../commit.py:552
+#: ../commit.py:549
 msgid "Global Commit Message"
 msgstr ""
 
-#: ../commit.py:554
+#: ../commit.py:551
 msgid "<b>Global Commit Message</b>"
 msgstr ""
 
-#: ../commit.py:581
+#: ../commit.py:578
 msgid "Diff for "
 msgstr ""
 
-#: ../commit.py:634
+#: ../commit.py:632
 msgid "Commit message for "
 msgstr ""
 
-#: ../commit.py:689
+#: ../commit.py:687
 msgid "Commit cancelled"
 msgstr ""
 
-#: ../commit.py:690
+#: ../commit.py:688
 msgid "Do you want to save your commit messages ?"
 msgstr ""
 
-#: ../commit.py:708
+#: ../commit.py:706
 msgid "Commit with an empty message?"
 msgstr "Valider avec un message vide ?"
 
-#: ../commit.py:709
+#: ../commit.py:707
 msgid "You can describe your commit intent in the message."
 msgstr "Vous pouvez donner la raison de cette validation dans ce message"
 
-#: ../commit.py:729
+#: ../commit.py:727
 msgid "Commit with unknowns?"
 msgstr "Valider avec des inconnus ?"
 
-#: ../commit.py:730
+#: ../commit.py:728
 msgid "Unknown files exist in the working tree. Commit anyway?"
 msgstr "Fichiers inconnus dans le répertoire de travail. Poursuivre  ?"
 
-#: ../commit.py:750
+#: ../commit.py:748
 msgid "Commit with no changes?"
 msgstr "Validerer sans aucun changement ?"
 
-#: ../commit.py:751
+#: ../commit.py:749
 msgid ""
 "There are no changes in the working tree. Do you want to commit anyway?"
 msgstr ""
 
-#: ../conflicts.py:50
+#: ../conflicts.py:45
 msgid "External utility:"
 msgstr "Utilitaire externe :"
 
-#: ../conflicts.py:101
+#: ../conflicts.py:97
 msgid "Conflicts"
 msgstr "Conflits"
 
-#: ../conflicts.py:104
+#: ../conflicts.py:100
 msgid "No conflicts in working tree."
 msgstr "Aucun conflit dans l'arbre de travail."
 
-#: ../conflicts.py:118
+#: ../conflicts.py:114
 msgid "path conflict"
 msgstr "conflit sur le chemin"
 
-#: ../conflicts.py:120
+#: ../conflicts.py:116
 msgid "contents conflict"
 msgstr "conflit sur le contenu"
 
-#: ../conflicts.py:122
+#: ../conflicts.py:118
 msgid "text conflict"
 msgstr "conflit sur le texte"
 
-#: ../conflicts.py:124
+#: ../conflicts.py:120
 msgid "duplicate id"
 msgstr "id en doublon"
 
-#: ../conflicts.py:126
+#: ../conflicts.py:122
 msgid "duplicate"
 msgstr "doublon"
 
-#: ../conflicts.py:128
+#: ../conflicts.py:124
 msgid "parent loop"
 msgstr ""
 
-#: ../conflicts.py:130
+#: ../conflicts.py:126
 msgid "unversioned parent"
 msgstr ""
 
-#: ../conflicts.py:132
+#: ../conflicts.py:128
 msgid "missing parent"
 msgstr "parent manquant"
 
-#: ../conflicts.py:134
+#: ../conflicts.py:130
 msgid "deleting parent"
 msgstr "suppression du parent"
 
-#: ../conflicts.py:136
+#: ../conflicts.py:132
 msgid "unknown type of conflict"
 msgstr "type de conflit inconnu"
 
-#: ../conflicts.py:165
+#: ../conflicts.py:161
 msgid "No file was selected"
 msgstr "Aucun fichier n'a été selectionné"
 
-#: ../conflicts.py:166
+#: ../conflicts.py:162
 msgid "Please select a file from the list."
 msgstr "Veuillez sélectionner un fichier parmi la liste."
 
-#: ../conflicts.py:176
+#: ../conflicts.py:172
 msgid "Call to external utility failed"
 msgstr "L'appel à utilitaire externe a échoué"
 
-#: ../conflicts.py:178
+#: ../conflicts.py:174
 msgid "Cannot resolve conflict"
 msgstr "Impossible de résoudre le conflit"
 
-#: ../conflicts.py:179
+#: ../conflicts.py:175
 msgid ""
 "Only conflicts on the text of files can be resolved with Olive at the "
 "moment. Content conflicts, on the structure of the tree, need to be resolved "
@@ -350,74 +350,74 @@ msgstr ""
 msgid "_View"
 msgstr "Afficha_ge"
 
-#: ../diff.py:447
+#: ../diff.py:448
 msgid "Wrap _Long Lines"
 msgstr ""
 
 #. No conflicts found.
-#: ../diff.py:492 ../merge.py:146
+#: ../diff.py:493 ../merge.py:144
 msgid "Merge successful"
 msgstr "Succès de la fusion"
 
-#: ../diff.py:493 ../merge.py:147
+#: ../diff.py:494 ../merge.py:145
 msgid "All changes applied successfully."
 msgstr "Tous les changements ont été appliqués avec succès."
 
 #. There are conflicts to be resolved.
-#: ../diff.py:496 ../merge.py:150
+#: ../diff.py:497 ../merge.py:148
 msgid "Conflicts encountered"
 msgstr "Conflits rencontrés."
 
-#: ../diff.py:497 ../merge.py:151
+#: ../diff.py:498 ../merge.py:149
 msgid "Please resolve the conflicts manually before committing."
 msgstr "Veuillez résoudre les conflits manuellement avant de valider."
 
-#: ../errors.py:28
+#: ../errors.py:31
 msgid "Directory is not a branch"
 msgstr "Le répertoire n'est pas une branche"
 
-#: ../errors.py:29
+#: ../errors.py:32
 msgid "You can perform this action only in a branch."
 msgstr "Cette action ne peut être effectuée que sur une branche."
 
-#: ../errors.py:31
+#: ../errors.py:34
 msgid "Directory is not a checkout"
 msgstr "Le répertoire n'est pas un checkout"
 
-#: ../errors.py:32
+#: ../errors.py:35
 msgid "You can perform local commit only on checkouts."
 msgstr ""
 "Les validations locales ne peuvent être effectués que sur des checkouts."
 
-#: ../errors.py:34
+#: ../errors.py:37
 msgid "No changes to commit"
 msgstr "Aucun changement à valider"
 
-#: ../errors.py:35
+#: ../errors.py:38
 msgid "Try force commit if you want to commit anyway."
 msgstr "Il est malgré tout possible de forcer la validation."
 
-#: ../errors.py:37
+#: ../errors.py:40
 msgid "No changes to merge"
 msgstr ""
 
-#: ../errors.py:38
+#: ../errors.py:41
 msgid "Merge location is already fully merged in working tree."
 msgstr ""
 
-#: ../errors.py:40
+#: ../errors.py:43
 msgid "Conflicts in tree"
 msgstr "Conflits dans l'arborescence"
 
-#: ../errors.py:41
+#: ../errors.py:44
 msgid "You need to resolve the conflicts before committing."
 msgstr "Il est nécessaire de résoudre les conflits avant de valider."
 
-#: ../errors.py:43
+#: ../errors.py:46
 msgid "Strict commit failed"
 msgstr "La validation stricte a échoué."
 
-#: ../errors.py:44
+#: ../errors.py:47
 msgid ""
 "There are unknown files in the working tree.\n"
 "Please add or delete them."
@@ -425,29 +425,29 @@ msgstr ""
 "L'arborescence de travail contient des fichiers inconnus.\n"
 "Veuillez les ajouter ou les supprimer."
 
-#: ../errors.py:46
+#: ../errors.py:49
 msgid "Bound branch is out of date"
 msgstr "La branche associée n'est pas à jour"
 
 #. FIXME: Really ? Internationalizing %s ?? --vila080505
-#: ../errors.py:48
+#: ../errors.py:51
 #, python-format
 msgid "%s"
 msgstr "%s"
 
-#: ../errors.py:50
+#: ../errors.py:53
 msgid "File not versioned"
 msgstr "Fichier non versionné"
 
-#: ../errors.py:51
+#: ../errors.py:54
 msgid "The selected file is not versioned."
 msgstr "Le fichier sélectionné n'est pas versionné."
 
-#: ../errors.py:53 ../push.py:99
+#: ../errors.py:56 ../push.py:100
 msgid "Branches have been diverged"
 msgstr "Les branches ont divergées"
 
-#: ../errors.py:54
+#: ../errors.py:57
 msgid ""
 "You cannot push if branches have diverged. Use the\n"
 "overwrite option if you want to push anyway."
@@ -456,35 +456,35 @@ msgstr ""
 "ont divergées. Utilisez l'option d'écrasement si vous souhaitez malgré tout\n"
 "effectuer un « push »."
 
-#: ../errors.py:56
+#: ../errors.py:59
 msgid "No diff output"
 msgstr "Pas de différences à afficher"
 
-#: ../errors.py:57
+#: ../errors.py:60
 msgid "The selected file hasn't changed."
 msgstr "Le fichier sélectionné n'a pas été modifié."
 
-#: ../errors.py:59
+#: ../errors.py:62
 msgid "No such revision"
 msgstr "Pas de telle révision"
 
-#: ../errors.py:60
+#: ../errors.py:63
 msgid "The revision you specified doesn't exist."
 msgstr "La révision que vous avez renseigné n'existe pas."
 
-#: ../errors.py:62
+#: ../errors.py:65
 msgid "Target already exists"
 msgstr "La cible existe déjà"
 
-#: ../errors.py:63
+#: ../errors.py:66
 msgid "Target directory already exists. Please select another target."
 msgstr "Le répertoire cible existe déjà. Veuillez choisir une autre cible."
 
-#: ../errors.py:65
+#: ../errors.py:68
 msgid "Directory is already a branch"
 msgstr "Le répertoire est déjà une branche"
 
-#: ../errors.py:66
+#: ../errors.py:69
 #, python-format
 msgid ""
 "The current directory (%s) is already a branch.\n"
@@ -493,11 +493,11 @@ msgstr ""
 "Le répertoire courant (%s) est déjà une branche.\n"
 "Vous avez la possibilité de l'utiliser ou d'initialiser un autre répertoire."
 
-#: ../errors.py:68
+#: ../errors.py:71
 msgid "Branch without a working tree"
 msgstr "Branche sans arborescence de travail"
 
-#: ../errors.py:69
+#: ../errors.py:72
 #, python-format
 msgid ""
 "The current directory (%s)\n"
@@ -506,32 +506,32 @@ msgstr ""
 "Le répertoire courant (%s)\n"
 "est une branche sans arbre de travail."
 
-#: ../errors.py:71
+#: ../errors.py:74
 msgid "Unknown bzr error"
 msgstr "Erreur bzr inconnue"
 
-#: ../errors.py:73
+#: ../errors.py:76
 msgid "Permission denied"
 msgstr "Permission refusée"
 
-#: ../errors.py:73
+#: ../errors.py:76
 msgid "permission denied."
 msgstr "permission refusée."
 
-#: ../errors.py:75
+#: ../errors.py:78
 msgid "Unknown error"
 msgstr "Erreur inconnue"
 
 #. Create the widgets
-#: ../initialize.py:48
+#: ../initialize.py:46
 msgid "_Initialize"
 msgstr "_Initialiser"
 
-#: ../initialize.py:49
+#: ../initialize.py:47
 msgid "Which directory do you want to initialize?"
 msgstr "Quel répertoire voulez-vous intialiser ?"
 
-#: ../initialize.py:50
+#: ../initialize.py:49
 msgid "Current directory"
 msgstr "Répertoire actuel"
 
@@ -539,60 +539,60 @@ msgstr "Répertoire actuel"
 msgid "Create a new directory with the name:"
 msgstr "Créer un nouveau répertoire nommé :"
 
-#: ../initialize.py:86
+#: ../initialize.py:87
 msgid "Directory name not specified"
 msgstr "Le nom du répertoire n'est pas indiqué"
 
-#: ../initialize.py:87
+#: ../initialize.py:88
 msgid "You should specify a new directory name."
 msgstr "Vous devez indiquer un nouveau nom de répertoire."
 
-#: ../loom.py:53
+#: ../loom.py:49
 msgid "Upgrade to Loom branch?"
 msgstr ""
 
-#: ../loom.py:54
+#: ../loom.py:50
 msgid "Branch is not a loom branch. Upgrade to Loom format?"
 msgstr ""
 
-#: ../merge.py:54
+#: ../merge.py:52
 msgid "Merge from"
 msgstr ""
 
-#: ../merge.py:56
+#: ../merge.py:54
 msgid "Folder"
 msgstr ""
 
-#: ../merge.py:56
+#: ../merge.py:54
 msgid "Custom Location"
 msgstr ""
 
-#: ../merge.py:59
+#: ../merge.py:57
 msgid "_Merge"
 msgstr "_Fusionner"
 
-#: ../merge.py:132
+#: ../merge.py:130
 msgid "Branch not given"
 msgstr "Branche non indiquée"
 
-#: ../merge.py:133
+#: ../merge.py:131
 msgid "Please specify a branch to merge from."
 msgstr "Veuillez indiquer une branche depuis laquelle fusionner."
 
-#: ../merge.py:141
+#: ../merge.py:139
 msgid "Bazaar command error"
 msgstr "Erreur de commande Bazaar"
 
 #. Create the widgets
-#: ../push.py:51
+#: ../push.py:50
 msgid "Location:"
 msgstr "Emplacement :"
 
-#: ../push.py:53
+#: ../push.py:52
 msgid "_Push"
 msgstr "_Push"
 
-#: ../push.py:100
+#: ../push.py:101
 msgid ""
 "You cannot push if branches have diverged.\n"
 "Overwrite?"
@@ -600,20 +600,20 @@ msgstr ""
 "Vous ne pouvez pas effectuer un push si les branches ont divergées.\n"
 "Voulez-vous écraser ?"
 
-#: ../push.py:108
+#: ../push.py:109
 msgid "Push successful"
 msgstr "Succès du push."
 
-#: ../push.py:109
+#: ../push.py:110
 #, python-format
 msgid "%d revision(s) pushed."
 msgstr "%d révisions exportées."
 
-#: ../push.py:142
+#: ../push.py:141
 msgid "Non existing parent directory"
 msgstr "Aucun répertoire parent existant"
 
-#: ../push.py:143
+#: ../push.py:142
 #, python-format
 msgid ""
 "The parent directory (%s)\n"
@@ -623,11 +623,11 @@ msgstr ""
 "Voulez-vous le créer ?"
 
 #. Create the widgets
-#: ../revbrowser.py:45
+#: ../revbrowser.py:35
 msgid "_Select"
 msgstr "_Sélectionner"
 
-#: ../search.py:44
+#: ../search.py:41
 msgid "Search for:"
 msgstr ""
 
@@ -635,32 +635,32 @@ msgstr ""
 msgid "Document"
 msgstr ""
 
-#: ../status.py:94
+#: ../status.py:87
 msgid "Added"
 msgstr "Ajouté"
 
-#: ../status.py:100
+#: ../status.py:93
 msgid "Removed"
 msgstr "Supprimé"
 
-#: ../status.py:106
+#: ../status.py:99
 msgid "Renamed"
 msgstr "Renommé"
 
-#: ../status.py:113
+#: ../status.py:106
 msgid "Modified"
 msgstr "Modifié"
 
-#: ../status.py:121
+#: ../status.py:114
 msgid "Unknown"
 msgstr "Inconnu"
 
-#: ../status.py:126
+#: ../status.py:119
 msgid "No changes."
 msgstr "Aucun changement."
 
 #. Set properties
-#: ../tags.py:66
+#: ../tags.py:60
 msgid "Tags"
 msgstr "Étiquettes"
 
@@ -672,46 +672,46 @@ msgstr "Nom de l'étiquette"
 msgid "Revision ID"
 msgstr "ID de la révision"
 
-#: ../tags.py:150
+#: ../tags.py:148
 msgid "Tags are not supported by this branch format. Please upgrade."
 msgstr ""
 "Les étiquettes ne sont pas prises en charge par le format de cette branche. "
 "Effectuez une mise à niveau."
 
-#: ../tags.py:156
+#: ../tags.py:154
 msgid "No tagged revisions in the branch."
 msgstr "Aucune révision étiquettée dans cette branche."
 
-#: ../tags.py:231
+#: ../tags.py:222
 msgid "_Remove tag"
 msgstr "_Supprimer l'étiquette"
 
-#: ../tags.py:241
+#: ../tags.py:232
 msgid "<b><big>Remove tag?</big></b>"
 msgstr "<b><big>Supprimer l'étiquette ?</big></b>"
 
-#: ../tags.py:243
+#: ../tags.py:234
 #, python-format
 msgid "Are you sure you want to remove the tag: <b>%s</b>?"
 msgstr "Voulez-vous vraiment supprimer l'étiquette : <b>%s</b> ?"
 
 #. Create the widgets
-#: ../tags.py:288
+#: ../tags.py:278
 msgid "_Add tag"
 msgstr "_Ajouter une étiquette"
 
-#: ../tags.py:290
+#: ../tags.py:280
 msgid "Tag Name:"
 msgstr "Nom de l'étiquette :"
 
-#: ../tags.py:291
+#: ../tags.py:281
 msgid "Revision ID:"
 msgstr "ID de révision :"
 
-#: ../tags.py:322
+#: ../tags.py:312
 msgid "No tag name specified"
 msgstr "Aucun nom d'étiquette indiqué"
 
-#: ../tags.py:323
+#: ../tags.py:313
 msgid "You have to specify the tag's desired name."
 msgstr "Vous devez renseigner le nom d'étiquette souhaité."
