@@ -31,8 +31,8 @@ from bzrlib.errors import (
     NotBranchError,
     NoWorkingTree,
     )
+from bzrlib.ignores import tree_ignores_add_patterns
 from bzrlib.tree import InterTree
-from bzrlib.workingtree import WorkingTree
 
 from bzrlib.plugin import load_plugins
 load_plugins()
@@ -51,41 +51,36 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
         controldir, path = ControlDir.open_containing(uri)
         return controldir, path
 
-    def add_cb(self, menu, vfs_file):
-        controldir, path = self._open_bzrdir(vfs_file)
-        tree = controldir.open_workingtree()
+    @classmethod
+    def _open_tree(cls, vfs_file):
+        controldir, path = cls._open_bzrdir(vfs_file)
+        return controldir.open_workingtree(), path
+
+    def add_cb(self, menu, tree, path):
         tree.add(path)
 
-    def ignore_cb(self, menu, vfs_file):
+    def ignore_cb(self, menu, tree, path):
         # We can only cope with local files
-        controldir, path = self._open_bzrdir(vfs_file)
-        tree = controldir.open_workingtree()
+        tree_ignores_add_patterns(tree, [path])
         #FIXME: Add path to ignore file
 
-    def unignore_cb(self, menu, vfs_file):
+    def unignore_cb(self, menu, tree, path):
+        pass
         # We can only cope with local files
-        controldir, path = self._open_bzrdir(vfs_file)
-        tree = controldir.open_workingtree()
         #FIXME
 
-    def diff_cb(self, menu, vfs_file):
-        controldir, path = self._open_bzrdir(vfs_file)
-        tree = controldir.open_workingtree()
+    def diff_cb(self, menu, tree, path=None):
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow()
         window.set_diff(tree.branch._get_nick(local=True), tree, 
                         tree.branch.basis_tree())
         window.show()
 
-        return
-
     def newtree_cb(self, menu, vfs_file):
         controldir, path = self._open_bzrdir(vfs_file)
         controldir.create_workingtree()
 
-    def remove_cb(self, menu, vfs_file):
-        controldir, path = self._open_bzrdir(vfs_file)
-        tree = controldir.open_workingtree()
+    def remove_cb(self, menu, tree, path):
         tree.remove(path)
 
     def annotate_cb(self, menu, tree, path, file_id):
@@ -105,10 +100,7 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
             dialog.hide()
             dialog.destroy()
 
-    def commit_cb(self, menu, vfs_file=None):
-        controldir, path = self._open_bzrdir(vfs_file)
-        tree = controldir.open_workingtree()
-
+    def commit_cb(self, menu, tree, path=None):
         from bzrlib.plugins.gtk.commit import CommitDialog
         dialog = CommitDialog(tree, path)
         response = dialog.run()
@@ -116,29 +108,27 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
             dialog.hide()
             dialog.destroy()
 
-    def log_cb(self, menu, vfs_file):
+    def log_cb(self, menu, controldir, path=None):
         from bzrlib.plugins.gtk.viz import BranchWindow
-        controldir, path = self._open_bzrdir(vfs_file)
         branch = controldir.open_branch()
         pp = BranchWindow(branch, [branch.last_revision()], None)
         pp.show()
         Gtk.main()
 
-    def pull_cb(self, menu, vfs_file):
-        controldir, path = self._open_bzrdir(vfs_file)
-        tree = controldir.open_workingtree()
+    def pull_cb(self, menu, controldir, path=None):
         from bzrlib.plugins.gtk.pull import PullDialog
-        dialog = PullDialog(tree, path)
+        dialog = PullDialog(controldir.open_workingtree(), path)
         dialog.display()
         Gtk.main()
 
-    def merge_cb(self, menu, vfs_file):
-        controldir, path = self._open_bzrdir(vfs_file)
-        tree = controldir.open_workingtree()
+    def merge_cb(self, menu, tree, path=None):
         from bzrlib.plugins.gtk.merge import MergeDialog
         dialog = MergeDialog(tree, path)
         dialog.run()
         dialog.destroy()
+
+    def create_tree_cb(self, menu, controldir):
+        controldir.create_workingtree()
 
     def get_background_items(self, window, vfs_file):
         try:
@@ -172,28 +162,28 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
                                      label='Enable Bazaar Plugin for this Branch',
                                      tip='Enable Bazaar plugin for nautilus',
                                      icon='')
-            item.connect('activate', self.toggle_integration, True, vfs_file)
+            item.connect('activate', self.toggle_integration, True, branch)
             return [item]
         else:
             item = Nautilus.MenuItem(name='BzrNautilus::disable',
                                      label='Disable Bazaar Plugin this Branch',
                                      tip='Disable Bazaar plugin for nautilus',
                                      icon='')
-            item.connect('activate', self.toggle_integration, False, vfs_file)
+            item.connect('activate', self.toggle_integration, False, branch)
             items.append(item)
 
         item = Nautilus.MenuItem(name='BzrNautilus::log',
                              label='History ...',
                              tip='Show Bazaar history',
                              icon='')
-        item.connect('activate', self.log_cb, vfs_file)
+        item.connect('activate', self.log_cb, controldir)
         items.append(item)
 
         item = Nautilus.MenuItem(name='BzrNautilus::pull',
                              label='Pull ...',
                              tip='Pull from another branch',
                              icon='')
-        item.connect('activate', self.pull_cb, vfs_file)
+        item.connect('activate', self.pull_cb, controldir)
         items.append(item)
 
         try:
@@ -203,21 +193,21 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
                                  label='Create working tree...',
                                  tip='Create a working tree for this branch',
                                  icon='')
-            item.connect('activate', self.create_tree_cb, vfs_file)
+            item.connect('activate', self.create_tree_cb, controldir)
             items.append(item)
         else:
             item = Nautilus.MenuItem(name='BzrNautilus::merge',
                                  label='Merge ...',
                                  tip='Merge from another branch',
                                  icon='')
-            item.connect('activate', self.merge_cb, vfs_file)
+            item.connect('activate', self.merge_cb, tree, path)
             items.append(item)
 
             item = Nautilus.MenuItem(name='BzrNautilus::commit',
                                  label='Commit ...',
                                  tip='Commit Changes',
                                  icon='')
-            item.connect('activate', self.commit_cb, vfs_file)
+            item.connect('activate', self.commit_cb, tree, path)
             items.append(item)
 
         return items
@@ -243,28 +233,28 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
                                      label='Add',
                                      tip='Add as versioned file',
                                      icon='')
-                item.connect('activate', self.add_cb, vfs_file)
+                item.connect('activate', self.add_cb, tree, path)
                 items.append(item)
 
                 item = Nautilus.MenuItem(name='BzrNautilus::ignore',
                                      label='Ignore',
                                      tip='Ignore file for versioning',
                                      icon='')
-                item.connect('activate', self.ignore_cb, vfs_file)
+                item.connect('activate', self.ignore_cb, tree, path)
                 items.append(item)
             elif tree.is_ignored(path):
                 item = Nautilus.MenuItem(name='BzrNautilus::unignore',
                                      label='Unignore',
                                      tip='Unignore file for versioning',
                                      icon='')
-                item.connect('activate', self.unignore_cb, vfs_file)
+                item.connect('activate', self.unignore_cb, tree, path)
                 items.append(item)
             else:
                 item = Nautilus.MenuItem(name='BzrNautilus::log',
                                  label='History ...',
                                  tip='List changes',
                                  icon='')
-                item.connect('activate', self.log_cb, vfs_file)
+                item.connect('activate', self.log_cb, controldir, path)
                 items.append(item)
 
                 intertree = InterTree.get(tree.basis_tree(), tree)
@@ -273,21 +263,21 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
                                      label='View Changes ...',
                                      tip='Show differences',
                                      icon='')
-                    item.connect('activate', self.diff_cb, vfs_file)
+                    item.connect('activate', self.diff_cb, tree, path)
                     items.append(item)
 
                     item = Nautilus.MenuItem(name='BzrNautilus::commit',
                                  label='Commit ...',
                                  tip='Commit Changes',
                                  icon='')
-                    item.connect('activate', self.commit_cb, vfs_file)
+                    item.connect('activate', self.commit_cb, tree, path)
                     items.append(item)
 
                 item = Nautilus.MenuItem(name='BzrNautilus::remove',
                                      label='Remove',
                                      tip='Remove this file from versioning',
                                      icon='')
-                item.connect('activate', self.remove_cb, vfs_file)
+                item.connect('activate', self.remove_cb, tree, path)
                 items.append(item)
 
                 item = Nautilus.MenuItem(name='BzrNautilus::annotate',
@@ -382,8 +372,41 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
         config = branch.get_config_stack()
         return config.get("nautilus_integration")
 
-    def toggle_integration(self, menu, action, vfs_file):
-        controldir = self._open_bzrdir(vfs_file)
-        branch = controldir.open_branch()
+    def toggle_integration(self, menu, action, branch):
         config = branch.get_config_stack()
         config.set("nautilus_integration", action)
+
+    def get_property_pages(self, files):
+        pages = []
+        for vfs_file in files:
+            try:
+                controldir, path = self._open_bzrdir(vfs_file)
+            except NotBranchError:
+                continue
+
+            try:
+                tree = controldir.open_workingtree()
+            except NoWorkingTree:
+                continue
+
+            tree.lock_read()
+            try:
+                property_label = Gtk.Label('Version Control')
+                property_label.show()
+
+                file_id = tree.path2id(path)
+
+                table = Gtk.Table(homogeneous=False, columns=2, rows=2)
+
+                table.attach(Gtk.Label('File id:'), 0, 1, 0, 1)
+                table.attach(Gtk.Label(file_id), 1, 2, 0, 1)
+
+                table.attach(Gtk.Label('SHA1Sum:'), 0, 1, 1, 2)
+                table.attach(Gtk.Label(tree.get_file_sha1(file_id, path)), 1, 1, 1, 2)
+
+                table.show_all()
+                pages.append(Nautilus.PropertyPage(name="BzrNautilus::version_info",
+                             label=property_label, page=table))
+            finally:
+                tree.unlock()
+        return pages
