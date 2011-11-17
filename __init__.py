@@ -136,6 +136,15 @@ branch.Branch.hooks.install_named_hook('post_uncommit',
                                        save_commit_messages,
                                        "Saving commit messages for gcommit")
 
+config.option_registry.register(
+    config.Option('nautilus_integration', default=True,
+           from_unicode=config.bool_from_store,
+           help='''\
+Whether to enable nautilus integration.
+
+Defines whether Nautilus integration should be enabled.
+'''))
+
 
 def load_tests(basic_tests, module, loader):
     testmod_names = [

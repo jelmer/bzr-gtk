@@ -25,87 +25,54 @@
 # You can also install nautilus-bzr manually by copying it (or linking it from)
 # ~/.local/share/nautilus-python/extensions/nautilus-bzr.py
 
-from gi.repository import Gtk
-import nautilus
-from bzrlib.branch import Branch
-from bzrlib.bzrdir import BzrDir
+from gi.repository import Gtk, Nautilus, GObject
+from bzrlib.controldir import ControlDir
 from bzrlib.errors import (
     NotBranchError,
     NoWorkingTree,
-    UnsupportedProtocol,
     )
+from bzrlib.tree import InterTree
 from bzrlib.workingtree import WorkingTree
-from bzrlib.config import GlobalConfig
 
 from bzrlib.plugin import load_plugins
 load_plugins()
 
-from bzrlib.plugins.gtk.commands import (
-    cmd_gannotate,
-    start_viz_window,
-    )
 
-class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.InfoProvider):
+class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
+        Nautilus.InfoProvider, Nautilus.PropertyPageProvider, GObject.GObject):
+    """Nautilus extension providing Bazaar integration."""
 
     def __init__(self):
         pass
 
+    @classmethod
+    def _open_bzrdir(cls, vfs_file):
+        uri = vfs_file.get_uri()
+        controldir, path = ControlDir.open_containing(uri)
+        return controldir, path
+
     def add_cb(self, menu, vfs_file):
-        # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
-        file = vfs_file.get_uri()
-        try:
-            tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            return
-
+        controldir, path = self._open_bzrdir(vfs_file)
+        tree = controldir.open_workingtree()
         tree.add(path)
-
-        return
 
     def ignore_cb(self, menu, vfs_file):
         # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
-        file = vfs_file.get_uri()
-        try:
-            tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            return
-
-        #FIXME
-
+        controldir, path = self._open_bzrdir(vfs_file)
+        tree = controldir.open_workingtree()
+        #FIXME: Add path to ignore file
         return
 
     def unignore_cb(self, menu, vfs_file):
         # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
-        file = vfs_file.get_uri()
-        try:
-            tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            return
-
+        controldir, path = self._open_bzrdir(vfs_file)
+        tree = controldir.open_workingtree()
         #FIXME
-
         return
 
     def diff_cb(self, menu, vfs_file):
-        # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
-        file = vfs_file.get_uri()
-        try:
-            tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            return
-
+        controldir, path = self._open_bzrdir(vfs_file)
+        tree = controldir.open_workingtree()
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow()
         window.set_diff(tree.branch._get_nick(local=True), tree, 
@@ -115,74 +82,34 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         return
 
     def newtree_cb(self, menu, vfs_file):
-        # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
-        file = vfs_file.get_uri()
-
-        # We only want to continue here if we get a NotBranchError
-        try:
-            tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            BzrDir.create_standalone_workingtree(file)
+        controldir, path = self._open_bzrdir(vfs_file)
+        controldir.create_workingtree()
 
     def remove_cb(self, menu, vfs_file):
-        # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
-        file = vfs_file.get_uri()
-        try:
-            tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            return
-
+        controldir, path = self._open_bzrdir(vfs_file)
+        tree = controldir.open_workingtree()
         tree.remove(path)
 
     def annotate_cb(self, menu, vfs_file):
-        # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
-        file = vfs_file.get_uri()
-
-        vis = cmd_gannotate()
-        vis.run(file)
+        from bzrlib.plugins.gtk.annotate.gannotate import GAnnotateWindow
+        controldir, path = self._open_bzrdir(vfs_file)
+        win = GAnnotateWindow()
+        win.annotate(controldir.open_workingtree(), controldir.open_branch(), path)
+        Gtk.main()
 
     def clone_cb(self, menu, vfs_file=None):
-        # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
         from bzrlib.plugins.gtk.branch import BranchDialog
-        
+        controldir, path = self._open_bzrdir(vfs_file)
+
         dialog = BranchDialog(vfs_file.get_name())
         response = dialog.run()
         if response != Gtk.ResponseType.NONE:
             dialog.hide()
             dialog.destroy()
- 
-    def commit_cb(self, menu, vfs_file=None):
-        # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
 
-        file = vfs_file.get_uri()
-        tree = None
-        branch = None
-        try:
-            tree, path = WorkingTree.open_containing(file)
-            branch = tree.branch
-        except NotBranchError, e:
-            path = e.path
-            #return
-        except NoWorkingTree, e:
-            path = e.base
-            try:
-                (branch, path) = Branch.open_containing(path)
-            except NotBranchError, e:
-                path = e.path
+    def commit_cb(self, menu, vfs_file=None):
+        controldir, path = self._open_bzrdir(vfs_file)
+        tree = controldir.open_workingtree()
 
         from bzrlib.plugins.gtk.commit import CommitDialog
         dialog = CommitDialog(tree, path)
@@ -192,216 +119,180 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
             dialog.destroy()
 
     def log_cb(self, menu, vfs_file):
-        # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
-        file = vfs_file.get_uri()
-
-        # We only want to continue here if we get a NotBranchError
-        try:
-            branch, path = Branch.open_containing(file)
-        except NotBranchError:
-            return
-
+        controldir, path = self._open_bzrdir(vfs_file)
+        branch = controldir.open_branch()
         pp = start_viz_window(branch, [branch.last_revision()])
         pp.show()
         Gtk.main()
 
     def pull_cb(self, menu, vfs_file):
-        # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
-        file = vfs_file.get_uri()
-
-        # We only want to continue here if we get a NotBranchError
-        try:
-            tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            return
-
+        controldir, path = self._open_bzrdir(vfs_file)
+        tree = controldir.open_workingtree()
         from bzrlib.plugins.gtk.pull import PullDialog
         dialog = PullDialog(tree, path)
         dialog.display()
         Gtk.main()
 
     def merge_cb(self, menu, vfs_file):
-        # We can only cope with local files
-        if vfs_file.get_uri_scheme() != 'file':
-            return
-
-        file = vfs_file.get_uri()
-
-        # We only want to continue here if we get a NotBranchError
-        try:
-            tree, path = WorkingTree.open_containing(file)
-        except NotBranchError:
-            return
-
+        controldir, path = self._open_bzrdir(vfs_file)
+        tree = controldir.open_workingtree()
         from bzrlib.plugins.gtk.merge import MergeDialog
         dialog = MergeDialog(tree, path)
         dialog.run()
         dialog.destroy()
 
     def get_background_items(self, window, vfs_file):
-        items = []
-        file = vfs_file.get_uri()
-
         try:
-            tree, path = WorkingTree.open_containing(file)
-            disabled_flag = self.check_branch_enabled(tree.branch)
-        except UnsupportedProtocol:
-            return
+            controldir, path = self._open_bzrdir(vfs_file)
         except NotBranchError:
-            disabled_flag = self.check_branch_enabled()
-            item = nautilus.MenuItem('BzrNautilus::newtree',
+            return
+        try:
+            branch = controldir.open_branch()
+        except NotBranchError:
+            items = []
+            item = Nautilus.MenuItem('BzrNautilus::newtree',
                                  'Make directory versioned',
                                  'Create new Bazaar tree in this folder')
             item.connect('activate', self.newtree_cb, vfs_file)
             items.append(item)
 
-            item = nautilus.MenuItem('BzrNautilus::clone',
+            item = Nautilus.MenuItem('BzrNautilus::clone',
                                  'Checkout Bazaar branch ...',
                                  'Checkout Existing Bazaar Branch')
             item.connect('activate', self.clone_cb, vfs_file)
             items.append(item)
-
             return items
-        except NoWorkingTree:
-            return
-        
-        if disabled_flag == 'False':
-            item = nautilus.MenuItem('BzrNautilus::enable',
+
+        items = []
+
+        nautilus_integration = self.check_branch_enabled(branch)
+        if not nautilus_integration:
+            item = Nautilus.MenuItem('BzrNautilus::enable',
                                      'Enable Bazaar Plugin for this Branch',
                                      'Enable Bazaar plugin for nautilus')
-            item.connect('activate', self.toggle_integration, 'True', vfs_file)
-            return item,
+            item.connect('activate', self.toggle_integration, True, vfs_file)
+            return [item]
         else:
-            item = nautilus.MenuItem('BzrNautilus::disable',
-                                      'Disable Bazaar Plugin this Branch',
-                                      'Disable Bazaar plugin for nautilus')
-            item.connect('activate', self.toggle_integration, 'False', vfs_file)
+            item = Nautilus.MenuItem('BzrNautilus::disable',
+                                     'Disable Bazaar Plugin this Branch',
+                                     'Disable Bazaar plugin for nautilus')
+            item.connect('activate', self.toggle_integration, False, vfs_file)
             items.append(item)
 
-        item = nautilus.MenuItem('BzrNautilus::log',
+        item = Nautilus.MenuItem('BzrNautilus::log',
                              'History ...',
                              'Show Bazaar history')
         item.connect('activate', self.log_cb, vfs_file)
         items.append(item)
 
-        item = nautilus.MenuItem('BzrNautilus::pull',
+        item = Nautilus.MenuItem('BzrNautilus::pull',
                              'Pull ...',
                              'Pull from another branch')
         item.connect('activate', self.pull_cb, vfs_file)
         items.append(item)
 
-        item = nautilus.MenuItem('BzrNautilus::merge',
-                             'Merge ...',
-                             'Merge from another branch')
-        item.connect('activate', self.merge_cb, vfs_file)
-        items.append(item)
+        try:
+            tree = controldir.open_workingtree()
+        except NoWorkingTree:
+            item = Nautilus.MenuItem('BzrNautilus::create_tree',
+                                 'Create working tree...',
+                                 'Create a working tree for this branch')
+            item.connect('activate', self.create_tree_cb, vfs_file)
+            items.append(item)
+        else:
+            item = Nautilus.MenuItem('BzrNautilus::merge',
+                                 'Merge ...',
+                                 'Merge from another branch')
+            item.connect('activate', self.merge_cb, vfs_file)
+            items.append(item)
 
-        item = nautilus.MenuItem('BzrNautilus::commit',
-                             'Commit ...',
-                             'Commit Changes')
-        item.connect('activate', self.commit_cb, vfs_file)
-        items.append(item)
+            item = Nautilus.MenuItem('BzrNautilus::commit',
+                                 'Commit ...',
+                                 'Commit Changes')
+            item.connect('activate', self.commit_cb, vfs_file)
+            items.append(item)
 
         return items
 
     def get_file_items(self, window, files):
         items = []
-        
-        wtfiles = {}
+
         for vfs_file in files:
-            # We can only cope with local files
-            if vfs_file.get_uri_scheme() != 'file':
-                continue
+            controldir, path = self._open_bzrdir(vfs_file)
 
-            file = vfs_file.get_uri()
             try:
-                tree, path = WorkingTree.open_containing(file)
-                disabled_flag = self.check_branch_enabled(tree.branch)
-            except NotBranchError:
-                disabled_flag = self.check_branch_enabled()
-                if not vfs_file.is_directory():
-                    continue
-
-                if disabled_flag == 'False':
-                    return
-
-                item = nautilus.MenuItem('BzrNautilus::newtree',
-                                     'Make directory versioned',
-                                     'Create new Bazaar tree in %s' % vfs_file.get_name())
-                item.connect('activate', self.newtree_cb, vfs_file)
-                return item,
+                tree = controldir.open_workingtree()
             except NoWorkingTree:
                 continue
-            # Refresh the list of filestatuses in the working tree
-            if path not in wtfiles.keys():
-                tree.lock_read()
-                for rpath, file_class, kind, id, entry in tree.list_files():
-                    wtfiles[rpath] = file_class
-                tree.unlock()
-                wtfiles[u''] = 'V'
 
-            if wtfiles[path] == '?':
-                item = nautilus.MenuItem('BzrNautilus::add',
+            nautilus_integration = self.check_branch_enabled(tree.branch)
+            if not nautilus_integration:
+                continue
+
+            file_id = tree.path2id(path)
+            if file_id is None:
+                item = Nautilus.MenuItem('BzrNautilus::add',
                                      'Add',
                                      'Add as versioned file')
                 item.connect('activate', self.add_cb, vfs_file)
                 items.append(item)
 
-                item = nautilus.MenuItem('BzrNautilus::ignore',
+                item = Nautilus.MenuItem('BzrNautilus::ignore',
                                      'Ignore',
                                      'Ignore file for versioning')
                 item.connect('activate', self.ignore_cb, vfs_file)
                 items.append(item)
-            elif wtfiles[path] == 'I':
-                item = nautilus.MenuItem('BzrNautilus::unignore',
+            elif tree.is_ignored(path):
+                item = Nautilus.MenuItem('BzrNautilus::unignore',
                                      'Unignore',
                                      'Unignore file for versioning')
                 item.connect('activate', self.unignore_cb, vfs_file)
                 items.append(item)
-            elif wtfiles[path] == 'V':
-                item = nautilus.MenuItem('BzrNautilus::log',
+            else:
+                item = Nautilus.MenuItem('BzrNautilus::log',
                                  'History ...',
                                  'List changes')
                 item.connect('activate', self.log_cb, vfs_file)
                 items.append(item)
 
-                item = nautilus.MenuItem('BzrNautilus::diff',
-                                 'View Changes ...',
-                                 'Show differences')
-                item.connect('activate', self.diff_cb, vfs_file)
-                items.append(item)
+                intertree = InterTree.get(tree.basis_tree(), tree)
+                if not intertree.file_content_matches(file_id, file_id):
+                    item = Nautilus.MenuItem('BzrNautilus::diff',
+                                     'View Changes ...',
+                                     'Show differences')
+                    item.connect('activate', self.diff_cb, vfs_file)
+                    items.append(item)
 
-                item = nautilus.MenuItem('BzrNautilus::remove',
+                    item = Nautilus.MenuItem('BzrNautilus::commit',
+                                 'Commit ...',
+                                 'Commit Changes')
+                    item.connect('activate', self.commit_cb, vfs_file)
+                    items.append(item)
+
+                item = Nautilus.MenuItem('BzrNautilus::remove',
                                      'Remove',
                                      'Remove this file from versioning')
                 item.connect('activate', self.remove_cb, vfs_file)
                 items.append(item)
 
-                item = nautilus.MenuItem('BzrNautilus::annotate',
+                item = Nautilus.MenuItem('BzrNautilus::annotate',
                              'Annotate ...',
                              'Annotate File Data')
                 item.connect('activate', self.annotate_cb, vfs_file)
                 items.append(item)
-
-                item = nautilus.MenuItem('BzrNautilus::commit',
-                             'Commit ...',
-                             'Commit Changes')
-                item.connect('activate', self.commit_cb, vfs_file)
-                items.append(item)
-
         return items
 
     def get_columns(self):
-        return nautilus.Column("BzrNautilus::bzr_status",
-                               "bzr_status",
-                               "Bzr Status",
-                               "Version control status"),
+        return [
+            Nautilus.Column(name="BzrNautilus::bzr_status",
+                            attribute="bzr_status",
+                            label="Status",
+                            description="Version control status"),
+            Nautilus.Column(name="BzrNautilus::bzr_revision",
+                            attribute="bzr_revision",
+                            label="Revision",
+                            description="Last change revision"),
+            ]
 
     def update_file_info(self, file):
 
@@ -415,8 +306,8 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         except NoWorkingTree:
             return   
 
-        disabled_flag = self.check_branch_enabled(tree.branch)
-        if disabled_flag == 'False':
+        nautilus_integration = self.check_branch_enabled(tree.branch)
+        if not nautilus_integration:
             return
 
         emblem = None
@@ -453,32 +344,18 @@ class BzrExtension(nautilus.MenuProvider, nautilus.ColumnProvider, nautilus.Info
         else:
             # FIXME: Check for ignored files
             status = 'unversioned'
-        
+
         if emblem is not None:
             file.add_emblem(emblem)
         file.add_string_attribute('bzr_status', status)
 
-    def check_branch_enabled(self, branch=None):
+    def check_branch_enabled(self, branch):
         # Supports global disable, but there is currently no UI to do this
-        config = GlobalConfig()
-        disabled_flag = config.get_user_option('nautilus_integration')
-        if disabled_flag != 'False':
-            if branch is not None:
-                config = branch.get_config()
-                disabled_flag = config.get_user_option('nautilus_integration')
-        return disabled_flag
+        config = branch.get_config_stack()
+        return config.get("nautilus_integration")
 
-    def toggle_integration(self, menu, action, vfs_file=None):
-        try:
-            tree, path = WorkingTree.open_containing(vfs_file.get_uri())
-        except NotBranchError:
-            return
-        except NoWorkingTree:
-            return
-        branch = tree.branch
-        if branch is None:
-            config = GlobalConfig()
-        else:
-            config = branch.get_config()
-        config.set_user_option('nautilus_integration', action)
-
+    def toggle_integration(self, menu, action, vfs_file):
+        controldir = self._open_bzrdir(vfs_file)
+        branch = controldir.open_branch()
+        config = branch.get_config_stack()
+        config.set("nautilus_integration", action)

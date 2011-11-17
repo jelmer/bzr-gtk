@@ -133,7 +133,6 @@ class GAnnotateWindow(Window):
         self.annoview.set_cursor(tree_path, None, False)
         self.annoview.scroll_to_cell(tree_path, use_align=True)
 
-
     def _annotate(self, tree, file_id):
         current_revision = FakeRevision(CURRENT_REVISION)
         current_revision.committer = self.branch.get_config().username()
