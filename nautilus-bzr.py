@@ -25,7 +25,7 @@
 # You can also install nautilus-bzr manually by copying it (or linking it from)
 # ~/.local/share/nautilus-python/extensions/nautilus-bzr.py
 
-from gi.repository import Gtk, Nautilus, GObject
+from gi.repository import Gtk, GObject, Nautilus
 from bzrlib.controldir import ControlDir
 from bzrlib.errors import (
     NotBranchError,
@@ -61,14 +61,12 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
         controldir, path = self._open_bzrdir(vfs_file)
         tree = controldir.open_workingtree()
         #FIXME: Add path to ignore file
-        return
 
     def unignore_cb(self, menu, vfs_file):
         # We can only cope with local files
         controldir, path = self._open_bzrdir(vfs_file)
         tree = controldir.open_workingtree()
         #FIXME
-        return
 
     def diff_cb(self, menu, vfs_file):
         controldir, path = self._open_bzrdir(vfs_file)
@@ -119,9 +117,10 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
             dialog.destroy()
 
     def log_cb(self, menu, vfs_file):
+        from bzrlib.plugins.gtk.viz import BranchWindow
         controldir, path = self._open_bzrdir(vfs_file)
         branch = controldir.open_branch()
-        pp = start_viz_window(branch, [branch.last_revision()])
+        pp = BranchWindow(branch, [branch.last_revision()])
         pp.show()
         Gtk.main()
 
@@ -294,60 +293,72 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
                             description="Last change revision"),
             ]
 
-    def update_file_info(self, file):
-
-        if file.get_uri_scheme() != 'file':
-            return
-        
-        try:
-            tree, path = WorkingTree.open_containing(file.get_uri())
-        except NotBranchError:
-            return
-        except NoWorkingTree:
-            return   
-
-        nautilus_integration = self.check_branch_enabled(tree.branch)
-        if not nautilus_integration:
-            return
-
+    def _file_summary(self, tree, basis_tree, intertree, path):
+        file_revision = ""
         emblem = None
-        status = None
 
-        id = tree.path2id(path)
-        if id == None:
+        file_id = tree.path2id(path)
+        if file_id is None:
             if tree.is_ignored(path):
                 status = 'ignored'
                 emblem = 'bzr-ignored'
             else:
                 status = 'unversioned'
-                        
-        elif tree.has_filename(path):
-            emblem = 'bzr-controlled'
-            status = 'unchanged'
-
-            delta = tree.changes_from(tree.branch.basis_tree())
-            if delta.touches_file_id(id):
-                emblem = 'bzr-modified'
-                status = 'modified'
-            for f, _, _ in delta.added:
-                if f == path:
+            file_revision = "N/A"
+        elif tree.has_filename(path): # Still present
+            if not intertree.file_content_matches(file_id, file_id):
+                if not basis_tree.has_id(file_id):
                     emblem = 'bzr-added'
                     status = 'added'
-
-            for of, f, _, _, _, _ in delta.renamed:
-                if f == path:
-                    status = 'renamed from %s' % f
-
-        elif tree.branch.basis_tree().has_filename(path):
+                    file_revision = "new file"
+                elif basis_tree.path2id(file_id) != path:
+                    status = 'bzr-renamed'
+                    status = 'renamed from %s' % basis_tree.path2id(file_id)
+                else:
+                    emblem = 'bzr-modified'
+                    status = 'modified'
+            else:
+                emblem = 'bzr-controlled'
+                status = 'unchanged'
+        elif basis_tree.has_filename(path):
             emblem = 'bzr-removed'
             status = 'removed'
         else:
             # FIXME: Check for ignored files
             status = 'unversioned'
+        return (status, emblem, file_revision)
 
-        if emblem is not None:
-            file.add_emblem(emblem)
-        file.add_string_attribute('bzr_status', status)
+    def update_file_info(self, vfs_file):
+        try:
+            controldir, path = self._open_bzrdir(vfs_file)
+        except NotBranchError:
+            return
+
+        try:
+            tree = controldir.open_workingtree()
+        except NoWorkingTree:
+            return
+
+        tree.lock_read()
+        try:
+            nautilus_integration = self.check_branch_enabled(tree.branch)
+            if not nautilus_integration:
+                return
+
+            basis_tree = tree.basis_tree()
+            intertree = InterTree.get(basis_tree, tree)
+
+            basis_tree.lock_read()
+            try:
+                (status, emblem, file_revision) = self._file_summary(tree, basis_tree, intertree, path)
+            finally:
+                basis_tree.unlock()
+            if emblem is not None:
+                vfs_file.add_emblem(emblem)
+            vfs_file.add_string_attribute('bzr_status', status)
+            vfs_file.add_string_attribute('bzr_revision', file_revision)
+        finally:
+            tree.unlock()
 
     def check_branch_enabled(self, branch):
         # Supports global disable, but there is currently no UI to do this
