@@ -49,6 +49,7 @@ class TestPendingRevisions(tests.TestCaseWithTransport):
         tree = self.make_branch_and_tree('.')
         tree.commit('one')
 
+        self.addCleanup(tree.lock_read().unlock)
         self.assertIs(None, commit.pending_revisions(tree))
 
     def test_pending_revisions_simple(self):
@@ -59,6 +60,7 @@ class TestPendingRevisions(tests.TestCaseWithTransport):
         tree.merge_from_branch(tree2.branch)
         self.assertEqual([rev_id1, rev_id2], tree.get_parent_ids())
 
+        self.addCleanup(tree.lock_read().unlock)
         pending_revisions = commit.pending_revisions(tree)
         # One primary merge
         self.assertEqual(1, len(pending_revisions))
@@ -77,6 +79,7 @@ class TestPendingRevisions(tests.TestCaseWithTransport):
         tree.merge_from_branch(tree2.branch)
         self.assertEqual([rev_id1, rev_id4], tree.get_parent_ids())
 
+        self.addCleanup(tree.lock_read().unlock)
         pending_revisions = commit.pending_revisions(tree)
         # One primary merge
         self.assertEqual(1, len(pending_revisions))
@@ -100,6 +103,7 @@ class TestPendingRevisions(tests.TestCaseWithTransport):
         tree.merge_from_branch(tree3.branch, force=True)
         self.assertEqual([rev_id1, rev_id3, rev_id5], tree.get_parent_ids())
 
+        self.addCleanup(tree.lock_read().unlock)
         pending_revisions = commit.pending_revisions(tree)
         # Two primary merges
         self.assertEqual(2, len(pending_revisions))

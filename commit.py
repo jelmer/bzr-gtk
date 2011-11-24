@@ -62,15 +62,10 @@ def pending_revisions(wt):
     last_revision = parents[0]
 
     if last_revision is not None:
-        try:
-            ignore = set(branch.repository.get_ancestry(last_revision,
-                                                        topo_sorted=False))
-        except errors.NoSuchRevision:
-            # the last revision is a ghost : assume everything is new
-            # except for it
-            ignore = set([None, last_revision])
+        graph = branch.repository.get_graph()
+        ignore = set([r for r,ps in graph.iter_ancestry([last_revision])])
     else:
-        ignore = set([None])
+        ignore = set([])
 
     pm = []
     for merge in pending:
@@ -133,7 +128,11 @@ class CommitDialog(Gtk.Dialog):
         """Setup the member variables for state."""
         self._basis_tree = self._wt.basis_tree()
         self._delta = None
-        self._pending = pending_revisions(self._wt)
+        self._wt.lock_read()
+        try:
+            self._pending = pending_revisions(self._wt)
+        finally:
+            self._wt.unlock()
 
         self._is_checkout = (self._wt.branch.get_bound_location() is not None)
 
