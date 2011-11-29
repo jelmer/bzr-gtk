@@ -18,3 +18,5 @@ The bug icon was created by Josef Vybíral.
 
 Numerous other people have contributed useful patches.  See the Bazaar history 
 of this branch for a full list of authors.
+
+Curtis Hovey converted bzr-gtk to pygi and Gtk3.
