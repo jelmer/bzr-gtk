@@ -542,7 +542,9 @@ class BranchWindow(Window):
         dialog = SearchDialog(index)
 
         if dialog.run() == Gtk.ResponseType.OK:
-            self.set_revision(dialog.get_revision())
+            revid = dialog.get_revision()
+            if revid is not None:
+                self.set_revision(revid)
 
         dialog.destroy()
 
