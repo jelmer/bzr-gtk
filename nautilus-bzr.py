@@ -212,80 +212,94 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
 
         return items
 
+    def _get_file_menuitems(self, tree, intertree, path):
+        file_id = tree.path2id(path)
+        if file_id is None:
+            item = Nautilus.MenuItem(name='BzrNautilus::add',
+                                 label='Add',
+                                 tip='Add as versioned file',
+                                 icon='')
+            item.connect('activate', self.add_cb, tree, path)
+            yield item
+
+            item = Nautilus.MenuItem(name='BzrNautilus::ignore',
+                                 label='Ignore',
+                                 tip='Ignore file for versioning',
+                                 icon='')
+            item.connect('activate', self.ignore_cb, tree, path)
+            yield item
+        elif tree.is_ignored(path):
+            item = Nautilus.MenuItem(name='BzrNautilus::unignore',
+                                 label='Unignore',
+                                 tip='Unignore file for versioning',
+                                 icon='')
+            item.connect('activate', self.unignore_cb, tree, path)
+            yield item
+        else:
+            item = Nautilus.MenuItem(name='BzrNautilus::log',
+                             label='History ...',
+                             tip='List changes',
+                             icon='')
+            item.connect('activate', self.log_cb, tree.bzrdir, path)
+            yield item
+
+            if not intertree.file_content_matches(file_id, file_id):
+                item = Nautilus.MenuItem(name='BzrNautilus::diff',
+                                 label='View Changes ...',
+                                 tip='Show differences',
+                                 icon='')
+                item.connect('activate', self.diff_cb, tree, path)
+                yield item
+
+                item = Nautilus.MenuItem(name='BzrNautilus::commit',
+                             label='Commit ...',
+                             tip='Commit Changes',
+                             icon='')
+                item.connect('activate', self.commit_cb, tree, path)
+                yield item
+
+            item = Nautilus.MenuItem(name='BzrNautilus::remove',
+                                 label='Remove',
+                                 tip='Remove this file from versioning',
+                                 icon='')
+            item.connect('activate', self.remove_cb, tree, path)
+            yield item
+
+            item = Nautilus.MenuItem(name='BzrNautilus::annotate',
+                         label='Annotate ...',
+                         tip='Annotate File Data',
+                         icon='')
+            item.connect('activate', self.annotate_cb, tree, path, file_id)
+            yield item
+
     def get_file_items(self, window, files):
         items = []
+        trees = {}
 
-        for vfs_file in files:
-            controldir, path = self._open_bzrdir(vfs_file)
+        try:
+            for vfs_file in files:
+                controldir, path = self._open_bzrdir(vfs_file)
 
-            try:
-                tree = controldir.open_workingtree()
-            except NoWorkingTree:
-                continue
+                try:
+                    tree = trees[controldir.user_url]
+                except KeyError:
+                    try:
+                        tree = controldir.open_workingtree()
+                    except NoWorkingTree:
+                        continue
+                    trees[controldir.user_url] = tree
+                    tree.lock_read()
 
-            nautilus_integration = self.check_branch_enabled(tree.branch)
-            if not nautilus_integration:
-                continue
-
-            file_id = tree.path2id(path)
-            if file_id is None:
-                item = Nautilus.MenuItem(name='BzrNautilus::add',
-                                     label='Add',
-                                     tip='Add as versioned file',
-                                     icon='')
-                item.connect('activate', self.add_cb, tree, path)
-                items.append(item)
-
-                item = Nautilus.MenuItem(name='BzrNautilus::ignore',
-                                     label='Ignore',
-                                     tip='Ignore file for versioning',
-                                     icon='')
-                item.connect('activate', self.ignore_cb, tree, path)
-                items.append(item)
-            elif tree.is_ignored(path):
-                item = Nautilus.MenuItem(name='BzrNautilus::unignore',
-                                     label='Unignore',
-                                     tip='Unignore file for versioning',
-                                     icon='')
-                item.connect('activate', self.unignore_cb, tree, path)
-                items.append(item)
-            else:
-                item = Nautilus.MenuItem(name='BzrNautilus::log',
-                                 label='History ...',
-                                 tip='List changes',
-                                 icon='')
-                item.connect('activate', self.log_cb, controldir, path)
-                items.append(item)
+                nautilus_integration = self.check_branch_enabled(tree.branch)
+                if not nautilus_integration:
+                    continue
 
                 intertree = InterTree.get(tree.basis_tree(), tree)
-                if not intertree.file_content_matches(file_id, file_id):
-                    item = Nautilus.MenuItem(name='BzrNautilus::diff',
-                                     label='View Changes ...',
-                                     tip='Show differences',
-                                     icon='')
-                    item.connect('activate', self.diff_cb, tree, path)
-                    items.append(item)
+                items.extend(list(self._get_file_menuitems(tree, intertree, path)))
+        finally:
+            for tree in trees.itervalues():
+                tree.unlock()
 
-                    item = Nautilus.MenuItem(name='BzrNautilus::commit',
-                                 label='Commit ...',
-                                 tip='Commit Changes',
-                                 icon='')
-                    item.connect('activate', self.commit_cb, tree, path)
-                    items.append(item)
-
-                item = Nautilus.MenuItem(name='BzrNautilus::remove',
-                                     label='Remove',
-                                     tip='Remove this file from versioning',
-                                     icon='')
-                item.connect('activate', self.remove_cb, tree, path)
-                items.append(item)
-
-                item = Nautilus.MenuItem(name='BzrNautilus::annotate',
-                             label='Annotate ...',
-                             tip='Annotate File Data',
-                             icon='')
-                item.connect('activate', self.annotate_cb, tree, path, file_id)
-                items.append(item)
         return items
 
     def get_columns(self):
@@ -391,22 +405,73 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
 
             tree.lock_read()
             try:
-                property_label = Gtk.Label('Version Control')
-                property_label.show()
-
                 file_id = tree.path2id(path)
-
-                table = Gtk.Table(homogeneous=False, columns=2, rows=2)
-
-                table.attach(Gtk.Label('File id:'), 0, 1, 0, 1)
-                table.attach(Gtk.Label(file_id), 1, 2, 0, 1)
-
-                table.attach(Gtk.Label('SHA1Sum:'), 0, 1, 1, 2)
-                table.attach(Gtk.Label(tree.get_file_sha1(file_id, path)), 1, 1, 1, 2)
-
-                table.show_all()
-                pages.append(Nautilus.PropertyPage(name="BzrNautilus::version_info",
-                             label=property_label, page=table))
+                pages.append(PropertyPageFile(tree, file_id, path))
+                pages.append(PropertyPageBranch(tree.branch))
             finally:
                 tree.unlock()
         return pages
+
+
+class PropertyPageFile(Nautilus.PropertyPage):
+
+    def __init__(self, tree, file_id, path):
+        self.tree = tree
+        self.file_id = file_id
+        self.path = path
+        label = Gtk.Label('File Version')
+        label.show()
+
+        table = self._create_table()
+
+        super(PropertyPageFile, self).__init__(label=label,
+            name="BzrNautilus::file_page", page=table)
+
+    def _create_table(self):
+        table = Gtk.Table(homogeneous=False, columns=2, rows=3)
+
+        table.attach(Gtk.Label('File id:'), 0, 1, 0, 1)
+        table.attach(Gtk.Label(self.file_id), 1, 2, 0, 1)
+
+        table.attach(Gtk.Label('SHA1Sum:'), 0, 1, 1, 2)
+        table.attach(Gtk.Label(self.tree.get_file_sha1(self.file_id, self.path)), 1, 1, 1, 2)
+
+        basis_tree = self.tree.revision_tree(self.tree.last_revision())
+        last_revision = basis_tree.get_file_revision(self.file_id)
+
+        table.attach(Gtk.Label('Last Change Revision:'), 0, 1, 2, 3)
+        revno = ".".join([str(x) for x in
+            self.tree.branch.revision_id_to_dotted_revno(last_revision)])
+        table.attach(Gtk.Label(revno), 1, 1, 2, 3)
+
+        table.attach(Gtk.Label('Last Change Author:'), 0, 1, 3, 4)
+        rev = self.tree.branch.repository.get_revision(last_revision)
+        table.attach(Gtk.Label("\n".join(rev.get_apparent_authors())), 1, 1, 3, 4)
+
+        table.show_all()
+        return table
+
+
+class PropertyPageBranch(Nautilus.PropertyPage):
+
+    def __init__(self, branch):
+        self.branch = branch
+        label = Gtk.Label('Branch')
+        label.show()
+
+        table = self._create_table()
+
+        super(PropertyPageBranch, self).__init__(label=label,
+            name="BzrNautilus::branch_page", page=table)
+
+    def _create_table(self):
+        table = Gtk.Table(homogeneous=False, columns=2, rows=3)
+
+        table.attach(Gtk.Label('Push location:'), 0, 1, 0, 1)
+        table.attach(Gtk.Label(self.branch.get_push_location()), 1, 2, 0, 1)
+
+        table.attach(Gtk.Label('Parent location:'), 0, 1, 1, 2)
+        table.attach(Gtk.Label(self.branch.get_parent()), 1, 1, 1, 2)
+
+        table.show_all()
+        return table
