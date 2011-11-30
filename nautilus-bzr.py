@@ -39,7 +39,8 @@ load_plugins()
 
 
 class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
-        Nautilus.InfoProvider, Nautilus.PropertyPageProvider, GObject.GObject):
+        Nautilus.InfoProvider, Nautilus.PropertyPageProvider,
+        Nautilus.LocationWidgetProvider, GObject.GObject):
     """Nautilus extension providing Bazaar integration."""
 
     def __init__(self):
@@ -412,6 +413,30 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
                 tree.unlock()
         return pages
 
+    def get_widget(self, uri, window):
+        controldir, path = ControlDir.open_containing(uri)
+        try:
+            tree = controldir.open_workingtree()
+        except NoWorkingTree:
+            return
+        ret = Gtk.HBox(False, 4)
+        text = 'This is a Bazaar working tree. '
+        get_shelf_manager = getattr(tree, 'get_shelf_manager', None)
+        if get_shelf_manager is not None:
+            manager = get_shelf_manager()
+            shelves = manager.active_shelves()
+            if len(shelves) == 0:
+                pass
+            elif len(shelves) == 1:
+                text += '1 shelf exists. '
+            else:
+                text += '%d shelf exists. ' % len(shelves)
+        label = Gtk.Label(text)
+        label.show()
+        ret.pack_start(label, True, True, 0)
+        ret.show_all()
+        return ret
+
 
 class PropertyPageFile(Nautilus.PropertyPage):
 
@@ -464,14 +489,48 @@ class PropertyPageBranch(Nautilus.PropertyPage):
         super(PropertyPageBranch, self).__init__(label=label,
             name="BzrNautilus::branch_page", page=table)
 
+    def _create_location_entry(self, get_location, set_location):
+        location = get_location()
+        ret = Gtk.Entry()
+        if location is not None:
+            ret.set_text(location)
+        return ret
+
     def _create_table(self):
-        table = Gtk.Table(homogeneous=False, columns=2, rows=3)
+        table = Gtk.Table(homogeneous=False, columns=2, rows=6)
+
+        self._push_location_entry = self._create_location_entry(
+            self.branch.get_push_location, self.branch.set_push_location)
+        self._parent_location_entry = self._create_location_entry(
+            self.branch.get_parent, self.branch.set_parent)
+        self._bound_location_entry = self._create_location_entry(
+            self.branch.get_bound_location, self.branch.set_bound_location)
+        self._public_location_entry = self._create_location_entry(
+            self.branch.get_public_branch, self.branch.set_public_branch)
+        self._submit_location_entry = self._create_location_entry(
+            self.branch.get_submit_branch, self.branch.set_submit_branch)
 
         table.attach(Gtk.Label('Push location:'), 0, 1, 0, 1)
-        table.attach(Gtk.Label(self.branch.get_push_location()), 1, 2, 0, 1)
+        table.attach(self._push_location_entry, 1, 2, 0, 1)
 
         table.attach(Gtk.Label('Parent location:'), 0, 1, 1, 2)
-        table.attach(Gtk.Label(self.branch.get_parent()), 1, 1, 1, 2)
+        table.attach(self._parent_location_entry, 1, 1, 1, 2)
+
+        table.attach(Gtk.Label('Bound location:'), 0, 1, 2, 3)
+        table.attach(self._bound_location_entry, 1, 1, 2, 3)
+
+        table.attach(Gtk.Label('Public location:'), 0, 1, 3, 4)
+        table.attach(self._public_location_entry, 1, 1, 3, 4)
+
+        table.attach(Gtk.Label('Submit location:'), 0, 1, 4, 5)
+        table.attach(self._submit_location_entry, 1, 1, 4, 5)
+
+        self._append_revisions_only = Gtk.CheckButton('Append revisions only')
+        value = self.branch.get_append_revisions_only()
+        if value is None:
+            value = False
+        self._append_revisions_only.set_active(value)
+        table.attach(self._append_revisions_only, 0, 2, 5, 6)
 
         table.show_all()
         return table

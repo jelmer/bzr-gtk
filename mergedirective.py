@@ -61,7 +61,7 @@ class SendMergeDirectiveDialog(Gtk.Dialog):
         self.submit_branch = BranchSelectionBox(self.branch.get_submit_branch())
         table.attach(self.submit_branch, 1, 2, 1, 2, Gtk.AttachOptions.FILL, Gtk.AttachOptions.FILL)
 
-        # TODO: Display number of revisions to be send whenever 
+        # TODO: Display number of revisions to be sent whenever 
         # submit branch changes
 
         label = Gtk.Label()
