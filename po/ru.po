@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: olive\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2010-02-18 06:41+0000\n"
+"POT-Creation-Date: 2011-11-12 06:14+0100\n"
+"PO-Revision-Date: 2011-11-30 22:58+0000\n"
 "Last-Translator: Sergey Basalaev <SBasalaev@gmail.com>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-08 04:41+0000\n"
-"X-Generator: Launchpad (build 12351)\n"
+"X-Launchpad-Export-Date: 2011-12-01 06:16+0000\n"
+"X-Generator: Launchpad (build 14414)\n"
 
 #: ../bazaar-properties.desktop.in.h:1
 msgid "Bazaar Preferences"
@@ -42,165 +42,165 @@ msgid "Notification Area Icon for Bazaar"
 msgstr ""
 
 #. Create the widgets
-#: ../branch.py:52
+#: ../branch.py:46
 msgid "_Branch"
 msgstr "В_етка"
 
-#: ../branch.py:55 ../checkout.py:55
+#: ../branch.py:49 ../checkout.py:49
 msgid "Branch location:"
 msgstr "Расположение ветки:"
 
-#: ../branch.py:57 ../checkout.py:56
+#: ../branch.py:51 ../checkout.py:50
 msgid "Destination:"
 msgstr "Назначение:"
 
-#: ../branch.py:58
+#: ../branch.py:52
 msgid "Branck nick:"
 msgstr "Условное обозначение ветки:"
 
-#: ../branch.py:59 ../checkout.py:58
+#: ../branch.py:53 ../checkout.py:52
 msgid "Revision:"
 msgstr "Версия:"
 
-#: ../branch.py:60 ../checkout.py:53
+#: ../branch.py:54 ../checkout.py:47
 msgid "Please select a folder"
 msgstr "Выберите папку"
 
-#: ../branch.py:140 ../checkout.py:159
+#: ../branch.py:134 ../checkout.py:153
 msgid "Missing branch location"
 msgstr "Отсутствует расположение ветки"
 
-#: ../branch.py:141 ../checkout.py:160
+#: ../branch.py:135 ../checkout.py:154
 msgid "You must specify a branch location."
 msgstr "Вы должны указать расположение ветви"
 
-#: ../branch.py:182
+#: ../branch.py:174
 msgid "Branching successful"
 msgstr "Ветвь успешно создана"
 
-#: ../branch.py:183
+#: ../branch.py:175
 #, python-format
 msgid "%d revision(s) branched."
 msgstr "%d версия ветки"
 
-#: ../branch.py:191 ../checkout.py:191
+#: ../branch.py:183 ../checkout.py:185
 msgid "N/A"
 msgstr "Н/Д"
 
 #. Create the widgets
-#: ../checkout.py:50
+#: ../checkout.py:44
 msgid "Check_out"
 msgstr "_Проверка"
 
-#: ../checkout.py:57
+#: ../checkout.py:51
 msgid "Branch nick:"
 msgstr ""
 
-#: ../checkout.py:62
+#: ../checkout.py:56
 msgid "_Lightweight checkout"
 msgstr "_Облегченная проверка"
 
-#: ../commands.py:307
+#: ../commands.py:305
 msgid "Directory does not have a working tree"
 msgstr "У каталога нет рабочего дерева"
 
-#: ../commands.py:308
+#: ../commands.py:306
 msgid "Operation aborted."
 msgstr "Операция прервана."
 
-#: ../commands.py:412
+#: ../commands.py:410
 msgid "There are local changes in the branch"
 msgstr "Есть локальные изменения в ветви"
 
-#: ../commands.py:413
+#: ../commands.py:411
 msgid "Please commit or revert the changes before merging."
 msgstr "Пожалуйста закрепите или откатите изменения перед обьединением."
 
-#: ../commit.py:182
+#: ../commit.py:178
 msgid "added"
 msgstr "добавлен"
 
-#: ../commit.py:183
+#: ../commit.py:179
 msgid "removed"
 msgstr "удален"
 
-#: ../commit.py:184
+#: ../commit.py:180
 msgid "renamed"
 msgstr "переименован"
 
-#: ../commit.py:185
+#: ../commit.py:181
 msgid "renamed and modified"
 msgstr "переименован и изменен"
 
-#: ../commit.py:186
+#: ../commit.py:182
 msgid "modified"
 msgstr "изменён"
 
-#: ../commit.py:187
+#: ../commit.py:183
 msgid "kind changed"
 msgstr ""
 
-#: ../commit.py:280
+#: ../commit.py:276
 msgid "<b>Commit Message</b>"
 msgstr ""
 
-#: ../commit.py:333
+#: ../commit.py:329
 msgid "_Only commit locally"
 msgstr "_Публиковать только локально?"
 
-#: ../commit.py:364
+#: ../commit.py:361
 msgid "Comm_it"
 msgstr "О_публиковать"
 
-#: ../commit.py:390
+#: ../commit.py:388
 msgid "Files"
 msgstr ""
 
-#: ../commit.py:395
+#: ../commit.py:393
 msgid "Commit all changes"
 msgstr ""
 
-#: ../commit.py:401
+#: ../commit.py:399
 msgid "Only commit selected changes"
 msgstr ""
 
-#: ../commit.py:407
+#: ../commit.py:405
 msgid "Commit all changes*"
 msgstr ""
 
-#: ../commit.py:440
+#: ../commit.py:437
 msgid "Commit*"
 msgstr ""
 
-#: ../commit.py:442
+#: ../commit.py:439
 msgid "Commit"
 msgstr "Публиковать"
 
-#: ../commit.py:446 ../conflicts.py:111
+#: ../commit.py:443 ../conflicts.py:107
 msgid "Path"
 msgstr "Путь"
 
-#: ../commit.py:448 ../conflicts.py:113
+#: ../commit.py:445 ../conflicts.py:109
 msgid "Type"
 msgstr "Тип"
 
-#: ../commit.py:481
+#: ../commit.py:478
 msgid "<i>* Cannot select specific files when merging</i>"
 msgstr ""
 
-#: ../commit.py:485
+#: ../commit.py:482
 msgid "Pending Revisions"
 msgstr ""
 
-#: ../commit.py:507
+#: ../commit.py:503
 msgid "Date"
 msgstr "Дата"
 
-#: ../commit.py:509
+#: ../commit.py:505
 msgid "Committer"
 msgstr "Опубликовал"
 
-#: ../commit.py:511 ../search.py:59
+#: ../commit.py:507 ../search.py:60
 msgid "Summary"
 msgstr "Сводка"
 
@@ -208,133 +208,133 @@ msgstr "Сводка"
 #. decide that we really don't ever want to display it, we should
 #. actually remove it, and other references to it, along with the
 #. tests that it is set properly.
-#: ../commit.py:521
+#: ../commit.py:517
 msgid "Diff for whole tree"
 msgstr ""
 
 #. Whole tree
-#: ../commit.py:545 ../commit.py:628
+#: ../commit.py:542 ../commit.py:626
 msgid "File commit message"
 msgstr ""
 
-#: ../commit.py:552
+#: ../commit.py:549
 msgid "Global Commit Message"
 msgstr ""
 
-#: ../commit.py:554
+#: ../commit.py:551
 msgid "<b>Global Commit Message</b>"
 msgstr ""
 
-#: ../commit.py:581
+#: ../commit.py:578
 msgid "Diff for "
 msgstr ""
 
-#: ../commit.py:634
+#: ../commit.py:632
 msgid "Commit message for "
 msgstr ""
 
-#: ../commit.py:689
+#: ../commit.py:687
 msgid "Commit cancelled"
 msgstr ""
 
-#: ../commit.py:690
+#: ../commit.py:688
 msgid "Do you want to save your commit messages ?"
 msgstr ""
 
-#: ../commit.py:708
+#: ../commit.py:706
 msgid "Commit with an empty message?"
 msgstr "Публиковать с пустым сообщением?"
 
-#: ../commit.py:709
+#: ../commit.py:707
 msgid "You can describe your commit intent in the message."
 msgstr "Вы можете описать вашу публикацию в сообщении"
 
-#: ../commit.py:729
+#: ../commit.py:727
 msgid "Commit with unknowns?"
 msgstr "Публиковать с неизвестными?"
 
-#: ../commit.py:730
+#: ../commit.py:728
 msgid "Unknown files exist in the working tree. Commit anyway?"
 msgstr "Неизвестные файлы в рабочем дереве. Продолжить публикацию?"
 
-#: ../commit.py:750
+#: ../commit.py:748
 msgid "Commit with no changes?"
 msgstr "Публиковать без внесения изменений?"
 
-#: ../commit.py:751
+#: ../commit.py:749
 msgid ""
 "There are no changes in the working tree. Do you want to commit anyway?"
 msgstr ""
 
-#: ../conflicts.py:50
+#: ../conflicts.py:45
 msgid "External utility:"
 msgstr "Внешняя утилита:"
 
-#: ../conflicts.py:101
+#: ../conflicts.py:97
 msgid "Conflicts"
 msgstr "Конфликты"
 
-#: ../conflicts.py:104
+#: ../conflicts.py:100
 msgid "No conflicts in working tree."
 msgstr "В рабочем дереве конфликтов нет."
 
-#: ../conflicts.py:118
+#: ../conflicts.py:114
 msgid "path conflict"
 msgstr "конфликт путей"
 
-#: ../conflicts.py:120
+#: ../conflicts.py:116
 msgid "contents conflict"
 msgstr "конфликт содержания"
 
-#: ../conflicts.py:122
+#: ../conflicts.py:118
 msgid "text conflict"
 msgstr "текстовый конфликт"
 
-#: ../conflicts.py:124
+#: ../conflicts.py:120
 msgid "duplicate id"
 msgstr "совпадающий id"
 
-#: ../conflicts.py:126
+#: ../conflicts.py:122
 msgid "duplicate"
 msgstr "дубликат"
 
-#: ../conflicts.py:128
+#: ../conflicts.py:124
 msgid "parent loop"
 msgstr "начальный контур"
 
-#: ../conflicts.py:130
+#: ../conflicts.py:126
 msgid "unversioned parent"
 msgstr "вне версионный предок"
 
-#: ../conflicts.py:132
+#: ../conflicts.py:128
 msgid "missing parent"
 msgstr "отсутствует предок"
 
-#: ../conflicts.py:134
+#: ../conflicts.py:130
 msgid "deleting parent"
 msgstr "удален предок"
 
-#: ../conflicts.py:136
+#: ../conflicts.py:132
 msgid "unknown type of conflict"
 msgstr "неизвестный тип конфликта"
 
-#: ../conflicts.py:165
+#: ../conflicts.py:161
 msgid "No file was selected"
 msgstr "Файл не был выбран"
 
-#: ../conflicts.py:166
+#: ../conflicts.py:162
 msgid "Please select a file from the list."
 msgstr "Пожалуйста, выберите файл из списка."
 
-#: ../conflicts.py:176
+#: ../conflicts.py:172
 msgid "Call to external utility failed"
 msgstr "Вызов внешнего приложения неудачен"
 
-#: ../conflicts.py:178
+#: ../conflicts.py:174
 msgid "Cannot resolve conflict"
 msgstr "Невозможно разрешить конфликт"
 
-#: ../conflicts.py:179
+#: ../conflicts.py:175
 msgid ""
 "Only conflicts on the text of files can be resolved with Olive at the "
 "moment. Content conflicts, on the structure of the tree, need to be resolved "
@@ -349,73 +349,73 @@ msgstr ""
 msgid "_View"
 msgstr "_Просмотр"
 
-#: ../diff.py:447
+#: ../diff.py:448
 msgid "Wrap _Long Lines"
 msgstr ""
 
 #. No conflicts found.
-#: ../diff.py:492 ../merge.py:146
+#: ../diff.py:493 ../merge.py:144
 msgid "Merge successful"
 msgstr "Объединение прошло успешно"
 
-#: ../diff.py:493 ../merge.py:147
+#: ../diff.py:494 ../merge.py:145
 msgid "All changes applied successfully."
 msgstr "Все изменения применены успешно ."
 
 #. There are conflicts to be resolved.
-#: ../diff.py:496 ../merge.py:150
+#: ../diff.py:497 ../merge.py:148
 msgid "Conflicts encountered"
 msgstr "Обнаружены конфликты"
 
-#: ../diff.py:497 ../merge.py:151
+#: ../diff.py:498 ../merge.py:149
 msgid "Please resolve the conflicts manually before committing."
 msgstr "Пожалуйста, разрешите конфликты вручную перед публикацией."
 
-#: ../errors.py:28
+#: ../errors.py:31
 msgid "Directory is not a branch"
 msgstr "Каталог не является ветвью"
 
-#: ../errors.py:29
+#: ../errors.py:32
 msgid "You can perform this action only in a branch."
 msgstr "Вы можете применить это действие только к ветви."
 
-#: ../errors.py:31
+#: ../errors.py:34
 msgid "Directory is not a checkout"
 msgstr "Каталог не проверен"
 
-#: ../errors.py:32
+#: ../errors.py:35
 msgid "You can perform local commit only on checkouts."
 msgstr "Вы можете выполнить локальную публикацию только после проверки."
 
-#: ../errors.py:34
+#: ../errors.py:37
 msgid "No changes to commit"
 msgstr "Нет изменений для публикации"
 
-#: ../errors.py:35
+#: ../errors.py:38
 msgid "Try force commit if you want to commit anyway."
 msgstr "Попытаться опубликовать если вы хотите опубликовать в любом случае."
 
-#: ../errors.py:37
+#: ../errors.py:40
 msgid "No changes to merge"
 msgstr ""
 
-#: ../errors.py:38
+#: ../errors.py:41
 msgid "Merge location is already fully merged in working tree."
 msgstr ""
 
-#: ../errors.py:40
+#: ../errors.py:43
 msgid "Conflicts in tree"
 msgstr "Конфликты в дереве"
 
-#: ../errors.py:41
+#: ../errors.py:44
 msgid "You need to resolve the conflicts before committing."
 msgstr "Вам необходимо устранить все конфликты перед публикацией."
 
-#: ../errors.py:43
+#: ../errors.py:46
 msgid "Strict commit failed"
 msgstr "Ошибка точной публикации"
 
-#: ../errors.py:44
+#: ../errors.py:47
 msgid ""
 "There are unknown files in the working tree.\n"
 "Please add or delete them."
@@ -423,29 +423,29 @@ msgstr ""
 "В рабочем дереве содержаться неизвестные файлы.\n"
 "Пожалуйста добавьте или удалите их."
 
-#: ../errors.py:46
+#: ../errors.py:49
 msgid "Bound branch is out of date"
 msgstr "Связанная ветвь устарела"
 
 #. FIXME: Really ? Internationalizing %s ?? --vila080505
-#: ../errors.py:48
+#: ../errors.py:51
 #, python-format
 msgid "%s"
 msgstr "%s"
 
-#: ../errors.py:50
+#: ../errors.py:53
 msgid "File not versioned"
 msgstr "Файл без версии"
 
-#: ../errors.py:51
+#: ../errors.py:54
 msgid "The selected file is not versioned."
 msgstr "Выбранный файл без версии"
 
-#: ../errors.py:53 ../push.py:99
+#: ../errors.py:56 ../push.py:100
 msgid "Branches have been diverged"
 msgstr "Ветви не совпадают"
 
-#: ../errors.py:54
+#: ../errors.py:57
 msgid ""
 "You cannot push if branches have diverged. Use the\n"
 "overwrite option if you want to push anyway."
@@ -453,36 +453,36 @@ msgstr ""
 "Вы не можете передать если ветви расходятся. Используйте\n"
 "опцию перезаписи если вы ходите передать в любом случае."
 
-#: ../errors.py:56
+#: ../errors.py:59
 msgid "No diff output"
 msgstr "Нет результатов сравнения"
 
-#: ../errors.py:57
+#: ../errors.py:60
 msgid "The selected file hasn't changed."
 msgstr "Выбранный файл не изменился."
 
-#: ../errors.py:59
+#: ../errors.py:62
 msgid "No such revision"
 msgstr "Нет такой ревизии"
 
-#: ../errors.py:60
+#: ../errors.py:63
 msgid "The revision you specified doesn't exist."
 msgstr "Указанная вами ревизия не существует"
 
-#: ../errors.py:62
+#: ../errors.py:65
 msgid "Target already exists"
 msgstr "Цель уже существует."
 
-#: ../errors.py:63
+#: ../errors.py:66
 msgid "Target directory already exists. Please select another target."
 msgstr ""
 "Указанный каталог уже существует. Пожалуйста, укажите другое значение."
 
-#: ../errors.py:65
+#: ../errors.py:68
 msgid "Directory is already a branch"
 msgstr "Каталог уже является ветвью"
 
-#: ../errors.py:66
+#: ../errors.py:69
 #, python-format
 msgid ""
 "The current directory (%s) is already a branch.\n"
@@ -491,11 +491,11 @@ msgstr ""
 "Текущий каталог (%s) уже является ветвью.\n"
 "Используйте его  или инициализируйте другой каталог."
 
-#: ../errors.py:68
+#: ../errors.py:71
 msgid "Branch without a working tree"
 msgstr "Ветвь находится вне рабочего дерева"
 
-#: ../errors.py:69
+#: ../errors.py:72
 #, python-format
 msgid ""
 "The current directory (%s)\n"
@@ -504,32 +504,32 @@ msgstr ""
 "Текущий каталог (%s)\n"
 "является ветвью вне рабочего дерева."
 
-#: ../errors.py:71
+#: ../errors.py:74
 msgid "Unknown bzr error"
 msgstr "Неизвестная ошибка bzr"
 
-#: ../errors.py:73
+#: ../errors.py:76
 msgid "Permission denied"
 msgstr "В доступе отказано"
 
-#: ../errors.py:73
+#: ../errors.py:76
 msgid "permission denied."
 msgstr "доступ запрещен."
 
-#: ../errors.py:75
+#: ../errors.py:78
 msgid "Unknown error"
 msgstr "Неизвестная ошибка"
 
 #. Create the widgets
-#: ../initialize.py:48
+#: ../initialize.py:46
 msgid "_Initialize"
 msgstr "_Инициализировать"
 
-#: ../initialize.py:49
+#: ../initialize.py:47
 msgid "Which directory do you want to initialize?"
 msgstr "Какой каталог вы хотите инициализировать?"
 
-#: ../initialize.py:50
+#: ../initialize.py:49
 msgid "Current directory"
 msgstr "Текущий каталог"
 
@@ -537,60 +537,60 @@ msgstr "Текущий каталог"
 msgid "Create a new directory with the name:"
 msgstr "Создайте новый каталог с именем:"
 
-#: ../initialize.py:86
+#: ../initialize.py:87
 msgid "Directory name not specified"
 msgstr "Не указано имя каталога"
 
-#: ../initialize.py:87
+#: ../initialize.py:88
 msgid "You should specify a new directory name."
 msgstr "вы должны указать имя нового каталога."
 
-#: ../loom.py:53
+#: ../loom.py:49
 msgid "Upgrade to Loom branch?"
 msgstr ""
 
-#: ../loom.py:54
+#: ../loom.py:50
 msgid "Branch is not a loom branch. Upgrade to Loom format?"
 msgstr ""
 
-#: ../merge.py:54
+#: ../merge.py:52
 msgid "Merge from"
 msgstr ""
 
-#: ../merge.py:56
+#: ../merge.py:54
 msgid "Folder"
 msgstr ""
 
-#: ../merge.py:56
+#: ../merge.py:54
 msgid "Custom Location"
 msgstr ""
 
-#: ../merge.py:59
+#: ../merge.py:57
 msgid "_Merge"
 msgstr "_Объединить"
 
-#: ../merge.py:132
+#: ../merge.py:130
 msgid "Branch not given"
 msgstr "Ветвь не выбрана"
 
-#: ../merge.py:133
+#: ../merge.py:131
 msgid "Please specify a branch to merge from."
 msgstr "Пожалуйста, укажите ветку для объединения"
 
-#: ../merge.py:141
+#: ../merge.py:139
 msgid "Bazaar command error"
 msgstr "Ошибка комманды Bazaar"
 
 #. Create the widgets
-#: ../push.py:51
+#: ../push.py:50
 msgid "Location:"
 msgstr "Местоположение:"
 
-#: ../push.py:53
+#: ../push.py:52
 msgid "_Push"
 msgstr "_Разместить"
 
-#: ../push.py:100
+#: ../push.py:101
 msgid ""
 "You cannot push if branches have diverged.\n"
 "Overwrite?"
@@ -598,20 +598,20 @@ msgstr ""
 "Вы не можете передать если ветви расходятся.\n"
 "Перезаписать?"
 
-#: ../push.py:108
+#: ../push.py:109
 msgid "Push successful"
 msgstr "Успешное размещение"
 
-#: ../push.py:109
+#: ../push.py:110
 #, python-format
 msgid "%d revision(s) pushed."
 msgstr "%d ревизия(и) передана(ы)."
 
-#: ../push.py:142
+#: ../push.py:141
 msgid "Non existing parent directory"
 msgstr "Отсутствует родительский каталог"
 
-#: ../push.py:143
+#: ../push.py:142
 #, python-format
 msgid ""
 "The parent directory (%s)\n"
@@ -621,11 +621,11 @@ msgstr ""
 "не существует. Создать?"
 
 #. Create the widgets
-#: ../revbrowser.py:45
+#: ../revbrowser.py:35
 msgid "_Select"
 msgstr "В_ыделить"
 
-#: ../search.py:44
+#: ../search.py:41
 msgid "Search for:"
 msgstr ""
 
@@ -633,32 +633,32 @@ msgstr ""
 msgid "Document"
 msgstr ""
 
-#: ../status.py:94
+#: ../status.py:87
 msgid "Added"
 msgstr "Добавлено"
 
-#: ../status.py:100
+#: ../status.py:93
 msgid "Removed"
 msgstr "Удалено"
 
-#: ../status.py:106
+#: ../status.py:99
 msgid "Renamed"
 msgstr "Переименовано"
 
-#: ../status.py:113
+#: ../status.py:106
 msgid "Modified"
 msgstr "Изменено"
 
-#: ../status.py:121
+#: ../status.py:114
 msgid "Unknown"
 msgstr "Неизвестный"
 
-#: ../status.py:126
+#: ../status.py:119
 msgid "No changes."
 msgstr "Без изменений."
 
 #. Set properties
-#: ../tags.py:66
+#: ../tags.py:60
 msgid "Tags"
 msgstr "Метки"
 
@@ -670,621 +670,44 @@ msgstr "Название метки"
 msgid "Revision ID"
 msgstr "Идентификатор ревизии"
 
-#: ../tags.py:150
+#: ../tags.py:148
 msgid "Tags are not supported by this branch format. Please upgrade."
 msgstr "Метки не поддерживаются текущим форматом ветви. Пожалуйста обновите."
 
-#: ../tags.py:156
+#: ../tags.py:154
 msgid "No tagged revisions in the branch."
 msgstr "Нет помеченной ревизии в ветви."
 
-#: ../tags.py:231
+#: ../tags.py:222
 msgid "_Remove tag"
 msgstr "_Удалить метку"
 
-#: ../tags.py:241
+#: ../tags.py:232
 msgid "<b><big>Remove tag?</big></b>"
 msgstr "<b><big>Удалить метку?</big></b>"
 
-#: ../tags.py:243
+#: ../tags.py:234
 #, python-format
 msgid "Are you sure you want to remove the tag: <b>%s</b>?"
 msgstr "Вы уверены, что хотите удалить метку: <b>%s</b>?"
 
 #. Create the widgets
-#: ../tags.py:288
+#: ../tags.py:278
 msgid "_Add tag"
 msgstr "_Добавить метку"
 
-#: ../tags.py:290
+#: ../tags.py:280
 msgid "Tag Name:"
 msgstr "Название метки:"
 
-#: ../tags.py:291
+#: ../tags.py:281
 msgid "Revision ID:"
 msgstr "Идентификатор ревизии:"
 
-#: ../tags.py:322
+#: ../tags.py:312
 msgid "No tag name specified"
 msgstr "Не указано название метки"
 
-#: ../tags.py:323
+#: ../tags.py:313
 msgid "You have to specify the tag's desired name."
 msgstr "Вы должны указать желаемое имя метки."
-
-#~ msgid "_Rename..."
-#~ msgstr "_Переименовать..."
-
-#~ msgid "_Move..."
-#~ msgstr "_Переместить..."
-
-#~ msgid "_Refresh"
-#~ msgstr "Обновить"
-
-#~ msgid "Show _hidden files"
-#~ msgstr "Показывать скрытые файлы"
-
-#~ msgid "_Commit..."
-#~ msgstr "Зафиксировать"
-
-#~ msgid "S_tatus..."
-#~ msgstr "Статус"
-
-#~ msgid "_Log..."
-#~ msgstr "Журнал..."
-
-#~ msgid "_Differences..."
-#~ msgstr "Различия..."
-
-#~ msgid "_Statistics"
-#~ msgstr "Статистика"
-
-#~ msgid "_Help"
-#~ msgstr "Справка"
-
-#~ msgid "Diff"
-#~ msgstr "Различия"
-
-#~ msgid "Copyright (C) 2006 Szilveszter Farkas (Phanatic)"
-#~ msgstr "Copyright (C) 2006 Szilveszter Farkas (Phanatic)"
-
-#~ msgid "Which file(s) do you want to add?"
-#~ msgstr "Какие файлы вы хотите добавить?"
-
-#~ msgid "https://launchpad.net/products/olive"
-#~ msgstr "https://launchpad.net/products/olive"
-
-#~ msgid "Olive - Add file(s)"
-#~ msgstr "Olive - Добавить файл(ы)"
-
-#~ msgid "All files with status 'added'"
-#~ msgstr "Все файлы со статусом \"добавлен\""
-
-#~ msgid "_Remove"
-#~ msgstr "Удалить"
-
-#~ msgid "Selected only"
-#~ msgstr "Только отмеченные"
-
-#~ msgid "Olive - Remove file(s)"
-#~ msgstr "Olive - Удалить файл(ы)"
-
-#~ msgid "Which file(s) do you want to remove?"
-#~ msgstr "Какие файлы вы хотите удалить?"
-
-#~ msgid "All unknowns recursively"
-#~ msgstr "Все неизвестные рекурсивно"
-
-#~ msgid "_Add"
-#~ msgstr "Добавить"
-
-#~ msgid "_Make directory"
-#~ msgstr "Создать каталог"
-
-#~ msgid "Olive - Move"
-#~ msgstr "Olive - Переместить"
-
-#~ msgid "Move to"
-#~ msgstr "Переместить в"
-
-#~ msgid "Olive - Make directory"
-#~ msgstr "Olive - Создать каталог"
-
-#~ msgid "Olive - Rename"
-#~ msgstr "Olive - Переименовать"
-
-#~ msgid "_Move"
-#~ msgstr "Переместить"
-
-#~ msgid "Select a directory"
-#~ msgstr "Выберите директорию"
-
-#~ msgid "Branch root: "
-#~ msgstr "Корень ветви: "
-
-#~ msgid "Repository branch: "
-#~ msgstr "Ветвь репозитория: "
-
-#~ msgid "Parent branch: "
-#~ msgstr "Родительская ветвь: "
-
-#~ msgid "Working tree format: "
-#~ msgstr "Тип рабоего дерева: "
-
-#~ msgid "Repository format: "
-#~ msgstr "Тип репозитория: "
-
-#~ msgid "Branch format: "
-#~ msgstr "Тип ветви: "
-
-#~ msgid "Unchanged files: "
-#~ msgstr "Неизмененные файлы: "
-
-#~ msgid "Modified files: "
-#~ msgstr "Измененные файлы: "
-
-#~ msgid "Added files: "
-#~ msgstr "Добавленные файлы: "
-
-#~ msgid "Repository lock status: "
-#~ msgstr "Состояние блокировки репозитория: "
-
-#~ msgid "Branch lock status: "
-#~ msgstr "Состояние блокировки ветви: "
-
-#~ msgid "Working tree lock status: "
-#~ msgstr "Состояние блокировки рабочего дерева: "
-
-#~ msgid "Renamed files: "
-#~ msgstr "Переименованные файлы: "
-
-#~ msgid "Unknown files: "
-#~ msgstr "Неизвестные файлы: "
-
-#~ msgid "Ignored files: "
-#~ msgstr "Игнорируемые файлы: "
-
-#~ msgid "Age of branch in days: "
-#~ msgstr "Возраст ветви в днях: "
-
-#~ msgid "Title:"
-#~ msgstr "Заголовок:"
-
-#~ msgid ""
-#~ "Please select a file from the list,\n"
-#~ "or choose the other option."
-#~ msgstr ""
-#~ "Пожалуйста, выберите файл из этого списка,\n"
-#~ "или выберите другие опции."
-
-#~ msgid "Size of repository: "
-#~ msgstr "Размер репозитория: "
-
-#~ msgid "Local branch up to date"
-#~ msgstr "Локальная ветьвь обновлена"
-
-#~ msgid "Bookmark"
-#~ msgstr "Закладка"
-
-#~ msgid "Bookmarks"
-#~ msgstr "Закладки"
-
-#~ msgid "Add the selected file"
-#~ msgstr "Добавить выбранный файл"
-
-#~ msgid "Add"
-#~ msgstr "Добавить"
-
-#~ msgid "Status"
-#~ msgstr "Состояние"
-
-#~ msgid "Filename"
-#~ msgstr "Имя файла"
-
-#~ msgid "unknown"
-#~ msgstr "неизвестный"
-
-#~ msgid "Show the differences of all files"
-#~ msgstr "Показать изменения во всех файлах"
-
-#~ msgid "All..."
-#~ msgstr "Все..."
-
-#~ msgid "Show the differences of the selected file"
-#~ msgstr "Показать изменения в выбранном файле"
-
-#~ msgid "Edit"
-#~ msgstr "Редактировать"
-
-#~ msgid "Edit the selected bookmark"
-#~ msgstr "Редактировать выбранную закладку"
-
-#~ msgid ""
-#~ "The current directory was bookmarked. You can reach\n"
-#~ "it by selecting it from the left panel."
-#~ msgstr ""
-#~ "Текущий каталог добавлен в закладки. Вы можете\n"
-#~ "выбрать его на левой панели."
-
-#~ msgid "Bookmark successfully added"
-#~ msgstr "Закладка успешно добавлена"
-
-#~ msgid ""
-#~ "The current directory is already bookmarked.\n"
-#~ "See the left panel for reference."
-#~ msgstr ""
-#~ "Текущий каталог уже добавлен в закладки.\n"
-#~ "Смотрите ссылку в левой панели."
-
-#~ msgid "Please specify a desired name for the new directory."
-#~ msgstr "Укажите имя нового каталога."
-
-#~ msgid "Directory already exists"
-#~ msgstr "Каталог уже существует"
-
-#~ msgid "Please specify another name to continue."
-#~ msgstr "Выберите другое имя."
-
-#~ msgid "Not the same branch"
-#~ msgstr "Это другая ветвь"
-
-#~ msgid "No matching files"
-#~ msgstr "Нет подходящих файлов"
-
-#~ msgid "Please specify a new name for the file."
-#~ msgstr "Выберите новое имя для этого файла."
-
-#~ msgid "Time"
-#~ msgstr "Время"
-
-#~ msgid "ignored"
-#~ msgstr "игнорируется"
-
-#~ msgid "Rename the selected file"
-#~ msgstr "Переименовать выбранный файл"
-
-#~ msgid "Last modified"
-#~ msgstr "Последняя модификация"
-
-#~ msgid "Size"
-#~ msgstr "Размер"
-
-#~ msgid "Rename"
-#~ msgstr "Переименовать"
-
-#~ msgid "Open"
-#~ msgstr "Открыть"
-
-#~ msgid "Revert"
-#~ msgstr "Восстановить"
-
-#~ msgid "Open Folder"
-#~ msgstr "Открыть папку"
-
-#~ msgid "Open the selected file"
-#~ msgstr "Открыть выбранный файл"
-
-#~ msgid "No directory name given"
-#~ msgstr "Не указано название папки"
-
-#~ msgid "Show differences"
-#~ msgstr "Показать изменения"
-
-#~ msgid "_Merge..."
-#~ msgstr "_Объединить..."
-
-#~ msgid "_File"
-#~ msgstr "_Файл"
-
-#~ msgid "Ta_gs..."
-#~ msgstr "_Метки..."
-
-#~ msgid "Con_flicts..."
-#~ msgstr "_Конфликты..."
-
-#~ msgid "_Rename"
-#~ msgstr "_Переименовать"
-
-#~ msgid "Rename to"
-#~ msgstr "Переименовать в"
-
-#~ msgid "_Information..."
-#~ msgstr "_Информация..."
-
-#~ msgid "(none)"
-#~ msgstr "(нет)"
-
-#~ msgid "<b>Location:</b>"
-#~ msgstr "<b>Местоположение:</b>"
-
-#~ msgid "<b>Format:</b>"
-#~ msgstr "<b>Формат:</b>"
-
-#~ msgid "There are no changes in the working tree."
-#~ msgstr "Отсутствуют изменения в рабочем дереве."
-
-#~ msgid "Set default push location"
-#~ msgstr "Указать место размещения по-умолчанию"
-
-#~ msgid "Revno"
-#~ msgstr "Рев.№"
-
-#, python-format
-#~ msgid ""
-#~ "There is no default push location set.\n"
-#~ "Set %r as default now?"
-#~ msgstr ""
-#~ "Место размещения по-умолчанию не установлено.\n"
-#~ "Установить %r по-умолчанию?"
-
-#~ msgid "File(s) to commit"
-#~ msgstr "Файл(ы) для публикации"
-
-#~ msgid "Commit message:"
-#~ msgstr "Сообщение публикации:"
-
-#~ msgid "Pending merges"
-#~ msgstr "Ожидающие слияния"
-
-#~ msgid "Please wait, revisions are being loaded..."
-#~ msgstr "Пожалуйста подождите, версии загружаются..."
-
-#~ msgid "Conflicts detected"
-#~ msgstr "Обнаружены конфликты"
-
-#~ msgid "Revert the changes"
-#~ msgstr "Откзаться от изменений"
-
-#~ msgid "Bookmark current location"
-#~ msgstr "Добавить текущее положение в закладки"
-
-#~ msgid "Commit the changes"
-#~ msgstr "Опубликовать изменения"
-
-#~ msgid "Open bookmark folder in Nautilus"
-#~ msgstr "Открыть папку с закладками в Наутилусе"
-
-#~ msgid "View contents"
-#~ msgstr "Просмотреть содержимое"
-
-#~ msgid "Revert to this revision"
-#~ msgstr "Вернуться к этой версии"
-
-#~ msgid "Location already bookmarked"
-#~ msgstr "Местоположение уже есть в закладках"
-
-#~ msgid "Revert the selected file to the selected revision"
-#~ msgstr "Вернуться к указанной версии выделенного файла"
-
-#~ msgid "Delete directory with all directories below ?"
-#~ msgstr "Удалить каталог и все его подкаталоги?"
-
-#~ msgid "No added files were found in the working tree."
-#~ msgstr "Не найдены добавленные файлы в рабочем дереве"
-
-#~ msgid "Filename not given"
-#~ msgstr "Не указано имя файла"
-
-#~ msgid "gtk-jump-to"
-#~ msgstr "gtk-jump-to"
-
-#~ msgid "<b>Lock status:</b>"
-#~ msgstr "<b>Статус блокировки:</b>"
-
-#~ msgid "<b>In the working tree:</b>"
-#~ msgstr "<b>В рабочем дереве:</b>"
-
-#~ msgid "Parent location is unknown"
-#~ msgstr "Местонахождение предка неизвестно"
-
-#~ msgid "Cannot determine missing revisions if no parent location is known."
-#~ msgstr ""
-#~ "Нельзя определить отсутствующие ревизии если местоположение предка не "
-#~ "известно."
-
-#~ msgid "Pull successful"
-#~ msgstr "Получение выполненно"
-
-#, python-format
-#~ msgid "%d revision(s) pulled."
-#~ msgstr "%d ревизия(й) получена(о)."
-
-#~ msgid "Revert successful"
-#~ msgstr "Откат выполнен"
-
-#~ msgid "All files reverted to last revision."
-#~ msgstr "Все файлы возвращены к последней ревизии."
-
-#~ msgid "Pulling is not possible until there is a parent location."
-#~ msgstr "Получить не возможно пока здесь расположен предок."
-
-#~ msgid "Glade file cannot be found."
-#~ msgstr "Открываемый файл не наден."
-
-#~ msgid "UI description file cannot be found."
-#~ msgstr "Файл описания идентификатора пользователя не найден."
-
-#~ msgid "Please specify a title to continue."
-#~ msgstr "Пожалуйста укажите заголовок для продолжения."
-
-#~ msgid "No title given"
-#~ msgstr "Заголовок не указан"
-
-#~ msgid "Remove the selected file/dir and delete from disk"
-#~ msgstr "Убрать выбранный файл/каталог и удалить с диска."
-
-#~ msgid "Remove and delete"
-#~ msgstr "Убрать и удалить"
-
-#~ msgid "View the contents of the file in a builtin viewer"
-#~ msgstr "Просмотреть содержимое файла во встроенном просмоторщике"
-
-#~ msgid "Please select a file from the list to proceed."
-#~ msgstr "Для продолжения выберите файл из списка."
-
-#~ msgid "Make _directory..."
-#~ msgstr "Создать _каталог..."
-
-#~ msgid "Olive - Bazaar GUI"
-#~ msgstr "Olive - Bazaar GUI"
-
-#~ msgid "_Add file(s)..."
-#~ msgstr "_Добавить файл(ы)..."
-
-#~ msgid "The destination is not in the same branch."
-#~ msgstr "Место назначения в другой ветви."
-
-#~ msgid "_Get..."
-#~ msgstr "_Забрать"
-
-#~ msgid "C_heckout..."
-#~ msgstr "_Проверить..."
-
-#~ msgid "Pu_ll"
-#~ msgstr "Пол_учить"
-
-#~ msgid "H_istory Mode"
-#~ msgstr "Режим и_стории"
-
-#~ msgid "_Initialize..."
-#~ msgstr "_Инициализация"
-
-#~ msgid "_Revert all changes"
-#~ msgstr "О_ткатить все изменения"
-
-#~ msgid "Missing _revisions"
-#~ msgstr "Отсутствующие _ревизии"
-
-#~ msgid "Checkout root: "
-#~ msgstr "Проверяемый корень: "
-
-#~ msgid "_Versioned directory"
-#~ msgstr "Отслеживаемые _каталоги"
-
-#~ msgid "Repository checkout: "
-#~ msgstr "Проверка репозитория: "
-
-#~ msgid "Olive - Information"
-#~ msgstr "Olive - Информация"
-
-#~ msgid "Checkout of branch: "
-#~ msgstr "Проверка ветви: "
-
-#~ msgid "Shared repository: "
-#~ msgstr "Доступный репозитоий: "
-
-#~ msgid "Light checkout root: "
-#~ msgstr "Облегченная проверка корня: "
-
-#~ msgid "Publish to branch: "
-#~ msgstr "Пкбликуемая ветвь: "
-
-#~ msgid "Control format: "
-#~ msgstr "Формат контроля: "
-
-#~ msgid "<b>Related branches:</b>"
-#~ msgstr "<b>Связанные ветви:</b>"
-
-#~ msgid "Versioned subdirectories: "
-#~ msgstr "Отслеживаемые подкаталолги: "
-
-#~ msgid "Revisions in branch: "
-#~ msgstr "Ревизий в ветви: "
-
-#~ msgid "<b>Branch history:</b>"
-#~ msgstr "<b>История ветви:</b>"
-
-#~ msgid "Number of commiters: "
-#~ msgstr "Колличество публикаций: "
-
-#~ msgid "Revisions in repository: "
-#~ msgstr "Ревизий в репозитории: "
-
-#~ msgid "Merge - Olive"
-#~ msgstr "Merge - Olive"
-
-#~ msgid "Merge from:"
-#~ msgstr "Обьеденить из:"
-
-#~ msgid "There are missing revisions"
-#~ msgstr "Есть отсутствующие ревизии"
-
-#, python-format
-#~ msgid "%d revision(s) missing."
-#~ msgstr "%d ревизия(-ий) отсутствует(-ют)."
-
-#~ msgid "There are no missing revisions."
-#~ msgstr "Нет отсутсвующих ревизий."
-
-#~ msgid "unchanged"
-#~ msgstr "неизменённый"
-
-#~ msgid "Please have a look at the working tree before continuing."
-#~ msgstr "Пожалуйста укажите рабочее дерево перед продолжением."
-
-#~ msgid "Remove"
-#~ msgstr "Убрать"
-
-#~ msgid "Annotate the selected file"
-#~ msgstr "Добавить аннотацию к выбранному файлу"
-
-#~ msgid "Annotate"
-#~ msgstr "Аннотация"
-
-#~ msgid "Remove the selected file"
-#~ msgstr "Убрать выбранный файл"
-
-#~ msgid "Show the diff of the file"
-#~ msgstr "Показать изменения в файле"
-
-#~ msgid "Show the differences between two revisions of the file"
-#~ msgstr "Показать изменения между двумя ревизиями файла"
-
-#~ msgid "Selected..."
-#~ msgstr "Выбранное..."
-
-#~ msgid "Remove the selected bookmark"
-#~ msgstr "Убрать выбранную закладку"
-
-#~ msgid "Remove file(s)..."
-#~ msgstr "Убрать файл(ы)..."
-
-#~ msgid "_Annotate..."
-#~ msgstr "_Аннотация..."
-
-#~ msgid "Pu_sh..."
-#~ msgstr "П_ередать..."
-
-#~ msgid "Removed files: "
-#~ msgstr "Убранные файлы: "
-
-#~ msgid "<b>Missing revisions:</b>"
-#~ msgstr "<b>Отсутсвующие ревизии:</b>"
-
-#~ msgid "Missing revisions in working tree: "
-#~ msgstr "Отсутсвующие ревизии в рабочем дереве: "
-
-#~ msgid "Missing revisions in branch: "
-#~ msgstr "Отсутсвующие ревизии в ветке: "
-
-#~ msgid "Time of last revision: "
-#~ msgstr "Время последней ревизии: "
-
-#~ msgid "Time of first revision: "
-#~ msgstr "Время первой ревизии: "
-
-#~ msgid "<b>Revision store:</b>"
-#~ msgstr "<b>Ревизий хранится:</b>"
-
-#~ msgid "translator-credits"
-#~ msgstr ""
-#~ "Launchpad Contributions:\n"
-#~ "  Alexander Belchenko https://launchpad.net/~bialix\n"
-#~ "  Mikhail Pitertsev https://launchpad.net/~platiferro\n"
-#~ "  Oleg Koptev https://launchpad.net/~koptev-oleg\n"
-#~ "  Pavel A. Bragin https://launchpad.net/~balintrue\n"
-#~ "  Petr E. Antonov https://launchpad.net/~antpeter\n"
-#~ "  Rail Aliev https://launchpad.net/~rail\n"
-#~ "  Sergey Basalaev https://launchpad.net/~sbasalaev\n"
-#~ "  Sergey Sedov https://launchpad.net/~serg-sedov\n"
-#~ "  XPEH https://launchpad.net/~akidyarov"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-11-12 06:14+0100\n"
+"POT-Creation-Date: 2011-12-01 11:46+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -566,6 +566,46 @@ msgstr ""
 
 #: ../merge.py:139
 msgid "Bazaar command error"
+msgstr ""
+
+#: ../nautilus-bzr.py:460
+msgid "File id:"
+msgstr ""
+
+#: ../nautilus-bzr.py:463
+msgid "SHA1Sum:"
+msgstr ""
+
+#: ../nautilus-bzr.py:469
+msgid "Last Change Revision:"
+msgstr ""
+
+#: ../nautilus-bzr.py:474
+msgid "Last Change Author:"
+msgstr ""
+
+#: ../nautilus-bzr.py:515
+msgid "Push location:"
+msgstr ""
+
+#: ../nautilus-bzr.py:518
+msgid "Parent location:"
+msgstr ""
+
+#: ../nautilus-bzr.py:521
+msgid "Bound location:"
+msgstr ""
+
+#: ../nautilus-bzr.py:524
+msgid "Public location:"
+msgstr ""
+
+#: ../nautilus-bzr.py:527
+msgid "Submit location:"
+msgstr ""
+
+#: ../nautilus-bzr.py:530
+msgid "Append revisions only"
 msgstr ""
 
 #. Create the widgets

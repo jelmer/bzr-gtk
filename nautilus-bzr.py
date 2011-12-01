@@ -37,6 +37,8 @@ from bzrlib.tree import InterTree
 from bzrlib.plugin import load_plugins
 load_plugins()
 
+from bzrlib.plugins.gtk.i18n import _i18n
+
 
 class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
         Nautilus.InfoProvider, Nautilus.PropertyPageProvider,
@@ -455,21 +457,21 @@ class PropertyPageFile(Nautilus.PropertyPage):
     def _create_table(self):
         table = Gtk.Table(homogeneous=False, columns=2, rows=3)
 
-        table.attach(Gtk.Label('File id:'), 0, 1, 0, 1)
+        table.attach(Gtk.Label(_i18n('File id:')), 0, 1, 0, 1)
         table.attach(Gtk.Label(self.file_id), 1, 2, 0, 1)
 
-        table.attach(Gtk.Label('SHA1Sum:'), 0, 1, 1, 2)
+        table.attach(Gtk.Label(_i18n('SHA1Sum:')), 0, 1, 1, 2)
         table.attach(Gtk.Label(self.tree.get_file_sha1(self.file_id, self.path)), 1, 1, 1, 2)
 
         basis_tree = self.tree.revision_tree(self.tree.last_revision())
         last_revision = basis_tree.get_file_revision(self.file_id)
 
-        table.attach(Gtk.Label('Last Change Revision:'), 0, 1, 2, 3)
+        table.attach(Gtk.Label(_i18n('Last Change Revision:')), 0, 1, 2, 3)
         revno = ".".join([str(x) for x in
             self.tree.branch.revision_id_to_dotted_revno(last_revision)])
         table.attach(Gtk.Label(revno), 1, 1, 2, 3)
 
-        table.attach(Gtk.Label('Last Change Author:'), 0, 1, 3, 4)
+        table.attach(Gtk.Label(_i18n('Last Change Author:')), 0, 1, 3, 4)
         rev = self.tree.branch.repository.get_revision(last_revision)
         table.attach(Gtk.Label("\n".join(rev.get_apparent_authors())), 1, 1, 3, 4)
 
@@ -510,22 +512,22 @@ class PropertyPageBranch(Nautilus.PropertyPage):
         self._submit_location_entry = self._create_location_entry(
             self.branch.get_submit_branch, self.branch.set_submit_branch)
 
-        table.attach(Gtk.Label('Push location:'), 0, 1, 0, 1)
+        table.attach(Gtk.Label(_i18n('Push location:')), 0, 1, 0, 1)
         table.attach(self._push_location_entry, 1, 2, 0, 1)
 
-        table.attach(Gtk.Label('Parent location:'), 0, 1, 1, 2)
+        table.attach(Gtk.Label(_i18n('Parent location:')), 0, 1, 1, 2)
         table.attach(self._parent_location_entry, 1, 1, 1, 2)
 
-        table.attach(Gtk.Label('Bound location:'), 0, 1, 2, 3)
+        table.attach(Gtk.Label(_i18n('Bound location:')), 0, 1, 2, 3)
         table.attach(self._bound_location_entry, 1, 1, 2, 3)
 
-        table.attach(Gtk.Label('Public location:'), 0, 1, 3, 4)
+        table.attach(Gtk.Label(_i18n('Public location:')), 0, 1, 3, 4)
         table.attach(self._public_location_entry, 1, 1, 3, 4)
 
-        table.attach(Gtk.Label('Submit location:'), 0, 1, 4, 5)
+        table.attach(Gtk.Label(_i18n('Submit location:')), 0, 1, 4, 5)
         table.attach(self._submit_location_entry, 1, 1, 4, 5)
 
-        self._append_revisions_only = Gtk.CheckButton('Append revisions only')
+        self._append_revisions_only = Gtk.CheckButton(_i18n('Append revisions only'))
         value = self.branch.get_append_revisions_only()
         if value is None:
             value = False

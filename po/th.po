@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: olive\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-03-06 02:19+0100\n"
-"PO-Revision-Date: 2010-03-18 03:18+0000\n"
+"POT-Creation-Date: 2011-11-12 06:14+0100\n"
+"PO-Revision-Date: 2011-11-30 22:58+0000\n"
 "Last-Translator: SiraNokyoongtong <gumaraa@gmail.com>\n"
 "Language-Team: Thai <th@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-03-08 04:41+0000\n"
-"X-Generator: Launchpad (build 12351)\n"
+"X-Launchpad-Export-Date: 2011-12-01 06:16+0000\n"
+"X-Generator: Launchpad (build 14414)\n"
 
 #: ../bazaar-properties.desktop.in.h:1
 msgid "Bazaar Preferences"
@@ -42,165 +42,165 @@ msgid "Notification Area Icon for Bazaar"
 msgstr ""
 
 #. Create the widgets
-#: ../branch.py:52
+#: ../branch.py:46
 msgid "_Branch"
 msgstr "_สาขา"
 
-#: ../branch.py:55 ../checkout.py:55
+#: ../branch.py:49 ../checkout.py:49
 msgid "Branch location:"
 msgstr "ตำแหน่งสาขา:"
 
-#: ../branch.py:57 ../checkout.py:56
+#: ../branch.py:51 ../checkout.py:50
 msgid "Destination:"
 msgstr "ปลายทาง:"
 
-#: ../branch.py:58
+#: ../branch.py:52
 msgid "Branck nick:"
 msgstr "ชื่อเรียกสาขา:"
 
-#: ../branch.py:59 ../checkout.py:58
+#: ../branch.py:53 ../checkout.py:52
 msgid "Revision:"
 msgstr "รุ่น:"
 
-#: ../branch.py:60 ../checkout.py:53
+#: ../branch.py:54 ../checkout.py:47
 msgid "Please select a folder"
 msgstr "โปรดเลือกโฟลเดอร์"
 
-#: ../branch.py:140 ../checkout.py:159
+#: ../branch.py:134 ../checkout.py:153
 msgid "Missing branch location"
 msgstr "ไม่พบตำแหน่งสาขา"
 
-#: ../branch.py:141 ../checkout.py:160
+#: ../branch.py:135 ../checkout.py:154
 msgid "You must specify a branch location."
 msgstr "คุณต้องระบุตำแหน่งสาขา"
 
-#: ../branch.py:182
+#: ../branch.py:174
 msgid "Branching successful"
 msgstr "แตกสาขาสำเร็จ"
 
-#: ../branch.py:183
+#: ../branch.py:175
 #, python-format
 msgid "%d revision(s) branched."
 msgstr "รุ่นที่ %d ของสาขา"
 
-#: ../branch.py:191 ../checkout.py:191
+#: ../branch.py:183 ../checkout.py:185
 msgid "N/A"
 msgstr "N/A"
 
 #. Create the widgets
-#: ../checkout.py:50
+#: ../checkout.py:44
 msgid "Check_out"
 msgstr ""
 
-#: ../checkout.py:57
+#: ../checkout.py:51
 msgid "Branch nick:"
 msgstr ""
 
-#: ../checkout.py:62
+#: ../checkout.py:56
 msgid "_Lightweight checkout"
 msgstr ""
 
-#: ../commands.py:307
+#: ../commands.py:305
 msgid "Directory does not have a working tree"
 msgstr "ไดเรกทอรีไม่มีสายงาน"
 
-#: ../commands.py:308
+#: ../commands.py:306
 msgid "Operation aborted."
 msgstr "ยกเลิกปฏิบัติการ"
 
-#: ../commands.py:412
+#: ../commands.py:410
 msgid "There are local changes in the branch"
 msgstr "นั่นคือการเปลี่ยนแปลงในสาขา"
 
-#: ../commands.py:413
+#: ../commands.py:411
 msgid "Please commit or revert the changes before merging."
 msgstr "โปรดยืนยันหรือย้อนกลับการเปลี่ยนแปลงก่อนจะรวม"
 
-#: ../commit.py:182
+#: ../commit.py:178
 msgid "added"
 msgstr "เพิ่มแล้ว"
 
-#: ../commit.py:183
+#: ../commit.py:179
 msgid "removed"
 msgstr "ลบแล้ว"
 
-#: ../commit.py:184
+#: ../commit.py:180
 msgid "renamed"
 msgstr "เปลี่ยนชื่อแล้ว"
 
-#: ../commit.py:185
+#: ../commit.py:181
 msgid "renamed and modified"
 msgstr "เปลี่ยนชื่อและเปลี่ยนแปลงแล้ว"
 
-#: ../commit.py:186
+#: ../commit.py:182
 msgid "modified"
 msgstr "เปลี่ยนแปลงแล้ว"
 
-#: ../commit.py:187
+#: ../commit.py:183
 msgid "kind changed"
 msgstr ""
 
-#: ../commit.py:280
+#: ../commit.py:276
 msgid "<b>Commit Message</b>"
 msgstr "<b>ข้อความยืนยัน</b>"
 
-#: ../commit.py:333
+#: ../commit.py:329
 msgid "_Only commit locally"
 msgstr "ยืนยัน_อยู่ภายในเท่านั้น"
 
-#: ../commit.py:364
+#: ../commit.py:361
 msgid "Comm_it"
 msgstr "_ยืนยัน"
 
-#: ../commit.py:390
+#: ../commit.py:388
 msgid "Files"
 msgstr "แฟ้ม"
 
-#: ../commit.py:395
+#: ../commit.py:393
 msgid "Commit all changes"
 msgstr "ยืนยันการเปลี่ยนแปลงทั้งหมด"
 
-#: ../commit.py:401
+#: ../commit.py:399
 msgid "Only commit selected changes"
 msgstr ""
 
-#: ../commit.py:407
+#: ../commit.py:405
 msgid "Commit all changes*"
 msgstr "ยืนยันการเปลี่ยนแปลงทั้งหมด*"
 
-#: ../commit.py:440
+#: ../commit.py:437
 msgid "Commit*"
 msgstr "ยืนยัน*"
 
-#: ../commit.py:442
+#: ../commit.py:439
 msgid "Commit"
 msgstr "ยืนยัน"
 
-#: ../commit.py:446 ../conflicts.py:111
+#: ../commit.py:443 ../conflicts.py:107
 msgid "Path"
 msgstr "พาธ"
 
-#: ../commit.py:448 ../conflicts.py:113
+#: ../commit.py:445 ../conflicts.py:109
 msgid "Type"
 msgstr "รูปแบบ"
 
-#: ../commit.py:481
+#: ../commit.py:478
 msgid "<i>* Cannot select specific files when merging</i>"
 msgstr "<i>* ไม่สามารถเลือกแฟ้มขณะกำลังผสาน</i>"
 
-#: ../commit.py:485
+#: ../commit.py:482
 msgid "Pending Revisions"
 msgstr "กำลังรอรุ่น"
 
-#: ../commit.py:507
+#: ../commit.py:503
 msgid "Date"
 msgstr "วันที่"
 
-#: ../commit.py:509
+#: ../commit.py:505
 msgid "Committer"
 msgstr "ผู้ยืนยัน"
 
-#: ../commit.py:511 ../search.py:59
+#: ../commit.py:507 ../search.py:60
 msgid "Summary"
 msgstr "ภาพรวม"
 
@@ -208,133 +208,133 @@ msgstr "ภาพรวม"
 #. decide that we really don't ever want to display it, we should
 #. actually remove it, and other references to it, along with the
 #. tests that it is set properly.
-#: ../commit.py:521
+#: ../commit.py:517
 msgid "Diff for whole tree"
 msgstr "เปรียบเทียบทั้งสายงาน"
 
 #. Whole tree
-#: ../commit.py:545 ../commit.py:628
+#: ../commit.py:542 ../commit.py:626
 msgid "File commit message"
 msgstr "แฟ้มข้อความยืนยัน"
 
-#: ../commit.py:552
+#: ../commit.py:549
 msgid "Global Commit Message"
 msgstr "ข้อความยืนยันโดยรวม"
 
-#: ../commit.py:554
+#: ../commit.py:551
 msgid "<b>Global Commit Message</b>"
 msgstr "<b>ข้อความยืนยันโดยรวม</b>"
 
-#: ../commit.py:581
+#: ../commit.py:578
 msgid "Diff for "
 msgstr "เปรียบเทียบกับ "
 
-#: ../commit.py:634
+#: ../commit.py:632
 msgid "Commit message for "
 msgstr "ข้อความยืนยันสำหรับ "
 
-#: ../commit.py:689
+#: ../commit.py:687
 msgid "Commit cancelled"
 msgstr ""
 
-#: ../commit.py:690
+#: ../commit.py:688
 msgid "Do you want to save your commit messages ?"
 msgstr ""
 
-#: ../commit.py:708
+#: ../commit.py:706
 msgid "Commit with an empty message?"
 msgstr "ยืนยันโดยไม่กำหนดข้อความ?"
 
-#: ../commit.py:709
+#: ../commit.py:707
 msgid "You can describe your commit intent in the message."
 msgstr "คุณสามารถระบุเหตุผลของการยืนยัน"
 
-#: ../commit.py:729
+#: ../commit.py:727
 msgid "Commit with unknowns?"
 msgstr ""
 
-#: ../commit.py:730
+#: ../commit.py:728
 msgid "Unknown files exist in the working tree. Commit anyway?"
 msgstr "มีแฟ้มที่ไม่รู้จักในสายงาน ยืนยันหรือไม่?"
 
-#: ../commit.py:750
+#: ../commit.py:748
 msgid "Commit with no changes?"
 msgstr "ยืนยันแม้ไม่เปลี่ยนแปลง?"
 
-#: ../commit.py:751
+#: ../commit.py:749
 msgid ""
 "There are no changes in the working tree. Do you want to commit anyway?"
 msgstr "ไม่มีการเปลี่ยนแปลงในสายงาน คุณต้องการยืนยันหรือไม่?"
 
-#: ../conflicts.py:50
+#: ../conflicts.py:45
 msgid "External utility:"
 msgstr "เครื่องมืออำนวยความสะดวกภายนอก:"
 
-#: ../conflicts.py:101
+#: ../conflicts.py:97
 msgid "Conflicts"
 msgstr "ขัดแย้ง"
 
-#: ../conflicts.py:104
+#: ../conflicts.py:100
 msgid "No conflicts in working tree."
 msgstr "ไม่มีความขัดแย้งในสายงานนนี้"
 
-#: ../conflicts.py:118
+#: ../conflicts.py:114
 msgid "path conflict"
 msgstr "ขัดแย้งที่พาธ"
 
-#: ../conflicts.py:120
+#: ../conflicts.py:116
 msgid "contents conflict"
 msgstr "ขัดแย้งที่เนื้อหา"
 
-#: ../conflicts.py:122
+#: ../conflicts.py:118
 msgid "text conflict"
 msgstr "ขัดแย้งที่อักขระ"
 
-#: ../conflicts.py:124
+#: ../conflicts.py:120
 msgid "duplicate id"
 msgstr "id ซ้ำซ้อน"
 
-#: ../conflicts.py:126
+#: ../conflicts.py:122
 msgid "duplicate"
 msgstr "ซ้ำซ้อน"
 
-#: ../conflicts.py:128
+#: ../conflicts.py:124
 msgid "parent loop"
 msgstr ""
 
-#: ../conflicts.py:130
+#: ../conflicts.py:126
 msgid "unversioned parent"
 msgstr ""
 
-#: ../conflicts.py:132
+#: ../conflicts.py:128
 msgid "missing parent"
 msgstr ""
 
-#: ../conflicts.py:134
+#: ../conflicts.py:130
 msgid "deleting parent"
 msgstr ""
 
-#: ../conflicts.py:136
+#: ../conflicts.py:132
 msgid "unknown type of conflict"
 msgstr "ไม่ทราบรูปแบบของความผิดพลาด"
 
-#: ../conflicts.py:165
+#: ../conflicts.py:161
 msgid "No file was selected"
 msgstr "ไม่มีแฟ้มถูกเลือก"
 
-#: ../conflicts.py:166
+#: ../conflicts.py:162
 msgid "Please select a file from the list."
 msgstr "โปรดเลือกแฟ้มจากรายการ"
 
-#: ../conflicts.py:176
+#: ../conflicts.py:172
 msgid "Call to external utility failed"
 msgstr "การเรียกเครื่องมืออำนวยความสะดวกภายนอกล้มเหลว"
 
-#: ../conflicts.py:178
+#: ../conflicts.py:174
 msgid "Cannot resolve conflict"
 msgstr "ไม่สามารถแก้ไขความขัดแย้ง"
 
-#: ../conflicts.py:179
+#: ../conflicts.py:175
 msgid ""
 "Only conflicts on the text of files can be resolved with Olive at the "
 "moment. Content conflicts, on the structure of the tree, need to be resolved "
@@ -346,146 +346,146 @@ msgstr ""
 msgid "_View"
 msgstr "มุม_มอง"
 
-#: ../diff.py:447
+#: ../diff.py:448
 msgid "Wrap _Long Lines"
 msgstr ""
 
 #. No conflicts found.
-#: ../diff.py:492 ../merge.py:146
+#: ../diff.py:493 ../merge.py:144
 msgid "Merge successful"
 msgstr "รวมสำเร็จ"
 
-#: ../diff.py:493 ../merge.py:147
+#: ../diff.py:494 ../merge.py:145
 msgid "All changes applied successfully."
 msgstr "การเปลี่ยนแปลงทั้งหมดปรับใช้เรียบร้อย"
 
 #. There are conflicts to be resolved.
-#: ../diff.py:496 ../merge.py:150
+#: ../diff.py:497 ../merge.py:148
 msgid "Conflicts encountered"
 msgstr "พบความขัดแย้ง"
 
-#: ../diff.py:497 ../merge.py:151
+#: ../diff.py:498 ../merge.py:149
 msgid "Please resolve the conflicts manually before committing."
 msgstr "โปรดแก้ไขความขัดแย้งด้วยตัวเองก่อนจะยืนยัน"
 
-#: ../errors.py:28
+#: ../errors.py:31
 msgid "Directory is not a branch"
 msgstr "ไดเรกทอรีไม่ใช่สาขา"
 
-#: ../errors.py:29
+#: ../errors.py:32
 msgid "You can perform this action only in a branch."
 msgstr "การกระทำนี้คุณสามารถทำได้ในสาขาเท่านั้น"
 
-#: ../errors.py:31
+#: ../errors.py:34
 msgid "Directory is not a checkout"
 msgstr ""
 
-#: ../errors.py:32
+#: ../errors.py:35
 msgid "You can perform local commit only on checkouts."
 msgstr ""
 
-#: ../errors.py:34
+#: ../errors.py:37
 msgid "No changes to commit"
 msgstr "ไม่มีการเปลี่ยนแปลงที่จะยืนยัน"
 
-#: ../errors.py:35
+#: ../errors.py:38
 msgid "Try force commit if you want to commit anyway."
 msgstr ""
 
-#: ../errors.py:37
+#: ../errors.py:40
 msgid "No changes to merge"
 msgstr ""
 
-#: ../errors.py:38
+#: ../errors.py:41
 msgid "Merge location is already fully merged in working tree."
 msgstr ""
 
-#: ../errors.py:40
+#: ../errors.py:43
 msgid "Conflicts in tree"
 msgstr "ขัดแย้งในสายงาน"
 
-#: ../errors.py:41
+#: ../errors.py:44
 msgid "You need to resolve the conflicts before committing."
 msgstr "คุณต้องแก้ไขความขัดแย้งก่อนการยืนยัน"
 
-#: ../errors.py:43
+#: ../errors.py:46
 msgid "Strict commit failed"
 msgstr ""
 
-#: ../errors.py:44
+#: ../errors.py:47
 msgid ""
 "There are unknown files in the working tree.\n"
 "Please add or delete them."
 msgstr ""
 
-#: ../errors.py:46
+#: ../errors.py:49
 msgid "Bound branch is out of date"
 msgstr "ส่วนขอบของสาขาล้าสมัย"
 
 #. FIXME: Really ? Internationalizing %s ?? --vila080505
-#: ../errors.py:48
+#: ../errors.py:51
 #, python-format
 msgid "%s"
 msgstr "%s"
 
-#: ../errors.py:50
+#: ../errors.py:53
 msgid "File not versioned"
 msgstr "แฟ้มยังไม่ได้ระบุรุ่น"
 
-#: ../errors.py:51
+#: ../errors.py:54
 msgid "The selected file is not versioned."
 msgstr "แฟ้มที่เลือกยังไม่ได้ระบุรุ่น"
 
-#: ../errors.py:53 ../push.py:99
+#: ../errors.py:56 ../push.py:100
 msgid "Branches have been diverged"
 msgstr ""
 
-#: ../errors.py:54
+#: ../errors.py:57
 msgid ""
 "You cannot push if branches have diverged. Use the\n"
 "overwrite option if you want to push anyway."
 msgstr ""
 
-#: ../errors.py:56
+#: ../errors.py:59
 msgid "No diff output"
 msgstr "ไม่มีผลลัพธ์การเปรียบเทียบ"
 
-#: ../errors.py:57
+#: ../errors.py:60
 msgid "The selected file hasn't changed."
 msgstr "แฟ้มที่เลือกไม่มีการเปลี่ยนแปลง"
 
-#: ../errors.py:59
+#: ../errors.py:62
 msgid "No such revision"
 msgstr ""
 
-#: ../errors.py:60
+#: ../errors.py:63
 msgid "The revision you specified doesn't exist."
 msgstr "ไม่มีรุ่นที่คุณระบุ"
 
-#: ../errors.py:62
+#: ../errors.py:65
 msgid "Target already exists"
 msgstr ""
 
-#: ../errors.py:63
+#: ../errors.py:66
 msgid "Target directory already exists. Please select another target."
 msgstr ""
 
-#: ../errors.py:65
+#: ../errors.py:68
 msgid "Directory is already a branch"
 msgstr "ไดเรกทอรี่เป็นสาขาแล้ว"
 
-#: ../errors.py:66
+#: ../errors.py:69
 #, python-format
 msgid ""
 "The current directory (%s) is already a branch.\n"
 "You can start using it, or initialize another directory."
 msgstr ""
 
-#: ../errors.py:68
+#: ../errors.py:71
 msgid "Branch without a working tree"
 msgstr "สาขาไม่มีสายงาน"
 
-#: ../errors.py:69
+#: ../errors.py:72
 #, python-format
 msgid ""
 "The current directory (%s)\n"
@@ -494,32 +494,32 @@ msgstr ""
 "ไดเรกทอรีปัจจุบัน (%s)\n"
 "คือสาขาโดยไม่มีสายงาน"
 
-#: ../errors.py:71
+#: ../errors.py:74
 msgid "Unknown bzr error"
 msgstr "bzr ผิดพลาดไม่ทราบสาเหตุ"
 
-#: ../errors.py:73
+#: ../errors.py:76
 msgid "Permission denied"
 msgstr "ไม่ได้รับอนุญาต"
 
-#: ../errors.py:73
+#: ../errors.py:76
 msgid "permission denied."
 msgstr "ไม่ได้รับอนุญาต"
 
-#: ../errors.py:75
+#: ../errors.py:78
 msgid "Unknown error"
 msgstr "ผิดพลาดไม่ทราบสาเหตุ"
 
 #. Create the widgets
-#: ../initialize.py:48
+#: ../initialize.py:46
 msgid "_Initialize"
 msgstr ""
 
-#: ../initialize.py:49
+#: ../initialize.py:47
 msgid "Which directory do you want to initialize?"
 msgstr "ไดเรกทอรีใดที่คุณต้องการเริ่ม?"
 
-#: ../initialize.py:50
+#: ../initialize.py:49
 msgid "Current directory"
 msgstr "ไดเรกทอรีปัจจุบัน"
 
@@ -527,79 +527,79 @@ msgstr "ไดเรกทอรีปัจจุบัน"
 msgid "Create a new directory with the name:"
 msgstr "สร้างไดเรกทอรีใหม่ด้วยชื่อ:"
 
-#: ../initialize.py:86
+#: ../initialize.py:87
 msgid "Directory name not specified"
 msgstr "ไม่ได้ระบุชื่อไดเรกทอรี"
 
-#: ../initialize.py:87
+#: ../initialize.py:88
 msgid "You should specify a new directory name."
 msgstr "คุณควรระบุชื่อไดเรกทอรี"
 
-#: ../loom.py:53
+#: ../loom.py:49
 msgid "Upgrade to Loom branch?"
 msgstr ""
 
-#: ../loom.py:54
+#: ../loom.py:50
 msgid "Branch is not a loom branch. Upgrade to Loom format?"
 msgstr ""
 
-#: ../merge.py:54
+#: ../merge.py:52
 msgid "Merge from"
 msgstr ""
 
-#: ../merge.py:56
+#: ../merge.py:54
 msgid "Folder"
 msgstr ""
 
-#: ../merge.py:56
+#: ../merge.py:54
 msgid "Custom Location"
 msgstr ""
 
-#: ../merge.py:59
+#: ../merge.py:57
 msgid "_Merge"
 msgstr "_ผสาน"
 
-#: ../merge.py:132
+#: ../merge.py:130
 msgid "Branch not given"
 msgstr ""
 
-#: ../merge.py:133
+#: ../merge.py:131
 msgid "Please specify a branch to merge from."
 msgstr "โปรดระบุสาขาที่จะรวมเข้ามา"
 
-#: ../merge.py:141
+#: ../merge.py:139
 msgid "Bazaar command error"
 msgstr "คำสั่ง Bazaar ผิดพลาด"
 
 #. Create the widgets
-#: ../push.py:51
+#: ../push.py:50
 msgid "Location:"
 msgstr "ตำแหน่ง:"
 
-#: ../push.py:53
+#: ../push.py:52
 msgid "_Push"
 msgstr "_ส่ง"
 
-#: ../push.py:100
+#: ../push.py:101
 msgid ""
 "You cannot push if branches have diverged.\n"
 "Overwrite?"
 msgstr ""
 
-#: ../push.py:108
+#: ../push.py:109
 msgid "Push successful"
 msgstr "ส่งเรียบร้อย"
 
-#: ../push.py:109
+#: ../push.py:110
 #, python-format
 msgid "%d revision(s) pushed."
 msgstr "รุ่นที่ %d ได้ส่งแล้ว"
 
-#: ../push.py:142
+#: ../push.py:141
 msgid "Non existing parent directory"
 msgstr ""
 
-#: ../push.py:143
+#: ../push.py:142
 #, python-format
 msgid ""
 "The parent directory (%s)\n"
@@ -607,11 +607,11 @@ msgid ""
 msgstr ""
 
 #. Create the widgets
-#: ../revbrowser.py:45
+#: ../revbrowser.py:35
 msgid "_Select"
 msgstr "เ_ลือก"
 
-#: ../search.py:44
+#: ../search.py:41
 msgid "Search for:"
 msgstr ""
 
@@ -619,32 +619,32 @@ msgstr ""
 msgid "Document"
 msgstr ""
 
-#: ../status.py:94
+#: ../status.py:87
 msgid "Added"
 msgstr "เพิ่มแล้ว"
 
-#: ../status.py:100
+#: ../status.py:93
 msgid "Removed"
 msgstr "ลบแล้ว"
 
-#: ../status.py:106
+#: ../status.py:99
 msgid "Renamed"
 msgstr "เปลี่ยนชื่อแล้ว"
 
-#: ../status.py:113
+#: ../status.py:106
 msgid "Modified"
 msgstr "แก้ไขแล้ว"
 
-#: ../status.py:121
+#: ../status.py:114
 msgid "Unknown"
 msgstr "ไม่ทราบ"
 
-#: ../status.py:126
+#: ../status.py:119
 msgid "No changes."
 msgstr "ไม่มีการเปลี่ยนแปลง"
 
 #. Set properties
-#: ../tags.py:66
+#: ../tags.py:60
 msgid "Tags"
 msgstr "ป้าย"
 
@@ -656,552 +656,44 @@ msgstr "ชื่อป้าย"
 msgid "Revision ID"
 msgstr "หมายเลขประจำรุ่น"
 
-#: ../tags.py:150
+#: ../tags.py:148
 msgid "Tags are not supported by this branch format. Please upgrade."
 msgstr ""
 
-#: ../tags.py:156
+#: ../tags.py:154
 msgid "No tagged revisions in the branch."
 msgstr ""
 
-#: ../tags.py:231
+#: ../tags.py:222
 msgid "_Remove tag"
 msgstr "_ลบป้าย"
 
-#: ../tags.py:241
+#: ../tags.py:232
 msgid "<b><big>Remove tag?</big></b>"
 msgstr "<b><big>ลบป้าย?</big></b>"
 
-#: ../tags.py:243
+#: ../tags.py:234
 #, python-format
 msgid "Are you sure you want to remove the tag: <b>%s</b>?"
 msgstr "คุณแน่ใจหรือไม่ที่ป้าย: <b>%s</b>?"
 
 #. Create the widgets
-#: ../tags.py:288
+#: ../tags.py:278
 msgid "_Add tag"
 msgstr "เ_พิ่มป้าย"
 
-#: ../tags.py:290
+#: ../tags.py:280
 msgid "Tag Name:"
 msgstr "ชื่อป้าย:"
 
-#: ../tags.py:291
+#: ../tags.py:281
 msgid "Revision ID:"
 msgstr "หมายเลขประจำรุ่น:"
 
-#: ../tags.py:322
+#: ../tags.py:312
 msgid "No tag name specified"
 msgstr "ไม่มีชื่อป้ายถูกระบุ"
 
-#: ../tags.py:323
+#: ../tags.py:313
 msgid "You have to specify the tag's desired name."
 msgstr ""
-
-#~ msgid "File(s) to commit"
-#~ msgstr "แฟ้มที่จะยืนยัน"
-
-#~ msgid "Commit message:"
-#~ msgstr "ข้อความการยืนยัน:"
-
-#~ msgid "Pending merges"
-#~ msgstr "กำลังรอผสาน"
-
-#~ msgid "There are no changes in the working tree."
-#~ msgstr "ไม่มีการเปลี่ยนแปลงในสายงานนี้"
-
-#~ msgid "Set default push location"
-#~ msgstr "กำหนดตำแหน่งส่งปริยาย"
-
-#, python-format
-#~ msgid ""
-#~ "There is no default push location set.\n"
-#~ "Set %r as default now?"
-#~ msgstr ""
-#~ "นั่นไม่ใช่ตำแหน่งส่งปริยาย\n"
-#~ "ตั้ง %r เป็นปริยายเดี๋ยวนี้?"
-
-#~ msgid "Revno"
-#~ msgstr "ลำดับรุ่น"
-
-#~ msgid "Time"
-#~ msgstr "เวลา"
-
-#~ msgid "Local branch up to date"
-#~ msgstr "สาขาภายในเป็นปัจจุบันแล้ว"
-
-#~ msgid "Pull successful"
-#~ msgstr "ดึงสำเร็จ"
-
-#, python-format
-#~ msgid "%d revision(s) pulled."
-#~ msgstr "รุ่นที่ %d ได้ดึงลงมาแล้ว"
-
-#~ msgid "Conflicts detected"
-#~ msgstr "ตรวจพบความขัดแย้ง"
-
-#~ msgid "Please have a look at the working tree before continuing."
-#~ msgstr "โปรดดูที่สายงานก่อนดำเนินการต่อ"
-
-#~ msgid "Revert successful"
-#~ msgstr "ย้อนกลับเรียบร้อย"
-
-#~ msgid "All files reverted to last revision."
-#~ msgstr "แฟ้มทั้งหมดย้อนกลับไปรุ่นก่อนหน้าเรียบร้อยแล้ว"
-
-#~ msgid "Bookmarks"
-#~ msgstr "ที่คั่นหน้า"
-
-#~ msgid "Bookmark"
-#~ msgstr "ที่คั่นหน้า"
-
-#~ msgid "unchanged"
-#~ msgstr "ไม่เปลี่ยนแปลง"
-
-#~ msgid "ignored"
-#~ msgstr "ละเลย"
-
-#~ msgid "unknown"
-#~ msgstr "ไม่ทราบ"
-
-#~ msgid "Filename"
-#~ msgstr "ชื่อแฟ้ม"
-
-#~ msgid "Status"
-#~ msgstr "สถานะ"
-
-#~ msgid "Size"
-#~ msgstr "ขนาด"
-
-#~ msgid "Last modified"
-#~ msgstr "แก้ไขล่าสุด"
-
-#~ msgid ""
-#~ "Please select a file from the list,\n"
-#~ "or choose the other option."
-#~ msgstr ""
-#~ "โปรดเลือกแฟ้มจากรายการ\n"
-#~ "หรือเลือกตัวเลือกอื่น"
-
-#~ msgid "Title:"
-#~ msgstr "หัวข้อ:"
-
-#~ msgid "Please specify a title to continue."
-#~ msgstr "โปรดระบุหัวข้อที่จะดำเนินการต่อ"
-
-#~ msgid "Add"
-#~ msgstr "เพิ่ม"
-
-#~ msgid "Add the selected file"
-#~ msgstr "เพิ่มแฟ้มที่เลือก"
-
-#~ msgid "Remove"
-#~ msgstr "ลบ"
-
-#~ msgid "Remove the selected file"
-#~ msgstr "ลบแฟ้มที่เลือก"
-
-#~ msgid "Remove and delete"
-#~ msgstr "เอาออกและลบ"
-
-#~ msgid "Remove the selected file/dir and delete from disk"
-#~ msgstr "เอาแฟ้ม/ไดเรกทอรีออกและลบจากดิสก์"
-
-#~ msgid "Rename"
-#~ msgstr "เปลี่ยนชื่อ"
-
-#~ msgid "Rename the selected file"
-#~ msgstr "เปลี่ยนชื่อแฟ้มที่เลือก"
-
-#~ msgid "Open"
-#~ msgstr "เปิด"
-
-#~ msgid "Open the selected file"
-#~ msgstr "เปิดแฟ้มที่เลือก"
-
-#~ msgid "Revert"
-#~ msgstr "ย้อนกลับ"
-
-#~ msgid "Revert the changes"
-#~ msgstr "ย้อนกลับการเปลี่ยนแปลง"
-
-#~ msgid "Commit the changes"
-#~ msgstr "ยืนยันการเปลี่ยนแปลง"
-
-#~ msgid "Annotate"
-#~ msgstr "หมายเหตุ"
-
-#~ msgid "Annotate the selected file"
-#~ msgstr "ใส่หมายเหตุแฟ้มที่เลือก"
-
-#~ msgid "Diff"
-#~ msgstr "เปรียบเทียบ"
-
-#~ msgid "Show the diff of the file"
-#~ msgstr "แสดงการเปรียบเทียบของแฟ้ม"
-
-#~ msgid "Bookmark current location"
-#~ msgstr "คั่นหน้าตำแหน่งปัจจุบัน"
-
-#~ msgid "Edit"
-#~ msgstr "แก้ไข"
-
-#~ msgid "Edit the selected bookmark"
-#~ msgstr "แก้ไขที่คั่นหน้าที่เลือก"
-
-#~ msgid "Remove the selected bookmark"
-#~ msgstr "ลบที่คั่นหน้าที่เลือก"
-
-#~ msgid "Open Folder"
-#~ msgstr "เปิดโฟลเดอร์"
-
-#~ msgid "Open bookmark folder in Nautilus"
-#~ msgstr "เปิดโฟลเดอร์ที่คั่นหน้าใน Nautilus"
-
-#~ msgid "Selected..."
-#~ msgstr "เลือกแล้ว..."
-
-#~ msgid "Show the differences of the selected file"
-#~ msgstr "แสดงความแตกต่างของแฟ้มที่เลือก"
-
-#~ msgid "All..."
-#~ msgstr "ทั้งหมด..."
-
-#~ msgid "Show the differences of all files"
-#~ msgstr "แสดงความแตกต่างของแฟ้มทั้งหมด"
-
-#~ msgid "View contents"
-#~ msgstr "แสดงเนื้อหา"
-
-#~ msgid "View the contents of the file in a builtin viewer"
-#~ msgstr "แสดงเนื้อหาของแฟ้มในตัวดูที่มีให้"
-
-#~ msgid "Show differences"
-#~ msgstr "แสดงความแตกต่าง"
-
-#~ msgid "Show the differences between two revisions of the file"
-#~ msgstr "แสดงความแตกต่างของแฟ้มระหว่างสองรุ่น"
-
-#~ msgid "Revert to this revision"
-#~ msgstr "ย้อนกลับมาเป็นรุ่นนี้"
-
-#~ msgid "Revert the selected file to the selected revision"
-#~ msgstr "ย้อนกลับแฟ้มที่เลือกมาเป็นรุ่นที่เลือก"
-
-#~ msgid "Delete directory with all directories below ?"
-#~ msgstr "ลบไดเรกทอรีรวมทั้งไดเรกทอรีทั้งหมดข้างล่าง ?"
-
-#~ msgid "Bookmark successfully added"
-#~ msgstr "เพิ่มที่คั่นหน้าสำเร็จแล้ว"
-
-#~ msgid ""
-#~ "The current directory was bookmarked. You can reach\n"
-#~ "it by selecting it from the left panel."
-#~ msgstr ""
-#~ "ไดเรกทอรีปัจจุบันได้คั่นหน้าไว้แล้ว คุณสามารถเข้าถึง\n"
-#~ "มันโดยการเลือกจากพาเนลซ้าย"
-
-#~ msgid "Location already bookmarked"
-#~ msgstr "คั่นหน้าตำแหน่งนี้แล้ว"
-
-#~ msgid ""
-#~ "The current directory is already bookmarked.\n"
-#~ "See the left panel for reference."
-#~ msgstr ""
-#~ "ไดเรกทอรีนี้เป็นที่คั่นหน้าแล้ว\n"
-#~ "ดูพาเนลซ้ายเพื่ออ้างถึง"
-
-#~ msgid "Please specify a desired name for the new directory."
-#~ msgstr "โปรดระบุชื่อที่ต้องการสำหรับไดเรกทอรีใหม่"
-
-#~ msgid "Directory already exists"
-#~ msgstr "ไดเรกทอรีมีแล้ว"
-
-#~ msgid "Please specify another name to continue."
-#~ msgstr "โปรดระบุชื่ออื่นเพื่อทำต่อ"
-
-#~ msgid "Please select a file from the list to proceed."
-#~ msgstr "โปรดเลือกแฟ้มจากรายการเพื่อดำเนินการ"
-
-#~ msgid "Not the same branch"
-#~ msgstr "ไม่ใช่สาขาเดียวกัน"
-
-#~ msgid "The destination is not in the same branch."
-#~ msgstr "ปลายทางไม่ใช่สาขาเดียวกัน"
-
-#~ msgid "No matching files"
-#~ msgstr "ไม่มีแฟ้มที่ตรงกัน"
-
-#~ msgid "No added files were found in the working tree."
-#~ msgstr "ไม่พบแฟ้มที่เพิ่มในสายงาน"
-
-#~ msgid "Which file(s) do you want to remove?"
-#~ msgstr "แฟ้มใดที่คุณต้องการลบ?"
-
-#~ msgid "Selected only"
-#~ msgstr "เฉพาะที่เลือกแล้ว"
-
-#~ msgid "All files with status 'added'"
-#~ msgstr "แฟ้มทั้งหมดเป็นสถานะ 'เพิ่มแล้ว'"
-
-#~ msgid "_Remove"
-#~ msgstr "_ถอดถอน"
-
-#~ msgid "Please specify a new name for the file."
-#~ msgstr "โปรดระบุชื่อใหม่สำหรับแฟ้ม"
-
-#~ msgid "Olive - Bazaar GUI"
-#~ msgstr "Olive - Bazaar GUI"
-
-#~ msgid "_File"
-#~ msgstr "แ_ฟ้ม"
-
-#~ msgid "_Add file(s)..."
-#~ msgstr "เ_พิ่มแฟ้ม..."
-
-#~ msgid "Remove file(s)..."
-#~ msgstr "ลบแฟ้ม..."
-
-#~ msgid "Make _directory..."
-#~ msgstr "สร้างไ_ดเรกทอรี..."
-
-#~ msgid "_Rename..."
-#~ msgstr "เ_ปลี่ยนชื่อ..."
-
-#~ msgid "_Move..."
-#~ msgstr "_ย้าย"
-
-#~ msgid "_Annotate..."
-#~ msgstr "_หมายเหตุ..."
-
-#~ msgid "Show _hidden files"
-#~ msgstr "แสดงแฟ้ม_ซ่อน"
-
-#~ msgid "_Refresh"
-#~ msgstr "เ_รียกใหม่"
-
-#~ msgid "Pu_ll"
-#~ msgstr "_ดึง"
-
-#~ msgid "Pu_sh..."
-#~ msgstr "_ส่ง..."
-
-#~ msgid "_Revert all changes"
-#~ msgstr "_ย้อนกลับการเปลี่ยนแปลงทั้งหมด"
-
-#~ msgid "_Merge..."
-#~ msgstr "_รวม..."
-
-#~ msgid "_Commit..."
-#~ msgstr "_ยืนยัน..."
-
-#~ msgid "Ta_gs..."
-#~ msgstr "_ป้าย..."
-
-#~ msgid "S_tatus..."
-#~ msgstr "_สถานะ..."
-
-#~ msgid "Con_flicts..."
-#~ msgstr "_ขัดแย้ง..."
-
-#~ msgid "_Statistics"
-#~ msgstr "ส_ถิติ"
-
-#~ msgid "_Differences..."
-#~ msgstr "ความแ_ตกต่าง..."
-
-#~ msgid "_Log..."
-#~ msgstr "_ปูม..."
-
-#~ msgid "_Information..."
-#~ msgstr "_ข้อมูล..."
-
-#~ msgid "_Help"
-#~ msgstr "_วิธีใช้"
-
-#~ msgid "gtk-jump-to"
-#~ msgstr "gtk-jump-to"
-
-#~ msgid "Copyright (C) 2006 Szilveszter Farkas (Phanatic)"
-#~ msgstr "ลิขสิทธิ์ (C) 2006 Szilveszter Farkas (Phanatic)"
-
-#~ msgid "https://launchpad.net/products/olive"
-#~ msgstr "https://launchpad.net/products/olive"
-
-#~ msgid "translator-credits"
-#~ msgstr ""
-#~ "Sira Nokyoongtong (http://launchpad.net/~gumara)\n"
-#~ "\n"
-#~ "Launchpad Contributions:\n"
-#~ "  SiraNokyoongtong https://launchpad.net/~gumara"
-
-#~ msgid "Olive - Add file(s)"
-#~ msgstr "Olive - เพิ่มแฟ้ม"
-
-#~ msgid "Which file(s) do you want to add?"
-#~ msgstr "แฟ้มใดที่คุณต้องการจะเพิ่ม?"
-
-#~ msgid "_Add"
-#~ msgstr "เ_พิ่ม"
-
-#~ msgid "Olive - Remove file(s)"
-#~ msgstr "Olive - ถอดถอนแฟ้ม"
-
-#~ msgid "Olive - Make directory"
-#~ msgstr "Olive - สร้างไดเรกทอรี"
-
-#~ msgid "_Make directory"
-#~ msgstr "สร้างไ_ดเรกทอรี"
-
-#~ msgid "Olive - Move"
-#~ msgstr "Olive - ย้าย"
-
-#~ msgid "Move to"
-#~ msgstr "ย้ายไปยัง"
-
-#~ msgid "Select a directory"
-#~ msgstr "เลือกไดเรกทอรี"
-
-#~ msgid "_Move"
-#~ msgstr "_ย้าย"
-
-#~ msgid "Olive - Rename"
-#~ msgstr "Olive - เปลี่ยนชื่อ"
-
-#~ msgid "Rename to"
-#~ msgstr "เปลี่ยนชื่อเป็น"
-
-#~ msgid "_Rename"
-#~ msgstr "เ_ปลี่ยนชื่อ"
-
-#~ msgid "Olive - Information"
-#~ msgstr "Olive - ข้อมูล"
-
-#~ msgid "(none)"
-#~ msgstr "(ไม่มี)"
-
-#~ msgid "Branch root: "
-#~ msgstr "รากสาขา: "
-
-#~ msgid "Repository branch: "
-#~ msgstr "สาขาคลัง: "
-
-#~ msgid "Shared repository: "
-#~ msgstr "คลังที่แบ่งปัน: "
-
-#~ msgid "<b>Location:</b>"
-#~ msgstr "<b>ตำแหน่ง:</b>"
-
-#~ msgid "Publish to branch: "
-#~ msgstr "เผยแพร่สาขา: "
-
-#~ msgid "<b>Related branches:</b>"
-#~ msgstr "<b>สาขาที่เกี่ยวข้อง:</b>"
-
-#~ msgid "Repository format: "
-#~ msgstr "รูปแบบคลัง: "
-
-#~ msgid "Branch format: "
-#~ msgstr "รูปแบบสาขา: "
-
-#~ msgid "Working tree format: "
-#~ msgstr "รูปแบบสายงาน: "
-
-#~ msgid "<b>Format:</b>"
-#~ msgstr "<b>รูปแบบ:</b>"
-
-#~ msgid "Repository lock status: "
-#~ msgstr "สถานะการล็อคคลัง: "
-
-#~ msgid "Branch lock status: "
-#~ msgstr "สถานะการล็อคสาขา: "
-
-#~ msgid "Working tree lock status: "
-#~ msgstr "สถานะการล็อคสายงาน: "
-
-#~ msgid "<b>Lock status:</b>"
-#~ msgstr "<b>สถานะการล็อค:</b>"
-
-#~ msgid "Ignored files: "
-#~ msgstr "แฟ้มที่เพิกเฉยแล้ว: "
-
-#~ msgid "Unknown files: "
-#~ msgstr "แฟ้มที่ไม่รู้จัก: "
-
-#~ msgid "Renamed files: "
-#~ msgstr "แฟ้มที่เปลี่ยนชื่อแล้ว: "
-
-#~ msgid "Removed files: "
-#~ msgstr "แฟ้มที่ถอดถอนแล้ว: "
-
-#~ msgid "Added files: "
-#~ msgstr "แฟ้มที่เพิ่มแล้ว: "
-
-#~ msgid "Modified files: "
-#~ msgstr "แฟ้มที่แก้ไขแล้ว: "
-
-#~ msgid "Unchanged files: "
-#~ msgstr "แฟ้มที่ยังไม่เปลี่ยนแปลง: "
-
-#~ msgid "<b>In the working tree:</b>"
-#~ msgstr "<b>ในสายงาน:</b>"
-
-#~ msgid "Time of last revision: "
-#~ msgstr "เวลาของรุ่นล่าสุด: "
-
-#~ msgid "Time of first revision: "
-#~ msgstr "เวลาของรุ่นแรก: "
-
-#~ msgid "Age of branch in days: "
-#~ msgstr "อายุของสาขา: "
-
-#~ msgid "Number of commiters: "
-#~ msgstr "จำนวนของผู้ยืนยัน: "
-
-#~ msgid "Revisions in branch: "
-#~ msgstr "รุ่นในสาขา: "
-
-#~ msgid "<b>Branch history:</b>"
-#~ msgstr "<b>ประวัติสาขา:</b>"
-
-#~ msgid "Size of repository: "
-#~ msgstr "ขนาดของคลัง: "
-
-#~ msgid "Revisions in repository: "
-#~ msgstr "รุ่นในคลัง: "
-
-#~ msgid "Merge - Olive"
-#~ msgstr "ผสาน - Olive"
-
-#~ msgid "Merge from:"
-#~ msgstr "ผสานจาก:"
-
-#~ msgid "_Bookmark current directory"
-#~ msgstr "_คั่นหน้าไดเรกทอรีปัจจุบัน"
-
-#~ msgid "Show _ignored files"
-#~ msgstr "แสดงแฟ้มที่เ_พิกเฉยแล้ว"
-
-#~ msgid "Update"
-#~ msgstr "อัปเดท"
-
-#~ msgid "Please wait, loading ancestral graph..."
-#~ msgstr "โปรดรอ กำลังโหลดกราฟ"
-
-#~ msgid "Lead Developer:"
-#~ msgstr "หัวหน้านักพัฒนา:"
-
-#~ msgid "Contributors:"
-#~ msgstr "ผู้ร่วมสนับสนุน:"
-
-#~ msgid "Update successful but conflicts generated"
-#~ msgstr "อัปเดทเรียบร้อยแต่มีความขัดแย้ง"
-
-#~ msgid "Number of conflicts generated: %d."
-#~ msgstr "จำนวนของความขัดแย้ง: %d"
-
-#~ msgid "Update successful"
-#~ msgstr "อัปเดทเรียบร้อย"
-
-#~ msgid "No conflicts generated."
-#~ msgstr "ไม่มีความขัดแย้ง"
