@@ -136,15 +136,10 @@ branch.Branch.hooks.install_named_hook('post_uncommit',
                                        save_commit_messages,
                                        "Saving commit messages for gcommit")
 
-config.option_registry.register(
-    config.Option('nautilus_integration', default=True,
-           from_unicode=config.bool_from_store,
-           help='''\
-Whether to enable nautilus integration.
-
-Defines whether Nautilus integration should be enabled.
-'''))
-
+option_registry = getattr(config, "option_registry", None)
+if option_registry is not None:
+    config.option_registry.register_lazy('nautilus_integration',
+            'bzrlib.plugins.gtk.config', 'opt_nautilus_integration')
 
 def load_tests(basic_tests, module, loader):
     testmod_names = [
