@@ -33,6 +33,8 @@ gtags             Manage branch tags.
 visualise         Graphically visualise this branch.
 """
 
+from __future__ import absolute_import
+
 import os
 import sys
 
@@ -57,7 +59,7 @@ from bzrlib import (
     )
 from bzrlib.commands import plugin_cmds
 
-from info import (
+from bzrlib.plugins.gtk.info import (
     bzr_plugin_version as version_info,
     bzr_compatible_versions,
     )
