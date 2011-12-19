@@ -78,7 +78,7 @@ if __name__ != 'bzrlib.plugins.gtk':
 
 
 def set_ui_factory():
-    from ui import GtkUIFactory
+    from bzrlib.plugins.gtk.ui import GtkUIFactory
     import bzrlib.ui
     bzrlib.ui.ui_factory = GtkUIFactory()
 
