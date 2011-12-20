@@ -296,7 +296,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree)
         values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
-        self.assertEqual([(None, None, True, 'All Files', ''),
+        self.assertEqual([("", "", True, 'All Files', ''),
                           ('a-id', 'a', True, 'a', 'added'),
                           ('b-id', 'b', True, 'b/', 'added'),
                           ('c-id', 'b/c', True, 'b/c', 'added'),
@@ -313,7 +313,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree)
         values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
-        self.assertEqual([(None, None, True, 'All Files', ''),
+        self.assertEqual([("", "", True, 'All Files', ''),
                           ('b-id', 'd', True, 'b/ => d/', 'renamed'),
                           ('a-id', 'd/a', True, 'a => d/a', 'renamed'),
                          ], values)
@@ -328,7 +328,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree)
         values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
-        self.assertEqual([(None, None, True, 'All Files', ''),
+        self.assertEqual([("", "", True, 'All Files', ''),
                           ('a-id', 'a', True, 'a', 'modified'),
                          ], values)
 
@@ -348,7 +348,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree)
         values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
-        self.assertEqual([(None, None, True, 'All Files', ''),
+        self.assertEqual([("", "", True, 'All Files', ''),
                           ('b-id', 'd', True, 'b/ => d/', 'renamed'),
                           ('a-id', 'd/a', True, 'a => d/a', 'renamed and modified'),
                           ('c-id', 'd/c', True, 'd/c', 'modified'),
@@ -371,7 +371,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree)
         values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
-        self.assertEqual([(None, None, True, 'All Files', ''),
+        self.assertEqual([("", "", True, 'All Files', ''),
                           ('a-id', 'a', True, 'a => a/', 'kind changed'),
                           # ('b-id', 'c', True, 'b => c/', 'renamed and modified'),
                          ], values)
@@ -387,7 +387,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree)
         values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
-        self.assertEqual([(None, None, True, 'All Files', ''),
+        self.assertEqual([("", "", True, 'All Files', ''),
                           ('a-id', 'a', True, 'a', 'removed'),
                           ('b-id', 'b', True, 'b/', 'removed'),
                          ], values)
@@ -402,7 +402,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         dlg = commit.CommitDialog(tree, selected='a')
         values = [(r[0], r[1], r[2], r[3], r[4]) for r in dlg._files_store]
-        self.assertEqual([(None, None, False, 'All Files', ''),
+        self.assertEqual([("", "", False, 'All Files', ''),
                           ('a-id', 'a', True, 'a', 'added'),
                           ('b-id', 'b', False, 'b/', 'added'),
                          ], values)
@@ -586,7 +586,7 @@ class TestCommitDialog(tests.TestCaseWithTransport):
         tree.add(['a', 'b'], ['a-id', 'b-id'])
 
         dlg = commit.CommitDialog(tree)
-        self.assertEqual([(None, None, True),
+        self.assertEqual([("", "", True),
                           ('a-id', 'a', True),
                           ('b-id', 'b', True),
                          ], [(r[0], r[1], r[2]) for r in dlg._files_store])
@@ -601,26 +601,26 @@ class TestCommitDialog(tests.TestCaseWithTransport):
 
         # Toggle a single entry should set just that entry to False
         dlg._toggle_commit(None, 1, dlg._files_store)
-        self.assertEqual([(None, None, True),
+        self.assertEqual([("", "", True),
                           ('a-id', 'a', False),
                           ('b-id', 'b', True),
                          ], [(r[0], r[1], r[2]) for r in dlg._files_store])
 
         # Toggling the main entry should set all entries
         dlg._toggle_commit(None, 0, dlg._files_store)
-        self.assertEqual([(None, None, False),
+        self.assertEqual([("", "", False),
                           ('a-id', 'a', False),
                           ('b-id', 'b', False),
                          ], [(r[0], r[1], r[2]) for r in dlg._files_store])
 
         dlg._toggle_commit(None, 2, dlg._files_store)
-        self.assertEqual([(None, None, False),
+        self.assertEqual([("", "", False),
                           ('a-id', 'a', False),
                           ('b-id', 'b', True),
                          ], [(r[0], r[1], r[2]) for r in dlg._files_store])
 
         dlg._toggle_commit(None, 0, dlg._files_store)
-        self.assertEqual([(None, None, True),
+        self.assertEqual([("", "", True),
                           ('a-id', 'a', True),
                           ('b-id', 'b', True),
                          ], [(r[0], r[1], r[2]) for r in dlg._files_store])

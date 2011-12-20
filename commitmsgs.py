@@ -59,8 +59,11 @@ class SavedCommitMessagesManager(object):
         for fi in file_info:
             file_message = fi['message']
             if file_message:
-                file_messages[fi['file_id']] = file_message # utf-8 strings
+                file_id = fi['file_id']
+                assert type(file_id) is str
+                file_messages[file_id] = file_message # utf-8 strings
         for k,v in file_messages.iteritems():
+            assert type(k) is str
             try:
                 self.file_messages[k] = v + '\n******\n' + self.file_messages[k]
             except KeyError:

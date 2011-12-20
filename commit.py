@@ -24,6 +24,7 @@ from gi.repository import Pango
 from bzrlib import (
     bencode,
     errors,
+    osutils,
     trace,
     )
 from bzrlib.plugins.gtk.dialog import question_dialog
@@ -92,7 +93,7 @@ _newline_variants_re = re.compile(r'\r\n?')
 def _sanitize_and_decode_message(utf8_message):
     """Turn a utf-8 message into a sanitized Unicode message."""
     fixed_newline = _newline_variants_re.sub('\n', utf8_message)
-    return fixed_newline.decode('utf-8')
+    return osutils.safe_unicode(fixed_newline)
 
 
 class CommitDialog(Gtk.Dialog):
@@ -186,7 +187,7 @@ class CommitDialog(Gtk.Dialog):
 
         all_enabled = (self._selected is None)
         # The first entry is always the 'whole tree'
-        all_iter = store.append([None, None, all_enabled, 'All Files', '', ''])
+        all_iter = store.append(["", "", all_enabled, 'All Files', '', ''])
         initial_cursor = store.get_path(all_iter)
         # should we pass specific_files?
         self._wt.lock_read()
@@ -443,7 +444,7 @@ class CommitDialog(Gtk.Dialog):
                                      self._on_treeview_files_cursor_changed)
 
     def _toggle_commit(self, cell, path, model):
-        if model[path][0] is None: # No file_id means 'All Files'
+        if model[path][0] == "": # No file_id means 'All Files'
             new_val = not model[path][2]
             for node in model:
                 node[2] = new_val
@@ -571,10 +572,10 @@ class CommitDialog(Gtk.Dialog):
         if selection is not None:
             path, display_path = model.get(selection, 1, 3)
             self._diff_label.set_text(_i18n('Diff for ') + display_path)
-            if path is None:
+            if path == "":
                 self._diff_view.show_diff(None)
             else:
-                self._diff_view.show_diff([path.decode('UTF-8')])
+                self._diff_view.show_diff([osutils.safe_unicode(path)])
             self._update_per_file_info(selection)
 
     def _on_accel_next(self, accel_group, window, keyval, modifier):
@@ -592,7 +593,7 @@ class CommitDialog(Gtk.Dialog):
             # selected. Either way, select All Files, and jump to the global
             # commit message.
             self._treeview_files.set_cursor(
-                Gtk.TreePath(path=0), None, False)
+                Gtk.TreePath(path=0), "", False)
             self._global_message_text_view.grab_focus()
         else:
             # Set the cursor to this entry, and jump to the per-file commit
@@ -617,7 +618,7 @@ class CommitDialog(Gtk.Dialog):
         self._save_current_file_message()
         text_buffer = self._file_message_text_view.get_buffer()
         file_id, display_path, message = self._files_store.get(selection, 0, 3, 5)
-        if file_id is None: # Whole tree
+        if file_id == "": # Whole tree
             self._file_message_expander.set_label(_i18n('File commit message'))
             self._file_message_expander.set_expanded(False)
             self._file_message_expander.set_sensitive(False)
@@ -640,13 +641,13 @@ class CommitDialog(Gtk.Dialog):
         files = []
         records = iter(self._files_store)
         rec = records.next() # Skip the All Files record
-        assert rec[0] is None, "Are we skipping the wrong record?"
+        assert rec[0] == "", "Are we skipping the wrong record?"
 
         file_info = []
         for record in records:
             if self._commit_all_changes or record[2]:# [2] checkbox
-                file_id = record[0] # [0] file_id
-                path = record[1]    # [1] real path
+                file_id = osutils.safe_utf8(record[0]) # [0] file_id
+                path = osutils.safe_utf8(record[1])    # [1] real path
                 # [5] commit message
                 file_message = _sanitize_and_decode_message(record[5])
                 files.append(path.decode('UTF-8'))

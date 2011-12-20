@@ -1,5 +1,10 @@
 0.104.0	UNRELEASED
 
+ BUG FIXES
+
+  * Fix compatibility with newer versions of gir-gtk which don't allow
+    None in STRING columns of ListStores. (Jelmer Vernooij)
+
 0.103.0	2011-12-11
 
  FEATURES
