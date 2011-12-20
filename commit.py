@@ -21,12 +21,8 @@ from gi.repository import Gtk
 from gi.repository import GObject
 from gi.repository import Pango
 
-try:
-    from bzrlib import bencode
-except ImportError:
-    from bzrlib.util import bencode
-
 from bzrlib import (
+    bencode,
     errors,
     trace,
     )

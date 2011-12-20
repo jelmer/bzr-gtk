@@ -21,10 +21,7 @@ import os
 from bzrlib import (
     tests,
     )
-try:
-    from bzrlib import bencode
-except ImportError:
-    from bzrlib.util import bencode
+from bzrlib import bencode
 
 from bzrlib.plugins.gtk import revisionview
 

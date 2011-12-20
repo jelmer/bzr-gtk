@@ -29,10 +29,7 @@ try:
     from bzrlib.tests.features import UnicodeFilenameFeature
 except ImportError: # bzr < 2.5
     from bzrlib.tests import UnicodeFilenameFeature
-try:
-    from bzrlib import bencode
-except ImportError:
-    from bzrlib.util import bencode
+from bzrlib import bencode
 
 from bzrlib.plugins.gtk import (
     commit,

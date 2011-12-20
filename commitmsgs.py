@@ -14,12 +14,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-try:
-    from bzrlib import bencode
-except ImportError:
-    from bzrlib.util import bencode
-
-from bzrlib import osutils
+from bzrlib import (
+    bencode,
+    osutils,
+    )
 
 class SavedCommitMessagesManager(object):
     """Save global and per-file commit messages.
