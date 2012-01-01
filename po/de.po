@@ -8,13 +8,13 @@ msgstr ""
 "Project-Id-Version: olive\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-12-01 11:46+0100\n"
-"PO-Revision-Date: 2011-12-30 13:30+0000\n"
+"PO-Revision-Date: 2011-12-31 16:09+0000\n"
 "Last-Translator: Daniel Winzen <d@winzen4.de>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-12-31 06:16+0000\n"
+"X-Launchpad-Export-Date: 2012-01-01 05:55+0000\n"
 "X-Generator: Launchpad (build 14560)\n"
 
 #: ../bazaar-properties.desktop.in.h:1
@@ -672,11 +672,11 @@ msgstr "Aus_wahl"
 
 #: ../search.py:41
 msgid "Search for:"
-msgstr ""
+msgstr "Suche nach:"
 
 #: ../search.py:56
 msgid "Document"
-msgstr ""
+msgstr "Dokument"
 
 #: ../status.py:87
 msgid "Added"
