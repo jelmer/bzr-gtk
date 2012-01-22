@@ -114,6 +114,7 @@ class CommitDialog(Gtk.Dialog):
         self._enable_per_file_commits = True
         self._commit_all_changes = True
         self.committed_revision_id = None # Nothing has been committed yet
+        self._last_selected_file = None
         self._saved_commit_messages_manager = SavedCommitMessagesManager(
             self._wt, self._wt.branch)
 
