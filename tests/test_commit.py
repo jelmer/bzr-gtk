@@ -232,6 +232,25 @@ class TestCommitDialogSimple(tests.TestCaseWithTransport):
         self.assertEqual([], delta.removed)
         self.assertEqual([(u'a', 'a-id', 'file')], delta.added)
 
+    def test_on_treeview_files_cursor_changed_no_selection(self):
+        MockMethod.bind(self, CommitDialogNoWidgets, '_update_per_file_info')
+        tree = self.make_branch_and_tree('tree')
+        rev_id = tree.commit('first')
+        dlg = CommitDialogNoWidgets(tree)
+        treeview = Gtk.TreeView()
+        dlg._on_treeview_files_cursor_changed(treeview)
+        self.assertFalse(CommitDialogNoWidgets._update_per_file_info.called)
+
+    def test_on_treeview_files_cursor_changed_with_destroyed_treeview(self):
+        MockMethod.bind(self, CommitDialogNoWidgets, '_update_per_file_info')
+        tree = self.make_branch_and_tree('tree')
+        rev_id = tree.commit('first')
+        dlg = CommitDialogNoWidgets(tree)
+        treeview = Gtk.TreeView()
+        treeview.destroy()
+        dlg._on_treeview_files_cursor_changed(treeview)
+        self.assertFalse(CommitDialogNoWidgets._update_per_file_info.called)
+
 
 class TestCommitDialog(tests.TestCaseWithTransport):
 

@@ -568,6 +568,9 @@ class CommitDialog(Gtk.Dialog):
 
     def _on_treeview_files_cursor_changed(self, treeview):
         treeselection = treeview.get_selection()
+        if treeselection is None:
+            # The treeview was probably destroyed as the dialog closes.
+            return
         (model, selection) = treeselection.get_selected()
 
         if selection is not None:
