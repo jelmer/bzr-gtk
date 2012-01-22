@@ -35,6 +35,7 @@ from bzrlib.plugins.gtk import (
     commit,
     commitmsgs,
     )
+from bzrlib.plugins.gtk.commitmsgs import SavedCommitMessagesManager
 
 
 # TODO: All we need is basic ancestry code to test this, we shouldn't need a
@@ -142,7 +143,46 @@ class CommitDialogNoWidgets(commit.CommitDialog):
         pass # With no widgets, there are no widgets to fill out
 
 
+class MockMethod():
+
+    @classmethod
+    def bind(klass, test_instance, obj, method_name):
+        original_method = getattr(obj, method_name)
+        test_instance.addCleanup(setattr, obj, method_name, original_method)
+        setattr(obj, method_name, klass())
+
+    def __init__(self):
+        self.called = False
+        self.args = None
+        self.kwargs = None
+
+    def __call__(self, *args, **kwargs):
+        self.called = True
+        self.args = args
+        self.kwargs = kwargs
+
+
 class TestCommitDialogSimple(tests.TestCaseWithTransport):
+
+    def test_init(self):
+        MockMethod.bind(self, CommitDialogNoWidgets, 'setup_params')
+        MockMethod.bind(self, CommitDialogNoWidgets, 'construct')
+        MockMethod.bind(self, CommitDialogNoWidgets, 'fill_in_data')
+
+        tree = self.make_branch_and_tree('tree')
+        rev_id = tree.commit('first')
+        dlg = CommitDialogNoWidgets(tree)
+        self.assertIs(tree, dlg._wt)
+        self.assertIs(None, dlg._selected)
+        self.assertTrue(dlg._enable_per_file_commits)
+        self.assertTrue(dlg._commit_all_changes)
+        self.assertIs(None, dlg.committed_revision_id)
+        self.assertIs(None, dlg._last_selected_file)
+        self.assertIsInstance(
+            dlg._saved_commit_messages_manager, SavedCommitMessagesManager)
+        self.assertTrue(CommitDialogNoWidgets.setup_params.called)
+        self.assertTrue(CommitDialogNoWidgets.construct.called)
+        self.assertTrue(CommitDialogNoWidgets.fill_in_data.called)
 
     def test_setup_parameters_no_pending(self):
         tree = self.make_branch_and_tree('tree')
