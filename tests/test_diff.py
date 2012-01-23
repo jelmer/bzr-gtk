@@ -18,6 +18,8 @@
 from cStringIO import StringIO
 import os
 
+from gi.repository import Gtk
+
 from bzrlib import (
     conflicts,
     errors,
@@ -111,9 +113,20 @@ class FakeDiffWidget(DiffWidget):
 
 class TestDiffWidget(tests.TestCaseWithTransport):
 
-    def test_treeview_cursor_cbd_with_destroyed_treeview(self):
+    def test_treeview_cursor_cb(self):
         widget = FakeDiffWidget()
-        widget.set_diff_text_sections([('a', None, 'patch')])
+        widget.set_diff_text_sections(
+            [('', None, 'patch'), ('a', 'a', 'patch')])
+        MockMethod.bind(self, widget.diff_view, 'show_diff')
+        widget.treeview.set_cursor(Gtk.TreePath(path=1), None, False)
+        widget._treeview_cursor_cb(None)
+        self.assertTrue(widget.diff_view.show_diff.called)
+        self.assertEqual((['a'],), widget.diff_view.show_diff.args)
+
+    def test_treeview_cursor_cb_with_destroyed_treeview(self):
+        widget = FakeDiffWidget()
+        widget.set_diff_text_sections(
+            [('', None, 'patch'), ('a', 'a', 'patch')])
         MockMethod.bind(self, widget.diff_view, 'show_diff')
         widget.treeview.destroy()
         widget._treeview_cursor_cb(None)
