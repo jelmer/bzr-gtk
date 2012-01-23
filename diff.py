@@ -284,6 +284,9 @@ class DiffWidget(Gtk.HPaned):
     """Diff widget
 
     """
+
+    SHOW_WIDGETS = True
+
     def __init__(self):
         super(DiffWidget, self).__init__()
 
@@ -292,7 +295,8 @@ class DiffWidget(Gtk.HPaned):
         scrollwin.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         scrollwin.set_shadow_type(Gtk.ShadowType.IN)
         self.pack1(scrollwin)
-        scrollwin.show()
+        if self.SHOW_WIDGETS:
+            scrollwin.show()
         
         self.model = Gtk.TreeStore(str, str)
         self.treeview = Gtk.TreeView(model=self.model)
@@ -300,7 +304,8 @@ class DiffWidget(Gtk.HPaned):
         self.treeview.set_search_column(1)
         self.treeview.connect("cursor-changed", self._treeview_cursor_cb)
         scrollwin.add(self.treeview)
-        self.treeview.show()
+        if self.SHOW_WIDGETS:
+            self.treeview.show()
 
         cell = Gtk.CellRendererText()
         cell.set_property("width-chars", 20)
@@ -338,7 +343,8 @@ class DiffWidget(Gtk.HPaned):
         if getattr(self, 'diff_view', None) is None:
             self.diff_view = DiffView()
             self.pack2(self.diff_view)
-        self.diff_view.show()
+        if self.SHOW_WIDGETS:
+            self.diff_view.show()
         self.diff_view.set_trees(rev_tree, parent_tree)
         self.rev_tree = rev_tree
         self.parent_tree = parent_tree
