@@ -116,17 +116,15 @@ class TestDiffWidget(tests.TestCaseWithTransport):
     def test_treeview_cursor_cb(self):
         widget = FakeDiffWidget()
         widget.set_diff_text_sections(
-            [('', None, 'patch'), ('a', 'a', 'patch')])
-        MockMethod.bind(self, widget.diff_view, 'show_diff')
+            [('', None, 'patch1'), ('a', 'a', 'patch2')])
         widget.treeview.set_cursor(Gtk.TreePath(path=1), None, False)
         widget._treeview_cursor_cb(None)
-        self.assertTrue(widget.diff_view.show_diff.called)
-        self.assertEqual((['a'],), widget.diff_view.show_diff.args)
+        self.assertTrue('patch2', widget.diff_view.buffer.props.text)
 
     def test_treeview_cursor_cb_with_destroyed_treeview(self):
         widget = FakeDiffWidget()
         widget.set_diff_text_sections(
-            [('', None, 'patch'), ('a', 'a', 'patch')])
+            [('', None, 'patch1'), ('a', 'a', 'patch2')])
         MockMethod.bind(self, widget.diff_view, 'show_diff')
         widget.treeview.destroy()
         widget._treeview_cursor_cb(None)
