@@ -395,6 +395,8 @@ class DiffWidget(Gtk.HPaned):
     def _treeview_cursor_cb(self, *args):
         """Callback for when the treeview cursor changes."""
         (path, col) = self.treeview.get_cursor()
+        if path is None:
+            return
         specific_files = [ self.model[path][1] ]
         if specific_files == [ None ]:
             return

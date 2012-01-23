@@ -32,9 +32,13 @@ from bzrlib.merge_directive import MergeDirective2
 from bzrlib.plugins.gtk.diff import (
     DiffController,
     DiffView,
+    DiffWidget,
     iter_changes_to_status,
     MergeDirectiveController,
     )
+from bzrlib.plugins.gtk.tests import MockMethod
+
+
 eg_diff = """\
 === modified file 'tests/test_diff.py'
 --- tests/test_diff.py	2008-03-11 13:18:28 +0000
@@ -97,6 +101,23 @@ class TestDiffView(tests.TestCaseWithTransport):
             '\\+contents of tree/\xce\xa9\n'
             '\n'
             )
+
+
+
+class FakeDiffWidget(DiffWidget):
+
+    SHOW_WIDGETS = False
+
+
+class TestDiffWidget(tests.TestCaseWithTransport):
+
+    def test_treeview_cursor_cbd_with_destroyed_treeview(self):
+        widget = FakeDiffWidget()
+        widget.set_diff_text_sections([('a', None, 'patch')])
+        MockMethod.bind(self, widget.diff_view, 'show_diff')
+        widget.treeview.destroy()
+        widget._treeview_cursor_cb(None)
+        self.assertFalse(widget.diff_view.show_diff.called)
 
 
 class MockDiffWidget(object):
