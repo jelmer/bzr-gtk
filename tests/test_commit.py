@@ -36,6 +36,7 @@ from bzrlib.plugins.gtk import (
     commitmsgs,
     )
 from bzrlib.plugins.gtk.commitmsgs import SavedCommitMessagesManager
+from bzrlib.plugins.gtk.tests import MockMethod
 
 
 # TODO: All we need is basic ancestry code to test this, we shouldn't need a
@@ -141,25 +142,6 @@ class CommitDialogNoWidgets(commit.CommitDialog):
 
     def fill_in_data(self):
         pass # With no widgets, there are no widgets to fill out
-
-
-class MockMethod():
-
-    @classmethod
-    def bind(klass, test_instance, obj, method_name):
-        original_method = getattr(obj, method_name)
-        test_instance.addCleanup(setattr, obj, method_name, original_method)
-        setattr(obj, method_name, klass())
-
-    def __init__(self):
-        self.called = False
-        self.args = None
-        self.kwargs = None
-
-    def __call__(self, *args, **kwargs):
-        self.called = True
-        self.args = args
-        self.kwargs = kwargs
 
 
 class TestCommitDialogSimple(tests.TestCaseWithTransport):

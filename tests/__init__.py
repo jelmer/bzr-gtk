@@ -31,3 +31,22 @@ def load_tests(basic_tests, module, loader):
     basic_tests.addTest(loader.loadTestsFromModuleNames(
             ["%s.%s" % (__name__, tmn) for tmn in testmod_names]))
     return basic_tests
+
+
+class MockMethod():
+
+    @classmethod
+    def bind(klass, test_instance, obj, method_name):
+        original_method = getattr(obj, method_name)
+        test_instance.addCleanup(setattr, obj, method_name, original_method)
+        setattr(obj, method_name, klass())
+
+    def __init__(self):
+        self.called = False
+        self.args = None
+        self.kwargs = None
+
+    def __call__(self, *args, **kwargs):
+        self.called = True
+        self.args = args
+        self.kwargs = kwargs

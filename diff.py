@@ -5,22 +5,31 @@ the changes made between two revisions on a branch.
 """
 
 __copyright__ = "Copyright 2005 Canonical Ltd."
-__author__    = "Scott James Remnant <scott@ubuntu.com>"
+__author__ = "Scott James Remnant <scott@ubuntu.com>"
 
 
 from cStringIO import StringIO
 
-from gi.repository import Gtk
-from gi.repository import Pango
 import os
 import re
 import sys
 import inspect
 try:
-    from xml.etree.ElementTree import Element, SubElement, tostring
+    from xml.etree.ElementTree import (
+        Element,
+        SubElement,
+        tostring,
+        )
+    Element, SubElement, tostring  # Hush PEP8 redefinition.
 except ImportError:
-    from elementtree.ElementTree import Element, SubElement, tostring
+    from elementtree.ElementTree import (
+        Element,
+        SubElement,
+        tostring,
+        )
 
+from gi.repository import Gtk
+from gi.repository import Pango
 try:
     from gi.repository import GtkSource
     have_gtksourceview = True
@@ -38,7 +47,7 @@ from bzrlib import (
     osutils,
     urlutils,
     workingtree,
-)
+    )
 from bzrlib.diff import show_diff_trees
 from bzrlib.patches import parse_patches
 from bzrlib.trace import warning
@@ -112,9 +121,9 @@ class DiffFileView(Gtk.ScrolledWindow):
         if style_scheme_name is not None:
             style_scheme_mgr = GtkSource.StyleSchemeManager()
             style_scheme_mgr.append_search_path(GEDIT_USER_STYLES_PATH)
-            
+
             style_scheme = style_scheme_mgr.get_scheme(style_scheme_name)
-            
+
             if style_scheme is not None:
                 buf.set_style_scheme(style_scheme)
 
@@ -128,7 +137,7 @@ class DiffFileView(Gtk.ScrolledWindow):
         """
         scheme_manager = GtkSource.StyleSchemeManager()
         style_scheme = scheme_manager.get_scheme('colordiff')
-        
+
         # if style scheme not found, we'll generate it from colordiffrc
         # TODO: reload if colordiffrc has changed.
         if style_scheme is None:
@@ -148,7 +157,7 @@ class DiffFileView(Gtk.ScrolledWindow):
             if not colors:
                 # ~/.colordiffrc does not exist
                 return
-            
+
             mapping = {
                 # map GtkSourceView2 scheme styles to colordiff names
                 # since GSV is richer, accept new names for extra bits,
@@ -159,7 +168,7 @@ class DiffFileView(Gtk.ScrolledWindow):
                 'diff:file': ['file', 'diffstuff'],
                 'diff:special-case': ['specialcase', 'diffstuff'],
             }
-            
+
             converted_colors = {}
             for name, values in mapping.items():
                 color = None
@@ -170,7 +179,7 @@ class DiffFileView(Gtk.ScrolledWindow):
                 if color is None:
                     continue
                 converted_colors[name] = color
-            
+
             # some xml magic to produce needed style scheme description
             e_style_scheme = Element('style-scheme')
             e_style_scheme.set('id', 'colordiff')
@@ -180,15 +189,19 @@ class DiffFileView(Gtk.ScrolledWindow):
                 style = SubElement(e_style_scheme, 'style')
                 style.set('name', name)
                 style.set('foreground', '#%s' % color)
-            
+
             scheme_xml = tostring(e_style_scheme, 'UTF-8')
-            if not os.path.exists(os.path.expanduser('~/.local/share/gtksourceview-2.0/styles')):
-                os.makedirs(os.path.expanduser('~/.local/share/gtksourceview-2.0/styles'))
-            file(os.path.expanduser('~/.local/share/gtksourceview-2.0/styles/colordiff.xml'), 'w').write(scheme_xml)
-            
+            if not os.path.exists(os.path.expanduser(
+                '~/.local/share/gtksourceview-2.0/styles')):
+                os.makedirs(os.path.expanduser(
+                    '~/.local/share/gtksourceview-2.0/styles'))
+            file(os.path.expanduser(
+                '~/.local/share/gtksourceview-2.0/styles/colordiff.xml'),
+                'w').write(scheme_xml)
+
             scheme_manager.force_rescan()
             style_scheme = scheme_manager.get_scheme('colordiff')
-        
+
         buf.set_style_scheme(style_scheme)
 
     @staticmethod
@@ -216,13 +229,15 @@ class DiffFileView(Gtk.ScrolledWindow):
 #        self.parent_tree.lock_read()
 #        self.rev_tree.lock_read()
 #        try:
-#            self.delta = iter_changes_to_status(self.parent_tree, self.rev_tree)
+#            self.delta = iter_changes_to_status(
+#               self.parent_tree, self.rev_tree)
 #            self.path_to_status = {}
 #            self.path_to_diff = {}
 #            source_inv = self.parent_tree.inventory
 #            target_inv = self.rev_tree.inventory
 #            for (file_id, real_path, change_type, display_path) in self.delta:
-#                self.path_to_status[real_path] = u'=== %s %s' % (change_type, display_path)
+#                self.path_to_status[real_path] = u'=== %s %s' % (
+#                    change_type, display_path)
 #                if change_type in ('modified', 'renamed and modified'):
 #                    source_ie = source_inv[file_id]
 #                    target_ie = target_inv[file_id]
@@ -230,7 +245,7 @@ class DiffFileView(Gtk.ScrolledWindow):
 #                    source_ie.diff(internal_diff, *old path, *old_tree,
 #                                   *new_path, target_ie, self.rev_tree,
 #                                   sio)
-#                    self.path_to_diff[real_path] = 
+#                    self.path_to_diff[real_path] =
 #
 #        finally:
 #            self.rev_tree.unlock()
@@ -284,6 +299,9 @@ class DiffWidget(Gtk.HPaned):
     """Diff widget
 
     """
+
+    SHOW_WIDGETS = True
+
     def __init__(self):
         super(DiffWidget, self).__init__()
 
@@ -292,15 +310,17 @@ class DiffWidget(Gtk.HPaned):
         scrollwin.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         scrollwin.set_shadow_type(Gtk.ShadowType.IN)
         self.pack1(scrollwin)
-        scrollwin.show()
-        
+        if self.SHOW_WIDGETS:
+            scrollwin.show()
+
         self.model = Gtk.TreeStore(str, str)
         self.treeview = Gtk.TreeView(model=self.model)
         self.treeview.set_headers_visible(False)
         self.treeview.set_search_column(1)
         self.treeview.connect("cursor-changed", self._treeview_cursor_cb)
         scrollwin.add(self.treeview)
-        self.treeview.show()
+        if self.SHOW_WIDGETS:
+            self.treeview.show()
 
         cell = Gtk.CellRendererText()
         cell.set_property("width-chars", 20)
@@ -321,7 +341,8 @@ class DiffWidget(Gtk.HPaned):
         if getattr(self, 'diff_view', None) is None:
             self.diff_view = DiffFileView()
             self.pack2(self.diff_view)
-        self.diff_view.show()
+        if self.SHOW_WIDGETS:
+            self.diff_view.show()
         for oldname, newname, patch in sections:
             self.diff_view._diffs[newname] = str(patch)
             if newname is None:
@@ -338,7 +359,8 @@ class DiffWidget(Gtk.HPaned):
         if getattr(self, 'diff_view', None) is None:
             self.diff_view = DiffView()
             self.pack2(self.diff_view)
-        self.diff_view.show()
+        if self.SHOW_WIDGETS:
+            self.diff_view.show()
         self.diff_view.set_trees(rev_tree, parent_tree)
         self.rev_tree = rev_tree
         self.parent_tree = parent_tree
@@ -346,28 +368,28 @@ class DiffWidget(Gtk.HPaned):
         self.model.clear()
         delta = self.rev_tree.changes_from(self.parent_tree)
 
-        self.model.append(None, [ "Complete Diff", "" ])
+        self.model.append(None, ["Complete Diff", ""])
 
         if len(delta.added):
-            titer = self.model.append(None, [ "Added", None ])
+            titer = self.model.append(None, ["Added", None])
             for path, id, kind in delta.added:
-                self.model.append(titer, [ path, path ])
+                self.model.append(titer, [path, path])
 
         if len(delta.removed):
-            titer = self.model.append(None, [ "Removed", None ])
+            titer = self.model.append(None, ["Removed", None])
             for path, id, kind in delta.removed:
-                self.model.append(titer, [ path, path ])
+                self.model.append(titer, [path, path])
 
         if len(delta.renamed):
-            titer = self.model.append(None, [ "Renamed", None ])
+            titer = self.model.append(None, ["Renamed", None])
             for oldpath, newpath, id, kind, text_modified, meta_modified \
                     in delta.renamed:
-                self.model.append(titer, [ oldpath, newpath ])
+                self.model.append(titer, [oldpath, newpath])
 
         if len(delta.modified):
-            titer = self.model.append(None, [ "Modified", None ])
+            titer = self.model.append(None, ["Modified", None])
             for path, id, kind, text_modified, meta_modified in delta.modified:
-                self.model.append(titer, [ path, path ])
+                self.model.append(titer, [path, path])
 
         self.treeview.expand_all()
         self.diff_view.show_diff(None)
@@ -388,20 +410,23 @@ class DiffWidget(Gtk.HPaned):
     def _treeview_cursor_cb(self, *args):
         """Callback for when the treeview cursor changes."""
         (path, col) = self.treeview.get_cursor()
-        specific_files = [ self.model[path][1] ]
-        if specific_files == [ None ]:
+        if path is None:
             return
-        elif specific_files == [ "" ]:
+        specific_files = [self.model[path][1]]
+        if specific_files == [None]:
+            return
+        elif specific_files == [""]:
             specific_files = None
-        
+
         self.diff_view.show_diff(specific_files)
-    
+
     def _on_wraplines_toggled(self, widget=None, wrap=False):
         """Callback for when the wrap lines checkbutton is toggled"""
         if wrap or widget.get_active():
             self.diff_view.sourceview.set_wrap_mode(Gtk.WrapMode.WORD)
         else:
             self.diff_view.sourceview.set_wrap_mode(Gtk.WrapMode.NONE)
+
 
 class DiffWindow(Window):
     """Diff window.
@@ -437,8 +462,7 @@ class DiffWindow(Window):
         hbox = self._get_button_bar(operations)
         if hbox is not None:
             self.vbox.pack_start(hbox, False, True, 0)
-        
-    
+
     def _get_menu_bar(self):
         menubar = Gtk.MenuBar()
         # View menu
@@ -455,7 +479,7 @@ class DiffWindow(Window):
         menubar.append(mb_view)
         menubar.show()
         return menubar
-    
+
     def _get_button_bar(self, operations):
         """Return a button bar to use.
 
