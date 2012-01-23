@@ -326,7 +326,8 @@ class DiffWidget(Gtk.HPaned):
         if getattr(self, 'diff_view', None) is None:
             self.diff_view = DiffFileView()
             self.pack2(self.diff_view)
-        self.diff_view.show()
+        if self.SHOW_WIDGETS:
+            self.diff_view.show()
         for oldname, newname, patch in sections:
             self.diff_view._diffs[newname] = str(patch)
             if newname is None:
