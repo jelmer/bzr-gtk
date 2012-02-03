@@ -72,6 +72,9 @@ class PluginsPage(Gtk.VPaned):
     def row_selected(self, tv, path=None, tvc=None):
         if path is None:
             (path, focus) = tv.get_cursor()
+        if path is None:
+            # The event was fired as the widget was destroyed.
+            return
         import bzrlib
         p = bzrlib.plugin.plugins()[self.model[path][0]].module
         from inspect import getdoc
