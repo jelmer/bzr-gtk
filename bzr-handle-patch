@@ -2,9 +2,8 @@
 
 from bzrlib import errors, merge_directive
 from bzrlib.plugin import load_plugins
-from bzrlib.plugins.gtk.commands import open_display
-
 load_plugins()
+from bzrlib.plugins.gtk.commands import open_display
 
 import sys
 
@@ -32,9 +31,9 @@ try:
 	window = controller.window
 	window.show()
 	Gtk = open_display()
-	window.connect("destroy", gtk.main_quit)
+	window.connect("destroy", Gtk.main_quit)
 except Exception, e:
 	from bzrlib.plugins.gtk.dialog import error_dialog
 	error_dialog('Error', str(e))
 	raise
-gtk.main()
+Gtk.main()
