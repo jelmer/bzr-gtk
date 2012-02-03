@@ -440,7 +440,7 @@ class DiffWindow(Window):
     def __init__(self, parent=None, operations=None):
         super(DiffWindow, self).__init__(parent=parent)
         self.set_border_width(0)
-        self.set_title("bzrk diff")
+        self.set_title("bzr diff")
 
         # Use two thirds of the screen by default
         screen = self.get_screen()
@@ -475,17 +475,11 @@ class DiffWindow(Window):
         mb_view_wrapsource = Gtk.CheckMenuItem.new_with_mnemonic(
             _i18n("Wrap _Long Lines"))
         mb_view_wrapsource.connect('activate', self.diff._on_wraplines_toggled)
-        if self.SHOW_WIDGETS:
-            mb_view_wrapsource.show()
         mb_view_menu.append(mb_view_wrapsource)
-        if self.SHOW_WIDGETS:
-            mb_view.show()
         mb_view.set_submenu(mb_view_menu)
-        if self.SHOW_WIDGETS:
-            mb_view.show()
         menubar.append(mb_view)
         if self.SHOW_WIDGETS:
-            menubar.show()
+            menubar.show_all()
         return menubar
 
     def _get_button_bar(self, operations):
