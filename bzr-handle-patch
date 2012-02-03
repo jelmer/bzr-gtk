@@ -36,4 +36,8 @@ except Exception, e:
 	from bzrlib.plugins.gtk.dialog import error_dialog
 	error_dialog('Error', str(e))
 	raise
+
+if len(sys.argv) == 3 and sys.argv[2] == 'test':
+    sys.exit(0)
+
 Gtk.main()

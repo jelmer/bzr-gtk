@@ -17,6 +17,8 @@
 """Test the Commit functionality."""
 
 import os
+import subprocess
+from tempfile import NamedTemporaryFile
 
 from gi.repository import Gtk
 
@@ -1296,3 +1298,32 @@ class TestReusingSavedCommitMessages(TestSavedCommitMessages, QuestionHelpers):
         self.assertEquals(u'', self._get_commit_message())
         self.assertEquals(u'de',
                           self._get_file_commit_messages())
+
+
+class BzrHandlePatchTestCase(tests.TestCase):
+
+    def setUp(self):
+        top = os.path.abspath(os.path.join(
+            os.path.dirname(__file__), os.pardir))
+        self.script = os.path.join(top, 'bzr-handle-patch')
+        self.env = dict(os.environ)
+        self.env['BZR_PLUGINS_AT'] = 'gtk@%s' %top
+        self.patch = NamedTemporaryFile()
+        self.patch.write('\n'.join([
+            "=== added file '_test.txt'",
+            "--- _test.txt	1970-01-01 00:00:00 +0000",
+            "+++ _test.txt	2012-02-03 20:00:34 +0000",
+            "@@ -0,0 +1,1 @@",
+            "+hello",
+            ]))
+        self.patch.flush()
+        super(BzrHandlePatchTestCase, self).setUp()
+
+    def test_smoketest(self):
+        # This is a smoke test to verify the process starts.
+        bzr_notify = subprocess.Popen(
+            [self.script, self.patch.name, 'test'],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=self.env)
+        stdout, stderr = bzr_notify.communicate()
+        self.assertEqual('', stdout)
+        self.assertEqual('', stderr)
