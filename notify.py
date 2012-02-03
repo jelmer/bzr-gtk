@@ -30,6 +30,8 @@ def has_avahi():
 
 class NotifyPopupMenu(Gtk.Menu):
 
+    SHOW_WIDGETS = True
+
     def __init__(self):
         super(NotifyPopupMenu, self).__init__()
         self.create_items()
@@ -46,7 +48,7 @@ class NotifyPopupMenu(Gtk.Menu):
         except ImportError:
             item.set_sensitive(False)
         except errors.BzrError:
-            # FIXME: Should only catch errors that indicate a lan-notify 
+            # FIXME: Should only catch errors that indicate a lan-notify
             # process is already running.
             item.set_sensitive(False)
 
@@ -62,20 +64,21 @@ class NotifyPopupMenu(Gtk.Menu):
         except ImportError:
             item.set_sensitive(False)
 
-        item = Gtk.ImageMenuItem(Gtk.STOCK_PREFERENCES, None)
+        item = Gtk.ImageMenuItem.new_from_stock(Gtk.STOCK_PREFERENCES, None)
         item.connect('activate', self.show_preferences)
         self.append(item)
-        item = Gtk.ImageMenuItem(Gtk.STOCK_ABOUT, None)
+        item = Gtk.ImageMenuItem.new_from_stock(Gtk.STOCK_ABOUT, None)
         item.connect('activate', self.show_about)
         self.append(item)
         self.append(Gtk.SeparatorMenuItem())
-        item = Gtk.ImageMenuItem(Gtk.STOCK_QUIT, None)
+        item = Gtk.ImageMenuItem.new_from_stock(Gtk.STOCK_QUIT, None)
         item.connect('activate', Gtk.main_quit)
         self.append(item)
-        self.show_all()
+        if self.SHOW_WIDGETS:
+            self.show_all()
 
     def display(self, icon, event_button, event_time):
-        self.popup(None, None, Gtk.status_icon_position_menu, 
+        self.popup(None, None, Gtk.status_icon_position_menu,
                event_button, event_time, icon)
 
     def toggle_lan_gateway(self, item):
@@ -99,4 +102,3 @@ class NotifyPopupMenu(Gtk.Menu):
         from bzrlib.plugins.gtk.preferences import PreferencesWindow
         prefs = PreferencesWindow()
         prefs.run()
-

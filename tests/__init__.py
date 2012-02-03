@@ -24,6 +24,7 @@ def load_tests(basic_tests, module, loader):
         'test_history',
         'test_graphcell',
         'test_linegraph',
+        'test_notify',
         'test_revisionview',
         'test_treemodel',
         ]
