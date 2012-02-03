@@ -42,14 +42,21 @@ class NotifyPopupMenuTestCase(tests.TestCase):
 
 class BzrNotifyTestCase(tests.TestCase):
 
+    def setUp(self):
+        top = os.path.abspath(os.path.join(
+            os.path.dirname(__file__), os.pardir))
+        self.script = os.path.join(top, 'bzr-notify')
+        self.env = dict(os.environ)
+        self.env['BZR_PLUGINS_AT'] = 'gtk@%s' % top
+        super(BzrNotifyTestCase, self).setUp()
+
     def test_smoketest(self):
         # This is a smoke test to verify the process starts.
         # The logic of the module must be moved into notify.py
         # where it can be properly tested.
-        script = os.path.join(
-            os.path.dirname(__file__), os.pardir, 'bzr-notify')
         bzr_notify = subprocess.Popen(
-            [script, 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            [self.script, 'test'],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=self.env)
         stdout, stderr = bzr_notify.communicate()
         self.assertEqual('', stdout)
         self.assertEqual('', stderr)
