@@ -35,6 +35,7 @@ from bzrlib.plugins.gtk.diff import (
     DiffController,
     DiffView,
     DiffWidget,
+    DiffWindow,
     iter_changes_to_status,
     MergeDirectiveController,
     )
@@ -129,6 +130,29 @@ class TestDiffWidget(tests.TestCaseWithTransport):
         widget.treeview.destroy()
         widget._treeview_cursor_cb(None)
         self.assertFalse(widget.diff_view.show_diff.called)
+
+
+class FakeDiffWindow(DiffWindow):
+
+    SHOW_WIDGETS = False
+
+
+class DiffWindowTestCase(tests.TestCaseWithTransport):
+
+    def test_get_button_bar_with_none(self):
+        window = DiffWindow()
+        self.assertIs(None, window._get_button_bar(None))
+
+    def test_get_button_bar_with_operations(self):
+        window = DiffWindow()
+        method = MockMethod()
+        button_bar = window._get_button_bar([('title', method)])
+        self.assertIsNot(None, button_bar)
+        buttons = button_bar.get_children()
+        self.assertEqual(1, len(buttons))
+        self.assertEqual('title', buttons[0].props.label)
+        buttons[0].emit('clicked')
+        self.assertIs(True, method.called)
 
 
 class MockDiffWidget(object):

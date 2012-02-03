@@ -435,6 +435,8 @@ class DiffWindow(Window):
     differences between two revisions on a branch.
     """
 
+    SHOW_WIDGETS = True
+
     def __init__(self, parent=None, operations=None):
         super(DiffWindow, self).__init__(parent=parent)
         self.set_border_width(0)
@@ -452,10 +454,12 @@ class DiffWindow(Window):
         """Construct the window contents."""
         self.vbox = Gtk.VBox()
         self.add(self.vbox)
-        self.vbox.show()
+        if self.SHOW_WIDGETS:
+            self.vbox.show()
         self.diff = DiffWidget()
         self.vbox.pack_end(self.diff, True, True, 0)
-        self.diff.show_all()
+        if self.SHOW_WIDGETS:
+            self.diff.show_all()
         # Build after DiffWidget to connect signals
         menubar = self._get_menu_bar()
         self.vbox.pack_start(menubar, False, False, 0)
@@ -471,13 +475,17 @@ class DiffWindow(Window):
         mb_view_wrapsource = Gtk.CheckMenuItem.new_with_mnemonic(
             _i18n("Wrap _Long Lines"))
         mb_view_wrapsource.connect('activate', self.diff._on_wraplines_toggled)
-        mb_view_wrapsource.show()
+        if self.SHOW_WIDGETS:
+            mb_view_wrapsource.show()
         mb_view_menu.append(mb_view_wrapsource)
-        mb_view.show()
+        if self.SHOW_WIDGETS:
+            mb_view.show()
         mb_view.set_submenu(mb_view_menu)
-        mb_view.show()
+        if self.SHOW_WIDGETS:
+            mb_view.show()
         menubar.append(mb_view)
-        menubar.show()
+        if self.SHOW_WIDGETS:
+            menubar.show()
         return menubar
 
     def _get_button_bar(self, operations):
@@ -491,11 +499,13 @@ class DiffWindow(Window):
         hbox.set_layout(Gtk.ButtonBoxStyle.START)
         for title, method in operations:
             merge_button = Gtk.Button(title)
-            merge_button.show()
+            if self.SHOW_WIDGETS:
+                merge_button.show()
             merge_button.set_relief(Gtk.ReliefStyle.NONE)
             merge_button.connect("clicked", method)
-            hbox.pack_start(merge_button, expand=False, fill=True)
-        hbox.show()
+            hbox.pack_start(merge_button, False, True, 0)
+        if self.SHOW_WIDGETS:
+            hbox.show()
         return hbox
 
     def _get_merge_target(self):
