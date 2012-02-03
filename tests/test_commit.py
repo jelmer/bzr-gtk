@@ -1307,7 +1307,7 @@ class BzrHandlePatchTestCase(tests.TestCase):
             os.path.dirname(__file__), os.pardir))
         self.script = os.path.join(top, 'bzr-handle-patch')
         self.env = dict(os.environ)
-        self.env['BZR_PLUGINS_AT'] = 'gtk@%s' %top
+        self.env['BZR_PLUGINS_AT'] = 'gtk@%s' % top
         self.patch = NamedTemporaryFile()
         self.patch.write('\n'.join([
             "=== added file '_test.txt'",
