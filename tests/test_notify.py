@@ -15,7 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from gi.repository import Gtk
+import os
+import subprocess
 
 from bzrlib import tests
 from bzrlib.plugins.gtk.notify import NotifyPopupMenu
@@ -25,8 +26,6 @@ class FakeNotifyPopupMenu(NotifyPopupMenu):
 
     SHOW_WIDGETS = False
 
-
-# ['_Gateway to LAN', '', 'Announce _branches on LAN', '', 'gtk-preferences', 'gtk-about', '', 'gtk-quit']
 
 class NotifyPopupMenuTestCase(tests.TestCase):
 
@@ -39,3 +38,18 @@ class NotifyPopupMenuTestCase(tests.TestCase):
         self.assertEqual('gtk-preferences', items[4].props.label)
         self.assertEqual('gtk-about', items[5].props.label)
         self.assertEqual('gtk-quit', items[7].props.label)
+
+
+class BzrNotifyTestCase(tests.TestCase):
+
+    def test_smoketest(self):
+        # This is a smoke test to verify the process starts.
+        # The logic of the module must be moved into notify.py
+        # where it can be properly tested.
+        script = os.path.join(
+            os.path.dirname(__file__), os.pardir, 'bzr-notify')
+        bzr_notify = subprocess.Popen(
+            [script, 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = bzr_notify.communicate()
+        self.assertEqual('', stdout)
+        self.assertEqual('', stderr)
