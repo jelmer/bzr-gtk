@@ -35,6 +35,7 @@ from bzrlib.plugins.gtk.diff import (
     DiffController,
     DiffView,
     DiffWidget,
+    DiffWindow,
     iter_changes_to_status,
     MergeDirectiveController,
     )
@@ -129,6 +130,65 @@ class TestDiffWidget(tests.TestCaseWithTransport):
         widget.treeview.destroy()
         widget._treeview_cursor_cb(None)
         self.assertFalse(widget.diff_view.show_diff.called)
+
+
+class FakeDiffWindow(DiffWindow):
+
+    SHOW_WIDGETS = False
+
+
+class DiffWindowTestCase(tests.TestCaseWithTransport):
+
+    def test_init(self):
+        window = DiffWindow()
+        self.assertEqual('bzr diff', window.props.title)
+        self.assertEqual(0, window.props.border_width)
+
+    def test_init_construct_without_operations(self):
+        window = DiffWindow()
+        widgets = window.vbox.get_children()
+        self.assertEqual(2, len(widgets))
+        self.assertIsInstance(widgets[0], Gtk.MenuBar)
+        self.assertIsInstance(widgets[1], DiffWidget)
+
+    def test_init_construct_with_operations(self):
+        method = MockMethod()
+        window = DiffWindow(operations=[('title', method)])
+        widgets = window.vbox.get_children()
+        self.assertEqual(3, len(widgets))
+        self.assertIsInstance(widgets[0], Gtk.MenuBar)
+        self.assertIsInstance(widgets[1], Gtk.HButtonBox)
+        self.assertIsInstance(widgets[2], DiffWidget)
+
+    def test_get_menu_bar(self):
+        window = DiffWindow()
+        menu_bar = window._get_menu_bar()
+        self.assertIsNot(None, menu_bar)
+        menus = menu_bar.get_children()
+        self.assertEqual(1, len(menus))
+        self.assertEqual('_View', menus[0].props.label)
+        sub_menu = menus[0].get_submenu()
+        self.assertIsNot(None, sub_menu)
+        items = sub_menu.get_children()
+        self.assertEqual(1, len(items))
+        menus[0].get_submenu().get_children()[0].props.label
+        self.assertEqual('Wrap _Long Lines', items[0].props.label)
+
+    def test_get_button_bar_with_none(self):
+        window = DiffWindow()
+        self.assertIs(None, window._get_button_bar(None))
+
+    def test_get_button_bar_with_operations(self):
+        window = DiffWindow()
+        method = MockMethod()
+        button_bar = window._get_button_bar([('title', method)])
+        self.assertIsNot(None, button_bar)
+        buttons = button_bar.get_children()
+        self.assertEqual(1, len(buttons))
+        self.assertEqual('title', buttons[0].props.label)
+        buttons[0].emit('clicked')
+        self.assertIs(True, method.called)
+
 
 
 class MockDiffWidget(object):
