@@ -10,23 +10,8 @@ __author__ = "Scott James Remnant <scott@ubuntu.com>"
 
 from cStringIO import StringIO
 
-import os
-import re
 import sys
 import inspect
-try:
-    from xml.etree.ElementTree import (
-        Element,
-        SubElement,
-        tostring,
-        )
-    Element, SubElement, tostring  # Hush PEP8 redefinition.
-except ImportError:
-    from elementtree.ElementTree import (
-        Element,
-        SubElement,
-        tostring,
-        )
 
 from gi.repository import Gtk
 from gi.repository import Pango
@@ -35,11 +20,6 @@ try:
     have_gtksourceview = True
 except ImportError:
     have_gtksourceview = False
-try:
-    from gi.repository import GConf
-    have_gconf = True
-except ImportError:
-    have_gconf = False
 
 from bzrlib import (
     errors,
@@ -50,7 +30,6 @@ from bzrlib import (
     )
 from bzrlib.diff import show_diff_trees
 from bzrlib.patches import parse_patches
-from bzrlib.trace import warning
 from bzrlib.plugins.gtk.dialog import (
     error_dialog,
     info_dialog,
@@ -76,6 +55,8 @@ class SelectCancelled(Exception):
 class DiffFileView(Gtk.ScrolledWindow):
     """Window for displaying diffs from a diff file"""
 
+    SHOW_WIDGETS = True
+
     def __init__(self):
         super(DiffFileView, self).__init__()
         self.construct()
@@ -89,136 +70,18 @@ class DiffFileView(Gtk.ScrolledWindow):
             self.buffer = GtkSource.Buffer()
             lang_manager = GtkSource.LanguageManager.get_default()
             language = lang_manager.guess_language(None, "text/x-patch")
-            if have_gconf:
-                self.apply_gedit_colors(self.buffer)
-            self.apply_colordiff_colors(self.buffer)
             self.buffer.set_language(language)
             self.buffer.set_highlight_syntax(True)
-
             self.sourceview = GtkSource.View(buffer=self.buffer)
         else:
             self.buffer = Gtk.TextBuffer()
             self.sourceview = Gtk.TextView(self.buffer)
 
         self.sourceview.set_editable(False)
-        self.sourceview.modify_font(Pango.FontDescription("Monospace"))
+        self.sourceview.override_font(Pango.FontDescription("Monospace"))
         self.add(self.sourceview)
-        self.sourceview.show()
-
-    @staticmethod
-    def apply_gedit_colors(buf):
-        """Set style to that specified in gedit configuration.
-
-        This method needs the gconf module.
-
-        :param buf: a GtkSource.Buffer object.
-        """
-        GEDIT_SCHEME_PATH = '/apps/gedit-2/preferences/editor/colors/scheme'
-        GEDIT_USER_STYLES_PATH = os.path.expanduser('~/.gnome2/gedit/styles')
-
-        client = GConf.Client.get_default()
-        style_scheme_name = client.get_string(GEDIT_SCHEME_PATH)
-        if style_scheme_name is not None:
-            style_scheme_mgr = GtkSource.StyleSchemeManager()
-            style_scheme_mgr.append_search_path(GEDIT_USER_STYLES_PATH)
-
-            style_scheme = style_scheme_mgr.get_scheme(style_scheme_name)
-
-            if style_scheme is not None:
-                buf.set_style_scheme(style_scheme)
-
-    @classmethod
-    def apply_colordiff_colors(klass, buf):
-        """Set style colors for lang using the colordiff configuration file.
-
-        Both ~/.colordiffrc and ~/.colordiffrc.bzr-gtk are read.
-
-        :param buf: a "Diff" GtkSource.Buffer object.
-        """
-        scheme_manager = GtkSource.StyleSchemeManager()
-        style_scheme = scheme_manager.get_scheme('colordiff')
-
-        # if style scheme not found, we'll generate it from colordiffrc
-        # TODO: reload if colordiffrc has changed.
-        if style_scheme is None:
-            colors = {}
-
-            for f in ('~/.colordiffrc', '~/.colordiffrc.bzr-gtk'):
-                f = os.path.expanduser(f)
-                if os.path.exists(f):
-                    try:
-                        f = file(f)
-                    except IOError, e:
-                        warning('could not open file %s: %s' % (f, str(e)))
-                    else:
-                        colors.update(klass.parse_colordiffrc(f))
-                        f.close()
-
-            if not colors:
-                # ~/.colordiffrc does not exist
-                return
-
-            mapping = {
-                # map GtkSourceView2 scheme styles to colordiff names
-                # since GSV is richer, accept new names for extra bits,
-                # defaulting to old names if they're not present
-                'diff:added-line': ['newtext'],
-                'diff:removed-line': ['oldtext'],
-                'diff:location': ['location', 'diffstuff'],
-                'diff:file': ['file', 'diffstuff'],
-                'diff:special-case': ['specialcase', 'diffstuff'],
-            }
-
-            converted_colors = {}
-            for name, values in mapping.items():
-                color = None
-                for value in values:
-                    color = colors.get(value, None)
-                    if color is not None:
-                        break
-                if color is None:
-                    continue
-                converted_colors[name] = color
-
-            # some xml magic to produce needed style scheme description
-            e_style_scheme = Element('style-scheme')
-            e_style_scheme.set('id', 'colordiff')
-            e_style_scheme.set('_name', 'ColorDiff')
-            e_style_scheme.set('version', '1.0')
-            for name, color in converted_colors.items():
-                style = SubElement(e_style_scheme, 'style')
-                style.set('name', name)
-                style.set('foreground', '#%s' % color)
-
-            scheme_xml = tostring(e_style_scheme, 'UTF-8')
-            if not os.path.exists(os.path.expanduser(
-                '~/.local/share/gtksourceview-2.0/styles')):
-                os.makedirs(os.path.expanduser(
-                    '~/.local/share/gtksourceview-2.0/styles'))
-            file(os.path.expanduser(
-                '~/.local/share/gtksourceview-2.0/styles/colordiff.xml'),
-                'w').write(scheme_xml)
-
-            scheme_manager.force_rescan()
-            style_scheme = scheme_manager.get_scheme('colordiff')
-
-        buf.set_style_scheme(style_scheme)
-
-    @staticmethod
-    def parse_colordiffrc(fileobj):
-        """Parse fileobj as a colordiff configuration file.
-
-        :return: A dict with the key -> value pairs.
-        """
-        colors = {}
-        for line in fileobj:
-            if re.match(r'^\s*#', line):
-                continue
-            if '=' not in line:
-                continue
-            key, val = line.split('=', 1)
-            colors[key.strip()] = val.strip()
-        return colors
+        if self.SHOW_WIDGETS:
+            self.sourceview.show()
 
     def set_trees(self, rev_tree, parent_tree):
         self.rev_tree = rev_tree
