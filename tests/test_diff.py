@@ -15,7 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from cStringIO import StringIO
 import os
 
 from gi.repository import Gtk
@@ -33,9 +32,11 @@ from bzrlib.merge_directive import MergeDirective2
 
 from bzrlib.plugins.gtk.diff import (
     DiffController,
+    DiffFileView,
     DiffView,
     DiffWidget,
     DiffWindow,
+    have_gtksourceview,
     iter_changes_to_status,
     MergeDirectiveController,
     )
@@ -61,24 +62,29 @@ eg_diff = """\
  class TestDiffViewSimple(tests.TestCase):
 """
 
-class TestDiffViewSimple(tests.TestCase):
 
-    def test_parse_colordiffrc(self):
-        colordiffrc = '''\
-newtext=blue
-oldtext = Red
-# now a comment and a blank line
+class FakeDiffFileView(DiffFileView):
 
-diffstuff = #ffff00  
-  # another comment preceded by whitespace
-'''
-        colors = {
-                'newtext': 'blue',
-                'oldtext': 'Red',
-                'diffstuff': '#ffff00',
-        }
-        parsed_colors = DiffView.parse_colordiffrc(StringIO(colordiffrc))
-        self.assertEqual(colors, parsed_colors)
+    SHOW_WIDGETS = False
+
+
+class DiffFileViewTestCase(tests.TestCase):
+
+    def test_init_construct(self):
+        view = FakeDiffFileView()
+        self.assertIsNot(None, view.buffer)
+        self.assertIsNot(None, view.sourceview)
+        self.assertIs(False, view.sourceview.props.editable)
+        font_desc = view.sourceview.get_style_context().get_font(
+            Gtk.StateFlags.NORMAL)
+        self.assertIn('Monospace', font_desc.get_family())
+
+    def test_init_construct_have_gtksourceview(self):
+        if not have_gtksourceview:
+            return
+        view = FakeDiffFileView()
+        self.assertEqual('Diff', view.buffer.get_language().get_name())
+        self.assertIs(True, view.buffer.get_highlight_syntax())
 
 
 class TestDiffView(tests.TestCaseWithTransport):
