@@ -17,10 +17,11 @@
 from gi.repository import Gtk
 
 
-class PluginsPage(Gtk.VPaned):
+class PluginsPage(Gtk.Paned):
 
     def __init__(self):
         super(PluginsPage, self).__init__()
+        self.set_orientation(Gtk.Orientation.VERTICAL)
         self.set_border_width(12)
         self.set_position(216)
 

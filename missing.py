@@ -47,7 +47,7 @@ class MissingWindow(Gtk.Dialog):
 
     def _create(self):
         self.set_default_size(600, 600)
-        paned = Gtk.VPaned()
+        paned = Gtk.Paned.new(Gtk.Orientation.VERTICAL)
 
         frame = Gtk.Frame(label="You have the following extra revisions:")
 

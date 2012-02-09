@@ -15,7 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from gi.repository import GObject
 from gi.repository import Gtk
 
 from bzrlib.plugins.gtk.dialog import error_dialog
@@ -47,7 +46,7 @@ class TagsWindow(Window):
         self._vbox_buttons = Gtk.VBox()
         self._vbox_buttons_top = Gtk.VBox()
         self._vbox_buttons_bottom = Gtk.VBox()
-        self._vpaned = Gtk.VPaned()
+        self._vpaned = Gtk.Paned.new(Gtk.Orientation.VERTICAL)
 
         # Set callbacks
         self._button_add.connect('clicked', self._on_add_clicked)
@@ -198,6 +197,8 @@ class TagsWindow(Window):
         # Refresh RevisionView only if there are tags available
         if not self._no_tags:
             (path, col) = self._treeview_tags.get_cursor()
+            if path is None:
+                return  # The widget is being destroyed.
             revision = self._model[path][1]
             self._revisionview.set_revision(self.branch.repository.get_revision(revision))
 
