@@ -134,7 +134,7 @@ class BranchWindow(Window):
     def construct_paned(self):
         """Construct the main HPaned/VPaned contents."""
         if self.config.get_user_option('viz-vertical') == 'True':
-            self.paned = Gtk.HPaned()
+            self.paned = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
         else:
             self.paned = Gtk.Paned.new(Gtk.Orientation.VERTICAL)
 
@@ -373,7 +373,7 @@ class BranchWindow(Window):
         if self.config.get_user_option('viz-wide-diffs') == 'True':
             self.diff_paned = Gtk.Paned.new(Gtk.Orientation.VERTICAL)
         else:
-            self.diff_paned = Gtk.HPaned()
+            self.diff_paned = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
         (width, height) = self.get_size()
         self.diff_paned.set_size_request(20, 20) # shrinkable
 
