@@ -50,9 +50,13 @@ class TestConfig(tests.TestCaseInTempDir):
         self.assertIsInstance(width, str)
 
     def test_write(self):
-        """The window values are save"""
+        """The window state and pane position is saved."""
         conf = config.GAnnotateConfig(self.window)
         self.window.pane.set_position(200)
         self.assertIs(False, conf._write())
         self.assertEqual(200, conf['window']['pane_position'])
-        self.assertIs(True, os.path.isfile(gannotate_config_filename()))
+        config_path = gannotate_config_filename()
+        self.assertIs(True, os.path.isfile(config_path))
+        with open(config_path) as config_file:
+            config_data = config_file.read()
+        self.assertIn('pane_position = 200', config_data)
