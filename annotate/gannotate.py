@@ -220,7 +220,7 @@ class GAnnotateWindow(Window):
         hbox.show()
         vbox.pack_start(hbox, False, True, 0)
 
-        self.pane = pane = Gtk.VPaned()
+        self.pane = pane = Gtk.Paned.new(Gtk.Orientation.VERTICAL)
         pane.add1(swbox)
         pane.add2(self.revisionview)
         pane.show()
