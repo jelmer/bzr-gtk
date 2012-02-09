@@ -16,6 +16,8 @@
 
 """Test the annotate configuration functionality."""
 
+import os
+
 from bzrlib import (
     tests,
     )
@@ -24,6 +26,7 @@ from bzrlib.plugins.gtk.annotate import (
     config,
     gannotate,
     )
+from bzrlib.plugins.gtk.annotate.config import gannotate_config_filename
 
 
 class TestConfig(tests.TestCaseInTempDir):
@@ -45,3 +48,15 @@ class TestConfig(tests.TestCaseInTempDir):
         width = conf['window']['width']
         # configobj presents attributes as strings only
         self.assertIsInstance(width, str)
+
+    def test_write(self):
+        """The window state and pane position is saved."""
+        conf = config.GAnnotateConfig(self.window)
+        self.window.pane.set_position(200)
+        self.assertIs(False, conf._write())
+        self.assertEqual(200, conf['window']['pane_position'])
+        config_path = gannotate_config_filename()
+        self.assertIs(True, os.path.isfile(config_path))
+        with open(config_path) as config_file:
+            config_data = config_file.read()
+        self.assertIn('pane_position = 200', config_data)

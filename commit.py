@@ -279,7 +279,7 @@ class CommitDialog(Gtk.Dialog):
         """Build up the dialog widgets."""
         # The primary pane which splits it into left and right (adjustable)
         # sections.
-        self._hpane = Gtk.HPaned()
+        self._hpane = Gtk.Paned.new(Gtk.Orientation.HORIZONTAL)
 
         self._construct_left_pane()
         self._construct_right_pane()
