@@ -62,7 +62,8 @@ class GAnnotateConfig(configobj.ConfigObj):
         self.pane.set_position(self['window'].as_int('pane_position'))
         self.window.set_default_size(self['window'].as_int('width'),
                                      self['window'].as_int('height'))
-        self.window.move(self['window'].as_int('x'), self['window'].as_int('y'))
+        self.window.move(
+            self['window'].as_int('x'), self['window'].as_int('y'))
 
         if self['window'].as_bool('maximized'):
             self.window.maximize()
@@ -71,7 +72,6 @@ class GAnnotateConfig(configobj.ConfigObj):
         self.window.connect("destroy", self._write)
         self.window.connect("configure-event", self._save_window_props)
         self.window.connect("window-state-event", self._save_window_props)
-        self.pane.connect("notify", self._save_pane_props)
 
     def _save_window_props(self, w, e, *args):
         if e.window.get_state() & Gdk.WindowState.MAXIMIZED:
@@ -83,14 +83,11 @@ class GAnnotateConfig(configobj.ConfigObj):
         self["window"]["maximized"] = maximized
         return False
 
-    def _save_pane_props(self, w, gparam):
-        if gparam and gparam.name == "position":
-            self["window"]["pane_position"] = w.get_position()
-
-        return False
+    def _save_pane_props(self):
+        self["window"]["pane_position"] = self.pane.get_position()
 
     def _write(self, *args):
+        self._save_pane_props()
         config.ensure_config_dir_exists()
         self.write()
         return False
-
