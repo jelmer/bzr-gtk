@@ -15,7 +15,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-from gi.repository import GObject
 from gi.repository import Gtk
 
 from errors import show_bzr_error
@@ -39,7 +38,6 @@ class PushDialog(Gtk.Dialog):
         super(PushDialog, self).__init__(
             title="Push", parent=parent, flags=0,
             buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL))
-
 
         # Get arguments
         self.repository = repository
@@ -65,7 +63,6 @@ class PushDialog(Gtk.Dialog):
             self._label_location, False, False, 0)
         self._hbox_location.pack_start(self._combo, True, True, 0)
         self.get_content_area().pack_start(self._hbox_location, True, True, 0)
-        # XXX sinzui 2011-08-12: maybe False, False, 0
         self.get_action_area().pack_end(self._button_push, True, True, 0)
 
         # Show the dialog
@@ -79,7 +76,7 @@ class PushDialog(Gtk.Dialog):
         """Build up the location history. """
         self._combo_model = Gtk.ListStore(str)
         for item in self._history.get_entries():
-            self._combo_model.append([ item ])
+            self._combo_model.append([item])
         self._combo.set_model(self._combo_model)
         self._combo.set_entry_text_column(0)
 
@@ -97,8 +94,10 @@ class PushDialog(Gtk.Dialog):
         try:
             revs = do_push(self.branch, location=location, overwrite=False)
         except errors.DivergedBranches:
-            response = question_dialog(_i18n('Branches have been diverged'),
-                                       _i18n('You cannot push if branches have diverged.\nOverwrite?'))
+            response = question_dialog(
+                _i18n('Branches have been diverged'),
+                _i18n('You cannot push if branches have diverged.\n'
+                      'Overwrite?'))
             if response == Gtk.ResponseType.YES:
                 revs = do_push(self.branch, location=location, overwrite=True)
 
@@ -138,8 +137,10 @@ def do_push(br_from, location, overwrite):
             relurl = transport.relpath(location_url)
             transport.mkdir(relurl)
         except errors.NoSuchFile:
-            response = question_dialog(_i18n('Non existing parent directory'),
-                         _i18n("The parent directory (%s)\ndoesn't exist. Create?") % location)
+            response = question_dialog(
+                _i18n('Non existing parent directory'),
+                _i18n("The parent directory (%s)\ndoesn't exist. Create?")
+                    % location)
             if response == Gtk.ResponseType.OK:
                 transport.create_prefix()
             else:
