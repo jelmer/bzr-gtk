@@ -24,6 +24,14 @@ from gi.repository import Gtk
 from bzrlib.ui import UIFactory
 
 
+def main_iteration(function):
+    def with_main_iteration(self, *args, **kwargs):
+        function(self, *args, **kwargs)
+        while Gtk.events_pending():
+            Gtk.main_iteration()
+    return with_main_iteration
+
+
 class PromptDialog(Gtk.Dialog):
     """Prompt the user for a yes/no answer."""
 
@@ -46,10 +54,12 @@ class GtkProgressBar(Gtk.ProgressBar):
         self.current = None
         self.total = None
 
+    @main_iteration
     def tick(self):
         self.show()
         self.pulse()
 
+    @main_iteration
     def update(self, msg=None, current_cnt=None, total_cnt=None):
         self.show()
         if current_cnt is not None:
@@ -63,14 +73,15 @@ class GtkProgressBar(Gtk.ProgressBar):
             if self.fraction < 0.0 or self.fraction > 1.0:
                 raise AssertionError
             self.set_fraction(self.fraction)
-        while Gtk.events_pending():
-            Gtk.main_iteration()
 
+    @main_iteration
     def finished(self):
+        self.current = None
+        self.total = None
         self.hide()
 
     def clear(self):
-        self.hide()
+        self.finished()
 
 
 class ProgressBarWindow(Gtk.Window):
@@ -126,12 +137,12 @@ class ProgressPanel(Gtk.HBox):
         self.pb.update(*args, **kwargs)
 
     def finished(self):
-        self.pb.finished()
         self.hide()
+        self.pb.finished()
 
     def clear(self):
-        self.pb.clear()
         self.hide()
+        self.pb.clear()
 
 
 class PasswordDialog(Gtk.Dialog):
@@ -183,7 +194,7 @@ class GtkUIFactory(UIFactory):
         :param kwargs: Arguments which will be expanded into the prompt.
                        This lets front ends display different things if
                        they so choose.
-        :return: The password string, return None if the user 
+        :return: The password string, return None if the user
                  canceled the request.
         """
         dialog = PasswordDialog(prompt % kwargs)
@@ -210,3 +221,8 @@ class GtkUIFactory(UIFactory):
         self._progress_bar_widget.update(task.msg,
                                          task.current_cnt, task.total_cnt)
 
+    def report_transport_activity(self, transport, byte_count, direction):
+        """See UIFactory.report_transport_activity"""
+#        self._progress_view.show_transport_activity(transport,
+#            direction, byte_count)
+        self._progress_bar_widget.tick()
