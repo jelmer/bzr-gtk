@@ -225,6 +225,4 @@ class GtkUIFactory(UIFactory):
 
     def report_transport_activity(self, transport, byte_count, direction):
         """See UIFactory.report_transport_activity"""
-#        self._progress_view.show_transport_activity(transport,
-#            direction, byte_count)
         self._progress_bar_widget.tick()
