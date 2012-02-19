@@ -30,7 +30,6 @@ from bzrlib.push import _show_push_branch
 from bzrlib.plugins.gtk.history import UrlHistory
 from bzrlib.plugins.gtk.i18n import _i18n
 from bzrlib.plugins.gtk.ui import (
-    main_iteration,
     ProgressPanel,
     )
 
@@ -103,19 +102,14 @@ class PushDialog(Gtk.Dialog):
             if location is not None:
                 self._combo.get_child().set_text(location)
 
-    @main_iteration
-    def _start_push(self):
-        self.push_message.hide()
-        self.progress_widget.pb.set_text('Checking location')
-        self.progress_widget.tick()
-
     def _on_close_clicked(self, widget):
         """Close dialog handler."""
         ui.ui_factory.set_progress_bar_widget(None)
 
     def _on_push_clicked(self, widget):
         """Push button clicked handler. """
-        self._start_push()
+        self.push_message.hide()
+        self.progress_widget.tick()
         location = self._combo.get_child().get_text()
         do_push(self.branch, location, False, self.on_push_complete)
 
