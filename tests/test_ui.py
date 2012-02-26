@@ -28,3 +28,9 @@ class GtkUIFactoryTestCase(tests.TestCase):
     def test__init(self):
         ui_factory = ui.GtkUIFactory()
         self.assertIs(None, ui_factory._progress_bar_widget)
+
+    def test_set_progress_bar_widget(self):
+        ui_factory = ui.GtkUIFactory()
+        progress_widget = ui.ProgressPanel()
+        ui_factory.set_progress_bar_widget(progress_widget)
+        self.assertIs(progress_widget, ui_factory._progress_bar_widget)
