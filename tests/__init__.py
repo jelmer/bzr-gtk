@@ -40,17 +40,19 @@ def load_tests(basic_tests, module, loader):
 class MockMethod():
 
     @classmethod
-    def bind(klass, test_instance, obj, method_name):
+    def bind(klass, test_instance, obj, method_name, return_value=None):
         original_method = getattr(obj, method_name)
         test_instance.addCleanup(setattr, obj, method_name, original_method)
-        setattr(obj, method_name, klass())
+        setattr(obj, method_name, klass(return_value))
 
-    def __init__(self):
+    def __init__(self, return_value=None):
         self.called = False
         self.args = None
         self.kwargs = None
+        self.return_value = return_value
 
     def __call__(self, *args, **kwargs):
         self.called = True
         self.args = args
         self.kwargs = kwargs
+        return self.return_value
