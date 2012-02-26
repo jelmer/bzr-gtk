@@ -16,11 +16,14 @@
 
 """Test the ui functionality."""
 
+from gi.repository import Gtk
+
 from bzrlib import (
     tests,
     )
 
 from bzrlib.plugins.gtk import ui
+from bzrlib.plugins.gtk.tests import MockMethod
 
 
 class GtkUIFactoryTestCase(tests.TestCase):
@@ -34,3 +37,17 @@ class GtkUIFactoryTestCase(tests.TestCase):
         progress_widget = ui.ProgressPanel()
         ui_factory.set_progress_bar_widget(progress_widget)
         self.assertIs(progress_widget, ui_factory._progress_bar_widget)
+
+    def test_get_boolean_true(self):
+        ui_factory = ui.GtkUIFactory()
+        MockMethod.bind(self, ui.PromptDialog, 'run', Gtk.ResponseType.YES)
+        boolean_value = ui_factory.get_boolean('test')
+        self.assertIs(True, ui.PromptDialog.run.called)
+        self.assertIs(True, boolean_value)
+
+    def test_get_boolean_false(self):
+        ui_factory = ui.GtkUIFactory()
+        MockMethod.bind(self, ui.PromptDialog, 'run', Gtk.ResponseType.NO)
+        boolean_value = ui_factory.get_boolean('test')
+        self.assertIs(True, ui.PromptDialog.run.called)
+        self.assertIs(False, boolean_value)
