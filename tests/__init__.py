@@ -27,7 +27,10 @@ def load_tests(basic_tests, module, loader):
         'test_notify',
         'test_revisionview',
         'test_treemodel',
+        'test_ui',
         ]
+    if module != 'discover':
+        testmod_names = [name for name in testmod_names if name == module]
 
     basic_tests.addTest(loader.loadTestsFromModuleNames(
             ["%s.%s" % (__name__, tmn) for tmn in testmod_names]))
