@@ -23,7 +23,10 @@ from bzrlib import (
     )
 
 from bzrlib.plugins.gtk import ui
-from bzrlib.plugins.gtk.tests import MockMethod
+from bzrlib.plugins.gtk.tests import (
+    MockMethod,
+    MockProperty,
+    )
 
 
 class GtkUIFactoryTestCase(tests.TestCase):
@@ -51,3 +54,12 @@ class GtkUIFactoryTestCase(tests.TestCase):
         boolean_value = ui_factory.get_boolean('test')
         self.assertIs(True, ui.PromptDialog.run.called)
         self.assertIs(False, boolean_value)
+
+    def test_get_password(self):
+        ui_factory = ui.GtkUIFactory()
+        MockMethod.bind(self, ui.PasswordDialog, 'run', Gtk.ResponseType.OK)
+        MockProperty.bind(self, ui.PasswordDialog, 'passwd', 'secret')
+        password = ui_factory.get_password('test')
+        self.assertIs(True, ui.PasswordDialog.run.called)
+        #self.assertIs(True, ui.PasswordDialog.passwd.mock.called)
+        self.assertEqual('secret', password)

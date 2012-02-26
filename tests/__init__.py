@@ -56,3 +56,21 @@ class MockMethod():
         self.args = args
         self.kwargs = kwargs
         return self.return_value
+
+
+class MockProperty(MockMethod):
+
+    @classmethod
+    def bind(klass, test_instance, obj, method_name, return_value=None):
+        original_method = getattr(obj, method_name)
+        test_instance.addCleanup(setattr, obj, method_name, original_method)
+        mock = klass(return_value)
+        setattr(obj, method_name, property(mock.get_value, mock.set_value))
+
+    def get_value(self, other):
+        self.called = True
+        return self.return_value
+
+    def set_value(self, other, value):
+        self.called = True
+        self.return_value = value
