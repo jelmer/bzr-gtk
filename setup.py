@@ -24,10 +24,12 @@ import sys
 class Check(Command):
     description = "Run unit tests"
 
-    user_options = []
+    user_options = [
+        ('module=', 'm', 'The test module to run'),
+        ]
 
     def initialize_options(self):
-        pass
+        self.module = 'discover'
 
     def finalize_options(self):
         pass
@@ -42,7 +44,7 @@ class Check(Command):
         from bzrlib.plugins.gtk.tests import load_tests
         suite = TestSuite()
         loader = TestLoader()
-        load_tests(suite, None, loader)
+        load_tests(suite, self.module, loader)
         runner = TextTestRunner()
         result = runner.run(suite)
         return result.wasSuccessful()

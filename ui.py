@@ -19,9 +19,20 @@
 """GTK UI
 """
 
-from gi.repository import Gtk
+from gi.repository import (
+    Gtk,
+    )
 
 from bzrlib.ui import UIFactory
+
+
+def main_iteration(function):
+    def with_main_iteration(self, *args, **kwargs):
+        result = function(self, *args, **kwargs)
+        while Gtk.events_pending():
+            Gtk.main_iteration_do(False)
+        return result
+    return with_main_iteration
 
 
 class PromptDialog(Gtk.Dialog):
@@ -46,10 +57,12 @@ class GtkProgressBar(Gtk.ProgressBar):
         self.current = None
         self.total = None
 
+    @main_iteration
     def tick(self):
         self.show()
         self.pulse()
 
+    @main_iteration
     def update(self, msg=None, current_cnt=None, total_cnt=None):
         self.show()
         if current_cnt is not None:
@@ -59,21 +72,43 @@ class GtkProgressBar(Gtk.ProgressBar):
         if msg is not None:
             self.set_text(msg)
         if None not in (self.current, self.total):
-            self.fraction = float(self.current) / self.total
-            if self.fraction < 0.0 or self.fraction > 1.0:
-                raise AssertionError
-            self.set_fraction(self.fraction)
-        while Gtk.events_pending():
-            Gtk.main_iteration()
+            fraction = float(self.current) / self.total
+            if fraction < 0.0 or fraction > 1.0:
+                raise ValueError
+            self.set_fraction(fraction)
 
+    @main_iteration
     def finished(self):
+        self.set_fraction(0.0)
+        self.current = None
+        self.total = None
         self.hide()
 
     def clear(self):
+        self.finished()
+
+
+class ProgressContainerMixin:
+    """Expose GtkProgressBar methods to a container class."""
+
+    def tick(self, *args, **kwargs):
+        self.show_all()
+        self.pb.tick(*args, **kwargs)
+
+    def update(self, *args, **kwargs):
+        self.show_all()
+        self.pb.update(*args, **kwargs)
+
+    def finished(self):
         self.hide()
+        self.pb.finished()
+
+    def clear(self):
+        self.hide()
+        self.pb.clear()
 
 
-class ProgressBarWindow(Gtk.Window):
+class ProgressBarWindow(ProgressContainerMixin, Gtk.Window):
 
     def __init__(self):
         super(ProgressBarWindow, self).__init__(type=Gtk.WindowType.TOPLEVEL)
@@ -85,53 +120,19 @@ class ProgressBarWindow(Gtk.Window):
         self.resize(250, 15)
         self.set_resizable(False)
 
-    def tick(self, *args, **kwargs):
-        self.show_all()
-        self.pb.tick(*args, **kwargs)
 
-    def update(self, *args, **kwargs):
-        self.show_all()
-        self.pb.update(*args, **kwargs)
-
-    def finished(self):
-        self.pb.finished()
-        self.hide()
-        self.destroy()
-
-    def clear(self):
-        self.pb.clear()
-        self.hide()
-
-
-class ProgressPanel(Gtk.HBox):
+class ProgressPanel(ProgressContainerMixin, Gtk.Box):
 
     def __init__(self):
-        super(ProgressPanel, self).__init__()
+        super(ProgressPanel, self).__init__(Gtk.Orientation.HORIZONTAL, 5)
         image_loading = Gtk.Image.new_from_stock(Gtk.STOCK_REFRESH,
                                                  Gtk.IconSize.BUTTON)
         image_loading.show()
 
         self.pb = GtkProgressBar()
-        self.set_spacing(5)
         self.set_border_width(5)
         self.pack_start(image_loading, False, False, 0)
         self.pack_start(self.pb, True, True, 0)
-
-    def tick(self, *args, **kwargs):
-        self.show_all()
-        self.pb.tick(*args, **kwargs)
-
-    def update(self, *args, **kwargs):
-        self.show_all()
-        self.pb.update(*args, **kwargs)
-
-    def finished(self):
-        self.pb.finished()
-        self.hide()
-
-    def clear(self):
-        self.pb.clear()
-        self.hide()
 
 
 class PasswordDialog(Gtk.Dialog):
@@ -183,7 +184,7 @@ class GtkUIFactory(UIFactory):
         :param kwargs: Arguments which will be expanded into the prompt.
                        This lets front ends display different things if
                        they so choose.
-        :return: The password string, return None if the user 
+        :return: The password string, return None if the user
                  canceled the request.
         """
         dialog = PasswordDialog(prompt % kwargs)
@@ -201,12 +202,19 @@ class GtkUIFactory(UIFactory):
         if pbw:
             pbw.finished()
 
-    def _progress_updated(self, task):
-        """See UIFactory._progress_updated"""
+    def _ensure_progress_widget(self):
         if self._progress_bar_widget is None:
-            # Default to a window since nobody gave us a better mean to report
+            # Default to a window since nobody gave us a better means to report
             # progress.
             self.set_progress_bar_widget(ProgressBarWindow())
+
+    def _progress_updated(self, task):
+        """See UIFactory._progress_updated"""
+        self._ensure_progress_widget()
         self._progress_bar_widget.update(task.msg,
                                          task.current_cnt, task.total_cnt)
 
+    def report_transport_activity(self, transport, byte_count, direction):
+        """See UIFactory.report_transport_activity"""
+        self._ensure_progress_widget()
+        self._progress_bar_widget.tick()
