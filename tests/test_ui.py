@@ -240,6 +240,16 @@ class ProgressContainerMixin:
         self.assertIs(True, progress_widget.show_all.called)
         self.assertIs(True, progress_widget.pb.tick.called)
 
+    def test_update(self):
+        progress_widget = self.progress_container()
+        MockMethod.bind(self, progress_widget, 'show_all')
+        MockMethod.bind(self, progress_widget.pb, 'update')
+        progress_widget.update('test', 5, 10)
+        self.assertIs(True, progress_widget.show_all.called)
+        self.assertIs(True, progress_widget.pb.update.called)
+        self.assertEqual(
+            ('test', 5, 10), progress_widget.pb.update.args)
+
 
 class ProgressBarWindowTestCase(ProgressContainerMixin, tests.TestCase):
 
