@@ -27,6 +27,7 @@ from bzrlib.plugins.gtk.tests import (
     MockMethod,
     MockProperty,
     )
+from bzrlib.progress import ProgressTask
 
 
 class GtkUIFactoryTestCase(tests.TestCase):
@@ -65,10 +66,6 @@ class GtkUIFactoryTestCase(tests.TestCase):
         self.assertIs(True, mock_property.called)
         self.assertEqual('secret', password)
 
-    def test_progress_all_finished_without_widget(self):
-        ui_factory = ui.GtkUIFactory()
-        self.assertIs(None, ui_factory._progress_all_finished())
-
     def test_progress_all_finished_with_widget(self):
         ui_factory = ui.GtkUIFactory()
         progress_widget = ui.ProgressPanel()
@@ -76,3 +73,35 @@ class GtkUIFactoryTestCase(tests.TestCase):
         ui_factory.set_progress_bar_widget(progress_widget)
         self.assertIs(None, ui_factory._progress_all_finished())
         self.assertIs(True, progress_widget.finished.called)
+
+    def test_progress_all_finished_without_widget(self):
+        ui_factory = ui.GtkUIFactory()
+        self.assertIs(None, ui_factory._progress_all_finished())
+
+    def test_progress_updated_with_widget(self):
+        ui_factory = ui.GtkUIFactory()
+        progress_widget = ui.ProgressPanel()
+        MockMethod.bind(self, progress_widget, 'update')
+        ui_factory.set_progress_bar_widget(progress_widget)
+        task = ProgressTask()
+        task.msg = 'test'
+        task.current_cnt = 1
+        task.total_cnt = 2
+        self.assertIs(None, ui_factory._progress_updated(task))
+        self.assertIs(True, progress_widget.update.called)
+        self.assertEqual(
+            ('test', 1, 2), progress_widget.update.args)
+
+    def test_progress_updated_without_widget(self):
+        ui_factory = ui.GtkUIFactory()
+        MockMethod.bind(self, ui.ProgressBarWindow, 'update')
+        task = ProgressTask()
+        task.msg = 'test'
+        task.current_cnt = 1
+        task.total_cnt = 2
+        self.assertIs(None, ui_factory._progress_updated(task))
+        self.assertIsInstance(
+            ui_factory._progress_bar_widget, ui.ProgressBarWindow)
+        self.assertIs(True, ui_factory._progress_bar_widget.update.called)
+        self.assertEqual(
+            ('test', 1, 2), ui_factory._progress_bar_widget.update.args)
