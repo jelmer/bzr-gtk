@@ -53,113 +53,6 @@ class MainIterationTestCase(tests.TestCase):
         self.assertEqual('after', button.props.label)
 
 
-class GtkUIFactoryTestCase(tests.TestCase):
-
-    def test__init(self):
-        ui_factory = ui.GtkUIFactory()
-        self.assertIs(None, ui_factory._progress_bar_widget)
-
-    def test_set_progress_bar_widget(self):
-        ui_factory = ui.GtkUIFactory()
-        progress_widget = ui.ProgressPanel()
-        ui_factory.set_progress_bar_widget(progress_widget)
-        self.assertIs(progress_widget, ui_factory._progress_bar_widget)
-
-    def test_get_boolean_true(self):
-        ui_factory = ui.GtkUIFactory()
-        MockMethod.bind(self, ui.PromptDialog, 'run', Gtk.ResponseType.YES)
-        boolean_value = ui_factory.get_boolean('test')
-        self.assertIs(True, ui.PromptDialog.run.called)
-        self.assertIs(True, boolean_value)
-
-    def test_get_boolean_false(self):
-        ui_factory = ui.GtkUIFactory()
-        MockMethod.bind(self, ui.PromptDialog, 'run', Gtk.ResponseType.NO)
-        boolean_value = ui_factory.get_boolean('test')
-        self.assertIs(True, ui.PromptDialog.run.called)
-        self.assertIs(False, boolean_value)
-
-    def test_show_message(self):
-        ui_factory = ui.GtkUIFactory()
-        MockMethod.bind(self, ui.InfoDialog, 'run', Gtk.ResponseType.CLOSE)
-        ui_factory.show_message('test')
-        self.assertIs(True, ui.InfoDialog.run.called)
-
-    def test_show_warning(self):
-        ui_factory = ui.GtkUIFactory()
-        MockMethod.bind(self, ui.WarningDialog, 'run', Gtk.ResponseType.CLOSE)
-        ui_factory.show_warning('test')
-        self.assertIs(True, ui.WarningDialog.run.called)
-
-    def test_get_password(self):
-        ui_factory = ui.GtkUIFactory()
-        MockMethod.bind(self, ui.PasswordDialog, 'run', Gtk.ResponseType.OK)
-        mock_property = MockProperty.bind(
-            self, ui.PasswordDialog, 'passwd', 'secret')
-        password = ui_factory.get_password('test')
-        self.assertIs(True, ui.PasswordDialog.run.called)
-        self.assertIs(True, mock_property.called)
-        self.assertEqual('secret', password)
-
-    def test_progress_all_finished_with_widget(self):
-        ui_factory = ui.GtkUIFactory()
-        progress_widget = ui.ProgressPanel()
-        MockMethod.bind(self, progress_widget, 'finished')
-        ui_factory.set_progress_bar_widget(progress_widget)
-        self.assertIs(None, ui_factory._progress_all_finished())
-        self.assertIs(True, progress_widget.finished.called)
-
-    def test_progress_all_finished_without_widget(self):
-        ui_factory = ui.GtkUIFactory()
-        self.assertIs(None, ui_factory._progress_all_finished())
-
-    def test_progress_updated_with_widget(self):
-        ui_factory = ui.GtkUIFactory()
-        progress_widget = ui.ProgressPanel()
-        MockMethod.bind(self, progress_widget, 'update')
-        ui_factory.set_progress_bar_widget(progress_widget)
-        task = ProgressTask()
-        task.msg = 'test'
-        task.current_cnt = 1
-        task.total_cnt = 2
-        self.assertIs(None, ui_factory._progress_updated(task))
-        self.assertIs(True, progress_widget.update.called)
-        self.assertEqual(
-            ('test', 1, 2), progress_widget.update.args)
-
-    def test_progress_updated_without_widget(self):
-        ui_factory = ui.GtkUIFactory()
-        MockMethod.bind(self, ui.ProgressBarWindow, 'update')
-        task = ProgressTask()
-        task.msg = 'test'
-        task.current_cnt = 1
-        task.total_cnt = 2
-        self.assertIs(None, ui_factory._progress_updated(task))
-        self.assertIsInstance(
-            ui_factory._progress_bar_widget, ui.ProgressBarWindow)
-        self.assertIs(True, ui_factory._progress_bar_widget.update.called)
-        self.assertEqual(
-            ('test', 1, 2), ui_factory._progress_bar_widget.update.args)
-
-    def test_report_transport_activity_with_widget(self):
-        ui_factory = ui.GtkUIFactory()
-        progress_widget = ui.ProgressPanel()
-        MockMethod.bind(self, progress_widget, 'tick')
-        ui_factory.set_progress_bar_widget(progress_widget)
-        self.assertIs(
-            None, ui_factory.report_transport_activity(None, None, None))
-        self.assertIs(True, progress_widget.tick.called)
-
-    def test_report_transport_activity_without_widget(self):
-        ui_factory = ui.GtkUIFactory()
-        MockMethod.bind(self, ui.ProgressBarWindow, 'tick')
-        self.assertIs(
-            None, ui_factory.report_transport_activity(None, None, None))
-        self.assertIsInstance(
-            ui_factory._progress_bar_widget, ui.ProgressBarWindow)
-        self.assertIs(True, ui.ProgressBarWindow.tick.called)
-
-
 class PromptDialogTestCase(tests.TestCase):
 
     def test_init(self):
@@ -341,3 +234,110 @@ class ProgressPanelTestCase(ProgressContainerMixin, tests.TestCase):
         widgets = pb_window.get_children()
         # The image's stock and icon_name properties are always None?
         self.assertIsInstance(widgets[0], Gtk.Image)
+
+
+class GtkUIFactoryTestCase(tests.TestCase):
+
+    def test__init(self):
+        ui_factory = ui.GtkUIFactory()
+        self.assertIs(None, ui_factory._progress_bar_widget)
+
+    def test_set_progress_bar_widget(self):
+        ui_factory = ui.GtkUIFactory()
+        progress_widget = ui.ProgressPanel()
+        ui_factory.set_progress_bar_widget(progress_widget)
+        self.assertIs(progress_widget, ui_factory._progress_bar_widget)
+
+    def test_get_boolean_true(self):
+        ui_factory = ui.GtkUIFactory()
+        MockMethod.bind(self, ui.PromptDialog, 'run', Gtk.ResponseType.YES)
+        boolean_value = ui_factory.get_boolean('test')
+        self.assertIs(True, ui.PromptDialog.run.called)
+        self.assertIs(True, boolean_value)
+
+    def test_get_boolean_false(self):
+        ui_factory = ui.GtkUIFactory()
+        MockMethod.bind(self, ui.PromptDialog, 'run', Gtk.ResponseType.NO)
+        boolean_value = ui_factory.get_boolean('test')
+        self.assertIs(True, ui.PromptDialog.run.called)
+        self.assertIs(False, boolean_value)
+
+    def test_show_message(self):
+        ui_factory = ui.GtkUIFactory()
+        MockMethod.bind(self, ui.InfoDialog, 'run', Gtk.ResponseType.CLOSE)
+        ui_factory.show_message('test')
+        self.assertIs(True, ui.InfoDialog.run.called)
+
+    def test_show_warning(self):
+        ui_factory = ui.GtkUIFactory()
+        MockMethod.bind(self, ui.WarningDialog, 'run', Gtk.ResponseType.CLOSE)
+        ui_factory.show_warning('test')
+        self.assertIs(True, ui.WarningDialog.run.called)
+
+    def test_get_password(self):
+        ui_factory = ui.GtkUIFactory()
+        MockMethod.bind(self, ui.PasswordDialog, 'run', Gtk.ResponseType.OK)
+        mock_property = MockProperty.bind(
+            self, ui.PasswordDialog, 'passwd', 'secret')
+        password = ui_factory.get_password('test')
+        self.assertIs(True, ui.PasswordDialog.run.called)
+        self.assertIs(True, mock_property.called)
+        self.assertEqual('secret', password)
+
+    def test_progress_all_finished_with_widget(self):
+        ui_factory = ui.GtkUIFactory()
+        progress_widget = ui.ProgressPanel()
+        MockMethod.bind(self, progress_widget, 'finished')
+        ui_factory.set_progress_bar_widget(progress_widget)
+        self.assertIs(None, ui_factory._progress_all_finished())
+        self.assertIs(True, progress_widget.finished.called)
+
+    def test_progress_all_finished_without_widget(self):
+        ui_factory = ui.GtkUIFactory()
+        self.assertIs(None, ui_factory._progress_all_finished())
+
+    def test_progress_updated_with_widget(self):
+        ui_factory = ui.GtkUIFactory()
+        progress_widget = ui.ProgressPanel()
+        MockMethod.bind(self, progress_widget, 'update')
+        ui_factory.set_progress_bar_widget(progress_widget)
+        task = ProgressTask()
+        task.msg = 'test'
+        task.current_cnt = 1
+        task.total_cnt = 2
+        self.assertIs(None, ui_factory._progress_updated(task))
+        self.assertIs(True, progress_widget.update.called)
+        self.assertEqual(
+            ('test', 1, 2), progress_widget.update.args)
+
+    def test_progress_updated_without_widget(self):
+        ui_factory = ui.GtkUIFactory()
+        MockMethod.bind(self, ui.ProgressBarWindow, 'update')
+        task = ProgressTask()
+        task.msg = 'test'
+        task.current_cnt = 1
+        task.total_cnt = 2
+        self.assertIs(None, ui_factory._progress_updated(task))
+        self.assertIsInstance(
+            ui_factory._progress_bar_widget, ui.ProgressBarWindow)
+        self.assertIs(True, ui_factory._progress_bar_widget.update.called)
+        self.assertEqual(
+            ('test', 1, 2), ui_factory._progress_bar_widget.update.args)
+
+    def test_report_transport_activity_with_widget(self):
+        ui_factory = ui.GtkUIFactory()
+        progress_widget = ui.ProgressPanel()
+        MockMethod.bind(self, progress_widget, 'tick')
+        ui_factory.set_progress_bar_widget(progress_widget)
+        self.assertIs(
+            None, ui_factory.report_transport_activity(None, None, None))
+        self.assertIs(True, progress_widget.tick.called)
+
+    def test_report_transport_activity_without_widget(self):
+        ui_factory = ui.GtkUIFactory()
+        MockMethod.bind(self, ui.ProgressBarWindow, 'tick')
+        self.assertIs(
+            None, ui_factory.report_transport_activity(None, None, None))
+        self.assertIsInstance(
+            ui_factory._progress_bar_widget, ui.ProgressBarWindow)
+        self.assertIs(True, ui.ProgressBarWindow.tick.called)
