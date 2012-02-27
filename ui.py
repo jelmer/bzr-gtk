@@ -42,6 +42,15 @@ class PromptDialog(Gtk.MessageDialog):
             Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, prompt)
 
 
+class InfoDialog(Gtk.MessageDialog):
+    """Show the user an informational message."""
+
+    def __init__(self, prompt, parent=None):
+        super(InfoDialog, self).__init__(
+            parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+            Gtk.MessageType.INFO, Gtk.ButtonsType.CLOSE, prompt)
+
+
 class GtkProgressBar(Gtk.ProgressBar):
 
     def __init__(self):
@@ -169,6 +178,12 @@ class GtkUIFactory(UIFactory):
         response = dialog.run()
         dialog.destroy()
         return (response == Gtk.ResponseType.YES)
+
+    def show_message(self, msg):
+        """See UIFactory.show_message."""
+        dialog = InfoDialog(msg)
+        dialog.run()
+        dialog.destroy()
 
     def get_password(self, prompt='', **kwargs):
         """Prompt the user for a password.

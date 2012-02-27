@@ -79,6 +79,12 @@ class GtkUIFactoryTestCase(tests.TestCase):
         self.assertIs(True, ui.PromptDialog.run.called)
         self.assertIs(False, boolean_value)
 
+    def test_show_message(self):
+        ui_factory = ui.GtkUIFactory()
+        MockMethod.bind(self, ui.InfoDialog, 'run', Gtk.ResponseType.CLOSE)
+        ui_factory.show_message('test')
+        self.assertIs(True, ui.InfoDialog.run.called)
+
     def test_get_password(self):
         ui_factory = ui.GtkUIFactory()
         MockMethod.bind(self, ui.PasswordDialog, 'run', Gtk.ResponseType.OK)
@@ -158,6 +164,17 @@ class PromptDialogTestCase(tests.TestCase):
         buttons = dialog.get_action_area().get_children()
         self.assertEqual('gtk-yes', buttons[0].props.label)
         self.assertEqual('gtk-no', buttons[1].props.label)
+
+
+class InfoDialogTestCase(tests.TestCase):
+
+    def test_init(self):
+        # The label and buttons are created, then shown.
+        dialog = ui.InfoDialog('test 123')
+        self.assertEqual('test 123', dialog.props.text)
+        self.assertEqual(Gtk.MessageType.INFO, dialog.props.message_type)
+        buttons = dialog.get_action_area().get_children()
+        self.assertEqual('gtk-close', buttons[0].props.label)
 
 
 class PasswordDialogTestCase(tests.TestCase):
