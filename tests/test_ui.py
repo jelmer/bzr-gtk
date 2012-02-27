@@ -128,6 +128,7 @@ class GtkUIFactoryTestCase(tests.TestCase):
 class PromptDialogTestCase(tests.TestCase):
 
     def test__init(self):
+        # tthe label and buttons are created, then shown.
         MockMethod.bind(self, Gtk.Box, 'show_all')
         dialog = ui.PromptDialog('test 123')
         content_area = dialog.get_content_area()
@@ -147,6 +148,7 @@ class PromptDialogTestCase(tests.TestCase):
 class PasswordDialogTestCase(tests.TestCase):
 
     def test__init(self):
+        # The label, password entry, and buttons are created, then shown.
         MockMethod.bind(self, Gtk.Box, 'show_all')
         dialog = ui.PasswordDialog('test password')
         content_area = dialog.get_content_area()
