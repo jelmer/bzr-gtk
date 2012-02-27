@@ -64,3 +64,15 @@ class GtkUIFactoryTestCase(tests.TestCase):
         self.assertIs(True, ui.PasswordDialog.run.called)
         self.assertIs(True, mock_property.called)
         self.assertEqual('secret', password)
+
+    def test_progress_all_finished_without_widget(self):
+        ui_factory = ui.GtkUIFactory()
+        self.assertIs(None, ui_factory._progress_all_finished())
+
+    def test_progress_all_finished_with_widget(self):
+        ui_factory = ui.GtkUIFactory()
+        progress_widget = ui.ProgressPanel()
+        MockMethod.bind(self, progress_widget, 'finished')
+        ui_factory.set_progress_bar_widget(progress_widget)
+        self.assertIs(None, ui_factory._progress_all_finished())
+        self.assertIs(True, progress_widget.finished.called)
