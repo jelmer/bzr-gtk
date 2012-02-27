@@ -230,7 +230,20 @@ class GtkProgressBarTestCase(tests.TestCase):
         self.assertIs(True, progress_bar.finished.called)
 
 
-class ProgressBarWindowTestCase(tests.TestCase):
+class ProgressContainerMixin:
+
+    def test_tick(self):
+        progress_widget = self.progress_container()
+        MockMethod.bind(self, progress_widget, 'show_all')
+        MockMethod.bind(self, progress_widget.pb, 'tick')
+        progress_widget.tick()
+        self.assertIs(True, progress_widget.show_all.called)
+        self.assertIs(True, progress_widget.pb.tick.called)
+
+
+class ProgressBarWindowTestCase(ProgressContainerMixin, tests.TestCase):
+
+    progress_container = ui.ProgressBarWindow
 
     def test_init(self):
         pb_window = ui.ProgressBarWindow()
