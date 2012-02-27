@@ -30,6 +30,16 @@ from bzrlib.plugins.gtk.tests import (
 from bzrlib.progress import ProgressTask
 
 
+class MainIterationTestCase(tests.TestCase):
+
+    def test_main_iteration(self):
+        def test_func(self):
+            return True
+        decorated_func = ui.main_iteration(test_func)
+        result = decorated_func(object())
+        self.assertIs(True, result)
+
+
 class GtkUIFactoryTestCase(tests.TestCase):
 
     def test__init(self):

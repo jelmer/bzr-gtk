@@ -28,9 +28,10 @@ from bzrlib.ui import UIFactory
 
 def main_iteration(function):
     def with_main_iteration(self, *args, **kwargs):
-        function(self, *args, **kwargs)
+        result = function(self, *args, **kwargs)
         while Gtk.events_pending():
             Gtk.main_iteration_do(False)
+        return result
     return with_main_iteration
 
 
