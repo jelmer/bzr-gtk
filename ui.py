@@ -78,6 +78,7 @@ class GtkProgressBar(Gtk.ProgressBar):
 
     @main_iteration
     def finished(self):
+        self.set_fraction(0.0)
         self.current = None
         self.total = None
         self.hide()

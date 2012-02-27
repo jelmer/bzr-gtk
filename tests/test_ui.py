@@ -183,6 +183,7 @@ class GtkProgressBarTestCase(tests.TestCase):
         progress_bar = ui.GtkProgressBar()
         progress_bar.tick()
         self.assertIs(True, progress_bar.show.called)
+        self.assetEqual('with_main_iteration', progress_bar.tick.__name__)
 
     def test_update_with_data(self):
         # update() shows the widget, sets the fraction, then clears the pending
@@ -194,6 +195,7 @@ class GtkProgressBarTestCase(tests.TestCase):
         self.assertEqual(0.5, progress_bar.props.fraction)
         self.assertEqual(10, progress_bar.total)
         self.assertEqual(5, progress_bar.current)
+        self.assetEqual('with_main_iteration', progress_bar.update.__name__)
 
     def test_update_without_data(self):
         progress_bar = ui.GtkProgressBar()
