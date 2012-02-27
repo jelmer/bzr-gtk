@@ -14,26 +14,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+import os
+
 
 def load_tests(basic_tests, module, loader):
-    testmod_names = [
-        'test_annotate_config',
-        'test_avatarsbox',
-        'test_commit',
-        'test_diff',
-        'test_history',
-        'test_graphcell',
-        'test_linegraph',
-        'test_notify',
-        'test_revisionview',
-        'test_treemodel',
-        'test_ui',
-        ]
-    if module != 'discover':
-        testmod_names = [name for name in testmod_names if name == module]
-
-    basic_tests.addTest(loader.loadTestsFromModuleNames(
-            ["%s.%s" % (__name__, tmn) for tmn in testmod_names]))
+    if module == 'discover':
+        here = os.path.abspath(os.path.dirname(__file__))
+        basic_tests.addTest(loader.discover(here))
+    else:
+        full_name = "%s.%s" % (__name__, module)
+        basic_tests.addTest(loader.loadTestsFromModuleNames([full_name]))
     return basic_tests
 
 
