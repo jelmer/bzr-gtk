@@ -123,3 +123,11 @@ class GtkUIFactoryTestCase(tests.TestCase):
         self.assertIsInstance(
             ui_factory._progress_bar_widget, ui.ProgressBarWindow)
         self.assertIs(True, ui.ProgressBarWindow.tick.called)
+
+
+class PromptDialogTestCase(tests.TestCase):
+
+    def test__init(self):
+        dialog = ui.PromptDialog('test 123')
+        label = dialog.get_content_area().get_children()[0]
+        self.assertEqual('test 123', label.props.label)
