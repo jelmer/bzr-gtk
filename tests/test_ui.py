@@ -228,3 +228,13 @@ class GtkProgressBarTestCase(tests.TestCase):
         progress_bar = ui.GtkProgressBar()
         progress_bar.finished()
         self.assertIs(True, progress_bar.finished.called)
+
+
+class ProgressBarWindowTestCase(tests.TestCase):
+
+    def test_init(self):
+        pb_window = ui.ProgressBarWindow()
+        self.assertEqual('Progress', pb_window.props.title)
+        self.assertEqual(
+            Gtk.WindowPosition.CENTER_ALWAYS, pb_window.props.window_position)
+        self.assertIsInstance(pb_window.pb, ui.GtkProgressBar)
