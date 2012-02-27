@@ -19,9 +19,7 @@
 """GTK UI
 """
 
-from gi.repository import (
-    Gtk,
-    )
+from gi.repository import Gtk
 
 from bzrlib.ui import UIFactory
 
