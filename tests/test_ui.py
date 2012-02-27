@@ -127,7 +127,7 @@ class GtkUIFactoryTestCase(tests.TestCase):
 
 class PromptDialogTestCase(tests.TestCase):
 
-    def test__init(self):
+    def test_init(self):
         # tthe label and buttons are created, then shown.
         MockMethod.bind(self, Gtk.Box, 'show_all')
         dialog = ui.PromptDialog('test 123')
@@ -147,7 +147,7 @@ class PromptDialogTestCase(tests.TestCase):
 
 class PasswordDialogTestCase(tests.TestCase):
 
-    def test__init(self):
+    def test_init(self):
         # The label, password entry, and buttons are created, then shown.
         MockMethod.bind(self, Gtk.Box, 'show_all')
         dialog = ui.PasswordDialog('test password')
@@ -165,3 +165,23 @@ class PasswordDialogTestCase(tests.TestCase):
         self.assertEqual(
             Gtk.ResponseType.OK,
             dialog.get_response_for_widget(buttons[1]))
+
+
+class GtkProgressBarTestCase(tests.TestCase):
+
+    def test_init(self):
+        progress_bar = ui.GtkProgressBar()
+        self.assertEqual(0.0, progress_bar.props.fraction)
+        self.assertIs(None, progress_bar.total)
+        self.assertIs(None, progress_bar.current)
+
+    def test_tick(self):
+        # tick() shows the widget, does one pulse, then clears the pending
+        # events in the main loop.
+        MockMethod.bind(self, ui.GtkProgressBar, 'show')
+        MockMethod.bind(self, ui.GtkProgressBar, 'pulse')
+        progress_bar = ui.GtkProgressBar()
+        progress_bar.tick()
+        self.assertIs(True, progress_bar.show.called)
+        self.assertIs(True, progress_bar.pulse.called)
+        self.assertEqual('with_main_iteration', progress_bar.tick.__name__)
