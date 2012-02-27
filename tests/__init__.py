@@ -14,6 +14,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+__all__ = [
+    'load_tests',
+    'MockMethod',
+    'MockProperty',
+    ]
+
 import os
 
 
@@ -27,7 +33,7 @@ def load_tests(basic_tests, module, loader):
     return basic_tests
 
 
-class MockMethod():
+class MockMethod(object):
 
     @classmethod
     def bind(klass, test_instance, obj, method_name, return_value=None):
