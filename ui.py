@@ -120,7 +120,7 @@ class ProgressBarWindow(ProgressContainerMixin, Gtk.Window):
         self.set_resizable(False)
 
 
-class ProgressPanel(Gtk.HBox):
+class ProgressPanel(ProgressContainerMixin, Gtk.HBox):
 
     def __init__(self):
         super(ProgressPanel, self).__init__()
@@ -133,22 +133,6 @@ class ProgressPanel(Gtk.HBox):
         self.set_border_width(5)
         self.pack_start(image_loading, False, False, 0)
         self.pack_start(self.pb, True, True, 0)
-
-    def tick(self, *args, **kwargs):
-        self.show_all()
-        self.pb.tick(*args, **kwargs)
-
-    def update(self, *args, **kwargs):
-        self.show_all()
-        self.pb.update(*args, **kwargs)
-
-    def finished(self):
-        self.hide()
-        self.pb.finished()
-
-    def clear(self):
-        self.hide()
-        self.pb.clear()
 
 
 class PasswordDialog(Gtk.Dialog):
