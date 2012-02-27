@@ -214,15 +214,19 @@ class GtkUIFactory(UIFactory):
         if pbw:
             pbw.finished()
 
-    def _progress_updated(self, task):
-        """See UIFactory._progress_updated"""
+    def _ensure_progress_widget(self):
         if self._progress_bar_widget is None:
-            # Default to a window since nobody gave us a better mean to report
+            # Default to a window since nobody gave us a better means to report
             # progress.
             self.set_progress_bar_widget(ProgressBarWindow())
+
+    def _progress_updated(self, task):
+        """See UIFactory._progress_updated"""
+        self._ensure_progress_widget()
         self._progress_bar_widget.update(task.msg,
                                          task.current_cnt, task.total_cnt)
 
     def report_transport_activity(self, transport, byte_count, direction):
         """See UIFactory.report_transport_activity"""
+        self._ensure_progress_widget()
         self._progress_bar_widget.tick()

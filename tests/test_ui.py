@@ -105,3 +105,21 @@ class GtkUIFactoryTestCase(tests.TestCase):
         self.assertIs(True, ui_factory._progress_bar_widget.update.called)
         self.assertEqual(
             ('test', 1, 2), ui_factory._progress_bar_widget.update.args)
+
+    def test_report_transport_activity_with_widget(self):
+        ui_factory = ui.GtkUIFactory()
+        progress_widget = ui.ProgressPanel()
+        MockMethod.bind(self, progress_widget, 'tick')
+        ui_factory.set_progress_bar_widget(progress_widget)
+        self.assertIs(
+            None, ui_factory.report_transport_activity(None, None, None))
+        self.assertIs(True, progress_widget.tick.called)
+
+    def test_report_transport_activity_without_widget(self):
+        ui_factory = ui.GtkUIFactory()
+        MockMethod.bind(self, ui.ProgressBarWindow, 'tick')
+        self.assertIs(
+            None, ui_factory.report_transport_activity(None, None, None))
+        self.assertIsInstance(
+            ui_factory._progress_bar_widget, ui.ProgressBarWindow)
+        self.assertIs(True, ui.ProgressBarWindow.tick.called)
