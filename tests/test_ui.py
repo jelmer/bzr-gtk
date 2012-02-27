@@ -138,3 +138,20 @@ class PromptDialogTestCase(tests.TestCase):
         self.assertEqual('gtk-yes', buttons[1].props.label)
         self.assertEqual(
             Gtk.ResponseType.YES, dialog.get_response_for_widget(buttons[1]))
+
+
+class PasswordDialogTestCase(tests.TestCase):
+
+    def test__init(self):
+        dialog = ui.PasswordDialog('test password')
+        widgets = dialog.get_content_area().get_children()
+        self.assertEqual('test password', widgets[0].props.label)
+        self.assertEqual(False, widgets[1].props.visibility)
+        buttons = dialog.get_action_area().get_children()
+        self.assertEqual('gtk-cancel', buttons[0].props.label)
+        self.assertEqual(
+            Gtk.ResponseType.CANCEL, dialog.get_response_for_widget(buttons[0]))
+        self.assertEqual('gtk-ok', buttons[1].props.label)
+        self.assertEqual(
+            Gtk.ResponseType.OK,
+            dialog.get_response_for_widget(buttons[1]))
