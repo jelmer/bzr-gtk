@@ -58,8 +58,9 @@ class GtkUIFactoryTestCase(tests.TestCase):
     def test_get_password(self):
         ui_factory = ui.GtkUIFactory()
         MockMethod.bind(self, ui.PasswordDialog, 'run', Gtk.ResponseType.OK)
-        MockProperty.bind(self, ui.PasswordDialog, 'passwd', 'secret')
+        mock_property = MockProperty.bind(
+            self, ui.PasswordDialog, 'passwd', 'secret')
         password = ui_factory.get_password('test')
         self.assertIs(True, ui.PasswordDialog.run.called)
-        #self.assertIs(True, ui.PasswordDialog.passwd.mock.called)
+        self.assertIs(True, mock_property.called)
         self.assertEqual('secret', password)

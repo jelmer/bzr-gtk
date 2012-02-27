@@ -66,6 +66,7 @@ class MockProperty(MockMethod):
         test_instance.addCleanup(setattr, obj, method_name, original_method)
         mock = klass(return_value)
         setattr(obj, method_name, property(mock.get_value, mock.set_value))
+        return mock
 
     def get_value(self, other):
         self.called = True
