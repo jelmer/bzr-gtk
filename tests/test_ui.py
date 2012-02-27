@@ -252,11 +252,19 @@ class ProgressContainerMixin:
 
     def test_finished(self):
         progress_widget = self.progress_container()
-        MockMethod.bind(self, progress_widget, 'show_all')
+        MockMethod.bind(self, progress_widget, 'hide')
         MockMethod.bind(self, progress_widget.pb, 'finished')
         progress_widget.finished()
-        self.assertIs(True, progress_widget.show_all.called)
+        self.assertIs(True, progress_widget.hide.called)
         self.assertIs(True, progress_widget.pb.finished.called)
+
+    def test_clear(self):
+        progress_widget = self.progress_container()
+        MockMethod.bind(self, progress_widget, 'hide')
+        MockMethod.bind(self, progress_widget.pb, 'clear')
+        progress_widget.clear()
+        self.assertIs(True, progress_widget.hide.called)
+        self.assertIs(True, progress_widget.pb.clear.called)
 
 
 class ProgressBarWindowTestCase(ProgressContainerMixin, tests.TestCase):
