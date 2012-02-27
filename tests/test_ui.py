@@ -291,6 +291,21 @@ class GtkUIFactoryTestCase(tests.TestCase):
         ui_factory.show_error('test')
         self.assertIs(True, ui.ErrorDialog.run.called)
 
+    def test_show_user_warning(self):
+        ui_factory = ui.GtkUIFactory()
+        MockMethod.bind(self, ui.WarningDialog, 'run', Gtk.ResponseType.CLOSE)
+        ui_factory.show_user_warning(
+            'recommend_upgrade', current_format_name='1.0', basedir='./test')
+        self.assertIs(True, ui.WarningDialog.run.called)
+
+    def test_show_user_warning_supressed(self):
+        ui_factory = ui.GtkUIFactory()
+        ui_factory.suppressed_warnings.add('recommend_upgrade')
+        MockMethod.bind(self, ui.WarningDialog, 'run', Gtk.ResponseType.CLOSE)
+        ui_factory.show_user_warning(
+            'recommend_upgrade', current_format_name='1.0', basedir='./test')
+        self.assertIs(False, ui.WarningDialog.run.called)
+
     def test_get_password(self):
         ui_factory = ui.GtkUIFactory()
         MockMethod.bind(self, ui.PasswordDialog, 'run', Gtk.ResponseType.OK)

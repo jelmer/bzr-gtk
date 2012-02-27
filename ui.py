@@ -211,6 +211,12 @@ class GtkUIFactory(UIFactory):
         dialog.run()
         dialog.destroy()
 
+    def show_user_warning(self, warning_id, **message_args):
+        """See UIFactory.show_user_warning."""
+        if warning_id not in self.suppressed_warnings:
+            message = self.format_user_warning(warning_id, message_args)
+            self.show_warning(message)
+
     def get_password(self, prompt='', **kwargs):
         """Prompt the user for a password.
 
