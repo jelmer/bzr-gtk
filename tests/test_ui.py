@@ -194,4 +194,16 @@ class GtkProgressBarTestCase(tests.TestCase):
         self.assertEqual(0.5, progress_bar.props.fraction)
         self.assertEqual(10, progress_bar.total)
         self.assertEqual(5, progress_bar.current)
-        self.assertEqual('with_main_iteration', progress_bar.tick.__name__)
+
+    def test_update_without_data(self):
+        progress_bar = ui.GtkProgressBar()
+        progress_bar.update(current_cnt=5, total_cnt=None)
+        self.assertEqual(0.0, progress_bar.props.fraction)
+        self.assertIs(None, progress_bar.total)
+        self.assertEqual(5, progress_bar.current)
+
+    def test_update_with_insane_data(self):
+        # The fraction must be between 0.0 and 1.0.
+        progress_bar = ui.GtkProgressBar()
+        self.assertRaises(
+            ValueError, progress_bar.update, None, 20, 2)
