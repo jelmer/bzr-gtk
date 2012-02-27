@@ -33,11 +33,24 @@ from bzrlib.progress import ProgressTask
 class MainIterationTestCase(tests.TestCase):
 
     def test_main_iteration(self):
+        # The main_iteration decorator iterates over the pending Gtk events
+        # after calling its function so that the UI is updated too.
+        button = Gtk.ToggleButton(label='before')
+
+        def event_listener(button):
+            button.props.label = 'after'
+
+        button.connect('clicked', event_listener)
+
         def test_func(self):
+            button.emit('clicked')
             return True
+
         decorated_func = ui.main_iteration(test_func)
         result = decorated_func(object())
         self.assertIs(True, result)
+        self.assertIs(False, Gtk.events_pending())
+        self.assertEqual('after', button.props.label)
 
 
 class GtkUIFactoryTestCase(tests.TestCase):
