@@ -183,5 +183,15 @@ class GtkProgressBarTestCase(tests.TestCase):
         progress_bar = ui.GtkProgressBar()
         progress_bar.tick()
         self.assertIs(True, progress_bar.show.called)
-        self.assertIs(True, progress_bar.pulse.called)
+
+    def test_update_with_data(self):
+        # update() shows the widget, sets the fraction, then clears the pending
+        # events in the main loop.
+        MockMethod.bind(self, ui.GtkProgressBar, 'show')
+        progress_bar = ui.GtkProgressBar()
+        progress_bar.update(msg='test', current_cnt=5, total_cnt=10)
+        self.assertIs(True, progress_bar.show.called)
+        self.assertEqual(0.5, progress_bar.props.fraction)
+        self.assertEqual(10, progress_bar.total)
+        self.assertEqual(5, progress_bar.current)
         self.assertEqual('with_main_iteration', progress_bar.tick.__name__)

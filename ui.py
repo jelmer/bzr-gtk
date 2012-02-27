@@ -71,10 +71,10 @@ class GtkProgressBar(Gtk.ProgressBar):
         if msg is not None:
             self.set_text(msg)
         if None not in (self.current, self.total):
-            self.fraction = float(self.current) / self.total
-            if self.fraction < 0.0 or self.fraction > 1.0:
+            fraction = float(self.current) / self.total
+            if fraction < 0.0 or fraction > 1.0:
                 raise AssertionError
-            self.set_fraction(self.fraction)
+            self.set_fraction(fraction)
 
     @main_iteration
     def finished(self):
