@@ -87,17 +87,8 @@ class GtkProgressBar(Gtk.ProgressBar):
         self.finished()
 
 
-class ProgressBarWindow(Gtk.Window):
-
-    def __init__(self):
-        super(ProgressBarWindow, self).__init__(type=Gtk.WindowType.TOPLEVEL)
-        self.set_border_width(0)
-        self.set_title("Progress")
-        self.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
-        self.pb = GtkProgressBar()
-        self.add(self.pb)
-        self.resize(250, 15)
-        self.set_resizable(False)
+class ProgressContainerMixin:
+    """Expose GtkProgressBar methods to a container class."""
 
     def tick(self, *args, **kwargs):
         self.show_all()
@@ -108,13 +99,25 @@ class ProgressBarWindow(Gtk.Window):
         self.pb.update(*args, **kwargs)
 
     def finished(self):
-        self.pb.finished()
         self.hide()
-        self.destroy()
+        self.pb.finished()
 
     def clear(self):
-        self.pb.clear()
         self.hide()
+        self.pb.clear()
+
+
+class ProgressBarWindow(ProgressContainerMixin, Gtk.Window):
+
+    def __init__(self):
+        super(ProgressBarWindow, self).__init__(type=Gtk.WindowType.TOPLEVEL)
+        self.set_border_width(0)
+        self.set_title("Progress")
+        self.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
+        self.pb = GtkProgressBar()
+        self.add(self.pb)
+        self.resize(250, 15)
+        self.set_resizable(False)
 
 
 class ProgressPanel(Gtk.HBox):
