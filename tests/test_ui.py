@@ -152,20 +152,12 @@ class PromptDialogTestCase(tests.TestCase):
 
     def test_init(self):
         # The label and buttons are created, then shown.
-        MockMethod.bind(self, Gtk.Box, 'show_all')
         dialog = ui.PromptDialog('test 123')
-        content_area = dialog.get_content_area()
-        self.assertIs(True, dialog.get_content_area().show_all.called)
-        self.assertIs(1, dialog.get_content_area().show_all.call_count)
-        label = content_area.get_children()[0]
-        self.assertEqual('test 123', label.props.label)
+        self.assertEqual('test 123', dialog.props.text)
+        self.assertEqual(Gtk.MessageType.QUESTION, dialog.props.message_type)
         buttons = dialog.get_action_area().get_children()
-        self.assertEqual('gtk-no', buttons[0].props.label)
-        self.assertEqual(
-            Gtk.ResponseType.NO, dialog.get_response_for_widget(buttons[0]))
-        self.assertEqual('gtk-yes', buttons[1].props.label)
-        self.assertEqual(
-            Gtk.ResponseType.YES, dialog.get_response_for_widget(buttons[1]))
+        self.assertEqual('gtk-yes', buttons[0].props.label)
+        self.assertEqual('gtk-no', buttons[1].props.label)
 
 
 class PasswordDialogTestCase(tests.TestCase):

@@ -33,18 +33,13 @@ def main_iteration(function):
     return with_main_iteration
 
 
-class PromptDialog(Gtk.Dialog):
+class PromptDialog(Gtk.MessageDialog):
     """Prompt the user for a yes/no answer."""
 
-    def __init__(self, prompt):
-        super(PromptDialog, self).__init__()
-
-        label = Gtk.Label(label=prompt)
-        self.get_content_area().pack_start(label, True, True, 10)
-        self.get_content_area().show_all()
-
-        self.add_buttons(Gtk.STOCK_YES, Gtk.ResponseType.YES, Gtk.STOCK_NO,
-                         Gtk.ResponseType.NO)
+    def __init__(self, prompt, parent=None):
+        super(PromptDialog, self).__init__(
+            parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+            Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, prompt)
 
 
 class GtkProgressBar(Gtk.ProgressBar):
