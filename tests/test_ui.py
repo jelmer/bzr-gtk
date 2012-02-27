@@ -176,18 +176,18 @@ class GtkProgressBarTestCase(tests.TestCase):
         self.assertIs(None, progress_bar.current)
 
     def test_tick(self):
-        # tick() shows the widget, does one pulse, then clears the pending
+        # tick() shows the widget, does one pulse, then handles the pending
         # events in the main loop.
         MockMethod.bind(self, ui.GtkProgressBar, 'show')
         MockMethod.bind(self, ui.GtkProgressBar, 'pulse')
         progress_bar = ui.GtkProgressBar()
         progress_bar.tick()
         self.assertIs(True, progress_bar.show.called)
-        self.assetEqual('with_main_iteration', progress_bar.tick.__name__)
+        self.assertEqual('with_main_iteration', progress_bar.tick.__name__)
 
     def test_update_with_data(self):
-        # update() shows the widget, sets the fraction, then clears the pending
-        # events in the main loop.
+        # update() shows the widget, sets the fraction, then handles the
+        # pending events in the main loop.
         MockMethod.bind(self, ui.GtkProgressBar, 'show')
         progress_bar = ui.GtkProgressBar()
         progress_bar.update(msg='test', current_cnt=5, total_cnt=10)
@@ -195,7 +195,7 @@ class GtkProgressBarTestCase(tests.TestCase):
         self.assertEqual(0.5, progress_bar.props.fraction)
         self.assertEqual(10, progress_bar.total)
         self.assertEqual(5, progress_bar.current)
-        self.assetEqual('with_main_iteration', progress_bar.update.__name__)
+        self.assertEqual('with_main_iteration', progress_bar.update.__name__)
 
     def test_update_without_data(self):
         progress_bar = ui.GtkProgressBar()
@@ -209,3 +209,22 @@ class GtkProgressBarTestCase(tests.TestCase):
         progress_bar = ui.GtkProgressBar()
         self.assertRaises(
             ValueError, progress_bar.update, None, 20, 2)
+
+    def test_finished(self):
+        # finished() hides the widget, resets the state, then handles the
+        # pending events in the main loop.
+        MockMethod.bind(self, ui.GtkProgressBar, 'hide')
+        progress_bar = ui.GtkProgressBar()
+        progress_bar.finished()
+        self.assertIs(True, progress_bar.hide.called)
+        self.assertEqual(0.0, progress_bar.props.fraction)
+        self.assertIs(None, progress_bar.total)
+        self.assertIs(None, progress_bar.current)
+        self.assertEqual('with_main_iteration', progress_bar.finished.__name__)
+
+    def test_clear(self):
+        # clear() is synonymous with finished.
+        MockMethod.bind(self, ui.GtkProgressBar, 'finished')
+        progress_bar = ui.GtkProgressBar()
+        progress_bar.finished()
+        self.assertIs(True, progress_bar.finished.called)
