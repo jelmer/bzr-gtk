@@ -195,7 +195,7 @@ class GtkUIFactory(UIFactory):
             return None
 
     def _progress_all_finished(self):
-        """See UIFactory._progress_all_finished"""
+        """See UIFactory._progress_all_finished."""
         pbw = self._progress_bar_widget
         if pbw:
             pbw.finished()
@@ -207,12 +207,12 @@ class GtkUIFactory(UIFactory):
             self.set_progress_bar_widget(ProgressBarWindow())
 
     def _progress_updated(self, task):
-        """See UIFactory._progress_updated"""
+        """See UIFactory._progress_updated."""
         self._ensure_progress_widget()
         self._progress_bar_widget.update(task.msg,
                                          task.current_cnt, task.total_cnt)
 
     def report_transport_activity(self, transport, byte_count, direction):
-        """See UIFactory.report_transport_activity"""
+        """See UIFactory.report_transport_activity."""
         self._ensure_progress_widget()
         self._progress_bar_widget.tick()
