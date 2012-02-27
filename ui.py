@@ -59,6 +59,12 @@ class WarningDialog(InfoDialog):
     MESSAGE_TYPE = Gtk.MessageType.WARNING
 
 
+class ErrorDialog(InfoDialog):
+    """Show the user a warning message."""
+
+    MESSAGE_TYPE = Gtk.MessageType.ERROR
+
+
 class GtkProgressBar(Gtk.ProgressBar):
 
     def __init__(self):
@@ -194,8 +200,14 @@ class GtkUIFactory(UIFactory):
         dialog.destroy()
 
     def show_warning(self, msg):
-        """See UIFactory.show_message."""
+        """See UIFactory.show_warning."""
         dialog = WarningDialog(msg)
+        dialog.run()
+        dialog.destroy()
+
+    def show_error(self, msg):
+        """See UIFactory.show_error."""
+        dialog = ErrorDialog(msg)
         dialog.run()
         dialog.destroy()
 
