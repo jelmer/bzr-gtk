@@ -47,12 +47,14 @@ class MockMethod():
 
     def __init__(self, return_value=None):
         self.called = False
+        self.call_count = 0
         self.args = None
         self.kwargs = None
         self.return_value = return_value
 
     def __call__(self, *args, **kwargs):
         self.called = True
+        self.call_count += 1
         self.args = args
         self.kwargs = kwargs
         return self.return_value

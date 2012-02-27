@@ -128,8 +128,12 @@ class GtkUIFactoryTestCase(tests.TestCase):
 class PromptDialogTestCase(tests.TestCase):
 
     def test__init(self):
+        MockMethod.bind(self, Gtk.Box, 'show_all')
         dialog = ui.PromptDialog('test 123')
-        label = dialog.get_content_area().get_children()[0]
+        content_area = dialog.get_content_area()
+        self.assertIs(True, dialog.get_content_area().show_all.called)
+        self.assertIs(1, dialog.get_content_area().show_all.call_count)
+        label = content_area.get_children()[0]
         self.assertEqual('test 123', label.props.label)
         buttons = dialog.get_action_area().get_children()
         self.assertEqual('gtk-no', buttons[0].props.label)
@@ -143,14 +147,18 @@ class PromptDialogTestCase(tests.TestCase):
 class PasswordDialogTestCase(tests.TestCase):
 
     def test__init(self):
+        MockMethod.bind(self, Gtk.Box, 'show_all')
         dialog = ui.PasswordDialog('test password')
-        widgets = dialog.get_content_area().get_children()
+        content_area = dialog.get_content_area()
+        self.assertIs(True, dialog.get_content_area().show_all.called)
+        widgets = content_area.get_children()
         self.assertEqual('test password', widgets[0].props.label)
         self.assertEqual(False, widgets[1].props.visibility)
         buttons = dialog.get_action_area().get_children()
         self.assertEqual('gtk-cancel', buttons[0].props.label)
         self.assertEqual(
-            Gtk.ResponseType.CANCEL, dialog.get_response_for_widget(buttons[0]))
+            Gtk.ResponseType.CANCEL,
+            dialog.get_response_for_widget(buttons[0]))
         self.assertEqual('gtk-ok', buttons[1].props.label)
         self.assertEqual(
             Gtk.ResponseType.OK,
