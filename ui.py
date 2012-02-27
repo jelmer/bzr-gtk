@@ -120,16 +120,15 @@ class ProgressBarWindow(ProgressContainerMixin, Gtk.Window):
         self.set_resizable(False)
 
 
-class ProgressPanel(ProgressContainerMixin, Gtk.HBox):
+class ProgressPanel(ProgressContainerMixin, Gtk.Box):
 
     def __init__(self):
-        super(ProgressPanel, self).__init__()
+        super(ProgressPanel, self).__init__(Gtk.Orientation.HORIZONTAL, 5)
         image_loading = Gtk.Image.new_from_stock(Gtk.STOCK_REFRESH,
                                                  Gtk.IconSize.BUTTON)
         image_loading.show()
 
         self.pb = GtkProgressBar()
-        self.set_spacing(5)
         self.set_border_width(5)
         self.pack_start(image_loading, False, False, 0)
         self.pack_start(self.pb, True, True, 0)

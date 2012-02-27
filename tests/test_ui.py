@@ -285,4 +285,10 @@ class ProgressPanelTestCase(ProgressContainerMixin, tests.TestCase):
 
     def test_init(self):
         pb_window = ui.ProgressPanel()
+        self.assertEqual(
+            Gtk.Orientation.HORIZONTAL, pb_window.props.orientation)
+        self.assertEqual(5, pb_window.props.spacing)
         self.assertIsInstance(pb_window.pb, ui.GtkProgressBar)
+        widgets = pb_window.get_children()
+        # The image's stock and icon_name properties are always None?
+        self.assertIsInstance(widgets[0], Gtk.Image)
