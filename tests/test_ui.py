@@ -131,3 +131,10 @@ class PromptDialogTestCase(tests.TestCase):
         dialog = ui.PromptDialog('test 123')
         label = dialog.get_content_area().get_children()[0]
         self.assertEqual('test 123', label.props.label)
+        buttons = dialog.get_action_area().get_children()
+        self.assertEqual('gtk-no', buttons[0].props.label)
+        self.assertEqual(
+            Gtk.ResponseType.NO, dialog.get_response_for_widget(buttons[0]))
+        self.assertEqual('gtk-yes', buttons[1].props.label)
+        self.assertEqual(
+            Gtk.ResponseType.YES, dialog.get_response_for_widget(buttons[1]))
