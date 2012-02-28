@@ -1,25 +1,37 @@
 #!/usr/bin/python
 """GTK+ Frontends for various Bazaar commands."""
 
-from info import *
+import os
+import sys
+
+from info import bzr_plugin_version
 
 from distutils.core import setup, Command
 from distutils.command.install_data import install_data
 from distutils.command.build import build
 from distutils.command.sdist import sdist
 try:
-    from DistUtilsExtra.command import *
+    from DistUtilsExtra.command import build_i18n
 except ImportError:
-   # Python distutils extra is not available.
-    class cmd_build_i18n(Command):
+    # Python distutils extra is not available.
+    class cmd_build_i18n(build):
+        user_options = []
+
+        def initialize_options(self):
+            self.domain = None
+            self.desktop_files = None
+
+        def finalize_options(self):
+            pass
+
         def run(self):
-            print >> sys.stderr, "For internationalization support you'll need to install https://launchpad.net/python-distutils-extra"
+            print >> sys.stderr, (
+                "For internationalization support you'll need to install "
+                "https://launchpad.net/python-distutils-extra")
 else:
     # Use build_i18n from DistUtilsExtra
     cmd_build_i18n = build_i18n.build_i18n
 
-import os
-import sys
 
 class Check(Command):
     description = "Run unit tests"
@@ -40,7 +52,8 @@ class Check(Command):
     def run(self):
         from bzrlib.tests import TestLoader, TestSuite, TextTestRunner
         from bzrlib.plugin import PluginImporter
-        PluginImporter.specific_paths["bzrlib.plugins.gtk"] = os.path.dirname(__file__)
+        PluginImporter.specific_paths["bzrlib.plugins.gtk"] = os.path.dirname(
+            __file__)
         from bzrlib.plugins.gtk.tests import load_tests
         suite = TestSuite()
         loader = TestLoader()
@@ -65,7 +78,8 @@ class CreateCredits(Command):
         return 'build_credits'
 
     def run(self):
-        from bzrlib.plugin import load_plugins; load_plugins()
+        from bzrlib.plugin import load_plugins
+        load_plugins()
         from bzrlib.branch import Branch
         from bzrlib.plugins.stats.cmds import find_credits
 
@@ -128,15 +142,15 @@ if __name__ == '__main__':
     version = bzr_plugin_version[:3]
     version_string = ".".join([str(x) for x in version])
     setup(
-        name = "bzr-gtk",
-        version = version_string,
-        maintainer = "Jelmer Vernooij",
-        maintainer_email = "jelmer@samba.org",
-        description = "GTK+ Frontends for various Bazaar commands",
-        license = "GNU GPL v2 or later",
-        scripts = ['bzr-handle-patch', 'bzr-notify'],
-        url = "http://bazaar-vcs.org/BzrGtk",
-        package_dir = {
+        name="bzr-gtk",
+        version=version_string,
+        maintainer="Jelmer Vernooij",
+        maintainer_email="jelmer@samba.org",
+        description="GTK+ Frontends for various Bazaar commands",
+        license="GNU GPL v2 or later",
+        scripts=['bzr-handle-patch', 'bzr-notify'],
+        url="http://bazaar-vcs.org/BzrGtk",
+        package_dir={
             "bzrlib.plugins.gtk": ".",
             "bzrlib.plugins.gtk.viz": "viz",
             "bzrlib.plugins.gtk.annotate": "annotate",
@@ -144,7 +158,7 @@ if __name__ == '__main__':
             "bzrlib.plugins.gtk.branchview": "branchview",
             "bzrlib.plugins.gtk.preferences": "preferences",
             },
-        packages = [
+        packages=[
             "bzrlib.plugins.gtk",
             "bzrlib.plugins.gtk.viz",
             "bzrlib.plugins.gtk.annotate",
@@ -152,7 +166,7 @@ if __name__ == '__main__':
             "bzrlib.plugins.gtk.branchview",
             "bzrlib.plugins.gtk.preferences",
         ],
-        data_files=[ ('share/bzr-gtk', ['credits.pickle']),
+        data_files=[('share/bzr-gtk', ['credits.pickle']),
                     ('share/bzr-gtk/icons', ['icons/commit.png',
                                              'icons/commit16.png',
                                              'icons/diff.png',
@@ -178,7 +192,8 @@ if __name__ == '__main__':
                                             'bzr-notify.desktop']),
                     ('share/application-registry', ['bzr-gtk.applications']),
                     ('share/pixmaps', ['icons/bzr-icon-64.png']),
-                    ('share/icons/hicolor/scalable/apps', ['icons/bzr-panel.svg']),
+                    ('share/icons/hicolor/scalable/apps',
+                        ['icons/bzr-panel.svg']),
                     ('share/icons/hicolor/scalable/emblems',
                      ['icons/emblem-bzr-added.svg',
                       'icons/emblem-bzr-conflict.svg',
