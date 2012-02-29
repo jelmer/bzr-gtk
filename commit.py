@@ -288,7 +288,12 @@ class CommitDialog(Gtk.Dialog):
             self._check_local.hide()
             return
         if have_dbus:
-            bus = dbus.SystemBus()
+            try:
+                bus = dbus.SystemBus()
+            except dbus.DBusException:
+                trace.mutter("DBus system bus not available")
+                self._check_local.show()
+                return
             try:
                 proxy_obj = bus.get_object('org.freedesktop.NetworkManager',
                                            '/org/freedesktop/NetworkManager')
