@@ -59,4 +59,6 @@ class BzrNotifyTestCase(tests.TestCase):
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=self.env)
         stdout, stderr = bzr_notify.communicate()
         self.assertEqual('', stdout)
-        self.assertEqual('', stderr)
+        self.assertTrue(
+            stderr in (
+            '', 'ERROR:root:Could not find any typelib for AppIndicator3\n'))

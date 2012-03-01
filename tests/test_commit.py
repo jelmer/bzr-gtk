@@ -51,7 +51,7 @@ class TestPendingRevisions(tests.TestCaseWithTransport):
         tree.commit('one')
 
         self.addCleanup(tree.lock_read().unlock)
-        self.assertIs(None, commit.pending_revisions(tree))
+        self.assertEquals([], list(commit.pending_revisions(tree)))
 
     def test_pending_revisions_simple(self):
         tree = self.make_branch_and_tree('tree')
@@ -62,7 +62,7 @@ class TestPendingRevisions(tests.TestCaseWithTransport):
         self.assertEqual([rev_id1, rev_id2], tree.get_parent_ids())
 
         self.addCleanup(tree.lock_read().unlock)
-        pending_revisions = commit.pending_revisions(tree)
+        pending_revisions = list(commit.pending_revisions(tree))
         # One primary merge
         self.assertEqual(1, len(pending_revisions))
         # Revision == rev_id2
@@ -81,7 +81,7 @@ class TestPendingRevisions(tests.TestCaseWithTransport):
         self.assertEqual([rev_id1, rev_id4], tree.get_parent_ids())
 
         self.addCleanup(tree.lock_read().unlock)
-        pending_revisions = commit.pending_revisions(tree)
+        pending_revisions = list(commit.pending_revisions(tree))
         # One primary merge
         self.assertEqual(1, len(pending_revisions))
         # Revision == rev_id2
@@ -105,7 +105,7 @@ class TestPendingRevisions(tests.TestCaseWithTransport):
         self.assertEqual([rev_id1, rev_id3, rev_id5], tree.get_parent_ids())
 
         self.addCleanup(tree.lock_read().unlock)
-        pending_revisions = commit.pending_revisions(tree)
+        pending_revisions = list(commit.pending_revisions(tree))
         # Two primary merges
         self.assertEqual(2, len(pending_revisions))
         # Revision == rev_id2
@@ -174,7 +174,7 @@ class TestCommitDialogSimple(tests.TestCaseWithTransport):
 
         dlg = CommitDialogNoWidgets(tree)
         self.assertEqual(rev_id, dlg._basis_tree.get_revision_id())
-        self.assertIs(None, dlg._pending)
+        self.assertEquals([], dlg._pending)
         self.assertFalse(dlg._is_checkout)
 
     def test_setup_parameters_checkout(self):
@@ -185,7 +185,7 @@ class TestCommitDialogSimple(tests.TestCaseWithTransport):
 
         dlg = CommitDialogNoWidgets(tree2)
         self.assertEqual(rev_id, dlg._basis_tree.get_revision_id())
-        self.assertIs(None, dlg._pending)
+        self.assertEquals([], dlg._pending)
         self.assertTrue(dlg._is_checkout)
 
     def test_setup_parameters_pending(self):

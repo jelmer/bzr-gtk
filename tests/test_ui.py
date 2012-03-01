@@ -56,7 +56,7 @@ class MainIterationTestCase(tests.TestCase):
 class PromptDialogTestCase(tests.TestCase):
 
     def test_init(self):
-        # The text and buttons are created, then shown.
+        # The text and buttons are created.
         dialog = ui.PromptDialog('test 123')
         self.assertEqual('test 123', dialog.props.text)
         self.assertEqual(Gtk.MessageType.QUESTION, dialog.props.message_type)
@@ -68,7 +68,7 @@ class PromptDialogTestCase(tests.TestCase):
 class InfoDialogTestCase(tests.TestCase):
 
     def test_init(self):
-        # The text and buttons are created, then shown.
+        # The text and buttons are created.
         dialog = ui.InfoDialog('test 123')
         self.assertEqual('test 123', dialog.props.text)
         self.assertEqual(Gtk.MessageType.INFO, dialog.props.message_type)
@@ -79,7 +79,7 @@ class InfoDialogTestCase(tests.TestCase):
 class WarningDialogTestCase(tests.TestCase):
 
     def test_init(self):
-        # The tezt and buttons are created, then shown.
+        # The text and buttons are created.
         dialog = ui.WarningDialog('test 123')
         self.assertEqual('test 123', dialog.props.text)
         self.assertEqual(Gtk.MessageType.WARNING, dialog.props.message_type)
@@ -90,7 +90,7 @@ class WarningDialogTestCase(tests.TestCase):
 class ErrorDialogTestCase(tests.TestCase):
 
     def test_init(self):
-        # The tezt and buttons are created, then shown.
+        # The text and buttons are created, then shown.
         dialog = ui.ErrorDialog('test 123')
         self.assertEqual('test 123', dialog.props.text)
         self.assertEqual(Gtk.MessageType.ERROR, dialog.props.message_type)

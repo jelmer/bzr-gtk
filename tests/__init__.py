@@ -23,13 +23,23 @@ __all__ = [
 import os
 
 
-def load_tests(basic_tests, module, loader):
-    if module == 'discover':
-        here = os.path.abspath(os.path.dirname(__file__))
-        basic_tests.addTest(loader.discover(here))
+def discover_test_names(module_or_name):
+    if isinstance(module_or_name, basestring):
+        match = module_or_name
     else:
-        full_name = "%s.%s" % (__name__, module)
-        basic_tests.addTest(loader.loadTestsFromModuleNames([full_name]))
+        match = ''
+    file_names = os.listdir(os.path.dirname(__file__))
+    test_names = set()
+    for file_name in file_names:
+        name, ext = os.path.splitext(file_name)
+        if name.startswith('test_') and ext == '.py' and match in name:
+            test_names.add("%s.%s" % (__name__, name))
+    return test_names
+
+
+def load_tests(basic_tests, module, loader):
+    test_names = discover_test_names(module)
+    basic_tests.addTest(loader.loadTestsFromModuleNames(test_names))
     return basic_tests
 
 

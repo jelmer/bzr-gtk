@@ -25,7 +25,9 @@ from bzrlib import (
     bencode,
     errors,
     osutils,
+    revision as _mod_revision,
     trace,
+    tsort,
     )
 from bzrlib.plugins.gtk.dialog import question_dialog
 from bzrlib.plugins.gtk.errors import show_bzr_error
@@ -40,6 +42,32 @@ except ImportError:
     have_dbus = False
 
 
+def _get_sorted_revisions(tip_revision, revision_ids, parent_map):
+    """Get an iterator which will return the revisions in merge sorted order.
+
+    This will build up a list of all nodes, such that only nodes in the list
+    are referenced. It then uses MergeSorter to return them in 'merge-sorted'
+    order.
+
+    :param revision_ids: A set of revision_ids
+    :param parent_map: The parent information for each node. Revisions which
+        are considered ghosts should not be present in the map.
+    :return: iterator from MergeSorter.iter_topo_order()
+    """
+    # MergeSorter requires that all nodes be present in the graph, so get rid
+    # of any references pointing outside of this graph.
+    parent_graph = {}
+    for revision_id in revision_ids:
+        if revision_id not in parent_map: # ghost
+            parent_graph[revision_id] = []
+        else:
+            # Only include parents which are in this sub-graph
+            parent_graph[revision_id] = [p for p in parent_map[revision_id]
+                                            if p in revision_ids]
+    sorter = tsort.MergeSorter(parent_graph, tip_revision)
+    return sorter.iter_topo_order()
+
+
 def pending_revisions(wt):
     """Return a list of pending merges or None if there are none of them.
 
@@ -50,7 +78,7 @@ def pending_revisions(wt):
     """
     parents = wt.get_parent_ids()
     if len(parents) < 2:
-        return None
+        return
 
     # The basic pending merge algorithm uses the same algorithm as
     # bzrlib.status.show_pending_merges
@@ -58,35 +86,56 @@ def pending_revisions(wt):
     branch = wt.branch
     last_revision = parents[0]
 
-    if last_revision is not None:
-        graph = branch.repository.get_graph()
-        ignore = set([r for r,ps in graph.iter_ancestry([last_revision])])
-    else:
-        ignore = set([])
+    graph = branch.repository.get_graph()
+    other_revisions = [last_revision]
 
     pm = []
     for merge in pending:
-        ignore.add(merge)
         try:
-            rev = branch.repository.get_revision(merge)
-            children = []
-            pm.append((rev, children))
-
-            # This does need to be topo sorted, so we search backwards
-            inner_merges = branch.repository.get_ancestry(merge)
-            assert inner_merges[0] is None
-            inner_merges.pop(0)
-            for mmerge in reversed(inner_merges):
-                if mmerge in ignore:
-                    continue
-                rev = branch.repository.get_revision(mmerge)
-                children.append(rev)
-
-                ignore.add(mmerge)
+            merge_rev = branch.repository.get_revision(merge)
         except errors.NoSuchRevision:
-            print "DEBUG: NoSuchRevision:", merge
+            # If we are missing a revision, just print out the revision id
+            trace.mutter("ghost: %r", merge)
+            other_revisions.append(merge)
+            continue
 
-    return pm
+        # Find all of the revisions in the merge source, which are not in the
+        # last committed revision.
+        merge_extra = graph.find_unique_ancestors(merge, other_revisions)
+        other_revisions.append(merge)
+        merge_extra.discard(_mod_revision.NULL_REVISION)
+
+        # Get a handle to all of the revisions we will need
+        try:
+            revisions = dict((rev.revision_id, rev) for rev in
+                             branch.repository.get_revisions(merge_extra))
+        except errors.NoSuchRevision:
+            # One of the sub nodes is a ghost, check each one
+            revisions = {}
+            for revision_id in merge_extra:
+                try:
+                    rev = branch.repository.get_revisions([revision_id])[0]
+                except errors.NoSuchRevision:
+                    revisions[revision_id] = None
+                else:
+                    revisions[revision_id] = rev
+
+         # Display the revisions brought in by this merge.
+        rev_id_iterator = _get_sorted_revisions(merge, merge_extra,
+                            branch.repository.get_parent_map(merge_extra))
+        # Skip the first node
+        num, first, depth, eom = rev_id_iterator.next()
+        if first != merge:
+            raise AssertionError('Somehow we misunderstood how'
+                ' iter_topo_order works %s != %s' % (first, merge))
+        children = []
+        for num, sub_merge, depth, eom in rev_id_iterator:
+            rev = revisions[sub_merge]
+            if rev is None:
+                trace.warning("ghost: %r", sub_merge)
+                continue
+            children.append(rev)
+        yield (merge_rev, children)
 
 
 _newline_variants_re = re.compile(r'\r\n?')
@@ -128,7 +177,7 @@ class CommitDialog(Gtk.Dialog):
         self._delta = None
         self._wt.lock_read()
         try:
-            self._pending = pending_revisions(self._wt)
+            self._pending = list(pending_revisions(self._wt))
         finally:
             self._wt.unlock()
 
@@ -247,7 +296,7 @@ class CommitDialog(Gtk.Dialog):
                 trace.mutter("networkmanager not available.")
                 self._check_local.show()
                 return
-            
+
             dbus_iface = dbus.Interface(proxy_obj,
                                         'org.freedesktop.NetworkManager')
             try:
