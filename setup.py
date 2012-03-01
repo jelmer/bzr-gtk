@@ -41,7 +41,7 @@ class Check(Command):
         ]
 
     def initialize_options(self):
-        self.module = 'discover'
+        self.module = None
 
     def finalize_options(self):
         pass
