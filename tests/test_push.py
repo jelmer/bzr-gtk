@@ -23,12 +23,11 @@ from bzrlib import (
     ui,
     )
 
-from bzrlib.plugins.gtk import set_ui_factory
-from bzrlib.plugins.gtk.push import PushDialog
-from bzrlib.plugins.gtk.tests import (
-    MockMethod,
-    MockProperty,
+from bzrlib.plugins.gtk import (
+    push,
+    set_ui_factory,
     )
+from bzrlib.plugins.gtk.tests import MockMethod
 from bzrlib.plugins.gtk.history import UrlHistory
 from bzrlib.plugins.gtk.ui import ProgressPanel
 
@@ -37,13 +36,12 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
 
     def make_push_branch(self):
         tree = self.make_branch_and_memory_tree('test')
-        tree.branch.set_push_location('lp:~user/fnord/trunk')
         return tree.branch
 
     def test_init(self):
         set_ui_factory()
         branch = self.make_push_branch()
-        dialog = PushDialog(
+        dialog = push.PushDialog(
             repository=None, revid=None, branch=branch, parent=None)
         self.assertIs(None, dialog.props.parent)
         self.assertIs(None, dialog.repository)
@@ -71,7 +69,8 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
     def test_build_history(self):
         set_ui_factory()
         branch = self.make_push_branch()
-        dialog = PushDialog(None, None, branch)
+        branch.set_push_location('lp:~user/fnord/trunk')
+        dialog = push.PushDialog(None, None, branch)
         dialog._history.add_entry('lp:~user/fnord/test1')
         dialog._history.add_entry('lp:~user/fnord/test2')
         dialog._build_history()
@@ -87,6 +86,24 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
         # The ui_factory's progress bar widget is set to None.
         set_ui_factory()
         branch = self.make_push_branch()
-        dialog = PushDialog(None, None, branch)
+        dialog = push.PushDialog(None, None, branch)
         dialog._on_close_clicked(None)
         self.assertIs(None, ui.ui_factory._progress_bar_widget)
+
+    def test_on_push_clicked_without_errors(self):
+        MockMethod.bind(self, push, 'do_push', "test success")
+        set_ui_factory()
+        branch = self.make_push_branch()
+        dialog = push.PushDialog(None, None, branch)
+        dialog._combo.get_child().props.text = 'lp:~user/fnord/test'
+        dialog._on_push_clicked(None)
+        self.assertIs(True, push.do_push.called)
+        self.assertEqual(
+            (branch, 'lp:~user/fnord/test'), push.do_push.args)
+        self.assertEqual(
+            {'overwrite': False}, push.do_push.kwargs)
+        self.assertIs(True, dialog._push_message.props.visible)
+        self.assertEqual('test success', dialog._push_message.props.label)
+        self.assertEqual(
+            'lp:~user/fnord/test', dialog._history.get_entries()[-1])
+        self.assertEqual('lp:~user/fnord/test', branch.get_push_location())

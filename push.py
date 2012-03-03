@@ -115,15 +115,14 @@ class PushDialog(Gtk.Dialog):
         location = self._combo.get_child().get_text()
 
         try:
-            message = do_push(self.branch, location=location, overwrite=False)
+            message = do_push(self.branch, location, overwrite=False)
         except errors.DivergedBranches:
             response = question_dialog(
                 _i18n('Branches have been diverged'),
                 _i18n('You cannot push if branches have diverged.\n'
                       'Overwrite?'))
             if response == Gtk.ResponseType.YES:
-                message = do_push(
-                    self.branch, location=location, overwrite=True)
+                message = do_push(self.branch, location, overwrite=True)
             else:
                 return
         self._history.add_entry(location)
@@ -134,10 +133,9 @@ class PushDialog(Gtk.Dialog):
             self._progress_widget.finished()
             self._push_message.props.label = message
             self._push_message.show()
-        message
 
 
-def do_push(br_from, location, overwrite):
+def do_push(br_from, location, overwrite=False):
     """Update a mirror of a branch.
 
     :param br_from: the source branch
@@ -182,4 +180,4 @@ def do_push(br_from, location, overwrite):
         else:
             count = tree_to.pull(br_from, overwrite)
 
-    return str(count)
+    return "Pushed %s revisions." % count
