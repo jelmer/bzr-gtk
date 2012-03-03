@@ -53,7 +53,7 @@ class PushDialog(Gtk.Dialog):
         self._label_location = Gtk.Label(label=_i18n("Location:"))
         self._combo = Gtk.ComboBox.new_with_entry()
         self._button_push = Gtk.Button(_i18n("_Push"), use_underline=True)
-        self._hbox_location = Gtk.HBox()
+        self._hbox_location = Gtk.Box(Gtk.Orientation.HORIZONTAL, 3)
 
         # Set callbacks
         self.connect('close', self._on_close_clicked)
@@ -61,7 +61,6 @@ class PushDialog(Gtk.Dialog):
 
         # Set properties
         self._label_location.set_alignment(0, 0.5)
-        self._hbox_location.set_spacing(3)
         self.get_content_area().set_spacing(3)
 
         # Pack widgets

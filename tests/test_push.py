@@ -22,12 +22,31 @@ from bzrlib import (
     tests,
     )
 
-from bzrlib.plugins.gtk import ui
+from bzrlib.plugins.gtk import set_ui_factory
+from bzrlib.plugins.gtk.push import PushDialog
 from bzrlib.plugins.gtk.tests import (
     MockMethod,
     MockProperty,
     )
 
 
-class PushTestCase(tests.TestCase):
-    pass
+class PushTestCase(tests.TestCaseWithMemoryTransport):
+
+    def test_init(self):
+        tree = self.make_branch_and_memory_tree('test')
+        branch = tree.branch
+        set_ui_factory()
+        dialog = PushDialog(
+            repository=None, revid=None, branch=branch, parent=None)
+        self.assertIs(None, dialog.props.parent)
+        self.assertIs(None, dialog.repository)
+        self.assertIs(None, dialog.revid)
+        self.assertIs(branch, dialog.branch)
+        self.assertIsInstance(dialog._label_location, Gtk.Label)
+        self.assertIsInstance(dialog._combo, Gtk.ComboBox)
+        self.assertIsInstance(dialog._button_push, Gtk.Button)
+        self.assertIsInstance(dialog._hbox_location, Gtk.Box)
+        self.assertEqual(
+            Gtk.Orientation.HORIZONTAL,
+            dialog._hbox_location.props.orientation)
+        self.assertEqual(3, dialog._hbox_location.props.spacing)
