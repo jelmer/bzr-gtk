@@ -29,15 +29,20 @@ from bzrlib.plugins.gtk.tests import (
     MockMethod,
     MockProperty,
     )
+from bzrlib.plugins.gtk.history import UrlHistory
 from bzrlib.plugins.gtk.ui import ProgressPanel
 
 
 class PushTestCase(tests.TestCaseWithMemoryTransport):
 
-    def test_init(self):
+    def make_push_branch(self):
         tree = self.make_branch_and_memory_tree('test')
-        branch = tree.branch
+        tree.branch.set_push_location('lp:~user/fnord/trunk')
+        return tree.branch
+
+    def test_init(self):
         set_ui_factory()
+        branch = self.make_push_branch()
         dialog = PushDialog(
             repository=None, revid=None, branch=branch, parent=None)
         self.assertIs(None, dialog.props.parent)
@@ -61,3 +66,19 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
         self.assertIs(True, dialog._combo.props.visible)
         self.assertIs(False, dialog._progress_widget.props.visible)
         self.assertIs(False, dialog._push_message.props.visible)
+        self.assertIsInstance(dialog._history, UrlHistory)
+
+    def test_build_history(self):
+        set_ui_factory()
+        branch = self.make_push_branch()
+        dialog = PushDialog(None, None, branch)
+        dialog._history.add_entry('lp:~user/fnord/test1')
+        dialog._history.add_entry('lp:~user/fnord/test2')
+        dialog._build_history()
+        self.assertEqual(
+            'lp:~user/fnord/trunk', dialog._combo.get_child().props.text)
+        self.assertIsInstance(dialog._combo_model, Gtk.ListStore)
+        self.assertIs(dialog._combo.get_model(), dialog._combo_model)
+        locations = [row[0] for row in dialog._combo_model]
+        self.assertEqual(
+            ['lp:~user/fnord/test1', 'lp:~user/fnord/test2'], locations)
