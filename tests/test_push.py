@@ -91,12 +91,15 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
         self.assertIs(None, ui.ui_factory._progress_bar_widget)
 
     def test_on_push_clicked_without_errors(self):
-        MockMethod.bind(self, push, 'do_push', "test success")
         set_ui_factory()
         branch = self.make_push_branch()
         dialog = push.PushDialog(None, None, branch)
+        MockMethod.bind(self, push, 'do_push', "test success")
+        MockMethod.bind(self, dialog._progress_widget, 'tick')
         dialog._combo.get_child().props.text = 'lp:~user/fnord/test'
         dialog._on_push_clicked(None)
+        self.assertIs(True, dialog._progress_widget.tick.called)
+        self.assertIs(False, dialog._progress_widget.props.visible)
         self.assertIs(True, push.do_push.called)
         self.assertEqual(
             (branch, 'lp:~user/fnord/test'), push.do_push.args)
