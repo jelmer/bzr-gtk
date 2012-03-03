@@ -43,11 +43,11 @@ class PushDialog(Gtk.Dialog):
         super(PushDialog, self).__init__(
             title="Push", parent=parent, flags=0,
             buttons=(Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE))
+        self.branch = branch
 
-        # Get arguments
+        # Unused arguments
         self.repository = repository
         self.revid = revid
-        self.branch = branch
 
         # Create the widgets
         self._label_location = Gtk.Label(label=_i18n("Location:"))
@@ -72,18 +72,19 @@ class PushDialog(Gtk.Dialog):
         self.get_action_area().pack_end(self._button_push, True, True, 0)
 
         # Set progress pane.
-        self.progress_widget = ProgressPanel()
-        ui.ui_factory.set_progress_bar_widget(self.progress_widget)
+        self._progress_widget = ProgressPanel()
+        ui.ui_factory.set_progress_bar_widget(self._progress_widget)
         self.get_content_area().pack_start(
-            self.progress_widget, False, False, 0)
-        self.push_message = Gtk.Label()
+            self._progress_widget, False, False, 0)
+        self._push_message = Gtk.Label()
         alignment = Gtk.Alignment.new(0.0, 0.5, 0.0, 0.0)
-        alignment.add(self.push_message)
+        alignment.add(self._push_message)
         self.get_content_area().pack_start(alignment, False, False, 0)
 
         # Show the dialog
         self.get_content_area().show_all()
-        self.progress_widget.hide()
+        self._progress_widget.hide()
+        self._push_message.hide()
 
         # Build location history
         self._history = UrlHistory(self.branch.get_config(), 'push_history')
@@ -109,8 +110,8 @@ class PushDialog(Gtk.Dialog):
     @show_bzr_error
     def _on_push_clicked(self, widget):
         """Push button clicked handler. """
-        self.push_message.hide()
-        self.progress_widget.tick()
+        self._push_message.hide()
+        self._progress_widget.tick()
         location = self._combo.get_child().get_text()
 
         try:
@@ -130,9 +131,9 @@ class PushDialog(Gtk.Dialog):
             and self.branch.get_push_location() is None):
             self.branch.set_push_location(location)
         if message:
-            self.progress_widget.finished()
-            self.push_message.props.label = message
-            self.push_message.show()
+            self._progress_widget.finished()
+            self._push_message.props.label = message
+            self._push_message.show()
         message
 
 

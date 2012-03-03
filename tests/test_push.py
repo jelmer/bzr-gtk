@@ -20,6 +20,7 @@ from gi.repository import Gtk
 
 from bzrlib import (
     tests,
+    ui,
     )
 
 from bzrlib.plugins.gtk import set_ui_factory
@@ -28,6 +29,7 @@ from bzrlib.plugins.gtk.tests import (
     MockMethod,
     MockProperty,
     )
+from bzrlib.plugins.gtk.ui import ProgressPanel
 
 
 class PushTestCase(tests.TestCaseWithMemoryTransport):
@@ -43,6 +45,7 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
         self.assertIs(None, dialog.revid)
         self.assertIs(branch, dialog.branch)
         self.assertIsInstance(dialog._label_location, Gtk.Label)
+        self.assertEqual((0.0, 0.5), dialog._label_location.get_alignment())
         self.assertIsInstance(dialog._combo, Gtk.ComboBox)
         self.assertIsInstance(dialog._button_push, Gtk.Button)
         self.assertIsInstance(dialog._hbox_location, Gtk.Box)
@@ -50,3 +53,11 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
             Gtk.Orientation.HORIZONTAL,
             dialog._hbox_location.props.orientation)
         self.assertEqual(3, dialog._hbox_location.props.spacing)
+        self.assertEqual(3, dialog.get_content_area().props.spacing)
+        self.assertIsInstance(dialog._progress_widget, ProgressPanel)
+        self.assertIs(
+            ui.ui_factory._progress_bar_widget, dialog._progress_widget)
+        self.assertIsInstance(dialog._push_message, Gtk.Label)
+        self.assertIs(True, dialog._combo.props.visible)
+        self.assertIs(False, dialog._progress_widget.props.visible)
+        self.assertIs(False, dialog._push_message.props.visible)
