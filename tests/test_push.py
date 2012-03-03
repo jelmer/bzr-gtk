@@ -82,3 +82,11 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
         locations = [row[0] for row in dialog._combo_model]
         self.assertEqual(
             ['lp:~user/fnord/test1', 'lp:~user/fnord/test2'], locations)
+
+    def test_on_close_clicked(self):
+        # The ui_factory's progress bar widget is set to None.
+        set_ui_factory()
+        branch = self.make_push_branch()
+        dialog = PushDialog(None, None, branch)
+        dialog._on_close_clicked(None)
+        self.assertIs(None, ui.ui_factory._progress_bar_widget)
