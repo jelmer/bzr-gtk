@@ -95,6 +95,7 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
         self.assertIs(None, ui.ui_factory._progress_bar_widget)
 
     def test_on_push_clicked_without_errors(self):
+        # Verify the dialog's and branch's final states after a push.
         MockMethod.bind(self, push, 'do_push', "test success")
         set_ui_factory()
         branch = self.make_push_branch()
@@ -116,6 +117,8 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
         self.assertEqual('lp:~user/fnord/test', branch.get_push_location())
 
     def test_on_push_clicked_with_divered_branches(self):
+        # Verify that when DivergedBranches is raise, the user can choose
+        # to overwrite the branch.
         error = errors.DivergedBranches(None, None)
         MockMethod.bind(self, push, 'do_push', raise_error=error)
         MockMethod.bind(self, push, 'question_dialog', Gtk.ResponseType.YES)
