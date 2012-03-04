@@ -54,8 +54,11 @@ class PushDialog(Gtk.Dialog):
         self._combo = Gtk.ComboBox.new_with_entry()
         self._button_push = Gtk.Button(_i18n("_Push"), use_underline=True)
         self._hbox_location = Gtk.Box(Gtk.Orientation.HORIZONTAL, 3)
+        self._push_message = Gtk.Label()
+        self._progress_widget = ProgressPanel()
 
         # Set callbacks
+        ui.ui_factory.set_progress_bar_widget(self._progress_widget)
         self.connect('close', self._on_close_clicked)
         self._button_push.connect('clicked', self._on_push_clicked)
 
@@ -64,22 +67,15 @@ class PushDialog(Gtk.Dialog):
         self.get_content_area().set_spacing(3)
 
         # Pack widgets
-        self._hbox_location.pack_start(
-            self._label_location, False, False, 0)
+        self._hbox_location.pack_start(self._label_location, False, False, 0)
         self._hbox_location.pack_start(self._combo, False, False, 0)
-        self.get_content_area().pack_start(
-            self._hbox_location, False, False, 0)
-        self.get_action_area().pack_end(self._button_push, True, True, 0)
-
-        # Set progress pane.
-        self._progress_widget = ProgressPanel()
-        ui.ui_factory.set_progress_bar_widget(self._progress_widget)
-        self.get_content_area().pack_start(
-            self._progress_widget, False, False, 0)
-        self._push_message = Gtk.Label()
+        content_area = self.get_content_area()
+        content_area.pack_start(self._hbox_location, False, False, 0)
+        content_area.pack_start(self._progress_widget, False, False, 0)
         alignment = Gtk.Alignment.new(0.0, 0.5, 0.0, 0.0)
         alignment.add(self._push_message)
-        self.get_content_area().pack_start(alignment, False, False, 0)
+        content_area.pack_start(alignment, False, False, 0)
+        self.get_action_area().pack_end(self._button_push, True, True, 0)
 
         # Show the dialog
         self.get_content_area().show_all()
@@ -135,7 +131,7 @@ class PushDialog(Gtk.Dialog):
             self._push_message.show()
 
 
-def do_push(br_from, location, overwrite=False):
+def do_push(br_from, location, overwrite):
     """Update a mirror of a branch.
 
     :param br_from: the source branch
