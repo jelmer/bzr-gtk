@@ -174,5 +174,5 @@ def do_push(br_from, location, overwrite):
             count = tree_to.pull(br_from, overwrite)
 
     # The count var is either an int or a PushResult. PushResult is being
-    # coerced into an int, but the method is deprecatedx
+    # coerced into an int, but the method is deprecated.
     return _i18n("%d revision(s) pushed.") % int(count)
