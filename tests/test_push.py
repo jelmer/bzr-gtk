@@ -48,24 +48,27 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
         self.assertIs(None, dialog.repository)
         self.assertIs(None, dialog.revid)
         self.assertIs(branch, dialog.branch)
+        # Layout rules to match HIG.
         self.assertIsInstance(dialog._label_location, Gtk.Label)
-        self.assertEqual((0.0, 0.5), dialog._label_location.get_alignment())
         self.assertIsInstance(dialog._combo, Gtk.ComboBox)
         self.assertIsInstance(dialog._button_push, Gtk.Button)
         self.assertIsInstance(dialog._hbox_location, Gtk.Box)
+        self.assertIsInstance(dialog._progress_widget, ProgressPanel)
+        self.assertIsInstance(dialog._push_message, Gtk.Label)
+        self.assertIsInstance(dialog._history, UrlHistory)
+        self.assertIs(
+            ui.ui_factory._progress_bar_widget, dialog._progress_widget)
         self.assertEqual(
             Gtk.Orientation.HORIZONTAL,
             dialog._hbox_location.props.orientation)
-        self.assertEqual(3, dialog._hbox_location.props.spacing)
-        self.assertEqual(3, dialog.get_content_area().props.spacing)
-        self.assertIsInstance(dialog._progress_widget, ProgressPanel)
-        self.assertIs(
-            ui.ui_factory._progress_bar_widget, dialog._progress_widget)
-        self.assertIsInstance(dialog._push_message, Gtk.Label)
+        self.assertEqual(0.0, dialog._push_message.props.xalign)
+        self.assertEqual(6, dialog.props.border_width)
+        self.assertEqual(6, dialog._hbox_location.props.spacing)
+        self.assertEqual(6, dialog.get_content_area().props.spacing)
+        # Show rules.
         self.assertIs(True, dialog._combo.props.visible)
         self.assertIs(False, dialog._progress_widget.props.visible)
         self.assertIs(False, dialog._push_message.props.visible)
-        self.assertIsInstance(dialog._history, UrlHistory)
 
     def test_build_history(self):
         set_ui_factory()

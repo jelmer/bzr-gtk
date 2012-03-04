@@ -41,7 +41,7 @@ class PushDialog(Gtk.Dialog):
     def __init__(self, repository, revid, branch=None, parent=None):
         """Initialize the Push dialog. """
         super(PushDialog, self).__init__(
-            title="Push", parent=parent, flags=0,
+            title="Push", parent=parent, flags=0, border_width=6,
             buttons=(Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE))
         self.branch = branch
 
@@ -53,8 +53,8 @@ class PushDialog(Gtk.Dialog):
         self._label_location = Gtk.Label(label=_i18n("Location:"))
         self._combo = Gtk.ComboBox.new_with_entry()
         self._button_push = Gtk.Button(_i18n("_Push"), use_underline=True)
-        self._hbox_location = Gtk.Box(Gtk.Orientation.HORIZONTAL, 3)
-        self._push_message = Gtk.Label()
+        self._hbox_location = Gtk.Box(Gtk.Orientation.HORIZONTAL, 6)
+        self._push_message = Gtk.Label(xalign=0)
         self._progress_widget = ProgressPanel()
 
         # Set callbacks
@@ -63,22 +63,19 @@ class PushDialog(Gtk.Dialog):
         self._button_push.connect('clicked', self._on_push_clicked)
 
         # Set properties
-        self._label_location.set_alignment(0, 0.5)
-        self.get_content_area().set_spacing(3)
+        content_area = self.get_content_area()
+        content_area.set_spacing(6)
 
         # Pack widgets
         self._hbox_location.pack_start(self._label_location, False, False, 0)
         self._hbox_location.pack_start(self._combo, False, False, 0)
-        content_area = self.get_content_area()
-        content_area.pack_start(self._hbox_location, False, False, 0)
-        content_area.pack_start(self._progress_widget, False, False, 0)
-        alignment = Gtk.Alignment.new(0.0, 0.5, 0.0, 0.0)
-        alignment.add(self._push_message)
-        content_area.pack_start(alignment, False, False, 0)
+        content_area.pack_start(self._hbox_location, True, True, 0)
+        content_area.pack_start(self._progress_widget, True, True, 0)
+        content_area.pack_start(self._push_message, True, True, 0)
         self.get_action_area().pack_end(self._button_push, True, True, 0)
 
         # Show the dialog
-        self.get_content_area().show_all()
+        content_area.show_all()
         self._progress_widget.hide()
         self._push_message.hide()
 
