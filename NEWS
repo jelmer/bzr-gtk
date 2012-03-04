@@ -5,6 +5,9 @@
   * Fix compatibility with newer versions of gir-gtk which don't allow
     None in STRING columns of ListStores. (Jelmer Vernooij)
 
+  * Properly handle popup menus when there is no selected revision in
+    "bzr viz". (Jelmer Vernooij, #281717)
+
 0.103.0	2011-12-11
 
  FEATURES

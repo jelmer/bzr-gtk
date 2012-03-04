@@ -478,7 +478,10 @@ class BranchWindow(Window):
         else:
             parent_id = parents[0]
 
-        self.show_diff(revision.revision_id, parent_id)
+        if revision is not None:
+            self.show_diff(revision.revision_id, parent_id)
+        else:
+            self.show_diff(NULL_REVISION)
         self.treeview.grab_focus()
 
     def _back_clicked_cb(self, *args):
@@ -654,7 +657,7 @@ class BranchWindow(Window):
             return width, height
         return None
 
-    def show_diff(self, revid=None, parentid=NULL_REVISION):
+    def show_diff(self, revid, parentid=NULL_REVISION):
         """Open a new window to show a diff between the given revisions."""
         from bzrlib.plugins.gtk.diff import DiffWindow
         window = DiffWindow(parent=self)
