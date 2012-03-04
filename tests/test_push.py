@@ -19,6 +19,7 @@
 from gi.repository import Gtk
 
 from bzrlib import (
+    errors,
     tests,
     ui,
     )
@@ -91,10 +92,10 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
         self.assertIs(None, ui.ui_factory._progress_bar_widget)
 
     def test_on_push_clicked_without_errors(self):
+        MockMethod.bind(self, push, 'do_push', "test success")
         set_ui_factory()
         branch = self.make_push_branch()
         dialog = push.PushDialog(None, None, branch)
-        MockMethod.bind(self, push, 'do_push', "test success")
         MockMethod.bind(self, dialog._progress_widget, 'tick')
         dialog._combo.get_child().props.text = 'lp:~user/fnord/test'
         dialog._on_push_clicked(None)
@@ -110,3 +111,19 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
         self.assertEqual(
             'lp:~user/fnord/test', dialog._history.get_entries()[-1])
         self.assertEqual('lp:~user/fnord/test', branch.get_push_location())
+
+    def test_on_push_clicked_with_divered_branches(self):
+        error = errors.DivergedBranches(None, None)
+        MockMethod.bind(self, push, 'do_push', raise_error=error)
+        MockMethod.bind(self, push, 'question_dialog', Gtk.ResponseType.YES)
+        set_ui_factory()
+        branch = self.make_push_branch()
+        dialog = push.PushDialog(None, None, branch)
+        dialog._combo.get_child().props.text = 'lp:~user/fnord/test'
+        dialog._on_push_clicked(None)
+        self.assertIs(True, push.do_push.called)
+        self.assertEqual(2, push.do_push.call_count)
+        self.assertEqual(
+            (branch, 'lp:~user/fnord/test'), push.do_push.args)
+        self.assertEqual(
+            {'overwrite': True}, push.do_push.kwargs)
