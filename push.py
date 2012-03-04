@@ -180,4 +180,4 @@ def do_push(br_from, location, overwrite=False):
         else:
             count = tree_to.pull(br_from, overwrite)
 
-    return "Pushed %s revisions." % count
+    return "Pushed %d revisions." % int(count)
