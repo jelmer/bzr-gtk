@@ -245,6 +245,7 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
             item.connect('activate', self.unignore_cb, tree, path)
             yield item
         else:
+            kind = tree.kind(file_id)
             item = Nautilus.MenuItem(name='BzrNautilus::log',
                              label='History ...',
                              tip='List changes',
@@ -274,12 +275,13 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
             item.connect('activate', self.remove_cb, tree, path)
             yield item
 
-            item = Nautilus.MenuItem(name='BzrNautilus::annotate',
-                         label='Annotate ...',
-                         tip='Annotate File Data',
-                         icon='')
-            item.connect('activate', self.annotate_cb, tree, path, file_id)
-            yield item
+            if kind == 'file':
+                item = Nautilus.MenuItem(name='BzrNautilus::annotate',
+                             label='Annotate ...',
+                             tip='Annotate File Data',
+                             icon='')
+                item.connect('activate', self.annotate_cb, tree, path, file_id)
+                yield item
 
     def get_file_items(self, window, files):
         items = []
