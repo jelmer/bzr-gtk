@@ -124,6 +124,12 @@ class BazaarExtension(Nautilus.MenuProvider, Nautilus.ColumnProvider,
         dialog.display()
         Gtk.main()
 
+    def push_cb(self, menu, controldir, path=None):
+        from bzrlib.plugins.gtk.push import PushDialog
+        dialog = PushDialog(branch=controldir.open_workingtree().branch)
+        dialog.display()
+        Gtk.main()
+
     def merge_cb(self, menu, tree, path=None):
         from bzrlib.plugins.gtk.merge import MergeDialog
         dialog = MergeDialog(tree, path)

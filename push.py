@@ -38,15 +38,19 @@ from bzrlib.plugins.gtk.ui import ProgressPanel
 class PushDialog(Gtk.Dialog):
     """New implementation of the Push dialog."""
 
-    def __init__(self, repository, revid, branch=None, parent=None):
+    def __init__(self, repository=None, revid=None, branch=None, parent=None):
         """Initialize the Push dialog. """
         super(PushDialog, self).__init__(
             title="Push", parent=parent, flags=0, border_width=6,
             buttons=(Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE))
+        if repository is None:
+            repository = branch.repository
         self.branch = branch
 
         # Unused arguments
         self.repository = repository
+        if revid is None:
+            revid = branch.last_revision()
         self.revid = revid
 
         # Create the widgets
