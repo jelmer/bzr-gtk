@@ -179,3 +179,45 @@ class DoPushTestCase(tests.TestCaseWithTransport):
         self.assertEqual('1 revision(s) pushed.', message)
         self.assertEqual(True, progress_panel.pb.update.called)
         self.assertEqual(True, progress_panel.pb.finished.called)
+
+    def test_create_push_result_unstacked(self):
+        from_branch = object()
+        to_branch = self.make_branch_and_tree('that').branch
+        push_result = push.create_push_result(from_branch, to_branch)
+        self.assertIs(from_branch, push_result.source_branch)
+        self.assertIs(to_branch, push_result.target_branch)
+        self.assertIs(None, push_result.branch_push_result)
+        self.assertIs(None, push_result.master_branch)
+        self.assertEqual(0, push_result.old_revno)
+        self.assertEqual(to_branch.last_revision(), push_result.old_revid)
+        self.assertIs(None, push_result.workingtree_updated)
+        self.assertIs(None, push_result.stacked_on)
+
+    def test_create_push_result_stacked(self):
+        from_branch = object()
+        to_branch = self.make_branch_and_tree('that').branch
+        MockMethod.bind(self, to_branch, 'get_stacked_on_url', 'lp:project')
+        push_result = push.create_push_result(from_branch, to_branch)
+        self.assertEqual('lp:project', push_result.stacked_on)
+
+    def test_create_push_message_stacked_on(self):
+        from_branch = object()
+        to_branch = self.make_branch_and_tree('that').branch
+        MockMethod.bind(self, to_branch, 'get_stacked_on_url', 'lp:project')
+        push_result = push.create_push_result(from_branch, to_branch)
+        from_branch = self.make_from_branch()
+        message = push.create_push_message(from_branch, push_result)
+        self.assertEqual(
+            '1 revision(s) pushed.\nStacked on lp:project.', message)
+
+    def test_create_push_message_workingtree_updated_false(self):
+        from_branch = object()
+        to_branch = self.make_branch_and_tree('that').branch
+        push_result = push.create_push_result(from_branch, to_branch)
+        push_result.workingtree_updated = False
+        from_branch = self.make_from_branch()
+        message = push.create_push_message(from_branch, push_result)
+        self.assertEqual(
+            "1 revision(s) pushed.\n\nThe working tree was not updated:\n"
+            "See 'bzr help working-trees' for more information.",
+            message)
