@@ -133,3 +133,52 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
             (branch, 'lp:~user/fnord/test'), push.do_push.args)
         self.assertEqual(
             {'overwrite': True}, push.do_push.kwargs)
+
+
+class PushTestCase(tests.TestCaseWithTransport):
+
+    def setup_ui(self):
+        set_ui_factory()
+        progress_panel = ProgressPanel()
+        ui.ui_factory.set_progress_bar_widget(progress_panel)
+        MockMethod.bind(self, progress_panel.pb, 'tick')
+        MockMethod.bind(self, progress_panel.pb, 'update')
+        MockMethod.bind(self, progress_panel.pb, 'finished')
+        return progress_panel
+
+    def make_from_branch(self):
+        from_tree = self.make_branch_and_tree('this')
+        self.build_tree(['this/a', 'this/b'])
+        from_tree.add(['a', 'b'])
+        from_tree.commit("msg")
+        return from_tree.branch
+
+    def test_do_push_without_dir(self):
+        progress_panel = self.setup_ui()
+        from_branch = self.make_from_branch()
+        message = push.do_push(from_branch, 'that', False)
+        self.assertEqual('1 revision(s) pushed.', message)
+        self.assertEqual(False, progress_panel.pb.tick.called)
+        self.assertEqual(True, progress_panel.pb.update.called)
+        self.assertEqual(True, progress_panel.pb.finished.called)
+
+    def test_do_push_without_parent_dir(self):
+        progress_panel = self.setup_ui()
+        from_branch = self.make_from_branch()
+        MockMethod.bind(self, push, 'question_dialog', Gtk.ResponseType.OK)
+        message = push.do_push(from_branch, 'that/there', False)
+        self.assertEqual('1 revision(s) pushed.', message)
+        self.assertEqual(True, push.question_dialog.called)
+        self.assertEqual(False, progress_panel.pb.tick.called)
+        self.assertEqual(True, progress_panel.pb.update.called)
+        self.assertEqual(True, progress_panel.pb.finished.called)
+
+    def test_do_push_with_dir(self):
+        progress_panel = self.setup_ui()
+        self.make_branch_and_tree('that')
+        from_branch = self.make_from_branch()
+        message = push.do_push(from_branch, 'that', False)
+        self.assertEqual('1 revision(s) pushed.', message)
+        self.assertEqual(False, progress_panel.pb.tick.called)
+        self.assertEqual(True, progress_panel.pb.update.called)
+        self.assertEqual(True, progress_panel.pb.finished.called)
