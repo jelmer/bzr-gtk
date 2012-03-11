@@ -171,6 +171,13 @@ class DoPushTestCase(tests.TestCaseWithTransport):
         self.assertEqual(True, progress_panel.pb.update.called)
         self.assertEqual(True, progress_panel.pb.finished.called)
 
+    def test_do_push_without_parent_dir_aborted(self):
+        self.setup_ui()
+        from_branch = self.make_from_branch()
+        MockMethod.bind(self, push, 'question_dialog', Gtk.ResponseType.CANCEL)
+        message = push.do_push(from_branch, 'that/there', False)
+        self.assertEqual('Push aborted.', message)
+
     def test_do_push_with_dir(self):
         progress_panel = self.setup_ui()
         self.make_branch_and_tree('that')
