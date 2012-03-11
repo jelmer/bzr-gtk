@@ -135,7 +135,7 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
             {'overwrite': True}, push.do_push.kwargs)
 
 
-class PushTestCase(tests.TestCaseWithTransport):
+class DoPushTestCase(tests.TestCaseWithTransport):
 
     def setup_ui(self):
         set_ui_factory()
@@ -158,7 +158,6 @@ class PushTestCase(tests.TestCaseWithTransport):
         from_branch = self.make_from_branch()
         message = push.do_push(from_branch, 'that', False)
         self.assertEqual('1 revision(s) pushed.', message)
-        self.assertEqual(False, progress_panel.pb.tick.called)
         self.assertEqual(True, progress_panel.pb.update.called)
         self.assertEqual(True, progress_panel.pb.finished.called)
 
@@ -169,7 +168,6 @@ class PushTestCase(tests.TestCaseWithTransport):
         message = push.do_push(from_branch, 'that/there', False)
         self.assertEqual('1 revision(s) pushed.', message)
         self.assertEqual(True, push.question_dialog.called)
-        self.assertEqual(False, progress_panel.pb.tick.called)
         self.assertEqual(True, progress_panel.pb.update.called)
         self.assertEqual(True, progress_panel.pb.finished.called)
 
@@ -179,6 +177,5 @@ class PushTestCase(tests.TestCaseWithTransport):
         from_branch = self.make_from_branch()
         message = push.do_push(from_branch, 'that', False)
         self.assertEqual('1 revision(s) pushed.', message)
-        self.assertEqual(False, progress_panel.pb.tick.called)
         self.assertEqual(True, progress_panel.pb.update.called)
         self.assertEqual(True, progress_panel.pb.finished.called)
