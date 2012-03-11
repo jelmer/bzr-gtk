@@ -27,6 +27,7 @@ from bzrlib.errors import NoSuchRevision
 from bzrlib.revision import NULL_REVISION, CURRENT_REVISION
 
 from bzrlib.plugins.gtk.annotate.colormap import AnnotateColorSaturation
+from bzrlib.plugins.gtk.i18n import _i18n
 from bzrlib.plugins.gtk.revisionview import RevisionView
 from bzrlib.plugins.gtk.window import Window
 
@@ -483,7 +484,7 @@ class SearchBox(Gtk.HBox):
         self.pack_start(entry, False, False, 0)
 
         # Next/previous buttons
-        button = Gtk.Button('_Next')
+        button = Gtk.Button(_i18n('_Next'), use_underline=True)
         image = Gtk.Image()
         image.set_from_stock('gtk-go-forward', Gtk.IconSize.BUTTON)
         button.set_image(image)
@@ -491,7 +492,7 @@ class SearchBox(Gtk.HBox):
                        'forward')
         self.pack_start(button, False, False, 0)
 
-        button = Gtk.Button('_Previous')
+        button = Gtk.Button(_i18n('_Previous'), use_underline=True)
         image = Gtk.Image()
         image.set_from_stock('gtk-go-back', Gtk.IconSize.BUTTON)
         button.set_image(image)
