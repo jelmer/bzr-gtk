@@ -54,7 +54,7 @@ class MergeDialog(Gtk.Dialog):
         for entry in [_i18n("Folder"),_i18n("Custom Location")]:
             self._combo_source.append_text(entry)
         self._combo_source.connect("changed", self._on_combo_changed)
-        self._button_merge = Gtk.Button(_i18n("_Merge"))
+        self._button_merge = Gtk.Button(_i18n("_Merge"), use_underline=True)
         self._button_merge_icon = Gtk.Image()
         self._button_merge_icon.set_from_stock(Gtk.STOCK_APPLY, Gtk.IconSize.BUTTON)
         self._button_merge.set_image(self._button_merge_icon)
