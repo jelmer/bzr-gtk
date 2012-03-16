@@ -54,7 +54,6 @@ if getattr(sys, "frozen", None) is not None: # we run bzr.exe
 import bzrlib
 import bzrlib.api
 from bzrlib import (
-    branch,
     config,
     )
 from bzrlib.commands import plugin_cmds
@@ -134,9 +133,17 @@ def save_commit_messages(*args):
     from bzrlib.plugins.gtk import commitmsgs
     commitmsgs.save_commit_messages(*args)
 
-branch.Branch.hooks.install_named_hook('post_uncommit',
-                                       save_commit_messages,
-                                       "Saving commit messages for gcommit")
+try:
+    from bzrlib.hooks import install_lazy_named_hook
+except ImportError:
+    from bzrlib.branch import Branch
+    Branch.hooks.install_named_hook('post_uncommit',
+                                    save_commit_messages,
+                                    "Saving commit messages for gcommit")
+else:
+    install_lazy_named_hook("bzrlib.branch", "Branch.hooks",
+        'post_uncommit', save_commit_messages, "Saving commit messages for gcommit")
+
 
 option_registry = getattr(config, "option_registry", None)
 if option_registry is not None:
