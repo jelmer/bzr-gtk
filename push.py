@@ -24,7 +24,8 @@ from bzrlib import (
     errors,
     ui,
     )
-from bzrlib.bzrdir import BzrDir
+from bzrlib.controldir import ControlDir
+from bzrlib.push import PushResult
 from bzrlib.transport import get_transport
 
 from bzrlib.plugins.gtk.dialog import (
@@ -140,43 +141,62 @@ def do_push(br_from, location, overwrite):
     :param overwrite: overwrite target location if it diverged
     :return: number of revisions pushed
     """
-    transport = get_transport(location)
-    location_url = transport.base
-
+    revision_id = None
+    to_transport = get_transport(location)
     try:
-        dir_to = BzrDir.open(location_url)
-        br_to = dir_to.open_branch()
+        dir_to = ControlDir.open_from_transport(to_transport)
     except errors.NotBranchError:
-        # create a branch.
-        transport = transport.clone('..')
+        dir_to = None
+
+    if dir_to is None:
         try:
-            relurl = transport.relpath(location_url)
-            transport.mkdir(relurl)
+            br_to = br_from.create_clone_on_transport(
+                to_transport, revision_id=revision_id)
         except errors.NoSuchFile:
             response = question_dialog(
                 _i18n('Non existing parent directory'),
                 _i18n("The parent directory (%s)\ndoesn't exist. Create?") %
-                location)
+                    location)
             if response == Gtk.ResponseType.OK:
-                transport.create_prefix()
+                br_to = br_from.create_clone_on_transport(
+                    to_transport, revision_id=revision_id, create_prefix=True)
             else:
-                return
-        dir_to = br_from.bzrdir.clone(location_url,
-            revision_id=br_from.last_revision())
-        br_to = dir_to.open_branch()
-        count = len(br_to.revision_history())
+                return _i18n("Push aborted.")
+        push_result = create_push_result(br_from, br_to)
     else:
-        br_to.revision_history()
-        try:
-            tree_to = dir_to.open_workingtree()
-        except errors.NotLocalUrl:
-            # FIXME - what to do here? how should we warn the user?
-            count = br_to.pull(br_from, overwrite)
-        except errors.NoWorkingTree:
-            count = br_to.pull(br_from, overwrite)
-        else:
-            count = tree_to.pull(br_from, overwrite)
+        push_result = dir_to.push_branch(br_from, revision_id, overwrite)
+    message = create_push_message(br_from, push_result)
+    return message
 
-    # The count var is either an int or a PushResult. PushResult is being
-    # coerced into an int, but the method is deprecated.
-    return _i18n("%d revision(s) pushed.") % int(count)
+
+def create_push_message(br_from, push_result):
+    """Return a mesage explaining what happened during the push."""
+    messages = []
+    rev_count = br_from.revno() - push_result.old_revno
+    messages.append(_i18n("%d revision(s) pushed.") % rev_count)
+    if push_result.stacked_on is not None:
+        messages.append(_i18n("Stacked on %s.") % push_result.stacked_on)
+    if push_result.workingtree_updated is False:
+        messages.append(_i18n(
+            "\nThe working tree was not updated:"
+            "\nSee 'bzr help working-trees' for more information."))
+    return '\n'.join(messages)
+
+
+def create_push_result(br_from, br_to):
+    """Return a PushResult like one created by ControlDir.push_branch()."""
+    push_result = PushResult()
+    push_result.source_branch = br_from
+    push_result.target_branch = br_to
+    push_result.branch_push_result = None
+    push_result.master_branch = None
+    push_result.old_revno = 0
+    push_result.old_revid = br_to.last_revision()
+    push_result.workingtree_updated = None  # Not applicable to this case.
+    try:
+        push_result.stacked_on = br_to.get_stacked_on_url()
+    except (errors.UnstackableBranchFormat,
+            errors.UnstackableRepositoryFormat,
+            errors.NotStacked):
+        push_result.stacked_on = None
+    return push_result

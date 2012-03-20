@@ -133,3 +133,98 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
             (branch, 'lp:~user/fnord/test'), push.do_push.args)
         self.assertEqual(
             {'overwrite': True}, push.do_push.kwargs)
+
+
+class DoPushTestCase(tests.TestCaseWithTransport):
+
+    def setup_ui(self):
+        set_ui_factory()
+        progress_panel = ProgressPanel()
+        ui.ui_factory.set_progress_bar_widget(progress_panel)
+        MockMethod.bind(self, progress_panel.pb, 'tick')
+        MockMethod.bind(self, progress_panel.pb, 'update')
+        MockMethod.bind(self, progress_panel.pb, 'finished')
+        return progress_panel
+
+    def make_from_branch(self):
+        from_tree = self.make_branch_and_tree('this')
+        self.build_tree(['this/a', 'this/b'])
+        from_tree.add(['a', 'b'])
+        from_tree.commit("msg")
+        return from_tree.branch
+
+    def test_do_push_without_dir(self):
+        progress_panel = self.setup_ui()
+        from_branch = self.make_from_branch()
+        message = push.do_push(from_branch, 'that', False)
+        self.assertEqual('1 revision(s) pushed.', message)
+        self.assertEqual(True, progress_panel.pb.update.called)
+        self.assertEqual(True, progress_panel.pb.finished.called)
+
+    def test_do_push_without_parent_dir(self):
+        progress_panel = self.setup_ui()
+        from_branch = self.make_from_branch()
+        MockMethod.bind(self, push, 'question_dialog', Gtk.ResponseType.OK)
+        message = push.do_push(from_branch, 'that/there', False)
+        self.assertEqual('1 revision(s) pushed.', message)
+        self.assertEqual(True, push.question_dialog.called)
+        self.assertEqual(True, progress_panel.pb.update.called)
+        self.assertEqual(True, progress_panel.pb.finished.called)
+
+    def test_do_push_without_parent_dir_aborted(self):
+        self.setup_ui()
+        from_branch = self.make_from_branch()
+        MockMethod.bind(self, push, 'question_dialog', Gtk.ResponseType.CANCEL)
+        message = push.do_push(from_branch, 'that/there', False)
+        self.assertEqual('Push aborted.', message)
+
+    def test_do_push_with_dir(self):
+        progress_panel = self.setup_ui()
+        self.make_branch_and_tree('that')
+        from_branch = self.make_from_branch()
+        message = push.do_push(from_branch, 'that', False)
+        self.assertEqual('1 revision(s) pushed.', message)
+        self.assertEqual(True, progress_panel.pb.update.called)
+        self.assertEqual(True, progress_panel.pb.finished.called)
+
+    def test_create_push_result_unstacked(self):
+        from_branch = object()
+        to_branch = self.make_branch_and_tree('that').branch
+        push_result = push.create_push_result(from_branch, to_branch)
+        self.assertIs(from_branch, push_result.source_branch)
+        self.assertIs(to_branch, push_result.target_branch)
+        self.assertIs(None, push_result.branch_push_result)
+        self.assertIs(None, push_result.master_branch)
+        self.assertEqual(0, push_result.old_revno)
+        self.assertEqual(to_branch.last_revision(), push_result.old_revid)
+        self.assertIs(None, push_result.workingtree_updated)
+        self.assertIs(None, push_result.stacked_on)
+
+    def test_create_push_result_stacked(self):
+        from_branch = object()
+        to_branch = self.make_branch_and_tree('that').branch
+        MockMethod.bind(self, to_branch, 'get_stacked_on_url', 'lp:project')
+        push_result = push.create_push_result(from_branch, to_branch)
+        self.assertEqual('lp:project', push_result.stacked_on)
+
+    def test_create_push_message_stacked_on(self):
+        from_branch = object()
+        to_branch = self.make_branch_and_tree('that').branch
+        MockMethod.bind(self, to_branch, 'get_stacked_on_url', 'lp:project')
+        push_result = push.create_push_result(from_branch, to_branch)
+        from_branch = self.make_from_branch()
+        message = push.create_push_message(from_branch, push_result)
+        self.assertEqual(
+            '1 revision(s) pushed.\nStacked on lp:project.', message)
+
+    def test_create_push_message_workingtree_updated_false(self):
+        from_branch = object()
+        to_branch = self.make_branch_and_tree('that').branch
+        push_result = push.create_push_result(from_branch, to_branch)
+        push_result.workingtree_updated = False
+        from_branch = self.make_from_branch()
+        message = push.create_push_message(from_branch, push_result)
+        self.assertEqual(
+            "1 revision(s) pushed.\n\nThe working tree was not updated:\n"
+            "See 'bzr help working-trees' for more information.",
+            message)
