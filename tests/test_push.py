@@ -45,8 +45,8 @@ class PushTestCase(tests.TestCaseWithMemoryTransport):
         dialog = push.PushDialog(
             repository=None, revid=None, branch=branch, parent=None)
         self.assertIs(None, dialog.props.parent)
-        self.assertIs(None, dialog.repository)
-        self.assertIs(None, dialog.revid)
+        self.assertIs(branch.repository, dialog.repository)
+        self.assertIs(branch.last_revision(), dialog.revid)
         self.assertIs(branch, dialog.branch)
         # Layout rules to match HIG.
         self.assertIsInstance(dialog._label_location, Gtk.Label)
