@@ -30,6 +30,7 @@ from bzrlib import (
     tsort,
     )
 from bzrlib.plugins.gtk.dialog import question_dialog
+from bzrlib.plugins.gtk.diff import DiffView
 from bzrlib.plugins.gtk.errors import show_bzr_error
 from bzrlib.plugins.gtk.i18n import _i18n
 from bzrlib.plugins.gtk.commitmsgs import SavedCommitMessagesManager
@@ -559,8 +560,6 @@ class CommitDialog(Gtk.Dialog):
                                              Gtk.CellRendererText(), text=3))
 
     def _construct_diff_view(self):
-        from bzrlib.plugins.gtk.diff import DiffView
-
         # TODO: jam 2007-10-30 The diff label is currently disabled. If we
         #       decide that we really don't ever want to display it, we should
         #       actually remove it, and other references to it, along with the
@@ -575,6 +574,12 @@ class CommitDialog(Gtk.Dialog):
         self._add_to_right_table(self._diff_view, 4, True)
         self._diff_view.show()
 
+    @staticmethod
+    def get_line_height(widget):
+        pango_layout = widget.create_pango_layout("X");
+        ink_rectangle, logical_rectangle = pango_layout.get_pixel_extents()
+        return logical_rectangle.height
+
     def _construct_file_message(self):
         scroller = Gtk.ScrolledWindow()
         scroller.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
@@ -587,6 +592,8 @@ class CommitDialog(Gtk.Dialog):
         self._file_message_text_view.modify_font(Pango.FontDescription("Monospace"))
         self._file_message_text_view.set_wrap_mode(Gtk.WrapMode.WORD)
         self._file_message_text_view.set_accepts_tab(False)
+        line_height = self.get_line_height(self._file_message_text_view)
+        self._file_message_text_view.set_size_request(-1, line_height * 2)
         self._file_message_text_view.show()
 
         self._file_message_expander = Gtk.Expander(

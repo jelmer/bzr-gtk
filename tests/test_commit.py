@@ -235,6 +235,13 @@ class TestCommitDialogSimple(tests.TestCaseWithTransport):
         dlg._on_treeview_files_cursor_changed(treeview)
         self.assertFalse(CommitDialogNoWidgets._update_per_file_info.called)
 
+    def test_get_line_height(self):
+        tree = self.make_branch_and_tree('tree')
+        dlg = CommitDialogNoWidgets(tree)
+        textview = Gtk.TextView()
+        line_height = dlg.get_line_height(textview)
+        self.assertIsInstance(line_height, int)
+
 
 class TestCommitDialog(tests.TestCaseWithTransport):
 
