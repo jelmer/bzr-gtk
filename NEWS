@@ -11,6 +11,8 @@
   * Ignore bzr-handle-patch.desktop in sofware center.
     (Jelmer Vernooij, #854245)
 
+  * Fix searching in tree views. (Jelmer Vernooij, #928301)
+
 0.103.0	2011-12-11
 
  FEATURES

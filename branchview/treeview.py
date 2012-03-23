@@ -354,7 +354,7 @@ class TreeView(Gtk.VBox):
         # from the key (that is the key is found in a REVNO at the offset 0)
         # or if a MESSAGE *contains* the key anywhere (that is, the key is
         # found case insensitively in a MESSAGE at any offset)
-        def search_equal_func(model, column, key, iter):
+        def search_equal_func(model, column, key, iter, ignored):
             return (model.get_value(iter, treemodel.REVNO).find(key) != 0
                 and model.get_value(iter, treemodel.MESSAGE).lower().find(key.lower()) == -1)
 
