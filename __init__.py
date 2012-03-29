@@ -53,9 +53,6 @@ if getattr(sys, "frozen", None) is not None: # we run bzr.exe
 
 import bzrlib
 import bzrlib.api
-from bzrlib import (
-    config,
-    )
 from bzrlib.commands import plugin_cmds
 
 from bzrlib.plugins.gtk.info import (
@@ -144,11 +141,19 @@ else:
     install_lazy_named_hook("bzrlib.branch", "Branch.hooks",
         'post_uncommit', save_commit_messages, "Saving commit messages for gcommit")
 
+try:
+    from bzrlib.registry import register_lazy
+except ImportError:
+    from bzrlib import config
+    option_registry = getattr(config, "option_registry", None)
+    if option_registry is not None:
+        config.option_registry.register_lazy('nautilus_integration',
+                'bzrlib.plugins.gtk.config', 'opt_nautilus_integration')
+else:
+    register_lazy("bzrlib.config", "option_registry",
+        'nautilus_integration', 'bzrlib.plugins.gtk.config',
+        'opt_nautilus_integration')
 
-option_registry = getattr(config, "option_registry", None)
-if option_registry is not None:
-    config.option_registry.register_lazy('nautilus_integration',
-            'bzrlib.plugins.gtk.config', 'opt_nautilus_integration')
 
 def load_tests(basic_tests, module, loader):
     testmod_names = [
