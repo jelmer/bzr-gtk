@@ -13,6 +13,12 @@
 
   * Fix searching in tree views. (Jelmer Vernooij, #928301)
 
+ CHANGES
+
+  * bzr-notify has been removed, as it was causing regressions
+    on several machines and not particularly useful.
+    (Jelmer Vernooij, #714767, #949798, #998994, #342135, #342136, #394536)
+
 0.103.0	2011-12-11
 
  FEATURES

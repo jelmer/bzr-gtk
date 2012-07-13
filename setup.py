@@ -148,7 +148,7 @@ if __name__ == '__main__':
         maintainer_email="jelmer@samba.org",
         description="GTK+ Frontends for various Bazaar commands",
         license="GNU GPL v2 or later",
-        scripts=['bzr-handle-patch', 'bzr-notify'],
+        scripts=['bzr-handle-patch'],
         url="http://bazaar-vcs.org/BzrGtk",
         package_dir={
             "bzrlib.plugins.gtk": ".",
@@ -188,8 +188,7 @@ if __name__ == '__main__':
                     # In case Python distutils extra is not available,
                     # install the .desktop files
                     ('share/applications', ['bazaar-properties.desktop',
-                                            'bzr-handle-patch.desktop',
-                                            'bzr-notify.desktop']),
+                                            'bzr-handle-patch.desktop']),
                     ('share/application-registry', ['bzr-gtk.applications']),
                     ('share/pixmaps', ['icons/bzr-icon-64.png']),
                     ('share/icons/hicolor/scalable/apps',

@@ -19,7 +19,6 @@ from gi.repository import Gtk
 from bzrlib.config import GlobalConfig
 from bzrlib.plugins.gtk.preferences.identity import IdentityPage
 from bzrlib.plugins.gtk.preferences.plugins import PluginsPage
-from bzrlib.plugins.gtk.preferences.notifications import NotificationsPage
 
 class PreferencesWindow(Gtk.Dialog):
     """Displays global preferences windows."""
@@ -55,8 +54,7 @@ class PreferencesWindow(Gtk.Dialog):
 
     def _create_pages(self):
         return [("Identity", IdentityPage(self.config)),
-                ("Plugins", PluginsPage()),
-                ("Notifications", NotificationsPage(self.config))]
+                ("Plugins", PluginsPage())]
 
     def display(self):
         self.window.show_all()
