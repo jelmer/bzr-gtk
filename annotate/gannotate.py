@@ -279,19 +279,23 @@ class GAnnotateWindow(Window):
         cell.set_property("xalign", 1.0)
         cell.set_property("ypad", 0)
         cell.set_property("family", "Monospace")
-        cell.set_property("cell-background-gdk",
-                          tv.get_style().bg[Gtk.StateType.NORMAL])
+        cell.set_property(
+            "cell-background-rgba",
+            tv.get_style_context().get_background_color(Gtk.StateType.NORMAL))
         col = Gtk.TreeViewColumn()
         col.set_resizable(False)
         col.pack_start(cell, True)
         col.add_attribute(cell, "text", LINE_NUM_COL)
         tv.append_column(col)
 
+        style_context = self.get_style_context()
+
         cell = Gtk.CellRendererText()
         cell.set_property("ypad", 0)
         cell.set_property("ellipsize", Pango.EllipsizeMode.END)
-        cell.set_property("cell-background-gdk",
-                          self.get_style().bg[Gtk.StateType.NORMAL])
+        cell.set_property(
+            "cell-background-rgba",
+            style_context.get_background_color(Gtk.StateType.NORMAL))
         col = Gtk.TreeViewColumn("Committer")
         col.set_resizable(True)
         col.pack_start(cell, True)
@@ -301,8 +305,9 @@ class GAnnotateWindow(Window):
         cell = Gtk.CellRendererText()
         cell.set_property("xalign", 1.0)
         cell.set_property("ypad", 0)
-        cell.set_property("cell-background-gdk",
-                          self.get_style().bg[Gtk.StateType.NORMAL])
+        cell.set_property(
+            "cell-background-rgba",
+            style_context.get_background_color(Gtk.StateType.NORMAL))
         col = Gtk.TreeViewColumn("Revno")
         col.set_resizable(False)
         col.pack_start(cell, True)
