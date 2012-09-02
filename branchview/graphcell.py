@@ -90,7 +90,8 @@ class CellRendererGraph(Gtk.CellRendererPixbuf):
             return self._box_size
         except AttributeError:
             pango_ctx = widget.get_pango_context()
-            font_desc = widget.get_style().font_desc
+            font_desc = widget.get_style_context().get_font(
+                Gtk.StateType.NORMAL)
             metrics = pango_ctx.get_metrics(font_desc, None)
             ascent = PANGO_PIXELS(metrics.get_ascent())
             descent = PANGO_PIXELS(metrics.get_descent())
