@@ -1,4 +1,4 @@
-# Copyright (C) 2006 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
+# Copyright (C) 2011, 2013 by Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -35,10 +35,11 @@ class SavedCommitMessagesManager(object):
         else:
             config = branch.get_config()
             self.global_message = config.get_user_option(
-                'gtk_global_commit_message')
+                'gtk_global_commit_message', expand=False)
             if self.global_message is None:
                 self.global_message = u''
-            file_messages = config.get_user_option('gtk_file_commit_messages')
+            file_messages = config.get_user_option(
+                'gtk_file_commit_messages' , expand=False)
             if file_messages: # unicode and B-encoded:
                 self.file_messages = bencode.bdecode(
                     file_messages.encode('UTF-8'))

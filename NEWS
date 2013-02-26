@@ -13,6 +13,10 @@
 
   * Fix searching in tree views. (Jelmer Vernooij, #928301)
 
+  * Don't try to expand options in commit messages. They've been saved from
+    previous commits and won't ever contain option references.
+    (Vincent Ladeuil, #1132719)
+
  CHANGES
 
   * bzr-notify has been removed, as it was causing regressions
