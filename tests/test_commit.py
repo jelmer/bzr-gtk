@@ -1,4 +1,4 @@
-# Copyright (C) 2007, 2008 John Arbash Meinel <john@arbash-meinel.com>
+# Copyright (C) 2007, 2008, 2009, 2011, 2012, 2013 John Arbash Meinel <john@arbash-meinel.com>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1185,8 +1185,10 @@ class TestSavedCommitMessages(tests.TestCaseWithTransport):
             'post_uncommit', commitmsgs.save_commit_messages, None)
 
     def _get_file_info_dict(self, rank):
-        file_info = [dict(path='a', file_id='a-id', message='a msg %d' % rank),
-                     dict(path='b', file_id='b-id', message='b msg %d' % rank)]
+        file_info = [dict(path='a', file_id='a-id',
+                          message='a {msg} %d' % rank),
+                     dict(path='b', file_id='b-id',
+                          message='b msg %d' % rank)]
         return file_info
 
     def _get_file_info_revprops(self, rank):
@@ -1194,10 +1196,12 @@ class TestSavedCommitMessages(tests.TestCaseWithTransport):
         return {'file-info': bencode.bencode(file_info_prop).decode('UTF-8')}
 
     def _get_commit_message(self):
-        return self.config.get_user_option('gtk_global_commit_message')
+        return self.config.get_user_option(
+            'gtk_global_commit_message', expand=False)
 
     def _get_file_commit_messages(self):
-        return self.config.get_user_option('gtk_file_commit_messages')
+        return self.config.get_user_option(
+            'gtk_file_commit_messages', expand=False)
 
 
 class TestUncommitHook(TestSavedCommitMessages):
@@ -1219,29 +1223,31 @@ class TestUncommitHook(TestSavedCommitMessages):
     def test_uncommit_one_by_one(self):
         uncommit.uncommit(self.tree.branch, tree=self.tree)
         self.assertEquals(u'three', self._get_commit_message())
-        self.assertEquals(u'd4:a-id7:a msg 34:b-id7:b msg 3e',
+        self.assertEquals(u'd4:a-id9:a {msg} 34:b-id7:b msg 3e',
                           self._get_file_commit_messages())
 
         uncommit.uncommit(self.tree.branch, tree=self.tree)
         self.assertEquals(u'two\n******\nthree', self._get_commit_message())
-        self.assertEquals(u'd4:a-id22:a msg 2\n******\na msg 3'
+        self.assertEquals(u'd4:a-id26:a {msg} 2\n******\na {msg} 3'
                           '4:b-id22:b msg 2\n******\nb msg 3e',
                           self._get_file_commit_messages())
 
         uncommit.uncommit(self.tree.branch, tree=self.tree)
         self.assertEquals(u'one\n******\ntwo\n******\nthree',
                           self._get_commit_message())
-        self.assertEquals(u'd4:a-id37:a msg 1\n******\na msg 2\n******\na msg 3'
-                          '4:b-id37:b msg 1\n******\nb msg 2\n******\nb msg 3e',
-                          self._get_file_commit_messages())
+        self.assertEquals(
+            u'd4:a-id43:a {msg} 1\n******\na {msg} 2\n******\na {msg} 3'
+            '4:b-id37:b msg 1\n******\nb msg 2\n******\nb msg 3e',
+            self._get_file_commit_messages())
 
     def test_uncommit_all_at_once(self):
         uncommit.uncommit(self.tree.branch, tree=self.tree, revno=1)
         self.assertEquals(u'one\n******\ntwo\n******\nthree',
                           self._get_commit_message())
-        self.assertEquals(u'd4:a-id37:a msg 1\n******\na msg 2\n******\na msg 3'
-                          '4:b-id37:b msg 1\n******\nb msg 2\n******\nb msg 3e',
-                          self._get_file_commit_messages())
+        self.assertEquals(
+            u'd4:a-id43:a {msg} 1\n******\na {msg} 2\n******\na {msg} 3'
+            '4:b-id37:b msg 1\n******\nb msg 2\n******\nb msg 3e',
+            self._get_file_commit_messages())
 
 
 class TestReusingSavedCommitMessages(TestSavedCommitMessages, QuestionHelpers):
@@ -1255,7 +1261,8 @@ class TestReusingSavedCommitMessages(TestSavedCommitMessages, QuestionHelpers):
         self.tree.add(['a'], ['a-id'])
         self.tree.add(['b'], ['b-id'])
         rev1 = self.tree.commit('one', revprops=self._get_file_info_revprops(1))
-        rev2 = self.tree.commit('two', revprops=self._get_file_info_revprops(2))
+        rev2 = self.tree.commit('two{x}',
+                                revprops=self._get_file_info_revprops(2))
         uncommit.uncommit(self.tree.branch, tree=self.tree)
         self.build_tree_contents([('tree/a', 'new a content\n'),
                                   ('tree/b', 'new b content'),])
@@ -1270,16 +1277,16 @@ class TestReusingSavedCommitMessages(TestSavedCommitMessages, QuestionHelpers):
 
     def test_setup_saved_messages(self):
         # Check the initial setup
-        self.assertEquals(u'two', self._get_commit_message())
-        self.assertEquals(u'd4:a-id7:a msg 24:b-id7:b msg 2e',
+        self.assertEquals(u'two{x}', self._get_commit_message())
+        self.assertEquals(u'd4:a-id9:a {msg} 24:b-id7:b msg 2e',
                           self._get_file_commit_messages())
 
     def test_messages_are_reloaded(self):
         dlg = self._get_commit_dialog(self.tree)
-        self.assertEquals(u'two', dlg._get_global_commit_message())
+        self.assertEquals(u'two{x}', dlg._get_global_commit_message())
         self.assertEquals(([u'a', u'b'],
                            [{ 'path': 'a',
-                             'file_id': 'a-id', 'message': 'a msg 2',},
+                             'file_id': 'a-id', 'message': 'a {msg} 2',},
                            {'path': 'b',
                             'file_id': 'b-id', 'message': 'b msg 2',}],),
                           dlg._get_specific_files())
@@ -1294,8 +1301,8 @@ class TestReusingSavedCommitMessages(TestSavedCommitMessages, QuestionHelpers):
         dlg = self._get_commit_dialog(self.tree)
         self._set_question_yes(dlg) # Save messages
         dlg._do_cancel()
-        self.assertEquals(u'two', self._get_commit_message())
-        self.assertEquals(u'd4:a-id7:a msg 24:b-id7:b msg 2e',
+        self.assertEquals(u'two{x}', self._get_commit_message())
+        self.assertEquals(u'd4:a-id9:a {msg} 24:b-id7:b msg 2e',
                           self._get_file_commit_messages())
 
     def test_messages_are_cleared_on_cancel_if_required(self):
